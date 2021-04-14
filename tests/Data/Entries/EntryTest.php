@@ -20,7 +20,6 @@ use Statamic\Sites\Site;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
-use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -765,6 +764,8 @@ class EntryTest extends TestCase
             ->data([
                 'title' => 'The title',
                 'array' => ['first one', 'second one'],
+                'null' => null,      // this...
+                'empty' => [], // and this should get stripped out because it's the root. there's no origin to fall back to.
                 'content' => 'The content',
             ]);
 
@@ -777,7 +778,44 @@ class EntryTest extends TestCase
             'id' => '123',
             'published' => false,
             'content' => 'The content',
-        ], Arr::removeNullValues($entry->fileData()));
+        ], $entry->fileData());
+    }
+
+    /** @test */
+    public function it_gets_file_contents_for_saving_a_localized_entry()
+    {
+        $originEntry = $this->mock(Entry::class);
+        $originEntry->shouldReceive('id')->andReturn('123');
+
+        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+
+        $entry = (new Entry)
+            ->id('456')
+            ->origin('123')
+            ->slug('test')
+            ->date('2018-01-01')
+            ->published(false)
+            ->data([
+                'title' => 'The title',
+                'array' => ['first one', 'second one'],
+                'null' => null,      // this...
+                'empty' => [], // and this should not get stripped out, otherwise it would fall back to the origin.
+                'content' => 'The content',
+            ]);
+
+        $this->assertEquals([
+            'title' => 'The title',
+            'array' => [
+                'first one',
+                'second one',
+            ],
+            'null' => null,
+            'empty' => [],
+            'id' => '456',
+            'origin' => '123',
+            'published' => false,
+            'content' => 'The content',
+        ], $entry->fileData());
     }
 
     /** @test */
