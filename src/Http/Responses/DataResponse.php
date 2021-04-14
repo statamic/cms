@@ -145,7 +145,7 @@ class DataResponse implements Responsable
             ->render();
 
         if ($this->isLivePreview()) {
-           $contents = $this->versionJavascriptModules($contents);
+            $contents = $this->versionJavascriptModules($contents);
         }
 
         return $contents;
@@ -192,8 +192,8 @@ class DataResponse implements Responsable
     {
         $sufix = 't='.(microtime(true) * 10000);
 
-        return preg_replace_callback('~<script[^>]*type=("|\')module\1[^>]*>~i', function($scriptMatches) use ($sufix) {
-            return preg_replace_callback('~src=("|\')(.*?)\1~i', function($matches) use ($sufix) {
+        return preg_replace_callback('~<script[^>]*type=("|\')module\1[^>]*>~i', function ($scriptMatches) use ($sufix) {
+            return preg_replace_callback('~src=("|\')(.*?)\1~i', function ($matches) use ($sufix) {
                 $quote = $matches[1];
                 $url = $matches[2];
 
