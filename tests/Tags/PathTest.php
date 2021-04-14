@@ -170,6 +170,32 @@ class PathTest extends TestCase
     }
 
     /** @test */
+    public function it_outputs_datas_url_if_not_providing_a_url()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('en')->andReturnSelf();
+        $entry->shouldReceive('url')->andReturn('/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('/test', $this->tag('{{ path to="123" }}'));
+        $this->assertEquals('/test', $this->tag('{{ path to="123" absolute="false" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_datas_url_for_a_specific_site_if_not_providing_a_url()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnSelf();
+        $entry->shouldReceive('url')->andReturn('/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('/test', $this->tag('{{ path to="123" in="fr" }}'));
+        $this->assertEquals('/test', $this->tag('{{ path to="123" in="fr" absolute="false" }}'));
+    }
+
+    /** @test */
     public function it_outputs_datas_absolute_url_if_not_providing_a_url()
     {
         $entry = $this->mock(Entry::class);
@@ -178,7 +204,7 @@ class PathTest extends TestCase
 
         Data::shouldReceive('find')->with('123')->andReturn($entry);
 
-        $this->assertEquals('http://example.com/test', $this->tag('{{ path to="123" }}'));
+        $this->assertEquals('http://example.com/test', $this->tag('{{ path to="123" absolute="true" }}'));
     }
 
     /** @test */
@@ -190,6 +216,6 @@ class PathTest extends TestCase
 
         Data::shouldReceive('find')->with('123')->andReturn($entry);
 
-        $this->assertEquals('http://example.com/test', $this->tag('{{ path to="123" in="fr" }}'));
+        $this->assertEquals('http://example.com/test', $this->tag('{{ path to="123" in="fr" absolute="true" }}'));
     }
 }

@@ -10,9 +10,9 @@ class Link extends Path
     public function wildcard($method)
     {
         if ($data = Data::find($method)) {
-            return $data
-                ->in($this->params->get('in', Site::current()->handle()))
-                ->absoluteUrl();
+            $data = $data->in($this->params->get('in', Site::current()->handle()));
+
+            return $this->params->bool('absolute', false) ? $data->absoluteUrl() : $data->url();
         }
     }
 }

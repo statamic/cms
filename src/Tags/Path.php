@@ -23,14 +23,15 @@ class Path extends Tags
         }
 
         $site = Site::current();
+        $absolute = $this->params->bool('absolute', false);
 
         if (! Str::isUrl($src) && ($data = Data::find($src))) {
-            return $data
-                ->in($this->params->get('in', $site->handle()))
-                ->absoluteUrl();
+            $data = $data->in($this->params->get('in', $site->handle()));
+
+            return $absolute ? $data->absoluteUrl() : $data->url();
         }
 
-        $url = $this->params->bool('absolute', false)
+        $url = $absolute
             ? $site->absoluteUrl().'/'.$src
             : URL::makeRelative($site->url()).'/'.$src;
 
