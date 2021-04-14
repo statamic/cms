@@ -47,9 +47,15 @@ trait ExistsAsFile
             return YAML::dump($data);
         }
 
-        $content = array_pull($data, 'content');
+        if (! Arr::has($data, 'content')) {
+            return YAML::dumpFrontMatter($data);
+        }
 
-        return YAML::dumpFrontMatter($data, $content);
+        $content = $data['content'];
+
+        return $content === null
+            ? YAML::dump($data)
+            : YAML::dumpFrontMatter(Arr::except($data, 'content'), $content);
     }
 
     protected function shouldRemoveNullsFromFileData()
