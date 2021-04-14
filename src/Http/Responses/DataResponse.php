@@ -190,17 +190,17 @@ class DataResponse implements Responsable
 
     protected function versionJavascriptModules($contents)
     {
-        $sufix = 't='.(microtime(true) * 10000);
-
-        return preg_replace_callback('~<script[^>]*type=("|\')module\1[^>]*>~i', function ($scriptMatches) use ($sufix) {
-            return preg_replace_callback('~src=("|\')(.*?)\1~i', function ($matches) use ($sufix) {
+        return preg_replace_callback('~<script[^>]*type=("|\')module\1[^>]*>~i', function ($scriptMatches) {
+            return preg_replace_callback('~src=("|\')(.*?)\1~i', function ($matches) {
                 $quote = $matches[1];
                 $url = $matches[2];
 
+                $parameter = 't='.(microtime(true) * 10000);
+
                 if (Str::contains($url, '?')) {
-                    $url = str_replace('?', "?$sufix&", $url);
+                    $url = str_replace('?', "?$parameter&", $url);
                 } else {
-                    $url .= "?$sufix";
+                    $url .= "?$parameter";
                 }
 
                 return 'src='.$quote.$url.$quote;
