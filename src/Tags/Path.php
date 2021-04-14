@@ -3,8 +3,10 @@
 namespace Statamic\Tags;
 
 use Statamic\Facades;
+use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class Path extends Tags
 {
@@ -21,6 +23,12 @@ class Path extends Tags
         }
 
         $site = Site::current();
+
+        if (! Str::isUrl($src) && ($data = Data::find($src))) {
+            return $data
+                ->in($this->params->get('in', $site->handle()))
+                ->absoluteUrl();
+        }
 
         $url = $this->params->bool('absolute', false)
             ? $site->absoluteUrl().'/'.$src
