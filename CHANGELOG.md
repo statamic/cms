@@ -1,5 +1,29 @@
 # Release Notes
 
+## 3.1.7 (2020-04-15)
+
+### What's new
+- The `link` and `path` tags can output URLs for entries, terms, etc. [#3530](https://github.com/statamic/cms/issues/3530)
+- You can customize the table names for storing users in a database. [#3278](https://github.com/statamic/cms/issues/3278)
+- Added a `urlWithoutRedirect` and `absoluteUrlWithoutRedirect` methods to entries and terms. [#3522](https://github.com/statamic/cms/issues/3522)
+
+### What's improved
+- Adjusted the UI for the site selector on the entry and term publish forms. [#3519](https://github.com/statamic/cms/issues/3519)
+
+### What's fixed
+- Localized entries can save empty values, which fixes not being able to override the values from the original entry. [#3531](https://github.com/statamic/cms/issues/3531)
+- Private entries can be viewed in Live Preview. [#3533](https://github.com/statamic/cms/issues/3533)
+- Fix the site being used in Live Preview. [#3534](https://github.com/statamic/cms/issues/3534)
+- Fix JavaScript modules only loading one time in Live Preview. [#3524](https://github.com/statamic/cms/issues/3524)
+- The `text` fieldtype, when using number mode will prevent an empty value being saved as `0`. [#3536](https://github.com/statamic/cms/issues/3536)
+- It will also save integers or floats appropriately. [a18d6f639](https://github.com/statamic/cms/commit/a18d6f639)
+- Add border to selected non-image thumbnails in the asset browser. [#3525](https://github.com/statamic/cms/issues/3525)
+- Fix `is_parent` on nav tags when using first-child redirects. [#2359](https://github.com/statamic/cms/issues/2359)
+- The `permalink` variable on nav items with hardcoded URLs will now be converted to absolute URLs. [#3522](https://github.com/statamic/cms/issues/3522)
+- Fixed YAML exceptions sometimes showing the wrong file's contents. [#3515](https://github.com/statamic/cms/issues/3515)
+
+
+
 ## 3.1.6 (2020-04-12)
 
 ### What's new
