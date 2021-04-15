@@ -65,7 +65,7 @@ class Text extends Fieldtype
 
     public function process($data)
     {
-        if ($this->config('input_type') === 'number') {
+        if ($data !== null && $this->config('input_type') === 'number') {
             return (int) $data;
         }
 
