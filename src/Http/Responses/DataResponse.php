@@ -129,7 +129,13 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_if($this->data->private(), new NotFoundHttpException);
+        if (! $this->isLivePreview() && $this->data->private()) {
+            throw new NotFoundHttpException;
+        }
+
+        if ($this->isLivePreview()) {
+            $this->headers['X-Statamic-Private'] = true;
+        }
 
         return $this;
     }
