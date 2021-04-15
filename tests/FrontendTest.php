@@ -10,7 +10,6 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 
 class FrontendTest extends TestCase
 {
@@ -206,13 +205,10 @@ class FrontendTest extends TestCase
     public function drafts_are_visible_if_using_live_preview()
     {
         $this->withStandardBlueprints();
-        $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
-        $user = User::make()->assignRole('draft_viewer');
 
         $this->createPage('about')->published(false)->set('content', 'Testing 123')->save();
 
         $response = $this
-            ->actingAs($user)
             ->get('/about', ['X-Statamic-Live-Preview' => true])
             ->assertStatus(200)
             ->assertHeader('X-Statamic-Draft', true);
