@@ -4,6 +4,7 @@ namespace Statamic\Http\Responses;
 
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Str;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -136,12 +137,18 @@ class DataResponse implements Responsable
 
     protected function contents()
     {
-        return (new View)
+        $contents = (new View)
             ->template($this->data->template())
             ->layout($this->data->layout())
             ->with($this->with)
             ->cascadeContent($this->data)
             ->render();
+
+        if ($this->isLivePreview()) {
+            $contents = $this->versionJavascriptModules($contents);
+        }
+
+        return $contents;
     }
 
     protected function cascade()
@@ -179,6 +186,26 @@ class DataResponse implements Responsable
     protected function isLivePreview()
     {
         return $this->request->headers->get('X-Statamic-Live-Preview');
+    }
+
+    protected function versionJavascriptModules($contents)
+    {
+        return preg_replace_callback('~<script[^>]*type=("|\')module\1[^>]*>~i', function ($scriptMatches) {
+            return preg_replace_callback('~src=("|\')(.*?)\1~i', function ($matches) {
+                $quote = $matches[1];
+                $url = $matches[2];
+
+                $parameter = 't='.(microtime(true) * 10000);
+
+                if (Str::contains($url, '?')) {
+                    $url = str_replace('?', "?$parameter&", $url);
+                } else {
+                    $url .= "?$parameter";
+                }
+
+                return 'src='.$quote.$url.$quote;
+            }, $scriptMatches[0]);
+        }, $contents);
     }
 
     public static function contentType($type)
