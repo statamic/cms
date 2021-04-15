@@ -74,7 +74,7 @@ class EntryPreviewController extends CpController
         Facade::clearResolvedInstance('request');
         Cascade::withRequest($subrequest);
         Cascade::withSite(Site::current());
-        app('translator')->setLocale(Site::current()->handle());
+        app('translator')->setLocale(Site::current()->shortLocale());
 
         try {
             $response = $entry->toLivePreviewResponse($subrequest, $request->extras);
@@ -90,7 +90,7 @@ class EntryPreviewController extends CpController
         Facade::clearResolvedInstance('request');
         Cascade::withRequest($request);
         Cascade::withSite(Site::current());
-        app('translator')->setLocale(Site::current()->handle());
+        app('translator')->setLocale(Site::current()->shortLocale());
 
         return $response;
     }
