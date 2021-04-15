@@ -160,11 +160,11 @@
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer hover:bg-grey-20"
-                                        :class="{ 'opacity-50': !option.active }"
+                                        class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer"
+                                        :class="option.active ? 'bg-blue-100' : 'opacity-50 hover:bg-grey-20'"
                                         @click="localizationSelected(option)"
                                     >
-                                        <div class="flex-1 flex items-center">
+                                        <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot mr-1" :class="{
                                                 'bg-green': option.published,
                                                 'bg-grey-50': !option.published,
