@@ -22,14 +22,15 @@ class TextTest extends TestCase
         $this->assertSame($values[0], $field->process('test'));
         $this->assertSame($values[1], $field->process('3'));
         $this->assertSame($values[2], $field->process('3test'));
-        $this->assertSame($values[3], $field->process(null));
+        $this->assertSame($values[3], $field->process('3.14'));
+        $this->assertSame($values[4], $field->process(null));
     }
 
     public function processValues()
     {
         return [
-            'text' => ['text', ['test', '3', '3test', null]],
-            'number' => ['number', [0, 3, 3, null]],
+            'text' => ['text', ['test', '3', '3test', '3.14', null]],
+            'number' => ['number', [0, 3, 3, 3.14, null]],
         ];
     }
 }
