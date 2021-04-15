@@ -113,13 +113,13 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        if (! $this->isLivePreview() && ! $this->data->published()) {
-            throw new NotFoundHttpException;
+        if ($this->data->published()) {
+            return $this;
         }
 
-        if ($this->isLivePreview()) {
-            $this->headers['X-Statamic-Draft'] = true;
-        }
+        throw_unless($this->isLivePreview(), new NotFoundHttpException);
+
+        $this->headers['X-Statamic-Draft'] = true;
 
         return $this;
     }
@@ -130,7 +130,13 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_if($this->data->private(), new NotFoundHttpException);
+        if (! $this->data->private()) {
+            return $this;
+        }
+
+        throw_unless($this->isLivePreview(), new NotFoundHttpException);
+
+        $this->headers['X-Statamic-Private'] = true;
 
         return $this;
     }

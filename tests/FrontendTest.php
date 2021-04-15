@@ -250,6 +250,29 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function future_private_entries_viewable_in_live_preview()
+    {
+        Carbon::setTestNow(Carbon::parse('2019-01-01'));
+        $this->withStandardFakeErrorViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRendered('default', 'The template contents');
+
+        tap($this->makeCollection()->dated(true)->futureDateBehavior('private'))->save();
+        tap($this->makePage('about')->date('2019-01-02'))->save();
+
+        $this
+            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->assertStatus(200)
+            ->assertHeader('X-Statamic-Private', true);
+    }
+
+    /** @test */
+    public function future_private_entries_dont_get_statically_cached()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
     public function past_private_entries_are_not_viewable()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-01'));
@@ -270,6 +293,29 @@ class FrontendTest extends TestCase
         $this
             ->get('/about')
             ->assertStatus(404);
+    }
+
+    /** @test */
+    public function past_private_entries_are_viewable_in_live_preview()
+    {
+        Carbon::setTestNow(Carbon::parse('2019-01-01'));
+        $this->withStandardFakeErrorViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRendered('default', 'The template contents');
+
+        tap($this->makeCollection()->dated(true)->pastDateBehavior('private'))->save();
+        tap($this->makePage('about')->date('2018-01-01'))->save();
+
+        $this
+            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->assertStatus(200)
+            ->assertHeader('X-Statamic-Private', true);
+    }
+
+    /** @test */
+    public function past_private_entries_dont_get_statically_cached()
+    {
+        $this->markTestIncomplete();
     }
 
     /** @test */
