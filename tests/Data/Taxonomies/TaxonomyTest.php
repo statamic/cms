@@ -6,7 +6,9 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
+use Statamic\Support\Arr;
 use Statamic\Taxonomies\Taxonomy;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -109,6 +111,20 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('/tags', $taxonomy->uri());
         $this->assertEquals('/tags', $taxonomy->url());
         $this->assertEquals('http://localhost/tags', $taxonomy->absoluteUrl());
+    }
+
+    /** @test */
+    public function it_gets_the_url_when_the_site_is_using_a_subdirectory()
+    {
+        $config = config('statamic.sites');
+        Arr::set($config, 'sites.en.url', '/subdirectory/');
+        Site::setConfig($config);
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $this->assertEquals('/tags', $taxonomy->uri());
+        $this->assertEquals('/subdirectory/tags', $taxonomy->url());
+        $this->assertEquals('http://localhost/subdirectory/tags', $taxonomy->absoluteUrl());
     }
 
     /** @test */
