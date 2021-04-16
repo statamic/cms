@@ -32,7 +32,7 @@ class Exporter
         }
 
         if (! $this->files->exists(base_path('starter-kit.yaml'))) {
-            throw new StarterKitException("Export config [starter-kit.yaml] does not exist.");
+            throw new StarterKitException('Export config [starter-kit.yaml] does not exist.');
         }
 
         $this->exportPath = $exportPath;
@@ -129,9 +129,9 @@ class Exporter
         $paths = collect($this->config()->get('export_paths'));
 
         if ($paths->isEmpty()) {
-            throw new StarterKitException("Export config [starter-kit.yaml] does not contain any export paths.");
+            throw new StarterKitException('Export config [starter-kit.yaml] does not contain any export paths.');
         } elseif ($paths->contains('composer.json')) {
-            throw new StarterKitException("Cannot export [composer.json]. Please use `dependencies` array!");
+            throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array!');
         }
 
         return $paths;
