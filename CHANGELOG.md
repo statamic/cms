@@ -1,5 +1,13 @@
 # Release Notes
 
+## 3.1.8 (2020-04-16)
+
+### What's fixed
+- Fix n+1 user group and role queries when storing users in the database. [#3527](https://github.com/statamic/cms/issues/3527)
+- Fix taxonomy not loading when your site has been configured with a subdirectory. [#3541](https://github.com/statamic/cms/issues/3541)
+
+
+
 ## 3.1.7 (2020-04-15)
 
 ### What's new
