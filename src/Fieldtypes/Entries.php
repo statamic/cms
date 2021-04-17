@@ -210,7 +210,7 @@ class Entries extends Relationship
             $value = $value->in($site);
         }
 
-        return $value && $value->published() ? $value : null;
+        return ($value && $value->status() === 'published') ? $value : null;
     }
 
     protected function shallowAugmentValue($value)
