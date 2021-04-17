@@ -106,6 +106,10 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
             return null;
         }
 
+        if ($cached = Blink::store('structure-entries')->get($this->reference)) {
+            return $cached;
+        }
+
         return $this->tree->entry($this->reference);
     }
 
