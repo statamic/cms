@@ -23,6 +23,7 @@ class EntriesTest extends TestCase
         $collection = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
         EntryFactory::id('123')->collection($collection)->slug('one')->data(['title' => 'One'])->create();
         EntryFactory::id('456')->collection($collection)->slug('two')->data(['title' => 'Two'])->create();
+        EntryFactory::id('789')->collection($collection)->slug('three')->data(['title' => 'Three'])->published(false)->create();
     }
 
     /** @test */
