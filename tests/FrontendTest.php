@@ -413,6 +413,23 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function disables_floc_through_header_by_default()
+    {
+        $this->createPage('about');
+
+        $this->get('about')->assertHeader('Permissions-Policy', 'interest-cohort=()');
+    }
+
+    /** @test */
+    public function doesnt_disable_floc_through_header_if_disabled()
+    {
+        config(['statamic.system.disable_floc' => false]);
+        $this->createPage('about');
+
+        $this->get('about')->assertHeaderMissing('Permissions-Policy', 'interest-cohort=()');
+    }
+
+    /** @test */
     public function headers_can_be_set_in_content()
     {
         $page = $this->createPage('about', ['with' => [
