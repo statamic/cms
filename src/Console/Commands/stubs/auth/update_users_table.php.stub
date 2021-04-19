@@ -1,0 +1,7 @@
+Schema::table('USERS_TABLE', function (Blueprint $table) {
+            $table->boolean('super')->default(false);
+            $table->string('avatar')->nullable();
+            $table->json('preferences')->nullable();
+            $table->timestamp('last_login')->nullable();
+            $table->string('password')->nullable()->change();
+        });

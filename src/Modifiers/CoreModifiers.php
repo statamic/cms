@@ -1468,6 +1468,29 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Plucks values from a collection of items.
+     *
+     * @param $value
+     * @param $params
+     * @param $context
+     * @return string
+     */
+    public function pluck($value, $params, $context)
+    {
+        $key = $params[0];
+
+        if ($wasArray = is_array($value)) {
+            $value = collect($value);
+        }
+
+        $items = $value->map(function ($item) use ($key) {
+            return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+        });
+
+        return $wasArray ? $items->all() : $items;
+    }
+
+    /**
      * Get the plural form of an English word with access to $context.
      *
      * @param $value

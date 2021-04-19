@@ -1,5 +1,67 @@
 # Release Notes
 
+## 3.1.9 (2020-04-19)
+
+### What's improved
+- Added header to disable Google's FLoC tracking by default. [#3545](https://github.com/statamic/cms/issues/3545)
+
+
+
+## 3.1.8 (2020-04-16)
+
+### What's fixed
+- Fix n+1 user group and role queries when storing users in the database. [#3527](https://github.com/statamic/cms/issues/3527)
+- Fix taxonomy not loading when your site has been configured with a subdirectory. [#3541](https://github.com/statamic/cms/issues/3541)
+
+
+
+## 3.1.7 (2020-04-15)
+
+### What's new
+- The `link` and `path` tags can output URLs for entries, terms, etc. [#3530](https://github.com/statamic/cms/issues/3530)
+- You can customize the table names for storing users in a database. [#3278](https://github.com/statamic/cms/issues/3278)
+- Added a `urlWithoutRedirect` and `absoluteUrlWithoutRedirect` methods to entries and terms. [#3522](https://github.com/statamic/cms/issues/3522)
+
+### What's improved
+- Adjusted the UI for the site selector on the entry and term publish forms. [#3519](https://github.com/statamic/cms/issues/3519)
+
+### What's fixed
+- Localized entries can save empty values, which fixes not being able to override the values from the original entry. [#3531](https://github.com/statamic/cms/issues/3531)
+- Private entries can be viewed in Live Preview. [#3533](https://github.com/statamic/cms/issues/3533)
+- Fix the site being used in Live Preview. [#3534](https://github.com/statamic/cms/issues/3534)
+- Fix JavaScript modules only loading one time in Live Preview. [#3524](https://github.com/statamic/cms/issues/3524)
+- The `text` fieldtype, when using number mode will prevent an empty value being saved as `0`. [#3536](https://github.com/statamic/cms/issues/3536)
+- It will also save integers or floats appropriately. [a18d6f639](https://github.com/statamic/cms/commit/a18d6f639)
+- Add border to selected non-image thumbnails in the asset browser. [#3525](https://github.com/statamic/cms/issues/3525)
+- Fix `is_parent` on nav tags when using first-child redirects. [#2359](https://github.com/statamic/cms/issues/2359)
+- The `permalink` variable on nav items with hardcoded URLs will now be converted to absolute URLs. [#3522](https://github.com/statamic/cms/issues/3522)
+- Fixed YAML exceptions sometimes showing the wrong file's contents. [#3515](https://github.com/statamic/cms/issues/3515)
+
+
+
+## 3.1.6 (2020-04-12)
+
+### What's new
+- Added a `pluck` modifier. [#3502](https://github.com/statamic/cms/issues/3502)
+- The `multisite` command lets you add more than one additional site. [#3302](https://github.com/statamic/cms/issues/3302)
+- Added a `max_depth` parameter to the `nav` tag. [#3513](https://github.com/statamic/cms/issues/3513)
+
+### What's improved
+- Updated French translations. [#3497](https://github.com/statamic/cms/issues/3497)
+- Gracefully handle incorrect-but-close-enough usage of `custom` field conditions. [73f941c5e](https://github.com/statamic/cms/commit/73f941c5e)
+
+### What's fixed
+- Fix taxonomy routing when using localization. [#3505](https://github.com/statamic/cms/issues/3505)
+- In the `search:results` tag, include `search_score`, and fix `result_type` when not supplementing data. [#3477](https://github.com/statamic/cms/issues/3477)
+- Preserve user defined defaults for new entries. [#3472](https://github.com/statamic/cms/issues/3472)
+- Prevent newly added navigation items being greyed out even if they're published. [#3510](https://github.com/statamic/cms/issues/3510)
+- Fix trailing slash on URLs which sometimes makes the asset browser not load. [#3504](https://github.com/statamic/cms/issues/3504)
+- Fix error in the `assets:generate-presets` command on older versions of Laravel. [#3511](https://github.com/statamic/cms/issues/3511)
+- Fix error wen `CarbonImmutable` is used app-wide. [#3499](https://github.com/statamic/cms/issues/3499)
+- Fix 404 error when URLs have both ending slash and query parameters. [#3494](https://github.com/statamic/cms/issues/3494)
+- Fix NaN and other glitches in the `time` fieldtype. [#3496](https://github.com/statamic/cms/issues/3496)
+
+
 ## 3.1.5 (2020-04-07)
 
 ### What's new

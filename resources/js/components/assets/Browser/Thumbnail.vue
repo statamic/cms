@@ -14,7 +14,7 @@
                 class="asset-thumbnail max-h-full max-w-full mx-auto rounded lazyload"
                 :class="{'w-8 h-8 fit-cover': square}"
                 />
-            <file-icon v-else :extension="asset.extension" class="h-full w-full p-1"></file-icon>
+            <file-icon v-else :extension="asset.extension" class="asset-thumbnail w-full h-full p-1 rounded"></file-icon>
         </template>
 
     </div>
