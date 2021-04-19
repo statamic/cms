@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.1.9 (2020-04-19)
+
+### What's improved
+- Added header to disable Google's FLoC tracking by default. [#3545](https://github.com/statamic/cms/issues/3545)
+
+
+
 ## 3.1.8 (2020-04-16)
 
 ### What's fixed
