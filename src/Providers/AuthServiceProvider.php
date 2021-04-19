@@ -2,7 +2,6 @@
 
 namespace Statamic\Providers;
 
-use Facades\Statamic\Auth\CorePermissions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
