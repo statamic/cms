@@ -158,7 +158,7 @@
 
                                 <template slot="actions" slot-scope="{ row: asset }">
                                     <dropdown-list>
-                                        <dropdown-item :text="__('Edit')" @click="edit(asset.id)" />
+                                        <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
@@ -225,6 +225,7 @@
         <asset-editor
             v-if="showAssetEditor"
             :id="editedAssetId"
+            :read-only="! canEdit"
             @closed="closeAssetEditor"
             @saved="assetSaved"
         />
@@ -331,9 +332,7 @@ export default {
         },
 
         canEdit() {
-            return true;
-            // TODO
-            // return this.can('assets:'+ this.container.id +':edit')
+            return this.can('assets:'+ this.container.id +':edit')
         },
 
         canUpload() {
@@ -502,9 +501,7 @@ export default {
         },
 
         edit(id) {
-            if (this.canEdit) {
-                this.editedAssetId = id;
-            }
+            this.editedAssetId = id;
         },
 
         closeAssetEditor() {
