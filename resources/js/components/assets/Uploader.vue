@@ -128,6 +128,14 @@ export default {
 
                     if (response.responseJSON) {
                         errMsg = response.responseJSON.message;
+                    } 
+
+                    if (! errMsg) {
+                        if (response.status === 413) {
+                            errMsg = __('File is too large');
+                        } else {
+                            errMsg = __('Something went wrong');    
+                        }
                     }
 
                     upload.errorMessage = errMsg;
