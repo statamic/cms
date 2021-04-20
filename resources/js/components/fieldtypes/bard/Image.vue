@@ -1,9 +1,9 @@
 <template>
 
     <div class="bard-inline-image-container">
-        <div ref="content" />
         <div v-if="src">
             <div class="p-1 text-center">
+                <div ref="content" hidden />
                 <img :src="src" class="block mx-auto" data-drag-handle />
             </div>
 
