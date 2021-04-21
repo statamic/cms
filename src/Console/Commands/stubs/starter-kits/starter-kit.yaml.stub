@@ -1,7 +1,7 @@
 # export_paths:
 #   - content
 #   - config/filesystems.php
-#   - config/statamic/assets.yphp
+#   - config/statamic/assets.php
 #   - public/assets
 #   - resources/blueprints
 #   - resources/css
