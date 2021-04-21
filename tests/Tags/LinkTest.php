@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use Statamic\Entries\Entry;
 use Statamic\Facades\Data;
 use Statamic\Facades\Parse;
 use Tests\TestCase;

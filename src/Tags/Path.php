@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Contracts\Data\Linkable;
+use Statamic\Contracts\Data\Localizable;
 use Statamic\Facades;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
@@ -25,8 +27,10 @@ class Path extends Tags
         $site = Site::current();
         $absolute = $this->params->bool('absolute', false);
 
-        if (! Str::isUrl($src) && ($data = Data::find($src))) {
-            $data = $data->in($this->params->get('in', $site->handle()));
+        if (! Str::isUrl($src) && ($data = Data::find($src)) && $data instanceof Linkable) {
+            if ($data instanceof Localizable) {
+                $data = $data->in($this->params->get('in', $site->handle()));
+            }
 
             return $absolute ? $data->absoluteUrl() : $data->url();
         }

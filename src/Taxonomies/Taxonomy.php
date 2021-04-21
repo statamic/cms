@@ -4,6 +4,7 @@ namespace Statamic\Taxonomies;
 
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Data\Linkable;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ContainsSupplementalData;
@@ -22,7 +23,7 @@ use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Taxonomy implements Contract, Responsable, AugmentableContract
+class Taxonomy implements Contract, Responsable, AugmentableContract, Linkable
 {
     use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
 

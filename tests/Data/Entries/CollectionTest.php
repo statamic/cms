@@ -504,6 +504,11 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_gets_the_uri_and_url_from_the_mounted_entry()
     {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/en/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+        ]]);
+
         $mount = $this->mock(Entry::class);
         $frenchMount = $this->mock(Entry::class);
         $mount->shouldReceive('in')->with('en')->andReturnSelf();
@@ -519,19 +524,25 @@ class CollectionTest extends TestCase
 
         $this->assertNull($collection->uri());
         $this->assertNull($collection->url());
+        $this->assertNull($collection->absoluteUrl());
         $this->assertNull($collection->uri('en'));
         $this->assertNull($collection->url('en'));
+        $this->assertNull($collection->absoluteUrl('en'));
         $this->assertNull($collection->uri('fr'));
         $this->assertNull($collection->url('fr'));
+        $this->assertNull($collection->absoluteUrl('fr'));
 
         $collection->mount('mounted');
 
         $this->assertEquals('/blog', $collection->uri());
         $this->assertEquals('/en/blog', $collection->url());
+        $this->assertEquals('http://domain.com/en/blog', $collection->absoluteUrl());
         $this->assertEquals('/blog', $collection->uri('en'));
         $this->assertEquals('/en/blog', $collection->url('en'));
+        $this->assertEquals('http://domain.com/en/blog', $collection->absoluteUrl('en'));
         $this->assertEquals('/le-blog', $collection->uri('fr'));
         $this->assertEquals('/fr/le-blog', $collection->url('fr'));
+        $this->assertEquals('http://domain.com/fr/le-blog', $collection->absoluteUrl('fr'));
     }
 
     /** @test */

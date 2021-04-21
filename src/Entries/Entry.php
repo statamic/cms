@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\Linkable;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
@@ -34,7 +35,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, Linkable
 {
     use Routable {
         uri as routableUri;

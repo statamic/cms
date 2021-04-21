@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Data\Linkable;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
@@ -20,12 +21,13 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Collection implements Contract, AugmentableContract
+class Collection implements Contract, AugmentableContract, Linkable
 {
     use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
 
@@ -180,6 +182,17 @@ class Collection implements Contract, AugmentableContract
         $site = $site ?? $this->sites()->first();
 
         return optional($mount->in($site))->uri();
+    }
+
+    public function absoluteUrl($site = null)
+    {
+        if (! $uri = $this->uri($site)) {
+            return null;
+        }
+
+        $site = $site ?? $this->sites()->first();
+
+        return URL::tidy(Site::get($site)->absoluteUrl().$uri);
     }
 
     public function showUrl()

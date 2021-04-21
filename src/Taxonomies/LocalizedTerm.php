@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\Linkable;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\HasAugmentedInstance;
@@ -21,7 +22,7 @@ use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
 
-class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
+class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Linkable
 {
     use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified, ContainsSupplementalData;
 
