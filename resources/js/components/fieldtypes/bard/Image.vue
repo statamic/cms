@@ -112,7 +112,7 @@ export default {
             this.assetId = src.substr(7);
         }
 
-        this.loadAsset(this.assetId);
+        this.loadAsset(this.assetId || src);
     },
 
     watch: {
@@ -171,6 +171,7 @@ export default {
 
         setAsset(asset) {
             this.asset = asset;
+            this.assetId = asset.id;
             this.alt = asset.alt || this.alt;
             this.loading = false;
             this.updateAttrs({ src: this.actualSrc });
