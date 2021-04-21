@@ -91,7 +91,7 @@
                         <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
-                    <div class="editor-file-actions">
+                    <div class="editor-file-actions" v-if="!readOnly">
                         <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="btn" @click.prevent="openFocalPointEditor">
                             {{ __('Set Focal Point') }}
                         </button>
@@ -131,10 +131,15 @@
 
                         <div class="editor-form-fields">
                             <div v-if="error" class="bg-red text-white p-2 shadow mb-2" v-text="error" />
-                            <publish-fields :fields="fields" @updated="setFieldValue" @meta-updated="setFieldMeta" />
+                            <publish-fields 
+                                :fields="fields"
+                                :read-only="readOnly"
+                                @updated="setFieldValue"
+                                @meta-updated="setFieldMeta"
+                            />
                         </div>
 
-                        <div class="editor-form-actions text-right">
+                        <div class="editor-form-actions text-right" v-if="!readOnly">
                             <button v-if="allowDeleting && canRunAction('delete')" type="button" class="btn-danger mr-1" @click="runAction('delete')">
                                 {{ __('Delete') }}
                             </button>
@@ -191,6 +196,9 @@ export default {
     props: {
         id: {
             required: true
+        },
+        readOnly: {
+            type: Boolean,
         },
         allowDeleting: {
             type: Boolean,
