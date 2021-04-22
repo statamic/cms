@@ -5,11 +5,13 @@ namespace Statamic\StarterKits;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
+use Statamic\Support\Str;
 
 class Exporter
 {
     protected $files;
     protected $exportPath;
+    protected $vendorName;
 
     /**
      * Instantiate starter kit exporter.
@@ -39,7 +41,7 @@ class Exporter
 
         $this
             ->exportFiles()
-            ->exportDependencies()
+            ->exportComposerJson()
             ->exportConfig();
     }
 
@@ -138,35 +140,68 @@ class Exporter
     }
 
     /**
-     * Export starter kit dependencies.
+     * Export composer.json.
      *
      * @return $this
      */
-    protected function exportDependencies()
+    protected function exportComposerJson()
+    {
+        $composerJson = array_merge(
+            $this->prepareComposerJsonFromStub(),
+            $this->prepareComposerJsonDependencies()
+        );
+
+        $this->files->put(
+            base_path("{$this->exportPath}/composer.json"),
+            json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Prepare composer.json from stub.
+     *
+     * @return array
+     */
+    protected function prepareComposerJsonFromStub()
+    {
+        $directory = preg_replace('/.*\/([^\/]*)/', '$1', $this->exportPath);
+        $vendorName = $this->vendorName ?? 'my-vendor-name';
+        $repoName = Str::slug($directory);
+        $package = "{$vendorName}/{$repoName}";
+        $title = Str::slugToTitle($repoName);
+
+        $stub = $this->files->get(__DIR__.'/../Console/Commands/stubs/starter-kits/composer.json.stub');
+        $stub = str_replace('dummy/package', $package, $stub);
+        $stub = str_replace('DummyTitle', $title, $stub);
+
+        return json_decode($stub, true);
+    }
+
+    /**
+     * Prepare composer.json dependencies.
+     *
+     * @return array
+     */
+    protected function prepareComposerJsonDependencies()
     {
         $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
 
         $originalRequire = $this->getExportableDependencies($composerJson, 'require');
         $originalRequireDev = $this->getExportableDependencies($composerJson, 'require-dev');
 
-        $exportComposerJson = [];
+        $dependencies = [];
 
         if ($originalRequire->isNotEmpty()) {
-            $exportComposerJson['require'] = $originalRequire->all();
+            $dependencies['require'] = $originalRequire->all();
         }
 
         if ($originalRequireDev->isNotEmpty()) {
-            $exportComposerJson['require-dev'] = $originalRequireDev->all();
+            $dependencies['require-dev'] = $originalRequireDev->all();
         }
 
-        if ($exportComposerJson) {
-            $this->files->put(
-                base_path("{$this->exportPath}/composer.json"),
-                json_encode($exportComposerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-            );
-        }
-
-        return $this;
+        return $dependencies;
     }
 
     /**

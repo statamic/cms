@@ -8,8 +8,11 @@ use Tests\TestCase;
 
 class ExportTest extends TestCase
 {
+    use Concerns\BacksUpComposerJson;
+
     protected $files;
     protected $configPath;
+    protected $exportPath;
 
     public function setUp(): void
     {
@@ -106,7 +109,7 @@ class ExportTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_export_opinionated_composer_json()
+    public function it_does_not_export_opinionated_app_composer_json()
     {
         $this->setExportPaths([
             'composer.json',
@@ -117,6 +120,31 @@ class ExportTest extends TestCase
         $this->exportCoolRunnings();
 
         $this->assertFileNotExists($this->exportPath('composer.json'));
+    }
+
+    /** @test */
+    public function it_exports_basic_composer_json_file()
+    {
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->assertFileExists(base_path('composer.json'));
+
+        $this->exportCoolRunnings();
+
+        $this->assertEquals(<<<'EOT'
+{
+    "name": "my-vendor-name/cool-runnings",
+    "extra": {
+        "statamic": {
+            "name": "Cool Runnings",
+            "description": "Cool Runnings starter kit"
+        }
+    }
+}
+EOT
+        , $this->files->get($this->exportPath('composer.json')));
     }
 
     /** @test */
@@ -150,6 +178,13 @@ EOT
 
         $this->assertEquals(<<<'EOT'
 {
+    "name": "my-vendor-name/cool-runnings",
+    "extra": {
+        "statamic": {
+            "name": "Cool Runnings",
+            "description": "Cool Runnings starter kit"
+        }
+    },
     "require": {
         "statamic/seo-pro": "^2.2",
         "statamic/ssg": "^0.4.0"
@@ -192,6 +227,13 @@ EOT
 
         $this->assertEquals(<<<'EOT'
 {
+    "name": "my-vendor-name/cool-runnings",
+    "extra": {
+        "statamic": {
+            "name": "Cool Runnings",
+            "description": "Cool Runnings starter kit"
+        }
+    },
     "require-dev": {
         "statamic/seo-pro": "^2.2",
         "statamic/ssg": "^0.4.0"
@@ -234,6 +276,13 @@ EOT
 
         $this->assertEquals(<<<'EOT'
 {
+    "name": "my-vendor-name/cool-runnings",
+    "extra": {
+        "statamic": {
+            "name": "Cool Runnings",
+            "description": "Cool Runnings starter kit"
+        }
+    },
     "require": {
         "statamic/seo-pro": "^2.2"
     },
@@ -243,20 +292,6 @@ EOT
 }
 EOT
         , $this->files->get($this->exportPath('composer.json')));
-    }
-
-    private function backupComposerJson()
-    {
-        if (! $this->files->exists(base_path('composer.json.bak'))) {
-            $this->files->copy(base_path('composer.json'), base_path('composer.json.bak'));
-        }
-    }
-
-    private function restoreComposerJson()
-    {
-        if ($this->files->exists(base_path('composer.json'))) {
-            $this->files->copy(base_path('composer.json.bak'), base_path('composer.json'));
-        }
     }
 
     private function exportPath($path = null)
