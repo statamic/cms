@@ -4,17 +4,28 @@ namespace Tests\Tags;
 
 use Statamic\Facades\Data;
 use Statamic\Facades\Parse;
+use Statamic\Facades\Site;
 use Tests\TestCase;
 
 class LinkTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Site::setConfig(['sites' => [
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr'],
+        ]]);
+    }
+
     private function tag($tag, $data = [])
     {
         return (string) Parse::template($tag, $data);
     }
 
     /** @test */
-    public function it_outputs_datas_url_if_not_providing_a_url()
+    public function it_outputs_datas_url()
     {
         $entry = $this->mock(Entry::class);
         $entry->shouldReceive('in')->with('en')->andReturnSelf();
@@ -27,7 +38,7 @@ class LinkTest extends TestCase
     }
 
     /** @test */
-    public function it_outputs_datas_url_for_a_specific_site_if_not_providing_a_url()
+    public function it_outputs_datas_url_for_a_specific_site()
     {
         $entry = $this->mock(Entry::class);
         $entry->shouldReceive('in')->with('fr')->andReturnSelf();
@@ -40,7 +51,7 @@ class LinkTest extends TestCase
     }
 
     /** @test */
-    public function it_outputs_datas_absolute_url_if_not_providing_a_url()
+    public function it_outputs_datas_absolute_url()
     {
         $entry = $this->mock(Entry::class);
         $entry->shouldReceive('in')->with('en')->andReturnSelf();
@@ -52,7 +63,7 @@ class LinkTest extends TestCase
     }
 
     /** @test */
-    public function it_outputs_datas_absolute_url_for_a_specific_site_if_not_providing_a_url()
+    public function it_outputs_datas_absolute_url_for_a_specific_site()
     {
         $entry = $this->mock(Entry::class);
         $entry->shouldReceive('in')->with('fr')->andReturnSelf();
