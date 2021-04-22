@@ -50,27 +50,27 @@ return [
 
         'navigation' => [
             'class' => Stores\NavigationStore::class,
-            'directory' => base_path(env('STATAMIC_STORE_NAVIGATION','content/navigation')),
+            'directory' => base_path(env('STATAMIC_STORE_NAVIGATION', 'content/navigation')),
         ],
 
         'collection-trees' => [
             'class' => Stores\CollectionTreeStore::class,
-            'directory' => base_path(env('STATAMIC_STORE_COLLECTION_TREES','content/trees/collections')),
+            'directory' => base_path(env('STATAMIC_STORE_COLLECTION_TREES', 'content/trees/collections')),
         ],
 
         'nav-trees' => [
             'class' => Stores\NavTreeStore::class,
-            'directory' => base_path(env('STATAMIC_STORE_NAVIGATION_TREES','content/trees/navigation')),
+            'directory' => base_path(env('STATAMIC_STORE_NAVIGATION_TREES', 'content/trees/navigation')),
         ],
 
         'globals' => [
             'class' => Stores\GlobalsStore::class,
-            'directory' => base_path(env('STATAMIC_STORE_GLOBALS','content/globals')),
+            'directory' => base_path(env('STATAMIC_STORE_GLOBALS', 'content/globals')),
         ],
 
         'asset-containers' => [
             'class' => Stores\AssetContainersStore::class,
-            'directory' => base_path(env('STATAMIC_STORE_ASSET_CONTAINERS','content/assets')),
+            'directory' => base_path(env('STATAMIC_STORE_ASSET_CONTAINERS', 'content/assets')),
         ],
 
         'assets' => [
@@ -79,7 +79,7 @@ return [
 
         'users' => [
             'class' => Stores\UsersStore::class,
-            'directory' => base_path(env('STATAMIC_STORE_USERS','users')),
+            'directory' => base_path(env('STATAMIC_STORE_USERS', 'users')),
         ],
 
     ],
