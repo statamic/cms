@@ -146,10 +146,11 @@ class Exporter
      */
     protected function exportComposerJson()
     {
-        $composerJson = array_merge(
-            $this->prepareComposerJsonFromStub(),
-            $this->prepareComposerJsonDependencies()
-        );
+        $composerJson = $this->prepareComposerJsonFromStub()
+            ->forget('require')
+            ->forget('require-dev')
+            ->merge($this->prepareComposerJsonDependencies())
+            ->all();
 
         $this->files->put(
             base_path("{$this->exportPath}/composer.json"),
@@ -162,21 +163,40 @@ class Exporter
     /**
      * Prepare composer.json from stub.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     protected function prepareComposerJsonFromStub()
     {
+        $stub = $this->getComposerJsonStub();
+
         $directory = preg_replace('/.*\/([^\/]*)/', '$1', $this->exportPath);
         $vendorName = $this->vendorName ?? 'my-vendor-name';
         $repoName = Str::slug($directory);
         $package = "{$vendorName}/{$repoName}";
         $title = Str::slugToTitle($repoName);
 
-        $stub = $this->files->get(__DIR__.'/../Console/Commands/stubs/starter-kits/composer.json.stub');
         $stub = str_replace('dummy/package', $package, $stub);
         $stub = str_replace('DummyTitle', $title, $stub);
 
-        return json_decode($stub, true);
+        return collect(json_decode($stub, true));
+    }
+
+    /**
+     * Get composer.json stub.
+     *
+     * @return string
+     */
+    protected function getComposerJsonStub()
+    {
+        $stubPath = __DIR__.'/../Console/Commands/stubs/starter-kits/composer.json.stub';
+
+        $existingComposerJsonPath = base_path("{$this->exportPath}/composer.json");
+
+        if ($this->files->exists($existingComposerJsonPath)) {
+            return $this->files->get($existingComposerJsonPath);
+        }
+
+        return $this->files->get($stubPath);
     }
 
     /**

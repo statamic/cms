@@ -294,6 +294,91 @@ EOT
         , $this->files->get($this->exportPath('composer.json')));
     }
 
+    /** @test */
+    public function it_uses_existing_composer_json_file()
+    {
+        $this->files->makeDirectory($this->exportPath);
+        $this->files->put($this->exportPath('composer.json'), <<<'EOT'
+{
+    "name": "custom/hot-runnings",
+    "keywords": [
+        "jamaica",
+        "bob-sled"
+    ]
+}
+EOT
+        );
+
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertEquals(<<<'EOT'
+{
+    "name": "custom/hot-runnings",
+    "keywords": [
+        "jamaica",
+        "bob-sled"
+    ]
+}
+EOT
+        , $this->files->get($this->exportPath('composer.json')));
+    }
+
+    /** @test */
+    public function it_copies_all_exportable_dependencies_into_an_existing_composer_json_file()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->files->makeDirectory($this->exportPath);
+        $this->files->put($this->exportPath('composer.json'), <<<'EOT'
+{
+    "name": "custom/hot-runnings",
+    "require-dev": {
+        "statamic/ssg": "^0.2.0"
+    }
+}
+EOT
+        );
+
+        $this->setExportableDependencies([
+            'statamic/ssg',
+            'statamic/seo-pro',
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertEquals(<<<'EOT'
+{
+    "name": "custom/hot-runnings",
+    "require": {
+        "statamic/seo-pro": "^2.2"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    }
+}
+EOT
+        , $this->files->get($this->exportPath('composer.json')));
+    }
+
     private function exportPath($path = null)
     {
         return collect([$this->exportPath, $path])->filter()->implode('/');
@@ -305,7 +390,9 @@ EOT
 
         $this->files->put($this->configPath, YAML::dump($config));
 
-        $this->files->makeDirectory($this->exportPath);
+        if (! $this->files->exists($this->exportPath)) {
+            $this->files->makeDirectory($this->exportPath);
+        }
     }
 
     private function setExportableDependencies($dependencies)
@@ -316,7 +403,9 @@ EOT
 
         $this->files->put($this->configPath, YAML::dump($config));
 
-        $this->files->makeDirectory($this->exportPath);
+        if (! $this->files->exists($this->exportPath)) {
+            $this->files->makeDirectory($this->exportPath);
+        }
     }
 
     private function exportCoolRunnings()
