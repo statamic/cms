@@ -170,7 +170,7 @@ class Installer
      */
     protected function reticulateSplines()
     {
-        $this->console->info("Reticulating splines...");
+        $this->console->info('Reticulating splines...');
 
         sleep(2);
 
@@ -184,7 +184,7 @@ class Installer
      */
     protected function removeStarterKit()
     {
-        $this->console->info("Cleaning up temporary files...");
+        $this->console->info('Cleaning up temporary files...');
 
         $this->composer(['remove', '--dev', $this->package]);
 
