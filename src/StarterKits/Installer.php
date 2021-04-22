@@ -13,6 +13,7 @@ class Installer
     protected $withConfig;
     protected $package;
     protected $console;
+    protected $composerOutput;
 
     /**
      * Instantiate starter kit installer.
@@ -53,6 +54,7 @@ class Installer
             ->ensureConfig()
             ->installFiles()
             ->installDependencies()
+            ->reticulateSplines()
             ->removeStarterKit();
     }
 
@@ -63,7 +65,7 @@ class Installer
      */
     protected function requireStarterKit()
     {
-        $this->console->info("Installing starter kit dependency [{$this->package}]...");
+        $this->console->info("Preparing starter kit [{$this->package}]...");
 
         $this->composer(['require', '--dev', $this->package]);
 
@@ -162,13 +164,27 @@ class Installer
     }
 
     /**
+     * Reticulate splines.
+     *
+     * @return $this
+     */
+    protected function reticulateSplines()
+    {
+        $this->console->info("Reticulating splines...");
+
+        sleep(2);
+
+        return $this;
+    }
+
+    /**
      * Composer remove starter kit dependency.
      *
      * @return $this
      */
     protected function removeStarterKit()
     {
-        $this->console->info("Removing starter kit dependency [{$this->package}]...");
+        $this->console->info("Cleaning up temporary files...");
 
         $this->composer(['remove', '--dev', $this->package]);
 
@@ -215,7 +231,8 @@ class Installer
 
         // If not a blank line, output to terminal.
         if (! empty(trim($output))) {
-            $console->line($output);
+            // $this->composerOutput .= $output; // TODO: Handle composer error output to log file?
+            // $console->line($output); // TODO: Add verbose command option?
         }
 
         return $output;
