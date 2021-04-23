@@ -1,5 +1,91 @@
 # Release Notes
 
+## 3.1.10 (2020-04-23)
+
+### What's improved
+- Improve Laravel Nova compatibility by avoiding conflicting routes. [#3543](https://github.com/statamic/cms/issues/3543)
+- A read-only asset editor is now more read-only-er. [#3552](https://github.com/statamic/cms/issues/3552)
+- Improved asset upload failure error messages. [#3560](https://github.com/statamic/cms/issues/3560)
+
+### What's fixed
+- The `link` and `path` tags use the `id` parameter to output urls for entries, etc. [#3576](https://github.com/statamic/cms/issues/3576)
+- They'll use the original item's url if it doesn't exist in the current site. [#3579](https://github.com/statamic/cms/issues/3579)
+- Fix the Collection edit screen not showing existing routes, and prevent an incorrect dirty state message. [#3581](https://github.com/statamic/cms/issues/3581)
+- Fix issues where the Static Site Generator would sometimes leak data between pages. [#3562](https://github.com/statamic/cms/issues/3562)
+- Fix set reordering for Bard and Replicator. [#3574](https://github.com/statamic/cms/issues/3574)
+- Fix page not scrolling when dragging Bard sets. [#3571](https://github.com/statamic/cms/issues/3571)
+- Fix images not displaying in Bard. [#3570](https://github.com/statamic/cms/issues/3570)
+- Add missing red asterisk to required fields in a Bard or Replicator set. [#3572](https://github.com/statamic/cms/issues/3572)
+- Fix issue where the first line after an image in Bard was not editable. [#3555](https://github.com/statamic/cms/issues/3555)
+- Fix issue where you sometimes couldn't move the cursor in Bard. [#3559](https://github.com/statamic/cms/issues/3559)
+- When using a collection widget with pagination, you don't get scrolled to the top of the page. [#3553](https://github.com/statamic/cms/issues/3553)
+- Fix the missing delete action for asset folders. [#3582](https://github.com/statamic/cms/issues/3582)
+- Bump ssri from 6.0.1 to 6.0.2. [#3549](https://github.com/statamic/cms/issues/3549)
+
+
+
+## 3.1.9 (2020-04-19)
+
+### What's improved
+- Added header to disable Google's FLoC tracking by default. [#3545](https://github.com/statamic/cms/issues/3545)
+
+
+
+## 3.1.8 (2020-04-16)
+
+### What's fixed
+- Fix n+1 user group and role queries when storing users in the database. [#3527](https://github.com/statamic/cms/issues/3527)
+- Fix taxonomy not loading when your site has been configured with a subdirectory. [#3541](https://github.com/statamic/cms/issues/3541)
+
+
+
+## 3.1.7 (2020-04-15)
+
+### What's new
+- The `link` and `path` tags can output URLs for entries, terms, etc. [#3530](https://github.com/statamic/cms/issues/3530)
+- You can customize the table names for storing users in a database. [#3278](https://github.com/statamic/cms/issues/3278)
+- Added a `urlWithoutRedirect` and `absoluteUrlWithoutRedirect` methods to entries and terms. [#3522](https://github.com/statamic/cms/issues/3522)
+
+### What's improved
+- Adjusted the UI for the site selector on the entry and term publish forms. [#3519](https://github.com/statamic/cms/issues/3519)
+
+### What's fixed
+- Localized entries can save empty values, which fixes not being able to override the values from the original entry. [#3531](https://github.com/statamic/cms/issues/3531)
+- Private entries can be viewed in Live Preview. [#3533](https://github.com/statamic/cms/issues/3533)
+- Fix the site being used in Live Preview. [#3534](https://github.com/statamic/cms/issues/3534)
+- Fix JavaScript modules only loading one time in Live Preview. [#3524](https://github.com/statamic/cms/issues/3524)
+- The `text` fieldtype, when using number mode will prevent an empty value being saved as `0`. [#3536](https://github.com/statamic/cms/issues/3536)
+- It will also save integers or floats appropriately. [a18d6f639](https://github.com/statamic/cms/commit/a18d6f639)
+- Add border to selected non-image thumbnails in the asset browser. [#3525](https://github.com/statamic/cms/issues/3525)
+- Fix `is_parent` on nav tags when using first-child redirects. [#2359](https://github.com/statamic/cms/issues/2359)
+- The `permalink` variable on nav items with hardcoded URLs will now be converted to absolute URLs. [#3522](https://github.com/statamic/cms/issues/3522)
+- Fixed YAML exceptions sometimes showing the wrong file's contents. [#3515](https://github.com/statamic/cms/issues/3515)
+
+
+
+## 3.1.6 (2020-04-12)
+
+### What's new
+- Added a `pluck` modifier. [#3502](https://github.com/statamic/cms/issues/3502)
+- The `multisite` command lets you add more than one additional site. [#3302](https://github.com/statamic/cms/issues/3302)
+- Added a `max_depth` parameter to the `nav` tag. [#3513](https://github.com/statamic/cms/issues/3513)
+
+### What's improved
+- Updated French translations. [#3497](https://github.com/statamic/cms/issues/3497)
+- Gracefully handle incorrect-but-close-enough usage of `custom` field conditions. [73f941c5e](https://github.com/statamic/cms/commit/73f941c5e)
+
+### What's fixed
+- Fix taxonomy routing when using localization. [#3505](https://github.com/statamic/cms/issues/3505)
+- In the `search:results` tag, include `search_score`, and fix `result_type` when not supplementing data. [#3477](https://github.com/statamic/cms/issues/3477)
+- Preserve user defined defaults for new entries. [#3472](https://github.com/statamic/cms/issues/3472)
+- Prevent newly added navigation items being greyed out even if they're published. [#3510](https://github.com/statamic/cms/issues/3510)
+- Fix trailing slash on URLs which sometimes makes the asset browser not load. [#3504](https://github.com/statamic/cms/issues/3504)
+- Fix error in the `assets:generate-presets` command on older versions of Laravel. [#3511](https://github.com/statamic/cms/issues/3511)
+- Fix error wen `CarbonImmutable` is used app-wide. [#3499](https://github.com/statamic/cms/issues/3499)
+- Fix 404 error when URLs have both ending slash and query parameters. [#3494](https://github.com/statamic/cms/issues/3494)
+- Fix NaN and other glitches in the `time` fieldtype. [#3496](https://github.com/statamic/cms/issues/3496)
+
+
 ## 3.1.5 (2020-04-07)
 
 ### What's new

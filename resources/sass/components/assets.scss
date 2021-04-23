@@ -248,6 +248,7 @@
 
     .editor-preview {
         flex-basis: 64%;
+        flex-grow: 1;
     }
 
     .editor-form {
@@ -298,12 +299,11 @@
 }
 
 .asset-editor .editor-preview {
-	@apply bg-grey-80 flex flex-col justify-between relative;
+	@apply bg-grey-80 flex flex-col justify-between;
 
     .editor-preview-image {
-        flex-grow: 1;
-        padding: 30px 30px 90px; // bottom padding accounts for action button bar.
-        height: 100%;
+        flex: 1;
+        padding: 30px;
         display: flex;
         flex-direction: column;
     }
@@ -335,7 +335,7 @@
     }
 
     .editor-file-actions {
-		@apply absolute bottom-0 inset-x-0 bg-grey-90 p-2 text-center h-16;
+		@apply bg-grey-90 p-2 text-center h-16;
 
         button {
             @apply mx-sm;

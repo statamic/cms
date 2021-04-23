@@ -170,7 +170,7 @@ export default class {
 
     prepareFunctionName(condition) {
         return condition
-            .replace(new RegExp('^custom .'), '')
+            .replace(new RegExp('^custom '), '')
             .split(':')[0];
     }
 

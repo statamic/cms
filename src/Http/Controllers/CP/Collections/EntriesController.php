@@ -243,11 +243,11 @@ class EntriesController extends CpController
             ->addValues($values)
             ->preProcess();
 
-        $values = $fields->values()->merge([
+        $values = collect([
             'title' => null,
             'slug' => null,
             'published' => $collection->defaultPublishState(),
-        ]);
+        ])->merge($fields->values());
 
         if ($collection->dated()) {
             $values['date'] = substr(now()->toDateTimeString(), 0, 10);

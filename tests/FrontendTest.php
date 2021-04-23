@@ -10,7 +10,6 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 
 class FrontendTest extends TestCase
 {
@@ -77,6 +76,123 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function page_is_displayed_with_ending_slash()
+    {
+        $this->withStandardBlueprints();
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
+
+        $page = $this->createPage('about', [
+            'with' => [
+                'title' => 'The About Page',
+                'content' => 'This is the about page.',
+                'template' => 'some_template',
+            ],
+        ]);
+
+        $response = $this->get('/about/')->assertStatus(200);
+
+        $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
+    }
+
+    /** @test */
+    public function page_is_displayed_with_query_string_and_ending_slash()
+    {
+        $this->withStandardBlueprints();
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
+
+        $page = $this->createPage('about', [
+            'with' => [
+                'title' => 'The About Page',
+                'content' => 'This is the about page.',
+                'template' => 'some_template',
+            ],
+        ]);
+
+        $response = $this->get('/about/?some=querystring')->assertStatus(200);
+
+        $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
+    }
+
+    /** @test */
+    public function home_page_on_second_subdirectory_based_site_is_displayed()
+    {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        $this->createHomePagesForTwoSites();
+
+        $response = $this->get('/fr')->assertStatus(200);
+
+        $this->assertEquals('French Home', trim($response->content()));
+    }
+
+    /** @test */
+    public function home_page_on_second_subdirectory_based_site_is_displayed_with_ending_slash()
+    {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        $this->createHomePagesForTwoSites();
+
+        $response = $this->get('/fr/')->assertStatus(200);
+
+        $this->assertEquals('French Home', trim($response->content()));
+    }
+
+    /** @test */
+    public function home_page_on_second_domain_site_is_displayed()
+    {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
+        ]]);
+
+        $this->createHomePagesForTwoSites();
+
+        $response = $this->get('http://anotherhost.com')->assertStatus(200);
+
+        $this->assertEquals('French Home', trim($response->content()));
+    }
+
+    /** @test */
+    public function home_page_on_second_domain_site_is_displayed_with_ending_slash()
+    {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
+        ]]);
+
+        $this->createHomePagesForTwoSites();
+
+        $response = $this->get('http://anotherhost.com/')->assertStatus(200);
+
+        $this->assertEquals('French Home', trim($response->content()));
+    }
+
+    private function createHomePagesForTwoSites()
+    {
+        $this->withStandardBlueprints();
+        $this->withoutExceptionHandling();
+        $this->withStandardFakeViews();
+
+        $c = tap(Collection::make('pages')->sites(['english', 'french'])->routes('{slug}')->structureContents(['root' => true]))->save();
+
+        EntryFactory::id('1')->locale('english')->slug('home')->collection('pages')->data(['content' => 'Home'])->create();
+        EntryFactory::id('2')->locale('french')->slug('french-home')->collection('pages')->data(['content' => 'French Home'])->create();
+
+        $c->structure()->in('english')->tree([['entry' => '1']])->save();
+        $c->structure()->in('french')->tree([['entry' => '2']])->save();
+    }
+
+    /** @test */
     public function drafts_are_not_visible()
     {
         $this->withStandardFakeErrorViews();
@@ -89,13 +205,10 @@ class FrontendTest extends TestCase
     public function drafts_are_visible_if_using_live_preview()
     {
         $this->withStandardBlueprints();
-        $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
-        $user = User::make()->assignRole('draft_viewer');
 
         $this->createPage('about')->published(false)->set('content', 'Testing 123')->save();
 
         $response = $this
-            ->actingAs($user)
             ->get('/about', ['X-Statamic-Live-Preview' => true])
             ->assertStatus(200)
             ->assertHeader('X-Statamic-Draft', true);
@@ -133,6 +246,29 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function future_private_entries_viewable_in_live_preview()
+    {
+        Carbon::setTestNow(Carbon::parse('2019-01-01'));
+        $this->withStandardFakeErrorViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRendered('default', 'The template contents');
+
+        tap($this->makeCollection()->dated(true)->futureDateBehavior('private'))->save();
+        tap($this->makePage('about')->date('2019-01-02'))->save();
+
+        $this
+            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->assertStatus(200)
+            ->assertHeader('X-Statamic-Private', true);
+    }
+
+    /** @test */
+    public function future_private_entries_dont_get_statically_cached()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
     public function past_private_entries_are_not_viewable()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-01'));
@@ -153,6 +289,29 @@ class FrontendTest extends TestCase
         $this
             ->get('/about')
             ->assertStatus(404);
+    }
+
+    /** @test */
+    public function past_private_entries_are_viewable_in_live_preview()
+    {
+        Carbon::setTestNow(Carbon::parse('2019-01-01'));
+        $this->withStandardFakeErrorViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRendered('default', 'The template contents');
+
+        tap($this->makeCollection()->dated(true)->pastDateBehavior('private'))->save();
+        tap($this->makePage('about')->date('2018-01-01'))->save();
+
+        $this
+            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->assertStatus(200)
+            ->assertHeader('X-Statamic-Private', true);
+    }
+
+    /** @test */
+    public function past_private_entries_dont_get_statically_cached()
+    {
+        $this->markTestIncomplete();
     }
 
     /** @test */
@@ -251,6 +410,23 @@ class FrontendTest extends TestCase
         $this->createPage('about');
 
         $this->get('about')->assertHeaderMissing('X-Powered-By', 'Statamic');
+    }
+
+    /** @test */
+    public function disables_floc_through_header_by_default()
+    {
+        $this->createPage('about');
+
+        $this->get('about')->assertHeader('Permissions-Policy', 'interest-cohort=()');
+    }
+
+    /** @test */
+    public function doesnt_disable_floc_through_header_if_disabled()
+    {
+        config(['statamic.system.disable_floc' => false]);
+        $this->createPage('about');
+
+        $this->get('about')->assertHeaderMissing('Permissions-Policy', 'interest-cohort=()');
     }
 
     /** @test */

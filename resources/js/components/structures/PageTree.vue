@@ -208,6 +208,7 @@ export default {
                     slug: selection.slug,
                     url: selection.url,
                     edit_url: selection.edit_url,
+                    status: selection.status,
                     children: []
                 });
             });

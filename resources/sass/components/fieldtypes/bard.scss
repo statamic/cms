@@ -14,7 +14,6 @@
 
 .bard-editor .ProseMirror {
     @apply p-1 min-h-48;
-    hyphens: auto;
 }
 
 // Modes
@@ -249,7 +248,8 @@
 .bard-fieldtype .ProseMirror > {
     p {
         @apply text-grey-80;
-        word-wrap: break-word;
+        word-break: break-all;
+        word-break: break-word;
 
         line-height: 1.7;
         text-size-adjust: 100%;
