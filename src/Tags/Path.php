@@ -36,7 +36,11 @@ class Path extends Tags
             return;
         }
 
-        $data = $data->in($this->targetSite()->handle());
+        if ($localized = $data->in($this->targetSite()->handle())) {
+            $data = $localized;
+        } elseif ($this->wantsSpecificSite()) {
+            return;
+        }
 
         return $this->wantsAbsoluteUrl() ? $data->absoluteUrl() : $data->url();
     }
@@ -55,6 +59,11 @@ class Path extends Tags
     protected function targetSite()
     {
         return Site::get($this->params->get('in', Site::current()->handle()));
+    }
+
+    protected function wantsSpecificSite()
+    {
+        return $this->params->has('in');
     }
 
     protected function wantsAbsoluteUrl()

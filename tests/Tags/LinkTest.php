@@ -51,6 +51,47 @@ class LinkTest extends TestCase
     }
 
     /** @test */
+    public function it_outputs_datas_url_for_the_current_site()
+    {
+        Site::setCurrent('fr');
+
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnSelf();
+        $entry->shouldReceive('url')->andReturn('/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('/test', $this->tag('{{ link:123 }}'));
+        $this->assertEquals('/test', $this->tag('{{ link:123 absolute="false" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_datas_url_for_the_original_site_if_it_doesnt_exist_in_the_current_one()
+    {
+        Site::setCurrent('fr');
+
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnNull();
+        $entry->shouldReceive('url')->andReturn('/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('/test', $this->tag('{{ link:123 }}'));
+        $this->assertEquals('/test', $this->tag('{{ link:123 absolute="false" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_nothing_if_it_doesnt_exist_in_the_requested_site()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnNull();
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('', $this->tag('{{ link:123 in="fr" }}'));
+    }
+
+    /** @test */
     public function it_outputs_datas_absolute_url()
     {
         $entry = $this->mock(Entry::class);
@@ -72,6 +113,34 @@ class LinkTest extends TestCase
         Data::shouldReceive('find')->with('123')->andReturn($entry);
 
         $this->assertEquals('http://example.com/test', $this->tag('{{ link:123 in="fr" absolute="true" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_datas_absolute_url_for_the_current_site()
+    {
+        Site::setCurrent('fr');
+
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnSelf();
+        $entry->shouldReceive('absoluteUrl')->andReturn('http://example.com/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('http://example.com/test', $this->tag('{{ link:123 absolute="true" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_datas_absolute_url_for_the_original_site_if_it_doesnt_exist_in_the_current_one()
+    {
+        Site::setCurrent('fr');
+
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnNull();
+        $entry->shouldReceive('absoluteUrl')->andReturn('http://example.com/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('http://example.com/test', $this->tag('{{ link:123 absolute="true" }}'));
     }
 
     /** @test */
