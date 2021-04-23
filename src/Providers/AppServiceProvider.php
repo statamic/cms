@@ -30,7 +30,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
+            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 

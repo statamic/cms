@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\View\Store;
+use Facades\Statamic\View\Cascade;
 
 class Section extends Tags
 {
@@ -10,6 +10,6 @@ class Section extends Tags
     {
         $name = explode(':', $this->tag)[1];
 
-        app(Store::class)->sections()->put($name, $this->parse());
+        Cascade::instance()->sections()->put($name, $this->parse());
     }
 }
