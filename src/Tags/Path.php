@@ -36,7 +36,9 @@ class Path extends Tags
             return;
         }
 
-        $data = $data->in($this->targetSite()->handle());
+        if ($localized = $data->in($this->targetSite()->handle())) {
+            $data = $localized;
+        }
 
         return $this->wantsAbsoluteUrl() ? $data->absoluteUrl() : $data->url();
     }

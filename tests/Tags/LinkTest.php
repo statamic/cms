@@ -51,6 +51,19 @@ class LinkTest extends TestCase
     }
 
     /** @test */
+    public function it_outputs_datas_url_for_the_original_site_if_it_doesnt_exist_in_the_requested_one()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnNull();
+        $entry->shouldReceive('url')->andReturn('/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('/test', $this->tag('{{ link:123 in="fr" }}'));
+        $this->assertEquals('/test', $this->tag('{{ link:123 in="fr" absolute="false" }}'));
+    }
+
+    /** @test */
     public function it_outputs_datas_absolute_url()
     {
         $entry = $this->mock(Entry::class);
@@ -67,6 +80,18 @@ class LinkTest extends TestCase
     {
         $entry = $this->mock(Entry::class);
         $entry->shouldReceive('in')->with('fr')->andReturnSelf();
+        $entry->shouldReceive('absoluteUrl')->andReturn('http://example.com/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('http://example.com/test', $this->tag('{{ link:123 in="fr" absolute="true" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_datas_absolute_url_for_the_original_site_if_it_doesnt_exist_in_the_requested_one()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnNull();
         $entry->shouldReceive('absoluteUrl')->andReturn('http://example.com/test');
 
         Data::shouldReceive('find')->with('123')->andReturn($entry);
