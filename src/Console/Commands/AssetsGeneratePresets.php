@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
@@ -105,7 +106,10 @@ class AssetsGeneratePresets extends Command
             foreach ($this->imageAssets as $asset) {
                 $bar->setMessage($asset->basename(), 'filename');
 
-                $dispatchMethod = $this->shouldQueue ? 'dispatch' : 'dispatchSync';
+                $dispatchMethod = $this->shouldQueue
+                    ? 'dispatch'
+                    : (method_exists(Dispatcher::class, 'dispatchSync') ? 'dispatchSync' : 'dispatchNow');
+
                 GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
 
                 $bar->advance();

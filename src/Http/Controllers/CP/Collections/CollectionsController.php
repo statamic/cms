@@ -141,7 +141,9 @@ class CollectionsController extends CpController
             'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
             'autopublish' => $collection->autoPublish(),
-            'routes' => $collection->routes()->all(),
+            'routes' => $collection->routes()->unique()->count() === 1
+                ? $collection->routes()->first()
+                : $collection->routes()->all(),
             'mount' => optional($collection->mount())->id(),
         ];
 

@@ -67,7 +67,7 @@ class EloquentUserTest extends TestCase
 
         $user = $this->createPermissible();
 
-        \DB::table('role_user')->insert([
+        \DB::table(config('statamic.users.tables.role_user', 'role_user'))->insert([
             ['user_id' => $user->id(), 'role_id' => 'a'],
             ['user_id' => $user->id(), 'role_id' => 'b'],
             ['user_id' => $user->id(), 'role_id' => 'c'],
