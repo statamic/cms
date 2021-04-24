@@ -50,6 +50,7 @@ class Collection implements Contract, AugmentableContract
     protected $structure;
     protected $structureContents;
     protected $taxonomies = [];
+    protected $createLabel;
 
     public function __construct()
     {
@@ -345,6 +346,16 @@ class Collection implements Contract, AugmentableContract
             ->args(func_get_args());
     }
 
+    public function createLabel($createLabel = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('createLabel')
+            ->getter(function ($createLabel) {
+                return $createLabel ?? __('Create Entry');
+            })
+            ->args(func_get_args());
+    }
+
     public function save()
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
@@ -426,6 +437,7 @@ class Collection implements Contract, AugmentableContract
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
             ],
+            'create_label' => $this->createLabel,
         ]));
 
         if (! Site::hasMultiple()) {
@@ -487,6 +499,7 @@ class Collection implements Contract, AugmentableContract
             'mount' => $this->mount,
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
+            'create_label' => $this->createLabel,
         ];
     }
 
