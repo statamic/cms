@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Sites\Site;
+use Statamic\Contracts\Forms\Submission as SubmissionContract;
 
 class SendEmails implements ShouldQueue
 {
@@ -19,7 +20,7 @@ class SendEmails implements ShouldQueue
     protected $submission;
     protected $site;
 
-    public function __construct(Submission $submission, Site $site)
+    public function __construct(SubmissionContract $submission, Site $site)
     {
         $this->submission = $submission;
         $this->site = $site;
