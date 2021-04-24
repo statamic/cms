@@ -125,6 +125,18 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_the_create_label()
+    {
+        $collection = new Collection;
+        $this->assertEquals('Create Entry', $collection->createLabel());
+
+        $return = $collection->createLabel('New Blog Post');
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('New Blog Post', $collection->createLabel());
+    }
+
+    /** @test */
     public function it_gets_and_sets_the_title()
     {
         $collection = (new Collection)->handle('blog');
