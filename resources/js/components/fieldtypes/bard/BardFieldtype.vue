@@ -227,8 +227,14 @@ export default {
         },
 
         htmlWithReplacedLinks() {
-            return this.html.replaceAll(/\"statamic:\/\/(.*)\"/g, (match, ref) => {
-                return `"${this.meta.linkData[ref].permalink}"`;
+            return this.html.replaceAll(/\"statamic:\/\/(.*?)\"/g, (match, ref) => {
+                const linkData = this.meta.linkData[ref];
+                if (! linkData) {
+                    this.$toast.error(`${__('No link data found for')} ${ref}`);
+                    return '""';
+                }
+
+                return `"${linkData.permalink}"`;
             });
         }
 

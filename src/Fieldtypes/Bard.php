@@ -373,7 +373,7 @@ class Bard extends Replicator
             'previews' => $previews,
             '__collaboration' => ['existing'],
             'linkCollections' => empty($collections = $this->config('link_collections')) ? Collection::handles()->all() : $collections,
-            'linkData' => $this->getLinkData($value),
+            'linkData' => (object) $this->getLinkData($value),
         ];
     }
 
