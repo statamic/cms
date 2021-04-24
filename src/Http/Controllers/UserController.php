@@ -90,7 +90,7 @@ class UserController extends Controller
     {
         $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
 
-        return $errorResponse->withErrors($errors, 'user.register');
+        return $errorResponse->withInput()->withErrors($errors, 'user.register');
     }
 
     private function userRegistrationSuccess(bool $silentFailure = false)
