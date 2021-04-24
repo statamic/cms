@@ -254,7 +254,7 @@ class EntriesController extends CpController
         }
 
         $viewData = [
-            'title' => __('Create Entry'),
+            'title' => $collection->createLabel(),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
             ],
