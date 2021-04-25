@@ -9,9 +9,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Facades\Antlers;
 use Statamic\Sites\Site;
-use Statamic\Contracts\Forms\Submission as SubmissionContract;
 
 class SendEmails implements ShouldQueue
 {
