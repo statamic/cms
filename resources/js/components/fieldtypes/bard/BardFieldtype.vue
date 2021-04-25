@@ -1,6 +1,11 @@
 <template>
 
-    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }" @dragstart.stop>
+    <div 
+        class="bard-fieldtype-wrapper"
+        :class="{'bard-fullscreen': fullScreenMode }"
+        @dragstart.stop="ignorePageHeader(true)"
+        @dragend="ignorePageHeader(false)"
+    >
 
         <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar" v-if="showFixedToolbar">
@@ -76,7 +81,7 @@
             </editor-floating-menu>
 
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
-            <bard-source :html="html" v-if="showSource" />
+            <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
         <div class="bard-footer-toolbar" v-if="config.reading_time">
             {{ readingTime }} {{ __('Reading Time') }}
@@ -160,6 +165,7 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
+            pageHeader: null,
         }
     },
 
@@ -212,6 +218,18 @@ export default {
             });
 
             return indexes;
+        },
+
+        site() {
+            if (! this.storeName) return this.$config.get('selectedSite');
+
+            return this.$store.state.publish[this.storeName].site;
+        },
+
+        htmlWithReplacedLinks() {
+            return this.html.replaceAll(/\"statamic:\/\/(.*)\"/g, (match, ref) => {
+                return `"${this.meta.linkData[ref].permalink}"`;
+            });
         }
 
     },
@@ -246,6 +264,8 @@ export default {
         this.$keys.bind('esc', this.closeFullscreen)
 
         this.$nextTick(() => this.mounted = true);
+
+        this.pageHeader = document.querySelector('.global-header');
     },
 
     beforeDestroy() {
@@ -513,7 +533,14 @@ export default {
 
         updateSetPreviews(set, previews) {
             this.previews[set] = previews;
+        },
+
+        ignorePageHeader(ignore) {
+            if (this.pageHeader) {
+                this.pageHeader.style['pointer-events'] = ignore ? 'none' : 'all';
+            }
         }
+
     }
 }
 </script>

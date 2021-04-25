@@ -1,5 +1,155 @@
 # Release Notes
 
+## 3.1.10 (2020-04-23)
+
+### What's improved
+- Improve Laravel Nova compatibility by avoiding conflicting routes. [#3543](https://github.com/statamic/cms/issues/3543)
+- A read-only asset editor is now more read-only-er. [#3552](https://github.com/statamic/cms/issues/3552)
+- Improved asset upload failure error messages. [#3560](https://github.com/statamic/cms/issues/3560)
+
+### What's fixed
+- The `link` and `path` tags use the `id` parameter to output urls for entries, etc. [#3576](https://github.com/statamic/cms/issues/3576)
+- They'll use the original item's url if it doesn't exist in the current site. [#3579](https://github.com/statamic/cms/issues/3579)
+- Fix the Collection edit screen not showing existing routes, and prevent an incorrect dirty state message. [#3581](https://github.com/statamic/cms/issues/3581)
+- Fix issues where the Static Site Generator would sometimes leak data between pages. [#3562](https://github.com/statamic/cms/issues/3562)
+- Fix set reordering for Bard and Replicator. [#3574](https://github.com/statamic/cms/issues/3574)
+- Fix page not scrolling when dragging Bard sets. [#3571](https://github.com/statamic/cms/issues/3571)
+- Fix images not displaying in Bard. [#3570](https://github.com/statamic/cms/issues/3570)
+- Add missing red asterisk to required fields in a Bard or Replicator set. [#3572](https://github.com/statamic/cms/issues/3572)
+- Fix issue where the first line after an image in Bard was not editable. [#3555](https://github.com/statamic/cms/issues/3555)
+- Fix issue where you sometimes couldn't move the cursor in Bard. [#3559](https://github.com/statamic/cms/issues/3559)
+- When using a collection widget with pagination, you don't get scrolled to the top of the page. [#3553](https://github.com/statamic/cms/issues/3553)
+- Fix the missing delete action for asset folders. [#3582](https://github.com/statamic/cms/issues/3582)
+- Bump ssri from 6.0.1 to 6.0.2. [#3549](https://github.com/statamic/cms/issues/3549)
+
+
+
+## 3.1.9 (2020-04-19)
+
+### What's improved
+- Added header to disable Google's FLoC tracking by default. [#3545](https://github.com/statamic/cms/issues/3545)
+
+
+
+## 3.1.8 (2020-04-16)
+
+### What's fixed
+- Fix n+1 user group and role queries when storing users in the database. [#3527](https://github.com/statamic/cms/issues/3527)
+- Fix taxonomy not loading when your site has been configured with a subdirectory. [#3541](https://github.com/statamic/cms/issues/3541)
+
+
+
+## 3.1.7 (2020-04-15)
+
+### What's new
+- The `link` and `path` tags can output URLs for entries, terms, etc. [#3530](https://github.com/statamic/cms/issues/3530)
+- You can customize the table names for storing users in a database. [#3278](https://github.com/statamic/cms/issues/3278)
+- Added a `urlWithoutRedirect` and `absoluteUrlWithoutRedirect` methods to entries and terms. [#3522](https://github.com/statamic/cms/issues/3522)
+
+### What's improved
+- Adjusted the UI for the site selector on the entry and term publish forms. [#3519](https://github.com/statamic/cms/issues/3519)
+
+### What's fixed
+- Localized entries can save empty values, which fixes not being able to override the values from the original entry. [#3531](https://github.com/statamic/cms/issues/3531)
+- Private entries can be viewed in Live Preview. [#3533](https://github.com/statamic/cms/issues/3533)
+- Fix the site being used in Live Preview. [#3534](https://github.com/statamic/cms/issues/3534)
+- Fix JavaScript modules only loading one time in Live Preview. [#3524](https://github.com/statamic/cms/issues/3524)
+- The `text` fieldtype, when using number mode will prevent an empty value being saved as `0`. [#3536](https://github.com/statamic/cms/issues/3536)
+- It will also save integers or floats appropriately. [a18d6f639](https://github.com/statamic/cms/commit/a18d6f639)
+- Add border to selected non-image thumbnails in the asset browser. [#3525](https://github.com/statamic/cms/issues/3525)
+- Fix `is_parent` on nav tags when using first-child redirects. [#2359](https://github.com/statamic/cms/issues/2359)
+- The `permalink` variable on nav items with hardcoded URLs will now be converted to absolute URLs. [#3522](https://github.com/statamic/cms/issues/3522)
+- Fixed YAML exceptions sometimes showing the wrong file's contents. [#3515](https://github.com/statamic/cms/issues/3515)
+
+
+
+## 3.1.6 (2020-04-12)
+
+### What's new
+- Added a `pluck` modifier. [#3502](https://github.com/statamic/cms/issues/3502)
+- The `multisite` command lets you add more than one additional site. [#3302](https://github.com/statamic/cms/issues/3302)
+- Added a `max_depth` parameter to the `nav` tag. [#3513](https://github.com/statamic/cms/issues/3513)
+
+### What's improved
+- Updated French translations. [#3497](https://github.com/statamic/cms/issues/3497)
+- Gracefully handle incorrect-but-close-enough usage of `custom` field conditions. [73f941c5e](https://github.com/statamic/cms/commit/73f941c5e)
+
+### What's fixed
+- Fix taxonomy routing when using localization. [#3505](https://github.com/statamic/cms/issues/3505)
+- In the `search:results` tag, include `search_score`, and fix `result_type` when not supplementing data. [#3477](https://github.com/statamic/cms/issues/3477)
+- Preserve user defined defaults for new entries. [#3472](https://github.com/statamic/cms/issues/3472)
+- Prevent newly added navigation items being greyed out even if they're published. [#3510](https://github.com/statamic/cms/issues/3510)
+- Fix trailing slash on URLs which sometimes makes the asset browser not load. [#3504](https://github.com/statamic/cms/issues/3504)
+- Fix error in the `assets:generate-presets` command on older versions of Laravel. [#3511](https://github.com/statamic/cms/issues/3511)
+- Fix error wen `CarbonImmutable` is used app-wide. [#3499](https://github.com/statamic/cms/issues/3499)
+- Fix 404 error when URLs have both ending slash and query parameters. [#3494](https://github.com/statamic/cms/issues/3494)
+- Fix NaN and other glitches in the `time` fieldtype. [#3496](https://github.com/statamic/cms/issues/3496)
+
+
+## 3.1.5 (2020-04-07)
+
+### What's new
+- The Bard link toolbar allows you to browse for entries. [#3466](https://github.com/statamic/cms/issues/3466)
+- Added a `queue` option to the `assets:generate-presets` command. [#3490](https://github.com/statamic/cms/issues/3490)
+- The `cache` tag supports cache tags. (Naming is hard.) [#3357](https://github.com/statamic/cms/issues/3357)
+- Add status UI for text nav items. [#3489](https://github.com/statamic/cms/issues/3489)
+
+### What's fixed
+- Fix SVG dimensions when not using pixels. [#3482](https://github.com/statamic/cms/issues/3482)
+- Prevent the 'read only' label and translation icons on `section` fieldtypes. [#3492](https://github.com/statamic/cms/issues/3492)
+- Prevent incorrect nav output when you had a nav named the same as a collection. [#3491](https://github.com/statamic/cms/issues/3491)
+
+
+
+## 3.1.4 (2020-04-06)
+
+### What's new
+- Ability to push queries and middleware into GraphQL. [#3385](https://github.com/statamic/cms/issues/3385)
+- Add breadcrumbs to asset browser. [#3475](https://github.com/statamic/cms/issues/3475)
+- Add limit param to foreach tag. [fc034eec1](https://github.com/statamic/cms/commit/fc034eec1)
+
+### What's fixed
+- Fix squished sidebar toggle. [#3456](https://github.com/statamic/cms/issues/3456)
+- Prevent unintended deletion of assets through editor. [#3474](https://github.com/statamic/cms/issues/3474)
+- Fix autofocus issues in Safari and Firefox. [#3471](https://github.com/statamic/cms/issues/3471)
+- Handle encoded characters in uploaded asset filenames. [#3473](https://github.com/statamic/cms/issues/3473)
+- Fix Glide 404ing for images in the `public` directory. [#3484](https://github.com/statamic/cms/issues/3484)
+- Fix assets being incorrect every other request in some cases. [#3485](https://github.com/statamic/cms/issues/3485)
+- Use request helper instead of server variables to fix an issue with Laravel Octane. [#3483](https://github.com/statamic/cms/issues/3483)
+
+
+
+## 3.1.3 (2020-04-02)
+
+### What's new
+- Status icons are shown in collections' tree views. [#3461](https://github.com/statamic/cms/issues/3461)
+- Addons can add external stylesheets. [#3464](https://github.com/statamic/cms/issues/3464)
+- Added a `honeypot` variable inside forms. [#3462](https://github.com/statamic/cms/issues/3462)
+
+### What's fixed
+- Glide routes will return 404s for non-existent images. [#3450](https://github.com/statamic/cms/issues/3450)
+- Recognize tag pairs correctly for a collection alias. [#3457](https://github.com/statamic/cms/issues/3457)
+- Fix utf8 handling of base64 encoded strings. [#3421](https://github.com/statamic/cms/issues/3421)
+- Fix `markdown` modifier not working with the `code` fieldtype. [#3460](https://github.com/statamic/cms/issues/3460)
+- Allow `symfony/var-exporter` 5.1. [#3463](https://github.com/statamic/cms/issues/3463)
+- Bump y18n from 4.0.0 to 4.0.1. [#3443](https://github.com/statamic/cms/issues/3443)
+
+
+
+## 3.1.2 (2020-03-30)
+
+### What's improved
+- Prevent the need to hit enter to add a validation rule. [bdf9e03a5](https://github.com/statamic/cms/commit/bdf9e03a5)
+- Updated German translations. [#3434](https://github.com/statamic/cms/issues/3434)
+
+### What's fixed
+- Fix taxonomies url and data handling which fixes a `nav:breadcrumbs` issue. [#3448](https://github.com/statamic/cms/issues/3448)
+- Fix "move asset" action not listing all folders. [#3447](https://github.com/statamic/cms/issues/3447)
+- Prevent action and glide routes being disabled by config. [#3446](https://github.com/statamic/cms/issues/3446)
+- Prevent error during addon tests. [#3435](https://github.com/statamic/cms/issues/3435)
+
+
+
 ## 3.1.1 (2020-03-25)
 
 ### What's improved

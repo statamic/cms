@@ -52,7 +52,7 @@ export default {
         },
 
         activeFilterParameters() {
-            return btoa(JSON.stringify(this.activeFilters));
+            return utf8btoa(JSON.stringify(this.activeFilters));
         },
 
         additionalParameters() {

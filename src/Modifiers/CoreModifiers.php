@@ -1227,17 +1227,13 @@ class CoreModifiers extends Modifier
      */
     public function markdown($value, $params)
     {
-        if (! is_string($value)) {
-            return $value;
-        }
-
         $parser = $params[0] ?? 'default';
 
         if (in_array($parser, [true, 'true', ''], true)) {
             $parser = 'default';
         }
 
-        return Markdown::parser($parser)->parse($value);
+        return Markdown::parser($parser)->parse((string) $value);
     }
 
     /**
@@ -1469,6 +1465,29 @@ class CoreModifiers extends Modifier
         $partial = 'partials/'.$name.'.html';
 
         return Parse::template(File::disk('resources')->get($partial), $value);
+    }
+
+    /**
+     * Plucks values from a collection of items.
+     *
+     * @param $value
+     * @param $params
+     * @param $context
+     * @return string
+     */
+    public function pluck($value, $params, $context)
+    {
+        $key = $params[0];
+
+        if ($wasArray = is_array($value)) {
+            $value = collect($value);
+        }
+
+        $items = $value->map(function ($item) use ($key) {
+            return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+        });
+
+        return $wasArray ? $items->all() : $items;
     }
 
     /**

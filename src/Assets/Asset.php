@@ -130,8 +130,8 @@ class Asset implements AssetContract, Augmentable
         }
 
         return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
-            if ($contents = $this->disk()->get($this->metaPath())) {
-                return YAML::parse($contents);
+            if ($contents = $this->disk()->get($path = $this->metaPath())) {
+                return YAML::file($path)->parse($contents);
             }
 
             $this->writeMeta($meta = $this->generateMeta());
@@ -656,7 +656,7 @@ class Asset implements AssetContract, Augmentable
             '#' => '-',
         ];
 
-        $str = Stringy::create($string)->toAscii();
+        $str = Stringy::create(urldecode($string))->toAscii();
 
         foreach ($replacements as $from => $to) {
             $str = $str->replace($from, $to);

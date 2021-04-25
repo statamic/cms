@@ -19,6 +19,7 @@ return [
     'bard.config.enable_input_rules' => 'Active des raccourcis Markdown lorsqu’on saisit du contenu.',
     'bard.config.enable_paste_rules' => 'Active des raccourcis Markdown lorsqu’on colle du contenu.',
     'bard.config.fullscreen' => 'Activez l’option pour basculer en mode plein écran.',
+    'bard.config.link_collections' => 'Les entrées de ces collections seront accessibles dans le sélecteur de lien. TOUTES les entrées seront accessibles si vous laissez cette zone vide.',
     'bard.config.link_noopener' => 'Définissez `rel="noopener"` sur tous les liens.',
     'bard.config.link_noreferrer' => 'Définissez `rel="noreferrer"` sur tous les liens.',
     'bard.config.reading_time' => 'Afficher le temps de lecture estimé en bas du champ.',

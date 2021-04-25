@@ -8,6 +8,8 @@ use Rebing\GraphQL\Support\Facades\GraphQL;
 class Manager
 {
     protected $fields = [];
+    protected $queries = [];
+    protected $middleware = [];
 
     public function addField($type, $field, $closure)
     {
@@ -72,5 +74,25 @@ class Manager
     public function paginate($type)
     {
         return GraphQL::paginate($type);
+    }
+
+    public function addQuery($query)
+    {
+        $this->queries[] = $query;
+    }
+
+    public function getExtraQueries()
+    {
+        return $this->queries;
+    }
+
+    public function addMiddleware($middleware)
+    {
+        $this->middleware[] = $middleware;
+    }
+
+    public function getExtraMiddleware()
+    {
+        return $this->middleware;
     }
 }

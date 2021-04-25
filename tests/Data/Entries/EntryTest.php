@@ -20,7 +20,6 @@ use Statamic\Sites\Site;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
-use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -204,31 +203,41 @@ class EntryTest extends TestCase
 
         $this->assertEquals('/blog/foo', $entryEn->uri());
         $this->assertEquals('/blog/foo', $entryEn->url());
+        $this->assertEquals('/blog/foo', $entryEn->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrl());
+        $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrlWithoutRedirect());
         $this->assertEquals('http://domain.com/amp/blog/foo', $entryEn->ampUrl());
         $this->assertNull($entryEn->redirectUrl());
 
         $this->assertEquals('/le-blog/le-foo', $entryFr->uri());
         $this->assertEquals('/fr/le-blog/le-foo', $entryFr->url());
+        $this->assertEquals('/fr/le-blog/le-foo', $entryFr->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrl());
+        $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrlWithoutRedirect());
         $this->assertEquals('http://domain.com/fr/amp/le-blog/le-foo', $entryFr->ampUrl());
         $this->assertNull($entryFr->redirectUrl());
 
         $this->assertEquals('/das-blog/das-foo', $entryDe->uri());
         $this->assertEquals('/das-blog/das-foo', $entryDe->url());
+        $this->assertEquals('/das-blog/das-foo', $entryDe->urlWithoutRedirect());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrl());
+        $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrlWithoutRedirect());
         $this->assertEquals('http://domain.de/amp/das-blog/das-foo', $entryDe->ampUrl());
         $this->assertNull($entryDe->redirectUrl());
 
         $this->assertEquals('/blog/redirected', $redirectEntry->uri());
         $this->assertEquals('http://example.com/page', $redirectEntry->url());
+        $this->assertEquals('/blog/redirected', $redirectEntry->urlWithoutRedirect());
         $this->assertEquals('http://example.com/page', $redirectEntry->absoluteUrl());
+        $this->assertEquals('http://domain.com/blog/redirected', $redirectEntry->absoluteUrlWithoutRedirect());
         $this->assertNull($redirectEntry->ampUrl());
         $this->assertEquals('http://example.com/page', $redirectEntry->redirectUrl());
 
         $this->assertEquals('/blog/redirect-404', $redirect404Entry->uri());
         $this->assertEquals('/blog/redirect-404', $redirect404Entry->url());
+        $this->assertEquals('/blog/redirect-404', $redirect404Entry->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrl());
+        $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrlWithoutRedirect());
         $this->assertEquals('http://domain.com/amp/blog/redirect-404', $redirect404Entry->ampUrl());
         $this->assertEquals(404, $redirect404Entry->redirectUrl());
     }
@@ -274,14 +283,17 @@ class EntryTest extends TestCase
 
         $this->assertEquals('/parent', $parent->uri());
         $this->assertEquals('/parent/child', $parent->url());
+        $this->assertEquals('/parent', $parent->urlWithoutRedirect());
         $this->assertEquals('/parent/child', $parent->redirectUrl());
 
         $this->assertEquals('/parent/child', $child->uri());
         $this->assertEquals('/parent/child', $child->url());
+        $this->assertEquals('/parent/child', $child->urlWithoutRedirect());
         $this->assertNull($child->redirectUrl());
 
         $this->assertEquals('/nochildren', $noChildren->uri());
         $this->assertEquals('/nochildren', $noChildren->url());
+        $this->assertEquals('/nochildren', $noChildren->urlWithoutRedirect());
         $this->assertEquals(404, $noChildren->redirectUrl());
     }
 
@@ -752,6 +764,8 @@ class EntryTest extends TestCase
             ->data([
                 'title' => 'The title',
                 'array' => ['first one', 'second one'],
+                'null' => null,      // this...
+                'empty' => [], // and this should get stripped out because it's the root. there's no origin to fall back to.
                 'content' => 'The content',
             ]);
 
@@ -764,7 +778,44 @@ class EntryTest extends TestCase
             'id' => '123',
             'published' => false,
             'content' => 'The content',
-        ], Arr::removeNullValues($entry->fileData()));
+        ], $entry->fileData());
+    }
+
+    /** @test */
+    public function it_gets_file_contents_for_saving_a_localized_entry()
+    {
+        $originEntry = $this->mock(Entry::class);
+        $originEntry->shouldReceive('id')->andReturn('123');
+
+        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+
+        $entry = (new Entry)
+            ->id('456')
+            ->origin('123')
+            ->slug('test')
+            ->date('2018-01-01')
+            ->published(false)
+            ->data([
+                'title' => 'The title',
+                'array' => ['first one', 'second one'],
+                'null' => null,      // this...
+                'empty' => [], // and this should not get stripped out, otherwise it would fall back to the origin.
+                'content' => 'The content',
+            ]);
+
+        $this->assertEquals([
+            'title' => 'The title',
+            'array' => [
+                'first one',
+                'second one',
+            ],
+            'null' => null,
+            'empty' => [],
+            'id' => '456',
+            'origin' => '123',
+            'published' => false,
+            'content' => 'The content',
+        ], $entry->fileData());
     }
 
     /** @test */

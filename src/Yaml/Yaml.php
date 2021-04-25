@@ -43,6 +43,8 @@ class Yaml
         }
 
         if (empty($str)) {
+            $this->file = null;
+
             return [];
         }
 
@@ -64,6 +66,8 @@ class Yaml
 
         $this->validateString($yaml, $str);
         $this->validateDocumentContent($yaml, $content, $originalStr);
+
+        $this->file = null;
 
         return isset($content)
             ? $yaml + ['content' => $content]
@@ -109,7 +113,11 @@ class Yaml
 
     protected function viewException($e, $str, $line = null)
     {
-        $path = $this->file ?? $this->createTemporaryExceptionFile($str);
+        if ($this->file && File::exists($this->file)) {
+            $path = $this->file;
+        } else {
+            $path = $this->createTemporaryExceptionFile($str, $this->file);
+        }
 
         $args = [
             $e->getMessage(), 0, 1, $path,
@@ -133,9 +141,9 @@ class Yaml
         return $exception;
     }
 
-    protected function createTemporaryExceptionFile($string)
+    protected function createTemporaryExceptionFile($string, $path = null)
     {
-        $path = storage_path('statamic/tmp/yaml-'.md5($string));
+        $path = storage_path('statamic/tmp/yaml/'.($path ?? md5($string)));
 
         File::put($path, $string);
 

@@ -148,7 +148,9 @@ class PageTest extends TestCase
 
         $this->assertEquals('/the/actual/entry/uri', $page->uri());
         $this->assertEquals('/the/actual/entry/uri', $page->url());
+        $this->assertEquals('/the/actual/entry/uri', $page->urlWithoutRedirect());
         $this->assertEquals('http://localhost/the/actual/entry/uri', $page->absoluteUrl());
+        $this->assertEquals('http://localhost/the/actual/entry/uri', $page->absoluteUrlWithoutRedirect());
         $this->assertFalse($page->isRedirect());
     }
 
@@ -171,8 +173,67 @@ class PageTest extends TestCase
 
         $this->assertEquals('/the/actual/entry/uri', $page->uri());
         $this->assertEquals('http://example.com/page', $page->url());
+        $this->assertEquals('/the/actual/entry/uri', $page->urlWithoutRedirect());
         $this->assertEquals('http://example.com/page', $page->absoluteUrl());
+        $this->assertEquals('http://localhost/the/actual/entry/uri', $page->absoluteUrlWithoutRedirect());
         $this->assertTrue($page->isRedirect());
+    }
+
+    /** @test */
+    public function it_gets_the_uri_of_a_hardcoded_relative_link()
+    {
+        $tree = $this->newTree()->setStructure(
+            $this->mock(Nav::class)
+        );
+
+        $page = (new Page)
+            ->setTree($tree)
+            ->setUrl('/blog');
+
+        $this->assertEquals('/blog', $page->uri());
+        $this->assertEquals('/blog', $page->url());
+        $this->assertEquals('/blog', $page->urlWithoutRedirect());
+        $this->assertEquals('http://localhost/blog', $page->absoluteUrl());
+        $this->assertEquals('http://localhost/blog', $page->absoluteUrlWithoutRedirect());
+        $this->assertFalse($page->isRedirect());
+    }
+
+    /** @test */
+    public function it_gets_the_uri_of_a_hardcoded_absolute_link()
+    {
+        $tree = $this->newTree()->setStructure(
+            $this->mock(Nav::class)
+        );
+
+        $page = (new Page)
+            ->setTree($tree)
+            ->setUrl('https://google.com');
+
+        $this->assertEquals('https://google.com', $page->uri());
+        $this->assertEquals('https://google.com', $page->url());
+        $this->assertEquals('https://google.com', $page->urlWithoutRedirect());
+        $this->assertEquals('https://google.com', $page->absoluteUrl());
+        $this->assertEquals('https://google.com', $page->absoluteUrlWithoutRedirect());
+        $this->assertFalse($page->isRedirect());
+    }
+
+    /** @test */
+    public function it_gets_the_uri_of_a_hardcoded_text_only_page()
+    {
+        $tree = $this->newTree()->setStructure(
+            $this->mock(Nav::class)
+        );
+
+        $page = (new Page)
+            ->setTree($tree)
+            ->setTitle('Test');
+
+        $this->assertNull($page->uri());
+        $this->assertNull($page->url());
+        $this->assertNull($page->urlWithoutRedirect());
+        $this->assertNull($page->absoluteUrl());
+        $this->assertNull($page->absoluteUrlWithoutRedirect());
+        $this->assertFalse($page->isRedirect());
     }
 
     /** @test */

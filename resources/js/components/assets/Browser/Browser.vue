@@ -73,6 +73,8 @@
 
                                 </div>
 
+                                <breadcrumbs :path="path" @navigated="selectFolder" />
+
                                 <data-list-bulk-actions
                                     :url="bulkActionsUrl"
                                     :context="actionContext"
@@ -101,8 +103,8 @@
                                     <tr v-if="folder && folder.parent_path && !restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
-                                            <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
+                                            <a class="flex items-center cursor-pointer group">
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue"></file-icon>
                                                 ..
                                             </a>
                                         </td>
@@ -111,8 +113,8 @@
                                     <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
-                                            <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
+                                            <a class="flex items-center cursor-pointer group">
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue"></file-icon>
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
@@ -156,7 +158,7 @@
 
                                 <template slot="actions" slot-scope="{ row: asset }">
                                     <dropdown-list>
-                                        <dropdown-item :text="__('Edit')" @click="edit(asset.id)" />
+                                        <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
@@ -223,6 +225,7 @@
         <asset-editor
             v-if="showAssetEditor"
             :id="editedAssetId"
+            :read-only="! canEdit"
             @closed="closeAssetEditor"
             @saved="assetSaved"
         />
@@ -242,6 +245,7 @@
 <script>
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
+import Breadcrumbs from './Breadcrumbs.vue';
 import FolderCreator from '../Folder/Create.vue';
 import FolderEditor from '../Folder/Edit.vue';
 import Uploader from '../Uploader.vue';
@@ -252,6 +256,7 @@ export default {
     components: {
         AssetThumbnail,
         AssetEditor,
+        Breadcrumbs,
         Uploader,
         Uploads,
         FolderEditor,
@@ -327,9 +332,7 @@ export default {
         },
 
         canEdit() {
-            return true;
-            // TODO
-            // return this.can('assets:'+ this.container.id +':edit')
+            return this.can('assets:'+ this.container.id +':edit')
         },
 
         canUpload() {
@@ -449,7 +452,7 @@ export default {
 
             const url = this.searchQuery
                 ? cp_url(`assets/browse/search/${this.container.id}`)
-                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
+                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
 
             this.$axios.get(url, { params: this.parameters }).then(response => {
                 const data = response.data;
@@ -498,9 +501,7 @@ export default {
         },
 
         edit(id) {
-            if (this.canEdit) {
-                this.editedAssetId = id;
-            }
+            this.editedAssetId = id;
         },
 
         closeAssetEditor() {
