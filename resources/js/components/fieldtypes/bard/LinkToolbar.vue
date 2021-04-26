@@ -1,77 +1,137 @@
 <template>
 
     <div class="bard-link-toolbar">
-        <div class="flex items-center px-2">
-            <div class="flex-1 min-w-0">
-                <div class="link-container">
-                    <a
-                        :href="actualLinkHref"
-                        v-text="actualLinkText"
-                        class="link"
-                        target="_blank"
-                        v-show="!isEditing"
-                    ></a>
+
+        <div class="p-2 border-b">
+
+            <!-- Link type select -->
+            <div class="mb-2 flex items-center">
+
+                <div class="mr-1.5 flex items-center" v-for="(title, type) in linkTypes" :key="type">
+                    <div 
+                        role="radio"
+                        class="w-4 h-4 mr-1 cursor-default rounded-full border-grey-60"
+                        :class="type === linkType ? 'border-4' : 'border'"
+                        @click="setLinkType(type)"
+                    />
+                    {{ title }}
                 </div>
 
-                <div :class="isEditing ? 'flex items-center' : 'hidden'">
-                    <input
-                        v-show="!isInternalLink"
-                        type="text"
-                        ref="input"
-                        v-model="linkInput"
-                        class="flex-1 input"
-                        @keydown.enter.prevent="commit"
-                    />
-                    <div
-                        v-show="isInternalLink"
-                        v-text="actualLinkText"
-                        class="flex-1 input whitespace-no-wrap overflow-hidden text-overflow-ellipsis h-auto cursor-not-allowed"
-                    />
-                </div>
             </div>
-            <div class="bard-link-toolbar-buttons">
-                <relationship-input
-                    class="hidden"
-                    ref="relationshipInput"
-                    name="link"
-                    :value="[]"
-                    :config="relationshipConfig"
-                    :item-data-url="itemDataUrl"
-                    :selections-url="selectionsUrl"
-                    :filters-url="filtersUrl"
-                    :columns="[{ label: __('Title'), field: 'title' }]"
-                    :max-items="1"
-                    :site="bard.site"
-                    @item-data-updated="relationshipItemDataUpdated"
+
+            <!-- Link input -->
+            <div class="h-8 p-1 border rounded border-grey-50 flex items-center">
+
+                <input
+                    type="text"
+                    ref="input"
+                    v-model="linkInput"
+                    class="input h-auto text-sm"
+                    :readonly="isData"
+                    @keydown.enter.prevent="commit"
                 />
-                <button @click="edit" v-tooltip="__('Edit Link')" v-show="!isEditing">
-                    <span class="icon icon-pencil" />
-                </button>
-                <button @click="openSelector" v-tooltip="`${__('Browse')}...`" v-show="isEditing">
+                <button 
+                    class="h-auto"
+                    :class="{ hidden: !isData }"
+                    v-tooltip="`${__('Browse')}...`"
+                    @click="openSelector">
                     <span class="icon icon-magnifying-glass" />
                 </button>
-                <button @click="remove" v-tooltip="__('Remove Link')" v-show="hasLink && isEditing">
-                    <span class="icon icon-trash" />
-                </button>
-                <button @click="commit" v-tooltip="__('Done')" v-show="isEditing">
-                    <span class="icon icon-check" />
-                </button>
+
             </div>
+
         </div>
-        <div class="p-sm pt-1 border-t" v-show="isEditing">
-            <label class="text-2xs flex items-center">
-                <input class="checkbox mr-1" type="checkbox" v-model="targetBlank">
-                {{ __('Open in new window') }}
-            </label>
+
+        <!-- Link attributes -->
+        <div class="p-2 border-b">
+
+            <div class="mb-1 font-medium">Title</div>
+            <div class="ml-1 h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
+
+                <input
+                    type="text"
+                    ref="input"
+                    v-model="linkInput"
+                    class="input h-auto text-sm"
+                />
+
+            </div>
+
+            <div class="p-sm">
+                <label class="text-2xs flex items-center">
+                    <input class="checkbox mr-1" type="checkbox" v-model="targetBlank">
+                    {{ __('Open in new window') }}
+                </label>
+            </div>
+
         </div>
+
+        <!-- Buttons -->
+        <div class="p-2 flex justify-between">
+            <button class="h-auto" v-tooltip="__('Remove link')">
+                <span class="icon icon-trash" />
+            </button>
+
+            <button class="h-auto mr-1" v-tooltip="__('OK')">
+                <span class="icon icon-check" />
+            </button>
+        </div>
+
+        <!-- Selectors -->
+
+        <relationship-input
+            class="hidden"
+            ref="relationshipInput"
+            name="link"
+            :value="[]"
+            :config="relationshipConfig"
+            :item-data-url="itemDataUrl"
+            :selections-url="selectionsUrl"
+            :filters-url="filtersUrl"
+            :columns="[{ label: __('Title'), field: 'title' }]"
+            :max-items="1"
+            :site="bard.site"
+            @item-data-updated="relationshipItemDataUpdated"
+        />
+
+         <stack
+            v-if="showAssetSelector"
+            name="asset-selector"
+            @closed="closeAssetSelector"
+        >
+            <asset-selector
+                :selected="[]"
+                :container="'assets'"
+                :max-files="1"
+                :view-mode="selectorViewMode"
+                @selected="assetSelected"
+                @closed="closeAssetSelector"
+            />
+            <!-- 
+                :container="container"
+                :folder="folder"
+                :restrict-container-navigation="true"
+                :restrict-folder-navigation="restrictNavigation"
+                :selected="selectedAssets"
+                :view-mode="selectorViewMode"
+                @selected="assetsSelected"
+                @closed="closeSelector"
+
+            -->
+        </stack>
     </div>
 
 </template>
 
 <script>
 import qs from 'qs';
+import AssetSelector from '../../assets/Selector.vue';
 
 export default {
+
+    components: {
+        AssetSelector
+    },
 
     props: {
         bard: {},
@@ -86,26 +146,38 @@ export default {
             targetBlank: null,
             isEditing: false,
             internalLink: null,
+            showTypeSelector: false, // TODO rename
+            showAssetSelector: false,
+            linkType: 'url',
+            linkTypes: {
+                url: __('URL'),
+                entry: __('Entry'),
+                asset: __('Asset'),
+            },
         }
     },
 
     computed: {
 
-        hasLink() {
-            return this.actualLinkHref != null;
+        isData() {
+            return this.linkType !== 'url';
         },
 
-        isInternalLink() {
-            return !! this.internalLink;
-        },
+        // hasLink() {
+        //     return this.actualLinkHref != null;
+        // },
 
-        actualLinkHref() {
-            return this.isInternalLink ? this.internalLink.permalink : this.linkAttrs.href;
-        },
+        // isInternalLink() {
+        //     return !! this.internalLink;
+        // },
 
-        actualLinkText() {
-            return this.isInternalLink ? this.internalLink.title : this.linkAttrs.href;
-        },
+        // actualLinkHref() {
+        //     return this.isInternalLink ? this.internalLink.permalink : this.linkAttrs.href;
+        // },
+
+        // actualLinkText() {
+        //     return this.isInternalLink ? this.internalLink.title : this.linkAttrs.href;
+        // },
 
         relationshipConfig() {
             return {
@@ -175,9 +247,15 @@ export default {
 
     methods: {
 
+        setLinkType(type) {
+            this.linkType = type;
+
+            // this.openSelector();
+        },
+
         edit() {
             this.isEditing = true;
-            this.$nextTick(() => this.$refs.input.focus());
+            // this.$nextTick(() => this.$refs.input.focus());
         },
 
         remove() {
@@ -211,8 +289,54 @@ export default {
                             str;
         },
 
+        toggleTypeSelector() {
+            this.showTypeSelector = !this.showTypeSelector;
+        },
+
+        openTypeSelector() {
+            this.showTypeSelector = true;
+        },
+
+        closeTypeSelector() {
+            this.showTypeSelector = false;
+        },
+
         openSelector() {
+            if (this.linkType === 'entry') {
+                this.openEntrySelector();
+            } else if (this.linkType === 'asset') {
+                this.openAssetSelector();
+            }
+        },
+
+         openEntrySelector() {
+            this.showTypeSelector = false;
+
             this.$refs.relationshipInput.$refs.existing.click();
+        },
+
+        openAssetSelector() {
+            this.showTypeSelector = false;
+
+            this.showAssetSelector = true;
+        },
+
+        closeAssetSelector() {
+            this.showAssetSelector = false;
+        },
+
+        assetSelected(data) {
+            console.log(data);
+            if (! data.length) return;
+
+            const item = data[0];
+            const ref = `asset::${item.id}`;
+
+            this.pushItemDataIntoMeta(ref, item);
+
+            this.linkInput = `statamic://${ref}`;
+
+            this.commit();
         },
 
         relationshipItemDataUpdated(data) {
