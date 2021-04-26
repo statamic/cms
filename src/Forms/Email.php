@@ -5,6 +5,7 @@ namespace Statamic\Forms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Facades\Config;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
@@ -20,7 +21,7 @@ class Email extends Mailable
     protected $config;
     protected $site;
 
-    public function __construct(Submission $submission, array $config, Site $site)
+    public function __construct(SubmissionContract $submission, array $config, Site $site)
     {
         $this->submission = $submission;
         $this->config = $this->parseConfig($config);
