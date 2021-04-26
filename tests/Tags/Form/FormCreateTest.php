@@ -87,8 +87,8 @@ EOT
 ));
 
         $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name">', $output);
-        $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email">', $output);
-        $this->assertStringContainsString('<label>Message</label><textarea name="message" rows="5"></textarea>', $output);
+        $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" required>', $output);
+        $this->assertStringContainsString('<label>Message</label><textarea name="message" rows="5" required></textarea>', $output);
 
         preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
 
