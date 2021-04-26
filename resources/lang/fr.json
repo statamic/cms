@@ -777,6 +777,8 @@
     "Updater": "Updater",
     "Updates": "Mises à jour",
     "Upload": "Télécharger",
+    "Upload failed. The file is larger than is allowed by your server.": "Le téléchargement a échoué. La taille du fichier dépasse celle autorisée par votre serveur.",
+    "Upload failed. The file might be larger than is allowed by your server.": "Le téléchargement a échoué. La taille du fichier pourrait bien dépasser celle autorisée par votre serveur.",
     "Upload file": "Télécharger un fichier",
     "URL": "URL",
     "Useful Links": "Liens utiles",
