@@ -1,4 +1,4 @@
-<select name="{{ handle }}{{ multiple ?= "[]" }}" {{ multiple ?= "multiple" }}>
+<select name="{{ handle }}{{ multiple ?= "[]" }}" {{ multiple ?= "multiple" }}{{ if validate|contains:required }} required{{ /if }}>
     {{ unless multiple }}
         <option value>{{ trans key="Please select..." }}</option>
     {{ /unless }}
