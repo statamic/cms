@@ -347,12 +347,15 @@ class Collection implements Contract, AugmentableContract
 
     public function createLabel()
     {
-        return $this
-            ->fluentlyGetOrSet('createLabel')
-            ->getter(function ($createLabel) {
-                return $createLabel ?? __('Create Entry');
-            })
-            ->args(func_get_args());
+        $key = "messages.{$this->handle()}_collection_create_entry";
+
+        $translation = __($key);
+
+        if ($translation === $key) {
+            return __('Create Entry');
+        }
+
+        return $translation;
     }
 
     public function save()
