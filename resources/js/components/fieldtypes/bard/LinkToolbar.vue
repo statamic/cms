@@ -2,37 +2,45 @@
 
     <div class="bard-link-toolbar">
 
-        <div class="p-2 border-b">
+        <div class="p-2">
 
             <!-- Link type select -->
             <div class="mb-2 flex items-center">
 
-                <div class="mr-1.5 flex items-center" v-for="(title, type) in linkTypes" :key="type">
-                    <div 
-                        role="radio"
-                        class="w-4 h-4 mr-1 cursor-default rounded-full border-grey-60"
-                        :class="type === linkType ? 'border-4' : 'border'"
+                <label
+                    class="mr-1.5 flex items-center font-normal"
+                    v-for="(title, type) in linkTypes"
+                    :for="type"
+                    :key="type"
+                >
+                    <input
+                        class="mr-1"
+                        type="radio"
+                        name="link-type"
+                        :id="type"
+                        :checked="type === linkType"
                         @click="setLinkType(type)"
                     />
                     {{ title }}
-                </div>
+                </label>
 
             </div>
 
             <!-- Link input -->
-            <div class="h-8 p-1 border rounded border-grey-50 flex items-center">
+            <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
 
                 <input
                     type="text"
                     ref="input"
-                    v-model="linkInput"
                     class="input h-auto text-sm"
-                    :readonly="isData"
+                    placeholder="URL"
+                    :readonly="! isUrl"
+                    :value="displayValue"
                     @keydown.enter.prevent="commit"
                 />
                 <button 
                     class="h-auto"
-                    :class="{ hidden: !isData }"
+                    :class="{ hidden: isUrl }"
                     v-tooltip="`${__('Browse')}...`"
                     @click="openSelector">
                     <span class="icon icon-magnifying-glass" />
@@ -40,25 +48,19 @@
 
             </div>
 
-        </div>
-
-        <!-- Link attributes -->
-        <div class="p-2 border-b">
-
-            <div class="mb-1 font-medium">Title</div>
-            <div class="ml-1 h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
-
+            <!-- Link attributes -->
+            <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
                 <input
                     type="text"
                     ref="input"
-                    v-model="linkInput"
+                    v-model="linkAttrs.title"
                     class="input h-auto text-sm"
+                    :placeholder="__('Tooltip')"
                 />
-
             </div>
 
-            <div class="p-sm">
-                <label class="text-2xs flex items-center">
+            <div class="">
+                <label class="flex items-center font-normal">
                     <input class="checkbox mr-1" type="checkbox" v-model="targetBlank">
                     {{ __('Open in new window') }}
                 </label>
@@ -67,12 +69,12 @@
         </div>
 
         <!-- Buttons -->
-        <div class="p-2 flex justify-between">
-            <button class="h-auto" v-tooltip="__('Remove link')">
-                <span class="icon icon-trash" />
+        <div class="p-2 border-t flex justify-between">
+            <button class="h-auto" v-tooltip="__('Remove link')" @click="remove">
+                <span class="mr-1 icon icon-trash" />
             </button>
 
-            <button class="h-auto mr-1" v-tooltip="__('OK')">
+            <button class="h-auto mr-1" v-tooltip="__('OK')"><!-- TODO @click -->
                 <span class="icon icon-check" />
             </button>
         </div>
@@ -103,7 +105,6 @@
                 :selected="[]"
                 :container="'assets'"
                 :max-files="1"
-                :view-mode="selectorViewMode"
                 @selected="assetSelected"
                 @closed="closeAssetSelector"
             />
@@ -142,41 +143,55 @@ export default {
     data() {
         return {
             linkAttrs: this.initialLinkAttrs,
-            linkInput: this.initialLinkAttrs.href,
-            targetBlank: null,
-            isEditing: false,
-            internalLink: null,
-            showTypeSelector: false, // TODO rename
-            showAssetSelector: false,
+            // linkInput: this.initialLinkAttrs.href,
+            // targetBlank: null,
+            // isEditing: false,
+            // internalLink: null,
             linkType: 'url',
             linkTypes: {
                 url: __('URL'),
                 entry: __('Entry'),
                 asset: __('Asset'),
             },
+            showAssetSelector: false,
+            regularUrl: this.initialLinkAttrs.href,
+            dataUrl: this.initialLinkAttrs.href,
+            itemData: null,
+            title: null,
+            targetBlank: null,
         }
     },
 
     computed: {
 
-        isData() {
-            return this.linkType !== 'url';
+        isUrl() {
+            return this.linkType === 'url';
         },
 
-        // hasLink() {
-        //     return this.actualLinkHref != null;
-        // },
+        displayValue() {
+            switch (this.linkType) {
+                case 'url':
+                    return this.regularUrl;
+                case 'entry':
+                    return this.itemData ? this.itemData.title : null;
+                case 'asset':
+                    return this.itemData ? this.itemData.basename : null;
+            }
+        },
+        
+        href() {
+             if (this.isUrl) {
+                return this.regularUrl
+            }
+           
+            return this.itemData ? this.itemData.permalink : null;
+        },
 
-        // isInternalLink() {
-        //     return !! this.internalLink;
-        // },
-
-        // actualLinkHref() {
-        //     return this.isInternalLink ? this.internalLink.permalink : this.linkAttrs.href;
-        // },
-
-        // actualLinkText() {
-        //     return this.isInternalLink ? this.internalLink.title : this.linkAttrs.href;
+        // targetBlank() {
+        //     // TODO check
+        //     return this.href
+        //         ? this.linkAttrs.target == '_blank'
+        //         : this.config.target_blank;
         // },
 
         relationshipConfig() {
@@ -218,26 +233,28 @@ export default {
     },
 
     created() {
-        this.targetBlank = this.linkAttrs.href
+        console.log('LinkToolbar.created()')
+        console.log(this.linkAttrs);
+
+        // TODO test
+        this.targetBlank = this.href
             ? this.linkAttrs.target == '_blank'
             : this.config.target_blank;
 
-        this.internalLink = this.getInternalLinkFromUrl(this.linkAttrs.href);
+        // this.title = this.linkAttrs.title;
+        
+        this.itemData = this.getItemDataForUrl(this.linkAttrs.href);
 
-        if (!this.linkAttrs.href) {
-            this.edit();
-        }
+        // this.bard.$on('link-selected', (selection) => {
+        //     // This can't be a good way to do this.
+        //     const attrs = selection.content().content.content[0].content.content[0].marks[0].attrs;
+        //     this.linkAttrs = attrs;
+        //     this.linkInput = attrs.href;
+        //     this.targetBlank = attrs.target == '_blank';
+        //     this.internalLink = this.getInternalLinkFromUrl(attrs.href);
+        // });
 
-        this.bard.$on('link-selected', (selection) => {
-            // This can't be a good way to do this.
-            const attrs = selection.content().content.content[0].content.content[0].marks[0].attrs;
-            this.linkAttrs = attrs;
-            this.linkInput = attrs.href;
-            this.targetBlank = attrs.target == '_blank';
-            this.internalLink = this.getInternalLinkFromUrl(attrs.href);
-        });
-
-        this.bard.$on('link-deselected', () => this.$emit('deselected'));
+        // this.bard.$on('link-deselected', () => this.$emit('deselected'));
     },
 
     beforeDestroy() {
@@ -250,12 +267,7 @@ export default {
         setLinkType(type) {
             this.linkType = type;
 
-            // this.openSelector();
-        },
-
-        edit() {
-            this.isEditing = true;
-            // this.$nextTick(() => this.$refs.input.focus());
+            this.openSelector();
         },
 
         remove() {
@@ -275,30 +287,18 @@ export default {
             });
         },
 
-        getLinkId(link) {
-            const match = link.match(/^{{ link:(.*) }}$/);
-            if (!match || !match[1]) return null;
-            return match[1];
-        },
+        // getLinkId(link) {
+        //     const match = link.match(/^{{ link:(.*) }}$/);
+        //     if (!match || !match[1]) return null;
+        //     return match[1];
+        // },
 
         sanitizeLink(link) {
             const str = link.trim();
 
-            return str.match(/^\w[\w\-_\.]+\.(co|uk|com|org|net|gov|biz|info|us|eu|de|fr|it|es|pl|nz)/i) ?
-                        'https://' + str :
-                            str;
-        },
-
-        toggleTypeSelector() {
-            this.showTypeSelector = !this.showTypeSelector;
-        },
-
-        openTypeSelector() {
-            this.showTypeSelector = true;
-        },
-
-        closeTypeSelector() {
-            this.showTypeSelector = false;
+            return str.match(/^\w[\w\-_\.]+\.(co|uk|com|org|net|gov|biz|info|us|eu|de|fr|it|es|pl|nz)/i) 
+                ? `https://${str}`
+                : str
         },
 
         openSelector() {
@@ -309,7 +309,7 @@ export default {
             }
         },
 
-         openEntrySelector() {
+        openEntrySelector() {
             this.showTypeSelector = false;
 
             this.$refs.relationshipInput.$refs.existing.click();
@@ -326,48 +326,58 @@ export default {
         },
 
         assetSelected(data) {
-            console.log(data);
-            if (! data.length) return;
+            // console.log(data);
+            if (data.length) {
+                this.loadAssetData(data[0]);
+            }
+        },
 
-            const item = data[0];
-            const ref = `asset::${item.id}`;
+        loadAssetData(url) {
+            this.isLoading = true;
 
-            this.pushItemDataIntoMeta(ref, item);
-
-            this.linkInput = `statamic://${ref}`;
-
-            this.commit();
+            this.$axios.get(cp_url('assets-fieldtype'), {
+                params: { assets: [url] }
+            }).then(response => {
+                this.selectItem('asset', response.data[0])
+                this.isLoading = false;
+            });
         },
 
         relationshipItemDataUpdated(data) {
-            if (! data.length) return;
+            if (data.length) {
+                this.selectItem('entry', data[0]);
+            }
+        },
 
-            const item = data[0];
-            const ref = `entry::${item.id}`;
+        selectItem(type, item) {
+            console.log('LinkToolbar.selectItem()')
+            console.log(type);
+            console.log(item);
+            const ref = `${type}::${item.id}`;
 
-            this.pushItemDataIntoMeta(ref, item);
+            this.putItemDataIntoMeta(ref, item);
 
-            this.linkInput = `statamic://${ref}`;
+            this.itemData = item;
+            this.dataUrl = `statamic://${ref}`;
 
             this.commit();
         },
 
-        pushItemDataIntoMeta(ref, item) {
+        putItemDataIntoMeta(ref, item) {
             let meta = this.bard.meta;
             meta.linkData[ref] = item;
             this.bard.updateMeta(meta);
         },
 
-        getReferenceFromInternalUrl(url) {
-            return url.substr(11); // everything after statamic://
+        getItemDataForUrl(url) {
+            if (this.isDataUrl(url)) {
+                return this.bard.meta.linkData[url.substr(11)];
+            }
         },
 
-        getInternalLinkFromUrl(url) {
-            if (!url || url.substr(0, 11) !== 'statamic://') return null;
-
-            return this.bard.meta.linkData[this.getReferenceFromInternalUrl(url)];
+        isDataUrl(url) {
+            return url && url.startsWith('statamic://')
         }
-
     }
 
 }
