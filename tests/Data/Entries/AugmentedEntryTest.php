@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use Carbon\Carbon;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Collection as IlluminateCollection;
 use Mockery;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
@@ -132,5 +133,37 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $entry->set('mount', 'b');
         $this->assertEquals('b', $augmented->get('mount'));
+    }
+
+    /** @test */
+    public function it_gets_the_authors_from_the_value_first_if_it_exists()
+    {
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->create();
+
+        $augmented = new AugmentedEntry($entry);
+
+        // by default, authors will return a collection of whatever is in "author" (singular)
+        $authors = $augmented->get('authors');
+        $this->assertInstanceOf(IlluminateCollection::class, $authors);
+        $this->assertEquals([], $authors->all());
+
+        // a string is fine, but it'll get wrapped in a collection.
+        $entry->set('author', 'user-1');
+        $authors = $augmented->get('authors');
+        $this->assertInstanceOf(IlluminateCollection::class, $authors);
+        $this->assertEquals(['user-1'], $authors->all());
+
+        // an array is fine too.
+        $entry->set('author', ['user-1', 'user-2']);
+        $authors = $augmented->get('authors');
+        $this->assertInstanceOf(IlluminateCollection::class, $authors);
+        $this->assertEquals(['user-1', 'user-2'], $authors->all());
+
+        // explicitly setting an "authors" (plural) value will use that
+        $entry->set('authors', 'foo');
+        $this->assertEquals('foo', $augmented->get('authors'));
     }
 }
