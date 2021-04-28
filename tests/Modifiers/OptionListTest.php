@@ -26,7 +26,7 @@ class OptionListTest extends TestCase
         $this->assertEquals('this', $this->modify(collect(['this']), '&'));
         $this->assertEquals('this&that', $this->modify(collect(['this', 'that']), '&'));
     }
-    
+
     /** @test */
     public function it_returns_original_value_when_not_iterable()
     {
