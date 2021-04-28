@@ -10,6 +10,7 @@
                     :restrict-container-navigation="restrictContainerNavigation"
                     :restrict-folder-navigation="restrictFolderNavigation"
                     :max-files="maxFiles"
+                    :autoselect-uploads="true"
                     @selections-updated="selectionsUpdated"
                     @asset-doubleclicked="select">
 
