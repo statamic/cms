@@ -691,6 +691,28 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_no_dimensions_for_non_images()
+    {
+        $file = UploadedFile::fake()->create('file.txt');
+        Storage::fake('test')->putFileAs('foo', $file, 'file.txt');
+        $asset = (new Asset)->path('foo/file.txt')->container($this->container);
+
+        $this->assertEquals([null, null], $asset->dimensions());
+        $this->assertEquals(null, $asset->width());
+        $this->assertEquals(null, $asset->height());
+    }
+
+    /** @test */
+    public function it_doesnt_regenerate_the_meta_file_when_getting_non_image_dimensions()
+    {
+        $asset = $this->partialMock(Asset::class);
+
+        $asset->shouldReceive('meta')->times(0);
+
+        $this->assertEquals([null, null], $asset->dimensions());
+    }
+
+    /** @test */
     public function it_gets_file_size_in_bytes()
     {
         $container = $this->container;
