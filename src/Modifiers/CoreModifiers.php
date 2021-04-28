@@ -1415,7 +1415,7 @@ class CoreModifiers extends Modifier
         if (! is_array($value)) {
             return $value;
         }
-        
+
         if (count($params) > 1) {
             $params = [implode('|', $params)];
         }
