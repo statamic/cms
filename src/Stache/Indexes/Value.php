@@ -25,6 +25,10 @@ class Value extends Index
             return $item->entriesCount();
         }
 
+        if ($method === 'authors') {
+            return $item->value('authors') ?? $item->authors();
+        }
+
         if (method_exists($item, $method)) {
             return $item->{$method}();
         }
