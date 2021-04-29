@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Stache;
 use Statamic\Stache\Stores\AggregateStore;
+use Statamic\Support\Str;
 
 class StacheDoctor extends Command
 {
@@ -16,9 +17,11 @@ class StacheDoctor extends Command
 
     public function handle()
     {
-        $missing = Stache::stores()->flatMap(function ($store) {
+        $stores = Stache::stores()->flatMap(function ($store) {
             return $store instanceof AggregateStore ? $store->discoverStores() : [$store];
-        })->mapWithKeys(function ($store) {
+        });
+
+        $missing = $stores->mapWithKeys(function ($store) {
             return [$store->key() => $this->getUnconfiguredIndexes($store)];
         })->filter(function ($item) {
             return ! $item->isEmpty();
@@ -35,6 +38,24 @@ class StacheDoctor extends Command
             $item->each(function ($item) {
                 $this->line('- '.$item);
             });
+            $this->line('');
+        });
+
+        $stores->each(function ($store) {
+            if (($duplicates = $store->duplicates())->isEmpty()) {
+                return;
+            }
+
+            $this->line("<fg=red>[✗]</> Duplicate IDs in <comment>{$store->key()}</comment>");
+
+            $duplicates->each(function ($paths, $id) use ($store) {
+                $this->line($id);
+
+                foreach ($paths as $path) {
+                    $this->line('- '.Str::after($path, $store->directory().'/'));
+                }
+            });
+
             $this->line('');
         });
     }
