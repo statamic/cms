@@ -316,12 +316,25 @@ abstract class Store
 
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
-        $paths = $files->mapWithKeys(function ($timestamp, $path) {
-            $item = $this->makeItemFromFile($path, File::get($path));
-            $this->cacheItem($item);
-
-            return [$this->getItemKey($item) => $path];
+        $fileItems = $files->map(function ($timestamp, $path) {
+            return [
+                'item' => $item = $this->makeItemFromFile($path, File::get($path)),
+                'key' => $this->getItemKey($item),
+                'path' => $path,
+            ];
         });
+
+        $items = $fileItems->unique('key');
+
+        if ($items->count() !== $fileItems->count()) {
+            $this->trackDuplicates($fileItems->duplicates('key'));
+        }
+
+        $items->each(function ($item) {
+            $this->cacheItem($item['item']);
+        });
+
+        $paths = $items->pluck('path', 'key');
 
         $this->cachePaths($paths);
 
@@ -391,5 +404,31 @@ abstract class Store
 
         $this->shouldCacheFileItems = false;
         $this->fileItems = null;
+    }
+
+    protected function trackDuplicates($paths)
+    {
+        $duplicates = [];
+
+        foreach ($paths as $path => $key) {
+            $duplicates[$key][] = $path;
+        }
+
+        Cache::forever('stache::duplicates::'.$this->key(), $duplicates);
+    }
+
+    public function duplicates()
+    {
+        // Duplicates would get tracked in here, so we'll trigger it in case the cache is empty.
+        $this->paths();
+
+        if (! $duplicates = Cache::get('stache::duplicates::'.$this->key())) {
+            $duplicates = [];
+        }
+
+        // Only the additional duplicates are tracked. We'll add the first "actual" item to each.
+        return collect($duplicates)->map(function ($dupes, $key) {
+            return array_merge([$this->getItem($key)->path()], $dupes);
+        });
     }
 }
