@@ -413,7 +413,8 @@ abstract class Store
 
     public function duplicates()
     {
-        // Duplicates would get tracked in here, so we'll trigger it in case the cache is empty.
+        // Duplicates would get tracked while compiling paths,
+        // so we'll trigger it in case the cache is empty.
         $this->paths();
 
         if (! $duplicates = Cache::get($this->duplicatesCacheKey())) {
