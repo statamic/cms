@@ -5,11 +5,13 @@ namespace Statamic\Console\Commands;
 use Facades\Statamic\StarterKits\Installer as StarterKitInstaller;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Console\ValidatesInput;
+use Statamic\Rules\ComposerPackage;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 
 class StarterKitInstall extends Command
 {
-    use RunsInPlease;
+    use RunsInPlease, ValidatesInput;
 
     /**
      * The name and signature of the console command.
@@ -17,7 +19,7 @@ class StarterKitInstall extends Command
      * @var string
      */
     protected $signature = 'statamic:starter-kit:install
-        { package : Specify the starter kit package to install }
+        { package? : Specify the starter kit package to install }
         { --with-config : Copy starter-kit.yaml config for development }';
 
     /**
@@ -32,14 +34,32 @@ class StarterKitInstall extends Command
      */
     public function handle()
     {
+        if ($this->validationFails($package = $this->getPackage(), new ComposerPackage)) {
+            return;
+        }
+
         $installer = StarterKitInstaller::withConfig($this->option('with-config'));
 
         try {
-            $installer->install($package = $this->argument('package'), $this);
+            $installer->install($package, $this);
         } catch (StarterKitException $exception) {
             return $this->error($exception->getMessage());
         }
 
         $this->info("Starter kit [$package] was successfully installed.");
+    }
+
+    /**
+     * Get composer package.
+     *
+     * @return string
+     */
+    protected function getPackage()
+    {
+        if ($package = $this->argument('package')) {
+            return $package;
+        }
+
+        return $this->ask('Package');
     }
 }
