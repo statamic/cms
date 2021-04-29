@@ -20,7 +20,8 @@ class StarterKitInstall extends Command
      */
     protected $signature = 'statamic:starter-kit:install
         { package? : Specify the starter kit package to install }
-        { --with-config : Copy starter-kit.yaml config for development }';
+        { --with-config : Copy starter-kit.yaml config for development }
+        { --clear-site : Clear site before installing }';
 
     /**
      * The console command description.
@@ -36,6 +37,10 @@ class StarterKitInstall extends Command
     {
         if ($this->validationFails($package = $this->getPackage(), new ComposerPackage)) {
             return;
+        }
+
+        if ($this->shouldClear()) {
+            $this->call('statamic:site:clear', ['--no-interaction' => true]);
         }
 
         $installer = StarterKitInstaller::withConfig($this->option('with-config'));
@@ -56,10 +61,16 @@ class StarterKitInstall extends Command
      */
     protected function getPackage()
     {
-        if ($package = $this->argument('package')) {
-            return $package;
-        }
+        return $this->argument('package') ?: $this->ask('Package');
+    }
 
-        return $this->ask('Package');
+    /**
+     * Check if should clear site first.
+     *
+     * @return bool
+     */
+    protected function shouldClear()
+    {
+        return $this->option('clear-site') ?: $this->confirm('Clear site first?', false);
     }
 }
