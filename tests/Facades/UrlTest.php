@@ -8,6 +8,13 @@ use Tests\TestCase;
 
 class UrlTest extends TestCase
 {
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $app['config']->set('app.url', 'http://absolute-url-resolved-from-request.com');
+    }
+
     public function testBuildsUrl()
     {
         $url = URL::buildFromPath('pages/about/index.md');
@@ -80,6 +87,19 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal('http://this-site.com'));
         $this->assertFalse(URL::isExternal('http://this-site.com/'));
         $this->assertFalse(URL::isExternal('http://this-site.com/some-slug'));
+        $this->assertFalse(URL::isExternal('/foo'));
+    }
+
+    public function testDeterminesExternalUrlWhenUsingRelativeInConfig()
+    {
+        Site::setConfig('sites.en.url', '/');
+        $this->assertTrue(URL::isExternal('http://that-site.com'));
+        $this->assertTrue(URL::isExternal('http://that-site.com/'));
+        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));
+        $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com'));
+        $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com/'));
+        $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com/some-slug'));
+        $this->assertFalse(URL::isExternal('/foo'));
     }
 
     /**

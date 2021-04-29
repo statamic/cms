@@ -65,7 +65,7 @@ export default {
         },
 
         configParameter() {
-            return btoa(JSON.stringify(this.config));
+            return utf8btoa(JSON.stringify(this.config));
         }
 
     },

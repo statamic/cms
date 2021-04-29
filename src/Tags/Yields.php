@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\View\Store;
+use Facades\Statamic\View\Cascade;
 
 class Yields extends Tags
 {
@@ -12,7 +12,7 @@ class Yields extends Tags
     {
         $name = explode(':', $this->tag)[1];
 
-        if ($yield = app(Store::class)->sections()->get($name)) {
+        if ($yield = Cascade::instance()->sections()->get($name)) {
             return $yield;
         }
 

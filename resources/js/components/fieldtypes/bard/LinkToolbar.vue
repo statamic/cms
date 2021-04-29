@@ -15,17 +15,40 @@
 
                 <div :class="isEditing ? 'flex items-center' : 'hidden'">
                     <input
+                        v-show="!isInternalLink"
                         type="text"
                         ref="input"
                         v-model="linkInput"
                         class="flex-1 input"
                         @keydown.enter.prevent="commit"
                     />
+                    <div
+                        v-show="isInternalLink"
+                        v-text="actualLinkText"
+                        class="flex-1 input whitespace-no-wrap overflow-hidden text-overflow-ellipsis h-auto cursor-not-allowed"
+                    />
                 </div>
             </div>
             <div class="bard-link-toolbar-buttons">
+                <relationship-input
+                    class="hidden"
+                    ref="relationshipInput"
+                    name="link"
+                    :value="[]"
+                    :config="relationshipConfig"
+                    :item-data-url="itemDataUrl"
+                    :selections-url="selectionsUrl"
+                    :filters-url="filtersUrl"
+                    :columns="[{ label: __('Title'), field: 'title' }]"
+                    :max-items="1"
+                    :site="bard.site"
+                    @item-data-updated="relationshipItemDataUpdated"
+                />
                 <button @click="edit" v-tooltip="__('Edit Link')" v-show="!isEditing">
                     <span class="icon icon-pencil" />
+                </button>
+                <button @click="openSelector" v-tooltip="`${__('Browse')}...`" v-show="isEditing">
+                    <span class="icon icon-magnifying-glass" />
                 </button>
                 <button @click="remove" v-tooltip="__('Remove Link')" v-show="hasLink && isEditing">
                     <span class="icon icon-trash" />
@@ -35,9 +58,9 @@
                 </button>
             </div>
         </div>
-        <div class="p-sm pt-1 border-t border-faint-white" v-show="isEditing">
-            <label class="text-2xs text-white flex items-center">
-                <input class="checkbox mr-1 -mt-sm" type="checkbox" v-model="targetBlank">
+        <div class="p-sm pt-1 border-t" v-show="isEditing">
+            <label class="text-2xs flex items-center">
+                <input class="checkbox mr-1" type="checkbox" v-model="targetBlank">
                 {{ __('Open in new window') }}
             </label>
         </div>
@@ -46,6 +69,8 @@
 </template>
 
 <script>
+import qs from 'qs';
+
 export default {
 
     props: {
@@ -60,6 +85,7 @@ export default {
             linkInput: this.initialLinkAttrs.href,
             targetBlank: null,
             isEditing: false,
+            internalLink: null,
         }
     },
 
@@ -70,16 +96,52 @@ export default {
         },
 
         isInternalLink() {
-            return false;
+            return !! this.internalLink;
         },
 
         actualLinkHref() {
-            return this.isInternalLink ? this.internalLink.url : this.linkAttrs.href;
+            return this.isInternalLink ? this.internalLink.permalink : this.linkAttrs.href;
         },
 
         actualLinkText() {
-            return this.isInternalLink ? this.internalLink.text : this.linkAttrs.href;
+            return this.isInternalLink ? this.internalLink.title : this.linkAttrs.href;
         },
+
+        relationshipConfig() {
+            return {
+                type: 'entries',
+                collections: this.collections,
+                max_items: 1,
+            };
+        },
+
+        itemDataUrl() {
+            return cp_url('fieldtypes/relationship/data') + '?' + qs.stringify({
+                config: this.configParameter
+            });
+        },
+
+        selectionsUrl() {
+            return cp_url('fieldtypes/relationship') + '?' + qs.stringify({
+                config: this.configParameter,
+                collections: this.collections,
+            });
+        },
+
+        filtersUrl() {
+            return cp_url('fieldtypes/relationship/filters') + '?' + qs.stringify({
+                config: this.configParameter,
+                collections: this.collections,
+            });
+        },
+
+        configParameter() {
+            return utf8btoa(JSON.stringify(this.relationshipConfig));
+        },
+
+        collections() {
+            return this.bard.meta.linkCollections;
+        }
 
     },
 
@@ -87,6 +149,8 @@ export default {
         this.targetBlank = this.linkAttrs.href
             ? this.linkAttrs.target == '_blank'
             : this.config.target_blank;
+
+        this.internalLink = this.getInternalLinkFromUrl(this.linkAttrs.href);
 
         if (!this.linkAttrs.href) {
             this.edit();
@@ -98,9 +162,15 @@ export default {
             this.linkAttrs = attrs;
             this.linkInput = attrs.href;
             this.targetBlank = attrs.target == '_blank';
+            this.internalLink = this.getInternalLinkFromUrl(attrs.href);
         });
 
         this.bard.$on('link-deselected', () => this.$emit('deselected'));
+    },
+
+    beforeDestroy() {
+        this.bard.$off('link-selected');
+        this.bard.$off('link-deselected');
     },
 
     methods: {
@@ -140,6 +210,39 @@ export default {
                         'https://' + str :
                             str;
         },
+
+        openSelector() {
+            this.$refs.relationshipInput.$refs.existing.click();
+        },
+
+        relationshipItemDataUpdated(data) {
+            if (! data.length) return;
+
+            const item = data[0];
+            const ref = `entry::${item.id}`;
+
+            this.pushItemDataIntoMeta(ref, item);
+
+            this.linkInput = `statamic://${ref}`;
+
+            this.commit();
+        },
+
+        pushItemDataIntoMeta(ref, item) {
+            let meta = this.bard.meta;
+            meta.linkData[ref] = item;
+            this.bard.updateMeta(meta);
+        },
+
+        getReferenceFromInternalUrl(url) {
+            return url.substr(11); // everything after statamic://
+        },
+
+        getInternalLinkFromUrl(url) {
+            if (!url || url.substr(0, 11) !== 'statamic://') return null;
+
+            return this.bard.meta.linkData[this.getReferenceFromInternalUrl(url)];
+        }
 
     }
 

@@ -3,6 +3,7 @@
 namespace Statamic\Console\Processes;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Console\Composer\Lock;
 use Statamic\Jobs\RunComposer;
 
 class Composer extends Process
@@ -51,10 +52,7 @@ class Composer extends Process
      */
     public function installedVersion(string $package)
     {
-        $version = collect(json_decode(file_get_contents($this->basePath.'composer.lock'))->packages)
-            ->keyBy('name')
-            ->get($package)
-            ->version;
+        $version = Lock::file($this->basePath.'composer.lock')->getInstalledVersion($package);
 
         return $this->normalizeVersion($version);
     }

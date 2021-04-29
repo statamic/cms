@@ -7,6 +7,7 @@ use Statamic\Contracts\Assets\AssetRepository as Contract;
 use Statamic\Contracts\Assets\QueryBuilder;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
@@ -116,6 +117,29 @@ class AssetRepository implements Contract
     public function save($asset)
     {
         $asset->writeMeta($asset->generateMeta());
+
+        $store = Stache::store('assets::'.$asset->containerHandle());
+
+        $cache = $asset->container()->contents();
+
+        $cache->add($asset->path());
+
+        if ($asset->path() !== ($originalPath = $asset->getOriginal('path'))) {
+            $originalId = $asset->container()->handle().'::'.$originalPath;
+            $store->delete($store->getItem($originalId));
+            $cache->forget($originalPath);
+        }
+
+        $cache->save();
+
+        $store->save($asset);
+    }
+
+    public function delete($asset)
+    {
+        $asset->container()->contents()->forget($asset->path())->save();
+
+        Stache::store('assets::'.$asset->containerHandle())->delete($asset);
     }
 
     public static function bindings(): array

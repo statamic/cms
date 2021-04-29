@@ -27,11 +27,13 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $policies = [];
     protected $commands = [];
     protected $stylesheets = [];
+    protected $externalStylesheets = [];
     protected $scripts = [];
     protected $externalScripts = [];
     protected $publishables = [];
     protected $routes = [];
     protected $middlewareGroups = [];
+    protected $updateScripts = [];
     protected $viewNamespace;
     protected $publishAfterInstall = true;
     protected $config = true;
@@ -62,6 +64,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootTranslations()
                 ->bootRoutes()
                 ->bootMiddleware()
+                ->bootUpdateScripts()
                 ->bootViews()
                 ->bootPublishAfterInstall();
         });
@@ -171,6 +174,10 @@ abstract class AddonServiceProvider extends ServiceProvider
             $this->registerStylesheet($path);
         }
 
+        foreach ($this->externalStylesheets as $url) {
+            $this->registerExternalStylesheet($url);
+        }
+
         return $this;
     }
 
@@ -180,8 +187,8 @@ abstract class AddonServiceProvider extends ServiceProvider
             $this->registerScript($path);
         }
 
-        foreach ($this->externalScripts as $path) {
-            $this->registerExternalScript($path);
+        foreach ($this->externalScripts as $url) {
+            $this->registerExternalScript($url);
         }
 
         return $this;
@@ -343,6 +350,15 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function bootUpdateScripts()
+    {
+        foreach ($this->updateScripts as $class) {
+            $class::register($this->getAddon()->package());
+        }
+
+        return $this;
+    }
+
     protected function bootViews()
     {
         if (file_exists($this->getAddon()->directory().'resources/views')) {
@@ -382,6 +398,11 @@ abstract class AddonServiceProvider extends ServiceProvider
         ], $this->getAddon()->slug());
 
         Statamic::style($name, $filename);
+    }
+
+    public function registerExternalStylesheet(string $url)
+    {
+        Statamic::externalStyle($url);
     }
 
     protected function schedule($schedule)

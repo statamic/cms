@@ -2,7 +2,6 @@
 
 namespace Statamic\Assets;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -13,13 +12,12 @@ use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
-use Statamic\Facades\YAML;
-use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
@@ -213,6 +211,18 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $this->disk;
     }
 
+    public function listContents()
+    {
+        return $this->contents()->all();
+    }
+
+    public function contents()
+    {
+        return Blink::once('asset-listing-cache-'.$this->handle(), function () {
+            return new AssetContainerContents($this);
+        });
+    }
+
     /**
      * Get all the asset files in this container.
      *
@@ -220,32 +230,21 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive
      * @return \Illuminate\Support\Collection
      */
-    public function files($folder = null, $recursive = false)
+    public function files($folder = '/', $recursive = false)
     {
         // When requesting files() as-is, we want all of them.
-        if ($folder == null) {
+        if (func_num_args() === 0) {
             $recursive = true;
         }
 
-        $cacheFor = config('statamic.assets.file_listing_cache_length', 60);
-
-        return Cache::remember($this->filesCacheKey($folder), $cacheFor, function () use ($folder, $recursive) {
-            $files = collect($this->disk()->getFiles($folder, $recursive));
-
-            // Get rid of files we never want to show up.
-            $files = $files->reject(function ($path) {
-                return Str::startsWith($path, '.meta/')
-                    || Str::contains($path, '/.meta/')
-                    || Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
-            });
-
-            return $files->values();
-        });
+        return $this->contents()->filteredFilesIn($folder, $recursive)->keys();
     }
 
-    public function filesCacheKey($folder = '/')
+    public function foldersCacheKey($folder = '/', $recursive = false)
     {
-        return 'asset-files-'.$this->handle().'-'.$folder;
+        $rec = $recursive ? '-recursive' : '';
+
+        return 'asset-folders-'.$this->handle().'-'.$folder.$rec;
     }
 
     /**
@@ -255,19 +254,14 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive
      * @return \Illuminate\Support\Collection
      */
-    public function folders($folder = null, $recursive = false)
+    public function folders($folder = '/', $recursive = false)
     {
         // When requesting folders() as-is, we want all of them.
-        if ($folder == null) {
-            $folder = '/';
+        if (func_num_args() === 0) {
             $recursive = true;
         }
 
-        $paths = $this->disk()->getFolders($folder, $recursive);
-
-        return collect($paths)->reject(function ($path) {
-            return basename($path) === '.meta';
-        })->values();
+        return $this->contents()->filteredDirectoriesIn($folder, $recursive)->keys();
     }
 
     /**
@@ -277,9 +271,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive Whether to look for assets recursively
      * @return AssetCollection
      */
-    public function assets($folder = null, $recursive = false)
+    public function assets($folder = '/', $recursive = false)
     {
         $query = $this->queryAssets();
+
+        if (func_num_args() === 0) {
+            $recursive = true;
+        }
+
+        if ($folder === '/' && $recursive) {
+            $folder = null;
+        }
 
         if ($folder && $recursive) {
             $query->where('folder', 'like', "{$folder}%");
@@ -293,11 +295,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * Get all the asset folders in this container.
      *
-     * @param string|null $folder Narrow down by folder
+     * @param string $folder Narrow down by folder
+     * @param bool $recursive Whether to look for subfolders recursively
+     * @return Collection  A collection of AssetFolder instances
      */
-    public function assetFolders($folder = null)
+    public function assetFolders($folder = '/', $recursive = false)
     {
-        return $this->folders($folder)->keyBy(function ($path) {
+        if (func_num_args() === 0) {
+            $recursive = true;
+        }
+
+        return $this->folders($folder, $recursive)->keyBy(function ($path) {
             return $path;
         })->map(function ($path) {
             return $this->assetFolder($path);
@@ -312,7 +320,10 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function makeAsset($path)
     {
-        return AssetAPI::make()->path($path)->container($this);
+        return AssetAPI::make()
+            ->path($path)
+            ->container($this)
+            ->syncOriginal();
     }
 
     /**
@@ -325,7 +336,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         $asset = Facades\Asset::make()->container($this)->path($path);
 
-        if (! $asset->disk()->exists($asset->path())) {
+        if (! $asset->exists()) {
             return null;
         }
 
@@ -342,16 +353,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function assetFolder($path)
     {
-        $filePath = ltrim("{$path}/folder.yaml", '/');
-
-        $contents = $this->disk()->get($filePath, '');
-
-        $data = YAML::parse($contents);
-
-        return (new AssetFolder)
-            ->container($this)
-            ->path($path)
-            ->title(array_get($data, 'title'));
+        return (new AssetFolder)->container($this)->path($path);
     }
 
     /**

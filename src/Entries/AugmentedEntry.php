@@ -69,4 +69,9 @@ class AugmentedEntry extends AbstractAugmented
     {
         return $this->data->value('mount') ?? Collection::findByMount($this->data);
     }
+
+    public function authors()
+    {
+        return $this->data->value('authors') ?? $this->data->authors();
+    }
 }

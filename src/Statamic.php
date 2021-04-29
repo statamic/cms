@@ -4,6 +4,7 @@ namespace Statamic;
 
 use Closure;
 use Illuminate\Http\Request;
+use Laravel\Nova\Nova;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -18,6 +19,7 @@ class Statamic
     protected static $scripts = [];
     protected static $externalScripts = [];
     protected static $styles = [];
+    protected static $externalStyles = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
@@ -79,9 +81,21 @@ class Statamic
         return static::$styles;
     }
 
+    public static function availableExternalStyles(Request $request)
+    {
+        return static::$externalStyles;
+    }
+
     public static function style($name, $path)
     {
         static::$styles[$name][] = str_finish($path, '.css');
+
+        return new static;
+    }
+
+    public static function externalStyle($url)
+    {
+        static::$externalStyles[] = $url;
 
         return new static;
     }
@@ -194,7 +208,7 @@ class Statamic
     public static function jsonVariables(Request $request)
     {
         return collect(static::$jsonVariables)->map(function ($variable) use ($request) {
-            return is_callable($variable) ? $variable($request) : $variable;
+            return is_callable($variable) && ! is_string($variable) ? $variable($request) : $variable;
         })->all();
     }
 
@@ -261,6 +275,8 @@ class Statamic
         foreach (static::$bootedCallbacks as $callback) {
             $callback();
         }
+
+        static::$bootedCallbacks = [];
     }
 
     public static function afterInstalled(Closure $callback)
@@ -273,6 +289,8 @@ class Statamic
         foreach (static::$afterInstalledCallbacks as $callback) {
             $callback($command);
         }
+
+        static::$afterInstalledCallbacks = [];
     }
 
     public static function repository($abstract, $concrete)
@@ -282,5 +300,16 @@ class Statamic
         foreach ($concrete::bindings() as $abstract => $concrete) {
             app()->bind($abstract, $concrete);
         }
+    }
+
+    public static function frontendRouteSegmentRegex()
+    {
+        $prefix = '';
+
+        if (class_exists(Nova::class)) {
+            $prefix = '(?!'.trim(Nova::path(), '/').')';
+        }
+
+        return $prefix.'.*';
     }
 }

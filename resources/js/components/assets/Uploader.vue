@@ -128,6 +128,14 @@ export default {
 
                     if (response.responseJSON) {
                         errMsg = response.responseJSON.message;
+                    } 
+
+                    if (! errMsg) {
+                        if (response.status === 413) {
+                            errMsg = __('Upload failed. The file is larger than is allowed by your server.');
+                        } else {
+                            errMsg = __('Upload failed. The file might be larger than is allowed by your server.');
+                        }
                     }
 
                     upload.errorMessage = errMsg;

@@ -32,6 +32,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Queue Connection
+    |--------------------------------------------------------------------------
+    |
+    | You may choose which queue connection should be used when dispatching
+    | commit jobs. Unless specified, the default connection will be used.
+    |
+    | https://statamic.dev/git-integration#queueing-commits
+    |
+    */
+
+    'queue_connection' => env('STATAMIC_GIT_QUEUE_CONNECTION'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Dispatch Delay
     |--------------------------------------------------------------------------
     |
@@ -85,6 +99,18 @@ return [
         resource_path('users'),
         storage_path('forms'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Git Binary
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will try to use the "git" command, but you can set
+    | an absolute path to the git binary if necessary for your environment.
+    |
+    */
+
+    'binary' => env('STATAMIC_GIT_BINARY', 'git'),
 
     /*
     |--------------------------------------------------------------------------

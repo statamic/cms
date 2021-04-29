@@ -2,8 +2,11 @@
 
 namespace Statamic\Forms;
 
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
@@ -12,12 +15,13 @@ use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Form implements FormContract
+class Form implements FormContract, Augmentable
 {
-    use FluentlyGetsAndSets;
+    use FluentlyGetsAndSets, HasAugmentedInstance;
 
     protected $handle;
     protected $title;
@@ -144,6 +148,8 @@ class Form implements FormContract
             'title' => $this->title,
             'honeypot' => $this->honeypot,
             'email' => collect($this->email)->map(function ($email) {
+                $email['markdown'] = $email['markdown'] ?: null;
+
                 return Arr::removeNullValues($email);
             })->all(),
             'metrics' => $this->metrics,
@@ -331,5 +337,20 @@ class Form implements FormContract
         return $this->fields()->filter(function ($field) {
             return $field->fieldtype()->handle() === 'assets';
         })->isNotEmpty();
+    }
+
+    public function newAugmentedInstance(): Augmented
+    {
+        return new AugmentedForm($this);
+    }
+
+    protected function shallowAugmentedArrayKeys()
+    {
+        return ['handle', 'title', 'api_url'];
+    }
+
+    public function apiUrl()
+    {
+        return Statamic::apiRoute('forms.show', $this->handle());
     }
 }

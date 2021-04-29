@@ -4,20 +4,24 @@ namespace Statamic\Structures;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\ForwardsCalls;
+use JsonSerializable;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\GraphQL\ResolvesValues;
 
-class Page implements Entry, Augmentable, Responsable, Protectable
+class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract
 {
-    use HasAugmentedInstance, ForwardsCalls;
+    use HasAugmentedInstance, ForwardsCalls, TracksQueriedColumns, ResolvesValues;
 
     protected $tree;
     protected $reference;
@@ -38,22 +42,17 @@ class Page implements Entry, Augmentable, Responsable, Protectable
 
     public function url()
     {
-        if ($this->url) {
-            return $this->url;
-        }
+        return $this->url ?? optional($this->entry())->url();
+    }
 
-        if ($this->isRedirect()) {
-            return $this->redirectUrl();
-        }
-
-        if ($this->reference && $this->referenceExists()) {
-            return URL::makeRelative($this->absoluteUrl());
-        }
+    public function urlWithoutRedirect()
+    {
+        return $this->url ?? optional($this->entry())->urlWithoutRedirect();
     }
 
     public function isRedirect()
     {
-        return optional($this->entry())->isRedirect();
+        return optional($this->entry())->isRedirect() ?? false;
     }
 
     public function setDepth($depth)
@@ -122,12 +121,12 @@ class Page implements Entry, Augmentable, Responsable, Protectable
         return $this->entry() !== null;
     }
 
-    public function parent(): ?Page
+    public function parent(): ?self
     {
         return $this->parent;
     }
 
-    public function setParent(?Page $parent): self
+    public function setParent(?self $parent): self
     {
         $this->parent = $parent;
 
@@ -153,8 +152,12 @@ class Page implements Entry, Augmentable, Responsable, Protectable
 
     public function uri()
     {
+        if ($this->url) {
+            return $this->url();
+        }
+
         if (! $this->reference) {
-            return optional($this->parent)->uri();
+            return null;
         }
 
         $uris = Blink::store('structure-uris');
@@ -181,21 +184,19 @@ class Page implements Entry, Augmentable, Responsable, Protectable
     public function absoluteUrl()
     {
         if ($this->url) {
-            return $this->url;
+            return URL::makeAbsolute($this->url);
         }
 
-        if ($this->isRedirect()) {
-            return $this->redirectUrl();
+        return optional($this->entry())->absoluteUrl();
+    }
+
+    public function absoluteUrlWithoutRedirect()
+    {
+        if ($this->url) {
+            return $this->absoluteUrl();
         }
 
-        if ($this->reference && $this->referenceExists()) {
-            $url = vsprintf('%s/%s', [
-                rtrim($this->site()->absoluteUrl(), '/'),
-                ltrim($this->uri(), '/'),
-            ]);
-
-            return $url === '/' ? $url : rtrim($url, '/');
-        }
+        return optional($this->entry())->absoluteUrlWithoutRedirect();
     }
 
     public function isRoot()
@@ -329,5 +330,13 @@ class Page implements Entry, Augmentable, Responsable, Protectable
     public function __call($method, $args)
     {
         return $this->forwardCallTo($this->entry(), $method, $args);
+    }
+
+    public function jsonSerialize()
+    {
+        return $this
+            ->toAugmentedCollection($this->selectedQueryColumns)
+            ->withShallowNesting()
+            ->toArray();
     }
 }

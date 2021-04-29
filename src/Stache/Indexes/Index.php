@@ -94,6 +94,11 @@ abstract class Index
         return $this;
     }
 
+    public function isCached()
+    {
+        return Cache::has($this->cacheKey());
+    }
+
     public function cache()
     {
         Cache::forever($this->cacheKey(), $this->items);

@@ -73,4 +73,9 @@ class Fieldtype extends Relationship
     {
         return Facades\Form::find($value);
     }
+
+    protected function shallowAugmentValue($value)
+    {
+        return $value->toShallowAugmentedCollection();
+    }
 }

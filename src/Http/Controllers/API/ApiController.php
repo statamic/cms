@@ -2,7 +2,8 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
@@ -11,19 +12,83 @@ class ApiController extends Controller
 {
     use QueriesConditions;
 
-    /**
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
+    protected $resourceConfigKey;
+    protected $routeResourceKey;
+    protected $filterPublished = false;
 
     /**
-     * Create a new CpController.
+     * Abort if item is unpublished.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param mixed $item
+     * @return bool
      */
-    public function __construct(Request $request)
+    protected function abortIfUnpublished($item)
     {
-        $this->request = $request;
+        throw_if($item->published() === false, new NotFoundHttpException);
+    }
+
+    /**
+     * Abort if endpoint is disabled.
+     */
+    protected function abortIfDisabled()
+    {
+        if (! $this->resourceConfigKey) {
+            return;
+        }
+
+        $config = config("statamic.api.resources.{$this->resourceConfigKey}", false);
+
+        if ($config !== true && ! is_array($config)) {
+            throw new NotFoundHttpException;
+        }
+
+        if (! $this->routeResourceKey || ! is_array($config)) {
+            return;
+        }
+
+        foreach ($config as $resource) {
+            $this->abortIfRouteResourceDisabled($this->routeResourceKey, $resource);
+        }
+    }
+
+    /**
+     * Abort if route resource is disabled.
+     *
+     * @param string $routeSegment
+     * @param string $resource
+     */
+    protected function abortIfRouteResourceDisabled($routeSegment, $resource)
+    {
+        if (! $handle = request()->route($routeSegment)) {
+            return;
+        }
+
+        if (! is_string($handle)) {
+            $handle = $handle->handle();
+        }
+
+        if ($handle && $handle !== $resource) {
+            throw new NotFoundHttpException;
+        }
+    }
+
+    /**
+     * If endpoint config is an array, filter allowed resources.
+     *
+     * @param \Illuminate\Support\Collection $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function filterAllowedResources($items)
+    {
+        $allowedResources = config("statamic.api.resources.{$this->resourceConfigKey}");
+
+        if (! is_array($allowedResources)) {
+            return $items;
+        }
+
+        return $items->filter(function ($item) use ($allowedResources) {
+            return in_array($item->handle(), $allowedResources);
+        });
     }
 
     /**
@@ -50,7 +115,7 @@ class ApiController extends Controller
      */
     protected function filter($query)
     {
-        collect($this->request->filter ?? [])
+        $this->getFilters()
             ->each(function ($value, $filter) use ($query) {
                 if ($value === 'true') {
                     $value = true;
@@ -72,6 +137,37 @@ class ApiController extends Controller
     }
 
     /**
+     * Get filters for querying.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getFilters()
+    {
+        $filters = collect(request()->filter ?? []);
+
+        if ($this->filterPublished && $this->doesntHaveFilter('status') && $this->doesntHaveFilter('published')) {
+            $filters->put('status:is', 'published');
+        }
+
+        return $filters;
+    }
+
+    /**
+     * Check if user is not filtering by a specific field, for applying default filters.
+     *
+     * @param string $field
+     * @return bool
+     */
+    public function doesntHaveFilter($field)
+    {
+        return ! collect(request()->filter ?? [])
+            ->map(function ($value, $param) {
+                return explode(':', $param)[0];
+            })
+            ->contains($field);
+    }
+
+    /**
      * Sorts the query based on the sort parameter.
      *
      * Fields can be prexied with a hyphen to sort descending.
@@ -84,7 +180,7 @@ class ApiController extends Controller
      */
     protected function sort($query)
     {
-        if (! $sorts = $this->request->sort) {
+        if (! $sorts = request()->sort) {
             return $this;
         }
 
@@ -113,10 +209,30 @@ class ApiController extends Controller
      */
     protected function paginate($query)
     {
-        $columns = explode(',', $this->request->input('fields', '*'));
+        $columns = explode(',', request()->input('fields', '*'));
 
         return $query
-            ->paginate($this->request->input('limit', 25), $columns)
-            ->appends($this->request->only(['filter', 'limit', 'page']));
+            ->paginate(request()->input('limit', 25), $columns)
+            ->appends(request()->only(['filter', 'limit', 'page']));
+    }
+
+    /**
+     * Get query param.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    protected function queryParam($key, $default = null)
+    {
+        if ($key === 'site') {
+            return request()->input('site', Site::default()->handle());
+        }
+
+        if ($key === 'fields') {
+            return explode(',', request()->input($key, '*'));
+        }
+
+        return request()->input($key, $default);
     }
 }
