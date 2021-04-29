@@ -245,15 +245,6 @@ abstract class Store
         // Load all the indexes so we're dealing with fresh items in both loops.
         $indexes = $this->resolveIndexes()->each->load();
 
-        // Remove deleted items from every index.
-        $indexes->each(function ($index) use ($deleted, $pathMap) {
-            $deleted->each(function ($path) use ($index, $pathMap) {
-                if ($key = $pathMap->get($path)) {
-                    $index->forgetItem($key);
-                }
-            });
-        });
-
         // Get items from every file that was modified.
         $modified = $modified->map(function ($timestamp, $path) use ($pathMap) {
             return $this->getItemFromModifiedPath($path, $pathMap);
