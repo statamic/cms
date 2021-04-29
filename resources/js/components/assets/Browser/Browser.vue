@@ -158,7 +158,7 @@
 
                                 <template slot="actions" slot-scope="{ row: asset }">
                                     <dropdown-list>
-                                        <dropdown-item :text="__('Edit')" @click="edit(asset.id)" />
+                                        <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
@@ -225,6 +225,7 @@
         <asset-editor
             v-if="showAssetEditor"
             :id="editedAssetId"
+            :read-only="! canEdit"
             @closed="closeAssetEditor"
             @saved="assetSaved"
         />
@@ -272,14 +273,15 @@ export default {
         selectedAssets: Array,
         maxFiles: Number,
         initialEditingAssetId: String,
+        autoselectUploads: Boolean,
     },
 
     data() {
         return {
             columns: [
-                { label: __('File'), field: 'basename', visible: true },
-                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true },
-                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true },
+                { label: __('File'), field: 'basename', visible: true, sortable: true },
+                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true, sortable: true },
+                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true, sortable: true },
             ],
             containers: [],
             container: {},
@@ -331,9 +333,7 @@ export default {
         },
 
         canEdit() {
-            return true;
-            // TODO
-            // return this.can('assets:'+ this.container.id +':edit')
+            return this.can('assets:'+ this.container.id +':edit')
         },
 
         canUpload() {
@@ -502,9 +502,7 @@ export default {
         },
 
         edit(id) {
-            if (this.canEdit) {
-                this.editedAssetId = id;
-            }
+            this.editedAssetId = id;
         },
 
         closeAssetEditor() {
@@ -526,6 +524,14 @@ export default {
         },
 
         uploadCompleted(asset) {
+            if (this.autoselectUploads) {
+                this.sortColumn = 'last_modified';
+                this.sortDirection = 'desc';
+
+                this.selectedAssets.push(asset.id);
+                this.$emit('selections-updated', this.selectedAssets);
+            }
+
             this.loadAssets();
             this.$toast.success(__(':file uploaded', { file: asset.basename }));
         },

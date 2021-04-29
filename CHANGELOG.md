@@ -1,5 +1,48 @@
 # Release Notes
 
+## 3.1.11 (2020-04-28)
+
+### What's improved
+- Assets uploaded in the selector stack will be automatically selected. [#3604](https://github.com/statamic/cms/issues/3604)
+- Improved the UX of the `link` fieldtype. [#3605](https://github.com/statamic/cms/issues/3605)
+- Updated French and German translations. [#3583](https://github.com/statamic/cms/issues/3583) [#3589](https://github.com/statamic/cms/issues/3589) [#3601](https://github.com/statamic/cms/issues/3601)
+
+### What's fixed
+- Fix relationship fieldtypes sometimes only showing IDs. [#3547](https://github.com/statamic/cms/issues/3547)
+- Prevent regenerating asset meta file for non-images. [#3609](https://github.com/statamic/cms/issues/3609)
+- Handle custom `authors` field. [#3599](https://github.com/statamic/cms/issues/3599)
+- Cascade is reused on subsequent calls rather than rehydrating. [#3595](https://github.com/statamic/cms/issues/3595)
+- Old input values are remembered in the `user:register_form`. [#3584](https://github.com/statamic/cms/issues/3584)
+- Support collections in the `sentence_list` modifier. [#3593](https://github.com/statamic/cms/issues/3593)
+- Support collections in the `option_list` modifier. [#3606](https://github.com/statamic/cms/issues/3606)
+- Fix bard formatting inside links. [#3108](https://github.com/statamic/cms/issues/3108)
+
+
+
+## 3.1.10 (2020-04-23)
+
+### What's improved
+- Improve Laravel Nova compatibility by avoiding conflicting routes. [#3543](https://github.com/statamic/cms/issues/3543)
+- A read-only asset editor is now more read-only-er. [#3552](https://github.com/statamic/cms/issues/3552)
+- Improved asset upload failure error messages. [#3560](https://github.com/statamic/cms/issues/3560)
+
+### What's fixed
+- The `link` and `path` tags use the `id` parameter to output urls for entries, etc. [#3576](https://github.com/statamic/cms/issues/3576)
+- They'll use the original item's url if it doesn't exist in the current site. [#3579](https://github.com/statamic/cms/issues/3579)
+- Fix the Collection edit screen not showing existing routes, and prevent an incorrect dirty state message. [#3581](https://github.com/statamic/cms/issues/3581)
+- Fix issues where the Static Site Generator would sometimes leak data between pages. [#3562](https://github.com/statamic/cms/issues/3562)
+- Fix set reordering for Bard and Replicator. [#3574](https://github.com/statamic/cms/issues/3574)
+- Fix page not scrolling when dragging Bard sets. [#3571](https://github.com/statamic/cms/issues/3571)
+- Fix images not displaying in Bard. [#3570](https://github.com/statamic/cms/issues/3570)
+- Add missing red asterisk to required fields in a Bard or Replicator set. [#3572](https://github.com/statamic/cms/issues/3572)
+- Fix issue where the first line after an image in Bard was not editable. [#3555](https://github.com/statamic/cms/issues/3555)
+- Fix issue where you sometimes couldn't move the cursor in Bard. [#3559](https://github.com/statamic/cms/issues/3559)
+- When using a collection widget with pagination, you don't get scrolled to the top of the page. [#3553](https://github.com/statamic/cms/issues/3553)
+- Fix the missing delete action for asset folders. [#3582](https://github.com/statamic/cms/issues/3582)
+- Bump ssri from 6.0.1 to 6.0.2. [#3549](https://github.com/statamic/cms/issues/3549)
+
+
+
 ## 3.1.9 (2020-04-19)
 
 ### What's improved

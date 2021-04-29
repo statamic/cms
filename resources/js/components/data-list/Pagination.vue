@@ -61,6 +61,10 @@ export default {
         resourceMeta: {
             type: Object,
             required: true
+        },
+        scrollToTop: {
+            type: Boolean,
+            default: true,
         }
     },
 
@@ -153,7 +157,9 @@ export default {
 
             this.$emit('page-selected', page);
 
-            window.scrollTo(0, 0);
+            if (this.scrollToTop) {
+                window.scrollTo(0, 0);
+            }
         },
 
         selectPreviousPage() {

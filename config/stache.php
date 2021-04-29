@@ -22,7 +22,9 @@ return [
     | Stores
     |--------------------------------------------------------------------------
     |
-    | Here you may configure which stores are used inside the Stache.
+    | Here you may configure the stores that are used inside the Stache.
+    |
+    | https://statamic.dev/stache#stores
     |
     */
 

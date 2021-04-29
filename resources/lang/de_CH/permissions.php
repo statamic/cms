@@ -38,7 +38,7 @@ return [
     'configure_navs_desc' => 'Gewährt Zugriff auf alle Berechtigungen im Zusammenhang mit der Navigation.',
     'view_{nav}_nav' => ':nav Navigation anzeigen',
     'edit_{nav}_nav' => 'Navigation bearbeiten',
-    'group_globals' => 'Gobale Inhalte',
+    'group_globals' => 'Globale Inhalte',
     'configure_globals' => 'Globale Sets konfigurieren',
     'configure_globals_desc' => 'Gewährt Zugriff auf alle Berechtigungen im Zusammenhang mit globalen Sets.',
     'edit_{global}_globals' => ':global Inhalte bearbeiten',

@@ -1,6 +1,11 @@
 <template>
 
-    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }" @dragstart.stop>
+    <div 
+        class="bard-fieldtype-wrapper"
+        :class="{'bard-fullscreen': fullScreenMode }"
+        @dragstart.stop="ignorePageHeader(true)"
+        @dragend="ignorePageHeader(false)"
+    >
 
         <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar" v-if="showFixedToolbar">
@@ -160,6 +165,7 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
+            pageHeader: null,
         }
     },
 
@@ -258,6 +264,8 @@ export default {
         this.$keys.bind('esc', this.closeFullscreen)
 
         this.$nextTick(() => this.mounted = true);
+
+        this.pageHeader = document.querySelector('.global-header');
     },
 
     beforeDestroy() {
@@ -525,7 +533,14 @@ export default {
 
         updateSetPreviews(set, previews) {
             this.previews[set] = previews;
+        },
+
+        ignorePageHeader(ignore) {
+            if (this.pageHeader) {
+                this.pageHeader.style['pointer-events'] = ignore ? 'none' : 'all';
+            }
         }
+
     }
 }
 </script>

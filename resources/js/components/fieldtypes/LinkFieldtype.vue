@@ -1,11 +1,9 @@
 <template>
     <div class="flex items-center">
-        <div class="mr-2" v-if="!config.required">
-            <toggle-fieldtype handle="enabled" v-model="enabled" />
-        </div>
+
+        <!-- Link type selector -->
         <div class="w-48 mr-2">
             <v-select
-                v-if="enabled"
                 v-model="option"
                 :options="options"
                 :clearable="false"
@@ -16,17 +14,18 @@
                 </template>
             </v-select>
         </div>
-        <div class="flex-1">
-            <text-input
-                v-if="enabled && option === 'url'"
-                :value="value"
-                @input="update($event)" />
 
+        <div class="flex-1">
+
+            <!-- URL text input -->
+            <text-input v-if="option === 'url'" v-model="urlValue" />
+
+            <!-- Entry select -->
             <relationship-fieldtype
-                v-if="enabled && option === 'entry'"
+                v-if="option === 'entry'"
                 ref="entries"
                 handle="entry"
-                :value="entriesValue"
+                :value="selectedEntries"
                 :config="meta.entry.config"
                 :meta="meta.entry.meta"
                 @input="entriesSelected"
@@ -43,38 +42,48 @@ export default {
     mixins: [Fieldtype],
 
     data() {
+
         return {
-            enabled: this.value != null,
-            option: 'url',
+            option: null,
             options: [],
-            entriesValue: [],
+            urlValue: null,
+            selectedEntries: [],
         }
+
+    },
+
+    computed: {
+
+        entryValue() {
+            return this.selectedEntries.length
+                ? `entry::${this.selectedEntries[0]}`
+                : null
+        }
+
     },
 
     watch: {
+
         option(option, oldOption) {
-            if (option === 'first-child') {
-                this.update('@child');
-            }
-
-            if (oldOption === 'entry') {
-                this.entriesValue = [];
+            if (option === null) {
                 this.update(null);
-            }
-
-            if (option === 'entry') {
-                setTimeout(() => this.$refs.entries.linkExistingItem(), 100);
+            } else if (option === 'url') {
+                this.update(this.urlValue);
+            } else if (option === 'first-child') {
+                this.update('@child');
+            } else if (option === 'entry') {
+                if (this.entryValue) {
+                    this.update(this.entryValue);
+                } else {
+                    setTimeout(() => this.$refs.entries.linkExistingItem(), 0);
+                }
             }
         },
 
-        enabled(enabled) {
-            if (enabled) {
-                this.option = 'url';
-            } else {
-                this.option = null;
-                this.update(null);
-            }
+        urlValue(url) {
+            this.update(url);
         }
+
     },
 
     created() {
@@ -82,35 +91,41 @@ export default {
 
         if (this.value === '@child') {
             this.option = 'first-child';
-        }
-
-        if (this.value && this.value.startsWith('entry::')) {
+        } else if (this.value && this.value.startsWith('entry::')) {
             this.option = 'entry';
-            this.entriesValue = [this.value.substr(7)];
+            this.selectedEntries = [this.value.substr(7)];
+        } else {
+            this.urlValue = this.value;
         }
 
-        if (this.config.required) {
-            this.enabled = true;
+        if (this.config.required && this.option === null) {
+            this.option = 'url';
         }
     },
 
     methods: {
 
         initialOptions() {
-            let options = [
-                {label: __('URL'), value: 'url'},
-                {label: __('First Child'), value: 'first-child'},
-                {label: __('Entry'), value: 'entry'}
-            ];
+            return [
+                
+                this.config.required
+                    ? null
+                    : { label: __('None'), value: null },
 
-            return this.meta.showFirstChildOption
-                ? options
-                : _.reject(options, option => option.value === 'first-child');
+                { label: __('URL'), value: 'url' },
+                
+                this.meta.showFirstChildOption
+                    ? { label: __('First Child'), value: 'first-child' }
+                    : null,
+                
+                { label: __('Entry'), value: 'entry' }
+                
+            ].filter(option => option);
         },
 
         entriesSelected(entries) {
-            this.entriesValue = entries;
-            this.update(entries.length ? 'entry::' + entries[0] : null);
+            this.selectedEntries = entries;
+            this.update(this.entryValue);
         }
 
     }
