@@ -408,7 +408,7 @@ abstract class Store
             $duplicates[$key][] = $path;
         }
 
-        Cache::forever('stache::duplicates::'.$this->key(), $duplicates);
+        Cache::forever($this->duplicatesCacheKey(), $duplicates);
     }
 
     public function duplicates()
@@ -416,7 +416,7 @@ abstract class Store
         // Duplicates would get tracked in here, so we'll trigger it in case the cache is empty.
         $this->paths();
 
-        if (! $duplicates = Cache::get('stache::duplicates::'.$this->key())) {
+        if (! $duplicates = Cache::get($this->duplicatesCacheKey())) {
             $duplicates = [];
         }
 
@@ -424,5 +424,10 @@ abstract class Store
         return collect($duplicates)->map(function ($dupes, $key) {
             return array_merge([$this->getItem($key)->path()], $dupes);
         });
+    }
+
+    protected function duplicatesCacheKey()
+    {
+        return 'stache::duplicates::'.$this->key();
     }
 }
