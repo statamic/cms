@@ -3,7 +3,6 @@
 namespace Statamic\Http\View\Composers;
 
 use Illuminate\Support\Arr;
-use Illuminate\View\View;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Statamic;
