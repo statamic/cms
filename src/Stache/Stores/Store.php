@@ -6,6 +6,7 @@ use Facades\Statamic\Stache\Traverser;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
 
@@ -402,33 +403,12 @@ abstract class Store
 
     protected function trackDuplicates($paths)
     {
-        $duplicates = [];
+        $duplicates = Stache::duplicates();
 
-        foreach ($paths as $path => $key) {
-            $duplicates[$key][] = $path;
+        foreach ($paths as $path => $id) {
+            $duplicates->track($this, $id, $path);
         }
 
-        Cache::forever($this->duplicatesCacheKey(), $duplicates);
-    }
-
-    public function duplicates()
-    {
-        // Duplicates would get tracked while compiling paths,
-        // so we'll trigger it in case the cache is empty.
-        $this->paths();
-
-        if (! $duplicates = Cache::get($this->duplicatesCacheKey())) {
-            $duplicates = [];
-        }
-
-        // Only the additional duplicates are tracked. We'll add the first "actual" item to each.
-        return collect($duplicates)->map(function ($dupes, $key) {
-            return array_merge([$this->getItem($key)->path()], $dupes);
-        });
-    }
-
-    protected function duplicatesCacheKey()
-    {
-        return 'stache::duplicates::'.$this->key();
+        $duplicates->save();
     }
 }

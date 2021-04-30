@@ -20,6 +20,7 @@ class Stache
     protected $updateIndexes = true;
     protected $lockFactory;
     protected $locks = [];
+    protected $duplicates;
 
     public function __construct()
     {
@@ -196,5 +197,14 @@ class Stache
         }
 
         return $this->locks[$name] = $this->lockFactory->createLock($name);
+    }
+
+    public function duplicates()
+    {
+        if ($this->duplicates) {
+            return $this->duplicates;
+        }
+
+        return $this->duplicates = (new Duplicates($this))->load();
     }
 }
