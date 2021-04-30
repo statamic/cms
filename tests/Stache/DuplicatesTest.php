@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Stache\Duplicates;
 use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\AggregateStore;
+use Statamic\Stache\Stores\ChildStore;
 use Statamic\Stache\Stores\Store;
 use Tests\TestCase;
 
@@ -91,8 +93,15 @@ class DuplicatesTest extends TestCase
         $store2->shouldReceive('paths')->once();
         $store2->shouldReceive('clearCachedPaths')->once();
 
+        $childStore = $this->mock(ChildStore::class);
+        $childStore->shouldReceive('paths')->once();
+        $childStore->shouldReceive('clearCachedPaths')->once();
+
+        $store3 = $this->mock(AggregateStore::class);
+        $store3->shouldReceive('discoverStores')->once()->andReturn([$childStore]);
+
         $stache = $this->mock(Stache::class);
-        $stache->shouldReceive('stores')->andReturn(collect([$store1, $store2]));
+        $stache->shouldReceive('stores')->andReturn(collect([$store1, $store2, $store3]));
 
         $duplicates = (new Duplicates($stache));
 
