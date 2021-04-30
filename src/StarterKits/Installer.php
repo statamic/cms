@@ -7,6 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
+use Statamic\Support\Str;
 
 class Installer
 {
@@ -117,11 +118,11 @@ class Installer
             return $this;
         }
 
-        $this->installableDependencies('require')->each(function ($version, $package) {
+        $this->installableDependencies('dependencies')->each(function ($version, $package) {
             $this->ensureCompatibleDependency($package, $version);
         });
 
-        $this->installableDependencies('require-dev')->each(function ($version, $package) {
+        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
             $this->ensureCompatibleDependency($package, $version, true);
         });
 
@@ -189,11 +190,11 @@ class Installer
             return $this;
         }
 
-        $this->installableDependencies('require')->each(function ($version, $package) {
+        $this->installableDependencies('dependencies')->each(function ($version, $package) {
             $this->installDependency($package, $version);
         });
 
-        $this->installableDependencies('require-dev')->each(function ($version, $package) {
+        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
             $this->installDependency($package, $version, true);
         });
 
@@ -368,31 +369,6 @@ class Installer
     }
 
     /**
-     * Get installable dependencies from appropriate require key in composer.json.
-     *
-     * @param string $requireKey
-     * @return \Illuminate\Support\Collection
-     */
-    protected function installableDependencies($requireKey)
-    {
-        $composerJson = json_decode($this->files->get($this->starterKitPath('composer.json')), true);
-
-        return collect($composerJson[$requireKey] ?? [])->filter(function ($version, $package) {
-            return $this->dependencies()->contains($package);
-        });
-    }
-
-    /**
-     * Get starter kit dependencies that should be copied from the composer.json.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function dependencies()
-    {
-        return collect($this->config()->get('dependencies'));
-    }
-
-    /**
      * Get require dependency args.
      *
      * @param string $package
@@ -418,10 +394,29 @@ class Installer
     /**
      * Get starter kit config.
      *
+     * @return mixed
+     */
+    protected function config($key = null)
+    {
+        $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+
+        if ($key) {
+            return $config->get($key);
+        }
+
+        return $config;
+    }
+
+    /**
+     * Get installable dependencies from appropriate require key in composer.json.
+     *
+     * @param string $configKey
      * @return \Illuminate\Support\Collection
      */
-    protected function config()
+    protected function installableDependencies($configKey)
     {
-        return collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        return collect($this->config($configKey))->filter(function ($version, $package) {
+            return Str::contains($package, '/');
+        });
     }
 }
