@@ -30,6 +30,9 @@ class DuplicatesTest extends TestCase
 
         $duplicates->track($store, '123', 'path/to/duplicate.md');
 
+        // Do it twice to make sure it's only tracked once.
+        $duplicates->track($store, '123', 'path/to/duplicate.md');
+
         $this->assertEquals([
             'test-store' => [
                 '123' => [

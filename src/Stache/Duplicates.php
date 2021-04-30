@@ -30,6 +30,10 @@ class Duplicates
     {
         $duplicates = $this->items[$store->key()] ?? [];
 
+        if (in_array($path, $duplicates[$id] ?? [])) {
+            return;
+        }
+
         $duplicates[$id][] = $path;
 
         $this->items[$store->key()] = $duplicates;
