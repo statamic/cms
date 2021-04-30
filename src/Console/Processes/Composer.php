@@ -8,7 +8,7 @@ use Statamic\Jobs\RunComposer;
 
 class Composer extends Process
 {
-    public $memoryLimit;
+    protected $memoryLimit;
 
     /**
      * Instantiate composer process.
@@ -159,6 +159,12 @@ class Composer extends Process
         return $this->run($this->prepareProcessArguments($parts));
     }
 
+    /**
+     * Run json composer command.
+     *
+     * @param mixed $parts
+     * @return string
+     */
     private function runJsonComposerCommand(...$parts)
     {
         $output = $this->runComposerCommand(...array_merge($parts, ['--format=json']));

@@ -5,7 +5,6 @@ namespace Statamic\Console\Processes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Statamic\Support\Arr;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process as SymfonyProcess;
 
@@ -55,7 +54,6 @@ class Process
      * @param string|array $command
      * @param string|null $cacheKey
      * @return mixed
-     * @throws ProcessFailedException
      */
     public function run($command, $cacheKey = null)
     {
@@ -143,9 +141,13 @@ class Process
             return;
         }
 
+        if (! $error = trim($buffer)) {
+            return;
+        }
+
         $process = (new \ReflectionClass($this))->getShortName();
 
-        Log::error("{$process} Process: {$buffer}");
+        Log::error("{$process} Process: {$error}");
     }
 
     /**
@@ -223,6 +225,11 @@ class Process
         @set_time_limit(config('statamic.system.php_max_execution_time'));
     }
 
+    /**
+     * Show colorized output.
+     *
+     * @return $this
+     */
     public function colorized()
     {
         $this->colorized = true;
