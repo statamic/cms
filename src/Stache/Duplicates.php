@@ -69,4 +69,17 @@ class Duplicates
 
         return $this;
     }
+
+    public function has($path)
+    {
+        foreach ($this->items as $store => $duplicates) {
+            foreach ($duplicates as $id => $paths) {
+                if (collect($paths)->contains($path)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

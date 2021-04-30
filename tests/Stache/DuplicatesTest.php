@@ -95,4 +95,21 @@ class DuplicatesTest extends TestCase
 
         $this->assertEquals($duplicates, $return);
     }
+
+    /** @test */
+    public function it_checks_if_a_duplicate_exists()
+    {
+        $stache = $this->mock(Stache::class);
+
+        $duplicates = (new Duplicates($stache))->setItems([
+            'test-store' => [
+                '123' => [
+                    'path/to/duplicate.md',
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($duplicates->has('path/to/duplicate.md'));
+        $this->assertFalse($duplicates->has('path/to/another.md'));
+    }
 }

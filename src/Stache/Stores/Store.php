@@ -199,6 +199,12 @@ abstract class Store
             return $existingTimestamp < $timestamp;
         });
 
+        // Ignore any files that have been marked as duplicates.
+        // The original one will be let through.
+        $modified = $modified->reject(function ($timestamp, $path) {
+            return Stache::duplicates()->has($path);
+        });
+
         // Get all the deleted files.
         // This would be any paths that exist in the cached array that aren't there anymore.
         $deleted = $existing->keys()->diff($files->keys())->values();
