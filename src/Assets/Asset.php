@@ -533,6 +533,10 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
+        if (! $this->isImage()) {
+            return [null, null];
+        }
+
         return [$this->meta('width'), $this->meta('height')];
     }
 

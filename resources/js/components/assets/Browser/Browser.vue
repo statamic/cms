@@ -273,14 +273,15 @@ export default {
         selectedAssets: Array,
         maxFiles: Number,
         initialEditingAssetId: String,
+        autoselectUploads: Boolean,
     },
 
     data() {
         return {
             columns: [
-                { label: __('File'), field: 'basename', visible: true },
-                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true },
-                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true },
+                { label: __('File'), field: 'basename', visible: true, sortable: true },
+                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true, sortable: true },
+                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true, sortable: true },
             ],
             containers: [],
             container: {},
@@ -523,6 +524,14 @@ export default {
         },
 
         uploadCompleted(asset) {
+            if (this.autoselectUploads) {
+                this.sortColumn = 'last_modified';
+                this.sortDirection = 'desc';
+
+                this.selectedAssets.push(asset.id);
+                this.$emit('selections-updated', this.selectedAssets);
+            }
+
             this.loadAssets();
             this.$toast.success(__(':file uploaded', { file: asset.basename }));
         },

@@ -1,5 +1,24 @@
 # Release Notes
 
+## 3.1.11 (2020-04-28)
+
+### What's improved
+- Assets uploaded in the selector stack will be automatically selected. [#3604](https://github.com/statamic/cms/issues/3604)
+- Improved the UX of the `link` fieldtype. [#3605](https://github.com/statamic/cms/issues/3605)
+- Updated French and German translations. [#3583](https://github.com/statamic/cms/issues/3583) [#3589](https://github.com/statamic/cms/issues/3589) [#3601](https://github.com/statamic/cms/issues/3601)
+
+### What's fixed
+- Fix relationship fieldtypes sometimes only showing IDs. [#3547](https://github.com/statamic/cms/issues/3547)
+- Prevent regenerating asset meta file for non-images. [#3609](https://github.com/statamic/cms/issues/3609)
+- Handle custom `authors` field. [#3599](https://github.com/statamic/cms/issues/3599)
+- Cascade is reused on subsequent calls rather than rehydrating. [#3595](https://github.com/statamic/cms/issues/3595)
+- Old input values are remembered in the `user:register_form`. [#3584](https://github.com/statamic/cms/issues/3584)
+- Support collections in the `sentence_list` modifier. [#3593](https://github.com/statamic/cms/issues/3593)
+- Support collections in the `option_list` modifier. [#3606](https://github.com/statamic/cms/issues/3606)
+- Fix bard formatting inside links. [#3108](https://github.com/statamic/cms/issues/3108)
+
+
+
 ## 3.1.10 (2020-04-23)
 
 ### What's improved

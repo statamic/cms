@@ -19,6 +19,7 @@ return [
     'bard.config.enable_input_rules' => 'Unterstützt beim Schreiben Tastenkombinationen im Markdown-Stil.',
     'bard.config.enable_paste_rules' => 'Unterstützt beim Einfügen Tastenkombinationen im Markdown-Stil.',
     'bard.config.fullscreen' => 'Ermöglicht das Umschalten in den Vollbildmodus.',
+    'bard.config.link_collections' => 'In der Linkauswahl werden Einträge aus diesen Sammlungen verfügbar sein. Bleibt dies leer, stehen alle Einträge zur Verfügung.',
     'bard.config.link_noopener' => 'Sämtliche Links mit `rel="noopener"` ausstatten.',
     'bard.config.link_noreferrer' => 'Sämtliche Links mit `rel="noreferrer"` ausstatten.',
     'bard.config.reading_time' => 'Geschätzte Lesezeit am unteren Rand des Feldes anzeigen.',
