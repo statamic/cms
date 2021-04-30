@@ -232,9 +232,13 @@ class Installer
 
         $args = $this->requireDependencyArgs($package, $version, $dev);
 
-        Composer::withoutQueue()->throwOnFailure(false)->runAndOperateOnOutput($args, function ($output) {
-            return $this->outputFromSymfonyProcess($output);
-        });
+        try {
+            Composer::withoutQueue()->throwOnFailure()->runAndOperateOnOutput($args, function ($output) {
+                return $this->outputFromSymfonyProcess($output);
+            });
+        } catch (ProcessException $exception) {
+            $this->console->error("Error installing [{$package}].");
+        }
     }
 
     /**
