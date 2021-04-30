@@ -4,6 +4,7 @@ namespace Statamic\Console\Processes;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Support\Arr;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process as SymfonyProcess;
@@ -26,6 +27,11 @@ class Process
      * @var bool
      */
     protected $colorized = false;
+
+    /**
+     * @var bool
+     */
+    protected $throwOnFailure = false;
 
     /**
      * Create new process on path.
@@ -65,7 +71,13 @@ class Process
             return;
         }
 
-        return $this->runAndReturnOutput($process);
+        $output = $this->runAndReturnOutput($process);
+
+        if ($this->throwOnFailure && $process->getExitCode() > 0) {
+            $this->throwException();
+        }
+
+        return $output;
     }
 
     /**
@@ -85,6 +97,10 @@ class Process
             $this->logErrorOutput($type, $buffer);
             $this->output .= $operateOnOutput($buffer);
         });
+
+        if ($this->throwOnFailure && $process->getExitCode() > 0) {
+            $this->throwException();
+        }
 
         return $this->output;
     }
@@ -238,6 +254,21 @@ class Process
     }
 
     /**
+     * Throw exception on process failure.
+     *
+     * @param bool $throwOnFailure
+     * @return $this
+     */
+    public function throwOnFailure($throwOnFailure = null)
+    {
+        $this->throwOnFailure = is_null($throwOnFailure)
+            ? true
+            : $throwOnFailure;
+
+        return $this;
+    }
+
+    /**
      * Normalize output.
      *
      * @param mixed $output
@@ -282,5 +313,15 @@ class Process
         $process->setTimeout(null);
 
         return $process;
+    }
+
+    /**
+     * Throw exception.
+     *
+     * @throws ProcessException
+     */
+    protected function throwException()
+    {
+        throw new ProcessException;
     }
 }
