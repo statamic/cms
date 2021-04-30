@@ -2,12 +2,12 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\StarterKits\Installer as StarterKitInstaller;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
 use Statamic\StarterKits\Exceptions\StarterKitException;
+use Statamic\StarterKits\Installer as StarterKitInstaller;
 
 class StarterKitInstall extends Command
 {
