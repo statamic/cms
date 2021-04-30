@@ -66,14 +66,7 @@ class StacheDoctor extends Command
 
     protected function outputDuplicateIds()
     {
-        $duplicates = $this->stores->map(function ($store) {
-            return [
-                'store' => $store,
-                'duplicates' => $store->duplicates(),
-            ];
-        })->filter(function ($item) {
-            return ! $item['duplicates']->isEmpty();
-        });
+        $duplicates = Stache::duplicates()->find()->all();
 
         $this->hasDuplicateIds = $duplicates->isNotEmpty();
 
@@ -83,14 +76,14 @@ class StacheDoctor extends Command
             return;
         }
 
-        $duplicates->each(function ($item) {
-            $item['duplicates']->each(function ($paths, $id) {
-                $this->line("<fg=red>[✗]</> Duplicate ID <comment>$id</comment>");
+        $duplicates->flatMap(function ($duplicates) {
+            return $duplicates;
+        })->each(function ($paths, $id) {
+            $this->line("<fg=red>[✗]</> Duplicate ID <comment>$id</comment>");
 
-                $this->output->listing(collect($paths)->map(function ($path) {
-                    return Str::after($path, base_path().'/');
-                })->all());
-            });
+            $this->output->listing(collect($paths)->map(function ($path) {
+                return Str::after($path, base_path().'/');
+            })->all());
         });
 
         return $duplicates->isNotEmpty();
