@@ -369,7 +369,7 @@ abstract class Store
         $this->cacheIndexUsage('path');
     }
 
-    protected function clearCachedPaths()
+    public function clearCachedPaths()
     {
         $this->paths = null;
         Cache::forget($this->pathsCacheKey());

@@ -83,8 +83,13 @@ class DuplicatesTest extends TestCase
     /** @test */
     public function it_finds_all_the_duplicates()
     {
-        $store1 = $this->mock(Store::class)->shouldReceive('paths')->once()->getMock();
-        $store2 = $this->mock(Store::class)->shouldReceive('paths')->once()->getMock();
+        $store1 = $this->mock(Store::class);
+        $store1->shouldReceive('paths')->once();
+        $store1->shouldReceive('clearCachedPaths')->once();
+
+        $store2 = $this->mock(Store::class);
+        $store2->shouldReceive('paths')->once();
+        $store2->shouldReceive('clearCachedPaths')->once();
 
         $stache = $this->mock(Stache::class);
         $stache->shouldReceive('stores')->andReturn(collect([$store1, $store2]));

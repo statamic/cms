@@ -3,6 +3,7 @@
 namespace Statamic\Stache;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Stache\Stores\Store;
 
 class Duplicates
@@ -65,7 +66,12 @@ class Duplicates
 
     public function find()
     {
-        $this->stache->stores()->each->paths();
+        $this->stache->stores()->flatMap(function ($store) {
+            return $store instanceof AggregateStore ? $store->discoverStores() : [$store];
+        })->each(function ($store) {
+            $store->clearCachedPaths();
+            $store->paths();
+        });
 
         return $this;
     }
