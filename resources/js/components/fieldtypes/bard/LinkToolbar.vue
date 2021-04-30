@@ -9,74 +9,113 @@
 
                 <label
                     class="mr-1.5 flex items-center font-normal"
-                    v-for="(title, type) in linkTypes"
-                    :for="type"
-                    :key="type"
+                    v-for="type in visibleLinkTypes"
+                    :for="type.type"
+                    :key="type.type"
                 >
                     <input
                         class="mr-1"
                         type="radio"
                         name="link-type"
-                        :id="type"
-                        :checked="type === linkType"
-                        @click="setLinkType(type)"
+                        :id="type.type"
+                        :checked="type.type === linkType"
+                        @click="setLinkType(type.type)"
                     />
-                    {{ title }}
+                    {{ type.title }}
                 </label>
 
             </div>
 
-            <!-- Link input -->
+            
             <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
 
+                <!-- URL input -->
                 <input
+                    v-if="linkType === 'url'"
+                    v-model="url.url"
                     type="text"
                     ref="input"
                     class="input h-auto text-sm"
                     placeholder="URL"
-                    :readonly="! isUrl"
-                    :value="displayValue"
-                    @keydown.enter.prevent="commit"
                 />
-                <button 
-                    class="h-auto"
-                    :class="{ hidden: isUrl }"
-                    v-tooltip="`${__('Browse')}...`"
-                    @click="openSelector">
-                    <span class="icon icon-magnifying-glass" />
-                </button>
+
+                <!-- Data input -->
+                <div
+                    v-else 
+                    class="w-full flex justify-between" 
+                    @click="openSelector"
+                >
+
+                    <loading-graphic v-if="isLoading" :inline="true" />
+
+                    <div v-else class="flex-1 flex items-center mr-1 truncate">
+                        <img
+                            v-if="linkType === 'asset' && itemData.asset"
+                            :src="itemData.asset.thumbnail"
+                            class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-1 fit-cover lazyloaded"
+                        >
+                        {{ displayValue }}
+                    </div>
+
+                    <button 
+                        v-tooltip="`${__('Browse')}...`"
+                        :aria-label="`${__('Browse')}...`"
+                        @click="openSelector"
+                    >
+                        <svg-icon :name="linkType === 'asset' ? 'folder-image' : 'folder-generic'" class="h-4 w-4" />
+                    </button>
+
+                </div>
 
             </div>
 
-            <!-- Link attributes -->
+            <!-- Tooltip input (title attribute) -->
             <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
                 <input
                     type="text"
                     ref="input"
-                    v-model="linkAttrs.title"
+                    v-model="title"
                     class="input h-auto text-sm"
                     :placeholder="__('Tooltip')"
                 />
             </div>
 
-            <div class="">
-                <label class="flex items-center font-normal">
-                    <input class="checkbox mr-1" type="checkbox" v-model="targetBlank">
+
+            <div class="flex justify-between items-center font-normal">
+
+                <label for="target-blank" class="flex items-center font-normal">
+                    <input class="checkbox mr-1" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
+
+                <div class="ml-2 flex justify-end">
+                    <button
+                        v-tooltip="__('Remove Link')"
+                        :aria-label="__('Remove Link')"
+                        @click="remove"
+                        class="mr-3"
+                    >
+                        <svg-icon name="hyperlink-broken" class="h-4 w-4" />
+                    </button>
+
+                    <button
+                        v-if="canCommit"
+                        v-tooltip="__('Apply Link')"
+                        :aria-label="__('Apply Link')"
+                        @click="commit"
+                        class=""
+                    >
+                        <svg-icon name="hyperlink" class="h-4 w-4" />
+                    </button>
+
+                    <span v-else class="text-grey-50">
+                        <svg-icon name="hyperlink" class="h-4 w-4" />
+                    </span>
+
+                </div>
+
             </div>
 
-        </div>
-
-        <!-- Buttons -->
-        <div class="p-2 border-t flex justify-between">
-            <button class="h-auto" v-tooltip="__('Remove link')" @click="remove">
-                <span class="mr-1 icon icon-trash" />
-            </button>
-
-            <button class="h-auto mr-1" v-tooltip="__('OK')"><!-- TODO @click -->
-                <span class="icon icon-check" />
-            </button>
         </div>
 
         <!-- Selectors -->
@@ -93,7 +132,8 @@
             :columns="[{ label: __('Title'), field: 'title' }]"
             :max-items="1"
             :site="bard.site"
-            @item-data-updated="relationshipItemDataUpdated"
+            @loading="isLoading = $event"
+            @item-data-updated="entrySelected"
         />
 
          <stack
@@ -102,23 +142,16 @@
             @closed="closeAssetSelector"
         >
             <asset-selector
+                :container="config.container"
+                :folder="config.folder || '/'"
+                :restrict-container-navigation="true"
+                :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
-                :container="'assets'"
+                :view-mode="'grid'"
                 :max-files="1"
                 @selected="assetSelected"
                 @closed="closeAssetSelector"
             />
-            <!-- 
-                :container="container"
-                :folder="folder"
-                :restrict-container-navigation="true"
-                :restrict-folder-navigation="restrictNavigation"
-                :selected="selectedAssets"
-                :view-mode="selectorViewMode"
-                @selected="assetsSelected"
-                @closed="closeSelector"
-
-            -->
         </stack>
     </div>
 
@@ -127,72 +160,74 @@
 <script>
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
+import SvgIcon from '../../SvgIcon.vue';
 
 export default {
 
     components: {
-        AssetSelector
+        AssetSelector,
+        SvgIcon
     },
 
     props: {
         bard: {},
         config: Object,
-        initialLinkAttrs: Object,
+        linkAttrs: Object,
     },
 
     data() {
         return {
-            linkAttrs: this.initialLinkAttrs,
-            // linkInput: this.initialLinkAttrs.href,
-            // targetBlank: null,
-            // isEditing: false,
-            // internalLink: null,
             linkType: 'url',
-            linkTypes: {
-                url: __('URL'),
-                entry: __('Entry'),
-                asset: __('Asset'),
-            },
-            showAssetSelector: false,
-            regularUrl: this.initialLinkAttrs.href,
-            dataUrl: this.initialLinkAttrs.href,
-            itemData: null,
+            linkTypes: [
+                { type: 'url', title: __('URL') },
+                { type: 'entry', title: __('Entry') },
+                { type: 'asset', title: __('Asset') },
+            ],
+            url: {},
+            itemData: {},
             title: null,
             targetBlank: null,
+            showAssetSelector: false,
+            isLoading: false,
         }
     },
 
     computed: {
 
-        isUrl() {
-            return this.linkType === 'url';
+        visibleLinkTypes() {
+            return this.linkTypes.filter((type) => {
+                if (type.type === 'asset' && ! this.config.container) {
+                    return false;
+                }
+                return true;
+            });
         },
 
         displayValue() {
             switch (this.linkType) {
                 case 'url':
-                    return this.regularUrl;
+                    return this.url.url;
                 case 'entry':
-                    return this.itemData ? this.itemData.title : null;
+                    return this.itemData.entry ? this.itemData.entry.title : null;
                 case 'asset':
-                    return this.itemData ? this.itemData.basename : null;
+                    return this.itemData.asset ? this.itemData.asset.basename : null;
             }
+        },
+
+        canCommit() {
+            return !! this.url[this.linkType];
         },
         
         href() {
-             if (this.isUrl) {
-                return this.regularUrl
-            }
-           
-            return this.itemData ? this.itemData.permalink : null;
+            return this.sanitizeLink(this.url[this.linkType]);
         },
 
-        // targetBlank() {
-        //     // TODO check
-        //     return this.href
-        //         ? this.linkAttrs.target == '_blank'
-        //         : this.config.target_blank;
-        // },
+        rel() {
+            let rel = [];
+            if (this.config.link_noopener) rel.push('noopener');
+            if (this.config.link_noreferrer) rel.push('noreferrer');
+            return rel.length ? rel.join(' ') : null;
+        },
 
         relationshipConfig() {
             return {
@@ -233,28 +268,10 @@ export default {
     },
 
     created() {
-        console.log('LinkToolbar.created()')
-        console.log(this.linkAttrs);
+        this.applyAttrs(this.linkAttrs);
 
-        // TODO test
-        this.targetBlank = this.href
-            ? this.linkAttrs.target == '_blank'
-            : this.config.target_blank;
-
-        // this.title = this.linkAttrs.title;
-        
-        this.itemData = this.getItemDataForUrl(this.linkAttrs.href);
-
-        // this.bard.$on('link-selected', (selection) => {
-        //     // This can't be a good way to do this.
-        //     const attrs = selection.content().content.content[0].content.content[0].marks[0].attrs;
-        //     this.linkAttrs = attrs;
-        //     this.linkInput = attrs.href;
-        //     this.targetBlank = attrs.target == '_blank';
-        //     this.internalLink = this.getInternalLinkFromUrl(attrs.href);
-        // });
-
-        // this.bard.$on('link-deselected', () => this.$emit('deselected'));
+        this.bard.$on('link-selected', this.applyAttrs);
+        this.bard.$on('link-deselected', () => this.$emit('deselected'));
     },
 
     beforeDestroy() {
@@ -264,10 +281,34 @@ export default {
 
     methods: {
 
+        applyAttrs(attrs) {
+            this.linkType = this.getLinkTypeForUrl(attrs.href);
+
+            this.url = { [this.linkType]: attrs.href };
+            this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
+    
+            this.title = attrs.title;
+            this.targetBlank = attrs.href
+                ? attrs.target === '_blank'
+                : this.config.target_blank;
+        },
+
         setLinkType(type) {
             this.linkType = type;
+        },
 
-            this.openSelector();
+        setUrl(type, url) {
+            this.url = {
+                ...this.url,
+                [type]: url,
+            }
+        },
+
+        setItemData(type, itemData) {
+            this.itemData = {
+                ...this.itemData,
+                [type]: itemData,
+            }
         },
 
         remove() {
@@ -275,23 +316,17 @@ export default {
         },
 
         commit() {
-            let rel = [];
-            if (this.config.link_noopener) rel.push('noopener');
-            if (this.config.link_noreferrer) rel.push('noreferrer');
-            rel = rel.length ? rel.join(' ') : null;
+            if (!this.href) {
+                return this.remove();
+            }
 
             this.$emit('updated', {
-                href: this.sanitizeLink(this.linkInput),
-                rel,
+                href: this.href,
+                rel: this.rel,
                 target: this.targetBlank ? '_blank' : null,
+                title: this.title,
             });
         },
-
-        // getLinkId(link) {
-        //     const match = link.match(/^{{ link:(.*) }}$/);
-        //     if (!match || !match[1]) return null;
-        //     return match[1];
-        // },
 
         sanitizeLink(link) {
             const str = link.trim();
@@ -310,14 +345,10 @@ export default {
         },
 
         openEntrySelector() {
-            this.showTypeSelector = false;
-
             this.$refs.relationshipInput.$refs.existing.click();
         },
 
         openAssetSelector() {
-            this.showTypeSelector = false;
-
             this.showAssetSelector = true;
         },
 
@@ -326,15 +357,12 @@ export default {
         },
 
         assetSelected(data) {
-            // console.log(data);
             if (data.length) {
                 this.loadAssetData(data[0]);
             }
         },
 
         loadAssetData(url) {
-            this.isLoading = true;
-
             this.$axios.get(cp_url('assets-fieldtype'), {
                 params: { assets: [url] }
             }).then(response => {
@@ -343,24 +371,19 @@ export default {
             });
         },
 
-        relationshipItemDataUpdated(data) {
+        entrySelected(data) {
             if (data.length) {
                 this.selectItem('entry', data[0]);
             }
         },
 
         selectItem(type, item) {
-            console.log('LinkToolbar.selectItem()')
-            console.log(type);
-            console.log(item);
             const ref = `${type}::${item.id}`;
 
+            this.setItemData(type, item);
+            this.setUrl(type, `statamic://${ref}`);
+
             this.putItemDataIntoMeta(ref, item);
-
-            this.itemData = item;
-            this.dataUrl = `statamic://${ref}`;
-
-            this.commit();
         },
 
         putItemDataIntoMeta(ref, item) {
@@ -369,14 +392,35 @@ export default {
             this.bard.updateMeta(meta);
         },
 
-        getItemDataForUrl(url) {
-            if (this.isDataUrl(url)) {
-                return this.bard.meta.linkData[url.substr(11)];
-            }
+        getLinkTypeForUrl(url) {
+            const { type } = this.parseDataUrl(url);
+            return type || 'url';
         },
 
-        isDataUrl(url) {
-            return url && url.startsWith('statamic://')
+        getItemDataForUrl(url) {
+            const { ref } = this.parseDataUrl(url);
+            if (! ref) {
+                return null;
+            }
+
+            return this.bard.meta.linkData[ref];
+        },
+
+        parseDataUrl(url) {
+            if (! url) {
+                return {}
+            }
+
+            const regex = /^statamic:\/\/((.*?)::(.*))$/;
+            
+            const matches = url.match(regex);
+            if (! matches) {
+                return {};
+            }
+            
+            const [_, ref, type, id] = matches;
+
+            return { ref, type, id};
         }
     }
 
