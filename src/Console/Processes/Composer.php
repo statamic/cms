@@ -9,6 +9,7 @@ use Statamic\Jobs\RunComposer;
 class Composer extends Process
 {
     protected $memoryLimit;
+    protected $withoutQueue = false;
 
     /**
      * Instantiate composer process.
@@ -24,6 +25,18 @@ class Composer extends Process
 
         // Set memory limit for child process to eleven.
         $this->memoryLimit = config('statamic.system.php_memory_limit');
+    }
+
+    /**
+     * Run without queue.
+     *
+     * @return $this
+     */
+    public function withoutQueue()
+    {
+        $this->withoutQueue = true;
+
+        return $this;
     }
 
     /**
@@ -76,12 +89,32 @@ class Composer extends Process
      *
      * @param string $package
      * @param string|null $version
+     * @param bool $dev
      */
-    public function require(string $package, string $version = null)
+    public function require(string $package, string $version = null, bool $dev = false)
     {
-        $version
-            ? $this->queueComposerCommand('require', $package, $version, '--update-with-dependencies')
-            : $this->queueComposerCommand('require', $package, '--update-with-dependencies');
+        $parts = ['require', '--update-with-dependencies', $package];
+
+        if ($version) {
+            $parts[] = $version;
+        }
+
+        if ($dev) {
+            $parts[] = '--dev';
+        }
+
+        $this->queueComposerCommand(...$parts);
+    }
+
+    /**
+     * Require a dev package.
+     *
+     * @param string $package
+     * @param string|null $version
+     */
+    public function requireDev(string $package, string $version = null)
+    {
+        $this->require($package, $version, true);
     }
 
     /**
@@ -154,7 +187,7 @@ class Composer extends Process
      * @param mixed $parts
      * @return mixed
      */
-    private function runComposerCommand(...$parts)
+    public function runComposerCommand(...$parts)
     {
         return $this->run($this->prepareProcessArguments($parts));
     }
@@ -184,6 +217,10 @@ class Composer extends Process
      */
     private function queueComposerCommand($command, $package, ...$extraParams)
     {
+        if ($this->withoutQueue) {
+            return $this->runComposerCommand($command, $package, ...$extraParams);
+        }
+
         $parts = array_merge([$command, $package], $extraParams);
 
         dispatch(new RunComposer($this->prepareProcessArguments($parts), $this->getCacheKey($package)));

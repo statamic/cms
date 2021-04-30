@@ -4,6 +4,7 @@ namespace Statamic\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 
@@ -11,6 +12,8 @@ class Installer
 {
     protected $files;
     protected $withConfig;
+    protected $withoutDependencies;
+    protected $force;
     protected $package;
     protected $console;
     protected $composerOutput;
@@ -37,6 +40,32 @@ class Installer
     }
 
     /**
+     * Install without dependencies.
+     *
+     * @param bool $withoutDependencies
+     * @return $this
+     */
+    public function withoutDependencies($withoutDependencies = false)
+    {
+        $this->withoutDependencies = $withoutDependencies;
+
+        return $this;
+    }
+
+    /**
+     * Force install and allow dependency errors.
+     *
+     * @param bool $force
+     * @return $this
+     */
+    public function force($force = false)
+    {
+        $this->force = $force;
+
+        return $this;
+    }
+
+    /**
      * Install starter kit.
      *
      * @param string $package
@@ -51,6 +80,7 @@ class Installer
         $this
             // ->checkLicense()
             ->requireStarterKit()
+            ->ensureCompatibleDependencies()
             ->ensureConfig()
             ->installFiles()
             ->installDependencies()
@@ -67,7 +97,33 @@ class Installer
     {
         $this->console->info("Preparing starter kit [{$this->package}]...");
 
-        $this->composer(['require', '--dev', $this->package]);
+        try {
+            Composer::withoutQueue()->throwOnFailure()->requireDev($this->package);
+        } catch (ProcessException $exception) {
+            $this->rollbackWithError("Error installing [{$this->package}].");
+        }
+
+        return $this;
+    }
+
+    /**
+     * Ensure compatible dependencies by performing a dry-run.
+     *
+     * @return $this
+     */
+    protected function ensureCompatibleDependencies()
+    {
+        if ($this->withoutDependencies || $this->force) {
+            return $this;
+        }
+
+        $this->installableDependencies('require')->each(function ($version, $package) {
+            $this->ensureCompatibleDependency($package, $version);
+        });
+
+        $this->installableDependencies('require-dev')->each(function ($version, $package) {
+            $this->ensureCompatibleDependency($package, $version, true);
+        });
 
         return $this;
     }
@@ -129,6 +185,10 @@ class Installer
      */
     protected function installDependencies()
     {
+        if ($this->withoutDependencies) {
+            return $this;
+        }
+
         $this->installableDependencies('require')->each(function ($version, $package) {
             $this->installDependency($package, $version);
         });
@@ -138,6 +198,24 @@ class Installer
         });
 
         return $this;
+    }
+
+    /**
+     * Ensure compatible dependency by performing a dry-run.
+     *
+     * @param string $package
+     * @param string $version
+     * @param bool $dev
+     */
+    protected function ensureCompatibleDependency($package, $version, $dev = false)
+    {
+        $args = $this->requireDependencyArgs($package, $version, $dev, '--dry-run');
+
+        try {
+            Composer::withoutQueue()->throwOnFailure()->runComposerCommand(...$args);
+        } catch (ProcessException $exception) {
+            $this->rollbackWithError("Cannot install due to error with [{$package}] dependency.");
+        }
     }
 
     /**
@@ -151,16 +229,11 @@ class Installer
     {
         $this->console->info("Installing dependency [{$package}]...");
 
-        $args = ['require'];
+        $args = $this->requireDependencyArgs($package, $version, $dev);
 
-        if ($dev) {
-            $args[] = '--dev';
-        }
-
-        $args[] = $package;
-        $args[] = $version;
-
-        $this->composer($args);
+        Composer::withoutQueue()->throwOnFailure(false)->runAndOperateOnOutput($args, function ($output) {
+            return $this->outputFromSymfonyProcess($output);
+        });
     }
 
     /**
@@ -186,9 +259,22 @@ class Installer
     {
         $this->console->info('Cleaning up temporary files...');
 
-        $this->composer(['remove', '--dev', $this->package]);
+        Composer::withoutQueue()->throwOnFailure(false)->remove($this->package);
 
         return $this;
+    }
+
+    /**
+     * Rollback with error.
+     *
+     * @param string $error
+     * @throws StarterKitException
+     */
+    protected function rollbackWithError($error)
+    {
+        $this->removeStarterKit();
+
+        throw new StarterKitException($error);
     }
 
     /**
@@ -202,18 +288,6 @@ class Installer
     }
 
     /**
-     * Run composer command.
-     *
-     * @param array $commandParts
-     */
-    protected function composer(array $commandParts)
-    {
-        Composer::runAndOperateOnOutput($commandParts, function ($output) {
-            return $this->outputFromSymfonyProcess($output, $this->console);
-        });
-    }
-
-    /**
      * Clean up symfony process output and output to cli.
      *
      * TODO: Move to trait and reuse in MakeAddon?
@@ -221,7 +295,7 @@ class Installer
      * @param string $output
      * @return string
      */
-    protected function outputFromSymfonyProcess(string $output, $console)
+    private function outputFromSymfonyProcess(string $output)
     {
         // Remove terminal color codes.
         $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
@@ -231,8 +305,7 @@ class Installer
 
         // If not a blank line, output to terminal.
         if (! empty(trim($output))) {
-            // $this->composerOutput .= $output; // TODO: Handle composer error output to log file?
-            // $console->line($output); // TODO: Add verbose command option?
+            $this->console->line($output);
         }
 
         return $output;
@@ -317,6 +390,29 @@ class Installer
     protected function dependencies()
     {
         return collect($this->config()->get('dependencies'));
+    }
+
+    /**
+     * Get require dependency args.
+     *
+     * @param string $package
+     * @param string $version
+     * @param bool $dev
+     * @param array $extraArgs
+     * @return array
+     */
+    protected function requireDependencyArgs($package, $version, $dev, ...$extraArgs)
+    {
+        $args = ['require'];
+
+        if ($dev) {
+            $args[] = '--dev';
+        }
+
+        $args[] = $package;
+        $args[] = $version;
+
+        return array_merge($args, $extraArgs);
     }
 
     /**

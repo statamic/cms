@@ -2,7 +2,7 @@
 
 namespace Statamic\Console\Commands;
 
-use Facades\Statamic\StarterKits\Installer as StarterKitInstaller;
+use Statamic\StarterKits\Installer as StarterKitInstaller;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
@@ -21,6 +21,8 @@ class StarterKitInstall extends Command
     protected $signature = 'statamic:starter-kit:install
         { package? : Specify the starter kit package to install }
         { --with-config : Copy starter-kit.yaml config for development }
+        { --without-dependencies : Install without dependencies }
+        { --force : Force install and allow dependency errors }
         { --clear-site : Clear site before installing }';
 
     /**
@@ -43,7 +45,10 @@ class StarterKitInstall extends Command
             $this->call('statamic:site:clear', ['--no-interaction' => true]);
         }
 
-        $installer = StarterKitInstaller::withConfig($this->option('with-config'));
+        $installer = (new StarterKitInstaller)
+            ->withConfig($this->option('with-config'))
+            ->withoutDependencies($this->option('without-dependencies'))
+            ->force($this->option('force'));
 
         try {
             $installer->install($package, $this);
