@@ -88,7 +88,7 @@ class Comparator
         $one = Str::lower($one);
         $two = Str::lower($two);
 
-        if (! class_exists(Collator::class)) {
+        if (! class_exists(Collator::class) || is_subclass_of(Collator::class, 'Symfony\Component\Intl\Collator\Collator')) {
             return strcmp($one, $two);
         }
 
