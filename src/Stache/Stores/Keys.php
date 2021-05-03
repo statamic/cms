@@ -27,6 +27,11 @@ class Keys
         Cache::forever($this->cacheKey(), $this->keys);
     }
 
+    public function clear()
+    {
+        Cache::forget($this->cacheKey());
+    }
+
     private function cacheKey()
     {
         return 'stache::keys/'.$this->store->key();

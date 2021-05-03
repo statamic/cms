@@ -109,6 +109,20 @@ class DuplicatesTest extends TestCase
     }
 
     /** @test */
+    public function it_clears_the_cache()
+    {
+        Cache::forever('stache::duplicates', ['foo' => 'bar']);
+
+        $duplicates = new Duplicates($this->mock(Stache::class));
+
+        $this->assertNotNull(Cache::get('stache::duplicates'));
+
+        $duplicates->clear();
+
+        $this->assertNull(Cache::get('stache::duplicates'));
+    }
+
+    /** @test */
     public function it_finds_all_the_duplicates()
     {
         $store1 = $this->mock(Store::class);

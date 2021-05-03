@@ -405,6 +405,8 @@ abstract class Store
         Cache::forget($this->indexUsageCacheKey());
 
         $this->clearCachedPaths();
+
+        $this->keys()->clear();
     }
 
     public function warm()

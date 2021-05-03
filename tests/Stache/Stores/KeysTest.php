@@ -81,4 +81,21 @@ class KeysTest extends TestCase
         $this->assertEquals($keys, $return);
         $this->assertEquals(['foo' => 'bar'], $keys->all());
     }
+
+    /** @test */
+    public function it_clears_the_cache()
+    {
+        Cache::forever('stache::keys/test-store', ['foo' => 'bar']);
+
+        $store = $this->mock(Store::class);
+        $store->shouldReceive('key')->andReturn('test-store');
+
+        $keys = new Keys($store);
+
+        $this->assertNotNull(Cache::get('stache::keys/test-store'));
+
+        $keys->clear();
+
+        $this->assertNull(Cache::get('stache::keys/test-store'));
+    }
 }

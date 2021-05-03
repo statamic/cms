@@ -86,6 +86,8 @@ class Stache
 
         $this->stores()->each->clear();
 
+        $this->duplicates()->clear();
+
         Cache::forget('stache::timing');
 
         return $this;
