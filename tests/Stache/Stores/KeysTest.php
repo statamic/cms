@@ -36,7 +36,7 @@ class KeysTest extends TestCase
 
         $this->assertNull(Cache::get('stache::keys/test-store'));
 
-        $keys->save();
+        $keys->cache();
 
         $this->assertEquals(['foo' => 'bar'], Cache::get('stache::keys/test-store'));
     }

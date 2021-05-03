@@ -64,7 +64,7 @@ class DuplicatesTest extends TestCase
 
         $this->assertNull(Cache::get('stache::duplicates'));
 
-        $duplicates->save();
+        $duplicates->cache();
 
         $this->assertEquals(['foo' => 'bar'], Cache::get('stache::duplicates'));
     }

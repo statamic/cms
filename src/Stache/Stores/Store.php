@@ -348,10 +348,10 @@ abstract class Store
 
         $this->cachePaths($paths);
 
-        $this->keys()->save();
+        $this->keys()->cache();
 
         if ($hasDuplicates) {
-            Stache::duplicates()->save();
+            Stache::duplicates()->cache();
         }
 
         return $paths;

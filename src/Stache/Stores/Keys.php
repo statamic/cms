@@ -21,7 +21,7 @@ class Keys
         return $this;
     }
 
-    public function save()
+    public function cache()
     {
         Cache::forever($this->cacheKey(), $this->keys);
     }

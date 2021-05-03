@@ -40,7 +40,7 @@ class Duplicates
         $this->items[$store->key()] = $duplicates;
     }
 
-    public function save()
+    public function cache()
     {
         Cache::forever('stache::duplicates', $this->items);
     }
