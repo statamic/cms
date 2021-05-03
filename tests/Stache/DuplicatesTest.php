@@ -60,13 +60,39 @@ class DuplicatesTest extends TestCase
     /** @test */
     public function it_saves_to_the_cache()
     {
-        $duplicates = (new Duplicates($this->mock(Stache::class)))->setItems(['foo' => 'bar']);
+        $store = $this->mock(Store::class);
+        $store->shouldReceive('key')->andReturn('test-store');
+
+        $stache = $this->mock(Stache::class);
+        $stache->shouldReceive('store')->with('test-store')->andReturn($store);
+
+        $duplicates = new Duplicates($stache);
+
+        $duplicates->track($store, '123', 'path/to/duplicate.md');
 
         $this->assertNull(Cache::get('stache::duplicates'));
 
         $duplicates->cache();
 
-        $this->assertEquals(['foo' => 'bar'], Cache::get('stache::duplicates'));
+        $this->assertEquals([
+            'test-store' => [
+                '123' => [
+                    'path/to/duplicate.md',
+                ],
+            ],
+        ], Cache::get('stache::duplicates'));
+    }
+
+    /** @test */
+    public function it_doesnt_save_if_there_are_no_changes()
+    {
+        $duplicates = new Duplicates($this->mock(Stache::class));
+
+        $this->assertNull(Cache::get('stache::duplicates'));
+
+        $duplicates->cache();
+
+        $this->assertNull(Cache::get('stache::duplicates'));
     }
 
     /** @test */

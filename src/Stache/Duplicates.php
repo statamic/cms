@@ -9,6 +9,7 @@ use Statamic\Stache\Stores\Store;
 class Duplicates
 {
     protected $stache;
+    protected $dirty = false;
     protected $items = [];
 
     public function __construct(Stache $stache)
@@ -38,10 +39,16 @@ class Duplicates
         $duplicates[$id][] = $path;
 
         $this->items[$store->key()] = $duplicates;
+
+        $this->dirty = true;
     }
 
     public function cache()
     {
+        if (! $this->dirty) {
+            return;
+        }
+
         Cache::forever('stache::duplicates', $this->items);
     }
 

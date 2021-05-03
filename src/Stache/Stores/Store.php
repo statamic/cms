@@ -326,11 +326,9 @@ abstract class Store
             ];
         });
 
-        $hasDuplicates = false;
         $items = $fileItems->filter(function ($item) use (&$hasDuplicates) {
             if ($this->keys()->isDuplicate($item['key'], $item['path'])) {
                 Stache::duplicates()->track($this, $item['key'], $item['path']);
-                $hasDuplicates = true;
 
                 return false;
             }
@@ -350,9 +348,7 @@ abstract class Store
 
         $this->keys()->cache();
 
-        if ($hasDuplicates) {
-            Stache::duplicates()->cache();
-        }
+        Stache::duplicates()->cache();
 
         return $paths;
     }
