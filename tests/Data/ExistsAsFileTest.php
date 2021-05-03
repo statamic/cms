@@ -91,7 +91,8 @@ EOT;
 
     private function makeItem($args)
     {
-        return new class($args['extension'] ?? 'yaml', $args['removeNulls'] ?? true, $args['data'] ?? []) {
+        return new class($args['extension'] ?? 'yaml', $args['removeNulls'] ?? true, $args['data'] ?? [])
+        {
             use ExistsAsFile;
 
             protected $extension;

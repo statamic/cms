@@ -198,7 +198,8 @@ EOT;
     /** @test */
     public function accessing_string_as_array_which_exists_as_callback_calls_the_callback()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'foo';
 
             public function test()
@@ -710,7 +711,8 @@ EOT;
     /** @test */
     public function it_doesnt_parse_noparse_tags_inside_callbacks()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function array()
@@ -751,7 +753,8 @@ EOT;
     {
         $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
 
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function array()
@@ -836,7 +839,8 @@ EOT;
     /** @test */
     public function it_gets_augmented_value()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -853,7 +857,8 @@ EOT;
     /** @test */
     public function it_expands_augmented_value_when_used_as_an_array()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($values)
             {
                 return collect($values)->map(function ($value) {
@@ -885,7 +890,8 @@ EOT;
     /** @test */
     public function it_loops_over_value_object()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($values)
             {
                 return collect($values)->map(function ($value) {
@@ -949,7 +955,8 @@ EOT;
     /** @test */
     public function it_parses_value_objects_values_when_configured_to_do_so()
     {
-        $fieldtypeOne = new class extends Fieldtype {
+        $fieldtypeOne = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -962,7 +969,8 @@ EOT;
 
             // fake what's being returned from the field config
         };
-        $fieldtypeTwo = new class extends Fieldtype {
+        $fieldtypeTwo = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -1021,7 +1029,8 @@ EOT;
     /** @test */
     public function it_casts_objects_to_string_when_using_single_tags()
     {
-        $object = new class {
+        $object = new class
+        {
             public function __toString()
             {
                 return 'string';
@@ -1040,7 +1049,8 @@ EOT;
         Log::shouldReceive('debug')->once()
             ->with('Cannot render an object variable as a string: {{ object }}');
 
-        $object = new class {
+        $object = new class
+        {
         };
 
         $this->assertEquals('', $this->parse('{{ object }}', compact('object')));
@@ -1084,7 +1094,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_unparsed_simple_arrays_get_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1110,7 +1121,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_unparsed_simple_arrays_get_parsed_with_scope()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1136,7 +1148,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_unparsed_multidimensional_arrays_get_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1168,7 +1181,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_empty_arrays_get_parsed_with_no_results()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1193,7 +1207,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_collections_get_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1225,12 +1240,14 @@ EOT;
     /** @test */
     public function callback_tags_that_return_value_objects_gets_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
             {
-                $fieldtype = new class extends Fieldtype {
+                $fieldtype = new class extends Fieldtype
+                {
                     public function augment($value)
                     {
                         return 'augmented '.$value;
@@ -1247,12 +1264,14 @@ EOT;
     /** @test */
     public function callback_tags_that_return_value_objects_with_antlers_gets_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
             {
-                $fieldtype = new class extends Fieldtype {
+                $fieldtype = new class extends Fieldtype
+                {
                     public function augment($value)
                     {
                         return 'augmented '.$value;
@@ -1274,12 +1293,14 @@ EOT;
     /** @test */
     public function callback_tags_that_return_value_objects_with_antlers_disabled_does_not_get_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
             {
-                $fieldtype = new class extends Fieldtype {
+                $fieldtype = new class extends Fieldtype
+                {
                     public function augment($value)
                     {
                         return 'augmented '.$value;
@@ -1301,7 +1322,8 @@ EOT;
     /** @test */
     public function value_objects_with_antlers_gets_parsed()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -1324,7 +1346,8 @@ EOT;
     /** @test */
     public function value_objects_with_antlers_disabled_do_not_get_parsed()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -1363,7 +1386,8 @@ EOT;
     /** @test */
     public function it_automatically_augments_augmentable_objects_when_returned_from_a_callback_tag()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1400,7 +1424,8 @@ EOT;
     /** @test */
     public function callback_tag_pair_variables_get_context_merged_in_but_nulls_remain_null()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1496,7 +1521,8 @@ EOT;
 
         $parser = Antlers::parser()->cascade($cascade);
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
         };
         $augmented = new Value(['drink' => 'la croix'], 'augmented', $fieldtype);
 
@@ -1632,7 +1658,8 @@ EOT;
     /** @test */
     public function it_aliases_callback_tag_pair_loop_using_the_as_param()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1683,7 +1710,8 @@ EOT;
     /** @test */
     public function modifiers_on_tag_pairs_receive_the_augmented_value()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 $value[1]['type'] = 'yup';
@@ -1709,7 +1737,8 @@ EOT;
     /** @test */
     public function it_outputs_the_value_when_a_ArrayableString_object_is_used_as_string()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return new ArrayableString('world', ['label' => 'World']);
@@ -1726,7 +1755,8 @@ EOT;
     /** @test */
     public function it_can_treat_a_ArrayableString_object_as_an_array()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return new ArrayableString('world', ['label' => 'World']);
@@ -1746,7 +1776,8 @@ EOT;
     /** @test */
     public function it_can_access_ArrayableString_properties_by_colon_notation()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return new ArrayableString('world', ['label' => 'World']);
@@ -1764,7 +1795,8 @@ EOT;
     /** @test */
     public function it_can_use_ArrayableString_objects_in_conditions()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 $label = is_null($value) ? null : strtoupper($value);
@@ -1908,7 +1940,8 @@ after
 EOT;
 
         $this->assertEquals($expected, $this->parse($template, [
-            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator {
+            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator
+            {
             }),
         ]));
     }
@@ -1930,7 +1963,8 @@ EOT;
     /** @test */
     public function it_uses_tags_with_single_part_in_conditions()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'truthy';
 
             public function index()
@@ -1939,7 +1973,8 @@ EOT;
             }
         })::register();
 
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'falsey';
 
             public function index()
@@ -1959,7 +1994,8 @@ EOT;
     /** @test */
     public function it_uses_tags_with_multiple_parts_in_conditions()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'truthy';
 
             public function test()
@@ -1968,7 +2004,8 @@ EOT;
             }
         })::register();
 
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'falsey';
 
             public function test()
@@ -2061,7 +2098,8 @@ class AugmentableObject extends ArrayableObject implements Augmentable
 
     public function blueprint()
     {
-        FieldtypeRepository::shouldReceive('find')->andReturn(new class extends Fieldtype {
+        FieldtypeRepository::shouldReceive('find')->andReturn(new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return strtoupper($data).'!';
