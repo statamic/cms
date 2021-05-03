@@ -84,7 +84,7 @@ class Stache
     {
         Partyline::comment('Clearing Stache...');
 
-        $this->stores()->each->clear();
+        $this->stores()->reverse()->each->clear();
 
         $this->duplicates()->clear();
 
