@@ -313,6 +313,8 @@ abstract class Store
 
     public function paths()
     {
+        $this->handleFileChanges();
+
         if ($this->paths) {
             return $this->paths;
         }
