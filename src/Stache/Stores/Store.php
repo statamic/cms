@@ -226,7 +226,7 @@ abstract class Store
             if ($key = $this->getKeyFromPath($path)) {
                 $this->forgetItem($key);
                 $this->forgetPath($key);
-                $this->resolveIndexes()->each->forgetItem($key);
+                $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
                 $this->handleDeletedItem($path, $key);
             }
         });
@@ -243,9 +243,6 @@ abstract class Store
                 $this->forgetItem($key);
             }
         });
-
-        // Load all the indexes so we're dealing with fresh items in both loops.
-        $indexes = $this->resolveIndexes()->each->load();
 
         // Get items from every file that was modified.
         $modified = $modified->map(function ($timestamp, $path) use ($pathMap) {
@@ -264,7 +261,7 @@ abstract class Store
         });
 
         // Update modified items in every index.
-        $indexes->each(function ($index) use ($modified) {
+        $this->resolveIndexes()->filter->isCached()->each(function ($index) use ($modified) {
             $modified->each(function ($item) use ($index) {
                 $index->updateItem($item);
             });
