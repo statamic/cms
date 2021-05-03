@@ -414,6 +414,8 @@ abstract class Store
         $this->clearCachedPaths();
 
         $this->keys()->clear();
+
+        Cache::forget("stache::timestamps::{$this->key()}");
     }
 
     public function warm()
