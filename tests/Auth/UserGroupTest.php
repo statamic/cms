@@ -78,7 +78,8 @@ class UserGroupTest extends TestCase
         $group = new UserGroup;
         $this->assertInstanceOf(Collection::class, $group->roles());
 
-        $role = new class extends Role {
+        $role = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'test';
@@ -94,7 +95,8 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_adds_a_role()
     {
-        $role = new class extends Role {
+        $role = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'test';
@@ -110,7 +112,8 @@ class UserGroupTest extends TestCase
 
     public function it_adds_a_role_using_handle()
     {
-        $role = new class extends Role {
+        $role = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'test';
@@ -129,19 +132,22 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_sets_all_roles()
     {
-        RoleAPI::shouldReceive('find')->with('one')->andReturn($roleOne = new class extends Role {
+        RoleAPI::shouldReceive('find')->with('one')->andReturn($roleOne = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'one';
             }
         });
-        RoleAPI::shouldReceive('find')->with('two')->andReturn($roleTwo = new class extends Role {
+        RoleAPI::shouldReceive('find')->with('two')->andReturn($roleTwo = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'two';
             }
         });
-        RoleAPI::shouldReceive('find')->with('three')->andReturn($roleThree = new class extends Role {
+        RoleAPI::shouldReceive('find')->with('three')->andReturn($roleThree = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'three';
@@ -161,7 +167,8 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_removes_a_role()
     {
-        $role = new class extends Role {
+        $role = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'test';
@@ -179,7 +186,8 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_removes_a_role_by_handle()
     {
-        $role = new class extends Role {
+        $role = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'test';
@@ -198,13 +206,15 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_checks_if_it_has_a_role()
     {
-        $roleA = new class extends Role {
+        $roleA = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'a';
             }
         };
-        $roleB = new class extends Role {
+        $roleB = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'b';
@@ -220,13 +230,15 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_checks_if_it_has_a_role_by_handle()
     {
-        $roleA = new class extends Role {
+        $roleA = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'a';
             }
         };
-        $roleB = new class extends Role {
+        $roleB = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'b';
@@ -242,7 +254,8 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_checks_if_it_has_permission()
     {
-        $role = new class extends Role {
+        $role = new class extends Role
+        {
             public function permissions($permissions = null)
             {
                 return collect(['one']);
@@ -258,13 +271,15 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_checks_if_it_has_super_permissions()
     {
-        $superRole = new class extends Role {
+        $superRole = new class extends Role
+        {
             public function permissions($permissions = null)
             {
                 return collect(['super']);
             }
         };
-        $nonSuperRole = new class extends Role {
+        $nonSuperRole = new class extends Role
+        {
             public function permissions($permissions = null)
             {
                 return collect(['test']);

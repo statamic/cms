@@ -543,7 +543,8 @@ class TreeTest extends TestCase
 
     protected function newTree()
     {
-        return new class extends Tree {
+        return new class extends Tree
+        {
             private $structure;
 
             public function path()
