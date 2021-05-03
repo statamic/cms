@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
+use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
 
@@ -200,12 +201,6 @@ abstract class Store
             return $existingTimestamp < $timestamp;
         });
 
-        // Ignore any files that have been marked as duplicates.
-        // The original one will be let through.
-        $modified = $modified->reject(function ($timestamp, $path) {
-            return Stache::duplicates()->has($path);
-        });
-
         // Get all the deleted files.
         // This would be any paths that exist in the cached array that aren't there anymore.
         $deleted = $existing->keys()->diff($files->keys())->values();
@@ -247,6 +242,23 @@ abstract class Store
         // Get items from every file that was modified.
         $modified = $modified->map(function ($timestamp, $path) use ($pathMap) {
             return $this->getItemFromModifiedPath($path, $pathMap);
+        });
+
+        // Remove items with duplicate IDs/keys
+        $modified = $modified->reject(function ($item) {
+            try {
+                $this->keys()->add($this->getItemKey($item), $item->path());
+            } catch (DuplicateKeyException $e) {
+                $isDuplicate = true;
+                Stache::duplicates()->track($this, $e->getKey(), $e->getPath());
+            }
+
+            return $isDuplicate ?? false;
+        });
+
+        // Put the items into the cache
+        $modified->each(function ($item) {
+            $this->cacheItem($item);
         });
 
         // There may be duplicate items when we're dealing with items that are split across files.
@@ -296,11 +308,7 @@ abstract class Store
             return $this->getItem($key);
         }
 
-        $item = $this->makeItemFromFile($path, File::get($path));
-
-        $this->cacheItem($item);
-
-        return $item;
+        return $this->makeItemFromFile($path, File::get($path));
     }
 
     public function paths()
