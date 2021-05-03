@@ -23,6 +23,7 @@ abstract class Store
     protected $fileItems;
     protected $shouldCacheFileItems = false;
     protected $modified;
+    protected $keys;
 
     public function directory($directory = null)
     {
@@ -325,11 +326,19 @@ abstract class Store
             ];
         });
 
-        $items = $fileItems->unique('key');
+        $hasDuplicates = false;
+        $items = $fileItems->filter(function ($item) use (&$hasDuplicates) {
+            if ($this->keys()->isDuplicate($item['key'], $item['path'])) {
+                Stache::duplicates()->track($this, $item['key'], $item['path']);
+                $hasDuplicates = true;
 
-        if ($items->count() !== $fileItems->count()) {
-            $this->trackDuplicates($fileItems->duplicates('key'));
-        }
+                return false;
+            }
+
+            $this->keys()->add($item['key'], $item['path']);
+
+            return true;
+        });
 
         $items->each(function ($item) {
             $this->cacheItem($item['item']);
@@ -338,6 +347,12 @@ abstract class Store
         $paths = $items->pluck('path', 'key');
 
         $this->cachePaths($paths);
+
+        $this->keys()->save();
+
+        if ($hasDuplicates) {
+            Stache::duplicates()->save();
+        }
 
         return $paths;
     }
@@ -407,14 +422,12 @@ abstract class Store
         $this->fileItems = null;
     }
 
-    protected function trackDuplicates($paths)
+    public function keys()
     {
-        $duplicates = Stache::duplicates();
-
-        foreach ($paths as $path => $id) {
-            $duplicates->track($this, $id, $path);
+        if ($this->keys) {
+            return $this->keys;
         }
 
-        $duplicates->save();
+        return $this->keys = (new Keys($this))->load();
     }
 }
