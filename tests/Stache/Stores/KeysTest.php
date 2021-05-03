@@ -3,6 +3,7 @@
 namespace Tests\Stache\Stores;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Stores\Keys;
 use Statamic\Stache\Stores\Store;
 use Tests\TestCase;
@@ -24,6 +25,28 @@ class KeysTest extends TestCase
         $this->assertEquals([
             '123' => 'path/to/item.md',
         ], $keys->all());
+    }
+
+    /** @test */
+    public function adding_a_duplicate_throws_an_exception()
+    {
+        $keys = (new Keys($this->mock(Store::class)))->setKeys(['123' => 'original.md']);
+
+        $keys->add('123', 'original.md'); // adding the same one twice is ok if it's the same path.
+        $keys->add('456', 'another.md');
+
+        try {
+            $keys->add('123', 'duplicate.md');
+        } catch (DuplicateKeyException $e) {
+            $this->assertEquals([
+                '123' => 'original.md',
+                '456' => 'another.md',
+            ], $keys->all());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 
     /** @test */
@@ -55,20 +78,5 @@ class KeysTest extends TestCase
 
         $this->assertEquals($keys, $return);
         $this->assertEquals(['foo' => 'bar'], $keys->all());
-    }
-
-    /** @test */
-    public function it_checks_if_a_duplicate_exists()
-    {
-        $store = $this->mock(Store::class);
-        $store->shouldReceive('key')->andReturn('test-store');
-
-        $keys = (new Keys($store))->setKeys([
-            '123' => 'path/to/item.md',
-        ]);
-
-        $this->assertFalse($keys->isDuplicate('123', 'path/to/item.md'));
-        $this->assertTrue($keys->isDuplicate('123', 'another/path.md'));
-        $this->assertFalse($keys->isDuplicate('another-id', 'another/path.md'));
     }
 }

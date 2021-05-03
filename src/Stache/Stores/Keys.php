@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Stache\Exceptions\DuplicateKeyException;
 
 class Keys
 {
@@ -45,13 +46,14 @@ class Keys
 
     public function add($key, $path)
     {
-        $this->keys[$key] = $path;
-    }
-
-    public function isDuplicate($key, $path)
-    {
         $existing = $this->keys[$key] ?? null;
 
-        return $existing && $existing !== $path;
+        // If you're adding a key that already exists but has
+        // a different path then a duplicate is being added.
+        if ($existing && $existing !== $path) {
+            throw new DuplicateKeyException;
+        }
+
+        $this->keys[$key] = $path;
     }
 }

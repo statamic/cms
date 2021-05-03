@@ -327,13 +327,13 @@ abstract class Store
         });
 
         $items = $fileItems->filter(function ($item) use (&$hasDuplicates) {
-            if ($this->keys()->isDuplicate($item['key'], $item['path'])) {
+            try {
+                $this->keys()->add($item['key'], $item['path']);
+            } catch (DuplicateKeyException $e) {
                 Stache::duplicates()->track($this, $item['key'], $item['path']);
 
                 return false;
             }
-
-            $this->keys()->add($item['key'], $item['path']);
 
             return true;
         });
