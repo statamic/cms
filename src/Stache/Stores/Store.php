@@ -331,7 +331,7 @@ abstract class Store
                 $this->keys()->add($item['key'], $item['path']);
             } catch (DuplicateKeyException $e) {
                 $isDuplicate = true;
-                Stache::duplicates()->track($this, $item['key'], $item['path']);
+                Stache::duplicates()->track($this, $e->getKey(), $e->getPath());
             }
 
             return $isDuplicate ?? false;

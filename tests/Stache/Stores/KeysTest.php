@@ -38,6 +38,8 @@ class KeysTest extends TestCase
         try {
             $keys->add('123', 'duplicate.md');
         } catch (DuplicateKeyException $e) {
+            $this->assertEquals('123', $e->getKey());
+            $this->assertEquals('duplicate.md', $e->getPath());
             $this->assertEquals([
                 '123' => 'original.md',
                 '456' => 'another.md',

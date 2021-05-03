@@ -51,7 +51,7 @@ class Keys
         // If you're adding a key that already exists but has
         // a different path then a duplicate is being added.
         if ($existing && $existing !== $path) {
-            throw new DuplicateKeyException;
+            throw new DuplicateKeyException($key, $path);
         }
 
         $this->keys[$key] = $path;
