@@ -3,8 +3,9 @@
 namespace Statamic\Fieldtypes;
 
 use ProseMirrorToHtml\Renderer;
+use Statamic\Facades\Asset;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Data;
+use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
@@ -373,7 +374,7 @@ class Bard extends Replicator
             'previews' => $previews,
             '__collaboration' => ['existing'],
             'linkCollections' => empty($collections = $this->config('link_collections')) ? Collection::handles()->all() : $collections,
-            'linkData' => $this->getLinkData($value),
+            'linkData' => (object) $this->getLinkData($value),
         ];
     }
 
@@ -458,11 +459,20 @@ class Bard extends Replicator
 
             if (Str::startsWith($href, 'statamic://')) {
                 $ref = Str::after($href, 'statamic://');
-                $item = Data::find($ref);
-                $data[$ref] = [
-                    'title' => $item->value('title'),
-                    'permalink' => $item->absoluteUrl(),
-                ];
+                [$type, $id] = explode('::', $ref, 2);
+                if ($type === 'entry') {
+                    $entry = Entry::find($id);
+                    $data[$ref] = [
+                        'title' => $entry->get('title'),
+                        'permalink' => $entry->absoluteUrl(),
+                    ];
+                } elseif ($type === 'asset') {
+                    $asset = Asset::find($id);
+                    $data[$ref] = [
+                        'basename' => $asset->basename(),
+                        'thumbnail' => $asset->thumbnailUrl(),
+                    ];
+                }
             }
         }
 

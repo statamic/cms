@@ -87,6 +87,15 @@ export default {
 
     },
 
+    watch: {
+
+        browserSelections(selections) {
+            if (this.maxFiles === 1 && selections.length === 1) {
+                this.select();
+            }
+        },
+
+    },
 
     methods: {
 
