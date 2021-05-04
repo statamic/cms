@@ -12,7 +12,8 @@ class ValueTest extends TestCase
     /** @test */
     public function it_augments_through_the_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return strtoupper($data).'!';
@@ -32,7 +33,8 @@ class ValueTest extends TestCase
     /** @test */
     public function it_shallow_augments_through_the_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return strtoupper($data).'!';
@@ -54,7 +56,8 @@ class ValueTest extends TestCase
     /** @test */
     public function it_converts_to_string_using_the_augmented_value()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return strtoupper($data).'!';
@@ -69,7 +72,8 @@ class ValueTest extends TestCase
     /** @test */
     public function it_converts_to_json_using_the_augmented_value()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return array_map(function ($item) {
@@ -86,7 +90,8 @@ class ValueTest extends TestCase
     /** @test */
     public function it_converts_to_json_and_augments_child_values()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return array_map(function ($item) {
@@ -95,14 +100,16 @@ class ValueTest extends TestCase
             }
         };
 
-        $fieldtypeTwo = new class extends Fieldtype {
+        $fieldtypeTwo = new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return new DummyAugmentable($data);
             }
         };
 
-        $fieldtypeThree = new class extends Fieldtype {
+        $fieldtypeThree = new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return collect($data)->map(function ($id) {
