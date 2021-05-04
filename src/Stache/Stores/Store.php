@@ -232,13 +232,6 @@ abstract class Store
         // all, then manually create any added files, and delete any deleted files.
         $this->clearCachedPaths();
 
-        // Flush the cached instances of modified items.
-        $modified->each(function ($timestamp, $path) use ($pathMap) {
-            if ($key = $pathMap->get($path)) {
-                $this->forgetItem($key);
-            }
-        });
-
         // Get items from every file that was modified.
         $modified = $modified->map(function ($timestamp, $path) use ($pathMap) {
             return $this->getItemFromModifiedPath($path, $pathMap);
