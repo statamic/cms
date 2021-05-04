@@ -34,25 +34,29 @@ class EloquentUserTest extends TestCase
     /** @test */
     public function it_gets_roles_already_in_the_db_without_explicitly_assigning_them()
     {
-        $roleA = new class extends Role {
+        $roleA = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'a';
             }
         };
-        $roleB = new class extends Role {
+        $roleB = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'b';
             }
         };
-        $roleC = new class extends Role {
+        $roleC = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'c';
             }
         };
-        $roleD = new class extends Role {
+        $roleD = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'd';
