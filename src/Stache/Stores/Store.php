@@ -16,7 +16,7 @@ abstract class Store
     protected $directory;
     protected $valueIndex = Indexes\Value::class;
     protected $customIndexes = [];
-    protected $defaultIndexes = ['id'];
+    protected $defaultIndexes = ['id', 'path'];
     protected $storeIndexes = [];
     protected $usedIndexes;
     protected $fileChangesHandled = false;
