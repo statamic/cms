@@ -34,6 +34,7 @@
     "require-dev": {
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
+        "matt-allan/laravel-code-style": "^0.6.0",
         "mockery/mockery": "^1.2.3",
         "orchestra/testbench": "^4.0 || ^5.0 || ^6.0"
     },
