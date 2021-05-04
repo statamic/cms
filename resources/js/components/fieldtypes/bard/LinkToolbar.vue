@@ -2,10 +2,10 @@
 
     <div class="bard-link-toolbar">
 
-        <div class="p-2">
+        <div>
 
             <!-- Link type select -->
-            <div class="mb-2 flex items-center">
+            <div class="flex items-center px-2 py-1 border-b">
 
                 <label
                     class="mr-1.5 flex items-center font-normal"
@@ -14,7 +14,7 @@
                     :key="type.type"
                 >
                     <input
-                        class="mr-1"
+                        class="mr-sm top-0"
                         type="radio"
                         name="link-type"
                         :id="type.type"
@@ -26,94 +26,84 @@
 
             </div>
 
-            
-            <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
+            <div class="px-2 py-2 border-b">
+                <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
 
-                <!-- URL input -->
-                <input
-                    v-if="linkType === 'url'"
-                    v-model="url.url"
-                    type="text"
-                    ref="input"
-                    class="input h-auto text-sm"
-                    placeholder="URL"
-                />
+                    <!-- URL input -->
+                    <input
+                        v-if="linkType === 'url'"
+                        v-model="url.url"
+                        type="text"
+                        ref="input"
+                        class="input h-auto text-sm"
+                        placeholder="URL"
+                    />
 
-                <!-- Data input -->
-                <div
-                    v-else 
-                    class="w-full flex justify-between" 
-                    @click="openSelector"
-                >
-
-                    <loading-graphic v-if="isLoading" :inline="true" />
-
-                    <div v-else class="flex-1 flex items-center mr-1 truncate">
-                        <img
-                            v-if="linkType === 'asset' && itemData.asset"
-                            :src="itemData.asset.thumbnail"
-                            class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-1 fit-cover lazyloaded"
-                        >
-                        {{ displayValue }}
-                    </div>
-
-                    <button 
-                        v-tooltip="`${__('Browse')}...`"
-                        :aria-label="`${__('Browse')}...`"
+                    <!-- Data input -->
+                    <div
+                        v-else
+                        class="w-full flex justify-between"
                         @click="openSelector"
                     >
-                        <svg-icon :name="linkType === 'asset' ? 'folder-image' : 'folder-generic'" class="h-4 w-4" />
-                    </button>
+
+                        <loading-graphic v-if="isLoading" :inline="true" />
+
+                        <div v-else class="flex-1 flex items-center mr-1 truncate">
+                            <img
+                                v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
+                                :src="itemData.asset.thumbnail || itemData.asset.url"
+                                class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-1 fit-cover lazyloaded"
+                            >
+                            {{ displayValue }}
+                        </div>
+
+                        <button
+                            v-tooltip="`${__('Browse')}...`"
+                            :aria-label="`${__('Browse')}...`"
+                            @click="openSelector"
+                        >
+                            <svg-icon :name="linkType === 'asset' ? 'folder-image' : 'folder-generic'" class="h-4 w-4" />
+                        </button>
+
+                    </div>
 
                 </div>
 
-            </div>
-
-            <!-- Tooltip input (title attribute) -->
-            <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
-                <input
-                    type="text"
-                    ref="input"
-                    v-model="title"
-                    class="input h-auto text-sm"
-                    :placeholder="__('Tooltip')"
-                />
-            </div>
-
-
-            <div class="flex justify-between items-center font-normal">
+                <!-- Title attribute -->
+                <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center" >
+                    <input
+                        type="text"
+                        ref="input"
+                        v-model="title"
+                        class="input h-auto text-sm placeholder-gray-50"
+                        :placeholder="__('Title (optional)')"
+                    />
+                </div>
 
                 <label for="target-blank" class="flex items-center font-normal">
                     <input class="checkbox mr-1" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
+            </div>
 
-                <div class="ml-2 flex justify-end">
-                    <button
-                        v-tooltip="__('Remove Link')"
-                        :aria-label="__('Remove Link')"
-                        @click="remove"
-                        class="mr-3"
-                    >
-                        <svg-icon name="hyperlink-broken" class="h-4 w-4" />
-                    </button>
-
-                    <button
-                        v-if="canCommit"
-                        v-tooltip="__('Apply Link')"
-                        :aria-label="__('Apply Link')"
-                        @click="commit"
-                        class=""
-                    >
-                        <svg-icon name="hyperlink" class="h-4 w-4" />
-                    </button>
-
-                    <span v-else class="text-grey-50">
-                        <svg-icon name="hyperlink" class="h-4 w-4" />
-                    </span>
-
-                </div>
-
+            <div class="flex items-center justify-end space-x-1 font-normal px-2 py-1.5">
+                <button
+                    v-tooltip="__('Remove Link')"
+                    :aria-label="__('Remove Link')"
+                    @click="remove"
+                    class="btn btn-sm"
+                >
+                    {{ __('Remove Link') }}
+                </button>
+                <button
+                    :disabled="! canCommit"
+                    v-tooltip="__('Apply Link')"
+                    :aria-label="__('Apply Link')"
+                    @click="commit"
+                    class="btn btn-sm"
+                >
+                    {{ __('OK') }}
+                </button>
             </div>
 
         </div>
@@ -217,7 +207,7 @@ export default {
         canCommit() {
             return !! this.url[this.linkType];
         },
-        
+
         href() {
             return this.sanitizeLink(this.url[this.linkType]);
         },
@@ -286,7 +276,7 @@ export default {
 
             this.url = { [this.linkType]: attrs.href };
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
-    
+
             this.title = attrs.title;
             this.targetBlank = attrs.href
                 ? attrs.target === '_blank'
@@ -331,7 +321,7 @@ export default {
         sanitizeLink(link) {
             const str = link.trim();
 
-            return str.match(/^\w[\w\-_\.]+\.(co|uk|com|org|net|gov|biz|info|us|eu|de|fr|it|es|pl|nz)/i) 
+            return str.match(/^\w[\w\-_\.]+\.(co|uk|com|org|net|gov|biz|info|us|eu|de|fr|it|es|pl|nz)/i)
                 ? `https://${str}`
                 : str
         },
@@ -412,12 +402,12 @@ export default {
             }
 
             const regex = /^statamic:\/\/((.*?)::(.*))$/;
-            
+
             const matches = url.match(regex);
             if (! matches) {
                 return {};
             }
-            
+
             const [_, ref, type, id] = matches;
 
             return { ref, type, id};
