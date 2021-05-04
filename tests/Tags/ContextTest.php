@@ -13,7 +13,8 @@ class ContextTest extends TestCase
     {
         parent::setUp();
 
-        $fieldtype = new class extends \Statamic\Fields\Fieldtype {
+        $fieldtype = new class extends \Statamic\Fields\Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
