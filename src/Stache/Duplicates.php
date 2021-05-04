@@ -62,6 +62,8 @@ class Duplicates
     public function clear()
     {
         Cache::forget('stache::duplicates');
+
+        return $this;
     }
 
     public function setItems($items)

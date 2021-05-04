@@ -66,7 +66,9 @@ class StacheDoctor extends Command
 
     protected function outputDuplicateIds()
     {
-        $duplicates = Stache::duplicates()->find()->all();
+        $this->stores->each->clearCachedPaths();
+
+        $duplicates = Stache::duplicates()->clear()->find()->all();
 
         $this->hasDuplicateIds = $duplicates->isNotEmpty();
 

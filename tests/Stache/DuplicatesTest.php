@@ -117,8 +117,9 @@ class DuplicatesTest extends TestCase
 
         $this->assertNotNull(Cache::get('stache::duplicates'));
 
-        $duplicates->clear();
+        $return = $duplicates->clear();
 
+        $this->assertEquals($duplicates, $return);
         $this->assertNull(Cache::get('stache::duplicates'));
     }
 
