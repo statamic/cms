@@ -98,14 +98,14 @@ class Augmentor
             ->replaceNode(DefaultImageNode::class, CustomImageNode::class)
             ->addNode(SetNode::class)
             ->addNodes(static::$customNodes)
-            ->addMarks(static::$customMarks)
-            ;
+            ->addMarks(static::$customMarks);
         foreach (static::$replaceNodes as $searchNode => $replaceNode) {
             $renderer->replaceNode($searchNode, $replaceNode);
         }
         foreach (static::$replaceMarks as $searchMark => $replaceMark) {
             $renderer->replaceMark($searchMark, $replaceMark);
         }
+
         return $renderer->render(['type' => 'doc', 'content' => $value]);
     }
 
