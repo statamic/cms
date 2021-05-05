@@ -16,7 +16,7 @@
                 v-for="field in fields"
                 v-show="showField(field)"
                 :key="field.handle"
-                :config="field"
+                :config="{...field, localizable: grid.config.localizable}"
                 :value="values[field.handle]"
                 :meta="meta[field.handle]"
                 :read-only="grid.isReadOnly"
