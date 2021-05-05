@@ -54,4 +54,13 @@ class ChildStore extends BasicStore
     {
         return $this->parent->makeItemFromFile($path, $contents);
     }
+
+    public function keys()
+    {
+        if ($this->keys) {
+            return $this->keys;
+        }
+
+        return $this->keys = (new Keys($this->parent()))->load();
+    }
 }

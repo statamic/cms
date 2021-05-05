@@ -83,5 +83,7 @@ return [
     'access_utility_desc' => 'Grants access to the :title utility',
 
     'group_misc' => 'Miscellaneous',
+    'resolve_duplicate_ids' => 'Resolve Duplicate IDs',
+    'resolve_duplicate_ids_desc' => 'Grants ability to see and resolve duplicate IDs.',
 
 ];
