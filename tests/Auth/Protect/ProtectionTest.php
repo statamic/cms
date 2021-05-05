@@ -51,7 +51,8 @@ class ProtectionTest extends TestCase
     {
         $this->assertNull($this->protection->scheme());
 
-        $this->protection->setData(new class {
+        $this->protection->setData(new class
+        {
             //
         });
 
@@ -106,7 +107,8 @@ class ProtectionTest extends TestCase
         $state = (object) ['protected' => false];
 
         app(ProtectorManager::class)->extend('test', function ($app) use ($state) {
-            return new class($state) extends Protector {
+            return new class($state) extends Protector
+            {
                 public function __construct($state)
                 {
                     $this->state = $state;
