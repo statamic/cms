@@ -19,21 +19,42 @@ class DuplicatesTest extends TestCase
         $original = $this->mock(Entry::class);
         $original->shouldReceive('path')->andReturn('path/to/original.md');
 
+        $anotherOriginal = $this->mock(Entry::class);
+        $anotherOriginal->shouldReceive('path')->andReturn('path/to/another-original.md');
+
+        $thirdOriginal = $this->mock(Entry::class);
+        $thirdOriginal->shouldReceive('path')->andReturn('path/to/yet/another-original.md');
+
         $store = $this->mock(Store::class);
         $store->shouldReceive('key')->andReturn('test-store');
         $store->shouldReceive('getItem')->with('123')->andReturn($original);
+        $store->shouldReceive('getItem')->with('456')->andReturn($anotherOriginal);
+
+        $anotherStore = $this->mock(Store::class);
+        $anotherStore->shouldReceive('key')->andReturn('another-test-store');
+        $anotherStore->shouldReceive('getItem')->with('789')->andReturn($thirdOriginal);
 
         $stache = $this->mock(Stache::class);
         $stache->shouldReceive('store')->with('test-store')->andReturn($store);
+        $stache->shouldReceive('store')->with('another-test-store')->andReturn($anotherStore);
 
         $duplicates = new Duplicates($stache);
 
         $this->assertEquals([], $duplicates->all()->all());
+        $this->assertEquals(0, $duplicates->count());
+        $this->assertTrue($duplicates->isEmpty());
+        $this->assertFalse($duplicates->isNotEmpty());
 
         $duplicates->track($store, '123', 'path/to/duplicate.md');
 
         // Do it twice to make sure it's only tracked once.
         $duplicates->track($store, '123', 'path/to/duplicate.md');
+
+        // Track another item in the same store
+        $duplicates->track($store, '456', 'path/to/another-duplicate.md');
+
+        // Track an item in a different store
+        $duplicates->track($anotherStore, '789', 'path/to/yet/another-duplicate.md');
 
         $this->assertEquals([
             'test-store' => [
@@ -41,8 +62,21 @@ class DuplicatesTest extends TestCase
                     'path/to/original.md',
                     'path/to/duplicate.md',
                 ],
+                '456' => [
+                    'path/to/another-original.md',
+                    'path/to/another-duplicate.md',
+                ],
+            ],
+            'another-test-store' => [
+                '789' => [
+                    'path/to/yet/another-original.md',
+                    'path/to/yet/another-duplicate.md',
+                ],
             ],
         ], $duplicates->all()->all());
+        $this->assertEquals(3, $duplicates->count());
+        $this->assertFalse($duplicates->isEmpty());
+        $this->assertTrue($duplicates->isNotEmpty());
 
         $duplicates->track($store, '123', 'path/to/triplicate.md');
 
@@ -53,8 +87,19 @@ class DuplicatesTest extends TestCase
                     'path/to/duplicate.md',
                     'path/to/triplicate.md',
                 ],
+                '456' => [
+                    'path/to/another-original.md',
+                    'path/to/another-duplicate.md',
+                ],
+            ],
+            'another-test-store' => [
+                '789' => [
+                    'path/to/yet/another-original.md',
+                    'path/to/yet/another-duplicate.md',
+                ],
             ],
         ], $duplicates->all()->all());
+        $this->assertEquals(4, $duplicates->count());
     }
 
     /** @test */

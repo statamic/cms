@@ -102,4 +102,19 @@ class Duplicates
 
         return false;
     }
+
+    public function count()
+    {
+        return collect($this->items)->flatten()->count();
+    }
+
+    public function isEmpty()
+    {
+        return $this->count() === 0;
+    }
+
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
 }
