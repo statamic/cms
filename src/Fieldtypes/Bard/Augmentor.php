@@ -99,9 +99,11 @@ class Augmentor
             ->addNode(SetNode::class)
             ->addNodes(static::$customNodes)
             ->addMarks(static::$customMarks);
+
         foreach (static::$replaceNodes as $searchNode => $replaceNode) {
             $renderer->replaceNode($searchNode, $replaceNode);
         }
+
         foreach (static::$replaceMarks as $searchMark => $replaceMark) {
             $renderer->replaceMark($searchMark, $replaceMark);
         }
