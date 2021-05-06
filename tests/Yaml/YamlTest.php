@@ -126,6 +126,28 @@ EOT;
         $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/3612
+     **/
+    public function it_dumps_front_matter_properly_when_a_multiline_string_is_the_last_key()
+    {
+        $expectedWithFrontMatter = <<<'EOT'
+---
+foo: bar
+baz: |-
+  first line
+  second line
+---
+content
+EOT;
+
+        $this->assertEqualsIgnoringLineEndings($expectedWithFrontMatter, YAML::dumpFrontMatter([
+            'foo' => 'bar',
+            'baz' => "first line\nsecond line", // the multiline string *must* be last for this bug
+        ], 'content'));
+    }
+
     /** @test */
     public function it_parses_a_string_of_yaml()
     {
