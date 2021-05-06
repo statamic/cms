@@ -74,6 +74,6 @@ class AugmentedEntry extends AbstractAugmented
 
     public function authors()
     {
-        return $this->data->value('authors') ?? $this->data->authors();
+        return $this->wrapValue($this->getFromData('authors'), 'authors');
     }
 }

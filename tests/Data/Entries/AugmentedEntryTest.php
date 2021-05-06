@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Carbon\Carbon;
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Mockery;
@@ -138,8 +139,37 @@ class AugmentedEntryTest extends AugmentedTestCase
     }
 
     /** @test */
-    public function it_gets_the_authors_from_the_value_first_if_it_exists()
+    public function authors_is_just_the_value_if_its_not_in_the_blueprint()
     {
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->create();
+
+        // Make sure there are authors on the entry.
+        // The singular "author" field is what's read using $entry->authors()
+        // But, this test is ensuring that method isn't being called during augmentation of the plural "authors" field.
+        $entry->set('author', ['user-1', 'user-2']);
+
+        $augmented = new AugmentedEntry($entry);
+
+        $this->assertNull($augmented->get('authors'));
+
+        $entry->set('authors', 'joe and bob');
+        $this->assertEquals('joe and bob', $augmented->get('authors'));
+    }
+
+    /** @test */
+    public function it_gets_the_authors_from_the_value_if_its_in_the_blueprint()
+    {
+        $blueprint = Blueprint::makeFromFields(['authors' => ['type' => 'users']]);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'test' => $blueprint,
+        ]));
+
+        User::make()->id('user-1')->save();
+        User::make()->id('user-2')->save();
+
         $entry = EntryFactory::id('entry-id')
             ->collection('test')
             ->slug('entry-slug')
@@ -147,25 +177,19 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $augmented = new AugmentedEntry($entry);
 
-        // by default, authors will return a collection of whatever is in "author" (singular)
+        // Since it's in the blueprint, and is using a "users" fieldtype, it gets augmented to a collection.
         $authors = $augmented->get('authors');
+        $this->assertInstanceOf(Value::class, $authors);
+        $authors = $authors->value();
         $this->assertInstanceOf(IlluminateCollection::class, $authors);
         $this->assertEquals([], $authors->all());
 
-        // a string is fine, but it'll get wrapped in a collection.
-        $entry->set('author', 'user-1');
+        $entry->set('authors', ['user-1', 'unknown-user', 'user-2']);
         $authors = $augmented->get('authors');
+        $this->assertInstanceOf(Value::class, $authors);
+        $authors = $authors->value();
         $this->assertInstanceOf(IlluminateCollection::class, $authors);
-        $this->assertEquals(['user-1'], $authors->all());
-
-        // an array is fine too.
-        $entry->set('author', ['user-1', 'user-2']);
-        $authors = $augmented->get('authors');
-        $this->assertInstanceOf(IlluminateCollection::class, $authors);
-        $this->assertEquals(['user-1', 'user-2'], $authors->all());
-
-        // explicitly setting an "authors" (plural) value will use that
-        $entry->set('authors', 'foo');
-        $this->assertEquals('foo', $augmented->get('authors'));
+        $this->assertEveryItemIsInstanceOf(\Statamic\Contracts\Auth\User::class, $authors);
+        $this->assertEquals(['user-1', 'user-2'], $authors->map->id()->all());
     }
 }
