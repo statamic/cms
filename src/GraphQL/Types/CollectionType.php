@@ -36,6 +36,10 @@ class CollectionType extends \Rebing\GraphQL\Support\Type
     private function resolver()
     {
         return function ($collection, $args, $context, $info) {
+            if ($info->fieldName === 'structure') {
+                return $collection->structure();
+            }
+
             $value = $collection->augmentedValue($info->fieldName);
 
             if ($value instanceof Value) {
