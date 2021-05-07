@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Entries\GetDateFromPath;
+use Statamic\Entries\GetSlugFromPath;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\File;
@@ -63,7 +64,7 @@ class CollectionEntriesStore extends ChildStore
             ->id($id)
             ->collection($collection);
 
-        $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
+        $slug = (new GetSlugFromPath)($path);
 
         if ($origin = array_pull($data, 'origin')) {
             $entry->origin($origin);

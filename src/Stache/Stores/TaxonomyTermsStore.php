@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Entries\GetSlugFromPath;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
@@ -51,7 +52,7 @@ class TaxonomyTermsStore extends ChildStore
 
         $term = Term::make()
             ->taxonomy($taxonomy)
-            ->slug(pathinfo(Path::clean($path), PATHINFO_FILENAME))
+            ->slug((new GetSlugFromPath)($path))
             ->initialPath($path)
             ->blueprint($data['blueprint'] ?? null);
 
