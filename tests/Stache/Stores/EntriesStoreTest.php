@@ -131,6 +131,77 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
+    public function it_appends_the_id_to_the_filename_if_one_already_exists()
+    {
+        $existingPath = $this->directory.'/blog/2017-07-04.test.md';
+        file_put_contents($existingPath, $existingContents = "---\nid: existing-id\n---");
+
+        $entry = Facades\Entry::make()
+            ->id('new-id')
+            ->slug('test')
+            ->date('2017-07-04')
+            ->collection('blog');
+
+        $this->parent->store('blog')->save($entry);
+
+        $newPath = $this->directory.'/blog/2017-07-04.test.new-id.md';
+        $this->assertFileEqualsString($existingPath, $existingContents);
+        $this->assertFileEqualsString($newPath, $entry->fileContents());
+        @unlink($newPath);
+        @unlink($existingPath);
+        $this->assertFileNotExists($newPath);
+        $this->assertFileNotExists($existingPath);
+
+        $this->assertEquals($newPath, $this->parent->store('blog')->paths()->get('new-id'));
+    }
+
+    /** @test */
+    public function it_doesnt_append_the_id_to_the_filename_if_it_is_itself()
+    {
+        $existingPath = $this->directory.'/blog/2017-07-04.test.md';
+        file_put_contents($existingPath, "---\nid: the-id\n---");
+
+        $entry = Facades\Entry::make()
+            ->id('the-id')
+            ->slug('test')
+            ->date('2017-07-04')
+            ->collection('blog');
+
+        $this->parent->store('blog')->save($entry);
+
+        $pathWithIdSuffix = $this->directory.'/blog/2017-07-04.test.the-id.md';
+        $this->assertFileEqualsString($existingPath, $entry->fileContents());
+        @unlink($existingPath);
+        $this->assertFileNotExists($pathWithIdSuffix);
+        $this->assertFileNotExists($existingPath);
+
+        $this->assertEquals($existingPath, $this->parent->store('blog')->paths()->get('the-id'));
+    }
+
+    /** @test */
+    public function it_removes_the_id_suffix_if_the_suffixless_path_is_available()
+    {
+        $existingPath = $this->directory.'/blog/2017-07-04.test.123.md';
+        $expectedPath = $this->directory.'/blog/2017-07-04.test.md';
+
+        $entry = Facades\Entry::make()
+            ->id('123')
+            ->slug('test')
+            ->date('2017-07-04')
+            ->collection('blog')
+            ->initialPath($existingPath);
+
+        $this->parent->store('blog')->save($entry);
+
+        $this->assertFileNotExists($existingPath);
+        $this->assertFileEqualsString($expectedPath, $entry->fileContents());
+        @unlink($expectedPath);
+        $this->assertFileNotExists($expectedPath);
+
+        $this->assertEquals($expectedPath, $this->parent->store('blog')->paths()->get('123'));
+    }
+
+    /** @test */
     public function it_ignores_entries_in_a_site_subdirectory_where_the_collection_doesnt_have_that_site_enabled()
     {
         $this->markTestIncomplete();

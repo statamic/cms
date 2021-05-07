@@ -5,6 +5,7 @@ namespace Statamic\Stache\Stores;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
@@ -164,5 +165,22 @@ class CollectionEntriesStore extends ChildStore
         return $indexes->merge(
             $collection->taxonomies()->map->handle()
         )->all();
+    }
+
+    protected function writeItemToDisk($item)
+    {
+        if (! $contents = File::get($path = $item->path())) {
+            return $item->writeFile();
+        }
+
+        $itemFromDisk = $this->makeItemFromFile($path, $contents);
+
+        if ($item->id() !== $itemFromDisk->id()) {
+            $ext = '.'.$item->fileExtension();
+            $filename = Str::before($path, $ext);
+            $path = "{$filename}.{$item->id()}{$ext}";
+        }
+
+        $item->writeFile($path);
     }
 }
