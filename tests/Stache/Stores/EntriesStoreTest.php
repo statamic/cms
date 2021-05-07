@@ -58,9 +58,9 @@ class EntriesStoreTest extends TestCase
             $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
 
             $this->assertEquals(collect([
-                $dir.'/numeric/1.one.md',
-                $dir.'/numeric/2.two.md',
-                $dir.'/numeric/3.three.md',
+                $dir.'/numeric/one.md',
+                $dir.'/numeric/two.md',
+                $dir.'/numeric/three.md',
             ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
         });
 
