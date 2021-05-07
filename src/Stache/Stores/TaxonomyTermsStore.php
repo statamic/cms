@@ -6,7 +6,6 @@ use Facades\Statamic\Stache\Traverser;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Facades\File;
-use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
