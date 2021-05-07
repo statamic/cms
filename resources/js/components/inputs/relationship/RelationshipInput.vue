@@ -184,6 +184,7 @@ export default {
         loading: {
             immediate: true,
             handler(loading) {
+                this.$emit('loading', loading);
                 this.setLoadingProgress(loading);
             }
         },

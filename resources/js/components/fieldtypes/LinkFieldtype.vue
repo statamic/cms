@@ -89,17 +89,19 @@ export default {
     created() {
         this.options = this.initialOptions();
 
+        if (! this.value) {
+            this.option = this.config.required ? 'url' : null;
+            return;
+        }
+
         if (this.value === '@child') {
             this.option = 'first-child';
-        } else if (this.value && this.value.startsWith('entry::')) {
+        } else if (this.value.startsWith('entry::')) {
             this.option = 'entry';
             this.selectedEntries = [this.value.substr(7)];
         } else {
-            this.urlValue = this.value;
-        }
-
-        if (this.config.required && this.option === null) {
             this.option = 'url';
+            this.urlValue = this.value;
         }
     },
 
@@ -107,19 +109,19 @@ export default {
 
         initialOptions() {
             return [
-                
+
                 this.config.required
                     ? null
                     : { label: __('None'), value: null },
 
                 { label: __('URL'), value: 'url' },
-                
+
                 this.meta.showFirstChildOption
                     ? { label: __('First Child'), value: 'first-child' }
                     : null,
-                
+
                 { label: __('Entry'), value: 'entry' }
-                
+
             ].filter(option => option);
         },
 

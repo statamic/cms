@@ -97,7 +97,7 @@ EOT
             '<label>Password Confirmation</label><input type="password" name="password_confirmation">',
             '<label>Full Name</label><input type="text" name="name">',
             '<label>Phone Number</label><input type="text" name="phone">',
-            '<label>Over 18 years of age?</label><input type="text" name="age">',
+            '<label>Over 18 years of age?</label><input type="text" name="age" required>',
         ];
 
         $this->assertEquals($expected, $actual[0]);

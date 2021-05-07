@@ -25,8 +25,9 @@ class Value extends Index
             return $item->entriesCount();
         }
 
+        // Don't want to use the authors() method, which would happen right after this.
         if ($method === 'authors') {
-            return $item->value('authors') ?? $item->authors();
+            return $item->value('authors');
         }
 
         if (method_exists($item, $method)) {
