@@ -61,7 +61,7 @@ class Bard extends Replicator
                 'type' => 'asset_container',
                 'max_items' => 1,
                 'if' => [
-                    'buttons' => 'contains image',
+                    'buttons' => 'contains_any anchor, image',
                 ],
             ],
             'save_html' => [
