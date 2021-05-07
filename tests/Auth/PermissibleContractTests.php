@@ -17,25 +17,29 @@ trait PermissibleContractTests
     /** @test */
     public function it_gets_and_assigns_roles()
     {
-        $roleA = new class extends Role {
+        $roleA = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'a';
             }
         };
-        $roleB = new class extends Role {
+        $roleB = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'b';
             }
         };
-        $roleC = new class extends Role {
+        $roleC = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'c';
             }
         };
-        $roleD = new class extends Role {
+        $roleD = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'd';
@@ -73,25 +77,29 @@ trait PermissibleContractTests
     /** @test */
     public function it_removes_a_role_assignment()
     {
-        $roleA = new class extends Role {
+        $roleA = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'a';
             }
         };
-        $roleB = new class extends Role {
+        $roleB = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'b';
             }
         };
-        $roleC = new class extends Role {
+        $roleC = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'c';
             }
         };
-        $roleD = new class extends Role {
+        $roleD = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'd';
@@ -114,13 +122,15 @@ trait PermissibleContractTests
     /** @test */
     public function it_checks_if_it_has_a_role()
     {
-        $roleA = new class extends Role {
+        $roleA = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'a';
             }
         };
-        $roleB = new class extends Role {
+        $roleB = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'b';
@@ -213,7 +223,8 @@ trait PermissibleContractTests
     /** @test */
     public function it_checks_if_it_has_super_permissions_through_roles_and_groups()
     {
-        $superRole = new class extends Role {
+        $superRole = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'superrole';
@@ -224,7 +235,8 @@ trait PermissibleContractTests
                 return ['super'];
             }
         };
-        $nonSuperRole = new class extends Role {
+        $nonSuperRole = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'nonsuperrole';

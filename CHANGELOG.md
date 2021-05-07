@@ -1,5 +1,27 @@
 # Release Notes
 
+## 3.1.12 (2020-05-06)
+
+### What's new
+- Added Duplicate ID tracking with Control Panel and CLI reviewing options. [#3619](https://github.com/statamic/cms/issues/3619)
+- You can replace ProseMirror nodes and marks with custom ones. [#3648](https://github.com/statamic/cms/issues/3648)
+
+### What's improved
+- Added `required` attributes to dynamic form field html. [#3592](https://github.com/statamic/cms/issues/3592)
+- Updated German translations. [#3607](https://github.com/statamic/cms/issues/3607)
+
+### What's fixed
+- Fix a bunch of Stache issues. [#3619](https://github.com/statamic/cms/issues/3619) [#3616](https://github.com/statamic/cms/issues/3616)
+- Fix augmentation fallback behavior [#3660](https://github.com/statamic/cms/issues/3660)
+- Fix `trans_choice` Tag [#3650](https://github.com/statamic/cms/issues/3650)
+- Fix `link` fieldtype not showing the saved value. [#3637](https://github.com/statamic/cms/issues/3637)
+- Fix localizable Grid fields in stacked mode being read only. [#3518](https://github.com/statamic/cms/issues/3518)
+- Add asset selector to Bard link toolbar. [#3591](https://github.com/statamic/cms/issues/3591)
+- Favor authors value in Stache index [#3617](https://github.com/statamic/cms/issues/3617)
+- Bump composer requirement, of composer. [#3653](https://github.com/statamic/cms/issues/3653)
+
+
+
 ## 3.1.11 (2020-04-28)
 
 ### What's improved

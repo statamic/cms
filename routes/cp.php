@@ -157,6 +157,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('updater/{product}/install', 'UpdateProductController@install');
     });
 
+    Route::group(['prefix' => 'duplicates'], function () {
+        Route::get('/', 'DuplicatesController@index')->name('duplicates');
+        Route::post('regenerate', 'DuplicatesController@regenerate')->name('duplicates.regenerate');
+    });
+
     Route::get('addons', 'AddonsController@index')->name('addons.index');
     Route::post('addons/install', 'AddonsController@install');
     Route::post('addons/uninstall', 'AddonsController@uninstall');
