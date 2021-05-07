@@ -184,12 +184,8 @@ class EntriesStoreTest extends TestCase
         $existingPath = $this->directory.'/blog/2017-07-04.test.123.md';
         $expectedPath = $this->directory.'/blog/2017-07-04.test.md';
 
-        $entry = Facades\Entry::make()
-            ->id('123')
-            ->slug('test')
-            ->date('2017-07-04')
-            ->collection('blog')
-            ->initialPath($existingPath);
+        file_put_contents($existingPath, 'id: 123');
+        $entry = $this->parent->store('blog')->makeItemFromFile($existingPath, file_get_contents($existingPath));
 
         $this->parent->store('blog')->save($entry);
 

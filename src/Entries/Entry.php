@@ -339,7 +339,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->initialPath ?? $this->buildPath();
     }
 
-    protected function buildPath()
+    public function buildPath()
     {
         $prefix = '';
 

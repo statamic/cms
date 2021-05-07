@@ -13,7 +13,7 @@ trait ExistsAsFile
 
     abstract public function path();
 
-    protected function buildPath()
+    public function buildPath()
     {
         return $this->path();
     }
