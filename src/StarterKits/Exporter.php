@@ -41,8 +41,8 @@ class Exporter
 
         $this
             ->exportFiles()
-            ->exportComposerJson()
-            ->exportConfig();
+            ->exportConfig()
+            ->exportComposerJson();
     }
 
     /**
@@ -140,17 +140,108 @@ class Exporter
     }
 
     /**
+     * Export starter kit config.
+     *
+     * @return $this
+     */
+    protected function exportConfig()
+    {
+        $config = $this->config();
+
+        $config = $this->exportDependenciesFromComposerJson($config);
+
+        $this->files->put(base_path("{$this->exportPath}/starter-kit.yaml"), YAML::dump($config->all()));
+
+        return $this;
+    }
+
+    /**
+     * Export dependencies from composer.json.
+     *
+     * @param \Illuminate\Support\Collection $config
+     * @return \Illuminate\Support\Collection
+     */
+    protected function exportDependenciesFromComposerJson($config)
+    {
+        $exportableDependencies = $this->getExportableDependenciesFromConfig($config);
+
+        $config
+            ->forget('dependencies')
+            ->forget('dependenices_dev');
+
+        if ($dependencies = $this->exportDependenciesFromComposerRequire('require', $exportableDependencies)) {
+            $config->put('dependencies', $dependencies->all());
+        }
+
+        if ($devDependencies = $this->exportDependenciesFromComposerRequire('require-dev', $exportableDependencies)) {
+            $config->put('dependencies_dev', $devDependencies->all());
+        }
+
+        return $config;
+    }
+
+    /**
+     * Get exportable dependencies without versions from config.
+     *
+     * @param \Illuminate\Support\Collection $config
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getExportableDependenciesFromConfig($config)
+    {
+        if ($this->hasDependenciesWithoutVersions($config)) {
+            return collect($config->get('dependencies') ?? []);
+        }
+
+        return collect()
+            ->merge($config->get('dependencies') ?? [])
+            ->merge($config->get('dependencies_dev') ?? [])
+            ->keys();
+    }
+
+    /**
+     * Check if config has dependencies without versions.
+     *
+     * @param \Illuminate\Support\Collection $config
+     * @return bool
+     */
+    protected function hasDependenciesWithoutVersions($config)
+    {
+        if (! $config->has('dependencies')) {
+            return false;
+        }
+
+        return isset($config['dependencies'][0]);
+    }
+
+    /**
+     * Export dependencies from composer.json using specific require key.
+     *
+     * @param string $requireKey
+     * @param \Illuminate\Support\Collection $exportableDependencies
+     * @return \Illuminate\Support\Collection
+     */
+    protected function exportDependenciesFromComposerRequire($requireKey, $exportableDependencies)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $dependencies = collect($composerJson[$requireKey] ?? [])
+            ->filter(function ($version, $dependency) use ($exportableDependencies) {
+                return $exportableDependencies->contains($dependency);
+            });
+
+        return $dependencies->isNotEmpty()
+            ? $dependencies
+            : false;
+    }
+
+    /**
      * Export composer.json.
      *
      * @return $this
      */
     protected function exportComposerJson()
     {
-        $composerJson = $this->prepareComposerJsonFromStub()
-            ->forget('require')
-            ->forget('require-dev')
-            ->merge($this->prepareComposerJsonDependencies())
-            ->all();
+        $composerJson = $this->prepareComposerJsonFromStub()->all();
 
         $this->files->put(
             base_path("{$this->exportPath}/composer.json"),
@@ -197,66 +288,5 @@ class Exporter
         }
 
         return $this->files->get($stubPath);
-    }
-
-    /**
-     * Prepare composer.json dependencies.
-     *
-     * @return array
-     */
-    protected function prepareComposerJsonDependencies()
-    {
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
-
-        $originalRequire = $this->getExportableDependencies($composerJson, 'require');
-        $originalRequireDev = $this->getExportableDependencies($composerJson, 'require-dev');
-
-        $dependencies = [];
-
-        if ($originalRequire->isNotEmpty()) {
-            $dependencies['require'] = $originalRequire->all();
-        }
-
-        if ($originalRequireDev->isNotEmpty()) {
-            $dependencies['require-dev'] = $originalRequireDev->all();
-        }
-
-        return $dependencies;
-    }
-
-    /**
-     * Get exportable dependencies from appropriate require key in composer.json.
-     *
-     * @param array $composerJson
-     * @param string $requireKey
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getExportableDependencies($composerJson, $requireKey)
-    {
-        return collect($composerJson[$requireKey] ?? [])->filter(function ($version, $package) {
-            return $this->dependencies()->contains($package);
-        });
-    }
-
-    /**
-     * Get starter kit dependencies that should be copied from the composer.json.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function dependencies()
-    {
-        return collect($this->config()->get('dependencies'));
-    }
-
-    /**
-     * Export starter kit config.
-     *
-     * @return $this
-     */
-    protected function exportConfig()
-    {
-        $this->files->copy(base_path('starter-kit.yaml'), base_path("{$this->exportPath}/starter-kit.yaml"));
-
-        return $this;
     }
 }

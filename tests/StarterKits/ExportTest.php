@@ -109,6 +109,243 @@ class ExportTest extends TestCase
     }
 
     /** @test */
+    public function it_exports_all_dependencies_from_versionless_array()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->setExportableDependencies([
+            'statamic/ssg',
+            'statamic/seo-pro',
+            'hansolo/falcon',
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigEquals('dependencies', [
+            'statamic/seo-pro' => '^2.2',
+            'hansolo/falcon' => '*',
+        ]);
+
+        $this->assertExportedConfigEquals('dependencies_dev', [
+            'statamic/ssg' => '^0.4.0',
+        ]);
+
+        $this->assertEquals(<<<'EOT'
+{
+    "name": "my-vendor-name/cool-runnings",
+    "extra": {
+        "statamic": {
+            "name": "Cool Runnings",
+            "description": "Cool Runnings starter kit"
+        }
+    }
+}
+EOT
+        , $this->files->get($this->exportPath('composer.json')));
+    }
+
+    /** @test */
+    public function it_exports_only_non_dev_dependencies_from_versionless_array()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->setExportableDependencies([
+            'statamic/seo-pro',
+            'hansolo/falcon',
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigEquals('dependencies', [
+            'statamic/seo-pro' => '^2.2',
+            'hansolo/falcon' => '*',
+        ]);
+
+        $this->assertExportedConfigDoesNotHave('dependencies_dev');
+    }
+
+    /** @test */
+    public function it_exports_only_dev_dependencies_from_versionless_array()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->setExportableDependencies([
+            'statamic/ssg',
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigDoesNotHave('dependencies');
+
+        $this->assertExportedConfigEquals('dependencies_dev', [
+            'statamic/ssg' => '^0.4.0',
+        ]);
+    }
+
+    /** @test */
+    public function it_overrides_all_dependencies_from_composer_json()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->setExportableDependencies([
+            'dependencies' => [
+                'statamic/ssg' => '10.0.0',
+                'statamic/seo-pro' => '10.0.0',
+            ],
+            'dependencies_dev' => [
+                'hansolo/falcon' => '10.0.0',
+            ],
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigEquals('dependencies', [
+            'statamic/seo-pro' => '^2.2',
+            'hansolo/falcon' => '*',
+        ]);
+
+        $this->assertExportedConfigEquals('dependencies_dev', [
+            'statamic/ssg' => '^0.4.0',
+        ]);
+    }
+
+    /** @test */
+    public function it_overrides_non_dev_dependencies_from_composer_json()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->setExportableDependencies([
+            'dependencies' => [
+                'statamic/seo-pro' => '10.0.0',
+            ],
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigEquals('dependencies', [
+            'statamic/seo-pro' => '^2.2',
+        ]);
+
+        $this->assertExportedConfigDoesNotHave('dependencies_dev');
+    }
+
+    /** @test */
+    public function it_overrides_dev_dependencies_from_composer_json()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->setExportableDependencies([
+            'dependencies' => [
+                'statamic/ssg' => '10.0.0',
+            ],
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigDoesNotHave('dependencies');
+
+        $this->assertExportedConfigEquals('dependencies_dev', [
+            'statamic/ssg' => '^0.4.0',
+        ]);
+    }
+
+    /** @test */
     public function it_does_not_export_opinionated_app_composer_json()
     {
         $this->setExportPaths([
@@ -148,153 +385,6 @@ EOT
     }
 
     /** @test */
-    public function it_copies_exportable_dependencies_into_a_clean_composer_json_file()
-    {
-        $this->files->put(base_path('composer.json'), <<<'EOT'
-{
-    "type": "project",
-    "require": {
-        "php": "^7.3 || ^8.0",
-        "laravel/framework": "^8.0",
-        "statamic/cms": "3.1.*",
-        "statamic/seo-pro": "^2.2",
-        "statamic/ssg": "^0.4.0"
-    },
-    "prefer-stable": true
-}
-EOT
-        );
-
-        $this->setExportableDependencies([
-            'statamic/ssg',
-            'statamic/seo-pro',
-        ]);
-
-        $this->assertFileNotExists($this->exportPath('composer.json'));
-
-        $this->exportCoolRunnings();
-
-        $this->assertFileExists($this->exportPath('composer.json'));
-
-        $this->assertEquals(<<<'EOT'
-{
-    "name": "my-vendor-name/cool-runnings",
-    "extra": {
-        "statamic": {
-            "name": "Cool Runnings",
-            "description": "Cool Runnings starter kit"
-        }
-    },
-    "require": {
-        "statamic/seo-pro": "^2.2",
-        "statamic/ssg": "^0.4.0"
-    }
-}
-EOT
-        , $this->files->get($this->exportPath('composer.json')));
-    }
-
-    /** @test */
-    public function it_copies_exportable_dev_dependencies_into_a_clean_composer_json_file()
-    {
-        $this->files->put(base_path('composer.json'), <<<'EOT'
-{
-    "type": "project",
-    "require": {
-        "php": "^7.3 || ^8.0",
-        "laravel/framework": "^8.0",
-        "statamic/cms": "3.1.*"
-    },
-    "require-dev": {
-        "statamic/seo-pro": "^2.2",
-        "statamic/ssg": "^0.4.0"
-    },
-    "prefer-stable": true
-}
-EOT
-        );
-
-        $this->setExportableDependencies([
-            'statamic/ssg',
-            'statamic/seo-pro',
-        ]);
-
-        $this->assertFileNotExists($this->exportPath('composer.json'));
-
-        $this->exportCoolRunnings();
-
-        $this->assertFileExists($this->exportPath('composer.json'));
-
-        $this->assertEquals(<<<'EOT'
-{
-    "name": "my-vendor-name/cool-runnings",
-    "extra": {
-        "statamic": {
-            "name": "Cool Runnings",
-            "description": "Cool Runnings starter kit"
-        }
-    },
-    "require-dev": {
-        "statamic/seo-pro": "^2.2",
-        "statamic/ssg": "^0.4.0"
-    }
-}
-EOT
-        , $this->files->get($this->exportPath('composer.json')));
-    }
-
-    /** @test */
-    public function it_copies_all_exportable_dependencies_into_a_clean_composer_json_file()
-    {
-        $this->files->put(base_path('composer.json'), <<<'EOT'
-{
-    "type": "project",
-    "require": {
-        "php": "^7.3 || ^8.0",
-        "laravel/framework": "^8.0",
-        "statamic/cms": "3.1.*",
-        "statamic/seo-pro": "^2.2"
-    },
-    "require-dev": {
-        "statamic/ssg": "^0.4.0"
-    },
-    "prefer-stable": true
-}
-EOT
-        );
-
-        $this->setExportableDependencies([
-            'statamic/ssg',
-            'statamic/seo-pro',
-        ]);
-
-        $this->assertFileNotExists($this->exportPath('composer.json'));
-
-        $this->exportCoolRunnings();
-
-        $this->assertFileExists($this->exportPath('composer.json'));
-
-        $this->assertEquals(<<<'EOT'
-{
-    "name": "my-vendor-name/cool-runnings",
-    "extra": {
-        "statamic": {
-            "name": "Cool Runnings",
-            "description": "Cool Runnings starter kit"
-        }
-    },
-    "require": {
-        "statamic/seo-pro": "^2.2"
-    },
-    "require-dev": {
-        "statamic/ssg": "^0.4.0"
-    }
-}
-EOT
-        , $this->files->get($this->exportPath('composer.json')));
-    }
-
-    /** @test */
     public function it_uses_existing_composer_json_file()
     {
         $this->files->makeDirectory($this->exportPath);
@@ -327,58 +417,6 @@ EOT
         , $this->files->get($this->exportPath('composer.json')));
     }
 
-    /** @test */
-    public function it_copies_all_exportable_dependencies_into_an_existing_composer_json_file()
-    {
-        $this->files->put(base_path('composer.json'), <<<'EOT'
-{
-    "type": "project",
-    "require": {
-        "php": "^7.3 || ^8.0",
-        "laravel/framework": "^8.0",
-        "statamic/cms": "3.1.*",
-        "statamic/seo-pro": "^2.2"
-    },
-    "require-dev": {
-        "statamic/ssg": "^0.4.0"
-    },
-    "prefer-stable": true
-}
-EOT
-        );
-
-        $this->files->makeDirectory($this->exportPath);
-        $this->files->put($this->exportPath('composer.json'), <<<'EOT'
-{
-    "name": "custom/hot-runnings",
-    "require-dev": {
-        "statamic/ssg": "^0.2.0"
-    }
-}
-EOT
-        );
-
-        $this->setExportableDependencies([
-            'statamic/ssg',
-            'statamic/seo-pro',
-        ]);
-
-        $this->exportCoolRunnings();
-
-        $this->assertEquals(<<<'EOT'
-{
-    "name": "custom/hot-runnings",
-    "require": {
-        "statamic/seo-pro": "^2.2"
-    },
-    "require-dev": {
-        "statamic/ssg": "^0.4.0"
-    }
-}
-EOT
-        , $this->files->get($this->exportPath('composer.json')));
-    }
-
     private function exportPath($path = null)
     {
         return collect([$this->exportPath, $path])->filter()->implode('/');
@@ -399,13 +437,32 @@ EOT
     {
         $config['export_paths'] = ['config']; // Dummy export paths to prevent command failure.
 
-        $config['dependencies'] = $dependencies;
+        if (isset($dependencies['dependencies']) || isset($dependencies['dependencies_dev'])) {
+            $config = array_merge($config, $dependencies);
+        } else {
+            $config['dependencies'] = $dependencies;
+        }
 
         $this->files->put($this->configPath, YAML::dump($config));
 
         if (! $this->files->exists($this->exportPath)) {
             $this->files->makeDirectory($this->exportPath);
         }
+    }
+
+    private function assertExportedConfigEquals($key, $expectedConfig)
+    {
+        return $this->assertEquals(
+            $expectedConfig,
+            YAML::parse($this->files->get($this->exportPath('starter-kit.yaml')))[$key]
+        );
+    }
+
+    private function assertExportedConfigDoesNotHave($key)
+    {
+        return $this->assertFalse(
+            isset(YAML::parse($this->files->get($this->exportPath('starter-kit.yaml')))[$key])
+        );
     }
 
     private function exportCoolRunnings()
