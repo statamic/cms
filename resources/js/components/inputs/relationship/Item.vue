@@ -1,7 +1,7 @@
 <template>
 
     <div
-        class="item mb-1 select-none"
+        class="item select-none"
         :class="{ 'invalid': item.invalid }"
     >
         <div class="item-move" v-if="sortable">&nbsp;</div>
