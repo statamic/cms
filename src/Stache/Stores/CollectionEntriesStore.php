@@ -170,16 +170,29 @@ class CollectionEntriesStore extends ChildStore
 
     protected function writeItemToDisk($item)
     {
-        if (! $contents = File::get($path = $item->buildPath())) {
-            return $item->writeFile();
+        if (! File::exists($basePath = $item->buildPath())) {
+            return $item->writeFile($basePath);
         }
 
-        $itemFromDisk = $this->makeItemFromFile($path, $contents);
+        $num = 0;
 
-        if ($item->id() !== $itemFromDisk->id()) {
+        while (true) {
             $ext = '.'.$item->fileExtension();
-            $filename = Str::before($path, $ext);
-            $path = "{$filename}.{$item->id()}{$ext}";
+            $filename = Str::before($basePath, $ext);
+            $suffix = $num ? ".$num" : '';
+            $path = "{$filename}{$suffix}{$ext}";
+
+            if (! $contents = File::get($path)) {
+                break;
+            }
+
+            $itemFromDisk = $this->makeItemFromFile($path, $contents);
+
+            if ($item->id() == $itemFromDisk->id()) {
+                break;
+            }
+
+            $num++;
         }
 
         $item->writeFile($path);
