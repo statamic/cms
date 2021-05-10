@@ -23,7 +23,6 @@
             'svg' => 'empty/form',
             'button_text' => __('Create Fieldset'),
             'button_url' => cp_route('fieldsets.create'),
-            'can' => Statamic\Support\Str::bool($user->can('configure fields'))
         ])
 
     @endunless

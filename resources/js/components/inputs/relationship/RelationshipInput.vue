@@ -20,7 +20,7 @@
         <loading-graphic v-if="initializing" :inline="true" />
 
         <template v-if="!initializing && !usesSelectField">
-            <div ref="items" class="relationship-input-items outline-none">
+            <div ref="items" class="relationship-input-items space-y-1 outline-none">
                 <component
                     :is="itemComponent"
                     v-for="(item, i) in items"
