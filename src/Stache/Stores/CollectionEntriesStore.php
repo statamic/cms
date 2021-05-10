@@ -170,8 +170,10 @@ class CollectionEntriesStore extends ChildStore
 
     protected function writeItemToDisk($item)
     {
-        if (! File::exists($basePath = $item->buildPath())) {
-            return $item->writeFile($basePath);
+        $basePath = $item->buildPath();
+
+        if ($basePath !== $item->path()) {
+            return $item->writeFile($item->path());
         }
 
         $num = 0;

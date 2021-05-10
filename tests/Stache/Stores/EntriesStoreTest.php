@@ -208,22 +208,23 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
-    public function it_removes_the_suffix_if_the_suffixless_path_is_available()
+    public function it_keeps_the_suffix_even_if_the_suffixless_path_is_available()
     {
         $existingPath = $this->directory.'/blog/2017-07-04.test.1.md';
-        $expectedPath = $this->directory.'/blog/2017-07-04.test.md';
+        $suffixlessPath = $this->directory.'/blog/2017-07-04.test.md';
 
         file_put_contents($existingPath, 'id: 123');
         $entry = $this->parent->store('blog')->makeItemFromFile($existingPath, file_get_contents($existingPath));
 
         $this->parent->store('blog')->save($entry);
 
-        $this->assertFileNotExists($existingPath);
-        $this->assertFileEqualsString($expectedPath, $entry->fileContents());
-        @unlink($expectedPath);
-        $this->assertFileNotExists($expectedPath);
+        $this->assertFileEqualsString($existingPath, $entry->fileContents());
+        $this->assertFileNotExists($suffixlessPath);
 
-        $this->assertEquals($expectedPath, $this->parent->store('blog')->paths()->get('123'));
+        $this->assertEquals($existingPath, $this->parent->store('blog')->paths()->get('123'));
+
+        @unlink($existingPath);
+        $this->assertFileNotExists($existingPath);
     }
 
     /** @test */
