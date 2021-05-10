@@ -373,7 +373,7 @@ class Bard extends Replicator
         if (empty($linkCollections)) {
             $site = Site::current()->handle();
 
-            $linkCollections = Blink::once('routable-collection-handles'.$site, function () use ($site) {
+            $linkCollections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
                 return Collection::all()->reject(function ($collection) use ($site) {
                     return is_null($collection->route($site));
                 })->map->handle();
