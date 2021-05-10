@@ -458,21 +458,7 @@ class Bard extends Replicator
             $href = $node['attrs']['href'] ?? null;
 
             if (Str::startsWith($href, 'statamic://')) {
-                $ref = Str::after($href, 'statamic://');
-                [$type, $id] = explode('::', $ref, 2);
-                if ($type === 'entry') {
-                    $entry = Entry::find($id);
-                    $data[$ref] = [
-                        'title' => $entry->get('title'),
-                        'permalink' => $entry->absoluteUrl(),
-                    ];
-                } elseif ($type === 'asset') {
-                    $asset = Asset::find($id);
-                    $data[$ref] = [
-                        'basename' => $asset->basename(),
-                        'thumbnail' => $asset->thumbnailUrl(),
-                    ];
-                }
+                $data = $data->merge($this->getLinkDataForUrl($href));
             }
         }
 
@@ -484,5 +470,34 @@ class Bard extends Replicator
             });
 
         return $data->merge($childData);
+    }
+
+    private function getLinkDataForUrl($url)
+    {
+        $ref = Str::after($url, 'statamic://');
+        [$type, $id] = explode('::', $ref, 2);
+
+        $data = null;
+
+        switch ($type) {
+            case 'entry':
+                if ($entry = Entry::find($id)) {
+                    $data = [
+                        'title' => $entry->get('title'),
+                        'permalink' => $entry->absoluteUrl(),
+                    ];
+                }
+                break;
+            case 'asset':
+                if ($asset = Asset::find($id)) {
+                    $data = [
+                        'basename' => $asset->basename(),
+                        'thumbnail' => $asset->thumbnailUrl(),
+                    ];
+                }
+                break;
+        }
+
+        return [$ref => $data];
     }
 }
