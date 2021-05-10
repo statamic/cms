@@ -4,9 +4,11 @@ namespace Statamic\Fieldtypes;
 
 use ProseMirrorToHtml\Renderer;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Site;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\GraphQL\Types\BardSetsType;
@@ -366,6 +368,18 @@ class Bard extends Replicator
             })->all();
         })->all();
 
+        $linkCollections = $this->config('link_collections');
+
+        if (empty($linkCollections)) {
+            $site = Site::current()->handle();
+
+            $linkCollections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
+                return Collection::all()->reject(function ($collection) use ($site) {
+                    return is_null($collection->route($site));
+                })->map->handle();
+            });
+        }
+
         return [
             'existing' => $existing,
             'new' => $new,
@@ -373,7 +387,7 @@ class Bard extends Replicator
             'collapsed' => [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
-            'linkCollections' => empty($collections = $this->config('link_collections')) ? Collection::handles()->all() : $collections,
+            'linkCollections' => $linkCollections,
             'linkData' => (object) $this->getLinkData($value),
         ];
     }
