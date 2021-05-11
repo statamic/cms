@@ -40,6 +40,7 @@ class EntryRepository implements RepositoryContract
         return $this->query()->where('id', $id)->first();
     }
 
+    /** @deprecated */
     public function findBySlug(string $slug, string $collection): ?Entry
     {
         return $this->query()
