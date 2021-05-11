@@ -4,6 +4,7 @@ namespace Statamic;
 
 use Closure;
 use Illuminate\Http\Request;
+use Laravel\Nova\Nova;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -299,5 +300,16 @@ class Statamic
         foreach ($concrete::bindings() as $abstract => $concrete) {
             app()->bind($abstract, $concrete);
         }
+    }
+
+    public static function frontendRouteSegmentRegex()
+    {
+        $prefix = '';
+
+        if (class_exists(Nova::class)) {
+            $prefix = '(?!'.trim(Nova::path(), '/').')';
+        }
+
+        return $prefix.'.*';
     }
 }

@@ -217,7 +217,7 @@ export default {
         values: {
             deep: true,
             handler(after, before) {
-                if (before === after) return;
+                if (_.isEqual(before, after)) return;
                 this.$store.commit(`publish/${this.name}/setValues`, after);
             }
         },
@@ -225,7 +225,7 @@ export default {
         meta: {
             deep: true,
             handler(after, before) {
-                if (before === after) return;
+                if (_.isEqual(before, after)) return;
                 this.$store.commit(`publish/${this.name}/setMeta`, after);
             }
         },

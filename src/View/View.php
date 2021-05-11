@@ -11,6 +11,7 @@ class View
     protected $data = [];
     protected $layout;
     protected $template;
+    protected $cascade;
     protected $cascadeContent;
 
     public static function make($template = null)
@@ -84,7 +85,7 @@ class View
 
     protected function cascade()
     {
-        return Cascade::instance()
+        return $this->cascade = $this->cascade ?? Cascade::instance()
             ->withContent($this->cascadeContent)
             ->hydrate()
             ->toArray();

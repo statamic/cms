@@ -126,6 +126,44 @@ EOT;
         $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/3612
+     **/
+    public function it_dumps_front_matter_properly_when_symfony_yaml_dumper_doesnt_end_with_a_line_break()
+    {
+        $array = [
+            'foo' => 'bar',
+            'baz' => "first line\nsecond line", // the multiline string *must* be last for this bug
+        ];
+
+        // We mock symfony because the multiline character is different depending on the version installed.
+        // It will be | on early versions. It will be |- on later versions.
+        // The |- character means trim trailing newlines, and is the default when dumping multiline strings.
+        $symfonyYaml = $this->mock(SymfonyYaml::class)
+            ->shouldReceive('dump')
+            ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
+            ->once()
+            ->andReturn($symfonyDumpedYaml = "foo: bar\nbaz: |-\n  first line\n  second line")
+            ->getMock();
+
+        $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
+
+        // Without the bug fix, the --- would come immediately after the "second line". Like this:
+        // baz: |-
+        //   first line
+        //   second line---
+        // content
+        $expected = <<<EOT
+---
+$symfonyDumpedYaml
+---
+content
+EOT;
+
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter($array, 'content'));
+    }
+
     /** @test */
     public function it_parses_a_string_of_yaml()
     {
@@ -241,7 +279,7 @@ EOT;
         } catch (Exception $e) {
             $this->assertInstanceOf(ParseException::class, $e);
             $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
-            $path = storage_path('statamic/tmp/yaml-'.md5("---\nfoo: 'bar\nbaz: 'qux'"));
+            $path = storage_path('statamic/tmp/yaml/'.md5("---\nfoo: 'bar\nbaz: 'qux'"));
             $this->assertEquals($path, $e->getFile());
 
             return;
@@ -251,7 +289,34 @@ EOT;
     }
 
     /** @test */
-    public function it_creates_parse_exception_pointing_to_actual_file_when_file_is_provided()
+    public function it_creates_parse_exception_pointing_to_actual_file_when_file_is_provided_and_it_exists()
+    {
+        $yaml = <<<'EOT'
+---
+foo: 'bar
+baz: 'qux'
+---
+some content
+EOT;
+
+        file_put_contents($path = __DIR__.'/test.yaml', $yaml);
+
+        try {
+            YAML::file($path)->parse($yaml);
+        } catch (Exception $e) {
+            $this->assertInstanceOf(ParseException::class, $e);
+            $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
+            $this->assertEquals($path, $e->getFile());
+            @unlink($path);
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    /** @test */
+    public function it_creates_parse_exception_pointing_to_temporary_file_with_similar_path_when_file_is_provided_but_doesnt_exist()
     {
         $yaml = <<<'EOT'
 ---
@@ -266,7 +331,61 @@ EOT;
         } catch (Exception $e) {
             $this->assertInstanceOf(ParseException::class, $e);
             $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
-            $this->assertEquals('path/to/file.yaml', $e->getFile());
+            $this->assertEquals(storage_path('statamic/tmp/yaml/path/to/file.yaml'), $e->getFile());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    /** @test */
+    public function it_doesnt_maintain_files_across_uses()
+    {
+        YAML::file('path/to/file/previously/used.yaml')->parse('foo: bar');
+
+        $yaml = <<<'EOT'
+---
+foo: 'bar
+baz: 'qux'
+---
+some content
+EOT;
+
+        try {
+            YAML::parse($yaml);
+        } catch (Exception $e) {
+            $this->assertInstanceOf(ParseException::class, $e);
+            $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
+            $path = storage_path('statamic/tmp/yaml/'.md5("---\nfoo: 'bar\nbaz: 'qux'"));
+            $this->assertEquals($path, $e->getFile());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    /** @test */
+    public function it_doesnt_maintain_files_across_uses_when_previous_call_had_no_yaml()
+    {
+        YAML::file('path/to/file/previously/used.yaml')->parse('');
+
+        $yaml = <<<'EOT'
+---
+foo: 'bar
+baz: 'qux'
+---
+some content
+EOT;
+
+        try {
+            YAML::parse($yaml);
+        } catch (Exception $e) {
+            $this->assertInstanceOf(ParseException::class, $e);
+            $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
+            $path = storage_path('statamic/tmp/yaml/'.md5("---\nfoo: 'bar\nbaz: 'qux'"));
+            $this->assertEquals($path, $e->getFile());
 
             return;
         }

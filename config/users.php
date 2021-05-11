@@ -80,14 +80,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | DB Connection
+    | Database
     |--------------------------------------------------------------------------
     |
-    | Default database connection.
+    | Here you may configure the database connection and its table names.
     |
     */
 
     'database' => config('database.default'),
+
+    'tables' => [
+        'users' => 'users',
+        'role_user' => 'role_user',
+        'group_user' => 'group_user',
+    ],
 
     /*
     |--------------------------------------------------------------------------

@@ -168,7 +168,8 @@ class ViewNavigationListingTest extends TestCase
                 ->addPermission($permissions);
         });
 
-        $fake = new class($roles) extends \Statamic\Auth\File\RoleRepository {
+        $fake = new class($roles) extends \Statamic\Auth\File\RoleRepository
+        {
             protected $roles;
 
             public function __construct($roles)

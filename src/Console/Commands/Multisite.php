@@ -23,9 +23,8 @@ class Multisite extends Command
     protected $name = 'statamic:multisite';
     protected $description = 'Converts from a single to multisite installation.';
 
-    protected $siteOne;
-    protected $siteTwo;
-    protected $siteTwoConfig;
+    protected $sites;
+    protected $newSiteConfigs;
 
     public function handle()
     {
@@ -35,11 +34,11 @@ class Multisite extends Command
 
         Stache::disableUpdatingIndexes();
 
-        $this->siteOne = Site::default()->handle();
+        $this->sites = collect(Site::default()->handle());
 
         $this->validateRunningOfCommand();
 
-        $confirmed = $this->confirm("The current site handle is [<comment>{$this->siteOne}</comment>], content will be moved into folders with this name. Is this okay?");
+        $confirmed = $this->confirm("The current site handle is [<comment>{$this->siteOne()}</comment>], content will be moved into folders with this name. Is this okay?");
 
         if (! $confirmed) {
             $this->crossLine('Change the site handle in <comment>config/statamic/sites.php</comment> then try this command again.');
@@ -47,7 +46,16 @@ class Multisite extends Command
             return;
         }
 
-        $this->siteTwo = $this->ask('Handle of the second site', 'two');
+        $this->info("Please enter the handles of the additional sites. Just press enter when you're done.");
+        do {
+            if ($site = $this->ask('Handle of site #'.($this->sites->count() + 1))) {
+                $this->sites->add($site);
+            }
+        } while ($site !== null);
+
+        if ($this->sites->count() < 2) {
+            return $this->crossLine('Multisite has not been enabled.');
+        }
 
         $this->clearStache();
 
@@ -89,15 +97,15 @@ class Multisite extends Command
 
     protected function updateSiteConfig()
     {
-        $sites = config('statamic.sites.sites');
+        $this->newSiteConfigs = $this->newSites()->mapWithKeys(function ($site) {
+            return [$site => [
+                'name' => $site,
+                'locale' => 'en_US',
+                'url' => "/{$site}/",
+            ]];
+        });
 
-        $this->siteTwoConfig = [
-            'name' => $this->siteTwo,
-            'locale' => 'en_US',
-            'url' => "/{$this->siteTwo}/",
-        ];
-
-        $sites[$this->siteTwo] = $this->siteTwoConfig;
+        $sites = config('statamic.sites.sites') + $this->newSiteConfigs->all();
 
         Site::setConfig('sites', $sites);
 
@@ -122,10 +130,14 @@ class Multisite extends Command
         $contents = File::get($path = config_path('statamic/sites.php'));
 
         // Create the php that should be added to the config file. Add the appropriate indentation.
-        $newConfig = '\''.$this->siteTwo.'\' => '.VarExporter::export($this->siteTwoConfig);
-        $newConfig = collect(explode("\n", $newConfig))->map(function ($line) {
-            return '        '.$line;
-        })->join("\n").',';
+        $newConfig = $this->newSiteConfigs->map(function ($config, $site) {
+            $newConfig = '\''.$site.'\' => '.VarExporter::export($config);
+            $newConfig = collect(explode("\n", $newConfig))->map(function ($line) {
+                return '        '.$line;
+            })->join("\n").',';
+
+            return $newConfig;
+        })->join("\n\n");
 
         // Use the closing square brace of the first site as the hook for injecting the second.
         // We'll assume the indentation is what you'd get on a fresh Statamic installation.
@@ -148,18 +160,18 @@ class Multisite extends Command
         $handle = $collection->handle();
         $base = "content/collections/{$handle}";
 
-        File::makeDirectory("{$base}/{$this->siteOne}");
+        File::makeDirectory("{$base}/{$this->siteOne()}");
 
         File::getFiles($base)->each(function ($file) use ($base) {
             $filename = pathinfo($file, PATHINFO_BASENAME);
-            File::move($file, "{$base}/{$this->siteOne}/{$filename}");
+            File::move($file, "{$base}/{$this->siteOne()}/{$filename}");
         });
     }
 
     protected function updateCollection($collection)
     {
         $collection
-            ->sites([$this->siteOne, $this->siteTwo])
+            ->sites($this->sites->all())
             ->save();
     }
 
@@ -177,10 +189,13 @@ class Multisite extends Command
         $yaml = YAML::file($set->path())->parse();
         $data = $yaml['data'] ?? [];
 
-        $set
-            ->addLocalization($origin = $set->makeLocalization($this->siteOne)->data($data))
-            ->addLocalization($set->makeLocalization($this->siteTwo)->origin($origin))
-            ->save();
+        $set->addLocalization($origin = $set->makeLocalization($this->siteOne())->data($data));
+
+        $this->newSites()->each(function ($site) use ($set, $origin) {
+            $set->addLocalization($set->makeLocalization($site)->origin($origin));
+        });
+
+        $set->save();
     }
 
     protected function moveNav($nav)
@@ -189,7 +204,9 @@ class Multisite extends Command
 
         $default->save();
 
-        $nav->makeTree($this->siteTwo, $default->tree())->save();
+        $this->sites->each(function ($site) use ($nav, $default) {
+            $nav->makeTree($site, $default->tree())->save();
+        });
     }
 
     protected function validateRunningOfCommand()
@@ -216,17 +233,17 @@ class Multisite extends Command
             return false;
         }
 
-        return File::isDirectory("content/collections/{$collection->handle()}/{$this->siteOne}");
+        return File::isDirectory("content/collections/{$collection->handle()}/{$this->siteOne()}");
     }
 
     protected function globalsHaveBeenMoved()
     {
-        return File::isDirectory("content/globals/{$this->siteOne}");
+        return File::isDirectory("content/globals/{$this->siteOne()}");
     }
 
     protected function navsHaveBeenMoved()
     {
-        return File::isDirectory("content/navigation/{$this->siteOne}");
+        return File::isDirectory("content/navigation/{$this->siteOne()}");
     }
 
     protected function checkForAndEnablePro()
@@ -250,5 +267,15 @@ class Multisite extends Command
         }
 
         return true;
+    }
+
+    protected function siteOne()
+    {
+        return $this->sites->first();
+    }
+
+    protected function newSites()
+    {
+        return $this->sites->slice(1);
     }
 }

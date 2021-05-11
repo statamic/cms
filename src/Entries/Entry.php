@@ -40,7 +40,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified, ResolvesValues;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -435,7 +438,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function fileData()
     {
-        $array = $this->data()->merge([
+        $array = Arr::removeNullValues([
             'id' => $this->id(),
             'origin' => optional($this->origin())->id(),
             'published' => $this->published === false ? false : null,
@@ -445,7 +448,18 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $array['blueprint'] = $this->blueprint;
         }
 
-        return $array->all();
+        $data = $this->data()->all();
+
+        if ($this->isRoot()) {
+            $data = Arr::removeNullValues($data);
+        }
+
+        return array_merge($array, $data);
+    }
+
+    protected function shouldRemoveNullsFromFileData()
+    {
+        return false;
     }
 
     public function ampable()
@@ -707,5 +721,14 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function getProtectionScheme()
     {
         return $this->value('protect');
+    }
+
+    public function resolveGqlValue($field)
+    {
+        if ($field === 'site') {
+            return $this->site();
+        }
+
+        return $this->traitResolveGqlValue($field);
     }
 }

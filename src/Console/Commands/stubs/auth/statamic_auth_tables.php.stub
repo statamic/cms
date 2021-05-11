@@ -13,21 +13,14 @@ class StatamicAuthTables extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('super')->default(false);
-            $table->string('avatar')->nullable();
-            $table->json('preferences')->nullable();
-            $table->timestamp('last_login')->nullable();
-            $table->string('password')->nullable()->change();
-        });
-
-        Schema::create('role_user', function (Blueprint $table) {
+        USERS_TABLE_REPLACE
+        Schema::create('ROLE_USER_TABLE', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('role_id');
         });
 
-        Schema::create('group_user', function (Blueprint $table) {
+        Schema::create('GROUP_USER_TABLE', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('group_id');
@@ -39,7 +32,7 @@ class StatamicAuthTables extends Migration
      */
      public function down()
      {
-         Schema::table('users', function (Blueprint $table) {
+         Schema::table('USERS_TABLE', function (Blueprint $table) {
              $table->dropColumn('super');
              $table->dropColumn('avatar');
              $table->dropColumn('preferences');
@@ -47,7 +40,7 @@ class StatamicAuthTables extends Migration
              $table->string('password')->nullable(false)->change();
          });
 
-         Schema::dropIfExists('role_user');
-         Schema::dropIfExists('group_user');
+         Schema::dropIfExists('ROLE_USER_TABLE');
+         Schema::dropIfExists('GROUP_USER_TABLE');
      }
 }

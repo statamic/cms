@@ -8,12 +8,12 @@
             v-html="button.html"
             v-tooltip="button.text"
             :aria-label="button.text"
-            @click="showLinkToolbar(getMarkAttrs('link'))"
+            @click="toggleLinkToolbar"
         />
 
         <link-toolbar
             v-if="showingToolbar"
-            :initial-link-attrs="linkAttrs"
+            :link-attrs="linkAttrs"
             :config="config"
             :bard="bard"
             @updated="setLink"
@@ -44,12 +44,14 @@ export default {
 
     methods: {
 
-        showLinkToolbar(attrs) {
-            this.showingToolbar = false;
-            this.$nextTick(() => {
-                this.showingToolbar = true;
-                this.linkAttrs = attrs;
-            });
+        toggleLinkToolbar() {            
+            this.showingToolbar = ! this.showingToolbar;
+
+            if (this.showingToolbar) {
+                this.linkAttrs = this.getMarkAttrs('link');
+            } else {
+                this.editor.focus();
+            }
         },
 
         setLink(attributes) {
