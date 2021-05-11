@@ -425,7 +425,9 @@ class EntriesController extends CpController
 
     private function validateUniqueUri($entry, $tree, $parent)
     {
-        $uri = $this->entryUri($entry, $tree, $parent);
+        if (! $uri = $this->entryUri($entry, $tree, $parent)) {
+            return;
+        }
 
         $existing = Entry::findByUri($uri);
 
