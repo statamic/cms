@@ -103,7 +103,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => 'required',
-            'slug' => 'required|unique_entry_value:'.$collection->handle().',null,'.$site->handle(),
+            'slug' => 'required',
         ];
     }
 
@@ -111,7 +111,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => 'required',
-            'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id().','.$entry->locale(),
+            'slug' => 'required|alpha_dash',
         ];
     }
 
