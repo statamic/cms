@@ -71,4 +71,6 @@ return [
     'access_utility' => ':title',
     'access_utility_desc' => 'Permet d’accéder à l’utilitaire :title',
     'group_misc' => 'Divers',
+    'resolve_duplicate_ids' => 'Résoudre les problèmes d’IDs en double',
+    'resolve_duplicate_ids_desc' => 'Donne la possibilité de voir et résoudre les problèmes d’IDs en double.',
 ];
