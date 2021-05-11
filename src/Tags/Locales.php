@@ -3,9 +3,8 @@
 namespace Statamic\Tags;
 
 use Illuminate\Support\Collection;
-use Statamic\Facades\Entry;
+use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\Term;
 use Statamic\Support\Str;
 
 class Locales extends Tags
@@ -144,13 +143,7 @@ class Locales extends Tags
 
         $id = $this->params->get('id', $this->context->get('id'));
 
-        if (Str::contains($id, '::')) {
-            [$taxonomy, $slug] = explode('::', $id);
-
-            return $this->data = Term::findBySlug($slug, $taxonomy);
-        }
-
-        return $this->data = Entry::find($id);
+        return $this->data = Data::find($id);
     }
 
     /**
