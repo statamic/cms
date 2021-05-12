@@ -240,13 +240,7 @@ class URL
             return config('app.url');
         }
 
-        $protocol = app('request')->isSecure()
-            ? 'https://'
-            : 'http://';
-
-        $domain_name = request()->server('HTTP_HOST').'/';
-
-        return $protocol.$domain_name;
+        return app('request')->root();
     }
 
     /**
