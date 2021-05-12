@@ -30,14 +30,19 @@
             class="flex items-center py-2 border-t"
         >
             <v-select
+                ref="fieldSelect"
                 v-model="conditions[index].field"
                 class="min-w-md"
                 :options="fieldOptions"
-                :placeholder="__('Select field')"
+                :placeholder="__('Field')"
                 :taggable="true"
                 :push-tags="true"
                 :reduce="field => field.value"
-                :create-option="field => ({value: field, label: field })" />
+                :create-option="field => ({value: field, label: field })"
+                @search:blur="fieldSelectBlur(index)"
+            >
+                <template #no-options><div class="hidden" /></template>
+            </v-select>
 
             <select-input
                 v-model="conditions[index].operator"
@@ -232,6 +237,11 @@ export default {
             }
 
             return operator;
+        },
+
+        fieldSelectBlur(index) {
+            const value = this.$refs.fieldSelect[index].$refs.search.value;
+            if (value) this.conditions[index].field = value;
         },
     }
 }

@@ -9,7 +9,7 @@ While working to identify potential security vulnerabilities in Statamic, we ask
 - Provide a quality report with precise explanations and concrete attack scenarios.
 
 ## Scope
-We are only interested in vulnerabilities that affect Statamic itself, tested against **your own local installation** of the software, running the latest version. You can install a local copy of Statamic by following these [installation instructions](https://statamic.dev/installing). Do not test against any Statamic installation that you don’t own, including [statamic.com](https:/statamic.com) or [docs.statamic.com](https://docs.statamic.com).
+We are only interested in vulnerabilities that affect Statamic itself, tested against **your own local installation** of the software, running the latest version. You can install a local copy of Statamic by following these [installation instructions](https://statamic.dev/installing). Do not test against any Statamic installation that you don’t own, including [statamic.com](https:/statamic.com) or [statamic.dev](https://statamic.dev).
 
 ### Qualifying Vulnerabilities
 
@@ -43,4 +43,4 @@ We are only interested in vulnerabilities that affect Statamic itself, tested ag
 - Any behavior that is clearly documented.
 - Issues discovered while scanning a site you don’t own without permission
 - Missing CSRF tokens on forms (unless you have a proof of concept, many forms either don't need CSRF or are mitigated in other ways) and "logout" CSRF attacks
-- [Open redirects](https://www.owasp.org/index.php/open_redirect)
+- [Open redirects](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html)

@@ -28,6 +28,7 @@ class FormsController extends CpController
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'delete_url' => $form->deleteUrl(),
+                    'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
                     'deleteable' => User::current()->can('delete', $form),
                 ];
             })
@@ -40,7 +41,14 @@ class FormsController extends CpController
     {
         $this->authorize('view', $form);
 
-        return view('statamic::forms.show', compact('form'));
+        $columns = $form
+            ->blueprint()
+            ->columns()
+            ->setPreferred("forms.{$form->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
+
+        return view('statamic::forms.show', compact('form', 'columns'));
     }
 
     /**
@@ -112,7 +120,7 @@ class FormsController extends CpController
 
         $values = $form->toArray();
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($form))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -129,7 +137,7 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($form)->fields()->addValues($request->all());
 
         $fields->validate();
 
@@ -137,7 +145,6 @@ class FormsController extends CpController
 
         $form
             ->title($values['title'])
-            ->blueprint($values['blueprint'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
             ->email($values['email']);
@@ -156,7 +163,7 @@ class FormsController extends CpController
         $form->delete();
     }
 
-    protected function editFormBlueprint()
+    protected function editFormBlueprint($form)
     {
         return Blueprint::makeFromSections([
             'name' => [
@@ -173,10 +180,12 @@ class FormsController extends CpController
                 'display' => __('Fields'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'blueprints',
+                        'type' => 'html',
                         'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                        'max_items' => 1,
-                        'mode' => 'select',
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <a href="'.cp_route('forms.blueprint.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
                     ],
                     'honeypot' => [
                         'type' => 'text',
@@ -207,7 +216,7 @@ class FormsController extends CpController
                                 'handle' => 'to',
                                 'field' => [
                                     'type' => 'text',
-                                    'display' => __('Recipient (To)'),
+                                    'display' => __('Recipient'),
                                     'validate' => [
                                         'required',
                                     ],
@@ -218,7 +227,7 @@ class FormsController extends CpController
                                 'handle' => 'from',
                                 'field' => [
                                     'type' => 'text',
-                                    'display' => __('Sender (From)'),
+                                    'display' => __('Sender'),
                                     'instructions' => __('statamic::messages.form_configure_email_from_instructions').' ('.config('mail.from.address').').',
                                 ],
                             ],
@@ -234,6 +243,7 @@ class FormsController extends CpController
                                 'handle' => 'subject',
                                 'field' => [
                                     'type' => 'text',
+                                    'display' => __('Subject'),
                                     'instructions' => __('statamic::messages.form_configure_email_subject_instructions'),
                                 ],
                             ],
@@ -251,6 +261,14 @@ class FormsController extends CpController
                                     'type' => 'template',
                                     'display' => __('Text view'),
                                     'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'markdown',
+                                'field' => [
+                                    'type' => 'toggle',
+                                    'display' => __('Markdown'),
+                                    'instructions' => __('statamic::messages.form_configure_email_markdown_instructions'),
                                 ],
                             ],
                         ],

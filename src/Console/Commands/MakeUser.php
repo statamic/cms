@@ -5,7 +5,6 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Statamic\Rules\EmailAvailable;
 use Statamic\Statamic;
@@ -174,7 +173,7 @@ class MakeUser extends Command
      */
     protected function hasSeparateNameFields()
     {
-        $fields = Blueprint::find('user')->fields()->all();
+        $fields = User::blueprint()->fields()->all();
 
         return $fields->has('first_name') && $fields->has('last_name');
     }

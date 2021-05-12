@@ -9,6 +9,8 @@ use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Assets\Assets;
+use Statamic\Fieldtypes\Assets\ImageRule;
+use Statamic\Fieldtypes\Assets\MimesRule;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -83,6 +85,26 @@ class AssetsTest extends TestCase
             'permalink' => 'http://localhost/assets/foo/one.txt',
             'api_url' => 'http://localhost/api/assets/test/foo/one.txt',
         ], $augmented->toArray());
+    }
+
+    /** @test */
+    public function it_replaces_image_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['image']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(ImageRule::class, $replaced[0]);
+    }
+
+    /** @test */
+    public function it_replaces_mimes_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['mimes:jpg,png']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(MimesRule::class, $replaced[0]);
     }
 
     public function fieldtype($config = [])

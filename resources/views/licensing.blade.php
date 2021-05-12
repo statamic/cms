@@ -20,7 +20,7 @@
                     <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
                 </div>
                 <div class="hidden md:block w-1/2 pl-6">
-                    @svg('empty/navigation')
+                    @cp_svg('empty/navigation')
                 </div>
             </div>
         </div>
@@ -110,8 +110,9 @@
 
     @endif
 
-    <div class="flex justify-center text-center mt-4">
-        <div class="bg-white rounded-full px-3 py-1 shadow-sm text-sm text-grey-70">{{ __('Learn more about') }} <a href="{{ Statamic::docsUrl('licensing') }}" class="text-blue hover:text-blue-dark">{{ __('Licensing') }}</a>.</div>
-    </div>
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Licensing'),
+        'url' => Statamic::docsUrl('licensing')
+    ])
 
 @stop

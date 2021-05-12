@@ -4,15 +4,16 @@
             <div v-if="config.prepend" v-text="config.prepend" class="mr-1" />
             <input
                 type="range"
-                :name="name"
                 v-model="val"
+                :name="name"
                 :min="config.min"
                 :max="config.max"
                 :step="config.step"
                 :width="config.width"
                 :readonly="isReadOnly"
                 :disabled="isReadOnly"
-                class="flex-1"
+                :id="fieldId"
+                class="flex-1 min-w-0"
             />
             <div class="rounded border px-1 py-sm mx-1 bg-grey-10">{{ val }}</div>
             <div v-if="config.append" v-text="config.append" />
@@ -29,7 +30,23 @@ export default {
 
      data() {
         return {
-            val: this.value || (this.config.max - this.config.min) / 2
+            val: this.value || this.config.default || this.getDefault()
+        }
+    },
+
+    methods: {
+        getDefault() {
+            // Spec: https://html.spec.whatwg.org/multipage/input.html#range-state-(type=range)
+            if (this.config.max < this.config.min) return this.config.min;
+
+            var val = this.config.min + (this.config.max - this.config.min) / 2;
+
+            // make sure on a valid step
+            if (this.config.step) {
+                val = Math.floor(val / this.config.step) * this.config.step;
+            }
+
+            return val;
         }
     },
 

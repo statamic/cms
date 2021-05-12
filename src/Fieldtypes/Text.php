@@ -23,7 +23,9 @@ class Text extends Fieldtype
                 'width' => 50,
                 'options' => [
                     'color',
+                    'date',
                     'email',
+                    'hidden',
                     'month',
                     'number',
                     'password',
@@ -52,7 +54,22 @@ class Text extends Fieldtype
                 'type' => 'text',
                 'width' => 50,
             ],
+            'antlers' => [
+                'display' => 'Antlers',
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
         ];
+    }
+
+    public function process($data)
+    {
+        if ($this->config('input_type') === 'number') {
+            return (int) $data;
+        }
+
+        return $data;
     }
 
     public function preProcessIndex($value)

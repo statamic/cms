@@ -2,8 +2,8 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Taxonomy;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 
@@ -69,12 +69,18 @@ class Fields extends Filter
 
     protected function getBlueprints()
     {
-        if ($collection = Arr::get($this->context, 'collection')) {
-            return Collection::findByHandle($collection)->entryBlueprints();
+        if ($collections = Arr::getFirst($this->context, ['collection', 'collections'])) {
+            return collect(Arr::wrap($collections))->flatMap(function ($collection) {
+                return Collection::findByHandle($collection)->entryBlueprints();
+            });
         }
 
-        return collect($this->context['blueprints'])->map(function ($blueprint) {
-            return Blueprint::find($blueprint);
-        });
+        if ($taxonomies = Arr::getFirst($this->context, ['taxonomy', 'taxonomies'])) {
+            return collect(Arr::wrap($taxonomies))->flatMap(function ($taxonomy) {
+                return Taxonomy::findByHandle($taxonomy)->termBlueprints();
+            });
+        }
+
+        return collect();
     }
 }

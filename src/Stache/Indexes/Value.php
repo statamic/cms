@@ -22,11 +22,17 @@ class Value extends Index
         }
 
         if ($method === 'entriesCount') {
-            return $item->queryEntries()->count();
+            return $item->entriesCount();
         }
 
-        return method_exists($item, $method)
-            ? $item->{$method}()
-            : $item->value($this->name);
+        if (method_exists($item, $method)) {
+            return $item->{$method}();
+        }
+
+        if (method_exists($item, 'value')) {
+            return $item->value($this->name);
+        }
+
+        return $item->get($this->name);
     }
 }

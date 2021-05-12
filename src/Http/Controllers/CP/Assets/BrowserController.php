@@ -36,6 +36,7 @@ class BrowserController extends CpController
                 'title' => $container->title(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
             ],
@@ -70,9 +71,7 @@ class BrowserController extends CpController
 
         $folder = $container->assetFolder($path);
 
-        $assets = $folder->queryAssets()
-            ->orderBy($request->sort ?? 'basename', $request->order ?? 'asc')
-            ->paginate(30);
+        $assets = $folder->queryAssets()->paginate(30);
 
         return (new FolderAssetsCollection($assets))->folder($folder);
     }

@@ -4,10 +4,13 @@ namespace Statamic\Entries;
 
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
+use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
-use Statamic\Events\Data\CollectionDeleted;
-use Statamic\Events\Data\CollectionSaved;
+use Statamic\Events\CollectionCreated;
+use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionSaved;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -16,7 +19,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
@@ -25,7 +27,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Collection implements Contract, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
 
     protected $handle;
     protected $routes = [];
@@ -48,7 +50,6 @@ class Collection implements Contract, AugmentableContract
     protected $structure;
     protected $structureContents;
     protected $taxonomies = [];
-    protected $cascade;
 
     public function __construct()
     {
@@ -159,9 +160,26 @@ class Collection implements Contract, AugmentableContract
             ->args(func_get_args());
     }
 
-    public function url()
+    public function url($site = null)
     {
-        return optional($this->mount())->url();
+        if (! $mount = $this->mount()) {
+            return null;
+        }
+
+        $site = $site ?? $this->sites()->first();
+
+        return optional($mount->in($site))->url();
+    }
+
+    public function uri($site = null)
+    {
+        if (! $mount = $this->mount()) {
+            return null;
+        }
+
+        $site = $site ?? $this->sites()->first();
+
+        return optional($mount->in($site))->uri();
     }
 
     public function showUrl()
@@ -191,35 +209,74 @@ class Collection implements Contract, AugmentableContract
         return Facades\Entry::query()->where('collection', $this->handle());
     }
 
-    public function entryBlueprints($blueprints = null)
+    public function entryBlueprints()
     {
-        return $this
-            ->fluentlyGetOrSet('blueprints')
-            ->getter(function ($blueprints) {
-                $blueprints = $blueprints ?? [$this->fallbackEntryBlueprint()->handle()];
+        $blink = 'collection-entry-blueprints-'.$this->handle();
 
-                return collect($blueprints)->map(function ($handle) {
-                    throw_unless($blueprint = Blueprint::find($handle), new \Exception("Blueprint [$handle] not found"));
-
-                    return $this->ensureEntryBlueprintFields($blueprint);
-                });
-            })
-            ->setter(function ($blueprints) {
-                return empty($blueprints) ? null : $blueprints;
-            })
-            ->args(func_get_args());
+        return Blink::once($blink, function () {
+            return $this->getEntryBlueprints();
+        });
     }
 
-    public function entryBlueprint()
+    private function getEntryBlueprints()
     {
-        return $this->ensureEntryBlueprintFields(
-            $this->entryBlueprints()->first() ?? $this->fallbackEntryBlueprint()
-        );
+        $blueprints = Blueprint::in('collections/'.$this->handle());
+
+        if ($blueprints->isEmpty()) {
+            $blueprints = collect([$this->fallbackEntryBlueprint()]);
+        }
+
+        return $blueprints->values()->map(function ($blueprint) {
+            return $this->ensureEntryBlueprintFields($blueprint);
+        });
+    }
+
+    public function entryBlueprint($blueprint = null, $entry = null)
+    {
+        if (! $blueprint = $this->getBaseEntryBlueprint($blueprint)) {
+            return null;
+        }
+
+        $blueprint->setParent($entry ?? $this);
+
+        $this->dispatchEntryBlueprintFoundEvent($blueprint, $entry);
+
+        return $blueprint;
+    }
+
+    private function getBaseEntryBlueprint($blueprint)
+    {
+        $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint;
+
+        return Blink::once($blink, function () use ($blueprint) {
+            return is_null($blueprint)
+                ? $this->entryBlueprints()->reject->hidden()->first()
+                : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
+        });
+    }
+
+    private function dispatchEntryBlueprintFoundEvent($blueprint, $entry)
+    {
+        $id = optional($entry)->id() ?? 'null';
+
+        $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint->handle().'-'.$id;
+
+        Blink::once($blink, function () use ($blueprint, $entry) {
+            EntryBlueprintFound::dispatch($blueprint, $entry);
+        });
     }
 
     public function fallbackEntryBlueprint()
     {
-        return Blueprint::find('default');
+        $blueprint = Blueprint::find('default')
+            ->setHandle($this->handle())
+            ->setNamespace('collections.'.$this->handle());
+
+        $contents = $blueprint->contents();
+        $contents['title'] = $this->title();
+        $blueprint->setContents($contents);
+
+        return $blueprint;
     }
 
     public function ensureEntryBlueprintFields($blueprint)
@@ -232,19 +289,20 @@ class Collection implements Contract, AugmentableContract
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
         }
 
-        if ($this->hasStructure()) {
+        if ($this->hasStructure() && ! $this->orderable()) {
             $blueprint->ensureField('parent', [
                 'type' => 'entries',
                 'collections' => [$this->handle()],
                 'max_items' => 1,
                 'listable' => false,
+                'localizable' => true,
             ], 'sidebar');
         }
 
         foreach ($this->taxonomies() as $taxonomy) {
             $blueprint->ensureField($taxonomy->handle(), [
-                'type' => 'taxonomy',
-                'taxonomy' => $taxonomy->handle(),
+                'type' => 'terms',
+                'taxonomies' => [$taxonomy->handle()],
                 'display' => $taxonomy->title(),
                 'mode' => 'select',
             ], 'sidebar');
@@ -289,13 +347,15 @@ class Collection implements Contract, AugmentableContract
 
     public function save()
     {
+        $isNew = ! Facades\Collection::handleExists($this->handle);
+
         Facades\Collection::save($this);
 
-        Blink::flush('collection-handles');
+        Blink::forget('collection-handles');
         Blink::flushStartingWith("collection-{$this->id()}");
 
-        if ($this->hasStructure()) { // todo: only if the structure changed.
-            $this->updateEntryUris();
+        if ($isNew) {
+            CollectionCreated::dispatch($this);
         }
 
         CollectionSaved::dispatch($this);
@@ -303,9 +363,16 @@ class Collection implements Contract, AugmentableContract
         return $this;
     }
 
-    public function updateEntryUris()
+    public function updateEntryUris($ids = null)
     {
-        Facades\Collection::updateEntryUris($this);
+        Facades\Collection::updateEntryUris($this, $ids);
+
+        return $this;
+    }
+
+    public function updateEntryOrder($ids = null)
+    {
+        Facades\Collection::updateEntryOrder($this, $ids);
 
         return $this;
     }
@@ -331,21 +398,6 @@ class Collection implements Contract, AugmentableContract
     public function hasSearchIndex()
     {
         return $this->searchIndex() !== null;
-    }
-
-    public function cascade($key = null, $default = null)
-    {
-        if (is_null($key)) {
-            return $this->cascade;
-        }
-
-        if (is_array($key)) {
-            $this->cascade = collect($key);
-
-            return $this;
-        }
-
-        return $this->cascade->get($key, $default);
     }
 
     public function fileData()
@@ -387,17 +439,7 @@ class Collection implements Contract, AugmentableContract
         $array['inject'] = Arr::pull($array, 'cascade');
 
         if ($this->hasStructure()) {
-            $array['structure'] = Arr::removeNullValues([
-                'root' => $this->structure()->expectsRoot(),
-                'max_depth' => $this->structure()->maxDepth(),
-                'tree' => $this->structure()->trees()->map(function ($tree) {
-                    return $tree->fileData()['tree'];
-                })->all(),
-            ]);
-
-            if (! Site::hasMultiple()) {
-                $array['structure']['tree'] = $array['structure']['tree'][Site::default()->handle()];
-            }
+            $array['structure'] = $this->structureContents();
         }
 
         return $array;
@@ -487,8 +529,9 @@ class Collection implements Contract, AugmentableContract
             })
             ->setter(function ($structure) {
                 if ($structure) {
-                    $structure->collection($this);
+                    $structure->handle($this->handle());
                 }
+
                 $this->structureContents = null;
                 Blink::forget("collection-{$this->id()}-structure");
 
@@ -507,28 +550,25 @@ class Collection implements Contract, AugmentableContract
 
                 return $contents;
             })
+            ->getter(function ($contents) {
+                if (! $structure = $this->structure()) {
+                    return null;
+                }
+
+                return Arr::removeNullValues([
+                    'root' => $structure->expectsRoot(),
+                    'max_depth' => $structure->maxDepth(),
+                ]);
+            })
             ->args(func_get_args());
     }
 
     protected function makeStructureFromContents()
     {
-        $structure = (new CollectionStructure)
-            ->collection($this)
+        return (new CollectionStructure)
+            ->handle($this->handle())
             ->expectsRoot($this->structureContents['root'] ?? false)
             ->maxDepth($this->structureContents['max_depth'] ?? null);
-
-        $trees = $this->structureContents['tree'];
-
-        if (! Site::hasMultiple()) {
-            $trees = [Site::default()->handle() => $trees];
-        }
-
-        foreach ($trees as $site => $contents) {
-            $tree = $structure->makeTree($site)->tree($contents);
-            $structure->addTree($tree);
-        }
-
-        return $structure;
     }
 
     public function structureHandle()
@@ -561,6 +601,10 @@ class Collection implements Contract, AugmentableContract
         return $this
             ->fluentlyGetOrSet('mount')
             ->getter(function ($mount) {
+                if (! $mount) {
+                    return null;
+                }
+
                 return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {
                     return Entry::find($mount);
                 });

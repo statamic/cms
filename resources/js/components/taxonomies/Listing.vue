@@ -8,6 +8,7 @@
                 <template slot="actions" slot-scope="{ row: taxonomy, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="taxonomy.edit_url" />
+                        <dropdown-item :text="__('Edit Blueprints')" :redirect="taxonomy.blueprints_url" />
                         <dropdown-item
                             v-if="taxonomy.deleteable"
                             :text="__('Delete')"

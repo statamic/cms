@@ -4,6 +4,8 @@ namespace Statamic\Extend;
 
 class AddonRepository
 {
+    protected $addons;
+
     /**
      * Make an addon instance.
      *
@@ -25,7 +27,7 @@ class AddonRepository
      */
     public function all()
     {
-        return app(Manifest::class)->addons()->map(function ($addon) {
+        return $this->addons = $this->addons ?? app(Manifest::class)->addons()->map(function ($addon) {
             return $this->make($addon);
         });
     }
@@ -37,8 +39,6 @@ class AddonRepository
      */
     public function get($id)
     {
-        return $this->make(
-            app(Manifest::class)->addons()->get($id)
-        );
+        return $this->all()->get($id);
     }
 }

@@ -69,7 +69,7 @@ interface Submission extends Arrayable
     public function set($field, $value);
 
     /**
-     * Delete sybmission.
+     * Delete submission.
      *
      * @param  string $key
      * @return mixed

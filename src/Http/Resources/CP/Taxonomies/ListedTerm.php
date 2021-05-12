@@ -40,6 +40,7 @@ class ListedTerm extends JsonResource
                 'slug' => $term->slug(),
             ])),
 
+            'permalink' => $term->absoluteUrl(),
             'edit_url' => $term->editUrl(),
             'viewable' => User::current()->can('view', $term),
             'editable' => User::current()->can('edit', $term),
@@ -55,6 +56,7 @@ class ListedTerm extends JsonResource
             $value = $this->blueprint
                 ->field($key)
                 ->setValue($extra[$key] ?? $this->resource->value($key))
+                ->setParent($this->resource)
                 ->preProcessIndex()
                 ->value();
 

@@ -26,7 +26,7 @@ trait MocksStructures
 
     private function createStructureTree($handle)
     {
-        return tap(Mockery::mock(Tree::class), function ($s) use ($handle) {
+        return tap(Mockery::mock(Tree::class), function ($s) {
             $s->shouldReceive('showUrl')->andReturn('/tree-show-url');
             $s->shouldReceive('editUrl')->andReturn('/tree-edit-url');
             $s->shouldReceive('route')->andReturn('/route');

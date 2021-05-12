@@ -19,11 +19,11 @@ class Users extends Tags
     {
         $query = $this->query();
 
-        if ($group = $this->get('group')) {
+        if ($group = $this->params->get('group')) {
             $query->where('group', $group);
         }
 
-        if ($role = $this->get('role')) {
+        if ($role = $this->params->get('role')) {
             $query->where('role', $role);
         }
 

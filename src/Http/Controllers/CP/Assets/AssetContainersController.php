@@ -31,6 +31,7 @@ class AssetContainersController extends CpController
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
             ];
@@ -53,7 +54,7 @@ class AssetContainersController extends CpController
 
         $values = $container->toArray();
 
-        $fields = ($blueprint = $this->formBlueprint())
+        $fields = ($blueprint = $this->formBlueprint($container))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -79,7 +80,6 @@ class AssetContainersController extends CpController
         $container
             ->title($values['title'])
             ->disk($values['disk'])
-            ->blueprint($values['blueprint'])
             ->allowDownloading($values['allow_downloading'])
             ->allowRenaming($values['allow_renaming'])
             ->allowMoving($values['allow_moving'])
@@ -131,7 +131,6 @@ class AssetContainersController extends CpController
         $container = AssetContainer::make($values['handle'])
             ->title($values['title'])
             ->disk($values['disk'])
-            ->blueprint($values['blueprint'])
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders']);
 
@@ -159,9 +158,9 @@ class AssetContainersController extends CpController
         return collect(config('filesystems.disks'))->keys();
     }
 
-    protected function formBlueprint()
+    protected function formBlueprint($container = null)
     {
-        return Blueprint::makeFromSections([
+        $fields = [
             'name' => [
                 'display' => __('Name'),
                 'fields' => [
@@ -175,6 +174,7 @@ class AssetContainersController extends CpController
                         'type' => 'slug',
                         'display' => __('Handle'),
                         'validate' => 'required|alpha_dash',
+                        'separator' => '_',
                         'instructions' => __('statamic::messages.asset_container_handle_instructions'),
                     ],
                 ],
@@ -191,25 +191,33 @@ class AssetContainersController extends CpController
                     ],
                 ],
             ],
-            'fields' => [
+        ];
+
+        if ($container) {
+            $fields['fields'] = [
                 'display' => __('Fields'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'blueprints',
+                        'type' => 'html',
                         'display' => __('Blueprint'),
                         'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
-                        'mode' => 'select',
-                        'max_items' => 1,
+                        'html' => $container ? ''.
+                            '<div class="text-xs">'.
+                            '   <a href="'.cp_route('asset-containers.blueprint.edit', $container->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>' : '<div class="text-xs text-grey">'.__('Editable once created').'</div>',
                     ],
                 ],
-            ],
+            ];
+        }
+
+        $fields = array_merge($fields, [
             'settings' => [
                 'display' => __('Settings'),
                 'fields' => [
                     'allow_uploads' => [
                         'type' => 'toggle',
                         'display' => __('Allow Uploads'),
-                        'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
+                        'instructions' => __('statamic::messages.asset_container_allow_uploads_instructions'),
                         'default' => true,
                     ],
                     'create_folders' => [
@@ -239,5 +247,7 @@ class AssetContainersController extends CpController
                 ],
             ],
         ]);
+
+        return Blueprint::makeFromSections($fields);
     }
 }

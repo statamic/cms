@@ -9,9 +9,11 @@
             :danger="action.dangerous"
             :buttonText="runButtonText"
             @confirm="confirm"
-            @cancel="cancel"
+            @cancel="reset"
         >
-            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-2': action.fields.length }" />
+            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-2': warningText || action.fields.length }" />
+
+            <div v-if="warningText" v-text="warningText" class="text-red" :class="{ 'mb-2': action.fields.length }" />
 
             <publish-container
                 v-if="action.fields.length"
@@ -52,6 +54,9 @@ export default {
         selections: {
             type: Number,
             required: true,
+        },
+        errors: {
+            type: Object
         }
     },
 
@@ -60,7 +65,6 @@ export default {
             confirming: false,
             fieldset: {sections:[{fields:this.action.fields}]},
             values: this.action.values,
-            errors: {},
         }
     },
 
@@ -72,26 +76,43 @@ export default {
             return __n(this.action.confirmationText, this.selections);
         },
 
+        warningText() {
+            if (! this.action.warningText) return;
+
+            return __n(this.action.warningText, this.selections);
+        },
+
         runButtonText() {
             return __n(this.action.buttonText, this.selections);
         }
 
     },
 
+    created() {
+        this.$events.$on('reset-action-modals', this.reset);
+    },
+
     methods: {
 
         select() {
-            this.confirming = true;
+            if (this.action.confirm) {
+                this.confirming = true;
+                return;
+            }
+
+            this.$emit('selected', this.action, this.values);
         },
 
         confirm() {
             this.$emit('selected', this.action, this.values);
-            this.confirming = false;
         },
 
-        cancel() {
+        reset() {
             this.confirming = false;
-        }
+
+            this.values = clone(this.action.values);
+        },
+
     }
 
 }

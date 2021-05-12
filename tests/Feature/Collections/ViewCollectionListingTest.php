@@ -36,8 +36,11 @@ class ViewCollectionListingTest extends TestCase
                     'edit_url' => 'http://localhost/cp/collections/foo/edit',
                     'delete_url' => 'http://localhost/cp/collections/foo',
                     'entries_url' => 'http://localhost/cp/collections/foo',
+                    'blueprints_url' => 'http://localhost/cp/collections/foo/blueprints',
                     'scaffold_url' => 'http://localhost/cp/collections/foo/scaffold',
                     'deleteable' => true,
+                    'editable' => true,
+                    'blueprint_editable' => true,
                 ],
                 [
                     'id' => 'bar',
@@ -46,8 +49,11 @@ class ViewCollectionListingTest extends TestCase
                     'edit_url' => 'http://localhost/cp/collections/bar/edit',
                     'delete_url' => 'http://localhost/cp/collections/bar',
                     'entries_url' => 'http://localhost/cp/collections/bar',
+                    'blueprints_url' => 'http://localhost/cp/collections/bar/blueprints',
                     'scaffold_url' => 'http://localhost/cp/collections/bar/scaffold',
                     'deleteable' => true,
+                    'editable' => true,
+                    'blueprint_editable' => true,
                 ],
             ]))
             ->assertDontSee('no-results');

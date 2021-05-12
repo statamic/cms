@@ -112,10 +112,12 @@
 
 // Responsive
 
-@element .live-preview-fields and (min-width: 1000px) {
-    :self { @apply p-3 bg-grey-30; }
+// add grey bg and padding so that it looks like a publish form, when its wide enough.
+.live-preview-fields-wide {
+    @apply p-3 bg-grey-30;
 }
 
-@element .live-preview-fields and (max-width: 1000px) {
-    :self .publish-section { @apply shadow-none }
+// remove shadow of sections when its narrow enough to be no longer be displayed as sections.
+.live-preview-fields-narrow .publish-section {
+    @apply shadow-none
 }

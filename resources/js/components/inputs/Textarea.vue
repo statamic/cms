@@ -3,6 +3,7 @@
         <textarea
             class="input-text"
             :value="value"
+            :id="id"
             :disabled="disabled"
             :readonly="isReadOnly"
             :placeholder="placeholder"
@@ -29,6 +30,7 @@ export default {
         isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
         value: { required: true },
+        id: { default: null },
         focus: { type: Boolean, default: false }
     }
 }

@@ -3,9 +3,12 @@
     <dropdown-list class="inline-block" :disabled="blueprints.length === 1">
         <template v-slot:trigger>
             <button
-                class="btn-primary"
+                class="btn-primary flex items-center"
                 @click="create"
-                v-text="__('Create Term')" />
+            >
+                <span v-text="__('Create Term')" />
+                <svg-icon name="chevron-down-xs" class="ml-1 -mr-1 w-2" v-if="blueprints.length > 1" />
+            </button>
         </template>
 
         <div v-for="blueprint in blueprints" :key="blueprint.handle">

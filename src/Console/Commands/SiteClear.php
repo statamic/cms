@@ -47,7 +47,7 @@ class SiteClear extends Command
 
         $this
             ->clearCollections()
-            ->clearStructures()
+            ->clearNavigations()
             ->clearTaxonomies()
             ->clearAssets()
             ->clearGlobals()
@@ -95,11 +95,11 @@ class SiteClear extends Command
      *
      * @return $this
      */
-    protected function clearStructures()
+    protected function clearNavigations()
     {
-        $this->cleanAndKeep(base_path('content/structures'));
+        $this->cleanAndKeep(base_path('content/navigation'));
 
-        $this->info('Structures cleared successfully.');
+        $this->info('Navigations cleared successfully.');
 
         return $this;
     }

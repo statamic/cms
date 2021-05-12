@@ -3,18 +3,22 @@
 namespace Statamic\Tags;
 
 use Statamic\Facades\Data;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class Nav extends Structure
 {
     public function index()
     {
-        return $this->structure($this->get('handle', 'collection::pages'));
+        return $this->structure($this->params->get('handle', 'collection::pages'));
     }
 
     public function breadcrumbs()
     {
-        $url = URL::getCurrent();
+        $currentUrl = URL::makeAbsolute(URL::getCurrent());
+        $url = Str::removeLeft($currentUrl, Site::current()->absoluteUrl());
+        $url = Str::ensureLeft($url, '/');
         $segments = explode('/', $url);
         $segments[0] = '/';
 
@@ -28,7 +32,9 @@ class Nav extends Structure
 
             return $uri;
         })->mapWithKeys(function ($uri) {
-            return [$uri => Data::findByUri($uri)];
+            $uri = Str::ensureLeft($uri, '/');
+
+            return [$uri => Data::findByUri($uri, Site::current()->handle())];
         })->filter();
 
         if (! $this->params->bool('reverse', false)) {

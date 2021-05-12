@@ -30,8 +30,11 @@ class CollectionsController extends CpController
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection),
+                'editable' => User::current()->can('edit', $collection),
+                'blueprint_editable' => User::current()->can('configure fields'),
             ];
         })->values();
 
@@ -48,23 +51,42 @@ class CollectionsController extends CpController
     {
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
-        $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
-            return [
-                'handle' => $blueprint->handle(),
-                'title' => $blueprint->title(),
-            ];
-        });
+        $blueprints = $collection
+            ->entryBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
 
         $site = $request->site ? Site::get($request->site) : Site::selected();
+
+        $columns = $collection
+            ->entryBlueprint()
+            ->columns()
+            ->setPreferred("collections.{$collection->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
 
         $viewData = [
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => $site->handle(),
+            'columns' => $columns,
             'filters' => Scope::filters('entries', [
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
+            'sites' => $collection->sites()->map(function ($site) {
+                $site = Site::get($site);
+
+                return [
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                ];
+            })->values()->all(),
         ];
 
         if ($collection->queryEntries()->count() === 0) {
@@ -80,15 +102,6 @@ class CollectionsController extends CpController
         return view('statamic::collections.show', array_merge($viewData, [
             'structure' => $structure,
             'expectsRoot' => $structure->expectsRoot(),
-            'structureSites' => $collection->sites()->map(function ($site) use ($structure) {
-                $tree = $structure->in($site);
-
-                return [
-                    'handle' => $tree->locale(),
-                    'name' => $tree->site()->name(),
-                    'url' => $tree->showUrl(),
-                ];
-            })->values()->all(),
         ]));
     }
 
@@ -120,10 +133,7 @@ class CollectionsController extends CpController
             'sort_direction' => $collection->sortDirection(),
             'max_depth' => optional($collection->structure())->maxDepth(),
             'expects_root' => optional($collection->structure())->expectsRoot(),
-            'blueprints' => $collection->entryBlueprints()->map->handle()->reject(function ($handle) {
-                return $handle == 'entry_link';
-            })->all(),
-            'links' => $collection->entryBlueprints()->map->handle()->contains('entry_link'),
+            'links' => $collection->entryBlueprints()->map->handle()->contains('link'),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
@@ -134,7 +144,7 @@ class CollectionsController extends CpController
             'mount' => optional($collection->mount())->id(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($collection))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -183,18 +193,13 @@ class CollectionsController extends CpController
     {
         $this->authorize('update', $collection, __('You are not authorized to edit this collection.'));
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($collection)->fields()->addValues($request->all());
 
         $fields->validate();
 
         $values = $fields->process()->values()->all();
 
-        $blueprints = collect($values['blueprints']);
-        if ($values['links']) {
-            $blueprints->push('entry_link')->unique();
-        } elseif ($blueprints->contains('entry_link')) {
-            $blueprints->diff(['entry_link'])->values();
-        }
+        $this->updateLinkBlueprint($values['links'], $collection);
 
         $collection
             ->title($values['title'])
@@ -205,7 +210,6 @@ class CollectionsController extends CpController
             ->defaultPublishState($values['default_publish_state'])
             ->sortDirection($values['sort_direction'])
             ->ampable($values['amp'])
-            ->entryBlueprints($blueprints->all())
             ->mount($values['mount'] ?? null)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
@@ -227,10 +231,42 @@ class CollectionsController extends CpController
         return $collection->toArray();
     }
 
+    protected function updateLinkBlueprint($shouldExist, $collection)
+    {
+        $namespace = 'collections.'.$collection->handle();
+        $blueprints = Blueprint::in($namespace);
+        $alreadyExists = $blueprints->has('link');
+
+        if ($shouldExist && ! $alreadyExists) {
+            if ($blueprints->count() === 0) {
+                $collection->entryBlueprint()->save();
+            }
+            $this->createLinkBlueprint($namespace);
+        }
+
+        if (! $shouldExist && $alreadyExists) {
+            Blueprint::find($namespace.'.link')->delete();
+        }
+    }
+
+    protected function createLinkBlueprint($namespace)
+    {
+        Blueprint::make('link')
+            ->setNamespace($namespace)
+            ->setContents([
+                'title' => __('Link'),
+                'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text']],
+                    ['handle' => 'redirect', 'field' => ['type' => 'link', 'required' => true]],
+                ],
+            ])
+            ->save();
+    }
+
     protected function makeStructure($collection, $maxDepth, $expectsRoot, $sites)
     {
         if (! $structure = $collection->structure()) {
-            $structure = (new CollectionStructure)->collection($collection);
+            $structure = new CollectionStructure;
         }
 
         return $structure
@@ -245,7 +281,7 @@ class CollectionsController extends CpController
         $collection->delete();
     }
 
-    protected function editFormBlueprint()
+    protected function editFormBlueprint($collection)
     {
         $fields = [
             'name' => [
@@ -333,9 +369,12 @@ class CollectionsController extends CpController
                     'blueprints' => [
                         'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.collections_blueprint_instructions'),
-                        'type' => 'blueprints',
-                        'validate' => 'array',
-                        'mode' => 'select',
+                        'type' => 'html',
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <span class="mr-2">'.$collection->entryBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <a href="'.cp_route('collections.blueprints.index', $collection).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
                     ],
                     'links' => [
                         'display' => __('Links'),

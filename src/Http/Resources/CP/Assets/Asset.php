@@ -18,12 +18,12 @@ class Asset extends JsonResource
             'url' => $this->url(),
             'permalink' => $this->absoluteUrl(),
             'extension' => $this->extension(),
-            'blueprint' => $this->blueprint()->handle(),
             'downloadUrl' => cp_route('assets.download', base64_encode($this->id())),
             'size' => Str::fileSizeForHumans($this->size()),
             'lastModified' => $this->lastModified()->inPreferredFormat(),
             'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
             'isImage' => $this->isImage(),
+            'isSvg' => $this->isSvg(),
             'isAudio' => $this->isAudio(),
             'isVideo' => $this->isVideo(),
             'isPreviewable' => $this->isPreviewable(),
@@ -34,7 +34,6 @@ class Asset extends JsonResource
                     'height' => $this->height(),
                     'preview' => $this->previewUrl(),
                     'thumbnail' => $this->thumbnailUrl('small'),
-                    'toenail' => $this->thumbnailUrl('large'),
                 ];
             }),
 
@@ -43,6 +42,8 @@ class Asset extends JsonResource
             'allowDownloading' => $this->container()->allowDownloading(),
             'runActionUrl' => cp_route('assets.actions.run'),
             'actions' => Action::for($this->resource, ['container' => $this->container()->handle()]),
+
+            'blueprint' => $this->blueprint()->toPublishArray(),
         ];
     }
 

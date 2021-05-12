@@ -33,15 +33,15 @@
                 </div>
 
                 <div class="asset-editor-meta-actions">
-                    <a @click="open" v-tooltip="__('Open in a new window')">
+                    <button @click="open" v-tooltip="__('Open in a new window')" :aria-label="__('Open in a new window')">
                         <svg-icon name="external-link" class="h-6 w-6"/>
-                    </a>
-                    <a @click="download" v-tooltip="__('Download file')" v-if="asset.allowDownloading">
+                    </button>
+                    <button @click="download" v-tooltip="__('Download file')" :aria-label="__('Download file')" v-if="asset.allowDownloading">
                         <svg-icon name="download" class="h-6 w-6"/>
-                    </a>
-                    <a @click="close" v-tooltip="__('Close editor')">
+                    </button>
+                    <button @click="close" v-tooltip="__('Close editor')" :aria-label="__('Close editor')">
                         <svg-icon name="close" class="h-6 w-6"/>
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -52,6 +52,25 @@
                     <div class="editor-preview-image" v-if="isImage">
                         <div class="image-wrapper">
                             <img :src="asset.preview" class="asset-thumb" />
+                        </div>
+                    </div>
+
+                    <div class="editor-preview-image" v-if="asset.isSvg">
+                        <div class="bg-checkerboard h-full w-full">
+                            <div class="hidden md:grid md:grid-cols-3 border-b-2 border-grey-90">
+                                <div class="border-r p-2 border-grey-90 flex items-center justify-center">
+                                    <img :src="asset.url" class="asset-thumb w-4 h-4" />
+                                </div>
+                                <div class="border-l border-r p-2 border-grey-90 flex items-center justify-center">
+                                    <img :src="asset.url" class="asset-thumb w-12 h-12" />
+                                </div>
+                                <div class="border-l p-2 border-grey-90 flex items-center justify-center">
+                                    <img :src="asset.url" class="asset-thumb w-24 h-24" />
+                                </div>
+                            </div>
+                            <div class="h-full flex items-center justify-center">
+                                <img :src="asset.url" class="asset-thumb w-2/3 max-h-screen-1/2 relative md:-top-6" />
+                            </div>
                         </div>
                     </div>
 
@@ -73,7 +92,7 @@
                     </div>
 
                     <div class="editor-file-actions">
-                        <button v-if="isImage" type="button" class="btn" @click.prevent="openFocalPointEditor">
+                        <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="btn" @click.prevent="openFocalPointEditor">
                             {{ __('Set Focal Point') }}
                         </button>
 
@@ -134,7 +153,7 @@
 
         <portal to="outside">
             <focal-point-editor
-                v-if="showFocalPointEditor"
+                v-if="showFocalPointEditor && isFocalPointEditorEnabled"
                 :data="values.focus"
                 :image="asset.preview"
                 @selected="selectFocalPoint"
@@ -221,8 +240,12 @@ export default {
         canUseGoogleDocsViewer()
         {
             return Statamic.$config.get('googleDocsViewer');
-        }
+        },
 
+        isFocalPointEditorEnabled()
+        {
+            return Statamic.$config.get("focalPointEditorEnabled");
+        }
     },
 
 
@@ -259,20 +282,8 @@ export default {
                 this.meta = data.meta;
                 this.runActionUrl = data.runActionUrl;
                 this.actions = data.actions;
-                this.getFieldset();
-            });
-        },
 
-        /**
-         * Load the fieldset
-         */
-        getFieldset() {
-            const url = cp_url(`fields/publish-blueprints/${this.asset.blueprint}`);
-
-            this.$axios.get(url).then(response => {
-                this.fieldset = response.data;
-
-                // Flatten fields from all sections into one array.
+                this.fieldset = data.blueprint;
                 this.fields = _.chain(this.fieldset.sections)
                     .map(section => section.fields)
                     .flatten(true)

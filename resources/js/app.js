@@ -11,7 +11,6 @@ window.Statamic = Statamic;
 window._ = require('underscore');
 window.$ = window.jQuery = require('jquery');
 window.rangy = require('rangy');
-window.EQCSS = require('./vendor/eqcss');
 
 require('./bootstrap/globals');
 require('./bootstrap/polyfills');
@@ -110,6 +109,7 @@ Statamic.app({
         CreateTermButton: require('./components/terms/CreateTermButton.vue').default,
         Importer: require('./components/importer/importer'),
         FieldsetListing: require('./components/fieldsets/Listing.vue').default,
+        FieldsetCreateForm: require('./components/fieldsets/CreateForm.vue').default,
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue').default,
         BlueprintListing: require('./components/blueprints/Listing.vue').default,
         BlueprintBuilder: require('./components/blueprints/Builder.vue').default,
@@ -130,6 +130,7 @@ Statamic.app({
         CollectionScaffolder: require('./components/collections/Scaffolder.vue').default,
         CollectionEditForm: require('./components/collections/EditForm.vue').default,
         CollectionView: require('./components/collections/View.vue').default,
+        CollectionBlueprintListing:  require('./components/collections/BlueprintListing.vue').default,
         SessionExpiry: require('./components/SessionExpiry.vue').default,
         NavigationListing: require('./components/navigation/Listing.vue').default,
         NavigationCreateForm: require('./components/navigation/CreateForm.vue').default,
@@ -138,6 +139,7 @@ Statamic.app({
         Stacks: require('./components/stacks/Stacks.vue').default,
         TaxonomyCreateForm: require('./components/taxonomies/CreateForm.vue').default,
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
+        TaxonomyBlueprintListing:  require('./components/taxonomies/BlueprintListing.vue').default,
         AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
         AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
         Updater: require('./components/updater/Updater.vue').default,
@@ -147,6 +149,7 @@ Statamic.app({
         showLoginModal: false,
         navOpen: true,
         mobileNavOpen: false,
+        showBanner: true,
         modals: [],
         stacks: [],
         panes: [],
@@ -208,6 +211,10 @@ Statamic.app({
 
         toggleMobileNav() {
             this.mobileNavOpen = ! this.mobileNavOpen;
+        },
+
+        hideBanner() {
+            this.showBanner = false;
         }
     }
 

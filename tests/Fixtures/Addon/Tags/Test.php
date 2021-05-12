@@ -8,7 +8,7 @@ class Test extends Tags
 {
     public function index()
     {
-        return $this->get('variable');
+        return $this->params->get('variable');
     }
 
     /**
@@ -18,7 +18,7 @@ class Test extends Tags
      */
     public function someParsing()
     {
-        $var = $this->get('var');
+        $var = $this->params->get('var');
 
         $val = array_get($this->context, $var);
 

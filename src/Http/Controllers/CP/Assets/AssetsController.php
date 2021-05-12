@@ -29,7 +29,7 @@ class AssetsController extends CpController
 
     public function show($asset)
     {
-        $asset = Asset::find(base64_decode($asset));
+        $asset = Asset::find(utf8_encode(base64_decode($asset)));
 
         // TODO: Auth
 
@@ -38,7 +38,7 @@ class AssetsController extends CpController
 
     public function update(Request $request, $asset)
     {
-        $asset = Asset::find(base64_decode($asset));
+        $asset = Asset::find(utf8_encode(base64_decode($asset)));
 
         $this->authorize('edit', $asset);
 
@@ -64,6 +64,11 @@ class AssetsController extends CpController
         $request->validate([
             'container' => 'required',
             'folder' => 'required',
+            'file' => ['file', function ($attribute, $value, $fail) {
+                if (in_array(trim(strtolower($value->getClientOriginalExtension())), ['php', 'php3', 'php4', 'php5', 'phtml'])) {
+                    $fail(__('validation.uploaded'));
+                }
+            }],
         ]);
 
         $container = AssetContainer::find($request->container);

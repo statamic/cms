@@ -22,7 +22,7 @@ class AugmentedTestCase extends TestCase
         foreach ($expectations as $key => $expectation) {
             $actual = $augmented->get($key);
 
-            if (! in_array($expectation['type'], ['string', 'bool', 'array', 'int'])) {
+            if (! in_array($expectation['type'], ['string', 'bool', 'array', 'int', 'null'])) {
                 $this->assertInstanceOf($expectation['type'], $actual, "Key '{$key}' is not a {$expectation['type']}");
             }
 

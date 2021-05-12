@@ -26,7 +26,7 @@ export default class {
             return this.passesCustomCondition(this.prepareCondition(conditions));
         }
 
-        conditions = this.converter.fromBlueprint(conditions);
+        conditions = this.converter.fromBlueprint(conditions, this.field.prefix);
 
         let passes = this.passOnAny
             ? this.passesAnyConditions(conditions)
@@ -204,6 +204,10 @@ export default class {
         if (condition.rhs === 'empty') {
             condition.lhs = _.isEmpty(condition.lhs);
             condition.rhs = true;
+        }
+
+        if (_.isObject(condition.lhs)) {
+            return false;
         }
 
         return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);

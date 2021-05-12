@@ -4,8 +4,8 @@ namespace Statamic\Auth\File;
 
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\Role as BaseRole;
-use Statamic\Events\Data\RoleDeleted;
-use Statamic\Events\Data\RoleSaved;
+use Statamic\Events\RoleDeleted;
+use Statamic\Events\RoleSaved;
 use Statamic\Facades;
 use Statamic\Preferences\HasPreferencesInProperty;
 use Statamic\Support\Arr;

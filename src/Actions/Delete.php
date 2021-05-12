@@ -2,7 +2,7 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Contracts;
 
 class Delete extends Action
 {
@@ -15,12 +15,21 @@ class Delete extends Action
 
     public function visibleTo($item)
     {
-        return true;
+        switch (true) {
+            case $item instanceof Contracts\Entries\Entry && $item->collection()->sites()->count() > 1:
+            case $item instanceof Contracts\Taxonomies\Term:
+            case $item instanceof Contracts\Assets\Asset:
+            case $item instanceof Contracts\Forms\Submission:
+            case $item instanceof Contracts\Auth\User:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function authorize($user, $item)
     {
-        if ($item instanceof UserContract && $user->id() === $item->id()) {
+        if ($item instanceof Contracts\Auth\User && $user->id() === $item->id()) {
             return false;
         }
 

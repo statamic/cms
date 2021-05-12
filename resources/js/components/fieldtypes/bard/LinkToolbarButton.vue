@@ -7,6 +7,7 @@
             :class="{ active }"
             v-html="button.html"
             v-tooltip="button.text"
+            :aria-label="button.text"
             @click="showLinkToolbar(getMarkAttrs('link'))"
         />
 

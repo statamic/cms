@@ -2,10 +2,11 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Scrumpy\ProseMirrorToHtml\Renderer;
+use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
+use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Field;
-use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 
@@ -15,6 +16,9 @@ class Augmentor
     protected $sets = [];
     protected $includeDisabledSets = false;
     protected $augmentSets = true;
+
+    protected static $customMarks = [];
+    protected static $customNodes = [];
 
     public function __construct($fieldtype)
     {
@@ -71,7 +75,7 @@ class Augmentor
         return collect($value)->reject(function ($value) {
             return $value['type'] === 'set'
                 && Arr::get($value, 'attrs.enabled', true) === false;
-        });
+        })->values();
     }
 
     protected function addSetIndexes($value)
@@ -88,16 +92,22 @@ class Augmentor
 
     public function convertToHtml($value)
     {
-        $renderer = new Renderer;
-        $renderer->addNodes([
-            ImageNode::class,
-            SetNode::class,
-        ]);
+        return (new Renderer)
+            ->replaceNode(DefaultImageNode::class, CustomImageNode::class)
+            ->addNode(SetNode::class)
+            ->addNodes(static::$customNodes)
+            ->addMarks(static::$customMarks)
+            ->render(['type' => 'doc', 'content' => $value]);
+    }
 
-        return $renderer->render([
-            'type' => 'doc',
-            'content' => $value,
-        ]);
+    public static function addNode($node)
+    {
+        static::$customNodes[] = $node;
+    }
+
+    public static function addMark($mark)
+    {
+        static::$customMarks[] = $mark;
     }
 
     protected function convertToSets($html)
@@ -127,11 +137,11 @@ class Augmentor
         $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
 
         return $value->map(function ($set) use ($augmentMethod) {
-            if (! $config = $this->fieldtype->config("sets.{$set['type']}.fields")) {
+            if (! $this->fieldtype->config("sets.{$set['type']}.fields")) {
                 return $set;
             }
 
-            $values = (new Fields($config))->addValues($set)->{$augmentMethod}()->values()->all();
+            $values = $this->fieldtype->fields($set['type'])->addValues($set)->{$augmentMethod}()->values()->all();
 
             return array_merge($values, ['type' => $set['type']]);
         })->all();

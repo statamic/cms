@@ -27,11 +27,26 @@ class DataRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_the_repository_key_and_the_id()
+    public function it_splits_the_repository_and_key_if_the_repository_exists()
     {
+        $this->data->setRepository('entry', new \stdClass);
         $this->assertEquals(['entry', '123'], $this->data->splitReference('entry::123'));
-        $this->assertEquals([null, '123'], $this->data->splitReference('123'));
+        $this->assertEquals([null, 'unknown::123'], $this->data->splitReference('unknown::123'));
+    }
+
+    /** @test */
+    public function it_splits_the_repository_and_key_even_if_there_are_multiple_delimiters()
+    {
+        $this->data->setRepository('asset', new \stdClass);
+
         $this->assertEquals(['asset', 'main::foo/bar'], $this->data->splitReference('asset::main::foo/bar'));
+        $this->assertEquals([null, 'unknown::main::foo/bar'], $this->data->splitReference('unknown::main::foo/bar'));
+    }
+
+    /** @test */
+    public function it_returns_the_key_as_is_if_theres_no_delimiter()
+    {
+        $this->assertEquals([null, '123'], $this->data->splitReference('123'));
     }
 
     /** @test */

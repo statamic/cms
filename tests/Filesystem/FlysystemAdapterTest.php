@@ -41,6 +41,14 @@ class FlysystemAdapterTest extends TestCase
     }
 
     /** @test */
+    public function gets_fallback_if_a_file_doesnt_exist_and_asserts_are_disabled()
+    {
+        $this->filesystem->getConfig()->set('disable_asserts', true);
+
+        $this->assertEquals('Hello World', $this->adapter->get('filename.txt', 'Hello World'));
+    }
+
+    /** @test */
     public function it_normalizes_relative_paths()
     {
         $this->assertEquals('bar.txt', $this->adapter->normalizePath('bar.txt'));

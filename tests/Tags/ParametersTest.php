@@ -31,12 +31,14 @@ class ParametersTest extends TestCase
         $this->params = Parameters::make([
             'string' => 'hello',
             'array' => ['one', 'two'],
+            'zero' => 0,
             'integer' => 7,
             'float' => 123.456,
             ':evaluated' => 'foo',
             'unevaluated' => 'foo',
             ':evaluatednested' => 'nested:foo',
             'unevaluatednested' => 'nested:foo',
+            ':notInContext' => 'not_in_context',
             'true' => true,
             'false' => false,
             'truthy' => 'true',
@@ -62,12 +64,14 @@ class ParametersTest extends TestCase
         $this->assertSame([
             'string' => 'hello',
             'array' => ['one', 'two'],
+            'zero' => 0,
             'integer' => 7,
             'float' => 123.456,
             'evaluated' => 'bar',
             'unevaluated' => 'foo',
             'evaluatednested' => 'bar',
             'unevaluatednested' => 'nested:foo',
+            'notInContext' => null,
             'true' => true,
             'false' => false,
             'truthy' => true,
@@ -88,6 +92,7 @@ class ParametersTest extends TestCase
         $this->assertEquals(123.456, $this->params->get('float'));
         $this->assertEquals('bar', $this->params->get('evaluated'));
         $this->assertEquals('foo', $this->params->get('unevaluated'));
+        $this->assertEquals(null, $this->params->get('notInContext'));
         $this->assertEquals(true, $this->params->get('true'));
         $this->assertEquals(false, $this->params->get('false'));
         $this->assertEquals(true, $this->params->get('truthy'));
@@ -178,6 +183,8 @@ class ParametersTest extends TestCase
         $this->assertEquals(0, $this->params->int('string'));
         $this->assertEquals(0, $this->params->int('unknown'));
         $this->assertEquals(3, $this->params->int('unknown', 3));
+        $this->assertEquals(0, $this->params->int('zero'));
+        $this->assertEquals(0, $this->params->int('zero', 1));
         $this->assertEquals('fallback', $this->params->int('unknown', 'fallback'));
     }
 
@@ -191,18 +198,71 @@ class ParametersTest extends TestCase
         $this->assertSame('fallback', $this->params->float('unknown', 'fallback'));
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/3248
+     */
+    public function it_gets_nested_values()
+    {
+        $augmentable = new class implements \Statamic\Contracts\Data\Augmentable {
+            use \Statamic\Data\HasAugmentedData;
+
+            public function augmentedArrayData()
+            {
+                return [
+                    'foo' => 'a',
+                ];
+            }
+        };
+
+        $context = new Context([
+            'array' => ['foo' => 'b'],
+            'object' => $augmentable,
+        ]);
+
+        $params = Parameters::make([
+            ':arr' => 'array:foo',
+            ':obj' => 'object:foo',
+        ], $context);
+
+        $this->assertSame('b', $params->get('arr'));
+        $this->assertSame('a', $params->get('obj'));
+    }
+
+    /** @test */
+    public function it_can_use_modifiers()
+    {
+        $context = new Context(['foo' => 'bar']);
+
+        $params = Parameters::make([
+            ':evaluated' => 'foo|upper',
+            ':double_quotes' => '"double"|upper|reverse',
+            ':single_quotes' => "'single'|upper|reverse",
+            ':double_quotes_with_spaces' => '"double" | upper | reverse',
+            ':single_quotes_with_spaces' => "'single' | upper | reverse",
+        ], $context);
+
+        $this->assertSame('BAR', $params->get('evaluated'));
+        $this->assertSame('ELBUOD', $params->get('double_quotes'));
+        $this->assertSame('ELGNIS', $params->get('single_quotes'));
+        $this->assertSame('ELBUOD', $params->get('double_quotes_with_spaces'));
+        $this->assertSame('ELGNIS', $params->get('single_quotes_with_spaces'));
+    }
+
     /** @test */
     public function it_is_iterable()
     {
         $expected = [
             'string' => 'hello',
             'array' => ['one', 'two'],
+            'zero' => 0,
             'integer' => 7,
             'float' => 123.456,
             'evaluated' => 'bar',
             'unevaluated' => 'foo',
             'evaluatednested' => 'bar',
             'unevaluatednested' => 'nested:foo',
+            'notInContext' => null,
             'true' => true,
             'false' => false,
             'truthy' => true,

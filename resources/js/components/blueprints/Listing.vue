@@ -1,7 +1,10 @@
 <template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows">
+    <data-list :visible-columns="columns" :columns="columns" :rows="rows" :sort="false">
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
-            <data-list-table>
+            <data-list-table
+                :reorderable="reorderable"
+                @reordered="$emit('reordered', $event)"
+            >
                 <template slot="cell-title" slot-scope="{ row: blueprint }">
                     <a :href="blueprint.edit_url">{{ blueprint.title }}</a>
                 </template>
@@ -36,7 +39,7 @@ export default {
 
     mixins: [Listing],
 
-    props: ['initialRows'],
+    props: ['initialRows', 'reorderable'],
 
     data() {
         return {
@@ -47,6 +50,14 @@ export default {
                 { label: __('Fields'), field: 'fields' },
             ]
         }
+    },
+
+    watch: {
+
+        initialRows(rows) {
+            this.rows = rows;
+        }
+
     }
 
 }

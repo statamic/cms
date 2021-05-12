@@ -10,7 +10,7 @@
                 {{ __('Fieldset') }}
             </h1>
             <button
-                class="text-grey-50 hover:text-grey-80 mr-3 text-sm"
+                class="text-grey-70 hover:text-grey-80 mr-3 text-sm"
                 @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>
@@ -23,7 +23,7 @@
 
         <div class="card">
 
-            <div class="publish-fields">
+            <publish-fields-container>
 
                 <form-group
                     handle="fieldset"
@@ -42,7 +42,7 @@
                     @input="updateField('prefix', $event)"
                 />
 
-            </div>
+            </publish-fields-container>
         </div>
     </div>
 

@@ -45,10 +45,12 @@ trait Routable
             return $this->redirectUrl();
         }
 
-        return vsprintf('%s/%s', [
+        $url = vsprintf('%s/%s', [
             rtrim($this->site()->absoluteUrl(), '/'),
             ltrim($this->uri(), '/'),
         ]);
+
+        return $url === '/' ? $url : rtrim($url, '/');
     }
 
     public function isRedirect()

@@ -6,15 +6,9 @@ use Statamic\Fields\Fieldtype;
 
 class Revealer extends Fieldtype
 {
-    public function canBeValidated()
-    {
-        return false;
-    }
-
-    public function canHaveDefault()
-    {
-        return false;
-    }
+    protected $localizable = false;
+    protected $validatable = false;
+    protected $defaultable = false;
 
     public function preProcess($data)
     {

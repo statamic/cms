@@ -2,10 +2,13 @@
 
 namespace Tests\Data\Structures;
 
+use Facades\Statamic\Stache\Repositories\NavTreeRepository;
 use Illuminate\Support\Collection as LaravelCollection;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Statamic\Structures\Nav;
+use Statamic\Structures\NavTree;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class NavTest extends StructureTestCase
@@ -27,6 +30,51 @@ class NavTest extends StructureTestCase
 
         $this->assertEquals('test', $structure->handle());
         $this->assertEquals($structure, $return);
+    }
+
+    /** @test */
+    public function it_makes_a_tree()
+    {
+        $structure = $this->structure()->handle('test');
+        Facades\Nav::shouldReceive('findByHandle')->with('test')->andReturn($structure);
+        $tree = $structure->makeTree('fr', [
+            ['url' => '/test'],
+        ]);
+        $this->assertEquals('fr', $tree->locale());
+        $this->assertEquals('test', $tree->handle());
+        $this->assertEquals([
+            ['url' => '/test'],
+        ], $tree->tree());
+    }
+
+    /** @test */
+    public function trees_exist_if_they_exist_as_files()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+            'de' => ['url' => '/de/', 'locale' => 'de'],
+        ]]);
+
+        // ...unlike collection structure trees, that exist if they're defined in the collection
+        // regardless of whether a file exists.
+
+        $structure = $this->structure('test');
+
+        NavTreeRepository::shouldReceive('find')->with('test', 'en')->andReturn($enTree = $structure->makeTree('en'));
+        NavTreeRepository::shouldReceive('find')->with('test', 'fr')->andReturn($frTree = $structure->makeTree('fr'));
+        NavTreeRepository::shouldReceive('find')->with('test', 'de')->andReturnNull();
+
+        $trees = $structure->trees();
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $trees);
+        $this->assertCount(2, $trees);
+        $this->assertEveryItemIsInstanceOf(NavTree::class, $trees);
+        $this->assertTrue($structure->existsIn('en'));
+        $this->assertTrue($structure->existsIn('fr'));
+        $this->assertFalse($structure->existsIn('de'));
+        $this->assertSame($enTree, $structure->in('en'));
+        $this->assertSame($frTree, $structure->in('fr'));
+        $this->assertNull($structure->in('de'));
     }
 
     /** @test */

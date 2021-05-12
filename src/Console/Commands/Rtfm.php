@@ -30,7 +30,7 @@ class Rtfm extends Command
      */
     public function handle()
     {
-        $this->info('Thank you for supporting your local Erin Dalzell 🍷');
-        $this->comment('http://please-rt.fm/');
+        $this->info('Please enjoy reading the friendly manual! 📓');
+        $this->comment('https://statamic.dev');
     }
 }

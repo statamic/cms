@@ -24,7 +24,9 @@ class Cache extends Tags
 
     private function isEnabled()
     {
-        // TODO: make a global config
+        if (! config('statamic.system.cache_tags_enabled', true)) {
+            return false;
+        }
 
         // Only get requests. This disables the cache during live preview.
         return request()->method() === 'GET';
@@ -32,12 +34,16 @@ class Cache extends Tags
 
     private function getCacheKey()
     {
+        if ($this->params->has('key')) {
+            return $this->params->get('key');
+        }
+
         $hash = [
             'content' => $this->content,
             'params' => $this->params->all(),
         ];
 
-        if ($this->get('scope', 'site') === 'page') {
+        if ($this->params->get('scope', 'site') === 'page') {
             $hash['url'] = URL::makeAbsolute(URL::getCurrent());
         }
 
@@ -46,7 +52,7 @@ class Cache extends Tags
 
     private function getCacheLength()
     {
-        if (! $length = $this->get('for')) {
+        if (! $length = $this->params->get('for')) {
             return null;
         }
 

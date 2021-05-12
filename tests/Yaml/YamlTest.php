@@ -5,6 +5,8 @@ namespace Tests\Yaml;
 use Exception;
 use Statamic\Facades\YAML;
 use Statamic\Yaml\ParseException;
+use Statamic\Yaml\Yaml as StatamicYaml;
+use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 use Tests\TestCase;
 
 class YamlTest extends TestCase
@@ -19,19 +21,16 @@ class YamlTest extends TestCase
             'array' => ['one', 'two'],
         ];
 
-        $expected = <<<'EOT'
-foo: bar
-two_words: 'two words'
-multiline: |
-  first
-  second
-array:
-  - one
-  - two
+        $symfonyYaml = $this->mock(SymfonyYaml::class)
+            ->shouldReceive('dump')
+            ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
+            ->once()
+            ->andReturn('some properly dumped yaml from symfony')
+            ->getMock();
 
-EOT;
+        $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump($array));
+        $this->assertEquals('some properly dumped yaml from symfony', YAML::dump($array));
     }
 
     /** @test */
@@ -142,14 +141,17 @@ EOT;
     /** @test */
     public function it_parses_with_content_and_front_matter()
     {
-        $yaml = <<<'EOT'
----
-foo: bar
----
-some content
-EOT;
+        $yaml = "---\nfoo: bar\n---\nsome content";
 
-        $this->assertEqualsIgnoringLineEndings(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
+        $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
+    }
+
+    /** @test */
+    public function it_parses_with_content_and_front_matter_with_crlf()
+    {
+        $yaml = "---\r\nfoo: bar\r\n---\r\nsome content";
+
+        $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
     }
 
     /** @test */
@@ -198,6 +200,20 @@ EOT;
             ['foo' => 'bar', 'content' => 'some content'],
             YAML::file($path)->parse()
         );
+    }
+
+    /** @test */
+    public function when_parsing_and_content_is_just_whitespace_it_treats_it_as_null()
+    {
+        $yaml = <<<'EOT'
+---
+foo: bar
+---
+
+
+EOT;
+
+        $this->assertEquals(['foo' => 'bar'], YAML::parse($yaml));
     }
 
     /** @test */

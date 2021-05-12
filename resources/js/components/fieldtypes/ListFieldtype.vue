@@ -23,6 +23,7 @@
                             class="w-full"
                             v-model="data[index].value"
                             :readonly="isReadOnly"
+                            :id="fieldId"
                             @keydown.enter.prevent="saveAndAddNewItem"
                             @keyup.up="previousItem"
                             @keyup.down="nextItem"

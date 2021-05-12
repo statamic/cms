@@ -345,6 +345,27 @@ class BardTest extends TestCase
         $this->assertNull($bard->process('[]'));
     }
 
+    /** @test */
+    public function it_preloads_preprocessed_default_values()
+    {
+        $field = (new Field('test', [
+            'type' => 'bard',
+            'sets' => [
+                'main' => [
+                    'fields' => [
+                        ['handle' => 'things', 'field' => ['type' => 'array']],
+                    ],
+                ],
+            ],
+        ]));
+
+        $expected = [
+            'things' => [],
+        ];
+
+        $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']);
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));

@@ -7,8 +7,8 @@ class Mix extends Tags
     public function index()
     {
         return mix(
-            $this->get(['src', 'path']),
-            $this->get(['from', 'in'], '')
+            $this->params->get(['src', 'path']),
+            $this->params->get(['from', 'in'], '')
         );
     }
 }

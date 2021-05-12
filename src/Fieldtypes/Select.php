@@ -2,8 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\LabeledValue;
+use Statamic\GraphQL\Types\LabeledValueType;
 use Statamic\Support\Arr;
 
 class Select extends Fieldtype
@@ -26,16 +28,22 @@ class Select extends Fieldtype
                 'value_header' => __('Label'),
                 'add_button' => __('Add Option'),
             ],
-            'clearable' => [
-                'display' => __('Clearable'),
-                'instructions' => __('statamic::fieldtypes.select.config.clearable'),
+            'multiple' => [
+                'display' => __('Multiple'),
+                'instructions' => __('statamic::fieldtypes.select.config.multiple'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
             ],
-            'multiple' => [
-                'display' => __('Multiple'),
-                'instructions' => __('statamic::fieldtypes.select.config.multiple'),
+            'max_items' => [
+                'display' => __('Max Items'),
+                'instructions' => __('statamic::messages.max_items_instructions'),
+                'type' => 'integer',
+                'width' => 50,
+            ],
+            'clearable' => [
+                'display' => __('Clearable'),
+                'instructions' => __('statamic::fieldtypes.select.config.clearable'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
@@ -64,7 +72,7 @@ class Select extends Fieldtype
             ],
             'cast_booleans' => [
                 'display' => __('Cast Booleans'),
-                'instructions' => __('statamic::fieldtypes.select.config.cast_booleans'),
+                'instructions' => __('statamic::fieldtypes.any.config.cast_booleans'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
@@ -117,6 +125,11 @@ class Select extends Fieldtype
         return $value;
     }
 
+    public function preProcessConfig($value)
+    {
+        return $value;
+    }
+
     public function process($value)
     {
         if ($this->config('cast_booleans')) {
@@ -128,5 +141,42 @@ class Select extends Fieldtype
         }
 
         return $value;
+    }
+
+    public function toGqlType()
+    {
+        return $this->config('multiple')
+            ? $this->multiSelectGqlType()
+            : $this->singleSelectGqlType();
+    }
+
+    private function singleSelectGqlType()
+    {
+        return [
+            'type' => GraphQL::type(LabeledValueType::NAME),
+            'resolve' => function ($item, $args, $context, $info) {
+                $resolved = $item->resolveGqlValue($info->fieldName);
+
+                return $resolved->value() ? $resolved : null;
+            },
+        ];
+    }
+
+    private function multiSelectGqlType()
+    {
+        return [
+            'type' => GraphQL::listOf(GraphQL::type(LabeledValueType::NAME)),
+            'resolve' => function ($item, $args, $context, $info) {
+                $resolved = $item->resolveGqlValue($info->fieldName);
+
+                if (empty($resolved)) {
+                    return null;
+                }
+
+                return collect($resolved)->map(function ($item) {
+                    return new LabeledValue($item['value'], $item['label']);
+                })->all();
+            },
+        ];
     }
 }

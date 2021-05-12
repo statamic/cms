@@ -73,8 +73,7 @@ trait Revisable
 
         $item
             ->published(true)
-            ->set('updated_at', Carbon::now()->timestamp)
-            ->set('updated_by', ($user = $options['user'] ?? false)->id())
+            ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
         $item
@@ -95,8 +94,7 @@ trait Revisable
 
         $item
             ->published(false)
-            ->set('updated_at', Carbon::now()->timestamp)
-            ->set('updated_by', ($user = $options['user'] ?? false)->id())
+            ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
         $item
@@ -115,8 +113,7 @@ trait Revisable
     {
         $this
             ->published(false)
-            ->set('updated_at', Carbon::now()->timestamp)
-            ->set('updated_by', ($user = $options['user'] ?? false)->id())
+            ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
         $this

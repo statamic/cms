@@ -2,17 +2,22 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Collection;
+use Closure;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class BlueprintRepository
 {
-    protected $blueprints = [];
-    protected $files;
+    private const BLINK_FOUND = 'blueprints.found';
+    private const BLINK_FROM_FILE = 'blueprints.from-file';
+    private const BLINK_NAMESPACE_PATHS = 'blueprints.paths-in-namespace';
+
     protected $directory;
-    protected $fallbackDirectory;
+    protected $fallbacks = [];
 
     public function setDirectory(string $directory)
     {
@@ -21,73 +26,65 @@ class BlueprintRepository
         return $this;
     }
 
-    public function setFallbackDirectory(string $directory)
+    public function directory()
     {
-        $this->fallbackDirectory = $directory;
+        return $this->directory;
+    }
+
+    public function find($blueprint): ?Blueprint
+    {
+        return Blink::store(self::BLINK_FOUND)->once($blueprint, function () use ($blueprint) {
+            if (! $blueprint) {
+                return null;
+            }
+
+            $path = $this->directory.'/'.str_replace('.', '/', $blueprint).'.yaml';
+
+            return File::exists($path)
+                ? $this->makeBlueprintFromFile($path)
+                : $this->findFallback($blueprint);
+        });
+    }
+
+    public function setFallback($handle, Closure $blueprint)
+    {
+        $handle = str_replace('/', '.', $handle);
+
+        $this->fallbacks[$handle] = $blueprint;
 
         return $this;
     }
 
-    public function find($handle): ?Blueprint
+    public function findFallback($handle)
     {
-        if (! $handle) {
+        if (! $blueprint = $this->fallbacks[$handle] ?? null) {
             return null;
         }
 
-        if ($cached = array_get($this->blueprints, $handle)) {
-            return $cached;
-        }
+        [$namespace, $handle] = $this->getNamespaceAndHandle($handle);
 
-        if (! File::exists($path = "{$this->directory}/{$handle}.yaml")) {
-            if (! File::exists($path = "{$this->fallbackDirectory}/{$handle}.yaml")) {
-                return null;
-            }
-        }
-
-        $blueprint = (new Blueprint)
-            ->setHandle($handle)
-            ->setContents(YAML::parse(File::get($path)));
-
-        $this->blueprints[$handle] = $blueprint;
-
-        return $blueprint;
-    }
-
-    public function all(): Collection
-    {
-        if (! File::exists($this->directory)) {
-            return collect();
-        }
-
-        return File::withAbsolutePaths()
-            ->getFilesByTypeRecursively($this->directory, 'yaml')
-            ->map(function ($file) {
-                $basename = str_after($file, str_finish($this->directory, '/'));
-                $handle = str_before($basename, '.yaml');
-                $handle = str_replace('/', '.', $handle);
-
-                return (new Blueprint)
-                    ->setHandle($handle)
-                    ->setContents(YAML::file($file)->parse());
-            })
-            ->keyBy->handle();
+        return $blueprint()->setHandle($handle)->setNamespace($namespace);
     }
 
     public function save(Blueprint $blueprint)
     {
-        if (! File::exists($this->directory)) {
-            File::makeDirectory($this->directory);
-        }
+        $this->clearBlinkCaches();
 
-        File::put(
-            "{$this->directory}/{$blueprint->handle()}.yaml",
-            YAML::dump($blueprint->contents())
-        );
+        $blueprint->writeFile();
     }
 
     public function delete(Blueprint $blueprint)
     {
-        File::delete("{$this->directory}/{$blueprint->handle()}.yaml");
+        $this->clearBlinkCaches();
+
+        $blueprint->deleteFile();
+    }
+
+    private function clearBlinkCaches()
+    {
+        Blink::store(self::BLINK_FOUND)->flush();
+        Blink::store(self::BLINK_FROM_FILE)->flush();
+        Blink::store(self::BLINK_NAMESPACE_PATHS)->flush();
     }
 
     public function make($handle = null)
@@ -105,7 +102,7 @@ class BlueprintRepository
     {
         $fields = collect($fields)->map(function ($field, $handle) {
             return compact('handle', 'field');
-        });
+        })->values()->all();
 
         return (new Blueprint)->setContents(['fields' => $fields]);
     }
@@ -123,5 +120,68 @@ class BlueprintRepository
         })->all();
 
         return (new Blueprint)->setContents(compact('sections'));
+    }
+
+    public function in(string $namespace)
+    {
+        return $this
+            ->filesIn($namespace)
+            ->map(function ($file) {
+                return $this->makeBlueprintFromFile($file);
+            })
+            ->sort(function ($a, $b) {
+                $orderA = $a->order() ?? 99999;
+                $orderB = $b->order() ?? 99999;
+
+                return $orderA === $orderB
+                    ? $a->title() <=> $b->title()
+                    : $orderA <=> $orderB;
+            })
+            ->keyBy->handle();
+    }
+
+    private function filesIn($namespace)
+    {
+        return Blink::store(self::BLINK_NAMESPACE_PATHS)->once($namespace, function () use ($namespace) {
+            $namespace = str_replace('/', '.', $namespace);
+            $namespaceDir = str_replace('.', '/', $namespace);
+            $directory = $this->directory.'/'.$namespaceDir;
+
+            if (! File::exists(Str::removeRight($directory, '/'))) {
+                return collect();
+            }
+
+            return File::withAbsolutePaths()->getFilesByType($directory, 'yaml');
+        });
+    }
+
+    private function makeBlueprintFromFile($path)
+    {
+        return Blink::store(self::BLINK_FROM_FILE)->once($path, function () use ($path) {
+            [$namespace, $handle] = $this->getNamespaceAndHandle(
+                Str::after(Str::before($path, '.yaml'), $this->directory.'/')
+            );
+
+            $contents = YAML::file($path)->parse();
+
+            return (new Blueprint)
+                ->setHidden(Arr::pull($contents, 'hide'))
+                ->setOrder(Arr::pull($contents, 'order'))
+                ->setInitialPath($path)
+                ->setHandle($handle)
+                ->setNamespace($namespace ?? null)
+                ->setContents($contents);
+        });
+    }
+
+    private function getNamespaceAndHandle($blueprint)
+    {
+        $blueprint = str_replace('/', '.', $blueprint);
+        $parts = explode('.', $blueprint);
+        $handle = array_pop($parts);
+        $namespace = implode('.', $parts);
+        $namespace = empty($namespace) ? null : $namespace;
+
+        return [$namespace, $handle];
     }
 }

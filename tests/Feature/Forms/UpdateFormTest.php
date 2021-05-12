@@ -2,10 +2,8 @@
 
 namespace Tests\Feature\Forms;
 
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
-use Statamic\Fields\BlueprintRepository;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -58,24 +56,6 @@ class UpdateFormTest extends TestCase
         $this->assertEquals('Updated title', $updated->title());
         $this->assertEquals('color', $updated->honeypot());
         $this->assertFalse($updated->store());
-    }
-
-    /** @test */
-    public function it_updates_blueprint()
-    {
-        $mock = $this->partialMock(BlueprintRepository::class);
-        $mock->shouldReceive('find')->with('one')->andReturn(Blueprint::make('one'));
-        $mock->shouldReceive('find')->with('two')->andReturn(Blueprint::make('two'));
-
-        $form = tap(Form::make('test')->blueprint('one'))->save();
-        $this->assertEquals('one', $form->blueprint()->handle());
-
-        $this
-            ->actingAs($this->userWithPermission())
-            ->update($form, ['blueprint' => ['two']])
-            ->assertOk();
-
-        $this->assertEquals('two', Form::all()->first()->blueprint()->handle());
     }
 
     /** @test */

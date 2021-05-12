@@ -152,6 +152,11 @@ export default {
         },
 
         treeChanged(node, tree) {
+            if (!this.validate()) {
+                this.updateTreeData();
+                return;
+            }
+            
             this.treeUpdated(tree);
         },
 
@@ -163,16 +168,32 @@ export default {
             this.$emit('changed');
         },
 
+        validate() {
+            let isValid = true;
+            th.depthFirstSearch(this.treeData, (childNode) => {
+                const index = childNode.parent.children.indexOf(childNode);
+                const level = childNode._vm.level;
+                const isRoot = this.expectsRoot && level === 1 && index === 0;
+                if (isRoot && childNode.children.length > 0) {
+                    isValid = false;
+                } 
+            });
+            return isValid;
+        },
+
         save() {
             this.saving = true;
             const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot, ...this.submitParameters };
 
-            this.$axios.post(this.submitUrl, payload).then(response => {
+            return this.$axios.post(this.submitUrl, payload).then(response => {
                 this.$emit('saved');
-                this.saving = false;
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;
-            });
+                return response;
+            }).catch(e => {
+                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'));
+                return Promise.reject(e);
+            }).finally(() => this.saving = false);
         },
 
         addPages(pages, targetParent) {

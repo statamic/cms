@@ -2,10 +2,15 @@
 
 namespace Statamic\Fieldtypes;
 
-use Scrumpy\ProseMirrorToHtml\Renderer;
+use ProseMirrorToHtml\Renderer;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\GraphQL\Types\BardSetsType;
+use Statamic\GraphQL\Types\BardTextType;
+use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
+use Statamic\Support\Arr;
 
 class Bard extends Replicator
 {
@@ -15,10 +20,18 @@ class Bard extends Replicator
     protected function configFieldItems(): array
     {
         return [
+            'always_show_set_button' => [
+                'display' => __('Always Show Set Button'),
+                'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
             'sets' => [
                 'display' => __('Sets'),
                 'instructions' => __('statamic::fieldtypes.bard.config.sets'),
                 'type' => 'sets',
+                'require_section' => false,
             ],
             'buttons' => [
                 'display' => __('Buttons'),
@@ -78,6 +91,7 @@ class Bard extends Replicator
                 'width' => 50,
             ],
             'target_blank' => [
+                'display' => __('Target Blank'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
@@ -100,6 +114,20 @@ class Bard extends Replicator
             'allow_source' => [
                 'display' => __('Allow Source Mode'),
                 'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'enable_input_rules' => [
+                'display' => __('Enable Input Rules'),
+                'instructions' => __('statamic::fieldtypes.bard.config.enable_input_rules'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'enable_paste_rules' => [
+                'display' => __('Enable Paste Rules'),
+                'instructions' => __('statamic::fieldtypes.bard.config.enable_paste_rules'),
                 'type' => 'toggle',
                 'default' => true,
                 'width' => 50,
@@ -171,6 +199,8 @@ class Bard extends Replicator
             unset($row['attrs']['enabled']);
         }
 
+        $row['attrs']['values'] = Arr::removeNullValues($row['attrs']['values']);
+
         return $row;
     }
 
@@ -181,7 +211,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
-            $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($value);
+            $doc = (new \HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
@@ -206,8 +236,8 @@ class Bard extends Replicator
             'type' => 'set',
             'attrs' => [
                 'id' => "set-$index",
-                'enabled' => array_pull($values, 'enabled', true),
-                'values' => $values,
+                'enabled' => $row['attrs']['enabled'] ?? true,
+                'values' => Arr::except($values, 'enabled'),
             ],
         ];
     }
@@ -218,9 +248,13 @@ class Bard extends Replicator
             return $value;
         }
 
+        if ($this->isLegacyData($value)) {
+            $value = $this->convertLegacyData($value);
+        }
+
         $data = collect($value)->reject(function ($value) {
             return $value['type'] === 'set';
-        });
+        })->values();
 
         $renderer = new Renderer;
 
@@ -276,7 +310,7 @@ class Bard extends Replicator
                 if (empty($set['text'])) {
                     return;
                 }
-                $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($set['text']);
+                $doc = (new \HtmlToProseMirror\Renderer)->render($set['text']);
 
                 return $doc['content'];
             }
@@ -303,22 +337,31 @@ class Bard extends Replicator
             $values = $set['attrs']['values'];
             $config = $this->config("sets.{$values['type']}.fields", []);
 
-            return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()];
+            return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()->put('_', '_')];
         })->toArray();
 
         $defaults = collect($this->config('sets'))->map(function ($set) {
-            return (new Fields($set['fields']))->all()->map->defaultValue()->all();
+            return (new Fields($set['fields']))->all()->map(function ($field) {
+                return $field->fieldtype()->preProcess($field->defaultValue());
+            })->all();
         })->all();
 
         $new = collect($this->config('sets'))->map(function ($set, $handle) use ($defaults) {
-            return (new Fields($set['fields']))->addValues($defaults[$handle])->meta();
+            return (new Fields($set['fields']))->addValues($defaults[$handle])->meta()->put('_', '_');
         })->toArray();
+
+        $previews = collect($existing)->map(function ($fields) {
+            return collect($fields)->map(function () {
+                return null;
+            })->all();
+        })->all();
 
         return [
             'existing' => $existing,
             'new' => $new,
             'defaults' => $defaults,
             'collapsed' => [],
+            'previews' => $previews,
             '__collaboration' => ['existing'],
         ];
     }
@@ -348,5 +391,43 @@ class Bard extends Replicator
 
             return $item;
         })->all();
+    }
+
+    public function toGqlType()
+    {
+        return $this->config('sets') ? parent::toGqlType() : GraphQL::string();
+    }
+
+    public function addGqlTypes()
+    {
+        $types = collect($this->config('sets'))
+            ->each(function ($set, $handle) {
+                $this->fields($handle)->all()->each(function ($field) {
+                    $field->fieldtype()->addGqlTypes();
+                });
+            })
+            ->map(function ($config, $handle) {
+                $type = new ReplicatorSetType($this, $this->gqlSetTypeName($handle), $handle);
+
+                return [
+                    'handle' => $handle,
+                    'name' => $type->name,
+                    'type' => $type,
+                ];
+            })->values();
+
+        $text = new BardTextType($this);
+
+        $types->push([
+            'handle' => 'text',
+            'name' => $text->name,
+            'type' => $text,
+        ]);
+
+        GraphQL::addTypes($types->pluck('type', 'name')->all());
+
+        $union = new BardSetsType($this, $this->gqlSetsTypeName(), $types);
+
+        GraphQL::addType($union);
     }
 }

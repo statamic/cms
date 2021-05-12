@@ -40,7 +40,7 @@ class Comb
      * Minimum characters to search over.
      * @var int
      */
-    private $min_characters = 3;
+    private $min_characters = 1;
 
     /**
      * Minimum characters per word to include word in search.
@@ -659,8 +659,8 @@ class Comb
      */
     private function removeDisallowedMatches($params)
     {
-        $disallowed = '#'.join('|', $params['disallowed']).'#i';
-        $required = '#(?=.*'.join(')(?=.*', $params['required']).')#i';
+        $disallowed = '#'.implode('|', $params['disallowed']).'#i';
+        $required = '#(?=.*'.implode(')(?=.*', $params['required']).')#i';
         $new_data = [];
 
         // this only applies to boolean mode
@@ -1007,6 +1007,6 @@ class Comb
             unset($config['limit']);
         }
 
-        return new Comb($data, $config);
+        return new self($data, $config);
     }
 }

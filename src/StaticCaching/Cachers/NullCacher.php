@@ -12,6 +12,11 @@ class NullCacher implements Cacher
         //
     }
 
+    public function hasCachedPage(Request $request)
+    {
+        return false;
+    }
+
     public function getCachedPage(Request $request)
     {
         //

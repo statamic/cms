@@ -47,6 +47,18 @@ class ProtectionTest extends TestCase
     }
 
     /** @test */
+    public function if_the_data_isnt_protectable_it_doesnt_get_a_scheme()
+    {
+        $this->assertNull($this->protection->scheme());
+
+        $this->protection->setData(new class {
+            //
+        });
+
+        $this->assertNull($this->protection->scheme());
+    }
+
+    /** @test */
     public function sitewide_scheme_comes_from_the_default_setting()
     {
         config(['statamic.protect.default' => 'logged_in']);

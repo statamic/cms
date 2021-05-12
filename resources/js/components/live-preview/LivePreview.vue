@@ -43,7 +43,11 @@
 
                     <transition name="live-preview-editor-slide">
                         <div v-show="panesVisible" class="live-preview-editor" :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }">
-                            <div class="live-preview-fields flex-1 h-full overflow-scroll" :class="{ 'p-3 bg-grey-30': poppedOut }">
+                            <div class="live-preview-fields flex-1 h-full overflow-scroll" :class="{
+                                'p-3 bg-grey-30': poppedOut,
+                                'live-preview-fields-wide': editorWidth >= 920,
+                                'live-preview-fields-narrow': editorWidth < 920
+                            }">
                                 <portal-target :name="livePreviewFieldsPortal" />
                             </div>
 
@@ -176,10 +180,6 @@ export default {
             handler(payload) {
                 if (this.previewing) this.update();
             }
-        },
-
-        poppedOut() {
-            this.$wait(300).then(() => EQCSS.apply());
         }
 
     },
@@ -250,7 +250,7 @@ export default {
                 .then(() => {
                     this.panesVisible = true;
                     return this.$wait(300);
-                }).then(() => EQCSS.apply());
+                });
         },
 
         animateOut() {

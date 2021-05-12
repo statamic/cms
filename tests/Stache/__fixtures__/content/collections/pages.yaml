@@ -2,16 +2,3 @@ title: Pages
 route: '{parent_uri}/{slug}'
 structure:
   root: true
-  tree:
-    -
-      entry: pages-home
-    -
-      entry: pages-about
-      children:
-        -
-          entry: pages-board
-          children:
-            -
-              entry: pages-directors
-    -
-      entry: pages-blog

@@ -19,13 +19,13 @@ class ScaffoldCollectionController extends CpController
         return view('statamic::collections.scaffold', compact('collection'));
     }
 
-    public function create(Request $request)
+    public function create(Request $request, $collection)
     {
         $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
 
         // Make the blueprint
         if ($blueprint = $this->request->get('blueprint')) {
-            $this->makeBlueprint($blueprint);
+            $this->makeBlueprint($blueprint, $collection);
         }
 
         // Make the index template
@@ -45,12 +45,9 @@ class ScaffoldCollectionController extends CpController
         ];
     }
 
-    private function makeBlueprint($title)
+    private function makeBlueprint($title, $collection)
     {
         $handle = Str::snake($title);
-
-        // Set the blueprint
-        $this->request->collection->entryBlueprints($handle)->save();
 
         // Don't overwrite existing
         if (Facades\Blueprint::find($handle)) {
@@ -59,6 +56,7 @@ class ScaffoldCollectionController extends CpController
 
         $blueprint = (new Blueprint)
             ->setHandle($handle)
+            ->setNamespace('collections.'.$collection->handle())
             ->setContents([
                 'title' => $title,
                 'sections' => [

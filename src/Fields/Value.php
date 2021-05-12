@@ -94,6 +94,11 @@ class Value implements IteratorAggregate, JsonSerializable
         return $value;
     }
 
+    public function field()
+    {
+        return $this->fieldtype->field();
+    }
+
     public function fieldtype()
     {
         return $this->fieldtype;

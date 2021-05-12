@@ -3,6 +3,7 @@
 namespace Tests\Licensing;
 
 use Illuminate\Contracts\Support\MessageBag;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Licensing\AddonLicense;
 use Statamic\Licensing\LicenseManager;
@@ -133,6 +134,8 @@ class LicenseManagerTest extends TestCase
     /** @test */
     public function it_checks_for_request_failures()
     {
+        Carbon::setTestNow(now()->startOfMinute());
+
         tap($this->managerWithResponse(['error' => 500]), function ($licenses) {
             $this->assertTrue($licenses->requestFailed());
             $this->assertEquals(500, $licenses->requestErrorCode());
@@ -161,7 +164,7 @@ class LicenseManagerTest extends TestCase
             $this->assertTrue($licenses->requestFailed());
             $this->assertEquals(429, $licenses->requestErrorCode());
             $this->assertTrue($licenses->requestRateLimited());
-            $this->assertEquals(9, $licenses->failedRequestRetrySeconds());
+            $this->assertEquals(10, $licenses->failedRequestRetrySeconds());
             $this->assertInstanceOf(MessageBag::class, $licenses->requestValidationErrors());
             $this->assertEquals([], $licenses->requestValidationErrors()->all());
         });

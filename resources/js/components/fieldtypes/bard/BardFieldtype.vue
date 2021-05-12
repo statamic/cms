@@ -1,6 +1,6 @@
 <template>
 
-    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
+    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }" @dragstart.stop>
 
         <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar" v-if="showFixedToolbar">
@@ -17,13 +17,13 @@
                 </div>
                 <div class="flex items-center no-select">
                 <div class="h-10 -my-sm border-l pr-1 w-px" v-if="toolbarIsFixed && hasExtraButtons"></div>
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
+                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
+                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
                         <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                     </button>
-                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
                         <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
                         <svg-icon name="expand" class="w-4 h-4" v-else />
                     </button>
@@ -56,14 +56,14 @@
                     slot-scope="{ commands, isActive, menu }"
                     class="bard-set-selector"
                     :class="{
-                        'invisible': !menu.isActive,
+                        'invisible': !config.always_show_set_button && !menu.isActive,
                         'visible': menu.isActive
                     }"
                     :style="`top: ${menu.top}px`"
                 >
-                    <dropdown-list ref="setSelectorDropdown">
+                    <dropdown-list>
                         <template v-slot:trigger>
-                            <button type="button" class="btn-round">
+                            <button type="button" class="btn-round" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
                                 <span class="icon icon-plus text-grey-80 antialiased"></span>
                             </button>
                         </template>
@@ -75,8 +75,7 @@
                 </div>
             </editor-floating-menu>
 
-            <editor-content :editor="editor" v-show="!showSource" />
-
+            <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="html" v-if="showSource" />
         </div>
         <div class="bard-footer-toolbar" v-if="config.reading_time">
@@ -94,6 +93,7 @@ import {
     CodeBlock,
     HardBreak,
     Heading,
+    HorizontalRule,
     OrderedList,
     BulletList,
     ListItem,
@@ -114,6 +114,8 @@ import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
 import Image from './Image';
+import Subscript from './Subscript';
+import Superscript from './Superscript';
 import RemoveFormat from './RemoveFormat';
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
@@ -156,6 +158,7 @@ export default {
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
+            previews: this.meta.previews,
             mounted: false,
         }
     },
@@ -175,7 +178,7 @@ export default {
         },
 
         showFixedToolbar() {
-            return this.toolbarIsFixed && (this.allowSource || this.hasExtraButtons)
+            return this.toolbarIsFixed && (this.visibleButtons.length > 0 || this.allowSource || this.hasExtraButtons)
         },
 
         hasExtraButtons() {
@@ -220,6 +223,8 @@ export default {
             extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
+            disableInputRules: ! this.config.enable_input_rules,
+            disablePasteRules: ! this.config.enable_paste_rules,
             onFocus: () => this.$emit('focus'),
             onBlur: () => {
                 // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
@@ -275,6 +280,18 @@ export default {
             const meta = this.meta;
             meta.collapsed = value;
             this.updateMeta(meta);
+        },
+
+        previews: {
+            deep: true,
+            handler(value) {
+                if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
+                    return
+                }
+                const meta = this.meta;
+                meta.previews = value;
+                this.updateMeta(meta);
+            }
         }
 
     },
@@ -284,12 +301,16 @@ export default {
         addSet(handle) {
             const id = `set-${uniqid()}`;
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
+
+            let previews = {};
+            Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
             this.updateSetMeta(id, this.meta.new[handle]);
 
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
                 this.editor.commands.set({ id, values });
-                this.$refs.setSelectorDropdown.close();
             });
         },
 
@@ -430,14 +451,17 @@ export default {
 
             let btns = this.buttons.map(button => button.name);
 
+            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('quote')) exts.push(new Blockquote());
             if (btns.includes('bold')) exts.push(new Bold());
             if (btns.includes('italic')) exts.push(new Italic());
             if (btns.includes('strikethrough')) exts.push(new Strike());
             if (btns.includes('underline')) exts.push(new Underline());
-            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
+            if (btns.includes('subscript')) exts.push(new Subscript());
+            if (btns.includes('superscript')) exts.push(new Superscript());
             if (btns.includes('removeformat')) exts.push(new RemoveFormat());
             if (btns.includes('image')) exts.push(new Image({ bard: this }));
+            if (btns.includes('horizontalrule')) exts.push(new HorizontalRule());
 
             if (btns.includes('orderedlist') || btns.includes('unorderedlist')) {
                 if (btns.includes('orderedlist')) exts.push(new OrderedList());
@@ -485,6 +509,10 @@ export default {
             });
 
             return exts;
+        },
+
+        updateSetPreviews(set, previews) {
+            this.previews[set] = previews;
         }
     }
 }

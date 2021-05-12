@@ -25,13 +25,14 @@ class UpdateCollectionStructureTest extends TestCase
         EntryFactory::id('3')->collection($collection)->create();
         EntryFactory::id('4')->collection($collection)->create();
         EntryFactory::id('5')->collection($collection)->create();
-        $collection->structureContents(['tree' => [
+        $collection->structureContents(['foo' => 'bar'])->save();
+        $collection->structure()->in('en')->tree([
             ['entry' => '1'],
             ['entry' => '2'],
             ['entry' => '3'],
             ['entry' => '4'],
             ['entry' => '5'],
-        ]])->save();
+        ])->save();
 
         $this
             ->actingAs($user)

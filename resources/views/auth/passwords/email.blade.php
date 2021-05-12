@@ -1,10 +1,7 @@
 @extends('statamic::outside')
-@section('body_class', 'rad-mode')
 
 @section('content')
-    <div class="logo pt-7">
-        @svg('statamic-wordmark')
-    </div>
+    @include('statamic::partials.outside-logo')
 
     <div class="card auth-card mx-auto">
         <div class="text-center pb-2 mb-2">
@@ -23,11 +20,13 @@
 
             <div class="mb-4">
                 <label for="email" class="mb-1">{{ __('Email Address') }}</label>
-                @if ($errors->has('email'))
-                    <small class="block text-red -mt-1 mb-1">{{ $errors->first('email') }}</small>
-                @endif
                 <input id="email" type="text" class="input-text input-text" name="email" value="{{ old('email') }}" >
+
+                @error('email', 'user.forgot_password')
+                    <div class="text-red text-xs mt-1">{{ $message }}</div>
+                @enderror
             </div>
+
             <button type="submit" class="btn-primary">
                 {{ __('Submit') }}
             </button>

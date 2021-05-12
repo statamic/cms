@@ -14,7 +14,7 @@
             <div class="filter mb-0">
                 <a @click="filterBy = 'all'" :class="{'active': filterBy == 'all'}">{{ __('All') }}</a>
                 <a @click="filterBy = filter" v-for="filter in filteredFilters" :class="{'active': filterBy == filter}">
-                    {{ __(filter) }}
+                    {{ filterLabels[filter] }}
                 </a>
                 <a @click.prevent="openSearch" :class="['no-dot', {'active': search}]"><span class="icon icon-magnifying-glass"></span></a>
             </div>
@@ -66,15 +66,15 @@ export default {
         return {
             isActive: false,
             filterBy: 'all',
-            filters: [
-                __('Text'),
-                __('Media'),
-                __('Pickable'),
-                __('Structured'),
-                __('Relationship'),
-                __('Special'),
-                __('System')
-            ],
+            filterLabels: {
+                text: __('Text'),
+                media: __('Media'),
+                pickable: __('Pickable'),
+                structured: __('Structured'),
+                relationship: __('Relationship'),
+                special: __('Special'),
+                system: __('System')
+            },
             search: '',
             isSearchOpen: false
         }
@@ -98,6 +98,10 @@ export default {
             if (this.allowTitle) options.unshift({text: __('Title'), value: 'title', categories: ['system'], isMeta: true, icon: 'title'});
 
             return options;
+        },
+
+        filters() {
+            return Object.keys(this.filterLabels);
         },
 
         searchFilteredFieldtypes() {
@@ -129,7 +133,7 @@ export default {
             if (!this.search && this.allowMeta) return this.filters;
 
             return this.filters.filter(filter => {
-                return this.searchFilteredFieldtypes.filter(fieldtype => fieldtype.categories.includes(filter.toLowerCase())).length;
+                return this.searchFilteredFieldtypes.filter(fieldtype => fieldtype.categories.includes(filter)).length;
             });
         },
 
@@ -199,7 +203,9 @@ export default {
             // and id keys. This will be 'field_n' etc, where n would be the total root
             // level, grid, or set fields depending on the event listener location.
             let field = {
+                display: fieldtype.title,
                 type: fieldtype.handle,
+                icon: fieldtype.icon,
                 instructions: null,
                 localizable: false,
                 width: 100,

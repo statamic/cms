@@ -3,7 +3,9 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
+use Statamic\GraphQL\Types\TaxonomyType;
 
 class Taxonomies extends Relationship
 {
@@ -11,6 +13,7 @@ class Taxonomies extends Relationship
     protected $canCreate = false;
     protected $canSearch = false;
     protected $statusIcons = false;
+    protected $icon = 'taxonomy';
 
     protected function toItemArray($id, $site = null)
     {
@@ -46,5 +49,16 @@ class Taxonomies extends Relationship
     protected function augmentValue($value)
     {
         return Taxonomy::findByHandle($value);
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(TaxonomyType::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

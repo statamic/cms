@@ -2,16 +2,46 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\GraphQL\Types\ReplicatorSetsType;
+use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
     protected $defaultValue = [];
-    protected $configFields = [
-        'sets' => ['type' => 'sets'],
-    ];
+
+    protected function configFieldItems(): array
+    {
+        return [
+            'collapse' => [
+                'display' => __('Collapse'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'width' => 50,
+                'options' => [
+                    'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                    'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                    'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                ],
+                'default' => false,
+            ],
+            'max_sets' => [
+                'display' => __('Max Sets'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
+                'type' => 'integer',
+                'width' => 50,
+            ],
+            'sets' => [
+                'type' => 'sets',
+            ],
+        ];
+    }
 
     public function filter()
     {
@@ -31,7 +61,9 @@ class Replicator extends Fieldtype
 
         $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
 
-        return array_merge($row, $fields);
+        $row = array_merge($row, $fields);
+
+        return Arr::removeNullValues($row);
     }
 
     public function preProcess($data)
@@ -51,9 +83,13 @@ class Replicator extends Fieldtype
         ]);
     }
 
-    protected function fields($set)
+    public function fields($set)
     {
-        return new Fields($this->config("sets.$set.fields"));
+        return new Fields(
+            $this->config("sets.$set.fields"),
+            $this->field()->parent(),
+            $this->field()
+        );
     }
 
     public function extraRules(): array
@@ -99,33 +135,84 @@ class Replicator extends Fieldtype
         return collect($values)->reject(function ($set, $key) {
             return array_get($set, 'enabled', true) === false;
         })->map(function ($set) use ($shallow) {
-            if (! $config = $this->config("sets.{$set['type']}.fields")) {
+            if (! $this->config("sets.{$set['type']}.fields")) {
                 return $set;
             }
 
             $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
 
-            $values = (new Fields($config))->addValues($set)->{$augmentMethod}()->values();
+            $values = $this->fields($set['type'])->addValues($set)->{$augmentMethod}()->values();
 
             return $values->merge(['type' => $set['type']])->all();
-        })->all();
+        })->values()->all();
     }
 
     public function preload()
     {
         return [
-            'existing' => collect($this->field->value())->mapWithKeys(function ($set) {
+            'existing' => $existing = collect($this->field->value())->mapWithKeys(function ($set) {
                 $config = $this->config("sets.{$set['type']}.fields", []);
 
-                return [$set['_id'] => (new Fields($config))->addValues($set)->meta()];
+                return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
             })->toArray(),
             'new' => collect($this->config('sets'))->map(function ($set, $handle) {
-                return (new Fields($set['fields']))->meta();
+                return (new Fields($set['fields']))->meta()->put('_', '_');
             })->toArray(),
             'defaults' => collect($this->config('sets'))->map(function ($set) {
-                return (new Fields($set['fields']))->all()->map->defaultValue();
+                return (new Fields($set['fields']))->all()->map(function ($field) {
+                    return $field->fieldtype()->preProcess($field->defaultValue());
+                });
             })->all(),
             'collapsed' => [],
+            'previews' => collect($existing)->map(function ($fields) {
+                return collect($fields)->map(function () {
+                    return null;
+                })->all();
+            })->all(),
         ];
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::listOf(GraphQL::type($this->gqlSetsTypeName()));
+    }
+
+    public function addGqlTypes()
+    {
+        $types = collect($this->config('sets'))
+            ->each(function ($set, $handle) {
+                $this->fields($handle)->all()->each(function ($field) {
+                    $field->fieldtype()->addGqlTypes();
+                });
+            })
+            ->map(function ($config, $handle) {
+                $type = new ReplicatorSetType($this, $this->gqlSetTypeName($handle), $handle);
+
+                return [
+                    'handle' => $handle,
+                    'name' => $type->name,
+                    'type' => $type,
+                ];
+            })->values();
+
+        GraphQL::addTypes($types->pluck('type', 'name')->all());
+
+        $union = new ReplicatorSetsType($this, $this->gqlSetsTypeName(), $types);
+
+        GraphQL::addType($union);
+    }
+
+    protected function gqlSetTypeName($set)
+    {
+        return 'Set_'.collect($this->field->handlePath())->map(function ($part) {
+            return Str::studly($part);
+        })->join('_').'_'.Str::studly($set);
+    }
+
+    protected function gqlSetsTypeName()
+    {
+        return 'Sets_'.collect($this->field->handlePath())->map(function ($part) {
+            return Str::studly($part);
+        })->join('_');
     }
 }

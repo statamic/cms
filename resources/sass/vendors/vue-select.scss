@@ -1,5 +1,5 @@
 .v-select {
-	@apply rounded;
+	@apply rounded min-w-0;
 	position: relative;
 	font-family: inherit
 }
@@ -15,11 +15,15 @@
 }
 
 .vs--disabled .vs__clear,
+.vs--disabled .vs__deselect,
 .vs--disabled .vs__dropdown-toggle,
 .vs--disabled .vs__open-indicator,
 .vs--disabled .vs__search,
 .vs--disabled .vs__selected {
-	cursor: not-allowed;
+	cursor: not-allowed !important;
+}
+
+.vs--disabled .vs__dropdown-toggle {
 	@apply bg-grey-20;
 }
 
@@ -56,12 +60,17 @@
 	}
 }
 
+.vs__selected-options {
+    @apply min-w-0;
+}
+
 .v-select:not(.vs--unsearchable) .vs__selected-options {
-	@apply appearance-none text-grey-80 w-full text-sm;
+	@apply appearance-none text-grey-80 text-sm;
 	@apply flex flex-wrap flex-1 border border-grey-50 border-r-0 rounded-l relative h-full;
 	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,.05);
 	padding: 5px 8px;
 	line-height: 1.5;
+	width: calc(100% - 34px);
 
     transition: border-color .15s ease-in-out,
 				box-shadow .15s ease-in-out;
@@ -77,17 +86,12 @@
 
 .vs--single.vs--unsearchable .vs__selected-options {
 	@include clickable;
-	@apply flex w-full rounded-l relative h-full border-r-0;
+	@apply flex flex-1 rounded-l relative h-full border-r-0;
+	width: calc(100% - 34px);
 }
 
 .vs__actions {
 	@apply flex items-center;
-}
-
-.vs__actions .vs__open-indicator {
-	@include clickable;
-	@apply flex items-center rounded-r px-1 text-sm;
-	height: 2.375rem;
 }
 
 .vs--searchable .vs__dropdown-toggle {
@@ -96,6 +100,12 @@
 
 .vs--unsearchable .vs__dropdown-toggle {
 	cursor: pointer
+}
+
+.vs__open-indicator {
+	@include clickable;
+	@apply flex items-center rounded-r px-1 text-sm flex-shrink-0;
+	height: 2.375rem;
 }
 
 .vs__open-indicator svg {
@@ -188,6 +198,7 @@
 }
 
 .vs--single .vs__selected {
+	@apply truncate;
 	background-color: transparent;
 	border-color: transparent;
 	padding: 0;
@@ -220,20 +231,8 @@
 	flex-grow: 1
 }
 
-.vs__search::-webkit-input-placeholder {
-	color: inherit
-}
-
-.vs__search:-ms-input-placeholder {
-	color: inherit
-}
-
-.vs__search::-ms-input-placeholder {
-	color: inherit
-}
-
 .vs__search::placeholder {
-	color: inherit
+	@apply text-grey-60;
 }
 
 .vs--unsearchable .vs__search {

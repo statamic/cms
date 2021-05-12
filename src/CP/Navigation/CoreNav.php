@@ -184,6 +184,13 @@ class CoreNav
 
         $this->makeUtilitiesSection();
 
+        if (config('statamic.graphql.enabled') && Statamic::pro()) {
+            Nav::tools('GraphQL')
+                ->route('graphql.index')
+                ->icon('array')
+                ->attributes(['target' => '_blank']);
+        }
+
         return $this;
     }
 

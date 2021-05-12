@@ -5,6 +5,7 @@ namespace Tests\Facades\CP;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -32,7 +33,7 @@ class NavTest extends TestCase
             'Top Level' => ['Dashboard', 'Playground'],
             'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'],
             'Fields' => ['Blueprints', 'Fieldsets'],
-            'Tools' => ['Forms', 'Updates', 'Addons', 'Utilities'],
+            'Tools' => ['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL'],
             'Users' => ['Users', 'Groups', 'Permissions'],
         ]);
 
@@ -54,7 +55,6 @@ class NavTest extends TestCase
 
         Nav::utilities('Wordpress Importer')
             ->route('wordpress-importer.index')
-            ->icon('up-arrow')
             ->can('view updates');
 
         $item = Nav::build()->get('Utilities')->last();
@@ -62,7 +62,6 @@ class NavTest extends TestCase
         $this->assertEquals('Utilities', $item->section());
         $this->assertEquals('Wordpress Importer', $item->name());
         $this->assertEquals(config('app.url').'/wordpress-importer', $item->url());
-        $this->assertEquals('up-arrow', $item->icon());
         $this->assertEquals('view updates', $item->authorization()->ability);
         $this->assertEquals('view updates', $item->can()->ability);
     }
@@ -106,13 +105,40 @@ class NavTest extends TestCase
     }
 
     /** @test */
+    public function it_can_create_a_nav_item_with_a_bundled_svg_icon()
+    {
+        File::put(public_path('vendor/statamic/cp/svg/test.svg'), 'the totally real svg');
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::utilities('Test')->icon('test');
+
+        $item = Nav::build()->get('Utilities')->last();
+
+        $this->assertEquals('the totally real svg', $item->icon());
+    }
+
+    /** @test */
+    public function it_can_create_a_nav_item_with_a_custom_svg_icon()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::utilities('Test')
+            ->icon('<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>');
+
+        $item = Nav::build()->get('Utilities')->last();
+
+        $this->assertEquals('<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>', $item->icon());
+    }
+
+    /** @test */
     public function it_can_get_and_modify_an_existing_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::droids('WAC-47')
             ->url('/pit-droid')
-            ->icon('droid');
+            ->icon('<svg>...</svg>');
 
         Nav::droids('WAC-47')
             ->url('/d-squad');
@@ -121,7 +147,7 @@ class NavTest extends TestCase
 
         $this->assertEquals('Droids', $item->section());
         $this->assertEquals('WAC-47', $item->name());
-        $this->assertEquals('droid', $item->icon());
+        $this->assertEquals('<svg>...</svg>', $item->icon());
         $this->assertEquals('http://localhost/d-squad', $item->url());
     }
 

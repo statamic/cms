@@ -9,6 +9,7 @@ use Statamic\Facades\User;
 class ListedSubmission extends JsonResource
 {
     protected $blueprint;
+    protected $columns;
 
     public function blueprint($blueprint)
     {
@@ -17,16 +18,45 @@ class ListedSubmission extends JsonResource
         return $this;
     }
 
+    public function columns($columns)
+    {
+        $this->columns = $columns;
+
+        return $this;
+    }
+
     public function toArray($request)
     {
         $form = $this->resource->form();
 
-        return array_merge($this->resource->toArray(), [
-            'datestring' => $this->resource->date()->format($form->dateFormat()),
-            'datestamp' => $this->resource->date()->timestamp,
+        return [
+            'id' => $this->resource->id(),
+            $this->merge($this->values([
+                'datestamp' => $this->resource->date()->format($form->dateFormat()),
+            ])),
             'url' => cp_route('forms.submissions.show', [$form->handle(), $this->resource->id()]),
             'deleteable' => User::current()->can('delete', $this->resource),
             'actions' => Action::for($this->resource),
-        ]);
+        ];
+    }
+
+    protected function values($extra = [])
+    {
+        return $this->columns->mapWithKeys(function ($column) use ($extra) {
+            $key = $column->field;
+            $value = $extra[$key] ?? $this->resource->get($key);
+
+            if (! $field = $this->blueprint->field($key)) {
+                return [$key => $value];
+            }
+
+            $value = $field
+                ->setValue($value)
+                ->setParent($this->resource)
+                ->preProcessIndex()
+                ->value();
+
+            return [$key => $value];
+        });
     }
 }

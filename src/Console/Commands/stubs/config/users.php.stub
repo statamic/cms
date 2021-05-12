@@ -25,7 +25,7 @@ return [
                 'users' => base_path('users'),
                 'roles' => resource_path('users/roles.yaml'),
                 'groups' => resource_path('users/groups.yaml'),
-            ]
+            ],
         ],
 
         'eloquent' => [
@@ -60,6 +60,22 @@ return [
 
     'new_user_roles' => [
         //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password Brokers
+    |--------------------------------------------------------------------------
+    |
+    | When resetting passwords, Statamic uses an appropriate password broker.
+    | Here you may define which broker should be used for each situation.
+    | You may want a longer expiry for user activations, for example.
+    |
+    */
+
+    'passwords' => [
+        'resets' => 'resets',
+        'activations' => 'activations',
     ],
 
 ];

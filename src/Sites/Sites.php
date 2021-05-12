@@ -37,6 +37,7 @@ class Sites
 
     public function findByUrl($url)
     {
+        $url = Str::before($url, '?');
         $url = Str::ensureRight($url, '/');
 
         return collect($this->sites)->filter(function ($site) use ($url) {

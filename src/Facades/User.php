@@ -15,6 +15,7 @@ use Statamic\Contracts\Auth\UserRepository;
  * @method static null|\Statamic\Contracts\Auth\User fromUser($user)
  * @method static void save(User $user);
  * @method static void delete(User $user);
+ * @method static \Statamic\Fields\Blueprint blueprint();
  *
  * @see \Statamic\Contracts\Auth\UserRepository
  */

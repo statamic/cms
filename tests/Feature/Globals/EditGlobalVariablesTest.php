@@ -37,13 +37,12 @@ class EditGlobalVariablesTest extends TestCase
             ['handle' => 'unused', 'field' => ['type' => 'text']],
         ]]);
         $userBlueprint = Blueprint::make();
-        Blueprint::shouldReceive('find')->with('test')->andReturn($blueprint);
+        Blueprint::shouldReceive('find')->with('globals.test')->andReturn($blueprint);
         Blueprint::shouldReceive('find')->with('user')->andReturn($userBlueprint);
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = User::make()->assignRole('test')->save();
 
         $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
-        $global->blueprint('test');
 
         $this
             ->actingAs($user)

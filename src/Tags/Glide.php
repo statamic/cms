@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
+use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
@@ -48,7 +49,7 @@ class Glide extends Tags
             return $this->generate();
         }
 
-        $item = $this->get(['src', 'id', 'path']);
+        $item = $this->params->get(['src', 'id', 'path']);
 
         return $this->output($this->generateGlideUrl($item));
     }
@@ -91,18 +92,21 @@ class Glide extends Tags
      */
     public function generate($items = null)
     {
-        $items = $items ?? $this->get(['src', 'id', 'path']);
+        $items = $items ?? $this->params->get(['src', 'id', 'path']);
 
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
         return $items->map(function ($item) {
-            $url = $this->generateGlideUrl($item);
+            $data = ['url' => $this->generateGlideUrl($item)];
 
-            $path = $this->generateImage($item);
+            if ($this->isResizable($item)) {
+                $path = $this->generateImage($item);
 
-            [$width, $height] = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
+                [$width, $height] = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
 
-            $data = compact('url', 'width', 'height');
+                $data['width'] = $width;
+                $data['height'] = $height;
+            }
 
             if ($item instanceof Augmentable) {
                 $data = array_merge($item->toAugmentedArray(), $data);
@@ -115,16 +119,21 @@ class Glide extends Tags
     /**
      * Generate the image.
      *
-     * @param string $item  Either a path or an asset ID
-     * @return string       Path to the generated image
+     * @param mixed $item
+     * @return string
      */
     private function generateImage($item)
     {
+        $item = $this->normalizeItem($item);
         $params = $this->getGlideParams($item);
 
-        return (Str::isUrl($item))
-            ? $this->getGenerator()->generateByPath($item, $params)
-            : $this->getGenerator()->generateByAsset(Asset::find($item), $params);
+        if (is_string($item) && Str::isUrl($item)) {
+            return Str::startsWith($item, ['http://', 'https://'])
+                ? $this->getGenerator()->generateByUrl($item, $params)
+                : $this->getGenerator()->generateByPath($item, $params);
+        }
+
+        return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
     }
 
     /**
@@ -140,8 +149,8 @@ class Glide extends Tags
                 compact('url', 'width', 'height')
             );
         }
-        if ($this->getBool('tag')) {
-            return "<img src=\"$url\" alt=\"{$this->get('alt')}\" />";
+        if ($this->params->bool('tag')) {
+            return "<img src=\"$url\" alt=\"{$this->params->get('alt')}\" />";
         }
 
         return $url;
@@ -156,14 +165,14 @@ class Glide extends Tags
     private function generateGlideUrl($item)
     {
         try {
-            $url = $this->getManipulator($item)->build();
+            $url = $this->isResizable($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
 
             return;
         }
 
-        $url = ($this->getBool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+        $url = ($this->params->bool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
 
         return $url;
     }
@@ -237,7 +246,7 @@ class Glide extends Tags
     {
         $params = collect();
 
-        foreach ($this->parameters as $param => $value) {
+        foreach ($this->params as $param => $value) {
             if (! in_array($param, ['src', 'id', 'path', 'tag', 'alt', 'absolute'])) {
                 $params->put($param, $value);
             }
@@ -264,5 +273,37 @@ class Glide extends Tags
     private function getServer()
     {
         return app(Server::class);
+    }
+
+    /**
+     * Checks if a file at a given path is resizable.
+     *
+     * @param string $item
+     * @return bool
+     */
+    private function isResizable($item)
+    {
+        return in_array(strtolower(Path::extension($item)), $this->allowedFileFormats());
+    }
+
+    /**
+     * The list of allowed file formats based on the configured driver.
+     *
+     * @see http://image.intervention.io/getting_started/formats
+     *
+     * @throws \Exception
+     * @return array
+     */
+    private function allowedFileFormats()
+    {
+        $driver = config('statamic.assets.image_manipulation.driver');
+
+        if ($driver == 'gd') {
+            return ['jpeg', 'jpg', 'png', 'gif', 'webp'];
+        } elseif ($driver == 'imagick') {
+            return ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
+        }
+
+        throw new \Exception("Unsupported image manipulation driver [$driver]");
     }
 }

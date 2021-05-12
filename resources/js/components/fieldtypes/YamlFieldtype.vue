@@ -19,6 +19,12 @@ export default {
         }
     },
 
+    computed: {
+        readOnlyOption() {
+            return this.isReadOnly ? 'nocursor' : false;
+        }
+    },
+
     mounted() {
         this.codemirror = CodeMirror(this.$refs.codemirror, {
             value: this.value || '',
@@ -29,13 +35,19 @@ export default {
             indentWithTabs: false,
             lineNumbers: true,
             lineWrapping: true,
-            readOnly: this.isReadOnly ? 'nocursor' : false,
+            readOnly: this.readOnlyOption,
             theme: this.config.theme || 'material',
         });
 
         this.codemirror.on('change', (cm) => {
             this.update(cm.doc.getValue());
         });
+    },
+
+    watch: {
+        readOnlyOption(val) {
+            this.codemirror.setOption('readOnly', val);
+        }
     },
 
     methods: {
