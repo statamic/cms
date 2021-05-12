@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -29,7 +30,6 @@ abstract class Fieldtype implements Arrayable
     protected $defaultValue;
     protected $configFields = [];
     protected $icon;
-    protected $view;
 
     public function setField(Field $field)
     {
@@ -91,6 +91,11 @@ abstract class Fieldtype implements Arrayable
     public function rules(): array
     {
         return Validator::explodeRules($this->rules);
+    }
+
+    public function fieldRules()
+    {
+        return $this->config('validate');
     }
 
     public function extraRules(): array
@@ -181,10 +186,6 @@ abstract class Fieldtype implements Arrayable
 
     public function view()
     {
-        if ($this->view) {
-            return $this->view;
-        }
-
         $default = 'statamic::forms.fields.'.$this->handle();
 
         return view()->exists($default)
@@ -216,5 +217,15 @@ abstract class Fieldtype implements Arrayable
     public static function docsUrl()
     {
         return Statamic::docsUrl('fieldtypes/'.static::handle());
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::string();
+    }
+
+    public function addGqlTypes()
+    {
+        //
     }
 }

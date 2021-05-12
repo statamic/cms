@@ -26,7 +26,7 @@ export default {
         },
         placement: {
             type: String,
-            default: 'bottom-start',
+            default: 'bottom-end',
         },
         offset: {
             type: Array,
@@ -53,6 +53,13 @@ export default {
                         name: 'offset',
                         options: {
                             offset: this.offset
+                        }
+                    },
+                    {
+                        name: 'eventListeners',
+                        options: {
+                            scroll: false,
+                            resize: true
                         }
                     }
                 ]

@@ -19,6 +19,36 @@ test('it converts from blueprint format', () => {
     expect(converted).toEqual(expected);
 });
 
+test('it converts from blueprint format and applies prefixes', () => {
+    let converted = FieldConditionsConverter.fromBlueprint({
+        name: 'isnt joe',
+        age: 13,
+        email: 'equals san@holo.com',
+    }, 'nested_');
+
+    let expected = [
+        {field: 'nested_name', operator: 'not', value: 'joe'},
+        {field: 'nested_age', operator: 'equals', value: '13'},
+        {field: 'nested_email', operator: 'equals', value: 'san@holo.com'}
+    ];
+
+    expect(converted).toEqual(expected);
+});
+
+test('it converts from blueprint format and does not apply prefix to root field conditions', () => {
+    let converted = FieldConditionsConverter.fromBlueprint({
+        'name': 'isnt joe',
+        'root.title': 'not empty',
+    }, 'nested_');
+
+    let expected = [
+        {field: 'nested_name', operator: 'not', value: 'joe'},
+        {field: 'root.title', operator: 'not', value: 'empty'}
+    ];
+
+    expect(converted).toEqual(expected);
+});
+
 test('it converts to blueprint format', () => {
     let converted = FieldConditionsConverter.toBlueprint([
         {field: 'name', operator: 'isnt', value: 'joe'},

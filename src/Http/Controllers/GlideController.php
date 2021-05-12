@@ -10,6 +10,7 @@ use League\Glide\Signatures\SignatureFactory;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Config;
+use Statamic\Facades\Site;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
@@ -141,8 +142,10 @@ class GlideController extends Controller
             return;
         }
 
+        $path = Str::after($this->request->url(), Site::current()->absoluteUrl());
+
         try {
-            SignatureFactory::create(Config::getAppKey())->validateRequest($this->request->path(), $_GET);
+            SignatureFactory::create(Config::getAppKey())->validateRequest($path, $_GET);
         } catch (SignatureException $e) {
             abort(400, $e->getMessage());
         }

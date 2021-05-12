@@ -13,6 +13,7 @@
         :initial-values="{{ json_encode($values) }}"
         :initial-meta="{{ json_encode($meta) }}"
         :can-edit-password="{{ Statamic\Support\Str::bool($canEditPassword) }}"
+        :can-edit-blueprint="{{ Statamic\Support\Str::bool($user->can('configure fields')) }}"
     ></user-publish-form>
 
 @endsection

@@ -13,9 +13,9 @@ trait GetsRedirects
      */
     protected function getRedirectUrl()
     {
-        $return = $this->get('redirect');
+        $return = $this->params->get('redirect');
 
-        if ($this->getBool('allow_request_redirect')) {
+        if ($this->params->get('allow_request_redirect')) {
             $return = request()->input('redirect', $return);
         }
 
@@ -29,9 +29,9 @@ trait GetsRedirects
      */
     protected function getErrorRedirectUrl()
     {
-        $return = $this->get('error_redirect');
+        $return = $this->params->get('error_redirect');
 
-        if ($this->getBool('allow_request_redirect')) {
+        if ($this->params->get('allow_request_redirect')) {
             $return = request()->input('error_redirect', $return);
         }
 

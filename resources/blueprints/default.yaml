@@ -1,8 +1,0 @@
-title: Default
-fields:
-  -
-    handle: content
-    field:
-      type: markdown
-      display: Content
-      localizable: true

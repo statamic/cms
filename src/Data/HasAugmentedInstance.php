@@ -23,7 +23,7 @@ trait HasAugmentedInstance
 
     public function toShallowAugmentedCollection()
     {
-        return $this->augmented()->select($this->shallowAugmentedArrayKeys());
+        return $this->augmented()->select($this->shallowAugmentedArrayKeys())->withShallowNesting();
     }
 
     public function toShallowAugmentedArray()

@@ -3,9 +3,12 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
+use Statamic\Events\CollectionCreated;
+use Statamic\Events\CollectionSaved;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
@@ -208,24 +211,72 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_and_sets_entry_blueprints()
+    public function it_gets_entry_blueprints()
     {
-        BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default = new Blueprint);
-        BlueprintRepository::shouldReceive('find')->with('one')->andReturn($blueprintOne = new Blueprint);
-        BlueprintRepository::shouldReceive('find')->with('two')->andReturn($blueprintTwo = new Blueprint);
+        $collection = (new Collection)->handle('blog');
 
-        $collection = new Collection;
-        $this->assertCount(0, $collection->entryBlueprints());
-        $this->assertEquals($default, $collection->entryBlueprint());
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'one' => $blueprintOne = (new Blueprint)->setHandle('one'),
+            'two' => $blueprintTwo = (new Blueprint)->setHandle('two'),
+        ]));
 
-        $return = $collection->entryBlueprints(['one', 'two']);
-
-        $this->assertEquals($collection, $return);
         $blueprints = $collection->entryBlueprints();
         $this->assertCount(2, $blueprints);
         $this->assertEveryItemIsInstanceOf(Blueprint::class, $blueprints);
-        $this->assertEquals([$blueprintOne, $blueprintTwo], $blueprints->values()->all());
+        $this->assertEquals([$blueprintOne, $blueprintTwo], $blueprints->all());
+
         $this->assertEquals($blueprintOne, $collection->entryBlueprint());
+        $this->assertEquals($blueprintOne, $collection->entryBlueprint('one'));
+        $this->assertEquals($blueprintTwo, $collection->entryBlueprint('two'));
+        $this->assertNull($collection->entryBlueprint('three'));
+    }
+
+    /** @test */
+    public function it_gets_first_non_hidden_entry_blueprint()
+    {
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'apple' => $blueprintOne = (new Blueprint)->setHandle('apple')->setHidden(true),
+            'berry' => $blueprintTwo = (new Blueprint)->setHandle('berry'),
+            'cherry' => $blueprintThree = (new Blueprint)->setHandle('cherry')->setHidden(true),
+        ]));
+
+        $blueprints = $collection->entryBlueprints();
+
+        $this->assertCount(3, $blueprints);
+
+        // Assert that it ignores hidden blueprints by default.
+        $this->assertEquals($blueprintTwo, $collection->entryBlueprint());
+
+        // But assert that it can still get a specific blueprint for editing the blueprint, etc.
+        $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+    }
+
+    /** @test */
+    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_collection()
+    {
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect());
+        BlueprintRepository::shouldReceive('find')->with('default')->andReturn(
+            $blueprint = (new Blueprint)
+                ->setHandle('thisll_change')
+                ->setContents(['title' => 'This will change'])
+        );
+
+        $blueprints = $collection->entryBlueprints();
+        $this->assertCount(1, $blueprints);
+        $this->assertEquals([$blueprint], $blueprints->all());
+
+        tap($collection->entryBlueprint(), function ($default) use ($blueprint) {
+            $this->assertEquals($blueprint, $default);
+            $this->assertEquals('blog', $default->handle());
+            $this->assertEquals('Blog', $default->title());
+        });
+
+        $this->assertEquals($blueprint, $collection->entryBlueprint('blog'));
+        $this->assertNull($collection->entryBlueprint('two'));
     }
 
     /** @test */
@@ -239,20 +290,18 @@ class CollectionTest extends TestCase
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
-        $structureWithMaxDepthOfOne = $this->makeStructure()->maxDepth(1);
-        $ordered = (new Collection)->structure($structureWithMaxDepthOfOne);
+        $ordered = (new Collection)->structureContents(['max_depth' => 1]);
         $this->assertEquals('order', $ordered->sortField());
         $this->assertEquals('asc', $ordered->sortDirection());
 
-        $datedAndOrdered = (new Collection)->dated(true)->structure($structureWithMaxDepthOfOne);
+        $datedAndOrdered = (new Collection)->dated(true)->structureContents(['max_depth' => 1]);
         $this->assertEquals('order', $datedAndOrdered->sortField());
         $this->assertEquals('asc', $datedAndOrdered->sortDirection());
 
-        $structure = $this->makeStructure();
-        $alpha->structure($structure);
+        $alpha->structureContents(['max_depth' => 99]);
         $this->assertEquals('title', $alpha->sortField());
         $this->assertEquals('asc', $alpha->sortDirection());
-        $dated->structure($structure);
+        $dated->structureContents(['max_depth' => 99]);
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
@@ -265,12 +314,42 @@ class CollectionTest extends TestCase
         $collection = (new Collection)->handle('test');
 
         Facades\Collection::shouldReceive('save')->with($collection)->once();
-        Facades\Blink::shouldReceive('flush')->with('collection-handles')->once();
+        Facades\Collection::shouldReceive('handleExists')->with('test')->once();
+        Facades\Blink::shouldReceive('forget')->with('collection-handles')->once();
         Facades\Blink::shouldReceive('flushStartingWith')->with('collection-test')->once();
 
         $return = $collection->save();
 
         $this->assertEquals($collection, $return);
+    }
+
+    /** @test */
+    public function it_dispatches_collection_saved()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->save();
+
+        Event::assertDispatched(CollectionSaved::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_collection_created_only_once()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->save();
+        $collection->save();
+
+        Event::assertDispatched(CollectionCreated::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
+        Event::assertDispatched(CollectionSaved::class, 2);
+        Event::assertDispatched(CollectionCreated::class, 1);
     }
 
     /** @test */
@@ -341,6 +420,8 @@ class CollectionTest extends TestCase
     {
         $structure = new CollectionStructure;
         $collection = (new Collection)->handle('test');
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
         $this->assertFalse($collection->hasStructure());
         $this->assertNull($collection->structure());
         $this->assertNull($structure->handle());
@@ -349,55 +430,21 @@ class CollectionTest extends TestCase
 
         $this->assertTrue($collection->hasStructure());
         $this->assertSame($structure, $collection->structure());
-        $this->assertEquals('collection::test', $structure->handle());
+        $this->assertEquals('test', $structure->handle());
         $this->assertEquals('Test', $structure->title());
     }
 
     /** @test */
-    public function it_sets_the_structure_inline()
-    {
-        // This applies to a file-based approach.
-
-        $collection = (new Collection)->handle('test');
-        $this->assertFalse($collection->hasStructure());
-        $this->assertNull($collection->structure());
-
-        EntryFactory::id('123')->collection('test')->create();
-        EntryFactory::id('456')->collection('test')->create();
-        EntryFactory::id('789')->collection('test')->create();
-
-        $return = $collection->structureContents($contents = [
-            'max_depth' => 2,
-            'tree' => [
-                ['entry' => '123', 'children' => [
-                    ['entry' => '789'],
-                ]],
-                ['entry' => '456'],
-            ],
-        ]);
-
-        $this->assertEquals($collection, $return);
-        $this->assertEquals($contents, $collection->structureContents());
-        $this->assertTrue($collection->hasStructure());
-        $structure = $collection->structure();
-        $this->assertInstanceOf(CollectionStructure::class, $structure);
-        $this->assertEquals('collection::test', $structure->handle());
-        $this->assertSame($collection, $structure->collection());
-        $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
-        $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());
-        $this->assertEquals(2, $structure->maxDepth());
-    }
-
-    /** @test */
-    public function setting_a_structure_removes_the_existing_inline_structure()
+    public function setting_a_structure_overrides_the_existing_inline_structure()
     {
         $collection = (new Collection)->handle('test');
-        $collection->structureContents($contents = ['tree' => []]);
+        $collection->structureContents($contents = ['root' => true, 'max_depth' => 3]);
         $this->assertSame($contents, $collection->structureContents());
 
-        $collection->structure(new CollectionStructure);
+        $collection->structure($structure = (new CollectionStructure)->expectsRoot(false)->maxDepth(13));
 
-        $this->assertNull($collection->structureContents());
+        $this->assertEquals(['root' => false, 'max_depth' => 13], $collection->structureContents());
+        $this->assertSame($structure, $collection->structure());
     }
 
     /** @test */
@@ -407,7 +454,7 @@ class CollectionTest extends TestCase
         $collection->structure($structure = (new CollectionStructure)->maxDepth(2));
         $this->assertSame($structure, $collection->structure());
         $this->assertEquals(2, $collection->structure()->maxDepth());
-        $this->assertNull($collection->structureContents());
+        $this->assertEquals(['root' => false, 'max_depth' => 2], $collection->structureContents());
 
         $collection->structureContents(['max_depth' => 13, 'tree' => []]);
 
@@ -454,10 +501,48 @@ class CollectionTest extends TestCase
         }
     }
 
-    private function makeStructure()
+    /** @test */
+    public function it_gets_the_uri_and_url_from_the_mounted_entry()
     {
-        return (new CollectionStructure)->tap(function ($s) {
-            $s->addTree($s->makeTree('en'));
-        });
+        $mount = $this->mock(Entry::class);
+        $frenchMount = $this->mock(Entry::class);
+        $mount->shouldReceive('in')->with('en')->andReturnSelf();
+        $mount->shouldReceive('in')->with('fr')->andReturn($frenchMount);
+        $mount->shouldReceive('uri')->andReturn('/blog');
+        $mount->shouldReceive('url')->andReturn('/en/blog');
+        $frenchMount->shouldReceive('uri')->andReturn('/le-blog');
+        $frenchMount->shouldReceive('url')->andReturn('/fr/le-blog');
+
+        Facades\Entry::shouldReceive('find')->with('mounted')->andReturn($mount);
+
+        $collection = (new Collection)->handle('test');
+
+        $this->assertNull($collection->uri());
+        $this->assertNull($collection->url());
+        $this->assertNull($collection->uri('en'));
+        $this->assertNull($collection->url('en'));
+        $this->assertNull($collection->uri('fr'));
+        $this->assertNull($collection->url('fr'));
+
+        $collection->mount('mounted');
+
+        $this->assertEquals('/blog', $collection->uri());
+        $this->assertEquals('/en/blog', $collection->url());
+        $this->assertEquals('/blog', $collection->uri('en'));
+        $this->assertEquals('/en/blog', $collection->url('en'));
+        $this->assertEquals('/le-blog', $collection->uri('fr'));
+        $this->assertEquals('/fr/le-blog', $collection->url('fr'));
+    }
+
+    /** @test */
+    public function it_updates_entry_uris_through_the_repository()
+    {
+        $collection = (new Collection)->handle('test');
+
+        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, null)->once()->ordered();
+        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, ['one', 'two'])->once()->ordered();
+
+        $collection->updateEntryUris();
+        $collection->updateEntryUris(['one', 'two']);
     }
 }

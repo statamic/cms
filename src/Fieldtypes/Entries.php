@@ -2,8 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Contracts\Data\Localization;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
@@ -40,6 +43,8 @@ class Entries extends Relationship
         'revisionsEnabled' => 'revisionsEnabled',
         'breadcrumbs' => 'breadcrumbs',
         'collectionHandle' => 'collection',
+        'canManagePublishState' => 'canManagePublishState',
+        'collectionHasRoutes' => 'collectionHasRoutes',
     ];
 
     protected function configFieldItems(): array
@@ -69,7 +74,9 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $query->paginate()->preProcessForIndex();
+        $items = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+
+        return $items->preProcessForIndex();
     }
 
     public function getResourceCollection($request, $items)
@@ -149,14 +156,33 @@ class Entries extends Relationship
 
         $collections = $this->getConfiguredCollections();
 
-        return collect($collections)->map(function ($collection) {
-            $collection = Collection::findByHandle($collection);
+        return collect($collections)->flatMap(function ($collectionHandle) use ($collections) {
+            $collection = Collection::findByHandle($collectionHandle);
 
-            return [
-                'title' => $collection->title(),
-                'url' => $collection->createEntryUrl(Site::selected()->handle()),
-            ];
+            throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
+
+            $blueprints = $collection->entryBlueprints();
+
+            return $blueprints->map(function ($blueprint) use ($collection, $collections, $blueprints) {
+                return [
+                    'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
+                    'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
+                ];
+            });
         })->all();
+    }
+
+    private function getCreatableTitle($collection, $blueprint, $collectionCount, $blueprintCount)
+    {
+        if ($collectionCount > 1 && $blueprintCount === 1) {
+            return $collection->title();
+        }
+
+        if ($collectionCount > 1 && $blueprintCount > 1) {
+            return $collection->title().': '.$blueprint->title();
+        }
+
+        return $blueprint->title();
     }
 
     protected function toItemArray($id)
@@ -168,10 +194,19 @@ class Entries extends Relationship
         return (new EntryResource($entry))->resolve();
     }
 
+    protected function collect($value)
+    {
+        return new \Statamic\Entries\EntryCollection($value);
+    }
+
     protected function augmentValue($value)
     {
-        if (is_string($value)) {
+        if (! is_object($value)) {
             $value = Entry::find($value);
+        }
+        if ($value != null && $parent = $this->field()->parent()) {
+            $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
+            $value = $value->in($site);
         }
 
         return $value;
@@ -189,13 +224,7 @@ class Entries extends Relationship
 
     protected function getSelectionFilterContext()
     {
-        $collections = $this->getConfiguredCollections();
-
-        $blueprints = collect($collections)->flatMap(function ($collection) {
-            return Collection::findByHandle($collection)->entryBlueprints()->map->handle();
-        })->all();
-
-        return compact('collections', 'blueprints');
+        return ['collections' => $this->getConfiguredCollections()];
     }
 
     protected function getConfiguredCollections()
@@ -203,5 +232,16 @@ class Entries extends Relationship
         return empty($collections = $this->config('collections'))
             ? Collection::handles()->all()
             : $collections;
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type('EntryInterface');
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

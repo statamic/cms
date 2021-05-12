@@ -16,6 +16,9 @@
                 @can('edit', $taxonomy)
                     <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
                 @endcan
+                @can('configure fields')
+                    <dropdown-item :text="__('Edit Blueprints')" redirect="{{ cp_route('taxonomies.blueprints.index', $taxonomy) }}"></dropdown-item>
+                @endcan
                 @can('delete', $taxonomy)
                     <dropdown-item :text="__('Delete Taxonomy')" class="warning" @click="$refs.deleter.confirm()">
                         <resource-deleter
@@ -43,6 +46,7 @@
             taxonomy="{{ $taxonomy->handle() }}"
             initial-sort-column="{{ $taxonomy->sortField() }}"
             initial-sort-direction="{{ $taxonomy->sortDirection() }}"
+            :initial-columns="{{ $columns->toJson() }}"
             :filters="{{ $filters->toJson() }}"
             run-action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
             bulk-actions-url="{{ cp_route('taxonomies.terms.actions.bulk', $taxonomy->handle()) }}"

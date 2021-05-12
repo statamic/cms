@@ -15,7 +15,7 @@
                 :key="i"
                 :class="{ 'current': page == currentPage }"
             >
-                <span v-if="page === 'separator'">...</span>
+                <span v-if="page === 'separator'" class="unclickable">...</span>
                 <a v-else @click="selectPage(page)">{{ page }}</a>
             </li>
 

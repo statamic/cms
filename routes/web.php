@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 
 Route::name('statamic.')->group(function () {
@@ -9,11 +11,17 @@ Route::name('statamic.')->group(function () {
      * Glide
      * On-the-fly URL-based image transforms.
      */
-    Route::group(['prefix' => Config::get('statamic.assets.image_manipulation.route')], function () {
-        Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
-        Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
-        Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
-    });
+    if (! config('statamic.assets.image_manipulation.cache')) {
+        Site::all()->map(function ($site) {
+            return URL::makeRelative($site->url());
+        })->unique()->each(function ($sitePrefix) {
+            Route::group(['prefix' => $sitePrefix.'/'.config('statamic.assets.image_manipulation.route')], function () {
+                Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
+                Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
+                Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
+            });
+        });
+    }
 
     Route::group(['prefix' => config('statamic.routes.action')], function () {
         Route::post('forms/{form}', 'FormController@submit')->name('forms.submit');
@@ -21,7 +29,7 @@ Route::name('statamic.')->group(function () {
         Route::get('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@show')->name('protect.password.show');
         Route::post('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@store')->name('protect.password.store');
 
-        Route::group(['prefix' => 'auth'], function () {
+        Route::group(['prefix' => 'auth', 'middleware' => [\Statamic\Http\Middleware\AuthGuard::class]], function () {
             Route::post('login', 'UserController@login')->name('login');
             Route::get('logout', 'UserController@logout')->name('logout');
             Route::post('register', 'UserController@register')->name('register');
@@ -29,7 +37,9 @@ Route::name('statamic.')->group(function () {
             Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
             Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
             Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.action');
+        });
 
+        Route::group(['prefix' => 'auth', 'middleware' => [\Statamic\Http\Middleware\CP\AuthGuard::class]], function () {
             Route::get('activate/{token}', 'ActivateAccountController@showResetForm')->name('account.activate');
             Route::post('activate', 'ActivateAccountController@reset')->name('account.activate.action');
         });

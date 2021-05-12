@@ -4,9 +4,11 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\MessageBag;
-use Statamic\Contracts\Auth\User as UserContract;
-use Statamic\Facades\Blueprint;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Statamic\Events\UserRegistered;
+use Statamic\Events\UserRegistering;
+use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\User;
 
 class UserController extends Controller
@@ -15,19 +17,21 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required',
             'password' => 'required',
         ]);
 
-        $loggedIn = Auth::attempt(
-            $request->only('email', 'password'),
-            $request->has('remember')
-        );
+        $loggedIn = $validator->passes()
+            ? Auth::attempt($request->only('email', 'password'), $request->has('remember'))
+            : false;
+
+        $response = redirect($request->input('_redirect', '/'));
+        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
 
         return $loggedIn
-            ? redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'))
-            : back()->withInput()->withErrors(__('Invalid credentials.'));
+            ? $response->withSuccess(__('Login successful.'))
+            : $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
     }
 
     public function logout()
@@ -39,7 +43,7 @@ class UserController extends Controller
 
     public function register(Request $request)
     {
-        $blueprint = Blueprint::find('user');
+        $blueprint = User::blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -48,7 +52,11 @@ class UserController extends Controller
             'password' => 'required|confirmed',
         ])->rules();
 
-        $this->validateWithBag('user.register', $request, $fieldRules);
+        $validator = Validator::make($request->all(), $fieldRules);
+
+        if ($validator->fails()) {
+            return $this->userRegistrationFailure($validator->errors());
+        }
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
@@ -61,53 +69,37 @@ class UserController extends Controller
             $user->roles($roles);
         }
 
-        // TODO: Registering event
+        try {
+            throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
+        } catch (ValidationException $e) {
+            return $this->userRegistrationFailure($e->errors());
+        } catch (SilentFormFailureException $e) {
+            return $this->userRegistrationSuccess(true);
+        }
 
         $user->save();
 
-        // TODO: Registered event
+        UserRegistered::dispatch($user);
 
         Auth::login($user);
 
-        $response = $request->has('_redirect') ? redirect($request->get('_redirect')) : back();
-
-        session()->flash('user.register.success', __('Registration successful.'));
-
-        return $response;
+        return $this->userRegistrationSuccess();
     }
 
-    /**
-     * Run the `user.registering` event.
-     *
-     * This allows the registration to be short-circuited before it gets saved and show errors.
-     * Or, the user may be modified. Lastly, an addon could just 'do something' here without
-     * modifying/stopping the registration.
-     *
-     * Expects an array of event responses (multiple listeners can listen for the same event).
-     * Each response in the array should be another array with an `errors` array.
-     *
-     * @param  UserContract $user
-     * @return MessageBag
-     */
-    protected function runRegisteringEvent(UserContract $user)
+    private function userRegistrationFailure($errors = null)
     {
-        $errors = [];
+        $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
 
-        $responses = event('user.registering', $user);
+        return $errorResponse->withErrors($errors, 'user.register');
+    }
 
-        foreach ($responses as $response) {
-            // Ignore any non-arrays
-            if (! is_array($response)) {
-                continue;
-            }
+    private function userRegistrationSuccess(bool $silentFailure = false)
+    {
+        $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
 
-            // If the event returned errors, tack those onto the array.
-            if ($response_errors = array_get($response, 'errors')) {
-                $errors = array_merge($response_errors, $errors);
-                continue;
-            }
-        }
+        session()->flash('user.register.success', __('Registration successful.'));
+        session()->flash('user.register.user_created', ! $silentFailure);
 
-        return new MessageBag($errors);
+        return $response;
     }
 }

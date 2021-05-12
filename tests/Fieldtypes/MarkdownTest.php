@@ -18,6 +18,15 @@ class MarkdownTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_null_on_null_value()
+    {
+        $this->assertSame(
+            null,
+            $this->fieldtype()->augment(null)
+        );
+    }
+
+    /** @test */
     public function it_augments_with_smartypants()
     {
         $default = $this->fieldtype();

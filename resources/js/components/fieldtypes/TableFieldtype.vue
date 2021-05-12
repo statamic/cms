@@ -8,12 +8,12 @@
                     <th v-for="(column, index) in columnCount" :key="index">
                         <div class="flex items-center justify-between h-6">
                             <span class="column-count">{{ index + 1 }}</span>
-                            <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)">
+                            <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')">
                                 &times;
                             </a>
                         </div>
                     </th>
-                    <th class="row-controls" v-if="canDeleteColumns"></th>
+                    <th class="row-controls" v-if="canDeleteRows"></th>
                 </tr>
             </thead>
 
@@ -31,8 +31,8 @@
                         <td v-for="(cell, cellIndex) in row.value.cells">
                             <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
                         </td>
-                        <td class="row-controls" v-if="canDeleteColumns">
-                            <a @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
+                        <td class="row-controls" v-if="canDeleteRows">
+                            <button @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75" :aria-label="__('Delete Row')">&times;</button>
                         </td>
                     </tr>
                 </tbody>
@@ -74,6 +74,7 @@
 
 <script>
 import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+import SortableKeyValue from '../sortable/SortableKeyValue';
 
 export default {
 
@@ -106,6 +107,7 @@ export default {
 
         value(value, oldValue) {
             if (JSON.stringify(value) == JSON.stringify(oldValue)) return;
+            if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
             this.data = this.arrayToSortable(value);
         }
     },
@@ -136,6 +138,10 @@ export default {
         },
 
         canAddRows() {
+            return !this.isReadOnly;
+        },
+
+        canDeleteRows() {
             return !this.isReadOnly;
         },
 

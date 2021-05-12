@@ -3,6 +3,7 @@
     <slugify
         :enabled="generate"
         :from="source"
+        :separator="separator"
         v-model="slug"
     >
         <text-fieldtype
@@ -34,6 +35,10 @@ export default {
     },
 
     computed: {
+
+        separator() {
+            return this.config.separator || '-';
+        },
 
         store() {
             let store;

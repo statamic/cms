@@ -26,7 +26,7 @@ class Arr extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.array.config.keys'),
                 'type' => 'array',
                 'key_header' => __('Key'),
-                'value_header' => __('Label (optional)'),
+                'value_header' => __('Label').' ('.__('Optional').')',
                 'if' => [
                     'mode' => 'keyed',
                 ],
@@ -36,7 +36,7 @@ class Arr extends Fieldtype
 
     public function preProcess($data)
     {
-        return array_merge($this->blankKeyed(), $data ?? []);
+        return array_replace($this->blankKeyed(), $data ?? []);
     }
 
     public function preProcessConfig($data)

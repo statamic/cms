@@ -25,7 +25,9 @@ assignees: ''
 
 ## Environment
 
-**Statamic version:** 3.0.0.-beta-{?}
+<!-- You can copy/paste the output of `php please support:details` here -->
+
+**Statamic version:** 3.0.{?}
 
 **PHP version:** 7.{?}
 

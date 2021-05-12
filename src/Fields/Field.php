@@ -3,15 +3,20 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
+use Rebing\GraphQL\Support\Field as GqlField;
+use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
 
 class Field implements Arrayable
 {
     protected $handle;
+    protected $prefix;
     protected $config;
     protected $value;
     protected $parent;
+    protected $parentField;
 
     public function __construct($handle, array $config)
     {
@@ -21,7 +26,10 @@ class Field implements Arrayable
 
     public function newInstance()
     {
-        return (new static($this->handle, $this->config))->setValue($this->value);
+        return (new static($this->handle, $this->config))
+            ->setParent($this->parent)
+            ->setParentField($this->parentField)
+            ->setValue($this->value);
     }
 
     public function setHandle(string $handle)
@@ -34,6 +42,27 @@ class Field implements Arrayable
     public function handle()
     {
         return $this->handle;
+    }
+
+    public function handlePath()
+    {
+        $path = $this->parentField ? $this->parentField->handlePath() : [];
+
+        $path[] = $this->handle();
+
+        return $path;
+    }
+
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+
+        return $this;
+    }
+
+    public function prefix()
+    {
+        return $this->prefix;
     }
 
     public function type()
@@ -60,7 +89,7 @@ class Field implements Arrayable
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
             $this->get('required') ? ['required'] : [],
-            Validator::explodeRules(array_get($this->config, 'validate')),
+            Validator::explodeRules($this->fieldtype()->fieldRules()),
             Validator::explodeRules($this->fieldtype()->rules())
         ))];
 
@@ -76,7 +105,7 @@ class Field implements Arrayable
         $nullable = true;
 
         foreach ($rules as $rule) {
-            if (preg_match('/^required_?/', $rule)) {
+            if (is_string($rule) && preg_match('/^required_?/', $rule)) {
                 $nullable = false;
                 break;
             }
@@ -103,6 +132,10 @@ class Field implements Arrayable
     {
         if (is_null($this->get('listable'))) {
             return true;
+        }
+
+        if ($this->config()['type'] === 'section') {
+            return false;
         }
 
         return (bool) $this->get('listable');
@@ -139,6 +172,7 @@ class Field implements Arrayable
     {
         return array_merge($this->preProcessedConfig(), [
             'handle' => $this->handle,
+            'prefix' => $this->prefix,
             'type' => $this->type(),
             'display' => $this->display(),
             'instructions' => $this->instructions(),
@@ -189,6 +223,18 @@ class Field implements Arrayable
     public function parent()
     {
         return $this->parent;
+    }
+
+    public function setParentField($field)
+    {
+        $this->parentField = $field;
+
+        return $this;
+    }
+
+    public function parentField()
+    {
+        return $this->parentField;
     }
 
     public function process()
@@ -274,5 +320,24 @@ class Field implements Arrayable
     public function meta()
     {
         return $this->fieldtype()->preload();
+    }
+
+    public function toGql(): array
+    {
+        $type = $this->fieldtype()->toGqlType();
+
+        if ($type instanceof GqlField) {
+            $type = $type->toArray();
+        }
+
+        if ($type instanceof Type) {
+            $type = ['type' => $type];
+        }
+
+        if ($this->isRequired()) {
+            $type['type'] = GraphQL::nonNull($type['type']);
+        }
+
+        return $type;
     }
 }

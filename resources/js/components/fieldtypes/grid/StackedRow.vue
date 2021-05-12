@@ -6,14 +6,15 @@
     >
         <div
             class="grid-item-header"
-            :class="{ [sortableHandleClass]: grid.isReorderable, 'hidden': ! grid.isReorderable }"
+            :class="{ [sortableHandleClass]: grid.isReorderable }"
         >
-            {{ index }}
-            <span v-if="canDelete" class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
+            <div />
+            <button v-if="canDelete" class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" :aria-label="__('Delete Row')" />
         </div>
-        <div class="publish-fields">
+        <publish-fields-container>
             <publish-field
                 v-for="field in fields"
+                v-show="showField(field)"
                 :key="field.handle"
                 :config="field"
                 :value="values[field.handle]"
@@ -27,7 +28,7 @@
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             />
-        </div>
+        </publish-fields-container>
     </div>
 
 </template>
@@ -45,9 +46,15 @@
 <script>
 import Row from './Row.vue';
 import PublishField from '../../publish/Field.vue';
+import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
-    mixins: [Row],
+
+    mixins: [
+        Row,
+        ValidatesFieldConditions,
+    ],
+
     components: { PublishField },
 
     computed: {
@@ -55,5 +62,6 @@ export default {
             return `${this.name}[${this.index}]`;
         }
     }
+
 }
 </script>

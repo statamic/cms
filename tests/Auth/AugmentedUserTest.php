@@ -21,7 +21,7 @@ class AugmentedUserTest extends AugmentedTestCase
     {
         Carbon::setTestNow('2020-04-15 13:00:00');
 
-        $blueprint = Blueprint::find('user');
+        $blueprint = User::blueprint();
         $contents = $blueprint->contents();
         $contents['sections']['main']['fields'] = array_merge($contents['sections']['main']['fields'], [
             ['handle' => 'two', 'field' => ['type' => 'text']],

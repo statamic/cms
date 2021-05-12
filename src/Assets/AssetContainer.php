@@ -2,23 +2,22 @@
 
 namespace Statamic\Assets;
 
-use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Events\Data\AssetContainerDeleted;
-use Statamic\Events\Data\AssetContainerSaved;
+use Statamic\Events\AssetContainerBlueprintFound;
+use Statamic\Events\AssetContainerDeleted;
+use Statamic\Events\AssetContainerSaved;
 use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
-use Statamic\Facades\Folder;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
-use Statamic\Facades\YAML;
-use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
@@ -28,7 +27,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
     protected $title;
     protected $handle;
     protected $disk;
-    protected $blueprint;
     protected $private;
     protected $allowUploads;
     protected $allowDownloading;
@@ -104,7 +102,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
             'title' => $this->title,
             'handle' => $this->handle,
             'disk' => $this->disk,
-            'blueprint' => $this->blueprint,
             'search_index' => $this->searchIndex,
             'allow_uploads' => $this->allowUploads,
             'allow_downloading' => $this->allowDownloading,
@@ -121,7 +118,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $array;
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedAssetContainer($this);
     }
@@ -152,19 +149,23 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Get or set the blueprint to be used by assets in this container.
+     * Get the blueprint to be used by assets in this container.
      *
-     * @param string $blueprint
-     * @return \Statamic\Fields\Blueprint|$this
+     * @return \Statamic\Fields\Blueprint
      */
-    public function blueprint($blueprint = null)
+    public function blueprint()
     {
-        return $this
-            ->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return Blueprint::find($blueprint ?? 'asset');
-            })
-            ->args(func_get_args());
+        $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
+            'alt' => [
+                'type' => 'text',
+                'display' => 'Alt Text',
+                'instructions' => 'Description of the image',
+            ],
+        ])->setHandle($this->handle())->setNamespace('assets');
+
+        AssetContainerBlueprintFound::dispatch($blueprint, $this);
+
+        return $blueprint;
     }
 
     /**
@@ -210,6 +211,18 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $this->disk;
     }
 
+    public function listContents()
+    {
+        return $this->contents()->all();
+    }
+
+    public function contents()
+    {
+        return Blink::once('asset-listing-cache-'.$this->handle(), function () {
+            return new AssetContainerContents($this);
+        });
+    }
+
     /**
      * Get all the asset files in this container.
      *
@@ -217,23 +230,21 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive
      * @return \Illuminate\Support\Collection
      */
-    public function files($folder = null, $recursive = false)
+    public function files($folder = '/', $recursive = false)
     {
         // When requesting files() as-is, we want all of them.
-        if ($folder == null) {
+        if (func_num_args() === 0) {
             $recursive = true;
         }
 
-        $files = collect($this->disk()->getFiles($folder, $recursive));
+        return $this->contents()->filteredFilesIn($folder, $recursive)->keys();
+    }
 
-        // Get rid of files we never want to show up.
-        $files = $files->reject(function ($path) {
-            return Str::startsWith($path, '.meta/')
-                || Str::contains($path, '/.meta/')
-                || Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
-        });
+    public function foldersCacheKey($folder = '/', $recursive = false)
+    {
+        $rec = $recursive ? '-recursive' : '';
 
-        return $files->values();
+        return 'asset-folders-'.$this->handle().'-'.$folder.$rec;
     }
 
     /**
@@ -243,19 +254,14 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive
      * @return \Illuminate\Support\Collection
      */
-    public function folders($folder = null, $recursive = false)
+    public function folders($folder = '/', $recursive = false)
     {
         // When requesting folders() as-is, we want all of them.
-        if ($folder == null) {
-            $folder = '/';
+        if (func_num_args() === 0) {
             $recursive = true;
         }
 
-        $paths = $this->disk()->getFolders($folder, $recursive);
-
-        return collect($paths)->reject(function ($path) {
-            return basename($path) === '.meta';
-        })->values();
+        return $this->contents()->filteredDirectoriesIn($folder, $recursive)->keys();
     }
 
     /**
@@ -265,9 +271,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive Whether to look for assets recursively
      * @return AssetCollection
      */
-    public function assets($folder = null, $recursive = false)
+    public function assets($folder = '/', $recursive = false)
     {
         $query = $this->queryAssets();
+
+        if (func_num_args() === 0) {
+            $recursive = true;
+        }
+
+        if ($folder === '/' && $recursive) {
+            $folder = null;
+        }
 
         if ($folder && $recursive) {
             $query->where('folder', 'like', "{$folder}%");
@@ -300,7 +314,10 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function makeAsset($path)
     {
-        return AssetAPI::make()->path($path)->container($this);
+        return AssetAPI::make()
+            ->path($path)
+            ->container($this)
+            ->syncOriginal();
     }
 
     /**
@@ -313,7 +330,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         $asset = Facades\Asset::make()->container($this)->path($path);
 
-        if (! $asset->disk()->exists($asset->path())) {
+        if (! $asset->exists()) {
             return null;
         }
 
@@ -330,16 +347,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function assetFolder($path)
     {
-        $filePath = ltrim("{$path}/folder.yaml", '/');
-
-        $contents = $this->disk()->get($filePath, '');
-
-        $data = YAML::parse($contents);
-
-        return (new AssetFolder)
-            ->container($this)
-            ->path($path)
-            ->title(array_get($data, 'title'));
+        return (new AssetFolder)->container($this)->path($path);
     }
 
     /**

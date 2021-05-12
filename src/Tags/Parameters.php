@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Facades\Antlers;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
@@ -14,11 +15,10 @@ class Parameters extends ArrayAccessor
         }
 
         $items = collect($items)->mapWithKeys(function ($value, $key) use ($context) {
-            // Values in parameters prefixed with a colon should be treated as the corresponding
-            // field's value in the context. If it doesn't exist, the value remains the literal.
+            // Values in parameters prefixed with a colon should be treated as the corresponding field's value in the context.
             if (Str::startsWith($key, ':')) {
                 $key = substr($key, 1);
-                $value = $context->get($value, $value);
+                $value = Antlers::parser()->getVariable($value, $context->all());
             }
 
             if ($value instanceof Value) {

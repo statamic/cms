@@ -3,7 +3,9 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
+use Statamic\GraphQL\Types\UserType;
 
 class Users extends Relationship
 {
@@ -97,13 +99,17 @@ class Users extends Relationship
         }
 
         return $users->map(function ($user) {
+            if (! $user) {
+                return null;
+            }
+
             return [
                 'id' => $user->id(),
                 'title' => $user->get('name', $user->email()),
                 'edit_url' => $user->editUrl(),
                 'published' => null,
             ];
-        });
+        })->filter()->values();
     }
 
     protected function augmentValue($value)
@@ -114,5 +120,16 @@ class Users extends Relationship
     protected function getCreateItemUrl()
     {
         return cp_route('users.create');
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(UserType::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

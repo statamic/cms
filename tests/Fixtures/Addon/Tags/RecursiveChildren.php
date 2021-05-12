@@ -18,6 +18,7 @@ class RecursiveChildren extends \Statamic\Tags\Tags
                         'children' => [
                             [
                                 'title' => 'Four',
+                                'foo' => 'Baz',
                             ],
                         ],
                     ],

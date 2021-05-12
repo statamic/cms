@@ -65,7 +65,7 @@ class EntriesTest extends TestCase
 
     protected function getEntryIds($params = [])
     {
-        return collect($this->getEntries($params)->items())->map->id()->values()->all();
+        return collect($this->getEntries($params)->items())->map->id()->all();
     }
 
     /** @test */
@@ -404,15 +404,13 @@ class EntriesTest extends TestCase
         $this->makeEntry('b')->save();
         $this->makeEntry('c')->save();
 
-        $structure = (new CollectionStructure)->collection($this->collection)->maxDepth(1)->tap(function ($s) {
-            $s->addTree($s->makeTree('en')->tree([
-                ['entry' => 'b'],
-                ['entry' => 'c'],
-                ['entry' => 'a'],
-            ]));
-        });
-
+        $structure = (new CollectionStructure)->maxDepth(1);
         $this->collection->structure($structure)->save();
+        $structure->makeTree('en')->tree([
+            ['entry' => 'b'],
+            ['entry' => 'c'],
+            ['entry' => 'a'],
+        ])->save();
 
         $this->assertEquals(['a', 'b', 'c'], $this->getEntries(['sort' => 'id'])->map->id()->all());
         $this->assertEquals(['b', 'c', 'a'], $this->getEntries(['sort' => 'order|title'])->map->id()->all());
@@ -456,6 +454,17 @@ class EntriesTest extends TestCase
         $this->expectExceptionMessage('Unknown taxonomy query modifier [xyz]. Valid values are "any" and "all".');
 
         $this->getEntries(['taxonomy:tags:xyz' => 'test']);
+    }
+
+    /** @test */
+    public function it_returns_all_entries_where_taxonomy_parameter_value_is_empty()
+    {
+        $this->makeEntry('1')->save();
+        $this->makeEntry('2')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('3')->data(['tags' => ['meh']])->save();
+
+        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => ''])->map->slug()->all());
+        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => '|'])->map->slug()->all());
     }
 }
 

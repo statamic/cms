@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Facades\Blink;
 
 class UserRepository extends BaseRepository
 {
@@ -34,11 +35,13 @@ class UserRepository extends BaseRepository
 
     public function find($id): ?UserContract
     {
-        if ($model = $this->model('find', $id)) {
-            return $this->makeUser($model);
-        }
+        return Blink::once("eloquent-user-find-{$id}", function () use ($id) {
+            if ($model = $this->model('find', $id)) {
+                return $this->makeUser($model);
+            }
 
-        return null;
+            return null;
+        });
     }
 
     public function findByEmail(string $email): ?UserContract
@@ -48,11 +51,6 @@ class UserRepository extends BaseRepository
         }
 
         return $this->makeUser($model);
-    }
-
-    public function findByOAuthId(string $provider, string $id): ?UserContract
-    {
-        // todo
     }
 
     public function model($method, ...$args)
@@ -81,11 +79,15 @@ class UserRepository extends BaseRepository
     public function save(UserContract $user)
     {
         $user->saveToDatabase();
+
+        Blink::forget("eloquent-user-find-{$user->id()}");
     }
 
     public function delete(UserContract $user)
     {
-        // todo
+        $user->model()->delete();
+
+        Blink::forget("eloquent-user-find-{$user->id()}");
     }
 
     public function fromUser($user): ?UserContract

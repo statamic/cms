@@ -8,6 +8,7 @@
                 <template slot="actions" slot-scope="{ row: form, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="form.edit_url" />
+                        <dropdown-item :text="__('Edit Blueprint')" :redirect="form.blueprint_url" />
                         <dropdown-item
                             v-if="form.deleteable"
                             :text="__('Delete')"

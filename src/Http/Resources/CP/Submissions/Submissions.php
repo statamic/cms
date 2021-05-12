@@ -4,9 +4,12 @@ namespace Statamic\Http\Resources\CP\Submissions;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
+use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
 class Submissions extends ResourceCollection
 {
+    use HasRequestedColumns;
+
     public $collects = ListedSubmission::class;
     protected $blueprint;
     protected $columns;
@@ -29,7 +32,7 @@ class Submissions extends ResourceCollection
     {
         $columns = $this->blueprint
             ->columns()
-            ->ensurePrepended(Column::make('datestamp')->label('Date')->value('datestring'));
+            ->ensurePrepended(Column::make('datestamp')->label('Date'));
 
         if ($key = $this->columnPreferenceKey) {
             $columns->setPreferred($key);
@@ -43,9 +46,14 @@ class Submissions extends ResourceCollection
         $this->setColumns();
 
         return [
-            'data' => $this->collection,
+            'data' => $this->collection->each(function ($collection) {
+                $collection
+                    ->blueprint($this->blueprint)
+                    ->columns($this->requestedColumns());
+            }),
+
             'meta' => [
-                'columns' => $this->columns,
+                'columns' => $this->visibleColumns(),
             ],
         ];
     }

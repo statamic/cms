@@ -6,7 +6,7 @@
                 <h1 v-text="initialTitle || __('Create Role')" />
             </header>
 
-            <div class="card p-0 mb-3 publish-fields configure-section">
+            <publish-fields-container class="card p-0 mb-3 configure-section">
 
                 <form-group
                     handle="title"
@@ -41,7 +41,7 @@
                     v-model="isSuper"
                 />
 
-            </div>
+            </publish-fields-container>
 
             <div v-if="!isSuper">
                 <div class="mt-3 content" v-for="group in permissions" :key="group.handle">

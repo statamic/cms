@@ -39,10 +39,30 @@ class PageTest extends TestCase
             ->with('example-page')
             ->andReturn($entry = new Entry);
 
-        $page = new Page;
+        $tree = $this->mock(Tree::class)->shouldReceive('entry')->with('example-page')->once()->andReturn($entry)->getMock();
+
+        $page = (new Page)->setTree($tree);
         $this->assertNull($page->entry());
 
         $return = $page->setEntry('example-page');
+
+        $this->assertEquals($entry, $page->entry());
+        $this->assertEquals($page, $return);
+    }
+
+    /** @test */
+    public function it_gets_the_entry_dynamically_when_its_set_using_an_int()
+    {
+        EntryAPI::shouldReceive('find')
+            ->with(3)
+            ->andReturn($entry = new Entry);
+
+        $tree = $this->mock(Tree::class)->shouldReceive('entry')->with(3)->once()->andReturn($entry)->getMock();
+
+        $page = (new Page)->setTree($tree);
+        $this->assertNull($page->entry());
+
+        $return = $page->setEntry(3);
 
         $this->assertEquals($entry, $page->entry());
         $this->assertEquals($page, $return);
@@ -96,7 +116,7 @@ class PageTest extends TestCase
         $parent->shouldReceive('uri')->andReturn('/the/parent/uri');
         $parent->shouldReceive('isRoot')->andReturnFalse();
 
-        $tree = (new Tree)->structure(
+        $tree = $this->newTree()->setStructure(
             $this->mock(CollectionStructure::class)->shouldReceive('collection')->andReturn($collection)->getMock()
         );
 
@@ -118,7 +138,7 @@ class PageTest extends TestCase
         $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
         $entry->shouldReceive('value')->with('redirect')->andReturnNull();
 
-        $tree = (new Tree)->structure(
+        $tree = $this->newTree()->setStructure(
             $this->mock(Nav::class)
         );
 
@@ -141,7 +161,7 @@ class PageTest extends TestCase
         $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
         $entry->shouldReceive('value')->with('redirect')->andReturn('http://example.com/page');
 
-        $tree = (new Tree)->structure(
+        $tree = $this->newTree()->setStructure(
             $this->mock(Nav::class)
         );
 
@@ -158,7 +178,7 @@ class PageTest extends TestCase
     /** @test */
     public function it_gets_child_pages()
     {
-        $tree = (new Tree)->structure($this->mock(Structure::class));
+        $tree = $this->newTree()->setStructure($this->mock(Structure::class));
 
         $page = (new Page)
             ->setTree($tree)
@@ -237,7 +257,7 @@ class PageTest extends TestCase
         $entry->shouldReceive('id')->andReturn('root');
         $entry->shouldReceive('slug')->andReturn('');
 
-        $tree = (new Tree)->structure(
+        $tree = $this->newTree()->setStructure(
             $this->mock(Structure::class)->shouldReceive('collection')->andReturnFalse()->getMock()
         );
 
@@ -271,5 +291,34 @@ class PageTest extends TestCase
         $page->setEntry($entry);
 
         $this->assertEquals('hello', $page->testing('123'));
+    }
+
+    protected function newTree()
+    {
+        return new class extends Tree {
+            private $structure;
+
+            public function path()
+            {
+                //
+            }
+
+            public function structure()
+            {
+                return $this->structure;
+            }
+
+            public function setStructure($structure)
+            {
+                $this->structure = $structure;
+
+                return $this;
+            }
+
+            protected function repository()
+            {
+                //
+            }
+        };
     }
 }

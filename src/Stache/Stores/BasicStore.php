@@ -97,7 +97,7 @@ abstract class BasicStore extends Store
 
     public function delete($item)
     {
-        $item->deleteFile();
+        $this->deleteItemFromDisk($item);
 
         $key = $this->getItemKey($item);
 
@@ -111,5 +111,10 @@ abstract class BasicStore extends Store
     protected function writeItemToDisk($item)
     {
         $item->writeFile();
+    }
+
+    protected function deleteItemFromDisk($item)
+    {
+        $item->deleteFile();
     }
 }

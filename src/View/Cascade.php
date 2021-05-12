@@ -4,6 +4,7 @@ namespace Statamic\View;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Facades;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
@@ -31,6 +32,13 @@ class Cascade
     public function toArray()
     {
         return $this->data;
+    }
+
+    public function withRequest($request)
+    {
+        $this->request = $request;
+
+        return $this;
     }
 
     public function withSite($site)
@@ -165,6 +173,7 @@ class Cascade
 
             // Request
             'current_url' => $this->request->url(),
+            'current_full_url' => $this->request->fullUrl(),
             'current_uri' => URL::format($this->request->path()),
             'get_post' => Arr::sanitize($this->request->all()),
             'get' => Arr::sanitize($this->request->query->all()),
@@ -172,6 +181,7 @@ class Cascade
             'old' => Arr::sanitize(old(null, [])),
 
             'site' => $this->site,
+            'sites' => Facades\Site::all()->values(),
             'homepage' => $this->site->url(),
             'cp_url' => cp_route('index'),
         ];
@@ -185,5 +195,18 @@ class Cascade
         }
 
         return $this;
+    }
+
+    public function getViewData($view)
+    {
+        $all = $this->get('views') ?? [];
+
+        return collect($all)
+            ->reverse()
+            ->reduce(function ($carry, $data) {
+                return $carry->merge($data);
+            }, collect())
+            ->merge($all[$view])
+            ->all();
     }
 }

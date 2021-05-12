@@ -11,9 +11,9 @@ class TransChoice extends Tags
      */
     public function wildcard($tag)
     {
-        $key = $this->get('key', $tag);
-        $count = $this->getInt('count', 1);
+        $key = $this->params->int('key', $tag);
+        $count = $this->params->int('count', 1);
 
-        return trans_choice($key, $count, $this->parameters->all());
+        return trans_choice($key, $count, $this->params->all());
     }
 }

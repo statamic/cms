@@ -10,7 +10,7 @@
         initial-handle="{{ $role->handle() }}"
         :initial-super="{{ Statamic\Support\Str::bool($super) }}"
         :initial-permissions="{{ json_encode($permissions) }}"
-        index-url="{{ cp_route('roles.index') }}"
+        breadcrumb-url="{{ cp_route('roles.index') }}"
         v-cloak
     >
 

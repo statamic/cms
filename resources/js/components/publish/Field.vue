@@ -7,8 +7,8 @@
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
-            <label class="publish-field-label" :class="{'font-bold': config.bold}">
-                <span :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle, 'cursor-pointer': canToggleLabel }" v-text="labelText" @click="toggleLabel" />
+            <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
+                <span :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle, 'cursor-pointer': canToggleLabel }" v-text="labelText" />
                 <i class="required ml-sm" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
                 <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
@@ -128,12 +128,17 @@ export default {
         classes() {
             return [
                 'form-group publish-field',
+                `publish-field__` + this.config.handle,
                 `${this.config.component || this.config.type}-fieldtype`,
                 `field-${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
                 { 'has-error': this.hasError }
             ];
+        },
+
+        fieldId() {
+            return 'field_'+this.config.handle;
         },
 
         locks() {

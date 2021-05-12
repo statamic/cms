@@ -1,5 +1,4 @@
 @extends('statamic::outside')
-@section('body_class', 'rad-mode')
 
 @section('content')
 
@@ -19,21 +18,21 @@
             <div class="mb-4">
                 <label for="email"  class="mb-1">{{ __('Email Address') }}</label>
 
-                @if ($errors->has('email'))
-                    <small class="block text-red -mt-1 mb-1">{{ $errors->first('email') }}</small>
-                @endif
-
                 <input id="email" type="email" class="input-text input-text" name="email" value="{{ $email ?? old('email') }}" autofocus required>
+
+                @error('email')
+                    <div class="text-red text-xs mt-1">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="mb-4">
                 <label for="password" class="mb-1">{{ __('Password') }}</label>
 
-                @if ($errors->has('password'))
-                    <small class="block text-red -mt-1 mb-1">{{ $errors->first('password') }}</small>
-                @endif
-
                 <input id="password" type="password" class="input-text input-text" name="password" required>
+
+                @error('password')
+                    <div class="text-red text-xs mt-1">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="mb-4">

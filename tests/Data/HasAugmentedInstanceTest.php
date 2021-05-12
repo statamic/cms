@@ -12,10 +12,15 @@ class HasAugmentedInstanceTest extends TestCase
     /** @test */
     public function it_makes_an_augmented_instance()
     {
+        $augmentedCollection = new AugmentedCollection(['foo', 'bar', 'baz']);
+        $filteredAugmentedCollection = new AugmentedCollection(['foo']);
+        $shallowFilteredAugmentedCollection = new AugmentedCollection(['id', 'title', 'api_url']);
+
         $mock = $this->mock(Augmented::class);
         $mock->shouldReceive('get')->with('foo')->once()->andReturn('bar');
-        $mock->shouldReceive('select')->with(null)->once()->andReturn(new AugmentedCollection(['foo', 'bar', 'baz']));
-        $mock->shouldReceive('select')->with(['one'])->once()->andReturn(new AugmentedCollection(['foo']));
+        $mock->shouldReceive('select')->with(null)->times(2)->andReturn($augmentedCollection);
+        $mock->shouldReceive('select')->with(['one'])->times(2)->andReturn($filteredAugmentedCollection);
+        $mock->shouldReceive('select')->with(['id', 'title', 'api_url'])->times(1)->andReturn($shallowFilteredAugmentedCollection);
 
         $thing = new class($mock) {
             use HasAugmentedInstance;
@@ -36,6 +41,14 @@ class HasAugmentedInstanceTest extends TestCase
         $this->assertEquals('bar', $thing->augmentedValue('foo'));
         $this->assertEquals(['foo', 'bar', 'baz'], $thing->toAugmentedArray());
         $this->assertEquals(['foo'], $thing->toAugmentedArray(['one']));
+
+        $this->assertEquals($augmentedCollection, $thing->toAugmentedCollection());
+        $this->assertEquals($filteredAugmentedCollection, $thing->toAugmentedCollection(['one']));
+        $this->assertFalse($augmentedCollection->hasShallowNesting());
+
+        $collection = $thing->toShallowAugmentedCollection();
+        $this->assertEquals($shallowFilteredAugmentedCollection, $collection);
+        $this->assertTrue($collection->hasShallowNesting());
     }
 
     /** @test */

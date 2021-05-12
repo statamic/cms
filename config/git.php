@@ -32,6 +32,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Queue Connection
+    |--------------------------------------------------------------------------
+    |
+    | You may choose which queue connection should be used when dispatching
+    | commit jobs. Unless specified, the default connection will be used.
+    |
+    | https://statamic.dev/git-integration#queueing-commits
+    |
+    */
+
+    'queue_connection' => env('STATAMIC_GIT_QUEUE_CONNECTION'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Dispatch Delay
     |--------------------------------------------------------------------------
     |
@@ -88,6 +102,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Git Binary
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will try to use the "git" command, but you can set
+    | an absolute path to the git binary if necessary for your environment.
+    |
+    */
+
+    'binary' => env('STATAMIC_GIT_BINARY', 'git'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Commands
     |--------------------------------------------------------------------------
     |
@@ -127,8 +153,21 @@ return [
     */
 
     'ignored_events' => [
-        // \Statamic\Events\Data\UserSaved::class,
-        // \Statamic\Events\Data\UserDeleted::class,
+        // \Statamic\Events\UserSaved::class,
+        // \Statamic\Events\UserDeleted::class,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Locale
+    |--------------------------------------------------------------------------
+    |
+    | The locale to be used when translating commit messages, etc. By
+    | default, the authenticated user's locale will be used, but
+    | feel free to override this using the provided variable.
+    |
+    */
+
+    'locale' => env('STATAMIC_GIT_LOCALE', null),
 
 ];

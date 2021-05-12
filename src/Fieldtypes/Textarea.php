@@ -10,15 +10,25 @@ class Textarea extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                'type' => 'text',
+                'width' => 50,
+            ],
             'character_limit' => [
                 'display' => __('Character Limit'),
                 'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
                 'type' => 'text',
             ],
+            'antlers' => [
+                'display' => 'Antlers',
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
         ];
     }
-
-    protected $view = 'statamic::forms.fields.textarea';
 
     public function filter()
     {

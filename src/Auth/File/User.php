@@ -62,6 +62,15 @@ class User extends BaseUser
         return $this->get($key);
     }
 
+    public function __get($key)
+    {
+        if ($key == 'email') {
+            return $this->email();
+        }
+
+        return $this->get($key);
+    }
+
     public function id($id = null)
     {
         return $this->fluentlyGetOrSet('id')->args(func_get_args());

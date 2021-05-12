@@ -15,7 +15,7 @@ class Query extends Tags
      */
     public function index()
     {
-        return $this->evaluate($this->parameters->get('builder'));
+        return $this->evaluate($this->params->get('builder'));
     }
 
     /**

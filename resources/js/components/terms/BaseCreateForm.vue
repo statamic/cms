@@ -6,8 +6,8 @@
         :initial-actions="actions"
         method="post"
         :initial-title="__('Create')"
-        :taxonomy-title="taxonomyTitle"
-        :taxonomy-url="taxonomyUrl"
+        :taxonomy-handle="taxonomyHandle"
+        :breadcrumbs="breadcrumbs"
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
@@ -16,6 +16,8 @@
         :initial-has-origin="false"
         :initial-is-root="true"
         :initial-origin-values="{}"
+        :create-another-url="createAnotherUrl"
+        :listing-url="listingUrl"
         @saved="saved"
     ></term-publish-form>
 
@@ -26,13 +28,15 @@ export default {
 
     props: [
         'actions',
-        'taxonomyTitle',
-        'taxonomyUrl',
+        'taxonomyHandle',
+        'breadcrumbs',
         'fieldset',
         'values',
         'meta',
         'published',
         'localizations',
+        'createAnotherUrl',
+        'listingUrl',
     ],
 
     methods: {

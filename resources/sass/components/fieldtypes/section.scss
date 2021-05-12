@@ -3,18 +3,18 @@
    ========================================================================== */
 
 .section-fieldtype {
-    @apply .border-t .border-b .bg-grey-20;
+    @apply border-t border-b bg-grey-20;
     top: -1px; // Avoid adjacent borders just in case they're stacked
 
     &.form-group {
         position: relative;
         &:first-child {
-            @apply .rounded-t .border-t-0;
+            @apply rounded-t border-t-0;
         }
-    }
 
-    label {
-        @apply .uppercase .text-sm .font-bold mb-2;
+        .field-inner > label {
+            @apply uppercase text-sm font-bold mt-1;
+        }
     }
 
     .help-block {

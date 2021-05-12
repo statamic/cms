@@ -27,7 +27,7 @@ class ForgotPasswordController extends Controller
 
     public function sendResetLinkEmail(Request $request)
     {
-        if ($url = $request->reset_url) {
+        if ($url = $request->_reset_url) {
             PasswordReset::resetFormUrl(URL::makeAbsolute($url));
         }
 
@@ -36,6 +36,12 @@ class ForgotPasswordController extends Controller
 
     public function broker()
     {
-        return Password::broker(PasswordReset::BROKER_RESETS);
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_RESETS);
+
+        if (is_array($broker)) {
+            $broker = $broker['web'];
+        }
+
+        return Password::broker($broker);
     }
 }

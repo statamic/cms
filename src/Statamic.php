@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Stringy\StaticStringy;
 
 class Statamic
@@ -22,6 +23,7 @@ class Statamic
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
+    protected static $afterInstalledCallbacks = [];
 
     public static function version()
     {
@@ -31,6 +33,21 @@ class Statamic
     public static function pro()
     {
         return config('statamic.editions.pro');
+    }
+
+    public static function enablePro()
+    {
+        $path = config_path('statamic/editions.php');
+
+        $contents = File::get($path);
+
+        if (! Str::contains($contents, "'pro' => false,")) {
+            throw new \Exception('Could not reliably update the config file.');
+        }
+
+        $contents = str_replace("'pro' => false,", "'pro' => true,", $contents);
+
+        File::put($path, $contents);
     }
 
     public static function availableScripts(Request $request)
@@ -243,6 +260,27 @@ class Statamic
     {
         foreach (static::$bootedCallbacks as $callback) {
             $callback();
+        }
+    }
+
+    public static function afterInstalled(Closure $callback)
+    {
+        static::$afterInstalledCallbacks[] = $callback;
+    }
+
+    public static function runAfterInstalledCallbacks($command)
+    {
+        foreach (static::$afterInstalledCallbacks as $callback) {
+            $callback($command);
+        }
+    }
+
+    public static function repository($abstract, $concrete)
+    {
+        app()->singleton($abstract, $concrete);
+
+        foreach ($concrete::bindings() as $abstract => $concrete) {
+            app()->bind($abstract, $concrete);
         }
     }
 }

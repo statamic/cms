@@ -2,11 +2,13 @@
 
 namespace Statamic\Data;
 
+use Statamic\Contracts\Data\Augmented;
+
 trait HasAugmentedData
 {
     use HasAugmentedInstance;
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedData($this, $this->augmentedArrayData());
     }

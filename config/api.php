@@ -7,11 +7,25 @@ return [
     | API
     |--------------------------------------------------------------------------
     |
-    | Whether the API should be enabled, and through what route.
+    | Whether the API should be enabled, and through what route. You
+    | can enable or disable the whole API, and expose individual
+    | resources per environent, depending on your site needs.
+    |
+    | https://statamic.dev/content-api#enable-the-api
     |
     */
 
     'enabled' => env('STATAMIC_API_ENABLED', false),
+
+    'resources' => [
+        'collections' => false,
+        'navs' => false,
+        'taxonomies' => false,
+        'assets' => false,
+        'globals' => false,
+        'forms' => false,
+        'users' => false,
+    ],
 
     'route' => env('STATAMIC_API_ROUTE', 'api'),
 
@@ -38,5 +52,22 @@ return [
     */
 
     'pagination_size' => 50,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Caching
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will cache each endpoint until the specified
+    | expiry, or until content is changed. See the documentation for
+    | more details on how to customize your cache implementation.
+    |
+    | https://statamic.dev/content-api#caching
+    |
+    */
+
+    'cache' => [
+        'expiry' => 60,
+    ],
 
 ];

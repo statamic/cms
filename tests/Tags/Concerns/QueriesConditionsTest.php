@@ -516,7 +516,7 @@ class QueriesConditionsTest extends TestCase
 
             public function __construct($value)
             {
-                $this->parameters = new Parameters(['somefield:is' => $value]);
+                $this->params = new Parameters(['somefield:is' => $value]);
             }
 
             public function query($query)
@@ -548,7 +548,7 @@ class QueriesConditionsTest extends TestCase
 
             public function __construct($values)
             {
-                $this->parameters = new Parameters(['somefield:is_in' => $values]);
+                $this->params = new Parameters(['somefield:is_in' => $values]);
             }
 
             public function query($query)
@@ -580,7 +580,7 @@ class QueriesConditionsTest extends TestCase
 
             public function __construct($values)
             {
-                $this->parameters = new Parameters(['somefield:is_in' => $values]);
+                $this->params = new Parameters(['somefield:is_in' => $values]);
             }
 
             public function query($query)
@@ -606,7 +606,7 @@ class QueriesConditionsTest extends TestCase
 
             public function __construct($value)
             {
-                $this->parameters = new Parameters(['somefield:is' => $value]);
+                $this->params = new Parameters(['somefield:is' => $value]);
             }
 
             public function query($query)
@@ -634,7 +634,7 @@ class QueriesConditionsTest extends TestCase
 
             public function __construct($value)
             {
-                $this->parameters = new Parameters(['somefield:is' => $value]);
+                $this->params = new Parameters(['somefield:is' => $value]);
             }
 
             public function query($query)

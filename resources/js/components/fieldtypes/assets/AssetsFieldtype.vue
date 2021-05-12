@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <element-container @resized="containerWidth = $event.width">
+    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280 }">
 
         <uploader
             ref="uploader"
@@ -83,6 +84,7 @@
                                     v-for="asset in assets"
                                     :key="asset.id"
                                     :asset="asset"
+                                    :read-only="isReadOnly"
                                     @updated="assetUpdated"
                                     @removed="assetRemoved">
                                 </asset-tile>
@@ -104,6 +106,7 @@
                                             v-for="asset in assets"
                                             :key="asset.id"
                                             :asset="asset"
+                                            :read-only="isReadOnly"
                                             @updated="assetUpdated"
                                             @removed="assetRemoved">
                                         </tr>
@@ -148,6 +151,7 @@
             </selector>
         </stack>
     </div>
+    </element-container>
 </template>
 
 
@@ -208,7 +212,8 @@ export default {
             draggingFile: false,
             uploads: [],
             innerDragging: false,
-            displayMode: 'grid'
+            displayMode: 'grid',
+            containerWidth: null,
         };
     },
 
@@ -452,7 +457,9 @@ export default {
             // our fieldtype is only concerned with their respective IDs.
             this.update(_.pluck(assets, 'id'));
 
-            this.updateMeta({ data: assets });
+            let meta = this.meta;
+            meta.data = assets;
+            this.updateMeta(meta);
         },
 
         loading(loading) {

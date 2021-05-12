@@ -7,8 +7,9 @@
                     v-model="data"
                     class="input-text flex-1"
                     :class="{ 'bg-white': !isReadOnly }"
-                    placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    :id="fieldId"
                     :readonly="isReadOnly"
+                    placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                     @focus="$emit('focus')"
                     @blur="$emit('blur')" />
             </div>

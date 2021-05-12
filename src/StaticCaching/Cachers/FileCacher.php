@@ -5,7 +5,6 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Statamic\Facades\File;
-use Statamic\Facades\Path;
 
 class FileCacher extends AbstractCacher
 {
@@ -62,6 +61,13 @@ class FileCacher extends AbstractCacher
         \Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
 
         return File::get($this->getFilePath($url));
+    }
+
+    public function hasCachedPage(Request $request)
+    {
+        $url = $this->getUrl($request);
+
+        return File::exists($this->getFilePath($url));
     }
 
     /**
@@ -137,7 +143,7 @@ class FileCacher extends AbstractCacher
         return sprintf('%s%s_%s.html',
             $this->getCachePath(),
             $parts['path'],
-            array_get($parts, 'query', '')
+            $this->config('ignore_query_strings') ? '' : array_get($parts, 'query', '')
         );
     }
 }

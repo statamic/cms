@@ -15,9 +15,11 @@ class Resource
     const STATAMIC_RESOURCES = [
         AssetResource::class,
         EntryResource::class,
+        FormResource::class,
         GlobalSetResource::class,
         TermResource::class,
         UserResource::class,
+        TreeResource::class,
     ];
 
     /**

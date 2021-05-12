@@ -2,8 +2,8 @@
 
 namespace Statamic\Search;
 
-use Statamic\Events\Data\EntryDeleted;
-use Statamic\Events\Data\EntrySaved;
+use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntrySaved;
 use Statamic\Facades\Search;
 
 class UpdateItemIndexes
@@ -16,7 +16,7 @@ class UpdateItemIndexes
 
     public function update($event)
     {
-        $item = $event->item;
+        $item = $event->entry;
 
         $this->indexes($item)->each(function ($index) use ($item) {
             $index->exists() ? $index->insert($item) : $index->update();
@@ -25,7 +25,7 @@ class UpdateItemIndexes
 
     public function delete($event)
     {
-        $item = $event->item;
+        $item = $event->entry;
 
         $this->indexes($item)->each->delete($item);
     }

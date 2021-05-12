@@ -2,13 +2,18 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use Statamic\Http\Resources\API\EntryResource;
 
 class CollectionEntriesController extends ApiController
 {
-    public function index($collection, Request $request)
+    protected $resourceConfigKey = 'collections';
+    protected $routeResourceKey = 'collection';
+    protected $filterPublished = true;
+
+    public function index($collection)
     {
+        $this->abortIfDisabled();
+
         return app(EntryResource::class)::collection(
             $this->filterSortAndPaginate($collection->queryEntries())
         );
@@ -16,6 +21,9 @@ class CollectionEntriesController extends ApiController
 
     public function show($collection, $entry)
     {
+        $this->abortIfDisabled();
+        $this->abortIfUnpublished($entry);
+
         return app(EntryResource::class)::make($entry);
     }
 }

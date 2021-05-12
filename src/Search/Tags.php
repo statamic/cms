@@ -3,39 +3,50 @@
 namespace Statamic\Search;
 
 use Statamic\Facades\Search;
+use Statamic\Facades\Site;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
     use Concerns\OutputsItems,
-        Concerns\QueriesConditions;
+        Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\QueriesOrderBys;
+    use Concerns\GetsQueryResults {
+        results as getQueryResults;
+    }
 
     protected static $handle = 'search';
 
     public function results()
     {
-        if (! $query = request($this->get('query', 'q'))) {
+        if (! $query = request($this->params->get('query', 'q'))) {
             return $this->parseNoResults();
         }
 
-        $builder = Search::index($this->get('index'))
+        $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($this->get('supplement_data', true))
-            ->limit($this->get('limit'))
-            ->offset($this->get('offset'));
+            ->withData($this->params->get('supplement_data', true))
+            ->limit($this->params->get('limit'))
+            ->offset($this->params->get('offset'));
 
+        $this->querySite($builder);
+        $this->queryStatus($builder);
         $this->queryConditions($builder);
+        $this->queryScopes($builder);
+        $this->queryOrderBys($builder);
 
-        $results = $this->addResultTypes($builder->get());
+        $results = $this->getQueryResults($builder);
+        $results = $this->addResultTypes($results);
 
         return $this->output($results);
     }
 
     protected function addResultTypes($results)
     {
-        return $results->map(function ($result) {
+        return $results->supplement('result_type', function ($result) {
             $type = null;
 
             if ($result instanceof \Statamic\Contracts\Entries\Entry) {
@@ -46,9 +57,27 @@ class Tags extends BaseTags
                 $type = 'asset';
             }
 
-            $result->set('result_type', $type);
-
-            return $result;
+            return $type;
         });
+    }
+
+    protected function queryStatus($query)
+    {
+        if ($this->isQueryingCondition('status') || $this->isQueryingCondition('published')) {
+            return;
+        }
+
+        return $query->where('status', 'published');
+    }
+
+    protected function querySite($query)
+    {
+        $site = $this->params->get(['site', 'locale'], Site::current()->handle());
+
+        if ($site === '*' || ! Site::hasMultiple()) {
+            return;
+        }
+
+        return $query->where('site', $site);
     }
 }

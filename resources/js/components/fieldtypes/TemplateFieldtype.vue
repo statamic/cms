@@ -36,9 +36,14 @@ export default {
             // Filter out partials
             if (this.config.hide_partials) {
                 templates = _.reject(templates, function(template) {
-                    return template.match(/(^_.*|\/_.*|\._.*)/g);
+                    return template.startsWith('partials/') || template.match(/(^_.*|\/_.*|\._.*)/g);
                 });
             }
+
+            // Filter out error templates
+            templates = _.reject(templates, function(template) {
+                return template.startsWith('errors/');
+            });
 
             // Set default
             var options = [];

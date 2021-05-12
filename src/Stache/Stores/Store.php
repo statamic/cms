@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Stache\Indexes;
+use Statamic\Stache\Indexes\Index;
 
 abstract class Store
 {
@@ -20,10 +21,11 @@ abstract class Store
     protected $paths;
     protected $fileItems;
     protected $shouldCacheFileItems = false;
+    protected $modified;
 
     public function directory($directory = null)
     {
-        if ($directory === null) {
+        if (func_num_args() === 0) {
             return $this->directory;
         }
 
@@ -98,9 +100,11 @@ abstract class Store
 
     public function cacheIndexUsage($index)
     {
+        $index = $index instanceof Index ? $index->name() : $index;
+
         $indexes = $this->indexUsage();
 
-        if ($indexes->contains($index = $index->name())) {
+        if ($indexes->contains($index)) {
             $this->usedIndexes = $indexes;
 
             return;
@@ -156,6 +160,8 @@ abstract class Store
 
     public function handleFileChanges()
     {
+        $this->modified = collect();
+
         // We only want to act on any file changes one time per store.
         if ($this->fileChangesHandled) {
             return;
@@ -217,6 +223,8 @@ abstract class Store
         $deleted->each(function ($path) {
             if ($key = $this->getKeyFromPath($path)) {
                 $this->forgetItem($key);
+                $this->forgetPath($key);
+                $this->resolveIndexes()->each->forgetItem($key);
                 $this->handleDeletedItem($path, $key);
             }
         });
@@ -263,11 +271,13 @@ abstract class Store
         });
 
         // Update modified items in every index.
-        $indexes->each(function ($index) use ($modified, $pathMap) {
+        $indexes->each(function ($index) use ($modified) {
             $modified->each(function ($item) use ($index) {
                 $index->updateItem($item);
             });
         });
+
+        $this->modified = $modified;
     }
 
     protected function handleModifiedItem($item)
@@ -350,6 +360,8 @@ abstract class Store
         Cache::forever($this->pathsCacheKey(), $paths->all());
 
         $this->paths = $paths;
+
+        $this->cacheIndexUsage('path');
     }
 
     protected function clearCachedPaths()
@@ -360,7 +372,7 @@ abstract class Store
 
     protected function pathsCacheKey()
     {
-        return "stache::indexes::{$this->key()}::_paths";
+        return "stache::indexes::{$this->key()}::path";
     }
 
     public function clear()

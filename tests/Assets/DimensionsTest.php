@@ -32,6 +32,7 @@ class DimensionsTest extends TestCase
     {
         $asset = $this->mock(Asset::class);
         $asset->shouldReceive('isImage')->andReturnFalse();
+        $asset->shouldReceive('isSvg')->andReturnFalse();
 
         $dimensions = $this->dimensions->asset($asset);
 

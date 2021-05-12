@@ -5,6 +5,7 @@
         :limit="config.character_limit || null"
         :placeholder="config.placeholder"
         :value="value"
+        :id="fieldId"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
         @input="update" />

@@ -1,12 +1,12 @@
 <template>
 
     <div class="replicator-set-picker">
-        <dropdown-list ref="setSelectorDropdown" class="align-left inline-block">
+        <dropdown-list class="align-left inline-block" placement="bottom-start" v-if="sets.length > 1">
             <template v-slot:trigger>
-                <button v-if="last" class="btn-round" v-tooltip.right="__('Add Set')">
+                <button v-if="last" class="btn-round" v-tooltip.right="__('Add Set')" :aria-label="__('Add Set')">
                     <span class="icon icon-plus text-grey-80 antialiased"></span>
                 </button>
-                <button v-else class="dropdown-icon" v-tooltip.right="__('Add Set')">
+                <button v-else class="dropdown-icon" v-tooltip.right="__('Add Set')" :aria-label="__('Add Set')">
                     <span class="icon icon-plus text-grey-50 antialiased" />
                 </button>
             </template>
@@ -15,6 +15,9 @@
                 <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
             </div>
         </dropdown-list>
+        <button v-else :class="{'btn-round': last, 'dropdown-icon': !last }" v-tooltip.right="__('Add Set')" :aria-label="__('Add Set')" @click="addSet(sets[0].handle)">
+            <span class="icon icon-plus text-grey-80 antialiased"></span>
+        </button>
     </div>
 
 </template>

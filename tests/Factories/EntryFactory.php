@@ -10,10 +10,18 @@ class EntryFactory
 {
     protected $id;
     protected $slug;
-    protected $data = [];
-    protected $published = true;
+    protected $data;
+    protected $date;
+    protected $published;
     protected $order;
-    protected $locale = 'en';
+    protected $locale;
+    protected $origin;
+    protected $collection;
+
+    public function __construct()
+    {
+        $this->reset();
+    }
 
     public function id($id)
     {
@@ -43,6 +51,13 @@ class EntryFactory
         return $this;
     }
 
+    public function date($date)
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
     public function published($published)
     {
         $this->published = $published;
@@ -57,6 +72,13 @@ class EntryFactory
         return $this;
     }
 
+    public function origin($origin)
+    {
+        $this->origin = $origin;
+
+        return $this;
+    }
+
     public function make()
     {
         $entry = Entry::make()
@@ -64,11 +86,15 @@ class EntryFactory
             ->collection($this->createCollection())
             ->slug($this->slug)
             ->data($this->data)
+            ->date($this->date)
+            ->origin($this->origin)
             ->published($this->published);
 
         if ($this->id) {
             $entry->id($this->id);
         }
+
+        $this->reset();
 
         return $entry;
     }
@@ -88,5 +114,18 @@ class EntryFactory
             ?? Collection::make($this->collection)
                 ->sites(['en'])
                 ->save();
+    }
+
+    private function reset()
+    {
+        $this->id = null;
+        $this->slug = null;
+        $this->data = [];
+        $this->date = null;
+        $this->published = true;
+        $this->order = null;
+        $this->locale = 'en';
+        $this->origin = null;
+        $this->collection = null;
     }
 }

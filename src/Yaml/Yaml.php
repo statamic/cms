@@ -13,6 +13,12 @@ use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 class Yaml
 {
     protected $file;
+    protected $yaml;
+
+    public function __construct(SymfonyYaml $yaml)
+    {
+        $this->yaml = $yaml;
+    }
 
     public function file($file)
     {
@@ -45,11 +51,13 @@ class Yaml
         if (Pattern::startsWith($str, '---')) {
             $split = preg_split("/\n---/", $str, 2, PREG_SPLIT_NO_EMPTY);
             $str = $split[0];
-            $content = ltrim(array_get($split, 1, ''));
+            if (empty($content = ltrim(array_get($split, 1, '')))) {
+                $content = null;
+            }
         }
 
         try {
-            $yaml = SymfonyYaml::parse($str);
+            $yaml = $this->yaml->parse($str);
         } catch (\Exception $e) {
             throw $this->viewException($e, $str);
         }
@@ -79,7 +87,7 @@ class Yaml
             $data['content'] = $content;
         }
 
-        return SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+        return $this->yaml->dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
     }
 
     /**

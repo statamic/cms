@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
-use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
 class FieldsController extends CpController
@@ -96,6 +95,9 @@ class FieldsController extends CpController
                 ],
                 'default' => 'hidden',
                 'width' => 50,
+                'unless' => [
+                    'type' => 'section',
+                ],
             ],
         ]);
 

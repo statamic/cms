@@ -95,4 +95,9 @@ class AugmentedUser extends AbstractAugmented
 
         return $this->data->initials();
     }
+
+    protected function avatar()
+    {
+        return $this->data->hasAvatarField() ? $this->data->avatarFieldValue() : $this->data->gravatarUrl();
+    }
 }

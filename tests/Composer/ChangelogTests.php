@@ -12,6 +12,8 @@ trait ChangelogTests
     /** @test */
     public function it_can_get_changelog_contents()
     {
+        config(['statamic.cp.date_format' => 'Y: F jS']);
+
         Client::shouldReceive('request')
             ->andReturn($this->fakeMarketplaceReleasesResponse(['2.0.0', '1.0.3', '1.0.2', '1.0.1', '1.0.0']));
 
@@ -43,7 +45,7 @@ trait ChangelogTests
         $this->assertFalse($contents[4]->latest);
 
         collect($contents)->each(function ($release) {
-            $this->assertEquals('November 6th, 2018', $release->date);
+            $this->assertEquals('2018: November 6th', $release->date);
             $this->assertContainsHtml($release->body);
         });
     }

@@ -15,6 +15,7 @@
                 :is-editing="editingField === field._id"
                 :is-section-expanded="isSectionExpanded"
                 :suggestable-condition-fields="suggestableConditionFields"
+                :can-define-localizable="canDefineLocalizable"
                 @edit="$emit('field-editing', field._id)"
                 @updated="$emit('field-updated', i, $event)"
                 @deleted="$emit('field-deleted', i)"
@@ -70,8 +71,11 @@ import ImportField from './ImportField.vue';
 import LinkFields from './LinkFields.vue';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 import FieldSettings from '../fields/Settings.vue';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
+
+    mixins: [CanDefineLocalizable],
 
     components: {
         RegularField,
@@ -111,12 +115,12 @@ export default {
                 _id: uniqid(),
                 type: 'inline',
                 fieldtype: field.type,
+                icon: field.icon,
                 handle,
                 config: {
                     ...field,
                     isNew: true,
-                    handle,
-                    display: handle.substring(0, 1).toUpperCase() + handle.substr(1),
+                    handle
                 }
             };
 
@@ -126,6 +130,7 @@ export default {
         fieldCreated(created) {
             let handle = created.handle;
             delete created.handle;
+            delete created.isNew;
 
             let field = {
                 ...this.pendingCreatedField,

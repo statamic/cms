@@ -208,6 +208,58 @@ class FieldsTest extends TestCase
         $this->assertEquals('test_two', $fields['test_two']->handle());
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/2869
+     **/
+    public function it_prefixes_the_handles_of_nested_imported_fieldsets()
+    {
+        $outer = (new Fieldset)->setHandle('outer')->setContents([
+            'fields' => [
+                [
+                    'import' => 'inner',
+                    'prefix' => 'prefix_',
+                ],
+            ],
+        ]);
+
+        $inner = (new Fieldset)->setHandle('inner')->setContents([
+            'fields' => [
+                [
+                    'handle' => 'foo',
+                    'field' => ['type' => 'text'],
+                ],
+                [
+                    'handle' => 'bar',
+                    'field' => ['type' => 'text'],
+                ],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('outer')->times(2)->andReturn($outer);
+        FieldsetRepository::shouldReceive('find')->with('inner')->times(1)->andReturn($inner);
+
+        $fields = new Fields([
+            [
+                'import' => 'outer',
+                'prefix' => 'first_',
+            ],
+            [
+                'import' => 'outer',
+                'prefix' => 'second_',
+            ],
+        ]);
+
+        $fields = $fields->all();
+
+        $this->assertInstanceOf(Collection::class, $fields);
+        $this->assertCount(4, $fields);
+        $this->assertEquals('first_prefix_foo', $fields['first_prefix_foo']->handle());
+        $this->assertEquals('first_prefix_bar', $fields['first_prefix_bar']->handle());
+        $this->assertEquals('second_prefix_foo', $fields['second_prefix_foo']->handle());
+        $this->assertEquals('second_prefix_bar', $fields['second_prefix_bar']->handle());
+    }
+
     /** @test */
     public function it_throws_exception_when_trying_to_import_a_non_existent_fieldset()
     {
@@ -218,6 +270,43 @@ class FieldsTest extends TestCase
         (new Fields)->createFields([
             'import' => 'test_partial',
         ]);
+    }
+
+    /** @test */
+    public function it_can_override_the_config_for_fields_in_an_imported_fieldset()
+    {
+        $fieldset = (new Fieldset)->setHandle('partial')->setContents([
+            'fields' => [
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text', 'foo' => 'original'],
+                ],
+                [
+                    'handle' => 'two',
+                    'field' => ['type' => 'textarea', 'foo' => 'original'],
+                ],
+                [
+                    'handle' => 'three',
+                    'field' => ['type' => 'textarea', 'foo' => 'original'],
+                ],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
+
+        $fields = (new Fields)->createFields([
+            'import' => 'partial',
+            'config' => [
+                'one' => ['foo' => 'custom'],
+                'three' => ['foo' => 'another custom'],
+            ],
+            // use a prefix to make sure they work together, without needing to write an almost identical test
+            'prefix' => 'prefix_',
+        ]);
+
+        $this->assertEquals(['type' => 'text', 'foo' => 'custom'], $fields['prefix_one']->config());
+        $this->assertEquals(['type' => 'textarea', 'foo' => 'original'], $fields['prefix_two']->config());
+        $this->assertEquals(['type' => 'textarea', 'foo' => 'another custom'], $fields['prefix_three']->config());
     }
 
     /** @test */
@@ -318,6 +407,7 @@ class FieldsTest extends TestCase
         $this->assertEquals([
             [
                 'handle' => 'one',
+                'prefix' => null,
                 'type' => 'text',
                 'display' => 'One',
                 'instructions' => 'One instructions',
@@ -329,9 +419,11 @@ class FieldsTest extends TestCase
                 'input_type' => 'text',
                 'prepend' => null,
                 'append' => null,
+                'antlers' => false,
             ],
             [
                 'handle' => 'two',
+                'prefix' => null,
                 'type' => 'textarea',
                 'display' => 'Two',
                 'instructions' => 'Two instructions',
@@ -339,6 +431,77 @@ class FieldsTest extends TestCase
                 'validate' => 'min:2',
                 'character_limit' => null,
                 'component' => 'textarea',
+                'antlers' => false,
+                'placeholder' => null,
+            ],
+        ], $fields->toPublishArray());
+    }
+
+    /** @test */
+    public function converts_to_array_suitable_for_rendering_prefixed_conditional_fields_in_publish_component()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('deeper_partial')
+            ->andReturn((new Fieldset)->setHandle('deeper_partial')->setContents([
+                'title' => 'Deeper Partial',
+                'fields' => [
+                    [
+                        'handle' => 'two',
+                        'field' => ['type' => 'text'],
+                    ],
+                ],
+            ]));
+
+        FieldsetRepository::shouldReceive('find')
+            ->with('partial')
+            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
+                'title' => 'Partial',
+                'fields' => [
+                    [
+                        'handle' => 'one',
+                        'field' => ['type' => 'text'],
+                    ],
+                    [
+                        'import' => 'deeper_partial',
+                        'prefix' => 'deeper_',
+                    ],
+                ],
+            ]));
+
+        $fields = new Fields([
+            ['import' => 'partial', 'prefix' => 'nested_'],
+        ]);
+
+        $this->assertEquals([
+            [
+                'handle' => 'nested_one',
+                'prefix' => 'nested_',
+                'type' => 'text',
+                'display' => 'Nested One',
+                'placeholder' => null,
+                'input_type' => 'text',
+                'character_limit' => 0,
+                'prepend' => null,
+                'append' => null,
+                'component' => 'text',
+                'instructions' => null,
+                'required' => false,
+                'antlers' => false,
+            ],
+            [
+                'handle' => 'nested_deeper_two',
+                'prefix' => 'nested_deeper_',
+                'type' => 'text',
+                'display' => 'Nested Deeper Two',
+                'placeholder' => null,
+                'input_type' => 'text',
+                'character_limit' => 0,
+                'prepend' => null,
+                'append' => null,
+                'component' => 'text',
+                'instructions' => null,
+                'required' => false,
+                'antlers' => false,
             ],
         ], $fields->toPublishArray());
     }
@@ -586,5 +749,30 @@ class FieldsTest extends TestCase
         Validator::shouldReceive('validate')->once();
 
         $fields->validate(['foo' => 'bar']);
+    }
+
+    /**
+     * @test
+     * @group graphql
+     **/
+    public function it_gets_the_fields_as_graphql_types()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text', 'validate' => 'required']],
+        ]);
+
+        $types = $fields->toGql();
+
+        $this->assertInstanceOf(Collection::class, $types);
+        $this->assertCount(2, $types);
+
+        $this->assertIsArray($types['one']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $types['one']['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['one']['type']);
+
+        $this->assertIsArray($types['two']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $types['two']['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['two']['type']->getWrappedType());
     }
 }

@@ -1,20 +1,28 @@
 <template>
 
-    <div class="blueprint-section w-full md:w-1/2 2xl:w-1/3" :class="{ 'w-full': isEditing }">
+    <div class="blueprint-section"
+        :class="{
+            'w-full md:w-1/2 2xl:w-1/3': !isEditing && !isSingle,
+            'w-full': isEditing || isSingle
+        }"
+    >
         <div class="blueprint-section-card card p-0 h-full flex flex-col">
 
-            <div class="bg-grey-20 border-b text-sm flex rounded-t;">
+            <div class="bg-grey-20 border-b text-sm flex rounded-t;" v-if="!isSingle">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-1.5 py-1 flex-1">
                     <span class="font-medium mr-1">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
+                    </span>
+                    <span class="font-mono text-xs text-grey-70 mr-1">
+                        <input type="text" v-model="section.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
                     </span>
                 </div>
                 <div class="flex items-center px-1.5">
                     <button @click.prevent="toggleEditing" class="text-grey-60 hover:text-grey-100 mr-1">
                         <svg-icon :name="isEditing ? 'shrink' : 'expand'" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100">
+                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100" v-if="deletable">
                         <svg-icon name="trash" />
                     </button>
                 </div>
@@ -25,8 +33,9 @@
                 class="p-2"
                 :fields="section.fields"
                 :editing-field="editingField"
-                :is-section-expanded="isEditing"
+                :is-section-expanded="isEditing || isSingle"
                 :suggestable-condition-fields="suggestableConditionFields"
+                :can-define-localizable="canDefineLocalizable"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-deleted="deleteField"
@@ -49,8 +58,11 @@
 
 <script>
 import Fields from './Fields.vue';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
+
+    mixins: [CanDefineLocalizable],
 
     components: {
         Fields,
@@ -60,6 +72,14 @@ export default {
         section: {
             type: Object,
             required: true
+        },
+        isSingle: {
+            type: Boolean,
+            default: false
+        },
+        deletable: {
+            type: Boolean,
+            default: true
         }
     },
 
@@ -67,6 +87,7 @@ export default {
         return {
             isEditing: false,
             editingField: null,
+            handleSyncedWithDisplay: false
         }
     },
 
@@ -86,9 +107,19 @@ export default {
         },
 
         'section.display': function(display) {
-            this.section.handle = this.$slugify(display, '_');
+            if (this.handleSyncedWithDisplay) {
+                this.section.handle = this.$slugify(display, '_');
+            }
         }
 
+    },
+
+    created() {
+        // This logic isn't ideal, but it was better than passing along a 'isNew' boolean and having
+        // to deal with stripping it out and making it not new, etc. Good enough for a quick win.
+        if (!this.section.handle || this.section.handle == 'new_section' || this.section.handle == 'new_set') {
+            this.handleSyncedWithDisplay = true;
+        }
     },
 
     methods: {
@@ -115,7 +146,9 @@ export default {
         },
 
         focus() {
-            this.$refs.displayInput.select();
+            if (this.$refs.displayInput) {
+                this.$refs.displayInput.select();
+            }
         },
 
         toggleEditing() {

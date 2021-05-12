@@ -2,46 +2,20 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Contracts\Support\Arrayable;
-use JsonSerializable;
-
-class LabeledValue implements Arrayable, JsonSerializable
+class LabeledValue extends ArrayableString
 {
-    protected $value;
-    protected $label;
-
     public function __construct($value, $label)
     {
-        $this->value = $value;
-        $this->label = $label;
-    }
-
-    public function value()
-    {
-        return $this->value;
+        parent::__construct($value, ['label' => $label]);
     }
 
     public function label()
     {
-        return $this->label;
-    }
-
-    public function __toString()
-    {
-        return (string) $this->value ?? '';
+        return $this->extra['label'];
     }
 
     public function toArray()
     {
-        return [
-            'key' => $this->value,
-            'value' => $this->value,
-            'label' => $this->label,
-        ];
-    }
-
-    public function jsonSerialize()
-    {
-        return $this->toArray();
+        return array_merge(parent::toArray(), ['key' => $this->value]);
     }
 }

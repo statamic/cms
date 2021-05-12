@@ -27,7 +27,7 @@
 }
 
 .filter-badge {
-    @apply text-2xs text-grey-80 bg-grey-30 flex items-center lowercase;
+    @apply text-2xs text-grey-80 bg-grey-30 flex items-center;
     height: 1.625rem; // 24px
     padding-left: 10px;
 

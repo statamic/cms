@@ -7,8 +7,10 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use InvalidArgumentException;
 use Statamic\Facades;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 
 class Outpost
 {
@@ -18,6 +20,7 @@ class Outpost
 
     private $response;
     private $client;
+    private $store;
 
     public function __construct(Client $client)
     {
@@ -96,7 +99,7 @@ class Outpost
             'payload' => $this->payload(),
         ]);
 
-        Cache::put(self::CACHE_KEY, $contents, $expiration);
+        $this->cache()->put(self::CACHE_KEY, $contents, $expiration);
 
         return $contents;
     }
@@ -107,28 +110,36 @@ class Outpost
             return false;
         }
 
-        return $cached['payload'] === $this->payload();
+        return ! $this->payloadHasChanged($cached['payload'], $this->payload());
+    }
+
+    private function payloadHasChanged($previous, $current)
+    {
+        $exclude = ['ip'];
+
+        return Arr::except($previous, $exclude) !== Arr::except($current, $exclude);
     }
 
     private function getCachedResponse()
     {
-        return Cache::get(self::CACHE_KEY);
+        return $this->cache()->get(self::CACHE_KEY);
     }
 
     public function clearCachedResponse()
     {
-        return Cache::forget(self::CACHE_KEY);
+        return $this->cache()->forget(self::CACHE_KEY);
     }
 
     private function handleRequestException(RequestException $e)
     {
-        switch ($e->getCode()) {
-            case 422:
-                return $this->cacheAndReturnValidationResponse($e);
-            case 429:
-                return $this->cacheAndReturnRateLimitResponse($e);
-            case 500:
-                return $this->cacheAndReturnErrorResponse();
+        $code = $e->getCode();
+
+        if ($code == 422) {
+            return $this->cacheAndReturnValidationResponse($e);
+        } elseif ($code == 429) {
+            return $this->cacheAndReturnRateLimitResponse($e);
+        } elseif ($code >= 500 && $code < 600) {
+            return $this->cacheAndReturnErrorResponse();
         }
 
         throw $e;
@@ -154,5 +165,20 @@ class Outpost
     private function cacheAndReturnErrorResponse()
     {
         return $this->cacheResponse(now()->addMinutes(5), ['error' => 500]);
+    }
+
+    private function cache()
+    {
+        if ($this->store) {
+            return $this->store;
+        }
+
+        try {
+            $store = Cache::store('outpost');
+        } catch (InvalidArgumentException $e) {
+            $store = Cache::store();
+        }
+
+        return $this->store = $store;
     }
 }

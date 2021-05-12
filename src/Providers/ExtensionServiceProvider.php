@@ -13,8 +13,10 @@ use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes;
 use Statamic\Query\Scopes\Scope;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Tags;
+use Statamic\UpdateScripts as Updates;
 use Statamic\Widgets;
 use Statamic\Widgets\Widget;
 
@@ -22,6 +24,7 @@ class ExtensionServiceProvider extends ServiceProvider
 {
     protected $actions = [
         Actions\Delete::class,
+        Actions\DeleteMultisiteEntry::class,
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,
@@ -37,7 +40,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
         Fieldtypes\ButtonGroup::class,
-        Fieldtypes\Blueprints::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
         Fieldtypes\CollectionRoutes::class,
@@ -45,9 +47,11 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Entries::class,
+        Fieldtypes\Floatval::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Hidden::class,
+        Fieldtypes\Html::class,
         Fieldtypes\Integer::class,
         Fieldtypes\Link::class,
         Fieldtypes\Lists::class,
@@ -64,8 +68,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Structures::class,
         Fieldtypes\Slug::class,
         Fieldtypes\Table::class,
-        Fieldtypes\Tags::class,
-        Fieldtypes\Taxonomy::class,
+        Fieldtypes\Taggable::class,
+        Fieldtypes\Terms::class,
         Fieldtypes\Taxonomies::class,
         Fieldtypes\Template::class,
         Fieldtypes\Text::class,
@@ -178,10 +182,16 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Widget::class,
     ];
 
+    protected $updateScripts = [
+        Updates\AddPerEntryPermissions::class,
+        Updates\UseDedicatedTrees::class,
+    ];
+
     public function register()
     {
         $this->registerExtensions();
         $this->registerAddonManifest();
+        $this->registerUpdateScripts();
     }
 
     protected function registerAddonManifest()
@@ -283,5 +293,14 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.extensions'][Modifier::class] = collect()
             ->merge($this->app['statamic.extensions'][Modifier::class] ?? [])
             ->merge($modifiers);
+    }
+
+    protected function registerUpdateScripts()
+    {
+        $this->app->instance('statamic.update-scripts', collect());
+
+        foreach ($this->updateScripts as $class) {
+            $class::register(Statamic::PACKAGE);
+        }
     }
 }

@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'any.config.antlers' => 'Se você deseja que este campo seja analisado pelo Antlers.',
+    'any.config.cast_booleans' => 'Opções com valores de verdadeiro e falso serão salvas como booleans.',
+    'any.config.default' => 'Definir o valor padrão',
     'array.config.keys' => 'O modo dinâmico dá ao utilizador o controlo dos dados enquanto que o modo com chave não o faz.',
     'array.config.mode' => 'Defina as chaves da matriz (variáveis) e as etiquetas opcionais.',
     'assets.config.allow_uploads' => 'Permitir o carregamento de novos ficheiros.',
@@ -10,6 +13,7 @@ return [
     'assets.config.mode' => 'Escolha o seu estilo de layout preferido.',
     'assets.config.restrict' => 'Impedir que os utilizadores naveguem para outras pastas.',
     'bard.config.allow_source' => 'Habilitar a opção de visualizar o código fonte HTML enquanto escreve',
+    'bard.config.always_show_set_button' => 'Permitir mostrar sempre o botão "Adicionar Set".',
     'bard.config.buttons' => 'Escolha quais os botões a mostrar na barra de ferramentas.',
     'bard.config.container' => 'Escolha qual o contentor de activos a utilizar para este campo.',
     'bard.config.fullscreen' => 'Permitir a opção de alternar para o modo de ecrã inteiro',
@@ -64,11 +68,15 @@ return [
     'range.config.prepend' => 'Adicionar texto ao início (lado esquerdo) da barra deslizante.',
     'range.config.step' => 'A dimensão mínima entre os valores.',
     'relationship.config.mode' => 'Escolha o seu estilo de interface do usuário preferido.',
-    'select.config.cast_booleans' => 'Opções com valores de verdadeiro e falso serão salvas como booleans.',
+    'replicator.config.collapse' => 'O comportamento de colapso do conjunto.',
+    'replicator.config.collapse.accordion' => 'Permitir que apenas um conjunto seja expandido de cada vez',
+    'replicator.config.collapse.disabled' => 'Todos os conjuntos são expandidos por padrão',
+    'replicator.config.collapse.enabled' => 'Todos os conjuntos recolhidos por padrão',
+    'replicator.config.max_sets' => 'O número máximo de conjuntos.',
     'select.config.clearable' => 'Permitir a desmarcação da sua opção.',
     'select.config.multiple' => 'Permitir selecções múltiplas.',
     'select.config.options' => 'Defina as chaves e as suas etiquetas opcionais.',
-    'select.config.placeholder' => 'Defina o texto por defeito, não seleccionável, dos espaços reservados.',
+    'select.config.placeholder' => 'Defina o texto padrão, não seleccionável, dos espaços reservados.',
     'select.config.push_tags' => 'Adicione etiquetas recentemente criadas à lista de opções.',
     'select.config.searchable' => 'Habilitar a pesquisa através de opções possíveis.',
     'select.config.taggable' => 'Permitir a adição de novas opções para além das opções pré-definidas',
@@ -76,6 +84,6 @@ return [
     'text.config.append' => 'Adicionar texto após (à direita de) o texto introduzido.',
     'text.config.character_limit' => 'Defina o número máximo de caracteres a digitar.',
     'text.config.input_type' => 'Defina o tipo de entrada HTML5.',
-    'text.config.placeholder' => 'Definir o texto por defeito do espaço reservado.',
+    'text.config.placeholder' => 'Definir o texto padrão do espaço reservado.',
     'text.config.prepend' => 'Adicionar texto antes (à esquerda) da entrada de texto.',
 ];

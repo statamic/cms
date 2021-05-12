@@ -4,13 +4,11 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Events\Data\TermDeleted;
-use Statamic\Events\Data\TermSaved;
+use Statamic\Events\TermDeleted;
+use Statamic\Events\TermSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -60,7 +58,7 @@ class Term implements TermContract
 
     public function taxonomyHandle()
     {
-        return $this->taxonomy()->handle();
+        return $this->taxonomy;
     }
 
     public function path()
@@ -72,13 +70,21 @@ class Term implements TermContract
         ]);
     }
 
-    public function blueprint()
+    public function blueprint($blueprint = null)
     {
-        return $this->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return $blueprint
-                    ? $this->taxonomy()->ensureTermBlueprintFields(Blueprint::find($blueprint))
-                    : $this->taxonomy()->termBlueprint();
+        $key = "term-{$this->id()}-blueprint";
+
+        return $this
+            ->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) use ($key) {
+                return Blink::once($key, function () use ($blueprint) {
+                    return $this->taxonomy()->termBlueprint($blueprint ?? $this->value('blueprint'), $this);
+                });
+            })
+            ->setter(function ($blueprint) use ($key) {
+                Blink::forget($key);
+
+                return $blueprint;
             })
             ->args(func_get_args());
     }
@@ -134,6 +140,13 @@ class Term implements TermContract
     public function entries()
     {
         return $this->queryEntries()->get();
+    }
+
+    public function entriesCount()
+    {
+        return Blink::once('term-entries-count-'.$this->id(), function () {
+            return Facades\Term::entriesCount($this);
+        });
     }
 
     public function queryEntries()

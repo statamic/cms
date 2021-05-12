@@ -38,8 +38,8 @@ class GetFiles extends Tags
      */
     private function getFiles()
     {
-        $folders = $this->get(['in', 'from']);
-        $depth = $this->getInt('depth', 1);
+        $folders = $this->params->get(['in', 'from']);
+        $depth = $this->params->int('depth', 1);
 
         $this->files = new FileCollection;
 
@@ -88,7 +88,7 @@ class GetFiles extends Tags
      */
     private function filterNotIn()
     {
-        if ($not_in = $this->get('not_in')) {
+        if ($not_in = $this->params->get('not_in')) {
             $regex = '#^('.$not_in.')#';
 
             $this->files = $this->files->reject(function ($path) use ($regex) {
@@ -102,7 +102,7 @@ class GetFiles extends Tags
      */
     private function filterSize()
     {
-        if ($size = $this->get('file_size')) {
+        if ($size = $this->params->get('file_size')) {
             $this->files = $this->files->filterBySize($size);
         }
     }
@@ -112,7 +112,7 @@ class GetFiles extends Tags
      */
     private function filterExtension()
     {
-        if ($extensions = $this->get(['extension', 'ext'])) {
+        if ($extensions = $this->params->get(['extension', 'ext'])) {
             $extensions = Arr::explodeOptions($extensions);
 
             $this->files = $this->files->filterByExtension($extensions);
@@ -121,34 +121,34 @@ class GetFiles extends Tags
 
     private function filterRegex()
     {
-        if ($include = $this->get(['include', 'match'])) {
+        if ($include = $this->params->get(['include', 'match'])) {
             $this->files = $this->files->filterByRegex($include);
         }
 
-        if ($exclude = $this->get('exclude')) {
+        if ($exclude = $this->params->get('exclude')) {
             $this->files = $this->files->rejectByRegex($exclude);
         }
     }
 
     private function filterDate()
     {
-        if ($date = $this->get('file_date')) {
+        if ($date = $this->params->get('file_date')) {
             $this->files = $this->files->filterByDate($date);
         }
     }
 
     private function limit()
     {
-        $limit = $this->getInt('limit');
+        $limit = $this->params->int('limit');
         $limit = ($limit == 0) ? $this->files->count() : $limit;
-        $offset = $this->getInt('offset');
+        $offset = $this->params->int('offset');
 
         $this->files = $this->files->splice($offset, $limit);
     }
 
     private function sort()
     {
-        if ($sort = $this->get('sort')) {
+        if ($sort = $this->params->get('sort')) {
             $this->files = $this->files->multisort($sort);
         }
     }

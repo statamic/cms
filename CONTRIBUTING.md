@@ -54,7 +54,7 @@ Next, please search through the [open issues](https://github.com/statamic/cms/is
 
 If you _do_ find a similar issue, upvote it by adding a :thumbsup: [reaction](https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments). Only leave a comment if you have relevant information to add.
 
-If no one has filed the issue yet, feel free to [submit a new one](https://github.com/statamic/cms/issues/new). Please include a clear description of the issue, follow along with the issue template, and provide and as much relevant information as possible. Code examples demonstrating the the issue are the best way to ensure a timely solution to the issue.
+If no one has filed the issue yet, feel free to [submit a new one](https://github.com/statamic/cms/issues/new). Please include a clear description of the issue, follow along with the issue template, and provide and as much relevant information as possible. Code examples demonstrating the issue are the best way to ensure a timely solution to the issue.
 
 ### Feature Requests
 
@@ -70,7 +70,7 @@ Statamic's documentation lives in the [https://github.com/statamic/docs](https:/
 
 ### Core Enhancements
 
-If you would like to work on a new core feature or improvement, first create a [Github issue](https://github.com/statamic/cms/issues) for it if there’s not one already. While we appreciate community contributions, we do remain selective about what features make it into Statamic itself, so don’t take it the wrong way if we recommend that you to pursue the idea as an addon instead.
+If you would like to work on a new core feature or improvement, first create a [Github issue](https://github.com/statamic/cms/issues) for it if there’s not one already. While we appreciate community contributions, we do remain selective about what features make it into Statamic itself, so don’t take it the wrong way if we recommend that you pursue the idea as an addon instead.
 
 ### Compiled Assets
 

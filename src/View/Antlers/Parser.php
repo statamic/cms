@@ -13,13 +13,12 @@ use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Facades\Config;
-use Statamic\Fields\LabeledValue;
+use Statamic\Contracts\Query\Builder;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Ignition\Value as IgnitionViewValue;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\Modify;
-use Statamic\Query\Builder;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -127,6 +126,8 @@ class Parser
 
         $this->view = $view;
 
+        $data = array_merge($data, ['view' => $this->cascade->getViewData($view)]);
+
         try {
             $parsed = $this->parse($text, $data);
         } catch (\Exception | \Error $e) {
@@ -156,10 +157,8 @@ class Parser
         // Save the original text coming in so that we can parse it recursively
         // later on without this needing to be within a callback
         $this->original_text = $text;
-        // Prevent the parsing of PHP by b0rking the PHP open tag
-        if (! $this->allowPhp) {
-            $text = str_replace(['<?php'], ['&lt;?php'], $text);
-        }
+
+        $text = $this->sanitizePhp($text);
 
         // We want to extract the noparse blocks before comments,
         // allowing us to show them for documentation purposes
@@ -306,6 +305,10 @@ class Parser
         $total = count($loop);
 
         foreach ($loop as $key => &$value) {
+            if ($value instanceof Augmentable) {
+                $value = $value->toAugmentedArray();
+            }
+
             // If the value of the current iteration is *not* already an array (ie. we're
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
@@ -596,10 +599,24 @@ class Parser
                         }
                     }
 
-                    if (! empty($values)) {
-                        // parse the tag found with the value(s) related to it
-                        $tmpname = md5($name);
-                        $replacement = $this->parseVariables("{{ $tmpname }}$content{{ /$tmpname }}", [$tmpname => $values]);
+                    if ($this->isLoopable($values) && ! empty($values)) {
+                        if ($values instanceof Value) {
+                            $values = $values->value();
+                        }
+
+                        if ($values instanceof Collection) {
+                            $values = $values->all();
+                        }
+
+                        if (Arr::isAssoc($values)) {
+                            $replacement = $this->parse($content, array_merge($data, $values));
+                        } else {
+                            $values = $this->addLoopIterationVariables($values);
+                            $replacement = collect($values)
+                                ->map(function ($value) use ($content, $data) {
+                                    return (string) $this->parse($content, array_merge($data, $value));
+                                })->join('');
+                        }
                     }
                 } else {
                     // nope, this must be a callback
@@ -724,7 +741,7 @@ class Parser
                     $conditional = '<?php if ('.$condition.'): ?>'.addslashes($this->getVariable($if_true, $data)).'<?php endif ?>';
 
                     // Do the evaluation
-                    $output = $this->parsePhp($conditional);
+                    $output = stripslashes($this->parsePhp($conditional));
 
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
@@ -745,7 +762,7 @@ class Parser
                     $conditional = '<?php echo('.$condition.') ? "'.addslashes($this->getVariable(trim($if_true), $data)).'" : "'.addslashes($this->getVariable(trim($if_false), $data)).'"; ?>';
 
                     // Do the evaluation
-                    $output = $this->parsePhp($conditional);
+                    $output = stripslashes($this->parsePhp($conditional));
 
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
@@ -799,7 +816,7 @@ class Parser
         // also pass in the current callback (for later processing callback tags); also setting
         // $ref so that we can use it within the anonymous function
         $ref = $this;
-        $condition = $this->preg_replace_callback('/\b('.$this->variableRegex.')\b/', function ($match) use ($ref) {
+        $condition = $this->preg_replace_callback('/\b('.$this->variableRegex.'\b]?)/', function ($match) use ($ref) {
             return $ref->processConditionVar($match);
         }, $condition);
 
@@ -860,6 +877,7 @@ class Parser
         // Re-inject any strings we extracted
         $condition = $this->injectExtractions($condition, '__cond_str');
         $condition = $this->injectExtractions($condition, '__cond_exists');
+        $condition = $this->injectExtractions($condition, '__cond_callbacks');
 
         return $condition;
     }
@@ -916,7 +934,7 @@ class Parser
                     $has_children = false;
                 }
 
-                $replacement = $this->parse($orig_text, $child);
+                $replacement = $this->parse($orig_text, array_merge($data, $child));
 
                 // If this is the first loop we'll use $tag as reference, if not
                 // we'll use the previous tag ($next_tag)
@@ -1139,7 +1157,7 @@ class Parser
      * @param  mixed        $default Default value to use if not found
      * @return mixed
      */
-    protected function getVariable($key, $context, $default = null)
+    public function getVariable($key, $context, $default = null)
     {
         [$key, $modifiers] = $this->parseModifiers($key);
 
@@ -1176,6 +1194,12 @@ class Parser
      */
     protected function getVariableExistenceAndValue($key, $context)
     {
+        try {
+            $key = $this->replaceDynamicArrayKeys($key, $context);
+        } catch (ArrayKeyNotFoundException $exception) {
+            return [false, null];
+        }
+
         // If the key exists in the context, great, we're done.
         if (Arr::has($context, $key)) {
             return [true, Arr::get($context, $key)];
@@ -1196,24 +1220,6 @@ class Parser
             // If it's not found in the context, we'll try looking for it in the cascade.
             if ($cascading = $this->cascade->get($first)) {
                 return $this->getVariableExistenceAndValue($rest, $cascading);
-            }
-
-            // If the first part of the variable is "view", we'll try to get the value from
-            // values defined in any views' front-matter. They are stored in the cascade
-            // organized by the view paths. It should be able to get a value from any
-            // loaded view, but the current view should take precedence. (ie. if
-            // you define the same var in this view and another view, the one
-            // from this view should win.)
-            if ($first == 'view') {
-                $views = collect($this->cascade->get('views'));
-                $thisView = $views->pull($this->view);
-                $views->prepend($thisView, $this->view);
-                foreach ($views as $viewData) {
-                    $viewExistAndVal = $this->getVariableExistenceAndValue($rest, $viewData);
-                    if ($viewExistAndVal[0]) {
-                        return $viewExistAndVal;
-                    }
-                }
             }
 
             return [false, null];
@@ -1239,6 +1245,49 @@ class Parser
         }
 
         return [false, null];
+    }
+
+    /**
+     * Replaces a dynamic array key access with the actual value.
+     *
+     * Example:
+     *
+     * The context contains a variable 'key' with the value 'foo' and there is an
+     * array 'old' containing a key 'foo'. The value of the array with the key 'foo'
+     * can be accessed using the variable 'key' like this inside the template:
+     *
+     *      {{ old[key] }} or {{ if old[key] }} ...
+     *
+     * @param string $key
+     * @param array $context
+     * @throws ArrayKeyNotFoundException
+     *
+     * @return string
+     */
+    protected function replaceDynamicArrayKeys($key, $context)
+    {
+        if (! Str::containsAll($key, ['[', ']'])) {
+            return $key;
+        }
+
+        // If the key contains dynamic array keys, let's replace them with their actual value.
+        return trim($this->preg_replace_callback('/\[([\'"\w\d-]*)\]/', function ($matches) use ($context) {
+            $key = $matches[1];
+
+            if ($this->isLiteralString($key)) {
+                return '.'.trim($key, '"\'');
+            }
+
+            $value = Arr::get($context, $key);
+
+            if (! (is_string($value) || is_numeric($value))) {
+                // If the variable does not exist in the context or the value is not a valid key
+                // the replacement should not return a value to prevent unexpected behaviour.
+                throw new ArrayKeyNotFoundException();
+            }
+
+            return '.'.$value;
+        }, $key));
     }
 
     /**
@@ -1393,7 +1442,7 @@ class Parser
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
-            throw_if(config('app.debug'), $e);
+            throw_if(config('app.debug'), ($prev = $e->getPrevious()) ? $prev : $e);
             Log::notice(sprintf('Error in [%s] modifier: %s', $e->getModifier(), $e->getMessage()));
 
             return $value;
@@ -1402,7 +1451,7 @@ class Parser
 
     protected function isLoopable($value)
     {
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Collection) {
             return true;
         }
 
@@ -1491,7 +1540,7 @@ class Parser
 
     protected function isNullWhenUsedInStrings($value)
     {
-        if ($value instanceof LabeledValue) {
+        if ($value instanceof ArrayableString) {
             $value = $value->value();
         }
 
@@ -1537,5 +1586,23 @@ class Parser
         }
 
         throw new RegexError(preg_last_error(), $this->view);
+    }
+
+    protected function sanitizePhp($text)
+    {
+        if ($this->allowPhp) {
+            return $text;
+        }
+
+        $text = str_replace('<?php', '&lt;?php', $text);
+
+        // Also replace short tags if they're enabled.
+        // If they're disabled (which is the common default), you can use <?xml tags right in your template. How nice!
+        // If they're enabled, we want to make sure it doesn't run PHP. You'll need to use {{ xml_header }}.
+        if (ini_get('short_open_tag')) {
+            $text = str_replace('<?', '&lt;?', $text);
+        }
+
+        return $text;
     }
 }
