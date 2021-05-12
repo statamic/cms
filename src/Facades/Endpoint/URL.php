@@ -240,7 +240,7 @@ class URL
             return config('app.url');
         }
 
-        $protocol = (! empty(request()->server('HTTPS')) && request()->server('HTTPS') !== 'off' || request()->server('SERVER_PORT') == 443)
+        $protocol = app('request')->isSecure()
             ? 'https://'
             : 'http://';
 
