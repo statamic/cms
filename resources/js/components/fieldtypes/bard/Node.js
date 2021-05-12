@@ -1,5 +1,5 @@
 import { Node, Plugin } from 'tiptap';
-import { pasteRule } from 'tiptap-commands';
+import { pasteRule, toggleBlockType } from 'tiptap-commands';
 
 export default function (extension) {
     return new class extends Node {
@@ -12,7 +12,7 @@ export default function (extension) {
         }
 
         commands(args) {
-            return extension.commands({...args });
+            return extension.commands({...args, toggleBlockType });
         }
 
         pasteRules(args) {
