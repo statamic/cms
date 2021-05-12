@@ -688,6 +688,7 @@ class AssetTest extends TestCase
         $this->assertEquals([30, 60], $asset->dimensions());
         $this->assertEquals(30, $asset->width());
         $this->assertEquals(60, $asset->height());
+        $this->assertEquals(0.5, $asset->ratio());
     }
 
     /** @test */
@@ -699,6 +700,7 @@ class AssetTest extends TestCase
         $this->assertEquals([30, 60], $asset->dimensions());
         $this->assertEquals(30, $asset->width());
         $this->assertEquals(60, $asset->height());
+        $this->assertEquals(0.5, $asset->ratio());
     }
 
     /** @test */
@@ -711,6 +713,7 @@ class AssetTest extends TestCase
         $this->assertEquals([null, null], $asset->dimensions());
         $this->assertEquals(null, $asset->width());
         $this->assertEquals(null, $asset->height());
+        $this->assertEquals(null, $asset->ratio());
     }
 
     /** @test */

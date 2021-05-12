@@ -585,7 +585,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function ratio()
     {
-        if (! $this->isImage()) {
+        if (! $this->isImage() && ! $this->isSvg()) {
             return null;
         }
 
