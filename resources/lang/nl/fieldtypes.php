@@ -19,6 +19,7 @@ return [
     'bard.config.enable_input_rules' => 'Schakelt Markdown-style shortcuts in tijdens typen.',
     'bard.config.enable_paste_rules' => 'Schakelt Markdown-style shortcuts in tijdens plakken.',
     'bard.config.fullscreen' => 'Schakel de optie in dat mensen volledige schermweergave kunnen gebruiken.',
+    'bard.config.link_collections' => 'Entries uit deze collecties zijn beschikbaar in de linkselector. Als je dit leeg laat worden alle vermeldingen beschikbaar.',
     'bard.config.link_noopener' => 'Gebruik `rel="noopener"` op alle links.',
     'bard.config.link_noreferrer' => 'Gebruik `rel="noreferrer"` op alle links.',
     'bard.config.reading_time' => 'Toon de geschatte leestijd onderaan het veld.',
