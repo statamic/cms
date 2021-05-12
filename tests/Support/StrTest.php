@@ -173,7 +173,7 @@ class StrTest extends TestCase
 
     /**
      * @test
-     * @see https://github.com/statamic/cms/issues/3697
+     * @see https://github.com/statamic/cms/pull/3698
      **/
     public function it_replaces_strings()
     {
