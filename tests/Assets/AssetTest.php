@@ -691,6 +691,17 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_dimensions_for_svgs()
+    {
+        Storage::fake('test')->put('foo/image.svg', '<svg width="30" height="60"></svg>');
+        $asset = (new Asset)->path('foo/image.svg')->container($this->container);
+
+        $this->assertEquals([30, 60], $asset->dimensions());
+        $this->assertEquals(30, $asset->width());
+        $this->assertEquals(60, $asset->height());
+    }
+
+    /** @test */
     public function it_gets_no_dimensions_for_non_images()
     {
         $file = UploadedFile::fake()->create('file.txt');

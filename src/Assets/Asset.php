@@ -533,7 +533,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        if (! $this->isImage()) {
+        if (! $this->isImage() && ! $this->isSvg()) {
             return [null, null];
         }
 
