@@ -33,11 +33,19 @@ class GithubReleasePresenter
 
         // TODO: Move to blade or vue? Or leave in presenter?
         // TODO: Create tailwind classes for these labels.
-        $string = Str::replace($string, '[new]', '<span class="label" style="background: #5bc0de;">NEW</span>');
-        $string = Str::replace($string, '[fix]', '<span class="label" style="background: #5cb85c;">FIX</span>');
-        $string = Str::replace($string, '[break]', '<span class="label" style="background: #d9534f;">BREAK</span>');
-        $string = Str::replace($string, '[na]', '<span class="label" style="background: #e8e8e8;">N/A</span>');
+        $replacements = [
+            '[new]' => '<span class="label" style="background: #5bc0de;">NEW</span>',
+            '[fix]' => '<span class="label" style="background: #5cb85c;">FIX</span>',
+            '[break]' => '<span class="label" style="background: #d9534f;">BREAK</span>',
+            '[na]' => '<span class="label" style="background: #e8e8e8;">N/A</span>',
+        ];
 
+        foreach ($replacements as $search => $replace) {
+            $string = method_exists(Str::class, 'replace')
+                ? Str::replace($search, $replace, $string) // Laravel >= 8.41.0
+                : Str::replace($string, $search, $replace);
+        }
+        
         return $string;
     }
 
