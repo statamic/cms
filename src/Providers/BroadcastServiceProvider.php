@@ -23,6 +23,9 @@ class BroadcastServiceProvider extends ServiceProvider
             'endpoint' => $this->authEndpoint(),
             'pusher' => [
                 'key' => config('broadcasting.connections.pusher.key'),
+                'host' => config('broadcasting.connections.pusher.options.host'),
+                'port' => config('broadcasting.connections.pusher.options.port', 443),
+                'disableStats' => config('broadcasting.connections.pusher.options.disableStats', false),
                 'cluster' => config('broadcasting.connections.pusher.options.cluster'),
                 'encrypted' => config('broadcasting.connections.pusher.options.encrypted'),
             ],

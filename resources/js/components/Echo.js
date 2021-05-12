@@ -19,7 +19,17 @@ class Echo {
             encrypted: Statamic.$config.get('broadcasting.pusher.encrypted'),
             csrfToken: Statamic.$config.get('csrfToken'),
             authEndpoint: Statamic.$config.get('broadcasting.endpoint'),
+            disableStats: Statamic.$config.get('broadcasting.pusher.disableStats'),
         };
+        const pusherHost = Statamic.$config.get('broadcasting.pusher.host'),
+        if(pusherHost) {
+            config.wsHost = pusherHost;
+        }
+
+        const pusherPort = Statamic.$config.get('broadcasting.pusher.port'),
+        if(pusherPort) {
+            config.wsPort = pusherPort;
+        }
 
         this.echo = new LaravelEcho(config);
 
