@@ -16,6 +16,8 @@ return [
     'bard.config.always_show_set_button' => 'Habilita para mostrar siempre el botón "Agregar conjunto".',
     'bard.config.buttons' => 'Elige qué botones mostrar en la barra de herramientas.',
     'bard.config.container' => 'Elige qué contenedor de medios usar para este campo.',
+    'bard.config.enable_input_rules' => 'Habilita atajos al estilo de Markdown al escribir contenido.',
+    'bard.config.enable_paste_rules' => 'Habilita atajos al estilo de Markdown al pegar contenido.',
     'bard.config.fullscreen' => 'Habilita la opción para alternar el modo de pantalla completa',
     'bard.config.link_noopener' => 'Establece `rel="noopener"` en todos los enlaces.',
     'bard.config.link_noreferrer' => 'Establece `rel="noreferrer"` en todos los enlaces.',
