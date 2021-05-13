@@ -76,6 +76,12 @@ class StarterKitInstall extends Command
      */
     protected function shouldClear()
     {
-        return $this->option('clear-site') ?: $this->confirm('Clear site first?', false);
+        if ($this->option('clear-site')) {
+            return true;
+        } elseif ($this->input->isInteractive()) {
+            return $this->confirm('Clear site first?', false);
+        }
+
+        return false;
     }
 }
