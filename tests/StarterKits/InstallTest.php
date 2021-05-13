@@ -165,6 +165,8 @@ class InstallTest extends TestCase
     /** @test */
     public function it_installs_dependencies()
     {
+        $this->skipIfLaravel6();
+
         $this->setConfig([
             'export_paths' => [
                 'config',
@@ -198,6 +200,8 @@ class InstallTest extends TestCase
     /** @test */
     public function it_installs_dev_dependencies()
     {
+        $this->skipIfLaravel6();
+
         $this->setConfig([
             'export_paths' => [
                 'config',
@@ -226,6 +230,8 @@ class InstallTest extends TestCase
     /** @test */
     public function it_installs_both_types_of_dependencies()
     {
+        $this->skipIfLaravel6();
+
         $this->setConfig([
             'export_paths' => [
                 'config',
@@ -266,6 +272,8 @@ class InstallTest extends TestCase
     /** @test */
     public function it_doesnt_create_custom_repositories_when_all_dependencies_are_found_on_packagist()
     {
+        $this->skipIfLaravel6();
+
         $this->setConfig([
             'export_paths' => [
                 'config',
@@ -293,6 +301,8 @@ class InstallTest extends TestCase
     /** @test */
     public function it_leaves_behind_existing_custom_repositories_when_all_dependencies_are_found_on_packagist()
     {
+        $this->skipIfLaravel6();
+
         $this->setConfig([
             'export_paths' => [
                 'config',
@@ -342,6 +352,8 @@ class InstallTest extends TestCase
     /** @test */
     public function it_creates_custom_repositories_if_not_available_through_packagist()
     {
+        $this->skipIfLaravel6();
+
         $this->setConfig([
             'export_paths' => [
                 'config',
@@ -388,6 +400,8 @@ class InstallTest extends TestCase
     /** @test */
     public function it_merges_in_custom_repositories_if_not_available_through_packagist()
     {
+        $this->skipIfLaravel6();
+
         $this->setConfig([
             'export_paths' => [
                 'config',
@@ -462,6 +476,8 @@ class InstallTest extends TestCase
     /** @test */
     public function it_restores_existing_custom_repositories_if_any_cannot_be_found()
     {
+        $this->skipIfLaravel6();
+
         $this->setConfig([
             'export_paths' => [
                 'config',
@@ -575,6 +591,13 @@ class InstallTest extends TestCase
     private function assertComposerJsonDoesntHave($package)
     {
         $this->assertFileDoesntHaveContent($package, base_path('composer.json'));
+    }
+
+    private function skipIfLaravel6()
+    {
+        if (version_compare(app()->version(), '7', '<')) {
+            $this->markTestSkipped();
+        }
     }
 }
 
