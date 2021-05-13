@@ -148,8 +148,8 @@ class Installer
     {
         $this->exportPaths()
              ->reject(function ($path) {
-                return $this->files->exists($this->starterKitPath($path));
-            })
+                 return $this->files->exists($this->starterKitPath($path));
+             })
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");
             });
