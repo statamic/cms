@@ -4,6 +4,7 @@ namespace Statamic\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Http;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
@@ -80,13 +81,28 @@ class Installer
 
         $this
             // ->checkLicense()
+            ->backupComposerJson()
             ->requireStarterKit()
-            ->ensureCompatibleDependencies()
             ->ensureConfig()
+            ->ensureExportPathsExist()
+            ->prepareDependencyRepositories()
+            ->ensureCompatibleDependencies()
             ->installFiles()
             ->installDependencies()
             ->reticulateSplines()
             ->removeStarterKit();
+    }
+
+    /**
+     * Backup composer.json file.
+     *
+     * @return $this
+     */
+    protected function backupComposerJson()
+    {
+        $this->files->copy(base_path('composer.json'), base_path('composer.json.bak'));
+
+        return $this;
     }
 
     /**
@@ -103,6 +119,62 @@ class Installer
         } catch (ProcessException $exception) {
             $this->rollbackWithError("Error installing [{$this->package}].");
         }
+
+        return $this;
+    }
+
+    /**
+     * Ensure starter kit has config.
+     *
+     * @return $this
+     * @throws StarterKitException
+     */
+    protected function ensureConfig()
+    {
+        if (! $this->files->exists($this->starterKitPath('starter-kit.yaml'))) {
+            throw new StarterKitException('Starter kit config [starter-kit.yaml] does not exist.');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Ensure export paths exist.
+     *
+     * @return $this
+     * @throws StarterKitException
+     */
+    protected function ensureExportPathsExist()
+    {
+        $this->exportPaths()
+             ->reject(function ($path) {
+                return $this->files->exists($this->starterKitPath($path));
+            })
+            ->each(function ($path) {
+                throw new StarterKitException("Starter kit path [{$path}] does not exist.");
+            });
+
+        return $this;
+    }
+
+    /**
+     * Prepare dependency repositories.
+     *
+     * @return $this
+     */
+    protected function prepareDependencyRepositories()
+    {
+        if ($this->withoutDependencies) {
+            return $this;
+        }
+
+        $this->installableDependencies('dependencies')->each(function ($version, $package) {
+            $this->prepareDependencyRepository($package);
+        });
+
+        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
+            $this->prepareDependencyRepository($package);
+        });
 
         return $this;
     }
@@ -125,21 +197,6 @@ class Installer
         $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
             $this->ensureCompatibleDependency($package, $version, true);
         });
-
-        return $this;
-    }
-
-    /**
-     * Ensure starter kit has config.
-     *
-     * @return $this
-     * @throws StarterKitException
-     */
-    protected function ensureConfig()
-    {
-        if (! $this->files->exists($this->starterKitPath('starter-kit.yaml'))) {
-            throw new StarterKitException('Starter kit config [starter-kit.yaml] does not exist.');
-        }
 
         return $this;
     }
@@ -202,6 +259,40 @@ class Installer
     }
 
     /**
+     * Prepare dependency repository.
+     *
+     * @param string $package
+     */
+    protected function prepareDependencyRepository($package)
+    {
+        if (Http::get("https://repo.packagist.org/p2/{$package}.json")->status() === 200) {
+            return;
+        }
+
+        if (Http::get($githubUrl = "https://github.com/{$package}")->status() === 200) {
+            $url = $githubUrl;
+        } elseif (Http::get($bitbucketUrl = "https://bitbucket.org/{$package}")->status() === 200) {
+            $url = $bitbucketUrl;
+        } elseif (Http::get($gitlabUrl = "https://gitlab.com/{$package}")->status() === 200) {
+            $url = $gitlabUrl;
+        } else {
+            return;
+        }
+
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $composerJson['repositories'][] = [
+            'type' => 'vcs',
+            'url' => $url,
+        ];
+
+        $this->files->put(
+            base_path('composer.json'),
+            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+        );
+    }
+
+    /**
      * Ensure compatible dependency by performing a dry-run.
      *
      * @param string $package
@@ -250,7 +341,9 @@ class Installer
     {
         $this->console->info('Reticulating splines...');
 
-        sleep(2);
+        if (config('app.env') !== 'testing') {
+            sleep(2);
+        }
 
         return $this;
     }
@@ -270,6 +363,18 @@ class Installer
     }
 
     /**
+     * Backup composer.json file.
+     *
+     * @return $this
+     */
+    protected function restoreComposerJson()
+    {
+        $this->files->copy(base_path('composer.json.bak'), base_path('composer.json'));
+
+        return $this;
+    }
+
+    /**
      * Rollback with error.
      *
      * @param string $error
@@ -277,7 +382,9 @@ class Installer
      */
     protected function rollbackWithError($error)
     {
-        $this->removeStarterKit();
+        $this
+            ->removeStarterKit()
+            ->restoreComposerJson();
 
         throw new StarterKitException($error);
     }
@@ -317,18 +424,26 @@ class Installer
     }
 
     /**
+     * Get export paths.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function exportPaths()
+    {
+        $config = YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml')));
+
+        return collect($config['export_paths'] ?? []);
+    }
+
+    /**
      * Get installable files.
      *
      * @return \Illuminate\Support\Collection
      */
     protected function installableFiles()
     {
-        $config = YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml')));
-
-        return collect($config['export_paths'] ?? [])
-            ->filter(function ($path) {
-                return $this->files->exists($this->starterKitPath($path));
-            })
+        return $this
+            ->exportPaths()
             ->flatMap(function ($path) {
                 return $this->expandConfigExportPaths($path);
             })
