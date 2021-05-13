@@ -6,6 +6,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Globals\Variables as Contract;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -13,11 +14,12 @@ use Statamic\Data\HasOrigin;
 use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Variables implements Contract, Localization, Augmentable
+class Variables implements Contract, Localization, Augmentable, ResolvesValuesContract
 {
-    use ExistsAsFile, ContainsData, HasAugmentedInstance, HasOrigin, FluentlyGetsAndSets;
+    use ExistsAsFile, ContainsData, HasAugmentedInstance, HasOrigin, FluentlyGetsAndSets, ResolvesValues;
 
     protected $set;
     protected $locale;
