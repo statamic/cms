@@ -242,7 +242,7 @@ class URL
         
         $rootUrl = app('request')->root();
 
-        return Str::ensureRight($rootUrl);
+        return Str::ensureRight($rootUrl, '/');
     }
 
     /**
