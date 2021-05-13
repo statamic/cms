@@ -467,7 +467,7 @@ EOT
 
     private function exportCoolRunnings()
     {
-        $this->artisan('statamic:starter-kit:export ../cool-runnings');
+        $this->artisan('statamic:starter-kit:export', ['path' => '../cool-runnings']);
     }
 
     private function assertFileHasContent($expected, $path)
