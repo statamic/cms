@@ -129,7 +129,7 @@ return [
     'one_site_without_origin'   => 'Al menos un sitio no debe tener un origen.',
     'origin_cannot_be_disabled' => 'No se puede seleccionar un origen inhabilitado.',
 
-     /*
+    /*
     |--------------------------------------------------------------------------
     | Líneas de lenguaje de validación personalizadas
     |--------------------------------------------------------------------------
