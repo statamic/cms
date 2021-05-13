@@ -86,7 +86,7 @@ class ResolvesValuesTest extends TestCase
         $set = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
         $vars = $set->in('en');
 
-        $this->assertEquals('bar', $vars->get('foo'));
+        $this->assertEquals('bar', $vars->value('foo'));
         $this->assertEquals('BAR', $vars->resolveGqlValue('foo'));
         $this->assertEquals('bar', $vars->resolveRawGqlValue('foo'));
     }
