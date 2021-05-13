@@ -36,6 +36,10 @@ class ExportTest extends TestCase
 
     public function tearDown(): void
     {
+        if ($this->files->exists($this->configPath)) {
+            $this->files->delete($this->configPath);
+        }
+
         $this->restoreComposerJson();
 
         parent::tearDown();
