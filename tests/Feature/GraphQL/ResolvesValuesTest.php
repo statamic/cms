@@ -23,7 +23,8 @@ class ResolvesValuesTest extends TestCase
     {
         parent::setUp();
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return strtoupper($value);
