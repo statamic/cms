@@ -82,8 +82,7 @@ export default {
     data() {
         return {
             data: this.objectToSortable(this.value || []),
-            deleting: false,
-            mounted: false,
+            deleting: false
         }
     },
 
