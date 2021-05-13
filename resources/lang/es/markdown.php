@@ -49,9 +49,9 @@ esto: es un poco de yaml
 
 <h3>Tablas</h3>
 
-<pre class="language-markdown"><code>Primer encabezado   | Segundo encabezado
-------------------- | -------------------
-Celda de contenido  | Celda de contenido
-Celda de contenido  | Celda de contenido</code></pre>',
+<pre class="language-markdown"><code>Encabezado 1  | Encabezado 2
+------------- | -------------
+Celda         | Celda
+Celda         | Celda </code></pre>',
 
 ];

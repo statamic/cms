@@ -24,9 +24,9 @@ return [
     'publish_{collection}_entries_desc' => 'Permite cambiar de Borrador a Publicado y viceversa',
     'reorder_{collection}_entries' => 'Reordenar entradas',
     'reorder_{collection}_entries_desc' => 'Permite reordenar, arrastrar y soltar',
-    'edit_other_authors_{collection}_entries' => "Editar entradas de otros autores",
-    'publish_other_authors_{collection}_entries' => "Administrar el estado de publicación en entradas de otros autores",
-    'delete_other_authors_{collection}_entries' => "Eliminar entradas de otros autores",
+    'edit_other_authors_{collection}_entries' => 'Editar entradas de otros autores',
+    'publish_other_authors_{collection}_entries' => 'Administrar el estado de publicación en entradas de otros autores',
+    'delete_other_authors_{collection}_entries' => 'Eliminar entradas de otros autores',
 
     'group_taxonomies' => 'Taxonomías',
     'configure_taxonomies' => 'Configurar taxonomías',
