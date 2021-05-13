@@ -97,7 +97,8 @@ class PageTest extends TestCase
     /** @test */
     public function it_builds_a_uri_based_on_the_position_in_the_structure_when_the_structure_has_a_collection()
     {
-        $entry = new class extends Entry {
+        $entry = new class extends Entry
+        {
             public function id($id = null)
             {
                 return 'a';
@@ -202,7 +203,8 @@ class PageTest extends TestCase
     public function it_gets_flattened_pages()
     {
         EntryAPI::shouldReceive('find')->with('one')
-            ->andReturn(new class extends Entry {
+            ->andReturn(new class extends Entry
+            {
                 public function id($slug = null)
                 {
                     return 'one';
@@ -215,7 +217,8 @@ class PageTest extends TestCase
             });
 
         EntryAPI::shouldReceive('find')->with('two')
-            ->andReturn(new class extends Entry {
+            ->andReturn(new class extends Entry
+            {
                 public function id($slug = null)
                 {
                     return 'two';
@@ -228,7 +231,8 @@ class PageTest extends TestCase
             });
 
         EntryAPI::shouldReceive('find')->with('three')
-            ->andReturn(new class extends Entry {
+            ->andReturn(new class extends Entry
+            {
                 public function id($slug = null)
                 {
                     return 'three';
@@ -241,7 +245,8 @@ class PageTest extends TestCase
             });
 
         EntryAPI::shouldReceive('find')->with('four')
-            ->andReturn(new class extends Entry {
+            ->andReturn(new class extends Entry
+            {
                 public function id($slug = null)
                 {
                     return 'four';
@@ -295,7 +300,8 @@ class PageTest extends TestCase
 
     protected function newTree()
     {
-        return new class extends Tree {
+        return new class extends Tree
+        {
             private $structure;
 
             public function path()

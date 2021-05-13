@@ -209,7 +209,8 @@ trait UserContractTests
 
     private function createRole($handle)
     {
-        $class = new class($handle) extends Role {
+        $class = new class($handle) extends Role
+        {
             public function __construct($handle)
             {
                 $this->handle = $handle;
@@ -225,7 +226,8 @@ trait UserContractTests
 
     private function createGroup($handle)
     {
-        $class = new class($handle) extends UserGroup {
+        $class = new class($handle) extends UserGroup
+        {
             public function __construct($handle)
             {
                 $this->handle = $handle;

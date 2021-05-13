@@ -11,7 +11,8 @@ class HasPreferencesInPropertyTraitTest extends TestCase
 
     public function makeUser()
     {
-        return new class {
+        return new class
+        {
             use HasPreferencesInProperty;
         };
     }
