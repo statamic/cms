@@ -81,26 +81,16 @@ export default {
 
     data() {
         return {
-            data: [],
+            data: this.objectToSortable(this.value || []),
             deleting: false,
             mounted: false,
         }
-    },
-
-    created() {
-        this.data = this.objectToSortable(this.value || []);
-        this.$watch('')
-    },
-
-    mounted() {
-        this.$nextTick(() => this.mounted = true);
     },
 
     watch: {
         data: {
             deep: true,
             handler (data) {
-                if (!this.mounted) return;
                 this.update(this.sortableToObject(data));
             }
         },
