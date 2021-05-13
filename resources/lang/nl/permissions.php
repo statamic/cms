@@ -71,6 +71,6 @@ return [
     'access_utility' => ':title',
     'access_utility_desc' => 'Geeft toegang tot het :title gereedschap',
     'group_misc' => 'Diversen',
-    'resolve_duplicate_ids' => 'Los dubbele ID''s op',
-    'resolve_duplicate_ids_desc' => 'Geeft de mogelijkheid om dubbele ID''s te zien en op te lossen.',
+    'resolve_duplicate_ids' => 'Los dubbele IDs op',
+    'resolve_duplicate_ids_desc' => 'Geeft de mogelijkheid om dubbele IDs te zien en op te lossen.',
 ];
