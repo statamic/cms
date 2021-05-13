@@ -76,7 +76,7 @@
                         ref="input"
                         v-model="title"
                         class="input h-auto text-sm placeholder-gray-50"
-                        :placeholder="__('Title (optional)')"
+                        :placeholder="`${__('Label')} (${__('Optional')})`"
                     />
                 </div>
 

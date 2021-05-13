@@ -98,4 +98,41 @@ class KeysTest extends TestCase
 
         $this->assertNull(Cache::get('stache::keys/test-store'));
     }
+
+    /** @test */
+    public function it_forgets_a_key()
+    {
+        $store = $this->mock(Store::class);
+        $store->shouldReceive('key')->andReturn('test-store');
+
+        $keys = (new Keys($store))->setKeys([
+            '123' => 'original.md',
+            '456' => 'another.md',
+        ]);
+
+        $return = $keys->forget('123');
+
+        $this->assertEquals($keys, $return);
+        $this->assertEquals(['456' => 'another.md'], $keys->all());
+    }
+
+    /** @test */
+    public function it_sets_the_path_of_a_key()
+    {
+        $store = $this->mock(Store::class);
+        $store->shouldReceive('key')->andReturn('test-store');
+
+        $keys = (new Keys($store))->setKeys([
+            '123' => 'original.md',
+            '456' => 'another.md',
+        ]);
+
+        $return = $keys->set('123', 'changed.md');
+
+        $this->assertEquals($keys, $return);
+        $this->assertEquals([
+            '123' => 'changed.md',
+            '456' => 'another.md',
+        ], $keys->all());
+    }
 }

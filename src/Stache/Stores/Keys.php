@@ -59,6 +59,20 @@ class Keys
             throw new DuplicateKeyException($key, $path);
         }
 
+        $this->set($key, $path);
+    }
+
+    public function forget($key)
+    {
+        unset($this->keys[$key]);
+
+        return $this;
+    }
+
+    public function set($key, $path)
+    {
         $this->keys[$key] = $path;
+
+        return $this;
     }
 }

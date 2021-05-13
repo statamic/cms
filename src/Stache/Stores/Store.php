@@ -359,6 +359,8 @@ abstract class Store
         unset($paths[$key]);
 
         $this->cachePaths($paths);
+
+        $this->keys()->forget($key)->cache();
     }
 
     protected function setPath($key, $path)
@@ -368,6 +370,8 @@ abstract class Store
         $paths[$key] = $path;
 
         $this->cachePaths($paths);
+
+        $this->keys()->set($key, $path)->cache();
     }
 
     protected function cachePaths($paths)

@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.1.13 (2020-05-10)
+
+### What's improved
+- In Bard, display the asset container option when using the link or image buttons. [#3665](https://github.com/statamic/cms/issues/3665)
+- Make dropdown items links, letting you open them in new tabs. [#3667](https://github.com/statamic/cms/issues/3667)
+
+### What's fixed
+- Update tracked keys when saving and deleting [#3684](https://github.com/statamic/cms/issues/3684)
+- Bard link picker only show entries for collections with a route. [#3679](https://github.com/statamic/cms/issues/3679)
+- Separate the title and optional translation. [#3675](https://github.com/statamic/cms/issues/3675)
+- Fix Bard error when linked entries and assets are deleted. [#3678](https://github.com/statamic/cms/issues/3678)
+- Fix `date` fieldtype's `time_enabled` option [#3661](https://github.com/statamic/cms/issues/3661)
+- Fix `link` fieldtype alignment. [83aededfe](https://github.com/statamic/cms/commit/83aededfe)
+- Fix YAML fence when dumping multiline string as last key [#3663](https://github.com/statamic/cms/issues/3663)
+- Fix "Create Fieldset" button not displaying. [#3645](https://github.com/statamic/cms/issues/3645)
+
+
+
 ## 3.1.12 (2020-05-06)
 
 ### What's new
