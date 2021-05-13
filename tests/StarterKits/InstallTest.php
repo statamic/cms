@@ -177,6 +177,7 @@ class InstallTest extends TestCase
 
         Http::fake([
             'repo.packagist.org/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
         ]);
 
         $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
@@ -208,6 +209,7 @@ class InstallTest extends TestCase
 
         Http::fake([
             'repo.packagist.org/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
         ]);
 
         $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
@@ -239,6 +241,7 @@ class InstallTest extends TestCase
 
         Http::fake([
             'repo.packagist.org/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
         ]);
 
         $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
@@ -279,6 +282,7 @@ class InstallTest extends TestCase
 
         Http::fake([
             'repo.packagist.org/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
         ]);
 
         $this->installCoolRunnings();
@@ -325,6 +329,7 @@ class InstallTest extends TestCase
 
         Http::fake([
             'repo.packagist.org/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
         ]);
 
         $this->installCoolRunnings();
@@ -357,6 +362,7 @@ class InstallTest extends TestCase
             'github.com/bobsled/*' => Http::response('', 200),
             'bitbucket.org/llama/*' => Http::response('', 200),
             'gitlab.com/rhino/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
         ]);
 
         $this->installCoolRunnings();
@@ -422,6 +428,7 @@ class InstallTest extends TestCase
             'github.com/bobsled/*' => Http::response('', 200),
             'bitbucket.org/llama/*' => Http::response('', 200),
             'gitlab.com/rhino/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
         ]);
 
         $this->installCoolRunnings();
