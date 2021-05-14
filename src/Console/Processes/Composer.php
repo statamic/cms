@@ -46,10 +46,13 @@ class Composer extends Process
      */
     public function installed()
     {
+        $lock = Lock::file($this->basePath.'composer.lock');
+
         return collect($this->runJsonComposerCommand('show', '--direct', '--no-plugins')->installed)
             ->keyBy('name')
-            ->map(function ($package) {
+            ->map(function ($package) use ($lock) {
                 $package->version = $this->normalizeVersion($package->version);
+                $package->dev = $lock->isDevPackageInstalled($package->name);
 
                 return $package;
             });
@@ -89,19 +92,17 @@ class Composer extends Process
      *
      * @param string $package
      * @param string|null $version
-     * @param bool $dev
+     * @param mixed $extraParams
      */
-    public function require(string $package, string $version = null, bool $dev = false)
+    public function require(string $package, string $version = null, ...$extraParams)
     {
         if ($version) {
             $parts[] = $version;
         }
 
-        if ($dev) {
-            $parts[] = '--dev';
-        }
-
         $parts[] = '--update-with-dependencies';
+
+        $parts = array_merge($parts, $extraParams);
 
         $this->queueComposerCommand('require', $package, ...$parts);
     }
@@ -112,9 +113,9 @@ class Composer extends Process
      * @param string $package
      * @param string|null $version
      */
-    public function requireDev(string $package, string $version = null)
+    public function requireDev(string $package, string $version = null, ...$extraParams)
     {
-        $this->require($package, $version, true);
+        $this->require($package, $version, '--dev', ...$extraParams);
     }
 
     /**
