@@ -6,6 +6,7 @@ use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\Processes\Exceptions\ProcessException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
@@ -18,7 +19,7 @@ class Installer
     protected $force;
     protected $package;
     protected $console;
-    protected $composerOutput;
+    protected $url;
 
     /**
      * Instantiate starter kit installer.
@@ -82,15 +83,17 @@ class Installer
         $this
             // ->checkLicense()
             ->backupComposerJson()
+            ->detectRepositoryUrl()
+            ->prepareRepository()
             ->requireStarterKit()
             ->ensureConfig()
             ->ensureExportPathsExist()
-            ->prepareDependencyRepositories()
             ->ensureCompatibleDependencies()
             ->installFiles()
             ->installDependencies()
             ->reticulateSplines()
-            ->removeStarterKit();
+            ->removeStarterKit()
+            ->removeRepository();
     }
 
     /**
@@ -106,7 +109,57 @@ class Installer
     }
 
     /**
-     * Composer require starter kit dependency.
+     * Detect repository url.
+     *
+     * @return $this
+     */
+    protected function detectRepositoryUrl()
+    {
+        if (Http::get("https://repo.packagist.org/p2/{$this->package}.json")->status() === 200) {
+            return $this;
+        }
+
+        if (Http::get($githubUrl = "https://github.com/{$this->package}")->status() === 200) {
+            $this->url = $githubUrl;
+        } elseif (Http::get($bitbucketUrl = "https://bitbucket.org/{$this->package}")->status() === 200) {
+            $this->url = $bitbucketUrl;
+        } elseif (Http::get($gitlabUrl = "https://gitlab.com/{$this->package}")->status() === 200) {
+            $this->url = $gitlabUrl;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Prepare repository.
+     *
+     * @return $this
+     */
+    protected function prepareRepository()
+    {
+        if (! $this->url) {
+            return $this;
+        }
+
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $composerJson['repositories'][] = [
+            'type' => 'vcs',
+            'url' => $this->url,
+        ];
+
+        $this->files->put(
+            base_path('composer.json'),
+            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+        );
+
+        Blink::put('starter-kit-repository-added', $this->url);
+
+        return $this;
+    }
+
+    /**
+     * Require starter kit dependency.
      *
      * @return $this
      */
@@ -153,28 +206,6 @@ class Installer
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");
             });
-
-        return $this;
-    }
-
-    /**
-     * Prepare dependency repositories.
-     *
-     * @return $this
-     */
-    protected function prepareDependencyRepositories()
-    {
-        if ($this->withoutDependencies) {
-            return $this;
-        }
-
-        $this->installableDependencies('dependencies')->each(function ($version, $package) {
-            $this->prepareDependencyRepository($package);
-        });
-
-        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
-            $this->prepareDependencyRepository($package);
-        });
 
         return $this;
     }
@@ -259,40 +290,6 @@ class Installer
     }
 
     /**
-     * Prepare dependency repository.
-     *
-     * @param string $package
-     */
-    protected function prepareDependencyRepository($package)
-    {
-        if (Http::get("https://repo.packagist.org/p2/{$package}.json")->status() === 200) {
-            return;
-        }
-
-        if (Http::get($githubUrl = "https://github.com/{$package}")->status() === 200) {
-            $url = $githubUrl;
-        } elseif (Http::get($bitbucketUrl = "https://bitbucket.org/{$package}")->status() === 200) {
-            $url = $bitbucketUrl;
-        } elseif (Http::get($gitlabUrl = "https://gitlab.com/{$package}")->status() === 200) {
-            $url = $gitlabUrl;
-        } else {
-            return;
-        }
-
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
-
-        $composerJson['repositories'][] = [
-            'type' => 'vcs',
-            'url' => $url,
-        ];
-
-        $this->files->put(
-            base_path('composer.json'),
-            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
-        );
-    }
-
-    /**
      * Ensure compatible dependency by performing a dry-run.
      *
      * @param string $package
@@ -301,10 +298,10 @@ class Installer
      */
     protected function ensureCompatibleDependency($package, $version, $dev = false)
     {
-        $args = $this->requireDependencyArgs($package, $version, $dev, '--dry-run');
+        $requireMethod = $dev ? 'requireDev' : 'require';
 
         try {
-            Composer::withoutQueue()->throwOnFailure()->runComposerCommand(...$args);
+            Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($package, $version, '--dry-run');
         } catch (ProcessException $exception) {
             $this->rollbackWithError("Cannot install due to error with [{$package}] dependency.");
         }
@@ -321,7 +318,14 @@ class Installer
     {
         $this->console->info("Installing dependency [{$package}]...");
 
-        $args = $this->requireDependencyArgs($package, $version, $dev);
+        $args = ['require'];
+
+        if ($dev) {
+            $args[] = '--dev';
+        }
+
+        $args[] = $package;
+        $args[] = $version;
 
         try {
             Composer::withoutQueue()->throwOnFailure()->runAndOperateOnOutput($args, function ($output) {
@@ -349,7 +353,7 @@ class Installer
     }
 
     /**
-     * Composer remove starter kit dependency.
+     * Remove starter kit dependency.
      *
      * @return $this
      */
@@ -358,6 +362,37 @@ class Installer
         $this->console->info('Cleaning up temporary files...');
 
         Composer::withoutQueue()->throwOnFailure(false)->remove($this->package);
+
+        return $this;
+    }
+
+    /**
+     * Remove repository.
+     *
+     * @return $this
+     */
+    protected function removeRepository()
+    {
+        if (! $this->url) {
+            return $this;
+        }
+
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $repositories = collect($composerJson['repositories'])->reject(function ($repository) {
+            return isset($repository['url']) && $repository['url'] === $this->url;
+        });
+
+        if ($repositories->isNotEmpty()) {
+            $composerJson['repositories'] = $repositories;
+        } else {
+            unset($composerJson['repositories']);
+        }
+
+        $this->files->put(
+            base_path('composer.json'),
+            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+        );
 
         return $this;
     }
@@ -485,29 +520,6 @@ class Installer
         }
 
         return $path;
-    }
-
-    /**
-     * Get require dependency args.
-     *
-     * @param string $package
-     * @param string $version
-     * @param bool $dev
-     * @param array $extraArgs
-     * @return array
-     */
-    protected function requireDependencyArgs($package, $version, $dev, ...$extraArgs)
-    {
-        $args = ['require'];
-
-        if ($dev) {
-            $args[] = '--dev';
-        }
-
-        $args[] = $package;
-        $args[] = $version;
-
-        return array_merge($args, $extraArgs);
     }
 
     /**

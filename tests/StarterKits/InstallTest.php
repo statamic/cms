@@ -5,6 +5,7 @@ namespace Tests\StarterKits;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use Statamic\Facades\Blink;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Tests\TestCase;
@@ -43,12 +44,108 @@ class InstallTest extends TestCase
     public function it_installs_starter_kit()
     {
         $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileNotExists(base_path('copied.md'));
 
         $this->installCoolRunnings();
 
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_installs_from_github()
+    {
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileNotExists(base_path('copied.md'));
+
+        $this->installCoolRunnings([], [
+            'github.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertEquals('https://github.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_installs_from_bitbucket()
+    {
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileNotExists(base_path('copied.md'));
+
+        $this->installCoolRunnings([], [
+            'bitbucket.org/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertEquals('https://bitbucket.org/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_installs_from_gitlab()
+    {
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileNotExists(base_path('copied.md'));
+
+        $this->installCoolRunnings([], [
+            'gitlab.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertEquals('https://gitlab.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_restores_existing_repositories_after_successful_install()
+    {
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileNotExists(base_path('copied.md'));
+
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $expectedRepositories = $composerJson['repositories'] = [
+            [
+                'type' => 'path',
+                'path' => '/some/path',
+            ],
+            [
+                'type' => 'vcs',
+                'url' => 'https://example.com/some/url',
+            ],
+        ];
+
+        $this->files->put(
+            base_path('composer.json'),
+            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+        );
+
+        $this->installCoolRunnings([], [
+            'github.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertEquals('https://github.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
         $this->assertFileNotExists($this->kitVendorPath());
         $this->assertFileExists(base_path('copied.md'));
+
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertCount(2, $composerJson['repositories']);
+        $this->assertEquals($expectedRepositories, $composerJson['repositories']);
     }
 
     /** @test */
@@ -179,11 +276,6 @@ class InstallTest extends TestCase
             ],
         ]);
 
-        Http::fake([
-            'repo.packagist.org/*' => Http::response('', 200),
-            '*' => Http::response('', 404),
-        ]);
-
         $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
         $this->assertFileNotExists(base_path('vendor/statamic/seo-pro'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
@@ -192,6 +284,7 @@ class InstallTest extends TestCase
 
         $this->installCoolRunnings();
 
+        $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
         $this->assertFileExists(base_path('vendor/statamic/seo-pro'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
@@ -211,17 +304,13 @@ class InstallTest extends TestCase
             ],
         ]);
 
-        Http::fake([
-            'repo.packagist.org/*' => Http::response('', 200),
-            '*' => Http::response('', 404),
-        ]);
-
         $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
         $this->assertFileNotExists(base_path('vendor/statamic/ssg'));
         $this->assertComposerJsonDoesntHave('statamic/ssg');
 
         $this->installCoolRunnings();
 
+        $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
         $this->assertFileExists(base_path('vendor/statamic/ssg'));
         $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
@@ -243,11 +332,6 @@ class InstallTest extends TestCase
             ],
         ]);
 
-        Http::fake([
-            'repo.packagist.org/*' => Http::response('', 200),
-            '*' => Http::response('', 404),
-        ]);
-
         $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
         $this->assertFileNotExists(base_path('vendor/statamic/seo-pro'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
@@ -258,6 +342,7 @@ class InstallTest extends TestCase
 
         $this->installCoolRunnings();
 
+        $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
         $this->assertFileExists(base_path('vendor/statamic/seo-pro'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
@@ -265,255 +350,6 @@ class InstallTest extends TestCase
         $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
         $this->assertFileExists(base_path('vendor/statamic/ssg'));
         $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
-    }
-
-    /** @test */
-    public function it_doesnt_create_custom_repositories_when_all_dependencies_are_found_on_packagist()
-    {
-        $this->setConfig([
-            'export_paths' => [
-                'config',
-                'copied.md',
-            ],
-            'dependencies' => [
-                'statamic/seo-pro' => '^0.2.0',
-                'bobsled/speed-calculator' => '^1.0.0',
-            ],
-            'dependencies_dev' => [
-                'statamic/ssg' => '*',
-            ],
-        ]);
-
-        Http::fake([
-            'repo.packagist.org/*' => Http::response('', 200),
-            '*' => Http::response('', 404),
-        ]);
-
-        $this->installCoolRunnings();
-
-        $this->assertComposerJsonDoesntHave('repositories');
-    }
-
-    /** @test */
-    public function it_leaves_behind_existing_custom_repositories_when_all_dependencies_are_found_on_packagist()
-    {
-        $this->setConfig([
-            'export_paths' => [
-                'config',
-                'copied.md',
-            ],
-            'dependencies' => [
-                'statamic/seo-pro' => '^0.2.0',
-                'bobsled/speed-calculator' => '^1.0.0',
-            ],
-            'dependencies_dev' => [
-                'statamic/ssg' => '*',
-            ],
-        ]);
-
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
-
-        $repositories = [
-            [
-                'type' => 'path',
-                'url' => base_path('repos/some-repo'),
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://github.com/hansolo/kessel-run',
-            ],
-        ];
-
-        $composerJson['repositories'] = $repositories;
-
-        $this->files->put(
-            base_path('composer.json'),
-            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
-        );
-
-        Http::fake([
-            'repo.packagist.org/*' => Http::response('', 200),
-            '*' => Http::response('', 404),
-        ]);
-
-        $this->installCoolRunnings();
-
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
-
-        $this->assertEquals($repositories, $composerJson['repositories']);
-    }
-
-    /** @test */
-    public function it_creates_custom_repositories_if_not_available_through_packagist()
-    {
-        $this->setConfig([
-            'export_paths' => [
-                'config',
-                'copied.md',
-            ],
-            'dependencies' => [
-                'statamic/seo-pro' => '^0.2.0',
-                'bobsled/speed-calculator' => '^1.0.0',
-            ],
-            'dependencies_dev' => [
-                'llama/jump-calculator' => '^1.0.0',
-                'rhino/impact-calculator' => '^1.0.0',
-            ],
-        ]);
-
-        Http::fake([
-            'repo.packagist.org/p2/statamic/*' => Http::response('', 200),
-            'github.com/bobsled/*' => Http::response('', 200),
-            'bitbucket.org/llama/*' => Http::response('', 200),
-            'gitlab.com/rhino/*' => Http::response('', 200),
-            '*' => Http::response('', 404),
-        ]);
-
-        $this->installCoolRunnings();
-
-        $expected = [
-            [
-                'type' => 'vcs',
-                'url' => 'https://github.com/bobsled/speed-calculator',
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://bitbucket.org/llama/jump-calculator',
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://gitlab.com/rhino/impact-calculator',
-            ],
-        ];
-
-        $this->assertEquals($expected, json_decode($this->files->get(base_path('composer.json')), true)['repositories']);
-    }
-
-    /** @test */
-    public function it_merges_in_custom_repositories_if_not_available_through_packagist()
-    {
-        $this->setConfig([
-            'export_paths' => [
-                'config',
-                'copied.md',
-            ],
-            'dependencies' => [
-                'statamic/seo-pro' => '^0.2.0',
-                'bobsled/speed-calculator' => '^1.0.0',
-            ],
-            'dependencies_dev' => [
-                'llama/jump-calculator' => '^1.0.0',
-                'rhino/impact-calculator' => '^1.0.0',
-            ],
-        ]);
-
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
-
-        $repositories = [
-            [
-                'type' => 'path',
-                'url' => base_path('repos/some-repo'),
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://github.com/hansolo/kessel-run',
-            ],
-        ];
-
-        $composerJson['repositories'] = $repositories;
-
-        $this->files->put(
-            base_path('composer.json'),
-            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
-        );
-
-        Http::fake([
-            'repo.packagist.org/p2/statamic/*' => Http::response('', 200),
-            'github.com/bobsled/*' => Http::response('', 200),
-            'bitbucket.org/llama/*' => Http::response('', 200),
-            'gitlab.com/rhino/*' => Http::response('', 200),
-            '*' => Http::response('', 404),
-        ]);
-
-        $this->installCoolRunnings();
-
-        $expected = [
-            [
-                'type' => 'path',
-                'url' => base_path('repos/some-repo'),
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://github.com/hansolo/kessel-run',
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://github.com/bobsled/speed-calculator',
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://bitbucket.org/llama/jump-calculator',
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://gitlab.com/rhino/impact-calculator',
-            ],
-        ];
-
-        $this->assertEquals($expected, json_decode($this->files->get(base_path('composer.json')), true)['repositories']);
-    }
-
-    /** @test */
-    public function it_restores_existing_custom_repositories_if_any_cannot_be_found()
-    {
-        $this->setConfig([
-            'export_paths' => [
-                'config',
-                'copied.md',
-            ],
-            'dependencies' => [
-                'statamic/seo-pro' => '^0.2.0',
-            ],
-        ]);
-
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
-
-        $repositories = [
-            [
-                'type' => 'path',
-                'url' => base_path('repos/some-repo'),
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://github.com/hansolo/kessel-run',
-            ],
-        ];
-
-        $composerJson['repositories'] = $repositories;
-
-        $this->files->put(
-            base_path('composer.json'),
-            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
-        );
-
-        Http::fake([
-            '*' => Http::response('', 404),
-        ]);
-
-        $this->installCoolRunnings();
-
-        $expected = [
-            [
-                'type' => 'path',
-                'url' => base_path('repos/some-repo'),
-            ],
-            [
-                'type' => 'vcs',
-                'url' => 'https://github.com/hansolo/kessel-run',
-            ],
-        ];
-
-        $this->assertEquals($expected, json_decode($this->files->get(base_path('composer.json')), true)['repositories']);
     }
 
     private function kitRepoPath($path = null)
@@ -547,8 +383,13 @@ class InstallTest extends TestCase
         return $path;
     }
 
-    private function installCoolRunnings($options = [])
+    private function installCoolRunnings($options = [], $customFake = null)
     {
+        Http::fake($customFake ?? [
+            'repo.packagist.org/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
         $this->artisan('statamic:starter-kit:install', array_merge([
             'package' => 'statamic/cool-runnings',
             '--no-interaction' => true,
@@ -589,14 +430,22 @@ class FakeComposer
         $this->files = app(Filesystem::class);
     }
 
-    public function require($package, $version = null)
+    public function require($package, $version = null, ...$extraParams)
     {
+        if (collect($extraParams)->contains('--dry-run')) {
+            return;
+        }
+
         $this->fakeInstallComposerJson('require', $package, $version);
         $this->fakeInstallVendorFiles($package);
     }
 
-    public function requireDev($package, $version = null)
+    public function requireDev($package, $version = null, ...$extraParams)
     {
+        if (collect($extraParams)->contains('--dry-run')) {
+            return;
+        }
+
         $this->fakeInstallComposerJson('require-dev', $package, $version);
         $this->fakeInstallVendorFiles($package);
     }
@@ -657,10 +506,14 @@ class FakeComposer
 
     private function fakeInstallVendorFiles($package)
     {
+        if ($this->files->exists($path = base_path("vendor/{$package}"))) {
+            $this->files->deleteDirectory($path);
+        }
+
         if ($package === 'statamic/cool-runnings') {
-            $this->files->copyDirectory(base_path('repo/cool-runnings'), base_path("vendor/{$package}"));
+            $this->files->copyDirectory(base_path('repo/cool-runnings'), $path);
         } else {
-            $this->files->makeDirectory(base_path("vendor/{$package}"), 0755, true);
+            $this->files->makeDirectory($path, 0755, true);
         }
     }
 
