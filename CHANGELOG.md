@@ -1,5 +1,28 @@
 # Release Notes
 
+## 3.1.14 (2020-05-14)
+
+### What's new
+- Add Bard node extension helper. [#3657](https://github.com/statamic/cms/issues/3657)
+
+### What's improved
+- Add HTML fieldtype icon. [247364cbb](https://github.com/statamic/cms/commit/247364cbb)
+- Update Spanish, German, Dutch, and French Translations [#3706](https://github.com/statamic/cms/issues/3706) [#3674](https://github.com/statamic/cms/issues/3674) [#3703](https://github.com/statamic/cms/issues/3703) [#3688](https://github.com/statamic/cms/issues/3688)
+
+### What's fixed
+- Fix avatar URLs for some situations. [468a55864](https://github.com/statamic/cms/commit/468a55864)
+- Fix error when selecting certain collections in a Bard fieldtype. [#3709](https://github.com/statamic/cms/issues/3709)
+- Fix array fieldtype always being dirty. [#3704](https://github.com/statamic/cms/issues/3704)
+- Fix GraphQL error in globals and terms. [#3711](https://github.com/statamic/cms/issues/3711)
+- Fix Bard z-index issue. [#3694](https://github.com/statamic/cms/issues/3694)
+- Fix SVG Dimensions. [#3702](https://github.com/statamic/cms/issues/3702)
+- Explicitly use Stringy for `Str::replace()`. [#3698](https://github.com/statamic/cms/issues/3698)
+- Bump codemirror from 5.55.0 to 5.58.2. [#3691](https://github.com/statamic/cms/issues/3691)
+- Bump url-parse from 1.4.7 to 1.5.1. [#3664](https://github.com/statamic/cms/issues/3664)
+- Bump hosted-git-info from 2.8.8 to 2.8.9. [#3676](https://github.com/statamic/cms/issues/3676)
+
+
+
 ## 3.1.13 (2020-05-10)
 
 ### What's improved
