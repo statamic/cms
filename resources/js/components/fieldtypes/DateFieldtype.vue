@@ -24,7 +24,6 @@
                     :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
                     :locale="$config.get('locale').replace('_', '-')"
-                    :formats="formats"
                     :mode="config.mode"
                     :input="value"
                     :is-required="config.required"
@@ -63,13 +62,6 @@ export default {
         return {
             date: null,
             time: null,
-            formats: {
-                title: 'MMMM YYYY',
-                weekdays: 'W',
-                navMonths: 'MMM',
-                input: ['L', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD'],
-                dayPopover: 'L',
-            },
             attrs: [
                 {
                     key: 'today',
