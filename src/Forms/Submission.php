@@ -22,7 +22,7 @@ class Submission implements SubmissionContract, Augmentable
     /**
      * @var string
      */
-    private $id;
+    public $id;
 
     /**
      * @var Form
