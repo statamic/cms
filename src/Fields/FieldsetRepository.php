@@ -26,17 +26,16 @@ class FieldsetRepository
             return $cached;
         }
 
-        // I don't understand why this is done
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
-
-        if (! $this->exists($handle)) {
-            return null;
-        }
 
         $directory = $this->directories()->first(function ($directory) use ($path) {
             return File::exists("{$directory}/{$path}.yaml");
         });
+
+        if (! $directory) {
+            return null;
+        }
 
         $fieldset = (new Fieldset)
             ->setHandle($handle)
@@ -49,7 +48,6 @@ class FieldsetRepository
 
     public function exists(string $handle): bool
     {
-        // I don't understand why this is done
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
@@ -65,7 +63,7 @@ class FieldsetRepository
 
     public function all(): Collection
     {
-        $fieldsets = $this->directories
+        $fieldsets = $this->directories()
             ->flatMap(function (string $directory) {
                 return File::withAbsolutePaths()
                     ->getFilesByTypeRecursively($directory, 'yaml')
