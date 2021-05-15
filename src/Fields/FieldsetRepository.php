@@ -70,7 +70,6 @@ class FieldsetRepository
                 return $this->getFieldsetsByDirectory($directory);
             });
 
-        dd($fieldsets);
         if ($fieldsets->isEmpty()) {
             return collect();
         }
