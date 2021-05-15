@@ -49,6 +49,33 @@ class ViewFieldsetListingTest extends TestCase
     }
 
     /** @test */
+    public function it_shows_a_list_of_non_addon_fieldsets()
+    {
+        Facades\Fieldset::shouldReceive('all')->andReturn(collect([
+            'foo' => $fieldsetA = $this->createfieldset('foo'),
+            'bar' => $fieldsetB = $this->createFieldset('bar')->setIsAddonFieldset(true),
+        ]));
+
+        $user = Facades\User::make()->makeSuper()->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('fieldsets.index'))
+            ->assertSuccessful()
+            ->assertViewHas('fieldsets', collect([
+                [
+                    'id' => 'foo',
+                    'handle' => 'foo',
+                    'title' => 'Foo',
+                    'fields' => 0,
+                    'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
+                    'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
+                ],
+            ]))
+            ->assertDontSee('no-results');
+    }
+
+    /** @test */
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -61,7 +88,7 @@ class ViewFieldsetListingTest extends TestCase
             ->assertRedirect('/cp/original');
     }
 
-    private function createFieldset($handle)
+    private function createFieldset($handle): Fieldset
     {
         return tap(new Fieldset)->setHandle($handle);
     }
