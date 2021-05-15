@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\Support\Str;
 
 class FieldsetRepository
 {
@@ -39,6 +40,7 @@ class FieldsetRepository
 
         $fieldset = (new Fieldset)
             ->setHandle($handle)
+            ->setIsAddonFieldset(Str::startsWith($directory, resource_path()))
             ->setContents(YAML::file("{$directory}/{$path}.yaml")->parse());
 
         $this->fieldsets[$handle] = $fieldset;
@@ -65,21 +67,10 @@ class FieldsetRepository
     {
         $fieldsets = $this->directories()
             ->flatMap(function (string $directory) {
-                return File::withAbsolutePaths()
-                    ->getFilesByTypeRecursively($directory, 'yaml')
-                    ->map(function ($file) use ($directory) {
-                        $basename = str_after($file, str_finish($directory, '/'));
-                        $handle = str_before($basename, '.yaml');
-                        $handle = str_replace('/', '.', $handle);
-
-                        return (new Fieldset)
-                            ->setHandle($handle)
-                            ->setPath($directory)
-                            ->setContents(YAML::file($file)->parse());
-                    })
-                    ->keyBy->handle();
+                return $this->getFieldsetsByDirectory($directory);
             });
 
+        dd($fieldsets);
         if ($fieldsets->isEmpty()) {
             return collect();
         }
@@ -112,5 +103,22 @@ class FieldsetRepository
     public function directories(): Collection
     {
         return collect($this->addonDirectories)->merge($this->directory);
+    }
+
+    private function getFieldsetsByDirectory(string $directory): Collection
+    {
+        return File::withAbsolutePaths()
+            ->getFilesByTypeRecursively($directory, 'yaml')
+            ->map(function ($file) use ($directory) {
+                $basename = str_after($file, str_finish($directory, '/'));
+                $handle = str_before($basename, '.yaml');
+                $handle = str_replace('/', '.', $handle);
+
+                return (new Fieldset)
+                    ->setHandle($handle)
+                    ->setIsAddonFieldset(Str::startsWith($directory, resource_path()))
+                    ->setContents(YAML::file($file)->parse());
+            })
+            ->keyBy->handle();
     }
 }

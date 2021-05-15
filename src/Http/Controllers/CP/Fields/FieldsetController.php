@@ -8,7 +8,6 @@ use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class FieldsetController extends CpController
 {
@@ -20,9 +19,9 @@ class FieldsetController extends CpController
     public function index(Request $request)
     {
         $fieldsets = Facades\Fieldset::all()
-            ->filter(function (Fieldset $fieldset) {
-                return Str::startsWith($fieldset->path(), resource_path());
-            })->map(function ($fieldset) {
+            ->reject(function (Fieldset $fieldset) {
+                return $fieldset->isAddonFieldset();
+            })->map(function (Fieldset $fieldset) {
                 return [
                     'id' => $fieldset->handle(),
                     'handle' => $fieldset->handle(),

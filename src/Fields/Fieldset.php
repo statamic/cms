@@ -13,7 +13,8 @@ class Fieldset
     protected $contents = [];
     protected $handle;
 
-    protected string $path;
+    /** @var bool */
+    protected $isAddonFieldset = false;
 
     public function setHandle(string $handle)
     {
@@ -27,16 +28,16 @@ class Fieldset
         return $this->handle;
     }
 
-    public function setPath(string $path)
+    public function setIsAddonFieldset(bool $isAddonFieldset)
     {
-        $this->path = $path;
+        $this->isAddonFieldset = $isAddonFieldset;
 
         return $this;
     }
 
-    public function path(): ?string
+    public function isAddonFieldset(): bool
     {
-        return $this->path;
+        return $this->isAddonFieldset;
     }
 
     public function setContents(array $contents)
