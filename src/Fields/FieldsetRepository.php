@@ -115,7 +115,7 @@ class FieldsetRepository
 
                 return (new Fieldset)
                     ->setHandle($handle)
-                    ->setIsAddonFieldset(Str::startsWith($directory, resource_path()))
+                    ->setIsAddonFieldset(! Str::startsWith($directory, resource_path()))
                     ->setContents(YAML::file($file)->parse());
             })
             ->keyBy->handle();
