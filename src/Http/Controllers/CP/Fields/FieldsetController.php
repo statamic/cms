@@ -8,6 +8,7 @@ use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FieldsetController extends CpController
 {
@@ -18,16 +19,19 @@ class FieldsetController extends CpController
 
     public function index(Request $request)
     {
-        $fieldsets = Facades\Fieldset::all()->map(function ($fieldset) {
-            return [
-                'id' => $fieldset->handle(),
-                'handle' => $fieldset->handle(),
-                'title' => $fieldset->title(),
-                'fields' => $fieldset->fields()->all()->count(),
-                'edit_url' => $fieldset->editUrl(),
-                'delete_url' => $fieldset->deleteUrl(),
-            ];
-        })->values();
+        $fieldsets = Facades\Fieldset::all()
+            ->filter(function (Fieldset $fieldset) {
+                return Str::startsWith($fieldset->path(), resource_path());
+            })->map(function ($fieldset) {
+                return [
+                    'id' => $fieldset->handle(),
+                    'handle' => $fieldset->handle(),
+                    'title' => $fieldset->title(),
+                    'fields' => $fieldset->fields()->all()->count(),
+                    'edit_url' => $fieldset->editUrl(),
+                    'delete_url' => $fieldset->deleteUrl(),
+                ];
+            })->values();
 
         if ($request->wantsJson()) {
             return $fieldsets;
