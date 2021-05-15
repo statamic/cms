@@ -112,7 +112,6 @@ fields:
 EOT;
 
         File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnTrue();
         File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
             '/path/to/resources/fieldsets/first.yaml',
             '/path/to/resources/fieldsets/second.yaml',
@@ -135,8 +134,6 @@ EOT;
     /** @test */
     public function it_returns_empty_collection_if_fieldset_directory_doesnt_exist()
     {
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
-
         $all = $this->repo->all();
 
         $this->assertInstanceOf(Collection::class, $all);
