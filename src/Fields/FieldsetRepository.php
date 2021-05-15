@@ -40,7 +40,7 @@ class FieldsetRepository
 
         $fieldset = (new Fieldset)
             ->setHandle($handle)
-            ->setIsAddonFieldset(Str::startsWith($directory, resource_path()))
+            ->setIsAddonFieldset(! Str::startsWith($directory, resource_path()))
             ->setContents(YAML::file("{$directory}/{$path}.yaml")->parse());
 
         $this->fieldsets[$handle] = $fieldset;
