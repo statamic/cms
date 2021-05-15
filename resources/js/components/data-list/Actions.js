@@ -56,7 +56,7 @@ export default {
                     });
                 }
 
-                this.$emit('completed');
+                this.$emit('completed', response.data);
             }).catch(error => {
                 error.response.data.text().then(data => {
                     data = JSON.parse(data);
@@ -66,7 +66,7 @@ export default {
                     if (error.response.status == 422) this.errors = data.errors;
                 });
 
-                this.$emit('completed', false)
+                this.$emit('completed', false, response.data)
             });
         },
 
