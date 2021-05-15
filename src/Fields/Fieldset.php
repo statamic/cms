@@ -16,7 +16,7 @@ class Fieldset
     /** @var bool */
     protected $isAddonFieldset = false;
 
-    public function setHandle(string $handle)
+    public function setHandle(string $handle): self
     {
         $this->handle = $handle;
 
@@ -28,7 +28,7 @@ class Fieldset
         return $this->handle;
     }
 
-    public function setIsAddonFieldset(bool $isAddonFieldset)
+    public function setIsAddonFieldset(bool $isAddonFieldset): self
     {
         $this->isAddonFieldset = $isAddonFieldset;
 
@@ -40,7 +40,7 @@ class Fieldset
         return $this->isAddonFieldset;
     }
 
-    public function setContents(array $contents)
+    public function setContents(array $contents): self
     {
         $fields = array_get($contents, 'fields', []);
 
