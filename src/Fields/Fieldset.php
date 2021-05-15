@@ -10,8 +10,10 @@ use Statamic\Support\Str;
 
 class Fieldset
 {
-    protected $handle;
     protected $contents = [];
+    protected $handle;
+
+    protected string $path;
 
     public function setHandle(string $handle)
     {
@@ -23,6 +25,18 @@ class Fieldset
     public function handle(): ?string
     {
         return $this->handle;
+    }
+
+    public function setPath(string $path)
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    public function path(): ?string
+    {
+        return $this->path;
     }
 
     public function setContents(array $contents)
