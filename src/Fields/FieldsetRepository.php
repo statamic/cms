@@ -11,6 +11,7 @@ class FieldsetRepository
 {
     protected $fieldsets = [];
     protected $directory;
+    protected $addonDirectories = [];
 
     public function setDirectory($directory)
     {
@@ -25,16 +26,21 @@ class FieldsetRepository
             return $cached;
         }
 
+        // I don't understand why this is done
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
-        if (! File::exists($path = "{$this->directory}/{$path}.yaml")) {
+        if (! $this->exists($handle)) {
             return null;
         }
 
+        $directory = $this->directories()->first(function ($directory) use ($path) {
+            return File::exists("{$directory}/{$path}.yaml");
+        });
+
         $fieldset = (new Fieldset)
             ->setHandle($handle)
-            ->setContents(YAML::file($path)->parse());
+            ->setContents(YAML::file("{$directory}/{$path}.yaml")->parse());
 
         $this->fieldsets[$handle] = $fieldset;
 
@@ -43,10 +49,13 @@ class FieldsetRepository
 
     public function exists(string $handle): bool
     {
+        // I don't understand why this is done
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
-        return File::exists($path = "{$this->directory}/{$path}.yaml");
+        return $this->directories()->contains(function ($directory) use ($path) {
+            return File::exists("{$directory}/{$path}.yaml");
+        });
     }
 
     public function make($handle = null): Fieldset
@@ -56,22 +65,28 @@ class FieldsetRepository
 
     public function all(): Collection
     {
-        if (! File::exists($this->directory)) {
+        $fieldsets = $this->directories
+            ->flatMap(function (string $directory) {
+                return File::withAbsolutePaths()
+                    ->getFilesByTypeRecursively($directory, 'yaml')
+                    ->map(function ($file) use ($directory) {
+                        $basename = str_after($file, str_finish($directory, '/'));
+                        $handle = str_before($basename, '.yaml');
+                        $handle = str_replace('/', '.', $handle);
+
+                        return (new Fieldset)
+                            ->setHandle($handle)
+                            ->setPath($directory)
+                            ->setContents(YAML::file($file)->parse());
+                    })
+                    ->keyBy->handle();
+            });
+
+        if ($fieldsets->isEmpty()) {
             return collect();
         }
 
-        return File::withAbsolutePaths()
-            ->getFilesByTypeRecursively($this->directory, 'yaml')
-            ->map(function ($file) {
-                $basename = str_after($file, str_finish($this->directory, '/'));
-                $handle = str_before($basename, '.yaml');
-                $handle = str_replace('/', '.', $handle);
-
-                return (new Fieldset)
-                    ->setHandle($handle)
-                    ->setContents(YAML::file($file)->parse());
-            })
-            ->keyBy->handle();
+        return $fieldsets;
     }
 
     public function save(Fieldset $fieldset)
@@ -89,5 +104,15 @@ class FieldsetRepository
     public function delete(Fieldset $fieldset)
     {
         File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
+    }
+
+    public function addDirectory(string $directory): void
+    {
+        $this->addonDirectories[] = $directory;
+    }
+
+    public function directories(): Collection
+    {
+        return collect($this->addonDirectories)->merge($this->directory);
     }
 }
