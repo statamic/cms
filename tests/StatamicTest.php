@@ -43,9 +43,9 @@ class StatamicTest extends TestCase
     /** @test */
     public function it_checks_for_cp_route()
     {
-        $this->assertFalse($this->getJson('/is-cp-route')->assertOk()['isCpRoute']);
+        $this->assertFalse($this->getJson('/is-cp-route')->assertOk()->json('isCpRoute'));
 
-        $this->assertTrue($this->getJson('/cp/is-cp-route')->assertOk()['isCpRoute']);
+        $this->assertTrue($this->getJson('/cp/is-cp-route')->assertOk()->json('isCpRoute'));
     }
 
     /** @test */
@@ -53,7 +53,7 @@ class StatamicTest extends TestCase
     {
         $response = $this->getJson('/date-format')->assertOk();
 
-        $this->assertEquals('system-date-format', $response['dateFormat']);
+        $this->assertEquals('system-date-format', $response->json('dateFormat'));
     }
 
     /** @test */
@@ -61,7 +61,7 @@ class StatamicTest extends TestCase
     {
         $response = $this->getJson('/date-format')->assertOk();
 
-        $this->assertEquals('cp-date-format', $response['cpDateFormat']);
+        $this->assertEquals('cp-date-format', $response->json('cpDateFormat'));
     }
 
     /** @test */
@@ -72,7 +72,7 @@ class StatamicTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/date-format')->assertOk();
 
-        $this->assertEquals('user-date-format', $response['dateFormat']);
+        $this->assertEquals('user-date-format', $response->json('dateFormat'));
     }
 
     /** @test */
@@ -83,7 +83,7 @@ class StatamicTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/date-format')->assertOk();
 
-        $this->assertEquals('user-date-format', $response['cpDateFormat']);
+        $this->assertEquals('user-date-format', $response->json('cpDateFormat'));
     }
 
     /** @test */
@@ -91,7 +91,7 @@ class StatamicTest extends TestCase
     {
         $response = $this->getJson('/cp/date-format')->assertOk();
 
-        $this->assertEquals('cp-date-format', $response['dateFormat']);
+        $this->assertEquals('cp-date-format', $response->json('dateFormat'));
     }
 
     /** @test */
@@ -99,7 +99,7 @@ class StatamicTest extends TestCase
     {
         $response = $this->getJson('/cp/date-format')->assertOk();
 
-        $this->assertEquals('cp-date-format', $response['cpDateFormat']);
+        $this->assertEquals('cp-date-format', $response->json('cpDateFormat'));
     }
 
     /** @test */
@@ -110,7 +110,7 @@ class StatamicTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/cp/date-format')->assertOk();
 
-        $this->assertEquals('user-date-format', $response['dateFormat']);
+        $this->assertEquals('user-date-format', $response->json('dateFormat'));
     }
 
     /** @test */
@@ -121,6 +121,6 @@ class StatamicTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/cp/date-format')->assertOk();
 
-        $this->assertEquals('user-date-format', $response['cpDateFormat']);
+        $this->assertEquals('user-date-format', $response->json('cpDateFormat'));
     }
 }
