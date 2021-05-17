@@ -8,6 +8,8 @@ use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
 use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
+use Statamic\Statamic;
+use Statamic\Support\DateFormat;
 
 class Date extends Fieldtype
 {
@@ -141,7 +143,7 @@ class Date extends Fieldtype
             return $start.' - '.$end;
         }
 
-        return Carbon::parse($data)->format(config('statamic.cp.date_format'));
+        return Carbon::parse($data)->format($this->displayFormat());
     }
 
     private function dateFormat($date)
@@ -150,6 +152,18 @@ class Date extends Fieldtype
             'format',
             strlen($date) > 10 ? 'Y-m-d H:i' : 'Y-m-d'
         );
+    }
+
+    private function displayFormat()
+    {
+        return Statamic::cpDateFormat();
+    }
+
+    public function preload()
+    {
+        return [
+            'displayFormat' => DateFormat::toMoment($this->displayFormat()),
+        ];
     }
 
     public function augment($value)
