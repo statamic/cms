@@ -75,7 +75,7 @@ trait ResetsPasswords
         return [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|confirmed|min:8',
+            'password' => array_merge(['required', 'confirmed'], config('statamic.users.password_validation', [])),
         ];
     }
 

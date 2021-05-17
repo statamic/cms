@@ -16,7 +16,7 @@ class PasswordController extends CpController
         $this->authorize('editPassword', $user);
 
         $request->validate([
-            'password' => 'required|confirmed',
+            'password' => array_merge(['required', 'confirmed'], config('statamic.users.password_validation', [])),
         ]);
 
         $user->password($request->password)->save();

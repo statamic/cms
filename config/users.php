@@ -64,6 +64,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Password Requirements
+    |--------------------------------------------------------------------------
+    |
+    | When setting a new password the password will be validated against
+    | these additional rules to prevent any weak passwords for users.
+    |
+    */
+
+    'password_validation' => [],
+
+    /*
+    |--------------------------------------------------------------------------
     | Password Brokers
     |--------------------------------------------------------------------------
     |

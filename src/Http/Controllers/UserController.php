@@ -49,7 +49,7 @@ class UserController extends Controller
 
         $fieldRules = $fields->validator()->withRules([
             'email' => 'required|email|unique_user_value',
-            'password' => 'required|confirmed',
+            'password' => array_merge(['required', 'confirmed'], config('statamic.users.password_validation', [])),
         ])->rules();
 
         $validator = Validator::make($request->all(), $fieldRules);
