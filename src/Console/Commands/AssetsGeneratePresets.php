@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Asset;
-use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Jobs\GeneratePresetImageManipulation;
 
