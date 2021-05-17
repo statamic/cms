@@ -37,6 +37,7 @@ return [
     'color.config.swatches' => 'Foruddefiner farver, der kan vælges fra en liste.',
     'color.config.theme' => 'Vælg mellem den klassiske og mini (enklere) farvevælger.',
     'date.config.columns' => 'Vis flere måneder ad gangen i rækker og kolonner',
+    'date.config.display_format' => 'Hvordan datoen skal vises ved hjælp af PHP-datoformatet.',
     'date.config.earliest_date' => 'Indstil den tidligst valgte dato.',
     'date.config.format' => 'Hvordan datoen skal gemmes ved hjælp af [PHP-datoformat](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Stræk kalenderen for at bruge den fulde bredde.',

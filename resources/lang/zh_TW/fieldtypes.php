@@ -37,6 +37,7 @@ return [
     'color.config.swatches' => '預定義可從列表中選擇的色彩。',
     'color.config.theme' => '選擇經典或迷你 (簡化版) 色彩選擇器。',
     'date.config.columns' => '一次以行列顯示多個月',
+    'date.config.display_format' => '使用PHP日期格式显示日期的方式。',
     'date.config.earliest_date' => '設定可選擇的最早日期。',
     'date.config.format' => '使用 [PHP日期格式](https://www.php.net/manual/en/datetime.format.php) 如何存儲日期。',
     'date.config.full_width' => '拉伸月曆以使用全寬。',

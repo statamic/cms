@@ -40,6 +40,7 @@ return [
     'color.config.swatches' => 'Voorgedefinieerde kleuren die uit een lijst geselecteerd kunnen worden.',
     'color.config.theme' => 'Kies uit de klassieke of mini (simpele) kleurpicker.',
     'date.config.columns' => 'Toon meerdere maanden tegelijk, in rijen en kolommen.',
+    'date.config.display_format' => 'Hoe de datum moet worden weergegeven, met behulp van de PHP-datumnotatie.',
     'date.config.earliest_date' => 'Stel de vroegst selecteerbare datum in.',
     'date.config.format' => 'Hoe de datum moet worden opgeslagen, met behulp van het [PHP-datumnotatie](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Maak de kalender zo groot als de beschikbare breedte.',

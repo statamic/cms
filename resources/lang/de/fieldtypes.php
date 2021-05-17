@@ -40,6 +40,7 @@ return [
     'color.config.swatches' => 'Farbfelder festlegen, die aus einer Liste ausgewählt werden können.',
     'color.config.theme' => 'Zur Auswahl stehen der klassische und der (einfachere) Mini-Farbwähler.',
     'date.config.columns' => 'Mehrere Monate gleichzeitig in verschiedenen Spalten anzeigen.',
+    'date.config.display_format' => 'Wie das Datum im PHP-Datumsformat angezeigt werden soll.',
     'date.config.earliest_date' => 'Frühestes auswählbares Datum festlegen.',
     'date.config.format' => 'Wie das Datum im [PHP-Datumsformat](https://www.php.net/manual/en/datetime.format.php) gespeichert werden soll.',
     'date.config.full_width' => 'Kalender dehnen, um die volle Breite auszunutzen.',
