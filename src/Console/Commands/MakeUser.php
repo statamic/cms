@@ -121,6 +121,10 @@ class MakeUser extends Command
     {
         $this->data['password'] = $this->secret('Password (Your input will be hidden)');
 
+        if ($this->passwordValidationFails()) {
+            return $this->promptPassword();
+        }
+
         return $this;
     }
 
@@ -162,6 +166,19 @@ class MakeUser extends Command
     protected function emailValidationFails()
     {
         return $this->validationFails($this->email, ['required', new EmailAvailable, 'email']);
+    }
+
+    /**
+     * Check if password validation fails.
+     *
+     * @return bool
+     */
+    protected function passwordValidationFails()
+    {
+        return $this->validationFails(
+            $this->data['password'],
+            array_merge(['required'], config('statamic.users.password_validation', []))
+        );
     }
 
     /**
