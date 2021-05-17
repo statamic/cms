@@ -8,6 +8,7 @@ use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Statamic;
+use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
 
 class JavascriptComposer
@@ -40,6 +41,7 @@ class JavascriptComposer
             'ampEnabled' => config('statamic.amp.enabled'),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
+            'dateFormat' => DateFormat::toMoment(Statamic::cpDateFormat()),
             'locale' => config('app.locale'),
             'permissions' => $this->permissions($user),
         ]);
