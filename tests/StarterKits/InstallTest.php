@@ -85,7 +85,7 @@ class InstallTest extends TestCase
             '*' => Http::response('', 404),
         ]);
 
-        $this->assertEquals('https://bitbucket.org/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
+        $this->assertEquals('https://bitbucket.org/statamic/cool-runnings.git', Blink::get('starter-kit-repository-added'));
         $this->assertFileNotExists($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));

@@ -121,7 +121,7 @@ class Installer
 
         if (Http::get($githubUrl = "https://github.com/{$this->package}")->status() === 200) {
             $this->url = $githubUrl;
-        } elseif (Http::get($bitbucketUrl = "https://bitbucket.org/{$this->package}")->status() === 200) {
+        } elseif (Http::get($bitbucketUrl = "https://bitbucket.org/{$this->package}.git")->status() === 200) {
             $this->url = $bitbucketUrl;
         } elseif (Http::get($gitlabUrl = "https://gitlab.com/{$this->package}")->status() === 200) {
             $this->url = $gitlabUrl;
