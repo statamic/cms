@@ -40,6 +40,7 @@ return [
     'color.config.swatches' => 'Pre-define colors that can be selected from a list.',
     'color.config.theme' => 'Choose between the classic and mini (simpler) color picker.',
     'date.config.columns' => 'Show multiple months at one time, in rows and columns',
+    'date.config.display_format' => 'How the date should be displayed, using the PHP date format.',
     'date.config.earliest_date' => 'Set the earliest selectable date.',
     'date.config.format' => 'How the date should be stored, using the [PHP date format](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Stretch the calendar to use up the full width.',

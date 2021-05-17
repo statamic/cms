@@ -48,11 +48,16 @@ class Date extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
                 'type' => 'text',
                 'default' => '1900-01-01',
-                'width' => 50,
             ],
             'format' => [
                 'display' => __('Format'),
                 'instructions' => __('statamic::fieldtypes.date.config.format'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+            'display_format' => [
+                'display' => __('Display Format'),
+                'instructions' => __('statamic::fieldtypes.date.config.display_format'),
                 'type' => 'text',
                 'width' => 50,
             ],
@@ -156,7 +161,7 @@ class Date extends Fieldtype
 
     private function displayFormat()
     {
-        return Statamic::cpDateFormat();
+        return $this->config('display_format', Statamic::cpDateFormat());
     }
 
     public function preload()
