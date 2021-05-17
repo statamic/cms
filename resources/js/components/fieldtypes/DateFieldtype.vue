@@ -24,6 +24,7 @@
                     :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
                     :locale="$config.get('locale').replace('_', '-')"
+                    :masks="{ input: [$config.get('dateFormat')] }"
                     :mode="config.mode"
                     :input="value"
                     :is-required="config.required"
