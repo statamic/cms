@@ -13,6 +13,9 @@ use Statamic\Support\DateFormat;
 
 class Date extends Fieldtype
 {
+    const DEFAULT_DATE_FORMAT = 'Y-m-d';
+    const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i';
+
     protected function configFieldItems(): array
     {
         return [
@@ -99,40 +102,79 @@ class Date extends Fieldtype
 
     public function preProcess($data)
     {
-        if (! $data) {
-            return $this->config('required') ? Carbon::now() : null;
+        return $this->config('mode') == 'range' ? $this->preProcessRange($data) : $this->preProcessSingle($data);
+    }
+
+    private function preProcessSingle($value)
+    {
+        if (! $value) {
+            return $this->isRequired()
+                ? Carbon::now()->format($this->config('time_enabled') ? self::DEFAULT_DATETIME_FORMAT : self::DEFAULT_DATE_FORMAT)
+                : null;
         }
 
-        if ($this->config('mode') === 'range') {
-            // If switching from single to range, all bets are off.
-            if (! is_array($data)) {
-                return null;
-            }
-
-            return $data;
+        // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
+        if (is_array($value)) {
+            $value = $value['start'];
         }
 
-        // If switching from range mode to single, use the start date.
-        if (is_array($data)) {
-            $data = array_get($data, 'start', null);
+        $date = Carbon::createFromFormat($this->dateFormat($value), $value);
+
+        return $date->format($this->config('time_enabled') ? self::DEFAULT_DATETIME_FORMAT : self::DEFAULT_DATE_FORMAT);
+    }
+
+    private function preProcessRange($value)
+    {
+        if (! $value) {
+            return $this->isRequired() ? [
+                'start' => Carbon::now()->format(self::DEFAULT_DATE_FORMAT),
+                'end' => Carbon::now()->format(self::DEFAULT_DATE_FORMAT),
+            ] : null;
         }
 
-        return $data;
+        // If the value is a string, this field probably used to be a single date.
+        // In this case, we'll use the date for both the start and end of the range.
+        if (is_string($value)) {
+            $value = ['start' => $value, 'end' => $value];
+        }
+
+        return [
+            'start' => Carbon::createFromFormat($this->dateFormat($value['start']), $value['start'])->format(self::DEFAULT_DATE_FORMAT),
+            'end' => Carbon::createFromFormat($this->dateFormat($value['end']), $value['end'])->format(self::DEFAULT_DATE_FORMAT),
+        ];
+    }
+
+    private function isRequired()
+    {
+        return in_array('required', $this->field->rules()[$this->field->handle()]);
     }
 
     public function process($data)
+    {
+        return $this->config('mode') == 'range' ? $this->processRange($data) : $this->processSingle($data);
+    }
+
+    private function processSingle($data)
     {
         if (is_null($data)) {
             return $data;
         }
 
-        if ($this->config('mode') === 'range') {
+        $date = Carbon::parse($data);
+
+        return $this->formatAndCast($date, $this->dateFormat($data));
+    }
+
+    private function processRange($data)
+    {
+        if (is_null($data)) {
             return $data;
         }
 
-        $date = Carbon::parse($data);
-
-        return $date->format($this->dateFormat($data));
+        return [
+            'start' => $this->processSingle($data['start']),
+            'end' => $this->processSingle($data['end']),
+        ];
     }
 
     public function preProcessIndex($data)
@@ -155,13 +197,24 @@ class Date extends Fieldtype
     {
         return $this->config(
             'format',
-            strlen($date) > 10 ? 'Y-m-d H:i' : 'Y-m-d'
+            strlen($date) > 10 ? self::DEFAULT_DATETIME_FORMAT : self::DEFAULT_DATE_FORMAT
         );
     }
 
     private function displayFormat()
     {
         return $this->config('display_format', Statamic::cpDateFormat());
+    }
+
+    private function formatAndCast(Carbon $date, $format)
+    {
+        $formatted = $date->format($format);
+
+        if (is_numeric($formatted)) {
+            $formatted = (int) $formatted;
+        }
+
+        return $formatted;
     }
 
     public function preload()
