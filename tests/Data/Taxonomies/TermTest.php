@@ -126,6 +126,9 @@ class TermTest extends TestCase
         $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
         $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
 
+        Facades\Term::shouldReceive('save')->with($term);
+        Facades\Term::shouldReceive('find')->with($term->id())->times(3)->andReturn(null, $term, $term);
+
         $term->save();
         $term->save();
         $term->save();

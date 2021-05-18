@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
+use Statamic\Facades\GlobalSet as GlobalSetFacade;
 use Statamic\Facades\Site;
 use Statamic\Globals\GlobalSet;
 use Tests\TestCase;
@@ -139,12 +140,15 @@ EOT;
             ]);
         });
 
+        GlobalSetFacade::shouldReceive('save')->with($set);
+        GlobalSetFacade::shouldReceive('find')->with($set->handle())->times(3)->andReturn(null, $set, $set);
+
         $set->save();
         $set->save();
         $set->save();
 
         Event::assertDispatched(GlobalSetSaved::class, 3);
-        Event::assertDispatched(GlobalSetCreated::class, 1); // TODO: fix this
+        Event::assertDispatched(GlobalSetCreated::class, 1);
     }
 
     /** @test */

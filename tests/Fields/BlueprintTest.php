@@ -510,8 +510,8 @@ class BlueprintTest extends TestCase
 
         $blueprint = new Blueprint;
 
-        BlueprintRepository::shouldReceive('find')->with($blueprint->handle());
-        BlueprintRepository::shouldReceive('save')->with($blueprint)->once();
+        BlueprintRepository::shouldReceive('save')->with($blueprint);
+        BlueprintRepository::shouldReceive('find')->with($blueprint->handle())->times(3)->andReturn(null, $blueprint, $blueprint);
 
         $blueprint->save();
         $blueprint->save();

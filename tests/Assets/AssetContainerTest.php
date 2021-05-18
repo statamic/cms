@@ -216,11 +216,12 @@ class AssetContainerTest extends TestCase
 
         $container = new AssetContainer;
 
-        $container->save();
-        $container->save();
-        $container->save();
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('find')->with($container->handle())->times(3)->andReturn(null, $container, $container);
 
-        Facades\AssetContainer::shouldHaveReceived('save')->with($container)->times(3);
+        $container->save();
+        $container->save();
+        $container->save();
 
         Event::assertDispatched(AssetContainerSaved::class, 3);
         Event::assertDispatched(AssetContainerCreated::class, 1); // TODO: fix this

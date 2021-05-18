@@ -60,6 +60,9 @@ class FormTest extends TestCase
             ->title('Contact Us')
             ->honeypot('winnie');
 
+        Form::shouldReceive('save')->with($form);
+        Form::shouldReceive('find')->with($form->handle())->times(3)->andReturn(null, $form, $form);
+
         $form->save();
         $form->save();
         $form->save();

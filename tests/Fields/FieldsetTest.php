@@ -172,8 +172,8 @@ class FieldsetTest extends TestCase
 
         $fieldset = (new Fieldset)->setHandle('seo');
 
-        FieldsetRepository::shouldReceive('find')->with($fieldset->handle());
-        FieldsetRepository::shouldReceive('save')->with($fieldset)->once();
+        FieldsetRepository::shouldReceive('save')->with($fieldset);
+        FieldsetRepository::shouldReceive('find')->with($fieldset->handle())->times(3)->andReturn(null, $fieldset, $fieldset);
 
         $fieldset->save();
         $fieldset->save();
