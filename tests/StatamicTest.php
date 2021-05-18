@@ -65,17 +65,6 @@ class StatamicTest extends TestCase
     }
 
     /** @test */
-    public function outside_of_cp_it_gets_users_preferred_date_format_when_requesting_default_format()
-    {
-        $user = tap(User::make())->save();
-        $user->setPreference('date_format', 'user-date-format');
-
-        $response = $this->actingAs($user)->getJson('/date-format')->assertOk();
-
-        $this->assertEquals('user-date-format', $response->json('dateFormat'));
-    }
-
-    /** @test */
     public function outside_of_cp_it_gets_users_preferred_date_format_when_requesting_cp_format()
     {
         $user = tap(User::make())->save();
