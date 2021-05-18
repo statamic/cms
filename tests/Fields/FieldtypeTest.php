@@ -42,7 +42,8 @@ class FieldtypeTest extends TestCase
     /** @test */
     public function handle_can_be_defined_as_a_property()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected static $handle = 'example';
         };
 
@@ -66,7 +67,8 @@ class FieldtypeTest extends TestCase
     /** @test */
     public function title_can_be_defined_as_a_property()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected static $title = 'Super Cool Example';
         };
 
@@ -78,7 +80,8 @@ class FieldtypeTest extends TestCase
     {
         $this->assertTrue((new TestFieldtype)->localizable());
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $localizable = false;
         };
 
@@ -90,7 +93,8 @@ class FieldtypeTest extends TestCase
     {
         $this->assertTrue((new TestFieldtype)->validatable());
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $validatable = false;
         };
 
@@ -102,7 +106,8 @@ class FieldtypeTest extends TestCase
     {
         $this->assertTrue((new TestFieldtype)->defaultable());
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $defaultable = false;
         };
 
@@ -114,7 +119,8 @@ class FieldtypeTest extends TestCase
     {
         $this->assertEquals(['text'], (new TestFieldtype)->categories());
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $categories = ['foo', 'bar'];
         };
 
@@ -126,7 +132,8 @@ class FieldtypeTest extends TestCase
     {
         $this->assertTrue((new TestFieldtype)->selectable());
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $selectable = false;
         };
 
@@ -157,7 +164,8 @@ class FieldtypeTest extends TestCase
         $fields = Mockery::mock(Fields::class);
         $fields->shouldReceive('toPublishArray')->once()->andReturn(['example', 'publish', 'array']);
 
-        $fieldtype = new class($fields) extends Fieldtype {
+        $fieldtype = new class($fields) extends Fieldtype
+        {
             protected $mock;
             protected static $handle = 'test';
 
@@ -182,12 +190,14 @@ class FieldtypeTest extends TestCase
     {
         $this->assertEquals([], (new TestFieldtype)->rules());
 
-        $arrayDefined = new class extends Fieldtype {
+        $arrayDefined = new class extends Fieldtype
+        {
             protected $rules = ['required', 'min:2'];
         };
         $this->assertEquals(['required', 'min:2'], $arrayDefined->rules());
 
-        $stringDefined = new class extends Fieldtype {
+        $stringDefined = new class extends Fieldtype
+        {
             protected $rules = 'required|min:2';
         };
         $this->assertEquals(['required', 'min:2'], $stringDefined->rules());
@@ -198,7 +208,8 @@ class FieldtypeTest extends TestCase
     {
         $this->assertEquals([], (new TestFieldtype)->rules());
 
-        $arrayDefined = new class extends Fieldtype {
+        $arrayDefined = new class extends Fieldtype
+        {
             protected $extraRules = [
                 'extra.one' => ['required', 'min:2'],
                 'extra.two' => ['array'],
@@ -209,7 +220,8 @@ class FieldtypeTest extends TestCase
             'extra.two' => ['array'],
         ], $arrayDefined->extraRules());
 
-        $stringDefined = new class extends Fieldtype {
+        $stringDefined = new class extends Fieldtype
+        {
             protected $extraRules = [
                 'extra.one' => 'required|min:2',
                 'extra.two' => 'array',
@@ -226,7 +238,8 @@ class FieldtypeTest extends TestCase
     {
         $this->assertNull((new TestFieldtype)->defaultValue());
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $defaultValue = 'test';
         };
 
@@ -242,7 +255,8 @@ class FieldtypeTest extends TestCase
             $this->assertCount(0, $fields->all());
         });
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $configFields = [
                 'foo' => ['type' => 'textarea'],
                 'max_items' => ['type' => 'integer'],
@@ -265,13 +279,15 @@ class FieldtypeTest extends TestCase
     {
         $this->assertEquals('test', (new TestFieldtype)->icon());
 
-        $customHandle = new class extends Fieldtype {
+        $customHandle = new class extends Fieldtype
+        {
             protected static $handle = 'custom_handle';
         };
 
         $this->assertEquals('custom_handle', $customHandle->icon());
 
-        $customIcon = new class extends Fieldtype {
+        $customIcon = new class extends Fieldtype
+        {
             protected $icon = 'foo';
         };
 

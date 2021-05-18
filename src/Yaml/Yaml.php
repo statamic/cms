@@ -108,7 +108,7 @@ class Yaml
             $content = '';
         }
 
-        return '---'.PHP_EOL.$this->dump($data).'---'.PHP_EOL.$content;
+        return '---'.PHP_EOL.rtrim($this->dump($data)).PHP_EOL.'---'.PHP_EOL.$content;
     }
 
     protected function viewException($e, $str, $line = null)

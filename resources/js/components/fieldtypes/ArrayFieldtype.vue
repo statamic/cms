@@ -81,13 +81,9 @@ export default {
 
     data() {
         return {
-            data: [],
-            deleting: false,
+            data: this.objectToSortable(this.value || []),
+            deleting: false
         }
-    },
-
-    created() {
-        this.data = this.objectToSortable(this.value || []);
     },
 
     watch: {

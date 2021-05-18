@@ -98,6 +98,14 @@ class DimensionsTest extends TestCase
         $this->assertEquals([300, 600], $this->dimensions->asset($asset)->get());
     }
 
+    /** @test */
+    public function it_uses_default_dimensions_if_the_svg_has_no_viewbox_and_is_missing_either_or_both_dimensions()
+    {
+        $this->assertEquals([300, 150], $this->dimensions->asset($this->svgAsset('<svg></svg>'))->get());
+        $this->assertEquals([300, 150], $this->dimensions->asset($this->svgAsset('<svg width="100"></svg>'))->get());
+        $this->assertEquals([300, 150], $this->dimensions->asset($this->svgAsset('<svg height="100"></svg>'))->get());
+    }
+
     private function svgAsset($svg)
     {
         $asset = (new Asset)

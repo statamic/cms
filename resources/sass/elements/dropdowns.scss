@@ -5,7 +5,7 @@
 .dropdown-list .popover-content {
     @apply p-1;
 
-    button {
+    button, a {
         @apply block w-full text-left rounded-sm text-xs font-normal px-1 py-sm text-grey-80;
         line-height: 1.4;
         white-space: nowrap;
@@ -29,7 +29,7 @@
         }
     }
 
-    button.warning {
+    button.warning, a.warning {
         color: $color_red;
 
         &:hover {
