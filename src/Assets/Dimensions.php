@@ -129,7 +129,7 @@ class Dimensions
             return [$viewBox[2], $viewBox[3]];
         }
 
-        return [null, null];
+        return [300, 150];
     }
 
     private function getCacheFlysystem()

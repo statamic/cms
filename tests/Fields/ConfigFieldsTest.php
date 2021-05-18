@@ -12,7 +12,8 @@ class ConfigFieldsTest extends TestCase
     /** @test */
     public function it_preprocesses_each_fields_values_by_its_fieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
+        {
             public function preProcess($data)
             {
                 return $data.' preprocessed';

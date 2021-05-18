@@ -20,7 +20,7 @@
     "autosize": "~3.0.12",
     "axios": "^0.21.1",
     "body-scroll-lock": "^2.6.4",
-    "codemirror": "^5.52.0",
+    "codemirror": "^5.58.2",
     "cookies-js": "^1.2.2",
     "dmuploader": "file:resources/js/vendor/dmuploader",
     "dropzone": "^4.0.1",

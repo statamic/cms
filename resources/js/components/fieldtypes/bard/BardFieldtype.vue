@@ -131,6 +131,7 @@ import css from 'highlight.js/lib/languages/css'
 import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
 import mark from './Mark';
+import node from './Node';
 
 export default {
 
@@ -227,8 +228,14 @@ export default {
         },
 
         htmlWithReplacedLinks() {
-            return this.html.replaceAll(/\"statamic:\/\/(.*)\"/g, (match, ref) => {
-                return `"${this.meta.linkData[ref].permalink}"`;
+            return this.html.replaceAll(/\"statamic:\/\/(.*?)\"/g, (match, ref) => {
+                const linkData = this.meta.linkData[ref];
+                if (! linkData) {
+                    this.$toast.error(`${__('No link data found for')} ${ref}`);
+                    return '""';
+                }
+
+                return `"${linkData.permalink}"`;
             });
         }
 
@@ -522,7 +529,7 @@ export default {
             }
 
             this.$bard.extensionCallbacks.forEach(callback => {
-                let returned = callback({ bard: this, mark });
+                let returned = callback({ bard: this, mark, node });
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );

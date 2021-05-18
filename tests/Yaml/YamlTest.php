@@ -126,6 +126,44 @@ EOT;
         $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/3612
+     **/
+    public function it_dumps_front_matter_properly_when_symfony_yaml_dumper_doesnt_end_with_a_line_break()
+    {
+        $array = [
+            'foo' => 'bar',
+            'baz' => "first line\nsecond line", // the multiline string *must* be last for this bug
+        ];
+
+        // We mock symfony because the multiline character is different depending on the version installed.
+        // It will be | on early versions. It will be |- on later versions.
+        // The |- character means trim trailing newlines, and is the default when dumping multiline strings.
+        $symfonyYaml = $this->mock(SymfonyYaml::class)
+            ->shouldReceive('dump')
+            ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
+            ->once()
+            ->andReturn($symfonyDumpedYaml = "foo: bar\nbaz: |-\n  first line\n  second line")
+            ->getMock();
+
+        $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
+
+        // Without the bug fix, the --- would come immediately after the "second line". Like this:
+        // baz: |-
+        //   first line
+        //   second line---
+        // content
+        $expected = <<<EOT
+---
+$symfonyDumpedYaml
+---
+content
+EOT;
+
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter($array, 'content'));
+    }
+
     /** @test */
     public function it_parses_a_string_of_yaml()
     {
