@@ -29,6 +29,7 @@ class Blueprint implements Augmentable
     protected $hidden = false;
     protected $initialPath;
     protected $contents;
+    protected $extendedContents = [];
     protected $fieldsCache;
     protected $parent;
     protected $ensuredFields = [];
@@ -119,6 +120,18 @@ class Blueprint implements Augmentable
             ->resetFieldsCache();
     }
 
+    public function extendWith(array $contents)
+    {
+        $this->extendedContents = $contents;
+
+        return $this->resetFieldsCache();
+    }
+
+    public function extendBlueprint(Blueprint $blueprint)
+    {
+        return $this->extendWith($blueprint->contents());
+    }
+
     public function contents(): array
     {
         return Blink::once($this->contentsBlinkKey(), function () {
@@ -131,9 +144,13 @@ class Blueprint implements Augmentable
         return "blueprint-contents-{$this->namespace()}-{$this->handle()}";
     }
 
-    private function getContents()
+    /**
+     * @param  bool  $withExtends  Whether to include the extended contents.
+     *                          This should only need to be disabled when writing the file.
+     */
+    private function getContents($withExtends = true)
     {
-        $contents = $this->contents;
+        $contents = $withExtends ? array_merge_recursive($this->contents, $this->extendedContents) : $this->contents;
 
         $contents['sections'] = $contents['sections'] ?? [
             'main' => ['fields' => []],
@@ -254,7 +271,7 @@ class Blueprint implements Augmentable
 
     public function fileData()
     {
-        return $this->contents();
+        return $this->getContents(false);
     }
 
     public function setParent($parent)
