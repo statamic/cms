@@ -36,10 +36,7 @@ class Traverser
         return $files
             ->mapWithKeys(function ($file) {
                 return [Path::tidy($file->getPathname()) => $file->getMTime()];
-            })
-            ->sortBy(function ($timestamp, $path) {
-                return [substr_count($path, '/'), $path];
-            });
+            })->sort();
     }
 
     public function filter($filter)

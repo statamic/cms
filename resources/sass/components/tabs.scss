@@ -15,7 +15,7 @@
 
     a.active {
         @apply bg-white text-blue border-t-2 border-blue relative .h-full .min-h-full border-b-0;
-        z-index: 10;
+        z-index: 1;
     }
 
     a.ghost {

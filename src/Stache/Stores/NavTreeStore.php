@@ -10,7 +10,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class NavTreeStore extends BasicStore
 {
-    protected $defaultIndexes = [];
+    protected $defaultIndexes = ['path'];
 
     public function key()
     {

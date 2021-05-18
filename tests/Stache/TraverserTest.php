@@ -61,10 +61,10 @@ class TraverserTest extends TestCase
     public function gets_files_in_a_stores_directory()
     {
         mkdir($this->tempDir.'/nested');
-        touch($this->tempDir.'/one.txt', 1234567891);
-        touch($this->tempDir.'/nested/three.txt', 1234567892);
+        touch($this->tempDir.'/one.txt', 1234567893);
+        touch($this->tempDir.'/nested/three.txt', 1234567891);
         touch($this->tempDir.'/.hidden.txt', 1234567893);
-        touch($this->tempDir.'/two.txt', 1234567894);
+        touch($this->tempDir.'/two.txt', 1234567892);
 
         $store = Mockery::mock();
         $store->shouldReceive('directory')->andReturn($this->tempDir);
@@ -75,12 +75,12 @@ class TraverserTest extends TestCase
         $this->assertInstanceOf(Collection::class, $files);
         $this->assertCount(3, $files);
         // We use assertSame because we care about the order.
-        // Paths should be output by depth then alphabetical.
+        // Paths should be output by timestamp.
         $dir = Path::tidy($this->tempDir);
         $this->assertSame([
-            $dir.'/one.txt' => 1234567891,
-            $dir.'/two.txt' => 1234567894,
-            $dir.'/nested/three.txt' => 1234567892,
+            $dir.'/nested/three.txt' => 1234567891,
+            $dir.'/two.txt' => 1234567892,
+            $dir.'/one.txt' => 1234567893,
         ], $files->all());
     }
 
@@ -93,7 +93,8 @@ class TraverserTest extends TestCase
 
         $stache = Mockery::mock(Stache::class);
         $stache->shouldReceive('sites')->andReturn(collect(['en']));
-        $store = new class($stache, app('files')) extends BasicStore {
+        $store = new class($stache, app('files')) extends BasicStore
+        {
             public function key()
             {
             }
