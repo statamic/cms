@@ -1708,6 +1708,47 @@ EOT;
     }
 
     /** @test */
+    public function it_applies_modifier_on_different_array_syntax()
+    {
+        $vars = [
+            'key' => 'entries',
+            'source' => [
+                'entries' => [
+                    ['id' => 0],
+                    ['id' => 1],
+                    ['id' => 2],
+                    ['id' => 3],
+                ],
+            ],
+        ];
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source.entries }}[{{ id }}]{{ /source.entries }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source[key] }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source.entries sort="id" }}[{{ id }}]{{ /source.entries }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source[key] sort="id" }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[3][2][1][0]',
+            $this->parse('{{ source[key] sort="id:desc" }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+    }
+
+    /** @test */
     public function modifiers_on_tag_pairs_receive_the_augmented_value()
     {
         $fieldtype = new class extends Fieldtype

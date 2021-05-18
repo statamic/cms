@@ -583,7 +583,9 @@ class Parser
             if ($name != 'content' && ! $replacement) {
 
                 // is the callback a variable in our data set?
-                if ($values = Arr::get($data, $name)) {
+                [$exists, $values] = $this->getVariableExistenceAndValue($name, $data);
+
+                if ($exists) {
 
                     // is this a tag-pair?
                     if ($this->isLoopable($values)) {
