@@ -28,7 +28,7 @@ class Blueprint implements Augmentable
     protected $order;
     protected $hidden = false;
     protected $initialPath;
-    protected $contents;
+    protected $contents = [];
     protected $extendedContents = [];
     protected $fieldsCache;
     protected $parent;
@@ -150,7 +150,10 @@ class Blueprint implements Augmentable
      */
     private function getContents($withExtends = true)
     {
-        $contents = $withExtends ? array_merge_recursive($this->contents, $this->extendedContents) : $this->contents;
+        $contents = array_merge_recursive(
+            $this->contents,
+            $withExtends ? $this->extendedContents : []
+        );
 
         $contents['sections'] = $contents['sections'] ?? [
             'main' => ['fields' => []],

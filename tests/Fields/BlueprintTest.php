@@ -1035,4 +1035,35 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals('test Test', Facades\Antlers::parse('{{ blueprint }}{{ handle }} {{ title }}{{ /blueprint }}', ['blueprint' => $blueprint]));
     }
+
+    /** @test */
+    public function it_save_the_correct_file_data_and_outputs_extended_contents() {
+        $contents_one = [
+            'sections' => [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                    ],
+                ]
+            ]
+        ];
+
+        $contents_two = [
+            'sections' => [
+                'two' => [
+                    'fields' => [
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                    ],
+                ]
+            ]
+        ];
+
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents_one);
+        $blueprint->extendWith($contents_two);
+
+        $this->assertEquals($contents_one, $blueprint->fileData());
+
+        $this->assertArraySubset($contents_one, $blueprint->contents());
+        $this->assertArraySubset($contents_two, $blueprint->contents());
+    }
 }
