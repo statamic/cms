@@ -475,11 +475,36 @@ EOT;
         $this->assertEquals('hello wilderness', $this->parse($template, $this->variables));
     }
 
+    public function testChainedStandardStringModifiersFromDynamicArrayRelaxed()
+    {
+        $template = '{{ associative[default_key] | upper | lower }}';
+
+        $this->assertEquals('wilderness', $this->parse($template, $this->variables));
+    }
+
     public function testSingleParameterStringModifier()
     {
         $template = "{{ string upper='true' }}";
 
         $this->assertEquals('HELLO WILDERNESS', $this->parse($template, $this->variables));
+    }
+
+    public function testSingleParameterStringFromArrayModifier()
+    {
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative.two upper='true' }}", $this->variables)
+        );
+
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative['two'] upper='true' }}", $this->variables)
+        );
+
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative[default_key] upper='true' }}", $this->variables)
+        );
     }
 
     public function testChainedParameterStringModifiers()

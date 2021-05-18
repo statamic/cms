@@ -452,7 +452,9 @@ class Parser
                 $name = $match[1][0];
 
                 // is this not the content tag, and is the value known?
-                if (Arr::get($data, $name)) {
+                [$exists] = $this->getVariableExistenceAndValue($name, $data);
+
+                if ($exists) {
                     // the value is known. Are there parameters?
                     if (isset($match[2])) {
                         // there are, make a backup of our $data
@@ -478,7 +480,7 @@ class Parser
 
                     // Parameter-style modifier time
                     // Probably should do an extraction here...
-                    $replacement = Arr::get($data, $name);
+                    [, $replacement] = $this->getVariableExistenceAndValue($name, $data);
 
                     foreach ($parameters as $modifier => $parameters) {
                         $replacement = $this->runModifier($modifier, $replacement, explode('|', $parameters), $data);
