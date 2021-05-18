@@ -57,6 +57,6 @@ class AugmentedTerm extends AbstractAugmented
 
     protected function permalink()
     {
-        return $this->get('absolute_url');
+        return $this->data->absoluteUrl();
     }
 }

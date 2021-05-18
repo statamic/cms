@@ -105,7 +105,7 @@ abstract class BasicStore extends Store
 
         $this->forgetPath($key);
 
-        $this->resolveIndexes()->each->forgetItem($key);
+        $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
     }
 
     protected function writeItemToDisk($item)

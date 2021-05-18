@@ -533,6 +533,10 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
+        if (! $this->isImage() && ! $this->isSvg()) {
+            return [null, null];
+        }
+
         return [$this->meta('width'), $this->meta('height')];
     }
 
@@ -581,7 +585,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function ratio()
     {
-        if (! $this->isImage()) {
+        if (! $this->isImage() && ! $this->isSvg()) {
             return null;
         }
 

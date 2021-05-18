@@ -1,5 +1,87 @@
 # Release Notes
 
+## 3.1.14 (2020-05-14)
+
+### What's new
+- Add Bard node extension helper. [#3657](https://github.com/statamic/cms/issues/3657)
+
+### What's improved
+- Add HTML fieldtype icon. [247364cbb](https://github.com/statamic/cms/commit/247364cbb)
+- Update Spanish, German, Dutch, and French Translations [#3706](https://github.com/statamic/cms/issues/3706) [#3674](https://github.com/statamic/cms/issues/3674) [#3703](https://github.com/statamic/cms/issues/3703) [#3688](https://github.com/statamic/cms/issues/3688)
+
+### What's fixed
+- Fix avatar URLs for some situations. [468a55864](https://github.com/statamic/cms/commit/468a55864)
+- Fix error when selecting certain collections in a Bard fieldtype. [#3709](https://github.com/statamic/cms/issues/3709)
+- Fix array fieldtype always being dirty. [#3704](https://github.com/statamic/cms/issues/3704)
+- Fix GraphQL error in globals and terms. [#3711](https://github.com/statamic/cms/issues/3711)
+- Fix Bard z-index issue. [#3694](https://github.com/statamic/cms/issues/3694)
+- Fix SVG Dimensions. [#3702](https://github.com/statamic/cms/issues/3702)
+- Explicitly use Stringy for `Str::replace()`. [#3698](https://github.com/statamic/cms/issues/3698)
+- Bump codemirror from 5.55.0 to 5.58.2. [#3691](https://github.com/statamic/cms/issues/3691)
+- Bump url-parse from 1.4.7 to 1.5.1. [#3664](https://github.com/statamic/cms/issues/3664)
+- Bump hosted-git-info from 2.8.8 to 2.8.9. [#3676](https://github.com/statamic/cms/issues/3676)
+
+
+
+## 3.1.13 (2020-05-10)
+
+### What's improved
+- In Bard, display the asset container option when using the link or image buttons. [#3665](https://github.com/statamic/cms/issues/3665)
+- Make dropdown items links, letting you open them in new tabs. [#3667](https://github.com/statamic/cms/issues/3667)
+
+### What's fixed
+- Update tracked keys when saving and deleting [#3684](https://github.com/statamic/cms/issues/3684)
+- Bard link picker only show entries for collections with a route. [#3679](https://github.com/statamic/cms/issues/3679)
+- Separate the title and optional translation. [#3675](https://github.com/statamic/cms/issues/3675)
+- Fix Bard error when linked entries and assets are deleted. [#3678](https://github.com/statamic/cms/issues/3678)
+- Fix `date` fieldtype's `time_enabled` option [#3661](https://github.com/statamic/cms/issues/3661)
+- Fix `link` fieldtype alignment. [83aededfe](https://github.com/statamic/cms/commit/83aededfe)
+- Fix YAML fence when dumping multiline string as last key [#3663](https://github.com/statamic/cms/issues/3663)
+- Fix "Create Fieldset" button not displaying. [#3645](https://github.com/statamic/cms/issues/3645)
+
+
+
+## 3.1.12 (2020-05-06)
+
+### What's new
+- Added Duplicate ID tracking with Control Panel and CLI reviewing options. [#3619](https://github.com/statamic/cms/issues/3619)
+- You can replace ProseMirror nodes and marks with custom ones. [#3648](https://github.com/statamic/cms/issues/3648)
+
+### What's improved
+- Added `required` attributes to dynamic form field html. [#3592](https://github.com/statamic/cms/issues/3592)
+- Updated German translations. [#3607](https://github.com/statamic/cms/issues/3607)
+
+### What's fixed
+- Fix a bunch of Stache issues. [#3619](https://github.com/statamic/cms/issues/3619) [#3616](https://github.com/statamic/cms/issues/3616)
+- Fix augmentation fallback behavior [#3660](https://github.com/statamic/cms/issues/3660)
+- Fix `trans_choice` Tag [#3650](https://github.com/statamic/cms/issues/3650)
+- Fix `link` fieldtype not showing the saved value. [#3637](https://github.com/statamic/cms/issues/3637)
+- Fix localizable Grid fields in stacked mode being read only. [#3518](https://github.com/statamic/cms/issues/3518)
+- Add asset selector to Bard link toolbar. [#3591](https://github.com/statamic/cms/issues/3591)
+- Favor authors value in Stache index [#3617](https://github.com/statamic/cms/issues/3617)
+- Bump composer requirement, of composer. [#3653](https://github.com/statamic/cms/issues/3653)
+
+
+
+## 3.1.11 (2020-04-28)
+
+### What's improved
+- Assets uploaded in the selector stack will be automatically selected. [#3604](https://github.com/statamic/cms/issues/3604)
+- Improved the UX of the `link` fieldtype. [#3605](https://github.com/statamic/cms/issues/3605)
+- Updated French and German translations. [#3583](https://github.com/statamic/cms/issues/3583) [#3589](https://github.com/statamic/cms/issues/3589) [#3601](https://github.com/statamic/cms/issues/3601)
+
+### What's fixed
+- Fix relationship fieldtypes sometimes only showing IDs. [#3547](https://github.com/statamic/cms/issues/3547)
+- Prevent regenerating asset meta file for non-images. [#3609](https://github.com/statamic/cms/issues/3609)
+- Handle custom `authors` field. [#3599](https://github.com/statamic/cms/issues/3599)
+- Cascade is reused on subsequent calls rather than rehydrating. [#3595](https://github.com/statamic/cms/issues/3595)
+- Old input values are remembered in the `user:register_form`. [#3584](https://github.com/statamic/cms/issues/3584)
+- Support collections in the `sentence_list` modifier. [#3593](https://github.com/statamic/cms/issues/3593)
+- Support collections in the `option_list` modifier. [#3606](https://github.com/statamic/cms/issues/3606)
+- Fix bard formatting inside links. [#3108](https://github.com/statamic/cms/issues/3108)
+
+
+
 ## 3.1.10 (2020-04-23)
 
 ### What's improved
