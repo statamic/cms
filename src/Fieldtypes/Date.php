@@ -107,10 +107,10 @@ class Date extends Fieldtype
 
     private function preProcessSingle($value)
     {
+        $vueFormat = $this->config('time_enabled') ? self::DEFAULT_DATETIME_FORMAT : self::DEFAULT_DATE_FORMAT;
+
         if (! $value) {
-            return $this->isRequired()
-                ? Carbon::now()->format($this->config('time_enabled') ? self::DEFAULT_DATETIME_FORMAT : self::DEFAULT_DATE_FORMAT)
-                : null;
+            return $this->isRequired() ? Carbon::now()->format($vueFormat) : null;
         }
 
         // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
@@ -118,17 +118,19 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        $date = Carbon::createFromFormat($this->dateFormat($value), $value);
+        $date = Carbon::createFromFormat($this->saveFormat($value), $value);
 
-        return $date->format($this->config('time_enabled') ? self::DEFAULT_DATETIME_FORMAT : self::DEFAULT_DATE_FORMAT);
+        return $date->format($vueFormat);
     }
 
     private function preProcessRange($value)
     {
+        $vueFormat = self::DEFAULT_DATE_FORMAT;
+
         if (! $value) {
             return $this->isRequired() ? [
-                'start' => Carbon::now()->format(self::DEFAULT_DATE_FORMAT),
-                'end' => Carbon::now()->format(self::DEFAULT_DATE_FORMAT),
+                'start' => Carbon::now()->format($vueFormat),
+                'end' => Carbon::now()->format($vueFormat),
             ] : null;
         }
 
@@ -139,8 +141,8 @@ class Date extends Fieldtype
         }
 
         return [
-            'start' => Carbon::createFromFormat($this->dateFormat($value['start']), $value['start'])->format(self::DEFAULT_DATE_FORMAT),
-            'end' => Carbon::createFromFormat($this->dateFormat($value['end']), $value['end'])->format(self::DEFAULT_DATE_FORMAT),
+            'start' => Carbon::createFromFormat($this->saveFormat($value['start']), $value['start'])->format($vueFormat),
+            'end' => Carbon::createFromFormat($this->saveFormat($value['end']), $value['end'])->format($vueFormat),
         ];
     }
 
@@ -162,7 +164,7 @@ class Date extends Fieldtype
 
         $date = Carbon::parse($data);
 
-        return $this->formatAndCast($date, $this->dateFormat($data));
+        return $this->formatAndCast($date, $this->saveFormat($data));
     }
 
     private function processRange($data)
@@ -193,7 +195,7 @@ class Date extends Fieldtype
         return Carbon::parse($data)->format($this->displayFormat());
     }
 
-    private function dateFormat($date)
+    private function saveFormat($date)
     {
         return $this->config(
             'format',
@@ -236,12 +238,12 @@ class Date extends Fieldtype
 
         if ($this->config('mode') === 'range') {
             return [
-                'start' => Carbon::createFromFormat($this->dateFormat($value['start']), $value['start'])->startOfDay(),
-                'end' => Carbon::createFromFormat($this->dateFormat($value['end']), $value['end'])->startOfDay(),
+                'start' => Carbon::createFromFormat($this->saveFormat($value['start']), $value['start'])->startOfDay(),
+                'end' => Carbon::createFromFormat($this->saveFormat($value['end']), $value['end'])->startOfDay(),
             ];
         }
 
-        $date = Carbon::createFromFormat($this->dateFormat($value), $value);
+        $date = Carbon::createFromFormat($this->saveFormat($value), $value);
 
         // Make sure that if it was only a date saved, then the time would be reset
         // to the beginning of the day, otherwise it would inherit the hour and
