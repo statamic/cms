@@ -9,6 +9,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
 use Stringy\StaticStringy;
 
@@ -248,9 +249,23 @@ class Statamic
         return Preference::get('date_format', config('statamic.cp.date_format'));
     }
 
+    public static function cpDateTimeFormat()
+    {
+        $format = self::cpDateFormat();
+
+        return DateFormat::containsTime($format) ? $format : $format.' H:i';
+    }
+
     public static function dateFormat()
     {
         return config('statamic.system.date_format');
+    }
+
+    public static function dateTimeFormat()
+    {
+        $format = self::dateFormat();
+
+        return DateFormat::containsTime($format) ? $format : $format.' H:i';
     }
 
     public static function flash()

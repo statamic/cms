@@ -60,4 +60,9 @@ class DateFormat
 
         return strtr($format, $replacements);
     }
+
+    public static function containsTime($format)
+    {
+        return Str::contains($format, ['G', 'g', 'H', 'h', 'U', 'c', 'r']);
+    }
 }
