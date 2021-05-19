@@ -32,6 +32,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StaticClear::class,
         // Commands\MakeUserMigration::class,
         Commands\SupportDetails::class,
+        Commands\SupportZipBlueprint::class,
         Commands\AuthMigration::class,
         Commands\Multisite::class,
         Commands\SiteClear::class,
