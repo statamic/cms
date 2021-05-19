@@ -31,13 +31,6 @@ class StatamicTest extends TestCase
                 'cpDateFormat' => Statamic::cpDateFormat(),
             ];
         });
-
-        Route::get('cp/date-format', function () {
-            return [
-                'dateFormat' => Statamic::dateFormat(),
-                'cpDateFormat' => Statamic::cpDateFormat(),
-            ];
-        });
     }
 
     /** @test */
@@ -49,23 +42,19 @@ class StatamicTest extends TestCase
     }
 
     /** @test */
-    public function outside_of_cp_the_date_format_is_the_system()
+    public function it_gets_the_system_date_format()
     {
-        $response = $this->getJson('/date-format')->assertOk();
-
-        $this->assertEquals('system-date-format', $response->json('dateFormat'));
+        $this->assertEquals('system-date-format', Statamic::dateFormat());
     }
 
     /** @test */
-    public function outside_of_cp_it_gets_cp_date_format()
+    public function it_gets_the_cp_date_format()
     {
-        $response = $this->getJson('/date-format')->assertOk();
-
-        $this->assertEquals('cp-date-format', $response->json('cpDateFormat'));
+        $this->assertEquals('cp-date-format', Statamic::cpDateFormat());
     }
 
     /** @test */
-    public function outside_of_cp_it_gets_users_preferred_date_format_when_requesting_cp_format()
+    public function it_gets_the_users_preferred_date_format_when_requesting_cp_format_but_not_the_system_format()
     {
         $user = tap(User::make())->save();
         $user->setPreference('date_format', 'user-date-format');
@@ -73,43 +62,6 @@ class StatamicTest extends TestCase
         $response = $this->actingAs($user)->getJson('/date-format')->assertOk();
 
         $this->assertEquals('user-date-format', $response->json('cpDateFormat'));
-    }
-
-    /** @test */
-    public function inside_cp_the_date_format_is_the_cp_format()
-    {
-        $response = $this->getJson('/cp/date-format')->assertOk();
-
-        $this->assertEquals('cp-date-format', $response->json('dateFormat'));
-    }
-
-    /** @test */
-    public function inside_cp_it_gets_the_cp_date_format()
-    {
-        $response = $this->getJson('/cp/date-format')->assertOk();
-
-        $this->assertEquals('cp-date-format', $response->json('cpDateFormat'));
-    }
-
-    /** @test */
-    public function inside_the_cp_it_gets_the_users_preferred_date_format_when_requesting_default_format()
-    {
-        $user = tap(User::make())->save();
-        $user->setPreference('date_format', 'user-date-format');
-
-        $response = $this->actingAs($user)->getJson('/cp/date-format')->assertOk();
-
-        $this->assertEquals('user-date-format', $response->json('dateFormat'));
-    }
-
-    /** @test */
-    public function inside_the_cp_it_gets_the_users_preferred_date_format_when_requesting_cp_format()
-    {
-        $user = tap(User::make())->save();
-        $user->setPreference('date_format', 'user-date-format');
-
-        $response = $this->actingAs($user)->getJson('/cp/date-format')->assertOk();
-
-        $this->assertEquals('user-date-format', $response->json('cpDateFormat'));
+        $this->assertEquals('system-date-format', $response->json('dateFormat'));
     }
 }

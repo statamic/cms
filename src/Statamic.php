@@ -250,9 +250,7 @@ class Statamic
 
     public static function dateFormat()
     {
-        return self::isCpRoute()
-            ? self::cpDateFormat()
-            : config('statamic.system.date_format');
+        return config('statamic.system.date_format');
     }
 
     public static function flash()
