@@ -43,6 +43,7 @@ class SupportZipBlueprint extends Command
 
         if (true !== $zip->open($filename, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) {
             $this->error("Unable to create zip file \"$filename\"");
+
             return false;
         }
 
@@ -67,6 +68,7 @@ class SupportZipBlueprint extends Command
 
         if (! $blueprint = Blueprint::find($handle)) {
             $this->error("Blueprint \"$handle\" not found");
+
             return null;
         }
 
@@ -79,7 +81,8 @@ class SupportZipBlueprint extends Command
 
         if (! Str::startsWith($fullPath, Blueprint::directory())) {
             $this->error("Not a valid blueprint file: \"$path\"");
-            $this->comment('Blueprints should be located in '.Path::makeRelative(Blueprint::directory()));
+            $this->comment('Blueprints can be found in '.Path::makeRelative(Blueprint::directory()));
+
             return null;
         }
 
