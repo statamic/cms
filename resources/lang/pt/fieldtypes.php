@@ -37,7 +37,6 @@ return [
     'color.config.swatches' => 'Pré-definir cores que podem ser seleccionadas a partir de uma lista.',
     'color.config.theme' => 'Escolha entre o clássico e o mini-apanhador de cores (mais simples).',
     'date.config.columns' => 'Mostrar vários meses ao mesmo tempo, em filas e colunas',
-    'date.config.display_format' => 'Como a data deve ser exibida, usando o formato de data PHP.',
     'date.config.earliest_date' => 'Fixar a data mais próxima a seleccionar.',
     'date.config.format' => 'Como a data deve ser armazenada, usando o [formato de data PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Esticar o calendário para utilizar em toda a sua largura.',

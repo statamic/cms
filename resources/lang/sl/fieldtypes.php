@@ -37,7 +37,6 @@ return [
     'color.config.swatches' => 'Vnaprej določite barve, ki jih lahko izberete s seznama.',
     'color.config.theme' => 'Izbirajte med klasičnim in mini (preprostejšim) nabiralnikom barv.',
     'date.config.columns' => 'Prikažite več mesecev hkrati, v vrsticah in stolpcih',
-    'date.config.display_format' => 'Kako naj bo datum prikazan v obliki zapisa datuma PHP.',
     'date.config.earliest_date' => 'Nastavite najzgodnejši izbirni datum.',
     'date.config.format' => 'Kako naj bo datum shranjen v [formatu datuma PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Raztegnite koledar, da izkoristite celotno širino.',

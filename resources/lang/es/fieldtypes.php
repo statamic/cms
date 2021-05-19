@@ -39,7 +39,6 @@ return [
     'color.config.swatches' => 'Predefinir colores seleccionables de la lista.',
     'color.config.theme' => 'Elige entre el selector de color clásico y el mini (más simple).',
     'date.config.columns' => 'Mostrar varios meses a la vez, en filas y columnas.',
-    'date.config.display_format' => 'Cómo se debe mostrar la fecha, usando el formato de fecha PHP.',
     'date.config.earliest_date' => 'Establece la fecha seleccionable más temprana.',
     'date.config.format' => 'Cómo se debe almacenar la fecha, usando el [formato de fecha PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Estira el calendario para usar todo el ancho.',

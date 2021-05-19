@@ -51,16 +51,11 @@ class Date extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
                 'type' => 'text',
                 'default' => '1900-01-01',
+                'width' => 50,
             ],
             'format' => [
                 'display' => __('Format'),
                 'instructions' => __('statamic::fieldtypes.date.config.format'),
-                'type' => 'text',
-                'width' => 50,
-            ],
-            'display_format' => [
-                'display' => __('Display Format'),
-                'instructions' => __('statamic::fieldtypes.date.config.display_format'),
                 'type' => 'text',
                 'width' => 50,
             ],
@@ -186,13 +181,13 @@ class Date extends Fieldtype
         }
 
         if ($this->config('mode') === 'range') {
-            $start = Carbon::parse($data['start'])->format(Statamic::cpDateFormat());
-            $end = Carbon::parse($data['end'])->format(Statamic::cpDateFormat());
+            $start = Carbon::parse($data['start'])->format($this->indexDisplayFormat());
+            $end = Carbon::parse($data['end'])->format($this->indexDisplayFormat());
 
             return $start.' - '.$end;
         }
 
-        return Carbon::parse($data)->format($this->displayFormat());
+        return Carbon::parse($data)->format($this->indexDisplayFormat());
     }
 
     private function saveFormat($date)
@@ -203,9 +198,20 @@ class Date extends Fieldtype
         );
     }
 
-    private function displayFormat()
+    public function indexDisplayFormat()
     {
-        return $this->config('display_format', Statamic::cpDateFormat());
+        if (! $this->config('time_enabled')) {
+            return Statamic::cpDateFormat();
+        }
+
+        return $this->config('format') || strlen($this->field->value()) > 10
+            ? Statamic::cpDateTimeFormat()
+            : Statamic::cpDateFormat();
+    }
+
+    public function fieldDisplayFormat()
+    {
+        return Statamic::cpDateFormat();
     }
 
     private function formatAndCast(Carbon $date, $format)
@@ -222,7 +228,7 @@ class Date extends Fieldtype
     public function preload()
     {
         return [
-            'displayFormat' => DateFormat::toMoment($this->displayFormat()),
+            'displayFormat' => DateFormat::toMoment($this->fieldDisplayFormat()),
         ];
     }
 

@@ -296,6 +296,71 @@ class DateTest extends TestCase
         );
     }
 
+    /** @test */
+    public function it_gets_the_display_format_when_time_is_disabled()
+    {
+        $fieldtype = $this->fieldtype();
+
+        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
+        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
+    }
+
+    /** @test */
+    public function it_gets_the_display_format_when_time_is_enabled_but_theres_no_time_selected()
+    {
+        $fieldtype = $this->fieldtype(['time_enabled' => true]);
+        $fieldtype->field()->setValue('2013-04-01');
+
+        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
+        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
+    }
+
+    /** @test */
+    public function it_gets_the_display_format_when_time_is_enabled_and_a_time_has_been_selected()
+    {
+        $fieldtype = $this->fieldtype(['time_enabled' => true]);
+        $fieldtype->field()->setValue('2013-04-01 19:45');
+
+        $this->assertEquals('Y-m-d H:i', $fieldtype->indexDisplayFormat());
+        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
+    }
+
+    /** @test */
+    public function it_gets_the_display_format_for_ranges()
+    {
+        $fieldtype = $this->fieldtype(['mode' => 'range']);
+
+        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
+        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
+    }
+
+    /** @test */
+    public function it_gets_the_display_format_when_time_is_disabled_with_custom_format()
+    {
+        $fieldtype = $this->fieldtype(['format' => 'U']);
+
+        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
+        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
+    }
+
+    /** @test */
+    public function it_gets_the_display_format_when_time_is_enabled_with_custom_format()
+    {
+        $fieldtype = $this->fieldtype(['time_enabled' => true, 'format' => 'U']);
+
+        $this->assertEquals('Y-m-d H:i', $fieldtype->indexDisplayFormat());
+        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
+    }
+
+    /** @test */
+    public function it_gets_the_display_format_for_ranges_with_custom_format()
+    {
+        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'U']);
+
+        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
+        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
+    }
+
     public function fieldtype($config = [])
     {
         $field = new Field('test', array_merge([

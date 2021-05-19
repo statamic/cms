@@ -37,7 +37,6 @@ return [
     'color.config.swatches' => 'Warna yang telah ditentukan sebelumnya yang dapat dipilih dari daftar.',
     'color.config.theme' => 'Pilih antara pemilih warna klasik dan mini (lebih sederhana).',
     'date.config.columns' => 'Tunjukkan beberapa bulan sekaligus, dalam baris dan kolom',
-    'date.config.display_format' => 'Bagaimana tanggal harus ditampilkan, menggunakan format tanggal PHP.',
     'date.config.earliest_date' => 'Setel tanggal paling awal yang dapat dipilih.',
     'date.config.format' => 'Bagaimana tanggal harus disimpan, menggunakan [format tanggal PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Regangkan kalender untuk menggunakan lebar penuh.',
