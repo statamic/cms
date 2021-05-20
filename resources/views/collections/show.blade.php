@@ -10,6 +10,7 @@
         breadcrumb-url="{{ cp_route('collections.index') }}"
         :can-create="@can('create', ['Statamic\Contracts\Entries\Entry', $collection]) true @else false @endcan"
         create-url="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"
+        create-label="{{ $collection->createLabel() }}"
         :blueprints='@json($blueprints)'
         sort-column="{{ $collection->sortField() }}"
         sort-direction="{{ $collection->sortDirection() }}"
