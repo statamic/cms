@@ -239,7 +239,7 @@ class URL
         if (app()->runningInConsole()) {
             return config('app.url');
         }
-        
+
         $rootUrl = app('request')->root();
 
         return Str::ensureRight($rootUrl, '/');
