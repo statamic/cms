@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -72,6 +73,8 @@ class EntryPreviewController extends CpController
         app()->instance('request', $subrequest);
         Facade::clearResolvedInstance('request');
         Cascade::withRequest($subrequest);
+        Cascade::withSite(Site::current());
+        app('translator')->setLocale(Site::current()->shortLocale());
 
         try {
             $response = $entry->toLivePreviewResponse($subrequest, $request->extras);
@@ -86,6 +89,8 @@ class EntryPreviewController extends CpController
         app()->instance('request', $request);
         Facade::clearResolvedInstance('request');
         Cascade::withRequest($request);
+        Cascade::withSite(Site::current());
+        app('translator')->setLocale(Site::current()->shortLocale());
 
         return $response;
     }

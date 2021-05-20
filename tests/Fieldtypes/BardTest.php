@@ -2,12 +2,17 @@
 
 namespace Tests\Fieldtypes;
 
+use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Collection;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Bard;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class BardTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     public function it_augments_prosemirror_structure_to_a_template_friendly_array()
     {
@@ -364,6 +369,39 @@ class BardTest extends TestCase
         ];
 
         $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']);
+    }
+
+    /** @test */
+    public function it_gets_link_data()
+    {
+        tap(Collection::make('pages')->routes('/{slug}'))->save();
+        EntryFactory::collection('pages')->id('1')->slug('about')->data(['title' => 'About'])->create();
+        EntryFactory::collection('pages')->id('2')->slug('articles')->data(['title' => 'Articles'])->create();
+        EntryFactory::collection('pages')->id('3')->slug('contact')->data(['title' => 'Contact'])->create();
+        EntryFactory::collection('pages')->id('4')->slug('unused')->data(['title' => 'Unused'])->create();
+
+        $bard = $this->bard(['save_html' => true]);
+
+        $html = <<<'EOT'
+<p>
+    Paragraph
+    <a href="http://google.com">External Link</a>
+    <a href="statamic://entry::1">Internal Link One</a>
+    <a href="statamic://entry::2">Internal Link Two</a>
+    <strong>
+        <a href="statamic://entry::3">Internal Link Three inside another element</a>
+        <a href="statamic://entry::1">Internal Link Four thats a repeat</a>
+    </strong>
+</p>
+EOT;
+
+        $prosemirror = (new \HtmlToProseMirror\Renderer)->render($html)['content'];
+
+        $this->assertEquals([
+            'entry::1' => ['title' => 'About', 'permalink' => 'http://localhost/about'],
+            'entry::2' => ['title' => 'Articles', 'permalink' => 'http://localhost/articles'],
+            'entry::3' => ['title' => 'Contact', 'permalink' => 'http://localhost/contact'],
+        ], $bard->getLinkData($prosemirror));
     }
 
     private function bard($config = [])

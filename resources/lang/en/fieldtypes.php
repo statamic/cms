@@ -19,6 +19,7 @@ return [
     'bard.config.enable_input_rules' => 'Enables Markdown-style shortcuts when typing content.',
     'bard.config.enable_paste_rules' => 'Enables Markdown-style shortcuts when pasting content.',
     'bard.config.fullscreen' => 'Enable to toggle into fullscreen mode',
+    'bard.config.link_collections' => 'Entries from these collections will be available in the link selector. Leaving this empty will make all entries available.',
     'bard.config.link_noopener' => 'Set `rel="noopener` on all links.',
     'bard.config.link_noreferrer' => 'Set `rel="noreferrer` on all links.',
     'bard.config.reading_time' => 'Show estimated reading time at the bottom of the field.',

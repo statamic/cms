@@ -3,6 +3,7 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Data\AugmentedCollection;
@@ -20,15 +21,21 @@ class EntriesTest extends TestCase
     {
         parent::setUp();
 
-        $collection = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
-        EntryFactory::id('123')->collection($collection)->slug('one')->data(['title' => 'One'])->create();
-        EntryFactory::id('456')->collection($collection)->slug('two')->data(['title' => 'Two'])->create();
+        Carbon::setTestNow(Carbon::parse('2021-01-02'));
+
+        $collection = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->dated(true)->pastDateBehavior('private')->futureDateBehavior('private')->save();
+
+        EntryFactory::id('123')->collection($collection)->slug('one')->data(['title' => 'One'])->date('2021-01-02')->create();
+        EntryFactory::id('456')->collection($collection)->slug('two')->data(['title' => 'Two'])->date('2021-01-02')->create();
+        EntryFactory::id('draft')->collection($collection)->slug('draft')->data(['title' => 'Draft'])->published(false)->create();
+        EntryFactory::id('scheduled')->collection($collection)->slug('scheduled')->data(['title' => 'Scheduled'])->date('2021-01-03')->create();
+        EntryFactory::id('expired')->collection($collection)->slug('expired')->data(['title' => 'Expired'])->date('2021-01-01')->create();
     }
 
     /** @test */
     public function it_augments_to_a_collection_of_entries()
     {
-        $augmented = $this->fieldtype()->augment(['123', 'invalid', 456]);
+        $augmented = $this->fieldtype()->augment(['123', 'invalid', 456, 'draft', 'scheduled', 'expired']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
         $this->assertEveryItemIsInstanceOf(Entry::class, $augmented);

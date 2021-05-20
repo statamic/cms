@@ -23,7 +23,7 @@
                     :popover="{ visibility: 'click' }"
                     :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
-                    :locale="$config.get('locale')"
+                    :locale="$config.get('locale').replace('_', '-')"
                     :formats="formats"
                     :mode="config.mode"
                     :input="value"
@@ -180,7 +180,7 @@ export default {
         },
 
         parseTime(value) {
-            if (value && this.config.time_enabled) {
+            if (this.config.time_enabled && value && value.length > 10) {
                 return Vue.moment(value).format('HH:mm');
             } else if (this.config.time_required) {
                 return Vue.moment().format('HH:mm');

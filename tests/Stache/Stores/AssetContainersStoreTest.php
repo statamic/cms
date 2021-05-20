@@ -105,8 +105,9 @@ EOL;
             ->with('asset-containers')
             ->andReturn($this->store);
 
-        Facades\Stache::shouldReceive('shouldUpdateIndexes')
-            ->andReturnTrue(); // irrelevant for this test but it gets called during saving
+        // irrelevant for this test but gets called during saving
+        Facades\Stache::shouldReceive('shouldUpdateIndexes')->andReturnTrue();
+        Facades\Stache::shouldReceive('duplicates')->andReturn(optional());
 
         $container = Facades\AssetContainer::make('new')
             ->title('New Container');

@@ -7,7 +7,7 @@ use Statamic\Fields\Fieldtype;
 class Html extends Fieldtype
 {
     protected static $title = 'HTML';
-    protected $icon = 'code';
+    protected $icon = 'html';
 
     protected $configFields = [
         'html' => [

@@ -17,6 +17,7 @@ use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Facades\Nav as NavAPI;
 use Statamic\Facades\Role as RoleAPI;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
@@ -181,6 +182,14 @@ class CoreNav
             ->route('addons.index')
             ->icon('addons')
             ->can('configure addons');
+
+        if (Stache::duplicates()->isNotEmpty()) {
+            Nav::tools('Duplicate IDs')
+                ->route('duplicates')
+                ->icon('duplicate-ids')
+                ->view('statamic::nav.duplicates')
+                ->can('resolve duplicate ids');
+        }
 
         $this->makeUtilitiesSection();
 

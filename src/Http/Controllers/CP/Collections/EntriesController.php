@@ -243,24 +243,25 @@ class EntriesController extends CpController
             ->addValues($values)
             ->preProcess();
 
-        $values = $fields->values()->merge([
+        $values = collect([
             'title' => null,
             'slug' => null,
             'published' => $collection->defaultPublishState(),
-        ]);
+        ])->merge($fields->values());
 
         if ($collection->dated()) {
             $values['date'] = substr(now()->toDateTimeString(), 0, 10);
         }
 
         $viewData = [
-            'title' => __('Create Entry'),
+            'title' => $collection->createLabel(),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
             ],
             'values' => $values->all(),
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
+            'collectionCreateLabel' => $collection->createLabel(),
             'collectionHasRoutes' => ! is_null($collection->route($site->handle())),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),

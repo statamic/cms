@@ -5,6 +5,7 @@ namespace Statamic\Forms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Config;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;

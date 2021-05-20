@@ -51,6 +51,10 @@ class GlobalSetType extends \Rebing\GraphQL\Support\Type
     private function resolver()
     {
         return function (Variables $globals, $args, $context, $info) {
+            if ($info->fieldName === 'handle') {
+                return $globals->handle();
+            }
+
             $value = $globals->augmentedValue($info->fieldName);
 
             if ($value instanceof Value) {
