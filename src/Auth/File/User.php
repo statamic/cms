@@ -376,14 +376,4 @@ class User extends BaseUser
             'preferences' => $this->preferences(),
         ])->all();
     }
-
-    public function preferredLocale()
-    {
-        return $this->getPreference('locale') ?? config('app.locale');
-    }
-
-    public function setPreferredLocale($locale)
-    {
-        return $this->setPreference('locale', $locale);
-    }
 }

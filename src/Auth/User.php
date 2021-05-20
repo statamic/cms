@@ -225,4 +225,14 @@ abstract class User implements
     {
         return ['id', 'name', 'email', 'api_url'];
     }
+
+    public function preferredLocale()
+    {
+        return $this->getPreference('locale') ?? config('app.locale');
+    }
+
+    public function setPreferredLocale($locale)
+    {
+        return $this->setPreference('locale', $locale);
+    }
 }

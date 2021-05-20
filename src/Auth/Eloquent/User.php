@@ -364,16 +364,6 @@ class User extends BaseUser
         $this->model()->preferences = array_merge($this->getPreferences(), Arr::wrap($preferences));
     }
 
-    public function preferredLocale()
-    {
-        return $this->getPreference('locale') ?? config('app.locale');
-    }
-
-    public function setPreferredLocale($locale)
-    {
-        return $this->setPreference('locale', $locale);
-    }
-
     public function __set($key, $value)
     {
         if ($key === 'timestamps') {
