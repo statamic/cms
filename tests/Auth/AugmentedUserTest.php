@@ -60,31 +60,31 @@ class AugmentedUserTest extends AugmentedTestCase
         $augmented = new AugmentedUser($user);
 
         $expectations = [
-            'id'                => ['type' => 'string', 'value' => 'user-id'],
-            'name'              => ['type' => Value::class, 'value' => 'John Smith'],
-            'title'             => ['type' => 'string', 'value' => 'john@example.com'],
-            'email'             => ['type' => Value::class, 'value' => 'john@example.com'],
-            'initials'          => ['type' => 'string', 'value' => 'JS'],
-            'edit_url'          => ['type' => 'string', 'value' => 'http://localhost/cp/users/user-id/edit'],
-            'is_user'           => ['type' => 'bool', 'value' => true],
-            'last_login'        => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
-            'avatar'            => ['type' => 'string', 'value' => null],
-            'api_url'           => ['type' => 'string', 'value' => 'http://localhost/api/users/user-id'],
-            'preferred_locale'  => ['type' => 'string', 'value' => 'en'],
+            'id'         => ['type' => 'string', 'value' => 'user-id'],
+            'name'       => ['type' => Value::class, 'value' => 'John Smith'],
+            'title'      => ['type' => 'string', 'value' => 'john@example.com'],
+            'email'      => ['type' => Value::class, 'value' => 'john@example.com'],
+            'initials'   => ['type' => 'string', 'value' => 'JS'],
+            'edit_url'   => ['type' => 'string', 'value' => 'http://localhost/cp/users/user-id/edit'],
+            'is_user'    => ['type' => 'bool', 'value' => true],
+            'last_login' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
+            'avatar'     => ['type' => 'string', 'value' => null],
+            'api_url'    => ['type' => 'string', 'value' => 'http://localhost/api/users/user-id'],
+            'preferred_locale' => ['type' => 'string', 'value' => 'en'],
 
-            'roles'             => ['type' => 'array', 'value' => ['role_one']],
-            'is_role_one'       => ['type' => 'bool', 'value' => true],
-            'is_role_two'       => ['type' => 'bool', 'value' => false],
+            'roles'       => ['type' => 'array', 'value' => ['role_one']],
+            'is_role_one' => ['type' => 'bool', 'value' => true],
+            'is_role_two' => ['type' => 'bool', 'value' => false],
 
-            'groups'            => ['type' => 'array', 'value' => ['group_one']],
-            'in_group_one'      => ['type' => 'bool', 'value' => true],
-            'in_group_two'      => ['type' => 'bool', 'value' => false],
+            'groups'       => ['type' => 'array', 'value' => ['group_one']],
+            'in_group_one' => ['type' => 'bool', 'value' => true],
+            'in_group_two' => ['type' => 'bool', 'value' => false],
 
-            'one'               => ['type' => 'string', 'value' => 'the "one" value on the user'],
-            'two'               => ['type' => Value::class, 'value' => 'the "two" value on the user and in the blueprint'],
-            'three'             => ['type' => 'string', 'value' => 'the "three" value supplemented on the user'],
-            'four'              => ['type' => Value::class, 'value' => 'the "four" value supplemented on the user and in the blueprint'],
-            'unused_in_bp'      => ['type' => Value::class, 'value' => null],
+            'one'          => ['type' => 'string', 'value' => 'the "one" value on the user'],
+            'two'          => ['type' => Value::class, 'value' => 'the "two" value on the user and in the blueprint'],
+            'three'        => ['type' => 'string', 'value' => 'the "three" value supplemented on the user'],
+            'four'         => ['type' => Value::class, 'value' => 'the "four" value supplemented on the user and in the blueprint'],
+            'unused_in_bp' => ['type' => Value::class, 'value' => null],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
