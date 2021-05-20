@@ -97,7 +97,6 @@ import {
     Blockquote,
     CodeBlock,
     HardBreak,
-    Heading,
     HorizontalRule,
     OrderedList,
     BulletList,
@@ -117,6 +116,7 @@ import {
 import Set from './Set';
 import Doc from './Doc';
 import BardSource from './Source.vue';
+import Heading from './Heading';
 import Link from './Link';
 import Image from './Image';
 import Subscript from './Subscript';
@@ -511,21 +511,9 @@ export default {
                 );
             }
 
-            if (btns.includes('h1') ||
-                btns.includes('h2') ||
-                btns.includes('h3') ||
-                btns.includes('h4') ||
-                btns.includes('h5') ||
-                btns.includes('h6')
-            ) {
-                let levels = [];
-                if (btns.includes('h1')) levels.push(1);
-                if (btns.includes('h2')) levels.push(2);
-                if (btns.includes('h3')) levels.push(3);
-                if (btns.includes('h4')) levels.push(4);
-                if (btns.includes('h5')) levels.push(5);
-                if (btns.includes('h6')) levels.push(6);
-                exts.push(new Heading({ levels }));
+            const levels = [1, 2, 3, 4, 5, 6].filter(level => btns.includes(`h${level}`))
+            if (levels.length) {
+                exts.push(new Heading({ levels, vm: this }));
             }
 
             this.$bard.extensionCallbacks.forEach(callback => {
