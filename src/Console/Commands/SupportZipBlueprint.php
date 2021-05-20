@@ -101,10 +101,10 @@ class SupportZipBlueprint extends Command
     protected function getFieldsetHandles($blueprint)
     {
         return $blueprint->sections()->map->fields()->flatMap->items()->map(function ($field) {
-            if (is_string($field['field'])) {
-                return Str::before($field['field'], '.');
-            } elseif (isset($field['import'])) {
+            if (isset($field['import'])) {
                 return $field['import'];
+            } elseif (is_string($field['field'])) {
+                return Str::before($field['field'], '.');
             }
         })->filter()->unique()->values();
     }
