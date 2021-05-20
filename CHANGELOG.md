@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.1.16 (2020-05-20)
+
+### What's fixed
+- Reverted the lodash and underscore upgrades from 3.1.15 temporarily. [#3750](https://github.com/statamic/cms/issues/3750)
+
+
+
 ## 3.1.15 (2020-05-20)
 
 ### What's new
