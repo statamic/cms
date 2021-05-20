@@ -170,7 +170,7 @@ class Installer
         try {
             Composer::withoutQueue()->throwOnFailure()->requireDev($this->package);
         } catch (ProcessException $exception) {
-            $this->rollbackWithError("Error installing [{$this->package}].");
+            $this->rollbackWithError("Error installing starter kit [{$this->package}].");
         }
 
         return $this;

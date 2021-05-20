@@ -38,7 +38,9 @@ class StarterKitExport extends Command
         try {
             StarterKitExporter::export($path = $this->argument('path'));
         } catch (StarterKitException $exception) {
-            return $this->error($exception->getMessage());
+            $this->error($exception->getMessage());
+
+            return 1;
         }
 
         $this->info("Starter kit was successfully exported to [$path].");

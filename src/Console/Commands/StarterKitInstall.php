@@ -57,7 +57,9 @@ class StarterKitInstall extends Command
         try {
             $installer->install($package, $this);
         } catch (StarterKitException $exception) {
-            return $this->error($exception->getMessage());
+            $this->error($exception->getMessage());
+
+            return 1;
         }
 
         $this->info("Starter kit [$package] was successfully installed.");
