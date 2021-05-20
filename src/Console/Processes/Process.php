@@ -269,8 +269,8 @@ class Process
 
         // Handle both string and array command formats.
         $process = is_string($command) && method_exists(SymfonyProcess::class, 'fromShellCommandLine')
-            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, getenv())
-            : new SymfonyProcess($command, $path ?? $this->basePath, getenv());
+            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, ['HOME' => getenv('HOME')])
+            : new SymfonyProcess($command, $path ?? $this->basePath, ['HOME' => getenv('HOME')]);
 
         $process->setTimeout(null);
 
