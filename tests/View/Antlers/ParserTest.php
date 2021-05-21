@@ -475,11 +475,36 @@ EOT;
         $this->assertEquals('hello wilderness', $this->parse($template, $this->variables));
     }
 
+    public function testChainedStandardStringModifiersFromDynamicArrayRelaxed()
+    {
+        $template = '{{ associative[default_key] | upper | lower }}';
+
+        $this->assertEquals('wilderness', $this->parse($template, $this->variables));
+    }
+
     public function testSingleParameterStringModifier()
     {
         $template = "{{ string upper='true' }}";
 
         $this->assertEquals('HELLO WILDERNESS', $this->parse($template, $this->variables));
+    }
+
+    public function testSingleParameterStringFromArrayModifier()
+    {
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative.two upper='true' }}", $this->variables)
+        );
+
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative['two'] upper='true' }}", $this->variables)
+        );
+
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative[default_key] upper='true' }}", $this->variables)
+        );
     }
 
     public function testChainedParameterStringModifiers()
@@ -1705,6 +1730,47 @@ EOT;
         $this->assertEquals('yup', $this->parse($template, ['entries' => Entry::query()]));
         $this->assertEquals('yup', $this->parse($template, ['entries' => Entry::query()->where('collection', 'blog')]));
         $this->assertEquals('nope', $this->parse($template, ['entries' => Entry::query()->where('collection', 'dunno')]));
+    }
+
+    /** @test */
+    public function it_applies_modifier_on_different_array_syntax()
+    {
+        $vars = [
+            'key' => 'entries',
+            'source' => [
+                'entries' => [
+                    ['id' => 0],
+                    ['id' => 1],
+                    ['id' => 2],
+                    ['id' => 3],
+                ],
+            ],
+        ];
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source.entries }}[{{ id }}]{{ /source.entries }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source[key] }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source.entries sort="id" }}[{{ id }}]{{ /source.entries }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source[key] sort="id" }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[3][2][1][0]',
+            $this->parse('{{ source[key] sort="id:desc" }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
     }
 
     /** @test */
