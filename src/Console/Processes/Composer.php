@@ -48,6 +48,10 @@ class Composer extends Process
     {
         $lock = Lock::file($this->basePath.'composer.lock');
 
+        if (! $lock->exists()) {
+            return collect();
+        }
+
         return collect($this->runJsonComposerCommand('show', '--direct', '--no-plugins')->installed)
             ->keyBy('name')
             ->map(function ($package) use ($lock) {
@@ -61,14 +65,18 @@ class Composer extends Process
     /**
      * Get installed version of a specific package.
      *
-     * We can easily use composer.lock in this case, which is more performant than running composer show.
-     *
      * @param string $package
      * @return string
      */
     public function installedVersion(string $package)
     {
-        $version = Lock::file($this->basePath.'composer.lock')->getInstalledVersion($package);
+        $lock = Lock::file($this->basePath.'composer.lock');
+
+        if (! $lock->exists()) {
+            return null;
+        }
+
+        $version = $lock->getInstalledVersion($package);
 
         return $this->normalizeVersion($version);
     }

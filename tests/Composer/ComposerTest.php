@@ -84,6 +84,21 @@ class ComposerTest extends TestCase
     }
 
     /**
+     * @group integration
+     * @test
+     */
+    public function it_gracefully_fails_when_lock_file_does_not_exist()
+    {
+        unlink($this->basePath('composer.lock'));
+
+        $installed = Composer::installed();
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $installed);
+        $this->assertEmpty($installed);
+        $this->assertNull(Composer::installedVersion('statamic/composer-test-example-dependency'));
+    }
+
+    /**
      * This method is intentionally doing way too much, for the sake of test suite performance.
      *
      * @group integration
