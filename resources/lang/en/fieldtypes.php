@@ -41,7 +41,7 @@ return [
     'color.config.theme' => 'Choose between the classic and mini (simpler) color picker.',
     'date.config.columns' => 'Show multiple months at one time, in rows and columns',
     'date.config.earliest_date' => 'Set the earliest selectable date.',
-    'date.config.format' => 'Optionally format the date string using [moment.js](https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'How the date should be stored, using the [PHP date format](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Stretch the calendar to use up the full width.',
     'date.config.inline' => 'Skip the dropdown input field and show the calendar directly.',
     'date.config.mode' => 'Choose between single or range mode (range disables time picker).',

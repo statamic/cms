@@ -368,6 +368,12 @@ class EntriesController extends CpController
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
         }
 
+        if ($entry->collection()->dated()) {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
         $fields = $blueprint
             ->fields()
             ->addValues($values)
@@ -378,12 +384,6 @@ class EntriesController extends CpController
             'slug' => $entry->slug(),
             'published' => $entry->published(),
         ]);
-
-        if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
-            $values['date'] = $datetime;
-        }
 
         return [$values->all(), $fields->meta()];
     }

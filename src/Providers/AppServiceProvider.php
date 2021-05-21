@@ -64,8 +64,6 @@ class AppServiceProvider extends ServiceProvider
             return $this->to(cp_route($route, $parameters));
         });
 
-        Carbon::setToStringFormat(config('statamic.system.date_format'));
-
         Carbon::macro('inPreferredFormat', function () {
             return $this->format(
                 Preference::get('date_format', config('statamic.cp.date_format'))

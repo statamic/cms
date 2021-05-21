@@ -16,7 +16,7 @@
                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
                     <svg-icon name="calendar" class="w-4 h-4" />
                 </div>
-                <input type="text" class="input-text" readonly :value="$moment(value).format('L')" v-if="isReadOnly">
+                <input type="text" class="input-text" readonly :value="$moment(value).format(displayFormat)" v-if="isReadOnly">
                 <v-date-picker
                     v-else
                     v-model="date"
@@ -24,7 +24,7 @@
                     :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
                     :locale="$config.get('locale').replace('_', '-')"
-                    :formats="formats"
+                    :masks="{ input: [displayFormat] }"
                     :mode="config.mode"
                     :input="value"
                     :is-required="config.required"
@@ -63,13 +63,6 @@ export default {
         return {
             date: null,
             time: null,
-            formats: {
-                title: 'MMMM YYYY',
-                weekdays: 'W',
-                navMonths: 'MMM',
-                input: ['L', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD'],
-                dayPopover: 'L',
-            },
             attrs: [
                 {
                     key: 'today',
@@ -103,6 +96,10 @@ export default {
 
         format() {
             return (this.time) ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD';
+        },
+
+        displayFormat() {
+            return this.meta.displayFormat;
         }
     },
 
