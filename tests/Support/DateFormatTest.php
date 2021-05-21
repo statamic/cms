@@ -10,7 +10,7 @@ class DateFormatTest extends TestCase
     /** @test */
     public function it_has_conversions()
     {
-        $this->assertCount(38, DateFormat::phpToMomentConversions());
+        $this->assertCount(38, DateFormat::phpToIsoConversions());
     }
 
     /**
@@ -24,7 +24,7 @@ class DateFormatTest extends TestCase
 
     public function formatProvider()
     {
-        return collect(DateFormat::phpToMomentConversions())->mapWithKeys(function ($moment, $php) {
+        return collect(DateFormat::phpToIsoConversions())->mapWithKeys(function ($moment, $php) {
             return [$php => [$php, $moment]];
         })->all();
     }

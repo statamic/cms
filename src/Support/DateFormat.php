@@ -4,7 +4,7 @@ namespace Statamic\Support;
 
 class DateFormat
 {
-    public static function phpToMomentConversions()
+    public static function phpToIsoConversions()
     {
         return [
             'A' => 'A',      // for the sake of escaping
@@ -51,7 +51,7 @@ class DateFormat
     // https://stackoverflow.com/questions/30186611/php-dateformat-to-moment-js-format
     public static function toMoment($format)
     {
-        $replacements = static::phpToMomentConversions();
+        $replacements = static::phpToIsoConversions();
 
         // Converts escaped characters.
         foreach ($replacements as $from => $to) {
