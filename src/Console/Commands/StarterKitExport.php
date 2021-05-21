@@ -6,6 +6,7 @@ use Facades\Statamic\StarterKits\Exporter as StarterKitExporter;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 
 class StarterKitExport extends Command
@@ -32,11 +33,15 @@ class StarterKitExport extends Command
     public function handle()
     {
         if (! File::exists(base_path('starter-kit.yaml'))) {
-            return $this->stubStarterKitConfig();
+            return $this->askToStubStarterKitConfig();
+        }
+
+        if (! File::exists(base_path($path = $this->argument('path')))) {
+            $this->askToCreateExportPath($path);
         }
 
         try {
-            StarterKitExporter::export($path = $this->argument('path'));
+            StarterKitExporter::export($path);
         } catch (StarterKitException $exception) {
             $this->error($exception->getMessage());
 
@@ -47,16 +52,42 @@ class StarterKitExport extends Command
     }
 
     /**
-     * Stub out starter kit config.
+     * Ask to stub out starter kit config.
      */
-    protected function stubStarterKitConfig()
+    protected function askToStubStarterKitConfig()
     {
         $stubPath = __DIR__.'/stubs/starter-kits/starter-kit.yaml.stub';
-        $newPath = base_path('starter-kit.yaml');
+        $newPath = base_path($config = 'starter-kit.yaml');
+
+        if ($this->input->isInteractive()) {
+            if (! $this->confirm("Config [{$config}] does not exist. Would you like to create it now?", true)) {
+                return;
+            }
+        }
 
         File::copy($stubPath, $newPath);
 
-        $this->comment('A new config has been created at [starter-kit.yaml].');
+        $this->comment("A new config has been created at [{$config}].");
         $this->comment('Please configure your `export_paths` and re-run to begin your export!');
+    }
+
+    /**
+     * Ask to create export path.
+     *
+     * @param string $path
+     */
+    protected function askToCreateExportPath($path)
+    {
+        $absolutePath = Path::resolve(Path::makeFull($path));
+
+        if ($this->input->isInteractive()) {
+            if (! $this->confirm("Path [{$absolutePath}] does not exist. Would you like to create it now?", true)) {
+                return;
+            }
+        }
+
+        File::makeDirectory($absolutePath, 0755, true);
+
+        $this->comment("A new directory has been created at [{$absolutePath}].");
     }
 }
