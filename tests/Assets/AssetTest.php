@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
+use Statamic\Events\AssetMoved;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
@@ -676,6 +677,9 @@ class AssetTest extends TestCase
             'old/newfilename.txt',
         ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetSaved::class);
+        Event::assertDispatched(AssetMoved::class, function ($event) use ($asset) {
+            return $event->asset === $asset && $event->oldPath === 'old/asset.txt';
+        });
     }
 
     /** @test */

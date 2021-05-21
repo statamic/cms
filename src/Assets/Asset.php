@@ -13,6 +13,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetMoved;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
@@ -522,6 +523,8 @@ class Asset implements AssetContract, Augmentable
         $this->path($newPath);
         $this->disk()->rename($oldMetaPath, $this->metaPath());
         $this->save();
+
+        AssetMoved::dispatch($this, $oldPath);
 
         return $this;
     }
