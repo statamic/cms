@@ -17,6 +17,10 @@ class DataRepository
 
     public function find($reference)
     {
+        if (! $reference) {
+            return null;
+        }
+
         [$handle, $id] = $this->splitReference($reference);
 
         if (! $handle) {
