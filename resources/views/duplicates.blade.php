@@ -29,7 +29,7 @@
                             <form method="POST" action="{{ cp_route('duplicates.regenerate') }}">
                                 @csrf
                                 <input type="hidden" name="path" value="{{ $path }}" />
-                                <button class="text-blue">Regenerate</button>
+                                <button class="text-blue">{{ __('Regenerate') }}</button>
                             </form>
                         </td>
                     </tr>

@@ -688,6 +688,19 @@ class AssetTest extends TestCase
         $this->assertEquals([30, 60], $asset->dimensions());
         $this->assertEquals(30, $asset->width());
         $this->assertEquals(60, $asset->height());
+        $this->assertEquals(0.5, $asset->ratio());
+    }
+
+    /** @test */
+    public function it_gets_dimensions_for_svgs()
+    {
+        Storage::fake('test')->put('foo/image.svg', '<svg width="30" height="60"></svg>');
+        $asset = (new Asset)->path('foo/image.svg')->container($this->container);
+
+        $this->assertEquals([30, 60], $asset->dimensions());
+        $this->assertEquals(30, $asset->width());
+        $this->assertEquals(60, $asset->height());
+        $this->assertEquals(0.5, $asset->ratio());
     }
 
     /** @test */
@@ -700,6 +713,7 @@ class AssetTest extends TestCase
         $this->assertEquals([null, null], $asset->dimensions());
         $this->assertEquals(null, $asset->width());
         $this->assertEquals(null, $asset->height());
+        $this->assertEquals(null, $asset->ratio());
     }
 
     /** @test */

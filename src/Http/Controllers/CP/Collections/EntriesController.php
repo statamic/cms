@@ -257,13 +257,14 @@ class EntriesController extends CpController
         }
 
         $viewData = [
-            'title' => __('Create Entry'),
+            'title' => $collection->createLabel(),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
             ],
             'values' => $values->all(),
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
+            'collectionCreateLabel' => $collection->createLabel(),
             'collectionHasRoutes' => ! is_null($collection->route($site->handle())),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
@@ -372,6 +373,12 @@ class EntriesController extends CpController
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
         }
 
+        if ($entry->collection()->dated()) {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
         $fields = $blueprint
             ->fields()
             ->addValues($values)
@@ -382,12 +389,6 @@ class EntriesController extends CpController
             'slug' => $entry->slug(),
             'published' => $entry->published(),
         ]);
-
-        if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
-            $values['date'] = $datetime;
-        }
 
         return [$values->all(), $fields->meta()];
     }

@@ -1,5 +1,57 @@
 # Release Notes
 
+## 3.1.16 (2020-05-20)
+
+### What's fixed
+- Reverted the lodash and underscore upgrades from 3.1.15 temporarily. [#3750](https://github.com/statamic/cms/issues/3750)
+
+
+
+## 3.1.15 (2020-05-20)
+
+### What's new
+- You can programmatically get and set a user's preferred locale more easily. [#3725](https://github.com/statamic/cms/issues/3725)
+- You can customize a Collection's "Create Entry" text. [#3586](https://github.com/statamic/cms/issues/3586)
+
+### What's improved
+- The Bard link picker will autofocus the URL input. [#3741](https://github.com/statamic/cms/issues/3741)
+- Updated French translations [#3718](https://github.com/statamic/cms/issues/3718) [#3716](https://github.com/statamic/cms/issues/3716)
+
+### What's fixed
+- Fix issue where the site URL sometimes would be incorrect, causing incorrect behavior in the `nav:breadcrumbs` tag, and likely other places. [#3695](https://github.com/statamic/cms/issues/3695)
+- Fix the `locales` tag only working for entries. [#3689](https://github.com/statamic/cms/issues/3689)
+- Fix asset editor not being editable even if you have permission. [#3743](https://github.com/statamic/cms/issues/3743)
+- Prevent mounting an entry from the same collection onto itself. [#3731](https://github.com/statamic/cms/issues/3731)
+- The `entries` fieldtype filters out unpublished entries when augmenting. [#3544](https://github.com/statamic/cms/issues/3544)
+- Typehint the Submission interface in the form email class so custom implementations can be used. [#3596](https://github.com/statamic/cms/issues/3596)
+- Bump underscore from 1.9.2 to 1.12.1 [#3662](https://github.com/statamic/cms/issues/3662)
+- Bump lodash from 4.17.19 to 4.17.21 [#3672](https://github.com/statamic/cms/issues/3672)
+
+
+
+## 3.1.14 (2020-05-14)
+
+### What's new
+- Add Bard node extension helper. [#3657](https://github.com/statamic/cms/issues/3657)
+
+### What's improved
+- Add HTML fieldtype icon. [247364cbb](https://github.com/statamic/cms/commit/247364cbb)
+- Update Spanish, German, Dutch, and French Translations [#3706](https://github.com/statamic/cms/issues/3706) [#3674](https://github.com/statamic/cms/issues/3674) [#3703](https://github.com/statamic/cms/issues/3703) [#3688](https://github.com/statamic/cms/issues/3688)
+
+### What's fixed
+- Fix avatar URLs for some situations. [468a55864](https://github.com/statamic/cms/commit/468a55864)
+- Fix error when selecting certain collections in a Bard fieldtype. [#3709](https://github.com/statamic/cms/issues/3709)
+- Fix array fieldtype always being dirty. [#3704](https://github.com/statamic/cms/issues/3704)
+- Fix GraphQL error in globals and terms. [#3711](https://github.com/statamic/cms/issues/3711)
+- Fix Bard z-index issue. [#3694](https://github.com/statamic/cms/issues/3694)
+- Fix SVG Dimensions. [#3702](https://github.com/statamic/cms/issues/3702)
+- Explicitly use Stringy for `Str::replace()`. [#3698](https://github.com/statamic/cms/issues/3698)
+- Bump codemirror from 5.55.0 to 5.58.2. [#3691](https://github.com/statamic/cms/issues/3691)
+- Bump url-parse from 1.4.7 to 1.5.1. [#3664](https://github.com/statamic/cms/issues/3664)
+- Bump hosted-git-info from 2.8.8 to 2.8.9. [#3676](https://github.com/statamic/cms/issues/3676)
+
+
+
 ## 3.1.13 (2020-05-10)
 
 ### What's improved

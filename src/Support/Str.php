@@ -258,4 +258,9 @@ class Str extends \Illuminate\Support\Str
     {
         return ! in_array(strtolower($value), ['no', 'false', '0', '', '-1']);
     }
+
+    public static function replace($string, $search, $replace)
+    {
+        return StaticStringy::replace($string, $search, $replace);
+    }
 }

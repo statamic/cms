@@ -38,7 +38,7 @@ return [
     'color.config.theme' => 'Escolha entre o clássico e o mini-apanhador de cores (mais simples).',
     'date.config.columns' => 'Mostrar vários meses ao mesmo tempo, em filas e colunas',
     'date.config.earliest_date' => 'Fixar a data mais próxima a seleccionar.',
-    'date.config.format' => 'Formatar opcionalmente a sequência de datas utilizando [moment.js](https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Como a data deve ser armazenada, usando o [formato de data PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Esticar o calendário para utilizar em toda a sua largura.',
     'date.config.inline' => 'Saltar o campo de entrada dropdown e mostrar directamente o calendário.',
     'date.config.mode' => 'Escolha entre o modo simples ou intervalo (intervalo desabilita o seletor de tempo).',

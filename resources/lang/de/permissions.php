@@ -70,5 +70,7 @@ return [
     'group_utilities' => 'Hilfsmittel',
     'access_utility' => ':title',
     'access_utility_desc' => 'Gewährt Zugriff auf das Hilfsmittel «:title»',
-    'group_misc' => 'Sonstiges',
+    'group_misc' => 'Verschiedenes',
+    'resolve_duplicate_ids' => 'Doppelte IDs auflösen',
+    'resolve_duplicate_ids_desc' => 'Ermöglicht das Erkennen und Auflösen von doppelten IDs.',
 ];
