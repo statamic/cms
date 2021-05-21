@@ -49,7 +49,7 @@ class DateFormat
     }
 
     // https://stackoverflow.com/questions/30186611/php-dateformat-to-moment-js-format
-    public static function toMoment($format)
+    public static function toIso($format)
     {
         $replacements = static::phpToIsoConversions();
 

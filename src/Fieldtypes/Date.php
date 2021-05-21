@@ -228,7 +228,7 @@ class Date extends Fieldtype
     public function preload()
     {
         return [
-            'displayFormat' => DateFormat::toMoment($this->fieldDisplayFormat()),
+            'displayFormat' => DateFormat::toIso($this->fieldDisplayFormat()),
         ];
     }
 

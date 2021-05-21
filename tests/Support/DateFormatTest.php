@@ -17,15 +17,15 @@ class DateFormatTest extends TestCase
      * @test
      * @dataProvider formatProvider
      **/
-    public function it_converts_from_php_to_moment($php, $moment)
+    public function it_converts_from_php_to_iso($php, $iso)
     {
-        $this->assertEquals($moment, DateFormat::toMoment($php));
+        $this->assertEquals($iso, DateFormat::toIso($php));
     }
 
     public function formatProvider()
     {
-        return collect(DateFormat::phpToIsoConversions())->mapWithKeys(function ($moment, $php) {
-            return [$php => [$php, $moment]];
+        return collect(DateFormat::phpToIsoConversions())->mapWithKeys(function ($iso, $php) {
+            return [$php => [$php, $iso]];
         })->all();
     }
 }
