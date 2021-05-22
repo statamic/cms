@@ -51,6 +51,7 @@ class InstallTest extends TestCase
 
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
         $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileNotExists(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
     }

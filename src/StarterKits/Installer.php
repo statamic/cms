@@ -363,6 +363,8 @@ class Installer
 
         Composer::withoutQueue()->throwOnFailure(false)->remove($this->package);
 
+        $this->files->delete(base_path('composer.json.bak'));
+
         return $this;
     }
 
