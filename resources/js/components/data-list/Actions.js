@@ -56,7 +56,7 @@ export default {
                     });
                 }
 
-                this.$emit('completed', response.data);
+                this.$emit('completed', true, response.data);
             }).catch(error => {
                 error.response.data.text().then(data => {
                     data = JSON.parse(data);
