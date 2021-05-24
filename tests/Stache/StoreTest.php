@@ -51,7 +51,8 @@ class StoreTest extends TestCase
             'golf',
         ]]);
 
-        $store = new class extends Store {
+        $store = new class extends Store
+        {
             protected $valueIndex = 'TestValueIndex';
             protected $storeIndexes = [
                 'alfa',
