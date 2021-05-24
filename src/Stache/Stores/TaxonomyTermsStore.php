@@ -80,7 +80,6 @@ class TaxonomyTermsStore extends ChildStore
         [$site, $slug] = explode('::', $key);
 
         if ($path = $this->getPath($key)) {
-            $path = explode('::', $path)[1];
             $item = $this->makeItemFromFile($path, File::get($path))->in($site);
         } else {
             $item = Term::make($slug)
@@ -145,27 +144,6 @@ class TaxonomyTermsStore extends ChildStore
         parent::handleFileChanges();
     }
 
-    public function getItemsFromFiles()
-    {
-        if ($this->shouldCacheFileItems && $this->fileItems) {
-            return $this->fileItems;
-        }
-
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
-
-        $items = $files->flatMap(function ($timestamp, $path) {
-            $keys = $this->getKeyFromPath($path);
-
-            return $keys->map(function ($key) {
-                return $this->getItem($key);
-            });
-        })->keyBy(function ($item) {
-            return $this->getItemKey($item);
-        });
-
-        return $this->fileItems = $items;
-    }
-
     public function paths()
     {
         if ($this->paths) {
@@ -184,20 +162,13 @@ class TaxonomyTermsStore extends ChildStore
             return $term->localizations()->flatMap(function ($localization, $locale) use ($path) {
                 $this->cacheItem($localization);
 
-                return [$this->getItemKey($localization) => $locale.'::'.$path];
+                return [$this->getItemKey($localization) => $path];
             })->all();
         });
 
         $this->cachePaths($paths);
 
         return $paths;
-    }
-
-    protected function getKeyFromPath($path)
-    {
-        return $this->paths()->filter(function ($p) use ($path) {
-            return \Statamic\Support\Str::endsWith($p, $path);
-        })->keys();
     }
 
     public function save($term)

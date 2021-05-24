@@ -93,8 +93,8 @@ GQL;
                 ['id' => 'tags::bravo', 'title' => 'Tag Bravo'],
                 ['id' => 'categories::alpha', 'title' => 'Category Alpha'],
                 ['id' => 'categories::bravo', 'title' => 'Category Bravo'],
-                ['id' => 'sizes::large', 'title' => 'Size Large'],
                 ['id' => 'sizes::small', 'title' => 'Size Small'],
+                ['id' => 'sizes::large', 'title' => 'Size Large'],
             ]]]]);
     }
 
@@ -197,8 +197,8 @@ GQL;
             ->assertExactJson(['data' => ['terms' => ['data' => [
                 ['id' => 'categories::alpha', 'title' => 'Category Alpha'],
                 ['id' => 'categories::bravo', 'title' => 'Category Bravo'],
-                ['id' => 'sizes::large', 'title' => 'Size Large'],
                 ['id' => 'sizes::small', 'title' => 'Size Small'],
+                ['id' => 'sizes::large', 'title' => 'Size Large'],
             ]]]]);
     }
 
@@ -252,8 +252,8 @@ GQL;
             ->assertExactJson(['data' => ['terms' => ['data' => [
                 ['id' => 'tags::alpha', 'foo' => 'FOO!'],
                 ['id' => 'tags::bravo', 'bar' => 'BAR!'],
-                ['id' => 'sizes::large', 'shorthand' => 'lg'],
                 ['id' => 'sizes::small', 'shorthand' => 'sm'],
+                ['id' => 'sizes::large', 'shorthand' => 'lg'],
             ]]]]);
     }
 
