@@ -121,26 +121,21 @@ abstract class Store
 
     public function indexes($withUsages = true)
     {
+        $rekey = function ($array) {
+            return collect($array)->mapWithKeys(function ($value, $key) {
+                return is_int($key) ? [$value => $this->valueIndex] : [$key => $value];
+            })->all();
+        };
+
         $storeIndexConfigKey = $this instanceof ChildStore ? $this->parent->key() : $this->key();
 
-        $indexes = collect(array_merge(
-            $this->defaultIndexes,
-            $this->storeIndexes(),
-            config('statamic.stache.indexes', []),
-            config("statamic.stache.stores.{$storeIndexConfigKey}.indexes", [])
+        return collect(array_merge(
+            ($withUsages) ? $rekey($this->indexUsage()->all()) : [],
+            $rekey(config('statamic.stache.indexes', [])),
+            $rekey(config("statamic.stache.stores.{$storeIndexConfigKey}.indexes", [])),
+            $rekey($this->defaultIndexes),
+            $rekey($this->storeIndexes()),
         ));
-
-        if ($withUsages) {
-            $indexes = $indexes->merge($this->indexUsage()->all());
-        }
-
-        return $indexes->unique(function ($value, $key) {
-            return is_int($key) ? $value : $key;
-        })->mapWithKeys(function ($index, $key) {
-            return is_int($key)
-                ? [$index => $this->valueIndex]
-                : [$key => $index];
-        });
     }
 
     public function resolveIndexes($withUsages = true)
