@@ -134,7 +134,7 @@ abstract class Store
             $rekey(config('statamic.stache.indexes', [])),
             $rekey(config("statamic.stache.stores.{$storeIndexConfigKey}.indexes", [])),
             $rekey($this->defaultIndexes),
-            $rekey($this->storeIndexes()),
+            $rekey($this->storeIndexes())
         ));
     }
 
