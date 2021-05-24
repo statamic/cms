@@ -74,6 +74,8 @@ class StoreTest extends TestCase
         Cache::forever('stache::indexes::test::_indexes', ['alfa', 'bravo', 'zulu']);
 
         $this->assertSame([
+            'id' => 'TestValueIndex', // default
+            'path' => 'TestValueIndex', // default
             'alfa' => 'TestValueIndex', // usage
             'bravo' => 'CustomBravoIndex', // usage, overridden by store index
             'zulu' => 'TestValueIndex', // usage
@@ -82,21 +84,19 @@ class StoreTest extends TestCase
             'romeo' => 'TestValueIndex', // indexes config
             'yankee' => 'TestValueIndex', // store indexes config
             'golf' => 'TestValueIndex', // store indexes config
-            'id' => 'TestValueIndex', // default
-            'path' => 'TestValueIndex', // default
             'tango' => 'CustomTangoIndex', // store
             'victor' => 'TestValueIndex', // store
         ], $store->indexes()->all());
 
         $this->assertSame([
+            'id' => 'TestValueIndex', // default
+            'path' => 'TestValueIndex', // default
             'bravo' => 'CustomBravoIndex', // indexes config, overridden by store index
             'kilo' => 'StoreCustomKiloIndex', // indexes config, overridden class from store indexes config
             'lima' => 'CustomLimaIndex', // indexes config
             'romeo' => 'TestValueIndex', // indexes config
             'yankee' => 'TestValueIndex', // store indexes config
             'golf' => 'TestValueIndex', // store indexes config
-            'id' => 'TestValueIndex', // default
-            'path' => 'TestValueIndex', // default
             'alfa' => 'TestValueIndex', // store
             'tango' => 'CustomTangoIndex', // store
             'victor' => 'TestValueIndex', // store

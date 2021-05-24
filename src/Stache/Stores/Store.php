@@ -123,10 +123,10 @@ abstract class Store
         $storeIndexConfigKey = $this instanceof ChildStore ? $this->parent->key() : $this->key();
 
         return collect([
+            $this->defaultIndexes,
             ($withUsages) ? $this->indexUsage()->all() : [],
             config('statamic.stache.indexes', []),
             config("statamic.stache.stores.{$storeIndexConfigKey}.indexes", []),
-            $this->defaultIndexes,
             $this->storeIndexes(),
         ])->reduce(function ($carry, $item) {
             return $carry->merge(collect($item)->mapWithKeys(function ($value, $key) {
