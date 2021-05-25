@@ -16,6 +16,7 @@ class Installer
     protected $files;
     protected $withConfig;
     protected $withoutDependencies;
+    protected $withUser;
     protected $force;
     protected $package;
     protected $console;
@@ -56,6 +57,19 @@ class Installer
     }
 
     /**
+     * Install with super user.
+     *
+     * @param bool $withUser
+     * @return $this
+     */
+    public function withUser($withUser = false)
+    {
+        $this->withUser = $withUser;
+
+        return $this;
+    }
+
+    /**
      * Force install and allow dependency errors.
      *
      * @param bool $force
@@ -91,6 +105,7 @@ class Installer
             ->ensureCompatibleDependencies()
             ->installFiles()
             ->installDependencies()
+            ->makeSuperUser()
             ->reticulateSplines()
             ->removeStarterKit()
             ->removeRepository();
@@ -334,6 +349,24 @@ class Installer
         } catch (ProcessException $exception) {
             $this->console->error("Error installing [{$package}].");
         }
+    }
+
+    /**
+     * Make super user.
+     *
+     * @return $this
+     */
+    public function makeSuperUser()
+    {
+        if (! $this->withUser) {
+            return $this;
+        }
+
+        if ($this->console->confirm('Create a super user?', false)) {
+            $this->console->call('make:user', ['--super' => true]);
+        }
+
+        return $this;
     }
 
     /**

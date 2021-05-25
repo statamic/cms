@@ -45,13 +45,14 @@ class StarterKitInstall extends Command
             return;
         }
 
-        if ($this->shouldClear()) {
+        if ($cleared = $this->shouldClear()) {
             $this->call('statamic:site:clear', ['--no-interaction' => true]);
         }
 
         $installer = (new StarterKitInstaller)
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
+            ->withUser($cleared && $this->input->isInteractive())
             ->force($this->option('force'));
 
         try {
