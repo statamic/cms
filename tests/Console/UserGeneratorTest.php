@@ -43,7 +43,7 @@ class UserGeneratorTest extends TestCase
             ->expectsQuestion('Email', 'jason@ifyoucantescapeit.org')
             ->expectsQuestion('Name', 'Jason')
             ->expectsQuestion('Password (Your input will be hidden)', 'midnight')
-            ->expectsConfirmation('Super user', 'yes')
+            ->expectsQuestion('Super user', true)
             ->assertExitCode(0);
 
         $user = User::all()->first();
@@ -64,7 +64,7 @@ class UserGeneratorTest extends TestCase
             ->expectsQuestion('Email', 'jesses.girl@springfield.com')
             ->expectsQuestion('Name', 'Gertrude')
             ->expectsQuestion('Password (Your input will be hidden)', 'rickie')
-            ->expectsConfirmation('Super user', 'no')
+            ->expectsQuestion('Super user', false)
             ->assertExitCode(0);
 
         $user = User::all()->first();
