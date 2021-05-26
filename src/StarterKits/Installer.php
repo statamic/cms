@@ -418,7 +418,7 @@ class Installer
     {
         $this->console->info('Cleaning up temporary files...');
 
-        Composer::withoutQueue()->throwOnFailure(false)->remove($this->package);
+        Composer::withoutQueue()->throwOnFailure(false)->removeDev($this->package);
 
         $this->files->delete(base_path('composer.json.bak'));
 

@@ -544,6 +544,11 @@ class FakeComposer
         $this->removeFromVendorFiles($package);
     }
 
+    public function removeDev($package)
+    {
+        $this->remove($package);
+    }
+
     public function runAndOperateOnOutput($args, $callback)
     {
         $args = collect($args);
