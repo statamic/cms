@@ -180,7 +180,7 @@ class TaxonomyTermsStore extends ChildStore
 
             $this->forgetItem($key);
 
-            $this->setPath($key, $item->locale().'::'.$item->path());
+            $this->setPath($key, $item->path());
 
             $this->resolveIndexes()->each->updateItem($item);
 
