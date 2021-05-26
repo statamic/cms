@@ -165,7 +165,8 @@ class FieldtypeTest extends TestCase
         $fields = Mockery::mock(Fields::class);
         $fields->shouldReceive('toPublishArray')->once()->andReturn(['example', 'publish', 'array']);
 
-        $fieldtype = new class($fields) extends Fieldtype {
+        $fieldtype = new class($fields) extends Fieldtype
+        {
             protected $mock;
             protected static $handle = 'test';
 
