@@ -24,20 +24,20 @@ class Exporter
     /**
      * Export starter kit.
      *
-     * @param string $exportPath
+     * @param string $absolutePath
      * @throws StarterKitException
      */
-    public function export($exportPath)
+    public function export($absolutePath)
     {
-        if (! $this->files->exists(base_path($exportPath))) {
+        $this->exportPath = $absolutePath;
+
+        if (! $this->files->exists($this->exportPath)) {
             throw new StarterKitException("Path [$exportPath] does not exist.");
         }
 
         if (! $this->files->exists(base_path('starter-kit.yaml'))) {
             throw new StarterKitException('Export config [starter-kit.yaml] does not exist.');
         }
-
-        $this->exportPath = $exportPath;
 
         $this
             ->exportFiles()
@@ -52,39 +52,40 @@ class Exporter
      */
     protected function exportFiles()
     {
-        $this->exportPaths()
+        $this
+            ->exportPaths()
             ->each(function ($path) {
-                $this->ensurePathExists($path);
+                $this->ensureExportPathExists($path);
             })
             ->each(function ($path) {
-                $this->exportPath($path, base_path("{$this->exportPath}/{$path}"));
+                $this->copyPath($path);
             });
 
         return $this;
     }
 
     /**
-     * Ensure path exists.
+     * Ensure export path exists.
      *
      * @param string $path
      * @throws StarterKitException
      */
-    protected function ensurePathExists($path)
+    protected function ensureExportPathExists($path)
     {
-        if (! $this->files->exists(base_path($path))) {
+        if (! $this->files->exists($path)) {
             throw new StarterKitException("Export path [{$path}] does not exist.");
         }
     }
 
     /**
-     * Export path.
+     * Copy path to new export path location.
      *
      * @param string $fromPath
-     * @param string $toPath
      */
-    protected function exportPath($fromPath, $toPath)
+    protected function copyPath($fromPath)
     {
-        $fromPath = base_path($fromPath);
+        $relativePath = str_replace(base_path().'/', '', $fromPath);
+        $toPath = "{$this->exportPath}/{$relativePath}";
 
         $this->preparePath($fromPath, $toPath);
 
@@ -136,7 +137,9 @@ class Exporter
             throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array!');
         }
 
-        return $paths;
+        return $paths->map(function ($path) {
+            return base_path($path);
+        });
     }
 
     /**
@@ -150,7 +153,7 @@ class Exporter
 
         $config = $this->exportDependenciesFromComposerJson($config);
 
-        $this->files->put(base_path("{$this->exportPath}/starter-kit.yaml"), YAML::dump($config->all()));
+        $this->files->put("{$this->exportPath}/starter-kit.yaml", YAML::dump($config->all()));
 
         return $this;
     }
@@ -244,7 +247,7 @@ class Exporter
         $composerJson = $this->prepareComposerJsonFromStub()->all();
 
         $this->files->put(
-            base_path("{$this->exportPath}/composer.json"),
+            "{$this->exportPath}/composer.json",
             json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
 
@@ -281,7 +284,7 @@ class Exporter
     {
         $stubPath = __DIR__.'/../Console/Commands/stubs/starter-kits/composer.json.stub';
 
-        $existingComposerJsonPath = base_path("{$this->exportPath}/composer.json");
+        $existingComposerJsonPath = "{$this->exportPath}/composer.json";
 
         if ($this->files->exists($existingComposerJsonPath)) {
             return $this->files->get($existingComposerJsonPath);

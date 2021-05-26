@@ -36,7 +36,7 @@ class StarterKitExport extends Command
             return $this->askToStubStarterKitConfig();
         }
 
-        if (! File::exists(base_path($path = $this->argument('path')))) {
+        if (! File::exists($path = $this->getAbsolutePath())) {
             $this->askToCreateExportPath($path);
         }
 
@@ -72,22 +72,34 @@ class StarterKitExport extends Command
     }
 
     /**
+     * Get absolute path.
+     *
+     * @return string
+     */
+    protected function getAbsolutePath()
+    {
+        $path = $this->argument('path');
+
+        return Path::isAbsolute($path)
+            ? $path
+            : Path::resolve(Path::makeFull($path));
+    }
+
+    /**
      * Ask to create export path.
      *
      * @param string $path
      */
     protected function askToCreateExportPath($path)
     {
-        $absolutePath = Path::resolve(Path::makeFull($path));
-
         if ($this->input->isInteractive()) {
-            if (! $this->confirm("Path [{$absolutePath}] does not exist. Would you like to create it now?", true)) {
+            if (! $this->confirm("Path [{$path}] does not exist. Would you like to create it now?", true)) {
                 return;
             }
         }
 
-        File::makeDirectory($absolutePath, 0755, true);
+        File::makeDirectory($path, 0755, true);
 
-        $this->comment("A new directory has been created at [{$absolutePath}].");
+        $this->comment("A new directory has been created at [{$path}].");
     }
 }
