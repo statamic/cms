@@ -188,6 +188,14 @@ class ComposerTest extends TestCase
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
         $this->assertTrue($installed->get('test/package')->dev);
         $this->assertStringContainsString('Installing test/package', Cache::get('composer.test/package')['output']);
+
+        // Test that we can remove a dev package...
+
+        Composer::removeDev('test/package');
+
+        $this->assertStringNotContainsString('test/package', Composer::installed()->keys());
+        $this->assertFileNotExists($this->basePath('vendor/test/package'));
+        $this->assertStringContainsString('Removing test/package', Cache::get('composer.test/package')['output']);
     }
 
     private function basePath($path = null)

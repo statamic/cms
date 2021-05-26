@@ -130,10 +130,21 @@ class Composer extends Process
      * Remove a package.
      *
      * @param string $package
+     * @param mixed $extraParams
      */
-    public function remove(string $package)
+    public function remove(string $package, ...$extraParams)
     {
-        $this->queueComposerCommand('remove', $package);
+        $this->queueComposerCommand('remove', $package, ...$extraParams);
+    }
+
+    /**
+     * Remove a dev package.
+     *
+     * @param string $package
+     */
+    public function removeDev(string $package)
+    {
+        $this->remove($package, '--dev');
     }
 
     /**
