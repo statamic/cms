@@ -213,7 +213,7 @@ abstract class Store
 
         // Flush cached instances of deleted items.
         $deleted->each(function ($path) {
-            collect(Arr::wrap($this->getKeyFromPath($path)))->each(function ($key) use ($path) {
+            collect($this->getKeyFromPath($path))->each(function ($key) use ($path) {
                 $this->forgetItem($key);
                 $this->forgetPath($key);
                 $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
