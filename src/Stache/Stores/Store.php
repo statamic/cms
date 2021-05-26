@@ -337,10 +337,6 @@ abstract class Store
             return $isDuplicate ?? false;
         });
 
-        $items->each(function ($item) {
-            $this->cacheItem($item['item']);
-        });
-
         $paths = $items->pluck('path', 'key');
 
         $this->cachePaths($paths);
