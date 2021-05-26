@@ -130,6 +130,7 @@ class ExportTest extends TestCase
     },
     "prefer-stable": true
 }
+
 EOT
         );
 
@@ -160,6 +161,7 @@ EOT
         }
     }
 }
+
 EOT
         , $this->files->get($this->exportPath('composer.json')));
     }
@@ -182,6 +184,7 @@ EOT
     },
     "prefer-stable": true
 }
+
 EOT
         );
 
@@ -218,6 +221,7 @@ EOT
     },
     "prefer-stable": true
 }
+
 EOT
         );
 
@@ -252,6 +256,7 @@ EOT
     },
     "prefer-stable": true
 }
+
 EOT
         );
 
@@ -295,6 +300,7 @@ EOT
     },
     "prefer-stable": true
 }
+
 EOT
         );
 
@@ -384,6 +390,7 @@ EOT
         }
     }
 }
+
 EOT
         , $this->files->get($this->exportPath('composer.json')));
     }
@@ -417,6 +424,7 @@ EOT
         "bob-sled"
     ]
 }
+
 EOT
         , $this->files->get($this->exportPath('composer.json')));
     }

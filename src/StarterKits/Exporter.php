@@ -248,7 +248,7 @@ class Exporter
 
         $this->files->put(
             "{$this->exportPath}/composer.json",
-            json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n"
         );
 
         return $this;
