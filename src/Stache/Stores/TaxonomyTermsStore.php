@@ -175,7 +175,7 @@ class TaxonomyTermsStore extends ChildStore
     {
         return $this->paths()->filter(function ($p) use ($path) {
             return \Statamic\Support\Str::endsWith($p, $path);
-        })->keys()->all();
+        })->keys();
     }
 
     public function save($term)
