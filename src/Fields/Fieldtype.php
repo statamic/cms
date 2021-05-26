@@ -24,6 +24,7 @@ abstract class Fieldtype implements Arrayable
     protected $validatable = true;
     protected $defaultable = true;
     protected $selectable = true;
+    protected $supportedInForms = false;
     protected $categories = ['text'];
     protected $rules = [];
     protected $extraRules = [];
@@ -76,6 +77,11 @@ abstract class Fieldtype implements Arrayable
     public function selectable(): bool
     {
         return $this->selectable;
+    }
+
+    public function supportedInForms(): bool
+    {
+        return $this->supportedInForms;
     }
 
     public function categories(): array
@@ -132,6 +138,7 @@ abstract class Fieldtype implements Arrayable
             'validatable' => $this->validatable(),
             'defaultable' => $this->defaultable(),
             'selectable'  => $this->selectable(),
+            'supportedInForms' => $this->supportedInForms(),
             'categories' => $this->categories(),
             'icon' => $this->icon(),
             'config' => $this->configFields()->toPublishArray(),

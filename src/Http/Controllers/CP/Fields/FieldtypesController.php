@@ -16,7 +16,7 @@ class FieldtypesController extends CpController
                 $arr = $fieldtype->toArray();
 
                 if ($request->forms) {
-                    $arr['selectable'] = $this->supportedInForms($fieldtype->handle());
+                    $arr['selectable'] = $arr['supportedInForms'] ?: $this->supportedInForms($fieldtype->handle());
                 }
 
                 return $arr;
