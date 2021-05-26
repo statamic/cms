@@ -171,6 +171,13 @@ class TaxonomyTermsStore extends ChildStore
         return $paths;
     }
 
+    protected function getKeyFromPath($path)
+    {
+        return $this->paths()->filter(function ($p) use ($path) {
+            return \Statamic\Support\Str::endsWith($p, $path);
+        })->keys()->all();
+    }
+
     public function save($term)
     {
         $this->writeItemToDisk($term);
