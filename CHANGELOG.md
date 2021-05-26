@@ -1,5 +1,19 @@
 # Release Notes
 
+## 3.1.17 (2021-05-26)
+
+### What's improved
+- Support underscored partials in a partials directory. [statamic/ideas#305](https://github.com/statamic/ideas/issues/305)
+
+### What's fixed
+- A bunch of date related fixes. [#3730](https://github.com/statamic/cms/issues/3730)
+- Fix and improve Stache path handling. Fixes a couple of term related errors. [#3768](https://github.com/statamic/cms/issues/3768)
+- Fix modifiers not working with dynamic array keys. [#3737](https://github.com/statamic/cms/issues/3737)
+- Fix an error when using the `locales` tag on non-content routes. [#3754](https://github.com/statamic/cms/issues/3754)
+- Fix an updater error on certain environments. [#3734](https://github.com/statamic/cms/issues/3734)
+
+
+
 ## 3.1.16 (2021-05-20)
 
 ### What's fixed
