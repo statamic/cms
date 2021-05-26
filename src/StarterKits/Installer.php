@@ -291,7 +291,7 @@ class Installer
             return $this->copyFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'));
         }
 
-        $this->console->line("Installing file [starter-kit.yaml]");
+        $this->console->line('Installing file [starter-kit.yaml]');
 
         $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
 
