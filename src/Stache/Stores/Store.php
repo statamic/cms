@@ -233,8 +233,14 @@ abstract class Store
         $this->clearCachedPaths();
 
         // Get items from every file that was modified.
-        $modified = $modified->map(function ($timestamp, $path) use ($pathMap) {
-            return $this->getItemFromModifiedPath($path, $pathMap);
+        $modified = $modified->flatMap(function ($timestamp, $path) {
+            $items = $this->getItemFromModifiedPath($path);
+
+            if (! is_array($items)) {
+                $items = [$items];
+            }
+
+            return $items;
         });
 
         // Remove items with duplicate IDs/keys
@@ -295,12 +301,8 @@ abstract class Store
         return $paths;
     }
 
-    protected function getItemFromModifiedPath($path, $pathMap)
+    protected function getItemFromModifiedPath($path)
     {
-        if ($key = $pathMap->get($path)) {
-            return $this->getItem($key);
-        }
-
         return $this->makeItemFromFile($path, File::get($path));
     }
 

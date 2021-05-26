@@ -188,34 +188,8 @@ class TaxonomyTermsStore extends ChildStore
         }
     }
 
-    protected function adjustModifiedPaths($paths)
+    protected function getItemFromModifiedPath($path)
     {
-        $sites = Taxonomy::find($this->childKey())->sites();
-
-        return $paths->flatMap(function ($timestamp, $path) use ($sites) {
-            return $sites->mapWithKeys(function ($site) use ($timestamp, $path) {
-                return [$site.'::'.$path => $timestamp];
-            });
-        });
-    }
-
-    protected function adjustDeletedPaths($paths)
-    {
-        return $this->adjustModifiedPaths($paths);
-    }
-
-    protected function getItemFromModifiedPath($path, $pathMap)
-    {
-        if ($key = $pathMap->get($path)) {
-            return $this->getItem($key);
-        }
-
-        $site = explode('::', $key)[0];
-
-        $item = $this->makeItemFromFile($path, File::get($path))->in($site);
-
-        $this->cacheItem($item);
-
-        return $item;
+        return parent::getItemFromModifiedPath($path)->localizations()->all();
     }
 }
