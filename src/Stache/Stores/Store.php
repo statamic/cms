@@ -210,9 +210,6 @@ abstract class Store
             return;
         }
 
-        // Get a path to key mapping, so we can easily get the keys of existing files.
-        $pathMap = $this->paths()->flip();
-
         // Flush cached instances of deleted items.
         $deleted->each(function ($path) {
             if ($key = $this->getKeyFromPath($path)) {
@@ -222,12 +219,6 @@ abstract class Store
                 $this->handleDeletedItem($path, $key);
             }
         });
-
-        // Clear cached paths so we're free to deal with the latest ones. We do this after
-        // forgetting deleted files, otherwise they wouldn't be available in the array.
-        // TODO: It may be more performant to keep the paths instead of clearing them
-        // all, then manually create any added files, and delete any deleted files.
-        $this->clearCachedPaths();
 
         // Get items from every file that was modified.
         $modified = $modified->flatMap(function ($timestamp, $path) {
