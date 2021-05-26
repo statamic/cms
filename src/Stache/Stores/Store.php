@@ -10,6 +10,7 @@ use Statamic\Facades\Stache;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
+use Statamic\Support\Arr;
 
 abstract class Store
 {
@@ -222,13 +223,7 @@ abstract class Store
 
         // Get items from every file that was modified.
         $modified = $modified->flatMap(function ($timestamp, $path) {
-            $items = $this->getItemFromModifiedPath($path);
-
-            if (! is_array($items)) {
-                $items = [$items];
-            }
-
-            return $items;
+            return Arr::wrap($this->getItemFromModifiedPath($path));
         });
 
         // Remove items with duplicate IDs/keys
