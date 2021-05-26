@@ -261,7 +261,7 @@ class Installer
         });
 
         if ($this->withConfig) {
-            $this->copyFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'));
+            $this->copyStarterKitConfig();
         }
 
         return $this;
@@ -280,6 +280,30 @@ class Installer
         $this->console->line("Installing file [{$displayPath}]");
 
         $this->files->copy($fromPath, $this->preparePath($toPath));
+    }
+
+    /**
+     * Copy starter kit config without versions, to encourage dependency management using composer.
+     */
+    protected function copyStarterKitConfig()
+    {
+        if ($this->withoutDependencies) {
+            return $this->copyFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'));
+        }
+
+        $this->console->line("Installing file [starter-kit.yaml]");
+
+        $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+
+        if ($dependencies = $config->get('dependencies')) {
+            $config->put('dependencies', array_keys($dependencies));
+        }
+
+        if ($dependencies = $config->get('dependencies_dev')) {
+            $config->put('dependencies_dev', array_keys($dependencies));
+        }
+
+        $this->files->put(base_path('starter-kit.yaml'), YAML::dump($config->all()));
     }
 
     /**

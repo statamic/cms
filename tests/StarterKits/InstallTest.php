@@ -224,7 +224,17 @@ class InstallTest extends TestCase
     {
         $this->installCoolRunnings(['--with-config' => true]);
 
-        $this->assertFileExists(base_path('starter-kit.yaml'));
+        $this->assertFileExists($configPath = base_path('starter-kit.yaml'));
+
+        $expected = <<<"EOT"
+export_paths:
+  - config
+  - content
+  - resources
+  - copied.md\n
+EOT;
+
+        $this->assertEquals($expected, $this->files->get($configPath));
     }
 
     /** @test */
@@ -234,8 +244,15 @@ class InstallTest extends TestCase
 
         $this->installCoolRunnings(['--with-config' => true]);
 
-        $this->assertFileDoesntHaveContent('old config', $configPath);
-        $this->assertFileHasContent('export_paths', $configPath);
+        $expected = <<<"EOT"
+export_paths:
+  - config
+  - content
+  - resources
+  - copied.md\n
+EOT;
+
+        $this->assertEquals($expected, $this->files->get($configPath));
     }
 
     /** @test */
@@ -351,6 +368,76 @@ class InstallTest extends TestCase
         $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
         $this->assertFileExists(base_path('vendor/statamic/ssg'));
         $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
+    }
+
+    /** @test */
+    public function it_removes_dependency_versions_in_starter_kit_config_to_encourage_management_with_composer()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+            ],
+            'dependencies' => [
+                'statamic/seo-pro' => '^0.2.0',
+                'bobsled/speed-calculator' => '^1.0.0',
+            ],
+            'dependencies_dev' => [
+                'statamic/ssg' => '*',
+            ],
+        ]);
+
+        $this->installCoolRunnings(['--with-config' => true]);
+
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
+        $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
+
+        $expected = <<<"EOT"
+export_paths:
+  - config
+dependencies:
+  - statamic/seo-pro
+  - bobsled/speed-calculator
+dependencies_dev:
+  - statamic/ssg\n
+EOT;
+
+        $this->assertEquals($expected, $this->files->get(base_path('starter-kit.yaml')));
+    }
+
+    /** @test */
+    public function it_leaves_dependency_versions_in_starter_kit_config_if_dependencies_are_not_installed()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+            ],
+            'dependencies' => [
+                'statamic/seo-pro' => '^0.2.0',
+                'bobsled/speed-calculator' => '^1.0.0',
+            ],
+            'dependencies_dev' => [
+                'statamic/ssg' => '*',
+            ],
+        ]);
+
+        $this->installCoolRunnings(['--with-config' => true, '--without-dependencies' => true]);
+
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertComposerJsonDoesntHave('statamic/ssg');
+
+        $expected = <<<"EOT"
+export_paths:
+  - config
+dependencies:
+  statamic/seo-pro: ^0.2.0
+  bobsled/speed-calculator: ^1.0.0
+dependencies_dev:
+  statamic/ssg: '*'\n
+EOT;
+
+        $this->assertEquals($expected, $this->files->get(base_path('starter-kit.yaml')));
     }
 
     private function kitRepoPath($path = null)
