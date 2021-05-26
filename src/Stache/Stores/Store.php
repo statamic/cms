@@ -210,9 +210,6 @@ abstract class Store
             return;
         }
 
-        $modified = $this->adjustModifiedPaths($modified);
-        $deleted = $this->adjustDeletedPaths($deleted);
-
         // Get a path to key mapping, so we can easily get the keys of existing files.
         $pathMap = $this->paths()->flip();
 
@@ -289,16 +286,6 @@ abstract class Store
     protected function handleDeletedItem($item, $key)
     {
         //
-    }
-
-    protected function adjustModifiedPaths($paths)
-    {
-        return $paths;
-    }
-
-    protected function adjustDeletedPaths($paths)
-    {
-        return $paths;
     }
 
     protected function getItemFromModifiedPath($path)
