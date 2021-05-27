@@ -281,7 +281,7 @@ class ReplicatorTest extends TestCase
             'things' => [],
         ];
 
-        $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']->all());
+        $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']);
     }
 
     /** @test */
