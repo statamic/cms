@@ -156,7 +156,7 @@ class Replicator extends Fieldtype
                 return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
             })->toArray(),
             'new' => collect($this->config('sets'))->map(function ($set, $handle) {
-                return (new Fields($set['fields']))->meta()->put('_', '_');
+                return (new Fields($set['fields']))->preProcess()->meta()->put('_', '_');
             })->toArray(),
             'defaults' => collect($this->config('sets'))->map(function ($set) {
                 return (new Fields($set['fields']))->all()->map(function ($field) {
