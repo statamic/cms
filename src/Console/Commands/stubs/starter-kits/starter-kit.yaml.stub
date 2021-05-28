@@ -2,10 +2,11 @@
 #   - content
 #   - config/filesystems.php
 #   - config/statamic/assets.php
-#   - public/assets
 #   - resources/blueprints
-#   - resources/css
+#   - resources/css/site.css
 #   - resources/views
+#   - public/assets
+#   - public/css
 #   - package.json
 #   - tailwind.config.js
 #   - webpack.mix.js
