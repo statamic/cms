@@ -867,6 +867,28 @@ EOT;
     }
 
     /** @test */
+    public function it_doesnt_parse_multiline_tags_prefixed_with_an_at_symbol_over_tags_in_multiple_lines()
+    {
+        $template = <<<'EOT'
+@{{ foo
+  bar:baz="qux"
+}} {{ qux }}
+bar
+{{ baz }}
+EOT;
+
+        $expected = <<<'EOT'
+{{ foo
+  bar:baz="qux"
+}} QUX
+bar
+BAZ
+EOT;
+
+        $this->assertEquals($expected, $this->parse($template, ['baz' => 'BAZ', 'qux' => 'QUX']));
+    }
+
+    /** @test */
     public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_containing_nested_tags()
     {
         $this->assertEquals('{{ foo bar="{baz}" }}', $this->parse('@{{ foo bar="{baz}" }}'));
