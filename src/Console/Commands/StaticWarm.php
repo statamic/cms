@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
@@ -19,6 +20,7 @@ use Statamic\Support\Str;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
+class StaticWarm extends Command
 {
     use RunsInPlease;
 
@@ -27,6 +29,8 @@ class StaticWarm extends Command
 
     public function handle()
     {
+        $this->checkVersion();
+
         $this->info('Warming the static cache.');
 
         $this->warm();
@@ -89,5 +93,13 @@ class StaticWarm extends Command
             ->flatMap(fn (Taxonomy $taxonomy) => $taxonomy->queryTerms()->get())
             ->map
             ->collection($collection);
+    }
+
+    private function checkVersion(): void
+    {
+        throw_if(
+            version_compare(Application::VERSION, '8.42.2', '<'),
+            new \RuntimeException('To use this, you must be on PHP 8 & Laravel 8.37+')
+        );
     }
 }
