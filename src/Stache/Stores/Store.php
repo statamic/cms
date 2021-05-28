@@ -10,6 +10,7 @@ use Statamic\Facades\Stache;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
+use Statamic\Support\Arr;
 
 abstract class Store
 {
@@ -210,31 +211,19 @@ abstract class Store
             return;
         }
 
-        $modified = $this->adjustModifiedPaths($modified);
-        $deleted = $this->adjustDeletedPaths($deleted);
-
-        // Get a path to key mapping, so we can easily get the keys of existing files.
-        $pathMap = $this->paths()->flip();
-
         // Flush cached instances of deleted items.
         $deleted->each(function ($path) {
-            if ($key = $this->getKeyFromPath($path)) {
+            collect($this->getKeyFromPath($path))->each(function ($key) use ($path) {
                 $this->forgetItem($key);
                 $this->forgetPath($key);
                 $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
                 $this->handleDeletedItem($path, $key);
-            }
+            });
         });
 
-        // Clear cached paths so we're free to deal with the latest ones. We do this after
-        // forgetting deleted files, otherwise they wouldn't be available in the array.
-        // TODO: It may be more performant to keep the paths instead of clearing them
-        // all, then manually create any added files, and delete any deleted files.
-        $this->clearCachedPaths();
-
         // Get items from every file that was modified.
-        $modified = $modified->map(function ($timestamp, $path) use ($pathMap) {
-            return $this->getItemFromModifiedPath($path, $pathMap);
+        $modified = $modified->flatMap(function ($timestamp, $path) {
+            return Arr::wrap($this->getItemFromModifiedPath($path));
         });
 
         // Remove items with duplicate IDs/keys
@@ -285,22 +274,8 @@ abstract class Store
         //
     }
 
-    protected function adjustModifiedPaths($paths)
+    protected function getItemFromModifiedPath($path)
     {
-        return $paths;
-    }
-
-    protected function adjustDeletedPaths($paths)
-    {
-        return $paths;
-    }
-
-    protected function getItemFromModifiedPath($path, $pathMap)
-    {
-        if ($key = $pathMap->get($path)) {
-            return $this->getItem($key);
-        }
-
         return $this->makeItemFromFile($path, File::get($path));
     }
 
@@ -335,10 +310,6 @@ abstract class Store
             }
 
             return $isDuplicate ?? false;
-        });
-
-        $items->each(function ($item) {
-            $this->cacheItem($item['item']);
         });
 
         $paths = $items->pluck('path', 'key');

@@ -32,6 +32,10 @@ class Partial extends Tags
             return $subdirectoried;
         }
 
+        if (view()->exists($underscored_subdirectoried = 'partials.'.$this->underscoredViewName($partial))) {
+            return $underscored_subdirectoried;
+        }
+
         return $partial;
     }
 
