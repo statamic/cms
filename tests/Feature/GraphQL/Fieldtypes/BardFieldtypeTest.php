@@ -26,18 +26,6 @@ class BardFieldtypeTest extends TestCase
     /** @test */
     public function it_outputs_bard_fields()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'things' => [
-                ['type' => 'text', 'text' => 'first text'],
-                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
-                ['type' => 'text', 'text' => 'second text'],
-                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
-                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
-                ['type' => 'text', 'text' => 'last text'],
-            ],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'bard',
@@ -61,6 +49,18 @@ class BardFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'things' => [
+                ['type' => 'text', 'text' => 'first text'],
+                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
+                ['type' => 'text', 'text' => 'second text'],
+                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
+                ['type' => 'text', 'text' => 'last text'],
+            ],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -110,6 +110,14 @@ GQL;
     /** @test */
     public function it_outputs_a_string_for_bard_fields_with_no_sets()
     {
+        $article = Blueprint::makeFromFields([
+            'things' => ['type' => 'bard'],
+        ]);
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'article' => $article->setHandle('article'),
+        ]));
+
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'things' => [
@@ -120,14 +128,6 @@ GQL;
                 ],
             ],
         ])->create();
-
-        $article = Blueprint::makeFromFields([
-            'things' => ['type' => 'bard'],
-        ]);
-
-        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
-            'article' => $article->setHandle('article'),
-        ]));
 
         $query = <<<'GQL'
 {
@@ -155,23 +155,6 @@ GQL;
     /** @test */
     public function it_outputs_nested_bard_fields()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'things' => [
-                ['type' => 'text', 'text' => 'first text'],
-                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke', 'extras' => [
-                    ['type' => 'food', 'item' => 'fries'],
-                    ['type' => 'food', 'item' => 'ketchup'],
-                ]],
-                ['type' => 'text', 'text' => 'second text'],
-                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
-                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water', 'extras' => [
-                    ['type' => 'food', 'item' => 'dressing'],
-                ]],
-                ['type' => 'text', 'text' => 'last text'],
-            ],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'bard',
@@ -208,6 +191,23 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'things' => [
+                ['type' => 'text', 'text' => 'first text'],
+                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke', 'extras' => [
+                    ['type' => 'food', 'item' => 'fries'],
+                    ['type' => 'food', 'item' => 'ketchup'],
+                ]],
+                ['type' => 'text', 'text' => 'second text'],
+                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water', 'extras' => [
+                    ['type' => 'food', 'item' => 'dressing'],
+                ]],
+                ['type' => 'text', 'text' => 'last text'],
+            ],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -276,18 +276,6 @@ GQL;
         // is converted appropriately to an Entry. A similar thing would
         // happen for `assets` fields converting to Asset objects, etc.
 
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'things' => [
-                [
-                    'type' => 'relation',
-                    'entry' => '2',
-                ],
-            ],
-        ])->create();
-
-        EntryFactory::collection('blog')->id('2')->data(['title' => 'Other Post'])->create();
-
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'bard',
@@ -307,6 +295,18 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'things' => [
+                [
+                    'type' => 'relation',
+                    'entry' => '2',
+                ],
+            ],
+        ])->create();
+
+        EntryFactory::collection('blog')->id('2')->data(['title' => 'Other Post'])->create();
 
         $query = <<<'GQL'
 {

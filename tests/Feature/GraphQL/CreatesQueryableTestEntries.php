@@ -11,6 +11,30 @@ trait CreatesQueryableTestEntries
 {
     public function createEntries()
     {
+        $article = Blueprint::makeFromFields([
+            'intro' => ['type' => 'text'],
+            'content' => ['type' => 'textarea'],
+        ]);
+        $artDirected = Blueprint::makeFromFields([
+            'hero_image' => ['type' => 'text'],
+            'content' => ['type' => 'textarea'],
+        ]);
+        $event = Blueprint::makeFromFields([]);
+        $food = Blueprint::makeFromFields([
+            'calories' => ['type' => 'integer'],
+        ]);
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'article' => $article->setHandle('article'),
+            'art_directed' => $artDirected->setHandle('art_directed'),
+        ]));
+        BlueprintRepository::shouldReceive('in')->with('collections/events')->andReturn(collect([
+            'event' => $event->setHandle('event'),
+        ]));
+        BlueprintRepository::shouldReceive('in')->with('collections/food')->andReturn(collect([
+            'food' => $food->setHandle('food'),
+        ]));
+
         Collection::make('blog')
             ->routes(['en' => '/blog/{slug}'])
             ->dated(true)
@@ -56,29 +80,5 @@ trait CreatesQueryableTestEntries
             'title' => 'Hamburger',
             'calories' => 350,
         ])->create();
-
-        $article = Blueprint::makeFromFields([
-            'intro' => ['type' => 'text'],
-            'content' => ['type' => 'textarea'],
-        ]);
-        $artDirected = Blueprint::makeFromFields([
-            'hero_image' => ['type' => 'text'],
-            'content' => ['type' => 'textarea'],
-        ]);
-        $event = Blueprint::makeFromFields([]);
-        $food = Blueprint::makeFromFields([
-            'calories' => ['type' => 'integer'],
-        ]);
-
-        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
-            'article' => $article->setHandle('article'),
-            'art_directed' => $artDirected->setHandle('art_directed'),
-        ]));
-        BlueprintRepository::shouldReceive('in')->with('collections/events')->andReturn(collect([
-            'event' => $event->setHandle('event'),
-        ]));
-        BlueprintRepository::shouldReceive('in')->with('collections/food')->andReturn(collect([
-            'food' => $food->setHandle('food'),
-        ]));
     }
 }
