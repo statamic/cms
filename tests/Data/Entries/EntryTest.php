@@ -756,7 +756,10 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving()
     {
+        tap(Collection::make('test'))->save();
+
         $entry = (new Entry)
+            ->collection('test')
             ->id('123')
             ->slug('test')
             ->date('2018-01-01')
@@ -778,18 +781,22 @@ class EntryTest extends TestCase
             'id' => '123',
             'published' => false,
             'content' => 'The content',
+            'blueprint' => 'test',
         ], $entry->fileData());
     }
 
     /** @test */
     public function it_gets_file_contents_for_saving_a_localized_entry()
     {
+        tap(Collection::make('test'))->save();
+
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
 
         Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
 
         $entry = (new Entry)
+            ->collection('test')
             ->id('456')
             ->origin('123')
             ->slug('test')
@@ -815,7 +822,38 @@ class EntryTest extends TestCase
             'origin' => '123',
             'published' => false,
             'content' => 'The content',
+            'blueprint' => 'test',
         ], $entry->fileData());
+    }
+
+    /** @test */
+    public function the_default_blueprint_is_added_to_the_file_contents_when_one_hasnt_been_explicitly_defined()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $entry = (new Entry)->collection('test');
+
+        $this->assertEquals('default', $entry->fileData()['blueprint']);
+    }
+
+    /** @test */
+    public function the_explicit_blueprint_is_added_to_the_file_contents()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $entry = (new Entry)->collection('test')->blueprint('another');
+
+        $this->assertEquals('another', $entry->fileData()['blueprint']);
     }
 
     /** @test */
