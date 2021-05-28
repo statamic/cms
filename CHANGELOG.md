@@ -1,5 +1,17 @@
 # Release Notes
 
+## 3.1.18 (2021-05-28)
+
+### What's improved
+- Updated Dutch and French translations. [#3781](https://github.com/statamic/cms/issues/3781) [#3777](https://github.com/statamic/cms/issues/3777)
+
+### What's fixed
+
+- Fix `@{{ }}` noparse tags with nested braces. [#3784](https://github.com/statamic/cms/issues/3784)
+- Fix an issue where a Grid with `min_rows` inside a Replicator wouldn't work by passing along pre-processed values. [#3782](https://github.com/statamic/cms/issues/3782)
+
+
+
 ## 3.1.17 (2021-05-26)
 
 ### What's improved
