@@ -89,7 +89,7 @@ class Parser
         $this->noparseRegex = '/{{\s*noparse\s*}}(.*?){{\s*\/noparse\s*}}/ms';
 
         // Matches an ignored tag as indicated by a prefixed @ symbol: @{{ }}
-        $this->ignoreRegex = '/@{{[^}]*}}/';
+        $this->ignoreRegex = '/@{{(?:(?!}}).)*}}/';
 
         // Matches the logic operator tags
         $this->conditionalRegex = '/{{\s*(if|unless|elseif|elseunless)\s+((?:\()?(.*?)(?:\))?)\s*}}/ms';
