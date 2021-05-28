@@ -398,7 +398,6 @@ export_paths:
 dependencies:
   - statamic/seo-pro
   - bobsled/speed-calculator
-dependencies_dev:
   - statamic/ssg\n
 EOT;
 

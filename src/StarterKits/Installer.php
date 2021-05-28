@@ -295,12 +295,16 @@ class Installer
 
         $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
 
-        if ($dependencies = $config->get('dependencies')) {
-            $config->put('dependencies', array_keys($dependencies));
-        }
+        $dependencies = collect()
+            ->merge($config->get('dependencies'))
+            ->merge($config->get('dependencies_dev'));
 
-        if ($dependencies = $config->get('dependencies_dev')) {
-            $config->put('dependencies_dev', array_keys($dependencies));
+        $config
+            ->forget('dependencies')
+            ->forget('dependencies_dev');
+
+        if ($dependencies->isNotEmpty()) {
+            $config->put('dependencies', $dependencies->keys()->all());
         }
 
         $this->files->put(base_path('starter-kit.yaml'), YAML::dump($config->all()));
