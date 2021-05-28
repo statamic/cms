@@ -53,7 +53,7 @@ class ViewFieldsetListingTest extends TestCase
     {
         Facades\Fieldset::shouldReceive('all')->andReturn(collect([
             'foo' => $fieldsetA = $this->createfieldset('foo'),
-            'bar' => $fieldsetB = $this->createFieldset('bar')->setIsAddonFieldset(true),
+            'bar' => $fieldsetB = $this->createFieldset('bar')->setIsExternalFieldset(true),
         ]));
 
         $user = Facades\User::make()->makeSuper()->save();

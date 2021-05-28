@@ -20,7 +20,7 @@ class FieldsetController extends CpController
     {
         $fieldsets = Facades\Fieldset::all()
             ->reject(function (Fieldset $fieldset) {
-                return $fieldset->isAddonFieldset();
+                return $fieldset->isExternalFieldset();
             })->map(function (Fieldset $fieldset) {
                 return [
                     'id' => $fieldset->handle(),
