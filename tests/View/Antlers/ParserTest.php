@@ -873,7 +873,6 @@ EOT;
 @{{ foo
   bar:baz="qux"
 }} {{ qux }}
-@{{ another }}
 bar
 {{ baz }}
 EOT;
@@ -882,7 +881,6 @@ EOT;
 {{ foo
   bar:baz="qux"
 }} QUX
-{{ another }}
 bar
 BAZ
 EOT;
