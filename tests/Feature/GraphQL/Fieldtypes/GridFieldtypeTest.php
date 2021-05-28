@@ -26,14 +26,6 @@ class GridFieldtypeTest extends TestCase
     /** @test */
     public function it_outputs_grid_fields()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'meals' => [
-                ['food' => 'burger', 'drink' => 'coke'],
-                ['food' => 'salad', 'drink' => 'water'],
-            ],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'meals' => [
                 'type' => 'grid',
@@ -47,6 +39,14 @@ class GridFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'meals' => [
+                ['food' => 'burger', 'drink' => 'coke'],
+                ['food' => 'salad', 'drink' => 'water'],
+            ],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -83,30 +83,6 @@ GQL;
      **/
     public function it_outputs_nested_grid_fields()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'meals' => [
-                [
-                    'food' => 'burger',
-                    'drink' => 'coke',
-                    'extras' => [
-                        ['item' => 'fries'],
-                        ['item' => 'ketchup'],
-                    ],
-                ],
-                [
-                    'food' => 'salad',
-                    'drink' => 'water',
-                    'extras' => [
-                        ['item' => 'dressing'],
-                    ],
-                ],
-            ],
-            'extras' => [
-                ['foo' => 'bar'],
-            ],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'meals' => [
                 'type' => 'grid',
@@ -137,6 +113,30 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'meals' => [
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'extras' => [
+                        ['item' => 'fries'],
+                        ['item' => 'ketchup'],
+                    ],
+                ],
+                [
+                    'food' => 'salad',
+                    'drink' => 'water',
+                    'extras' => [
+                        ['item' => 'dressing'],
+                    ],
+                ],
+            ],
+            'extras' => [
+                ['foo' => 'bar'],
+            ],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -191,15 +191,6 @@ GQL;
         // is converted appropriately to an Entry. A similar thing would
         // happen for `assets` fields converting to Asset objects, etc.
 
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'things' => [
-                ['entry' => '2'],
-            ],
-        ])->create();
-
-        EntryFactory::collection('blog')->id('2')->data(['title' => 'Other Post'])->create();
-
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'grid',
@@ -215,6 +206,15 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'things' => [
+                ['entry' => '2'],
+            ],
+        ])->create();
+
+        EntryFactory::collection('blog')->id('2')->data(['title' => 'Other Post'])->create();
 
         $query = <<<'GQL'
 {

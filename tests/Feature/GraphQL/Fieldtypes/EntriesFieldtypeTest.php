@@ -26,13 +26,6 @@ class EntriesFieldtypeTest extends TestCase
     /** @test */
     public function it_gets_multiple_entries()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_entries' => [2, 3],
-        ])->create();
-        EntryFactory::collection('blog')->id('2')->data(['title' => 'Related Post One'])->create();
-        EntryFactory::collection('blog')->id('3')->data(['title' => 'Related Post Two'])->create();
-
         $article = Blueprint::makeFromFields([
             'related_entries' => ['type' => 'entries'],
         ]);
@@ -40,6 +33,13 @@ class EntriesFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_entries' => [2, 3],
+        ])->create();
+        EntryFactory::collection('blog')->id('2')->data(['title' => 'Related Post One'])->create();
+        EntryFactory::collection('blog')->id('3')->data(['title' => 'Related Post Two'])->create();
 
         $query = <<<'GQL'
 {
@@ -73,12 +73,6 @@ GQL;
     /** @test */
     public function it_gets_single_entry()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_entry' => 2,
-        ])->create();
-        EntryFactory::collection('blog')->id('2')->data(['title' => 'Related Post One'])->create();
-
         $article = Blueprint::makeFromFields([
             'related_entry' => ['type' => 'entries', 'max_items' => 1],
         ]);
@@ -86,6 +80,12 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_entry' => 2,
+        ])->create();
+        EntryFactory::collection('blog')->id('2')->data(['title' => 'Related Post One'])->create();
 
         $query = <<<'GQL'
 {
