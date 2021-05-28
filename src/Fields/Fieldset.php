@@ -14,7 +14,7 @@ class Fieldset
     protected $handle;
 
     /** @var bool */
-    protected $isAddonFieldset = false;
+    protected $isExternalFieldset = false;
 
     public function setHandle(string $handle): self
     {
@@ -28,16 +28,16 @@ class Fieldset
         return $this->handle;
     }
 
-    public function setIsAddonFieldset(bool $isAddonFieldset): self
+    public function setIsExternalFieldset(bool $isExternalFieldset): self
     {
-        $this->isAddonFieldset = $isAddonFieldset;
+        $this->isExternalFieldset = $isExternalFieldset;
 
         return $this;
     }
 
-    public function isAddonFieldset(): bool
+    public function isExternalFieldset(): bool
     {
-        return $this->isAddonFieldset;
+        return $this->isExternalFieldset;
     }
 
     public function setContents(array $contents): self

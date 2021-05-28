@@ -12,7 +12,7 @@ class FieldsetRepository
 {
     protected $fieldsets = [];
     protected $directory;
-    protected $addonDirectories = [];
+    protected $fieldsetDirectories = [];
 
     public function setDirectory($directory)
     {
@@ -40,7 +40,7 @@ class FieldsetRepository
 
         $fieldset = (new Fieldset)
             ->setHandle($handle)
-            ->setIsAddonFieldset(! Str::startsWith($directory, resource_path()))
+            ->setIsExternalFieldset(! Str::startsWith($directory, resource_path()))
             ->setContents(YAML::file("{$directory}/{$path}.yaml")->parse());
 
         $this->fieldsets[$handle] = $fieldset;
@@ -96,12 +96,12 @@ class FieldsetRepository
 
     public function addDirectory(string $directory): void
     {
-        $this->addonDirectories[] = $directory;
+        $this->fieldsetDirectories[] = $directory;
     }
 
     public function directories(): Collection
     {
-        return collect($this->addonDirectories)->merge($this->directory);
+        return collect($this->fieldsetDirectories)->merge($this->directory);
     }
 
     private function getFieldsetsByDirectory(string $directory): Collection
@@ -115,7 +115,7 @@ class FieldsetRepository
 
                 return (new Fieldset)
                     ->setHandle($handle)
-                    ->setIsAddonFieldset(! Str::startsWith($directory, resource_path()))
+                    ->setIsExternalFieldset(! Str::startsWith($directory, resource_path()))
                     ->setContents(YAML::file($file)->parse());
             })
             ->keyBy->handle();
