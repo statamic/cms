@@ -20,7 +20,6 @@ use Statamic\Support\Str;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
-class StaticWarm extends Command
 {
     use RunsInPlease;
 
