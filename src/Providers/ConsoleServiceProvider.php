@@ -3,8 +3,10 @@
 namespace Statamic\Providers;
 
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Console\Commands;
+use Statamic\Console\Commands\StaticWarm;
 
 class ConsoleServiceProvider extends ServiceProvider
 {
@@ -30,7 +32,6 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StacheWarm::class,
         Commands\StacheDoctor::class,
         Commands\StaticClear::class,
-        Commands\StaticWarm::class,
         // Commands\MakeUserMigration::class,
         Commands\SupportDetails::class,
         Commands\AuthMigration::class,
@@ -48,5 +49,12 @@ class ConsoleServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../Console/Please/please.stub' => base_path('please'),
         ], 'statamic');
+    }
+
+    public function register()
+    {
+        if (version_compare(Application::VERSION, '8.37', '>=')) {
+            $this->commands(StaticWarm::class);
+        }
     }
 }
