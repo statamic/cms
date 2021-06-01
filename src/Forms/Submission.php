@@ -212,7 +212,7 @@ class Submission implements SubmissionContract, Augmentable
 
         return $this->form()->fields()->keys()->flip()
             ->reject(function ($field, $key) {
-                return in_array($key, ['id', 'date']);
+                return in_array($key, ['id', 'date', 'form']);
             })
             ->map(function ($field, $key) use ($data) {
                 return $data[$key] ?? null;
@@ -220,6 +220,7 @@ class Submission implements SubmissionContract, Augmentable
             ->merge([
                 'id' => $this->id(),
                 'date' => $this->date(),
+                'form' => $this->form()
             ])
             ->all();
     }
