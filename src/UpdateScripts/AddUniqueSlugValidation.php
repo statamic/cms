@@ -44,7 +44,7 @@ class AddUniqueSlugValidation extends UpdateScript
         $this->console->line(sprintf(
             'Unique slug validation added to the <comment>%s</comment> collection\'s <info>%s</info> blueprint.',
             $collection->handle(),
-            $blueprint->handle(),
+            $blueprint->handle()
         ));
     }
 }
