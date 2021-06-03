@@ -7,7 +7,7 @@ use Facades\Statamic\Console\Processes\Composer;
 class Installed extends Tags
 {
     /**
-     * Check if composer package is installed via {{ installed:* }}
+     * Check if composer package is installed via {{ installed:* }}.
      *
      * @param string $package
      * @return string
