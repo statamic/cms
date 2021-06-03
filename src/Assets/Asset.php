@@ -420,6 +420,8 @@ class Asset implements AssetContract, Augmentable
 
         AssetSaved::dispatch($this);
 
+        $this->syncOriginal();
+
         return true;
     }
 
@@ -644,7 +646,7 @@ class Asset implements AssetContract, Augmentable
             fclose($stream);
         }
 
-        $this->path($path);
+        $this->path($path)->syncOriginal();
 
         $this->save();
 
