@@ -134,6 +134,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Glide::class,
         Tags\In::class,
         Tags\Increment::class,
+        Tags\Installed::class,
         Tags\Is::class,
         Tags\Iterate::class,
         Tags\Link::class,

@@ -121,6 +121,21 @@ class Lock
     }
 
     /**
+     * Check if package is installed.
+     *
+     * @param string $package
+     * @return bool
+     */
+    public function isInstalled(string $package)
+    {
+        $this->ensureExists();
+
+        return collect(json_decode($this->files->get($this->path))->packages)
+            ->keyBy('name')
+            ->has($package);
+    }
+
+    /**
      * Override package version.
      *
      * @param string $package
