@@ -129,6 +129,7 @@ return [
     'one_site_without_origin' => 'At least one site must not have an origin.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',
     'unique_uri' => 'This URI has already been taken.',
+    'duplicate_uri' => 'Duplicate URI :value',
 
     /*
     |--------------------------------------------------------------------------

@@ -66,7 +66,7 @@ class CollectionStructureController extends CpController
             $uris = $siblings->map->uri();
 
             if ($uris->contains($uri = $page->uri())) {
-                throw ValidationException::withMessages(['uri' => "Duplicate URI $uri"]);
+                throw ValidationException::withMessages(['uri' => trans('statamic::validation.duplicate_uri', ['value' => $uri])]);
             }
         }
     }
