@@ -2,6 +2,7 @@
 
 namespace Statamic\UpdateScripts;
 
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Validator;
 
@@ -15,6 +16,12 @@ class AddUniqueSlugValidation extends UpdateScript
     public function update()
     {
         Collection::all()->each(function ($collection) {
+            // First, save them. This is the most reliable way at the moment
+            // to make sure the slug field exists in the blueprint properly.
+            $collection->entryBlueprints()->each->save();
+
+            Blink::forget('collection-entry-blueprints-'.$collection->handle());
+
             $collection->entryBlueprints()->each(function ($blueprint) use ($collection) {
                 $this->updateBlueprint($collection, $blueprint);
             });
@@ -25,10 +32,6 @@ class AddUniqueSlugValidation extends UpdateScript
 
     private function updateBlueprint($collection, $blueprint)
     {
-        // First, save it. This is the most reliable way at the moment
-        // to make sure the slug field exists in the blueprint properly.
-        $blueprint->save();
-
         $rules = $blueprint->field('slug')->get('validate');
 
         // Make sure that it's an array, since it might
