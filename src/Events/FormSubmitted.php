@@ -4,6 +4,7 @@ namespace Statamic\Events;
 
 class FormSubmitted extends Event
 {
+    /** @var \Statamic\Forms\Submission */
     public $submission;
 
     /** @deprecated */
