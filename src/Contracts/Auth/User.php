@@ -2,6 +2,11 @@
 
 namespace Statamic\Contracts\Auth;
 
+/**
+ * @method mixed get(string $key)
+ * @method User set(string $key, mixed $data)
+ * @method User save()
+ */
 interface User
 {
     /**
