@@ -3,8 +3,10 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Entries\GetDateFromPath;
+use Statamic\Entries\GetSlugFromPath;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
@@ -62,7 +64,7 @@ class CollectionEntriesStore extends ChildStore
             ->id($id)
             ->collection($collection);
 
-        $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
+        $slug = (new GetSlugFromPath)($path);
 
         if ($origin = array_pull($data, 'origin')) {
             $entry->origin($origin);
@@ -164,5 +166,37 @@ class CollectionEntriesStore extends ChildStore
         return $indexes->merge(
             $collection->taxonomies()->map->handle()
         )->all();
+    }
+
+    protected function writeItemToDisk($item)
+    {
+        $basePath = $item->buildPath();
+
+        if ($basePath !== $item->path()) {
+            return $item->writeFile($item->path());
+        }
+
+        $num = 0;
+
+        while (true) {
+            $ext = '.'.$item->fileExtension();
+            $filename = Str::before($basePath, $ext);
+            $suffix = $num ? ".$num" : '';
+            $path = "{$filename}{$suffix}{$ext}";
+
+            if (! $contents = File::get($path)) {
+                break;
+            }
+
+            $itemFromDisk = $this->makeItemFromFile($path, $contents);
+
+            if ($item->id() == $itemFromDisk->id()) {
+                break;
+            }
+
+            $num++;
+        }
+
+        $item->writeFile($path);
     }
 }

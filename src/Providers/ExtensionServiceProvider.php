@@ -186,6 +186,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $updateScripts = [
         Updates\AddPerEntryPermissions::class,
         Updates\UseDedicatedTrees::class,
+        Updates\AddUniqueSlugValidation::class,
     ];
 
     public function register()
