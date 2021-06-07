@@ -39,6 +39,7 @@ class AddUniqueSlugValidation extends UpdateScript
         $rules = Validator::explodeRules($rules);
 
         $rules[] = 'unique_entry_value:{collection},{id},{site}';
+        $rules = array_unique($rules);
 
         $blueprint->ensureFieldHasConfig('slug', ['validate' => $rules]);
 
