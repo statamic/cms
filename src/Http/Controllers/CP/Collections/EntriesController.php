@@ -164,7 +164,14 @@ class EntriesController extends CpController
 
         $fields = $entry->blueprint()->fields()->addValues($data);
 
-        $fields->validate(Entry::updateRules($collection, $entry));
+        $fields
+            ->validator()
+            ->withRules(Entry::updateRules($collection, $entry))
+            ->withReplacements([
+                'id' => $entry->id(),
+                'collection' => $collection->handle(),
+                'site' => $entry->locale(),
+            ])->validate();
 
         $values = $fields->process()->values();
 
@@ -303,7 +310,13 @@ class EntriesController extends CpController
 
         $fields = $blueprint->fields()->addValues($data);
 
-        $fields->validate(Entry::createRules($collection, $site));
+        $fields
+            ->validator()
+            ->withRules(Entry::createRules($collection, $site))
+            ->withReplacements([
+                'collection' => $collection->handle(),
+                'site' => $site->handle(),
+            ])->validate();
 
         $values = $fields->process()->values()->except(['slug', 'date', 'blueprint']);
 
