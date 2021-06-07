@@ -1,5 +1,19 @@
 # Release Notes
 
+## 3.1.19 (2021-06-07)
+
+### What's new
+- Allow duplicate entry slugs (mainly so you can have entries of the same slug in different positions of a tree.) [#3671](https://github.com/statamic/cms/issues/3671)
+- Validation replacements. [#3690](https://github.com/statamic/cms/issues/3690)
+- Added an `installed` tag to check for packages within Antlers templates. [#3800](https://github.com/statamic/cms/issues/3800)
+
+### What's fixed
+- The `blueprint` is always saved to an entry. [#3786](https://github.com/statamic/cms/issues/3786)
+- Fix support for multiline `@{{ }}` noparse tags. [#3785](https://github.com/statamic/cms/issues/3785)
+- Bump dns-packet from 1.3.1 to 1.3.4 [#3779](https://github.com/statamic/cms/issues/3779)
+
+
+
 ## 3.1.18 (2021-05-28)
 
 ### What's improved
