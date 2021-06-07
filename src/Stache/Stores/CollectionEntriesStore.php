@@ -88,7 +88,7 @@ class CollectionEntriesStore extends ChildStore
         }
 
         if (isset($idGenerated) || isset($positionGenerated)) {
-            $entry->save();
+            $this->writeItemToDiskWithoutIncrementing($entry);
         }
 
         return $entry;
@@ -168,12 +168,17 @@ class CollectionEntriesStore extends ChildStore
         )->all();
     }
 
+    protected function writeItemToDiskWithoutIncrementing($item)
+    {
+        $item->writeFile($item->path());
+    }
+
     protected function writeItemToDisk($item)
     {
         $basePath = $item->buildPath();
 
         if ($basePath !== $item->path()) {
-            return $item->writeFile($item->path());
+            return $this->writeItemToDiskWithoutIncrementing($item);
         }
 
         $num = 0;
