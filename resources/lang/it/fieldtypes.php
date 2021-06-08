@@ -38,7 +38,7 @@ return [
     'color.config.theme' => 'Scegli tra il selettore di colori classico e mini (più semplice).',
     'date.config.columns' => 'Mostra più mesi contemporaneamente, in righe e colonne',
     'date.config.earliest_date' => 'Imposta la prima data selezionabile.',
-    'date.config.format' => 'Formatta la stringa della data usando [moment.js](https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Come deve essere memorizzata la data, utilizzando il [formato data PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Forza il calendario ad utilizzare l\'intera larghezza.',
     'date.config.inline' => 'Ignora il menu a discesa e mostra direttamente il calendario.',
     'date.config.mode' => 'Scegli tra singola o intervallo (l\'intervallo disabilita il selettore dell\'ora).',

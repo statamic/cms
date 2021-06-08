@@ -41,7 +41,7 @@ return [
     'color.config.theme' => 'Choisissez entre le sélecteur de couleurs classique et le mini (plus simple).',
     'date.config.columns' => 'Afficher plusieurs mois à la fois, en lignes et en colonnes.',
     'date.config.earliest_date' => 'Définissez la première date sélectionnable.',
-    'date.config.format' => 'Formatez éventuellement la chaîne de date à l’aide de [moment.js](https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Comment la date doit être stockée, en utilisant le [format de date PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Étirez le calendrier pour utiliser toute la largeur.',
     'date.config.inline' => 'Ignorez le champ de saisie déroulant et affichez directement le calendrier.',
     'date.config.mode' => 'Choisissez entre le mode unitaire (Single) ou Intervalle (ce dernier désactive l’horodatage).',

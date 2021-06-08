@@ -41,7 +41,7 @@ return [
     'color.config.theme' => 'Kies uit de klassieke of mini (simpele) kleurpicker.',
     'date.config.columns' => 'Toon meerdere maanden tegelijk, in rijen en kolommen.',
     'date.config.earliest_date' => 'Stel de vroegst selecteerbare datum in.',
-    'date.config.format' => 'Formatteer optioneel de datumtekenreeks met [moment.js] (https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Hoe de datum moet worden opgeslagen, met behulp van het [PHP-datumnotatie](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Maak de kalender zo groot als de beschikbare breedte.',
     'date.config.inline' => 'Sla de dropdown over en toon de kalender altijd.',
     'date.config.mode' => 'Kies tussen enkele of range modus (range schakelt de tijdpicker uit).',

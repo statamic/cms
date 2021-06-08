@@ -372,6 +372,53 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    public function it_preloads_new_meta_with_preprocessed_values()
+    {
+        // For this test, use a grid field with min_rows.
+        // It doesn't have to be, but it's a fieldtype that would
+        // require preprocessed values to be provided down the line.
+        // https://github.com/statamic/cms/issues/3481
+
+        $field = (new Field('test', [
+            'type' => 'bard',
+            'sets' => [
+                'main' => [
+                    'fields' => [
+                        [
+                            'handle' => 'things',
+                            'field' => [
+                                'type' => 'grid',
+                                'min_rows' => 2,
+                                'fields' => [
+                                    ['handle' => 'one', 'field' => ['type' => 'text']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]));
+
+        $expected = [
+            '_' => '_',
+            'things' => [ // this array is the preloaded meta for the grid field
+                'defaults' => [
+                    'one' => null, // default value for the text field
+                ],
+                'new' => [
+                    'one' => null, // meta for the text field
+                ],
+                'existing' => [
+                    'row-0' => ['one' => null],
+                    'row-1' => ['one' => null],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $field->fieldtype()->preload()['new']['main']);
+    }
+
+    /** @test */
     public function it_gets_link_data()
     {
         tap(Collection::make('pages')->routes('/{slug}'))->save();

@@ -30,11 +30,6 @@ class TaxonomiesFieldtypeTest extends TestCase
     /** @test */
     public function it_gets_multiple_taxonomies()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_taxonomies' => ['tags', 'colors'],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'related_taxonomies' => ['type' => 'taxonomies'],
         ]);
@@ -42,6 +37,11 @@ class TaxonomiesFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_taxonomies' => ['tags', 'colors'],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -75,11 +75,6 @@ GQL;
     /** @test */
     public function it_gets_single_taxonomy()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_taxonomy' => 'tags',
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'related_taxonomy' => ['type' => 'taxonomies', 'max_items' => 1],
         ]);
@@ -87,6 +82,11 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_taxonomy' => 'tags',
+        ])->create();
 
         $query = <<<'GQL'
 {

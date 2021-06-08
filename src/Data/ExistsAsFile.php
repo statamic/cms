@@ -13,6 +13,11 @@ trait ExistsAsFile
 
     abstract public function path();
 
+    public function buildPath()
+    {
+        return $this->path();
+    }
+
     public function initialPath($path = null)
     {
         if (func_num_args() === 0) {
@@ -77,9 +82,9 @@ trait ExistsAsFile
         return 'yaml';
     }
 
-    public function writeFile()
+    public function writeFile($path = null)
     {
-        $path = $this->path();
+        $path = $path ?? $this->buildPath();
         $initial = $this->initialPath();
 
         if ($initial && $path !== $initial) {

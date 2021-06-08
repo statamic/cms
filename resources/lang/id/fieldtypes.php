@@ -38,7 +38,7 @@ return [
     'color.config.theme' => 'Pilih antara pemilih warna klasik dan mini (lebih sederhana).',
     'date.config.columns' => 'Tunjukkan beberapa bulan sekaligus, dalam baris dan kolom',
     'date.config.earliest_date' => 'Setel tanggal paling awal yang dapat dipilih.',
-    'date.config.format' => 'Secara opsional, format string tanggal menggunakan [moment.js](https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Bagaimana tanggal harus disimpan, menggunakan [format tanggal PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Regangkan kalender untuk menggunakan lebar penuh.',
     'date.config.inline' => 'Lewati kolom input dropdown dan tunjukkan kalender secara langsung.',
     'date.config.mode' => 'Pilih antara mode tunggal atau rentang (rentang menonaktifkan pemilih waktu).',
