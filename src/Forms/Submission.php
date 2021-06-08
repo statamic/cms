@@ -220,7 +220,7 @@ class Submission implements SubmissionContract, Augmentable
             ->merge([
                 'id' => $this->id(),
                 'date' => $this->date(),
-                'form' => $this->form()
+                'form' => $this->form(),
             ])
             ->all();
     }
