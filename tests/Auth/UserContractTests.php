@@ -21,6 +21,7 @@ trait UserContractTests
                 'foo' => 'bar',
                 'content' => 'Lorem Ipsum',
             ])
+            ->setPreferredLocale('en')
             ->setSupplement('supplemented', 'qux')
             ->assignRole($this->createRole('role_one'))
             ->assignRole($this->createRole('role_two'))
@@ -119,6 +120,12 @@ trait UserContractTests
     }
 
     /** @test */
+    public function it_gets_preferred_locale()
+    {
+        $this->assertEquals('en', $this->user()->preferredLocale());
+    }
+
+    /** @test */
     public function it_encrypts_a_password()
     {
         $user = $this->user();
@@ -199,6 +206,7 @@ trait UserContractTests
             'edit_url' => 'http://localhost/cp/users/123/edit',
             'last_login' => null,
             'api_url' => 'http://localhost/api/users/123',
+            'preferred_locale' => 'en',
         ], $this->additionalToArrayValues()), $arr);
     }
 

@@ -437,6 +437,9 @@ class CollectionsController extends CpController
                         'type' => 'entries',
                         'max_items' => 1,
                         'create' => false,
+                        'collections' => Collection::all()->map->handle()->reject(function ($collectionHandle) use ($collection) {
+                            return $collectionHandle === $collection->handle();
+                        })->all(),
                     ],
                     'amp' => [
                         'display' => __('Enable AMP'),

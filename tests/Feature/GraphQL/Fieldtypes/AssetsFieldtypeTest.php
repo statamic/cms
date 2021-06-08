@@ -33,11 +33,6 @@ class AssetsFieldtypeTest extends TestCase
         Storage::disk('test')->put('bar.txt', '');
         AssetContainer::make('assets')->disk('test')->save();
 
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'images' => ['foo.txt', 'bar.txt'],
-        ])->create();
-
         $asset = Blueprint::makeFromFields(['alt' => ['type' => 'text']]);
         $article = Blueprint::makeFromFields(['images' => ['type' => 'assets']]);
 
@@ -45,6 +40,11 @@ class AssetsFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'images' => ['foo.txt', 'bar.txt'],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -83,11 +83,6 @@ GQL;
         Storage::disk('test')->put('bar.txt', '');
         AssetContainer::make('assets')->disk('test')->save();
 
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'image' => 'foo.txt',
-        ])->create();
-
         $asset = Blueprint::makeFromFields(['alt' => ['type' => 'text']]);
         $article = Blueprint::makeFromFields([
             'image' => ['type' => 'assets', 'max_files' => 1],
@@ -97,6 +92,11 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'image' => 'foo.txt',
+        ])->create();
 
         $query = <<<'GQL'
 {

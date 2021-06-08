@@ -38,7 +38,7 @@ return [
     'color.config.theme' => 'Vælg mellem den klassiske og mini (enklere) farvevælger.',
     'date.config.columns' => 'Vis flere måneder ad gangen i rækker og kolonner',
     'date.config.earliest_date' => 'Indstil den tidligst valgte dato.',
-    'date.config.format' => 'Du kan eventuelt formatere datostrengen ved hjælp af [moment.js] (https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Hvordan datoen skal gemmes ved hjælp af [PHP-datoformat](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Stræk kalenderen for at bruge den fulde bredde.',
     'date.config.inline' => 'Spring over dropdown-indtastningsfeltet og vis kalenderen direkte.',
     'date.config.mode' => 'Vælg mellem enkelt- eller områdetilstand (rækkevidde deaktiverer tidsvælger).',

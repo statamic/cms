@@ -6,6 +6,7 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
@@ -31,7 +32,8 @@ abstract class User implements
     CanResetPasswordContract,
     Augmentable,
     AuthorizableContract,
-    ResolvesValuesContract
+    ResolvesValuesContract,
+    HasLocalePreference
 {
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar, ResolvesValues;
 
@@ -221,5 +223,15 @@ abstract class User implements
     protected function shallowAugmentedArrayKeys()
     {
         return ['id', 'name', 'email', 'api_url'];
+    }
+
+    public function preferredLocale()
+    {
+        return $this->getPreference('locale') ?? config('app.locale');
+    }
+
+    public function setPreferredLocale($locale)
+    {
+        return $this->setPreference('locale', $locale);
     }
 }

@@ -62,6 +62,18 @@ class DataRepositoryTest extends TestCase
     }
 
     /** @test */
+    public function it_bails_early_when_finding_null()
+    {
+        $this->app->instance('FooRepository', Mockery::mock('FooRepository', function ($m) {
+            $m->shouldNotReceive('find');
+        }));
+
+        $this->data->setRepository('foo', 'FooRepository');
+
+        $this->assertNull($this->data->find(null));
+    }
+
+    /** @test */
     public function when_a_repository_key_isnt_provided_it_will_loop_through_repositories()
     {
         $this->app->instance('FooRepository', Mockery::mock('FooRepository', function ($m) {
