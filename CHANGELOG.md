@@ -1,5 +1,13 @@
 # Release Notes
 
+## 3.1.20 (2021-06-08)
+
+### What's fixed
+- URI uniqueness is validated per site. [#3808](https://github.com/statamic/cms/issues/3808)
+- Prevent an infinite loop when you manually create an entry file without an ID. [#3807](https://github.com/statamic/cms/issues/3807)
+
+
+
 ## 3.1.19 (2021-06-07)
 
 ### What's new
