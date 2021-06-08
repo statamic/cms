@@ -443,7 +443,7 @@ class EntriesController extends CpController
             return;
         }
 
-        $existing = Entry::findByUri($uri);
+        $existing = Entry::findByUri($uri, $entry->locale());
 
         if (! $existing || $existing->id() === $entry->id()) {
             return;
