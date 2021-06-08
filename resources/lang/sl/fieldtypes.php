@@ -38,7 +38,7 @@ return [
     'color.config.theme' => 'Izbirajte med klasičnim in mini (preprostejšim) nabiralnikom barv.',
     'date.config.columns' => 'Prikažite več mesecev hkrati, v vrsticah in stolpcih',
     'date.config.earliest_date' => 'Nastavite najzgodnejši izbirni datum.',
-    'date.config.format' => 'Neobvezno oblikujte datumski niz z uporabo [moment.js] (https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Kako naj bo datum shranjen v [formatu datuma PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Raztegnite koledar, da izkoristite celotno širino.',
     'date.config.inline' => 'Preskočite spustno polje za vnos in koledar prikažite neposredno.',
     'date.config.mode' => 'Izberite med enojnim ali obsežnim načinom (obseg onemogoči izbirnik časa).',

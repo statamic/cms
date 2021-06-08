@@ -287,6 +287,10 @@ export default [
     //     example: 'unique:table,column,except,idColumn'
     // },
     {
+        label: 'Unique Entry Value',
+        value: 'unique_entry_value:{collection},{id},{site}',
+    },
+    {
         label: 'URL',
         value: 'url'
     },

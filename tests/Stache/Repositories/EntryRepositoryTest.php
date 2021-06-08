@@ -132,7 +132,10 @@ class EntryRepositoryTest extends TestCase
         $this->assertNull($this->repo->find('unknown'));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @deprecated
+     **/
     public function it_gets_entry_by_slug()
     {
         $entry = $this->repo->findBySlug('bravo', 'alphabetical');

@@ -78,7 +78,8 @@
                     v-if="!reordering && canCreate"
                     button-class="btn-primary"
                     :url="createUrl"
-                    :blueprints="blueprints" />
+                    :blueprints="blueprints"
+                    :text="createLabel" />
             </div>
 
         </header>
@@ -181,6 +182,7 @@ export default {
         handle: { type: String, required: true },
         canCreate: { type: Boolean, required: true },
         createUrl: { type: String, required: true },
+        createLabel: { type: String, required: true },
         blueprints: { type: Array, required: true },
         breadcrumbUrl: { type: String, required: true },
         structured: { type: Boolean, default: false },

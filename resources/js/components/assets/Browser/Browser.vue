@@ -333,7 +333,7 @@ export default {
         },
 
         canEdit() {
-            return this.can('assets:'+ this.container.id +':edit')
+            return this.can('edit '+ this.container.id +' assets')
         },
 
         canUpload() {

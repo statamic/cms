@@ -34,7 +34,7 @@
                         v-if="linkType === 'url'"
                         v-model="url.url"
                         type="text"
-                        ref="input"
+                        ref="urlInput"
                         class="input h-auto text-sm"
                         placeholder="URL"
                     />
@@ -257,11 +257,23 @@ export default {
 
     },
 
+    watch: {
+
+        linkType() {
+            this.autofocus();
+        }
+
+    },
+
     created() {
         this.applyAttrs(this.linkAttrs);
 
         this.bard.$on('link-selected', this.applyAttrs);
         this.bard.$on('link-deselected', () => this.$emit('deselected'));
+    },
+
+    mounted() {
+        this.autofocus();
     },
 
     beforeDestroy() {
@@ -285,6 +297,12 @@ export default {
 
         setLinkType(type) {
             this.linkType = type;
+        },
+
+        autofocus() {
+            if (this.linkType === 'url') {
+                this.$nextTick(() => { this.$refs.urlInput.focus() });
+            }
         },
 
         setUrl(type, url) {

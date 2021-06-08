@@ -15,36 +15,6 @@ class UrlTest extends TestCase
         $app['config']->set('app.url', 'http://absolute-url-resolved-from-request.com');
     }
 
-    public function testBuildsUrl()
-    {
-        $url = URL::buildFromPath('pages/about/index.md');
-        $this->assertEquals('/about', $url);
-    }
-
-    public function testBuildsHomepage()
-    {
-        $url = URL::buildFromPath('pages/index.md');
-        $this->assertEquals('/', $url);
-    }
-
-    public function testBuildsUrlFromFullPath()
-    {
-        $url = URL::buildFromPath(base_path().'/pages/index.md');
-        $this->assertEquals('/', $url);
-    }
-
-    public function testBuildsLocalizedUrl()
-    {
-        $url = URL::buildFromPath('pages/about/fr.index.md');
-        $this->assertEquals('/about', $url);
-    }
-
-    public function testBuildsLocalizedHomepage()
-    {
-        $url = URL::buildFromPath('pages/fr.index.md');
-        $this->assertEquals('/', $url);
-    }
-
     public function testPrependsSiteUrl()
     {
         Site::setConfig('sites.en.url', 'http://site.com/');
