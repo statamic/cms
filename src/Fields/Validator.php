@@ -99,7 +99,7 @@ class Validator
 
     private function parse($rule)
     {
-        if (! Str::contains($rule, '{')) {
+        if (! is_string($rule) || ! Str::contains($rule, '{')) {
             return $rule;
         }
 
