@@ -858,6 +858,29 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function the_inherited_blueprint_is_added_to_the_localized_file_contents()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $originEntry = $this->mock(Entry::class);
+        $originEntry->shouldReceive('id')->andReturn('123');
+
+        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('another');
+
+        $entry = (new Entry)
+            ->collection('test')
+            ->origin('123'); // do not set blueprint.
+
+        $this->assertEquals('another', $entry->fileData()['blueprint']);
+    }
+
+    /** @test */
     public function it_gets_and_sets_the_template()
     {
         $collection = tap(Collection::make('test'))->save();
