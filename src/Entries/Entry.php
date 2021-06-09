@@ -447,7 +447,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             'id' => $this->id(),
             'origin' => optional($this->origin())->id(),
             'published' => $this->published === false ? false : null,
-            'blueprint' => $this->blueprint ?? $this->collection()->entryBlueprint()->handle(),
+            'blueprint' => $this->blueprint()->handle(),
         ]);
 
         $data = $this->data()->all();
