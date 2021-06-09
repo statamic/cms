@@ -794,6 +794,7 @@ class EntryTest extends TestCase
         $originEntry->shouldReceive('id')->andReturn('123');
 
         Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('test');
 
         $entry = (new Entry)
             ->collection('test')
