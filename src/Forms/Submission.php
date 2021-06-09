@@ -220,14 +220,15 @@ class Submission implements SubmissionContract, Augmentable
             ->merge([
                 'id' => $this->id(),
                 'date' => $this->date(),
-                'form' => $this->form(),
             ])
             ->all();
     }
 
     public function augmentedArrayData()
     {
-        return $this->toArray();
+        return array_merge($this->toArray(), [
+            'form' => $this->form,
+        ]);
     }
 
     public function blueprint()
