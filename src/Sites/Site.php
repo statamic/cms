@@ -52,11 +52,7 @@ class Site implements Augmentable
 
     public function direction()
     {
-        if (! isset($this->config['direction'])) {
-            return 'ltr';
-        }
-
-        return $this->config['direction'];
+        return $this->config['direction'] ?? 'ltr';
     }
 
     public function absoluteUrl()
