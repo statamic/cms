@@ -1,5 +1,17 @@
 # Release Notes
 
+## 3.1.21 (2021-06-09)
+
+### What's new
+- The `redirect` tag will pass along route parameters when targeting a named route. [#3801](https://github.com/statamic/cms/issues/3801)
+
+### What's fixed
+- Fix entry slug or date changes not being reflected in filename. [#3816](https://github.com/statamic/cms/issues/3816)
+- Fix incorrect blueprint being saved to localized entry files. [#3818](https://github.com/statamic/cms/issues/3818)
+- Fix error when attempting to parse an `image` validation rule. [#3812](https://github.com/statamic/cms/issues/3812)
+
+
+
 ## 3.1.20 (2021-06-08)
 
 ### What's fixed
