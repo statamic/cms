@@ -46,7 +46,7 @@
                         :id="`checkbox-${row.id}`"
                     />
                 </td>
-                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row)">
+                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row)" :width="column.width">
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
