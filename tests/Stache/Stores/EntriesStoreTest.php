@@ -131,6 +131,30 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
+    public function it_saves_to_disk_with_modified_path()
+    {
+        $entry = Facades\Entry::make()
+            ->id('123')
+            ->slug('test')
+            ->date('2017-07-04')
+            ->collection('blog');
+
+        $this->parent->store('blog')->save($entry);
+
+        $this->assertFileEqualsString($initialPath = $this->directory.'/blog/2017-07-04.test.md', $entry->fileContents());
+        $this->assertEquals($initialPath, $this->parent->store('blog')->paths()->get('123'));
+
+        $entry->slug('updated');
+        $entry->save();
+
+        $this->assertFileEqualsString($path = $this->directory.'/blog/2017-07-04.updated.md', $entry->fileContents());
+        $this->assertEquals($path, $this->parent->store('blog')->paths()->get('123'));
+
+        @unlink($initialPath);
+        @unlink($path);
+    }
+
+    /** @test */
     public function it_appends_suffix_to_the_filename_if_one_already_exists()
     {
         $existingPath = $this->directory.'/blog/2017-07-04.test.md';
@@ -225,6 +249,31 @@ class EntriesStoreTest extends TestCase
 
         @unlink($existingPath);
         $this->assertFileNotExists($existingPath);
+    }
+
+    /** @test */
+    public function it_removes_the_suffix_if_it_previously_had_one_but_needs_a_new_path_anyway()
+    {
+        // eg. if the slug is changing, and the filename would be changing anyway,
+        // we shouldn't maintain the suffix.
+
+        $existingPath = $this->directory.'/blog/2017-07-04.test.1.md';
+        $newPath = $this->directory.'/blog/2017-07-04.updated.md';
+
+        file_put_contents($existingPath, 'id: 123');
+        $entry = $this->parent->store('blog')->makeItemFromFile($existingPath, file_get_contents($existingPath));
+
+        $entry->slug('updated');
+
+        $this->parent->store('blog')->save($entry);
+
+        $this->assertFileEqualsString($newPath, $entry->fileContents());
+        $this->assertFileNotExists($existingPath);
+
+        $this->assertEquals($newPath, $this->parent->store('blog')->paths()->get('123'));
+
+        @unlink($newPath);
+        $this->assertFileNotExists($newPath);
     }
 
     /** @test */
