@@ -4,6 +4,8 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
+use Statamic\Entries\GetSuffixFromPath;
+use Statamic\Entries\RemoveSuffixFromPath;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\File;
@@ -176,12 +178,16 @@ class CollectionEntriesStore extends ChildStore
     protected function writeItemToDisk($item)
     {
         $basePath = $item->buildPath();
+        $suffixlessPath = (new RemoveSuffixFromPath)($item->path());
 
-        if ($basePath !== $item->path()) {
-            return $this->writeItemToDiskWithoutIncrementing($item);
+        if ($basePath !== $suffixlessPath) {
+            // If the path should change (e.g. a new slug or date) then
+            // reset the counter to 1 so the suffix doesn't get maintained.
+            $num = 0;
+        } else {
+            // Otherwise, start from whatever the suffix was.
+            $num = (new GetSuffixFromPath)($item->path()) ?? 0;
         }
-
-        $num = 0;
 
         while (true) {
             $ext = '.'.$item->fileExtension();
