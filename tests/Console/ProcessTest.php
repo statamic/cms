@@ -67,7 +67,9 @@ class ProcessTest extends TestCase
         $process->run('not-a-command');
         $this->assertTrue($process->hasErrorOutput());
 
-        $process->runAndOperateOnOutput('pwd', function($output) { return $output; });
+        $process->runAndOperateOnOutput('pwd', function ($output) {
+            return $output;
+        });
         $this->assertFalse($process->hasErrorOutput());
     }
 
