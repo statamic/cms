@@ -76,7 +76,7 @@
                                 <breadcrumbs :path="path" @navigated="selectFolder" />
 
                                 <data-list-bulk-actions
-                                    :url="bulkActionsUrl"
+                                    :url="actionUrl"
                                     :context="actionContext"
                                     :show-always="mode === 'grid'"
                                     @started="actionStarted"
@@ -128,7 +128,7 @@
 
                                                 <data-list-inline-actions
                                                     :item="folder.path"
-                                                    :url="runFolderActionUrl"
+                                                    :url="folderActionUrl"
                                                     :actions="folderActions(folder)"
                                                     @started="actionStarted"
                                                     @completed="actionCompleted"
@@ -162,7 +162,7 @@
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
-                                            :url="runActionUrl"
+                                            :url="actionUrl"
                                             :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"
@@ -302,9 +302,8 @@ export default {
             sortColumn: 'basename',
             sortDirection: 'asc',
             mode: 'table',
-            runActionUrl: null,
-            bulkActionsUrl: null,
-            runFolderActionUrl: null,
+            actionUrl: null,
+            folderActionUrl: null,
         }
     },
 
@@ -466,9 +465,8 @@ export default {
                 } else {
                     this.folder = data.data.folder;
                     this.folders = data.data.folder.folders;
-                    this.runActionUrl = data.links.run_asset_action;
-                    this.bulkActionsUrl = data.links.bulk_asset_actions;
-                    this.runFolderActionUrl = data.links.run_folder_action;
+                    this.actionUrl = data.links.asset_action;
+                    this.folderActionUrl = data.links.folder_action;
                 }
 
                 this.loadingAssets = false;

@@ -168,7 +168,7 @@
                 v-if="actions.length"
                 :id="id"
                 :actions="actions"
-                :url="runActionUrl"
+                :url="actionUrl"
                 @started="actionStarted"
                 @completed="actionCompleted" />
         </portal>
@@ -288,7 +288,7 @@ export default {
                 this.asset = data;
                 this.values = data.values;
                 this.meta = data.meta;
-                this.runActionUrl = data.runActionUrl;
+                this.actionUrl = data.actionUrl;
                 this.actions = data.actions;
 
                 this.fieldset = data.blueprint;
