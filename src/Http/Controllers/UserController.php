@@ -49,8 +49,8 @@ class UserController extends Controller
         $fields = $blueprint->fields()->addValues($request->all());
 
         $fieldRules = $fields->validator()->withRules([
-            'email' => ['required','email','unique_user_value'],
-            'password' => ['required','confirmed', PasswordDefaults::rules()],
+            'email' => ['required', 'email', 'unique_user_value'],
+            'password' => ['required', 'confirmed', PasswordDefaults::rules()],
         ])->rules();
 
         $validator = Validator::make($request->all(), $fieldRules);

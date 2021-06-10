@@ -75,7 +75,7 @@ trait ResetsPasswords
     {
         return [
             'token' => 'required',
-            'email' => ['required','email'],
+            'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', PasswordDefaults::rules()],
         ];
     }

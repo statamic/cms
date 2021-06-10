@@ -17,7 +17,7 @@ class PasswordController extends CpController
         $this->authorize('editPassword', $user);
 
         $request->validate([
-            'password' => ['required','confirmed', PasswordDefaults::rules()],
+            'password' => ['required', 'confirmed', PasswordDefaults::rules()],
         ]);
 
         $user->password($request->password)->save();

@@ -9,8 +9,9 @@ class PasswordDefaults
     /**
      * @return Password|string
      */
-    public static function rules() {
-        if (version_compare(app()->version(), '8.43.0', '<') ) {
+    public static function rules()
+    {
+        if (version_compare(app()->version(), '8.43.0', '<')) {
             // Return the old password rules
             return 'min:8';
         }
