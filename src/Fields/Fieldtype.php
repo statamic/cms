@@ -138,7 +138,6 @@ abstract class Fieldtype implements Arrayable
             'validatable' => $this->validatable(),
             'defaultable' => $this->defaultable(),
             'selectable'  => $this->selectable(),
-            'supportedInForms' => $this->supportedInForms(),
             'categories' => $this->categories(),
             'icon' => $this->icon(),
             'config' => $this->configFields()->toPublishArray(),

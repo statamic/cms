@@ -16,7 +16,7 @@ class FieldtypesController extends CpController
                 $arr = $fieldtype->toArray();
 
                 if ($request->forms) {
-                    $arr['selectable'] = $arr['supportedInForms'] ?: $this->supportedInForms($fieldtype->handle());
+                    $arr['selectable'] = $fieldtype->supportedInForms();
                 }
 
                 return $arr;
@@ -31,18 +31,5 @@ class FieldtypesController extends CpController
         // TODO: Make sure the configs get preprocessed.
 
         return $fieldtypes->values();
-    }
-
-    private function supportedInForms($fieldtype)
-    {
-        return in_array($fieldtype, [
-            'assets',
-            'checkboxes',
-            'integer',
-            'radio',
-            'select',
-            'text',
-            'textarea',
-        ]);
     }
 }
