@@ -264,7 +264,7 @@ class BrowserTest extends TestCase
     {
         return [
             'meta',
-            'links' => ['run_folder_action', 'run_asset_action'],
+            'links' => ['folder_action', 'asset_action'],
             'data' => [
                 'assets' => [
                     ['id', 'size_formatted', 'last_modified_relative', 'actions'],
