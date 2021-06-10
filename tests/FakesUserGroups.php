@@ -25,7 +25,8 @@ trait FakesUserGroups
                     : UserGroup::make()->handle($handle)->roles($roles);
             });
 
-        $fake = new class($groups) extends UserGroupRepository {
+        $fake = new class($groups) extends UserGroupRepository
+        {
             protected $groups;
 
             public function __construct($groups)

@@ -249,12 +249,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     {
         $site = Site::current();
 
-        $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : $site->url();
-
-        // If the site's url was defined absolutely, it'll be absolute.
-        // We need it relative. Perhaps the url method should return
-        // a relative url already, but that's a problem for later.
-        $prefix = URL::makeRelative($prefix);
+        $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
         return URL::tidy($prefix.str_replace('_', '-', '/'.$this->handle));
     }

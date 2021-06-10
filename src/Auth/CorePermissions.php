@@ -56,6 +56,8 @@ class CorePermissions
         $this->group('utilities', function () {
             $this->registerUtilities();
         });
+
+        $this->register('resolve duplicate ids');
     }
 
     protected function registerCollections()

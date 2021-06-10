@@ -3,7 +3,9 @@
 namespace Tests\Data\Entries;
 
 use Carbon\Carbon;
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Collection as IlluminateCollection;
 use Mockery;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
@@ -89,6 +91,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'permalink'     => ['type' => 'string', 'value' => 'http://localhost/test/entry-slug'],
             'amp_url'       => ['type' => 'string', 'value' => 'http://localhost/amp/test/entry-slug'],
             'api_url'       => ['type' => 'string', 'value' => 'http://localhost/api/collections/test/entries/entry-id'],
+            'status'        => ['type' => 'string', 'value' => 'published'],
             'published'     => ['type' => 'bool', 'value' => true],
             'private'       => ['type' => 'bool', 'value' => false],
             'date'          => ['type' => Carbon::class, 'value' => '2018-01-03 17:05'],
@@ -96,6 +99,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'is_entry'      => ['type' => 'bool', 'value' => true],
             'collection'    => ['type' => CollectionContract::class, 'value' => $collection],
             'mount'         => ['type' => CollectionContract::class, 'value' => $mount],
+            'locale'        => ['type' => 'string', 'value' => 'en'],
             'last_modified' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_at'    => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_by'    => ['type' => UserContract::class, 'value' => 'test-user'],
@@ -132,5 +136,60 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $entry->set('mount', 'b');
         $this->assertEquals('b', $augmented->get('mount'));
+    }
+
+    /** @test */
+    public function authors_is_just_the_value_if_its_not_in_the_blueprint()
+    {
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->create();
+
+        // Make sure there are authors on the entry.
+        // The singular "author" field is what's read using $entry->authors()
+        // But, this test is ensuring that method isn't being called during augmentation of the plural "authors" field.
+        $entry->set('author', ['user-1', 'user-2']);
+
+        $augmented = new AugmentedEntry($entry);
+
+        $this->assertNull($augmented->get('authors'));
+
+        $entry->set('authors', 'joe and bob');
+        $this->assertEquals('joe and bob', $augmented->get('authors'));
+    }
+
+    /** @test */
+    public function it_gets_the_authors_from_the_value_if_its_in_the_blueprint()
+    {
+        $blueprint = Blueprint::makeFromFields(['authors' => ['type' => 'users']]);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'test' => $blueprint,
+        ]));
+
+        User::make()->id('user-1')->save();
+        User::make()->id('user-2')->save();
+
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->create();
+
+        $augmented = new AugmentedEntry($entry);
+
+        // Since it's in the blueprint, and is using a "users" fieldtype, it gets augmented to a collection.
+        $authors = $augmented->get('authors');
+        $this->assertInstanceOf(Value::class, $authors);
+        $authors = $authors->value();
+        $this->assertInstanceOf(IlluminateCollection::class, $authors);
+        $this->assertEquals([], $authors->all());
+
+        $entry->set('authors', ['user-1', 'unknown-user', 'user-2']);
+        $authors = $augmented->get('authors');
+        $this->assertInstanceOf(Value::class, $authors);
+        $authors = $authors->value();
+        $this->assertInstanceOf(IlluminateCollection::class, $authors);
+        $this->assertEveryItemIsInstanceOf(\Statamic\Contracts\Auth\User::class, $authors);
+        $this->assertEquals(['user-1', 'user-2'], $authors->map->id()->all());
     }
 }

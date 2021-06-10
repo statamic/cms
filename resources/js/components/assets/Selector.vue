@@ -10,6 +10,7 @@
                     :restrict-container-navigation="restrictContainerNavigation"
                     :restrict-folder-navigation="restrictFolderNavigation"
                     :max-files="maxFiles"
+                    :autoselect-uploads="true"
                     @selections-updated="selectionsUpdated"
                     @asset-doubleclicked="select">
 
@@ -86,6 +87,15 @@ export default {
 
     },
 
+    watch: {
+
+        browserSelections(selections) {
+            if (this.maxFiles === 1 && selections.length === 1) {
+                this.select();
+            }
+        },
+
+    },
 
     methods: {
 

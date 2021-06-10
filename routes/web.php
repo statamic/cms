@@ -61,6 +61,6 @@ if (config('statamic.routes.enabled')) {
      * All front-end website requests go through a single controller method.
      */
     Route::any('/{segments?}', 'FrontendController@index')
-        ->where('segments', '.*')
+        ->where('segments', Statamic::frontendRouteSegmentRegex())
         ->name('statamic.site');
 }

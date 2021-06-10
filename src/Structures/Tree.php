@@ -19,6 +19,7 @@ abstract class Tree implements Contract, Localization
     protected $tree = [];
     protected $cachedFlattenedPages;
     protected $original;
+    protected $uriCacheEnabled = true;
 
     public function locale($locale = null)
     {
@@ -115,6 +116,18 @@ abstract class Tree implements Contract, Localization
     public function uris()
     {
         return $this->flattenedPages()->map->uri();
+    }
+
+    public function disableUriCache()
+    {
+        $this->uriCacheEnabled = false;
+
+        return $this;
+    }
+
+    public function uriCacheEnabled()
+    {
+        return $this->uriCacheEnabled;
     }
 
     public function page(string $id): ?Page
@@ -306,7 +319,7 @@ abstract class Tree implements Contract, Localization
 
     public function entry($entry)
     {
-        $blink = $this->structure()->handle().'-'.$this->locale();
+        $blink = static::class.'-'.$this->structure()->handle().'-'.$this->locale();
 
         $entries = Blink::store('structure-entries')->once($blink, function () {
             $refs = $this->flattenedPages()->map->reference()->filter()->all();

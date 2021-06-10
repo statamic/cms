@@ -2,11 +2,13 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
+use ProseMirrorToHtml\Marks\Link as DefaultLinkMark;
 use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
 use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
+use Statamic\Fieldtypes\Bard\LinkMark as CustomLinkMark;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 
@@ -19,6 +21,8 @@ class Augmentor
 
     protected static $customMarks = [];
     protected static $customNodes = [];
+    protected static $replaceMarks = [];
+    protected static $replaceNodes = [];
 
     public function __construct($fieldtype)
     {
@@ -92,12 +96,22 @@ class Augmentor
 
     public function convertToHtml($value)
     {
-        return (new Renderer)
+        $renderer = (new Renderer)
             ->replaceNode(DefaultImageNode::class, CustomImageNode::class)
+            ->replaceMark(DefaultLinkMark::class, CustomLinkMark::class)
             ->addNode(SetNode::class)
             ->addNodes(static::$customNodes)
-            ->addMarks(static::$customMarks)
-            ->render(['type' => 'doc', 'content' => $value]);
+            ->addMarks(static::$customMarks);
+
+        foreach (static::$replaceNodes as $searchNode => $replaceNode) {
+            $renderer->replaceNode($searchNode, $replaceNode);
+        }
+
+        foreach (static::$replaceMarks as $searchMark => $replaceMark) {
+            $renderer->replaceMark($searchMark, $replaceMark);
+        }
+
+        return $renderer->render(['type' => 'doc', 'content' => $value]);
     }
 
     public static function addNode($node)
@@ -108,6 +122,16 @@ class Augmentor
     public static function addMark($mark)
     {
         static::$customMarks[] = $mark;
+    }
+
+    public static function replaceNode($searchNode, $replaceNode)
+    {
+        static::$replaceNodes[$searchNode] = $replaceNode;
+    }
+
+    public static function replaceMark($searchMark, $replaceMark)
+    {
+        static::$replaceMarks[$searchMark] = $replaceMark;
     }
 
     protected function convertToSets($html)

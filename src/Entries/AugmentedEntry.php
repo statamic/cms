@@ -27,6 +27,7 @@ class AugmentedEntry extends AbstractAugmented
             'permalink',
             'amp_url',
             'api_url',
+            'status',
             'published',
             'private',
             'date',
@@ -34,6 +35,7 @@ class AugmentedEntry extends AbstractAugmented
             'is_entry',
             'collection',
             'mount',
+            'locale',
             'last_modified',
             'updated_at',
             'updated_by',
@@ -57,7 +59,7 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function permalink()
     {
-        return $this->get('absolute_url');
+        return $this->data->absoluteUrl();
     }
 
     protected function parent()
@@ -68,5 +70,10 @@ class AugmentedEntry extends AbstractAugmented
     protected function mount()
     {
         return $this->data->value('mount') ?? Collection::findByMount($this->data);
+    }
+
+    public function authors()
+    {
+        return $this->wrapValue($this->getFromData('authors'), 'authors');
     }
 }

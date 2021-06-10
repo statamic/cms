@@ -46,5 +46,6 @@ trait ListensForContentEvents
         \Statamic\Events\UserGroupDeleted::class,
         \Statamic\Events\UserGroupSaved::class,
         \Statamic\Events\UserSaved::class,
+        \Statamic\Events\DuplicateIdRegenerated::class,
     ];
 }

@@ -3,7 +3,12 @@
 namespace Statamic\Fieldtypes;
 
 use ProseMirrorToHtml\Renderer;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Site;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\GraphQL\Types\BardSetsType;
@@ -11,6 +16,7 @@ use Statamic\GraphQL\Types\BardTextType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Bard extends Replicator
 {
@@ -57,7 +63,7 @@ class Bard extends Replicator
                 'type' => 'asset_container',
                 'max_items' => 1,
                 'if' => [
-                    'buttons' => 'contains image',
+                    'buttons' => 'contains_any anchor, image',
                 ],
             ],
             'save_html' => [
@@ -96,6 +102,12 @@ class Bard extends Replicator
                 'default' => false,
                 'width' => 50,
                 'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
+            ],
+            'link_collections' => [
+                'display' => __('Link Collections'),
+                'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
+                'type' => 'collections',
+                'mode' => 'select',
             ],
             'reading_time' => [
                 'display' => __('Show Reading Time'),
@@ -356,6 +368,18 @@ class Bard extends Replicator
             })->all();
         })->all();
 
+        $linkCollections = $this->config('link_collections');
+
+        if (empty($linkCollections)) {
+            $site = Site::current()->handle();
+
+            $linkCollections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
+                return Collection::all()->reject(function ($collection) use ($site) {
+                    return is_null($collection->route($site));
+                })->map->handle()->values();
+            });
+        }
+
         return [
             'existing' => $existing,
             'new' => $new,
@@ -363,6 +387,8 @@ class Bard extends Replicator
             'collapsed' => [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
+            'linkCollections' => $linkCollections,
+            'linkData' => (object) $this->getLinkData($value),
         ];
     }
 
@@ -429,5 +455,63 @@ class Bard extends Replicator
         $union = new BardSetsType($this, $this->gqlSetsTypeName(), $types);
 
         GraphQL::addType($union);
+    }
+
+    public function getLinkData($value)
+    {
+        return collect($value)->mapWithKeys(function ($node) {
+            return $this->extractLinkDataFromNode($node);
+        })->all();
+    }
+
+    private function extractLinkDataFromNode($node)
+    {
+        $data = collect();
+
+        if ($node['type'] === 'link') {
+            $href = $node['attrs']['href'] ?? null;
+
+            if (Str::startsWith($href, 'statamic://')) {
+                $data = $data->merge($this->getLinkDataForUrl($href));
+            }
+        }
+
+        $childData = collect()
+            ->merge($node['content'] ?? [])
+            ->merge($node['marks'] ?? [])
+            ->mapWithKeys(function ($node) {
+                return $this->extractLinkDataFromNode($node);
+            });
+
+        return $data->merge($childData);
+    }
+
+    private function getLinkDataForUrl($url)
+    {
+        $ref = Str::after($url, 'statamic://');
+        [$type, $id] = explode('::', $ref, 2);
+
+        $data = null;
+
+        switch ($type) {
+            case 'entry':
+                if ($entry = Entry::find($id)) {
+                    $data = [
+                        'title' => $entry->get('title'),
+                        'permalink' => $entry->absoluteUrl(),
+                    ];
+                }
+                break;
+            case 'asset':
+                if ($asset = Asset::find($id)) {
+                    $data = [
+                        'basename' => $asset->basename(),
+                        'thumbnail' => $asset->thumbnailUrl(),
+                    ];
+                }
+                break;
+        }
+
+        return [$ref => $data];
     }
 }

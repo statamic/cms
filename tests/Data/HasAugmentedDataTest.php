@@ -17,14 +17,16 @@ class HasAugmentedDataTest extends TestCase
     /** @test */
     public function it_makes_an_augmented_instance()
     {
-        FieldtypeRepository::shouldReceive('find')->with('test')->andReturn($fieldtype = new class extends Fieldtype {
+        FieldtypeRepository::shouldReceive('find')->with('test')->andReturn($fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'AUGMENTED '.$value;
             }
         });
 
-        $thing = new class implements Augmentable {
+        $thing = new class implements Augmentable
+        {
             use HasAugmentedData, ContainsData;
 
             public function __construct()

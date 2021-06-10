@@ -26,15 +26,6 @@ class ReplicatorFieldtypeTest extends TestCase
     /** @test */
     public function it_outputs_replicator_fields()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'things' => [
-                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
-                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
-                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
-            ],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'replicator',
@@ -58,6 +49,15 @@ class ReplicatorFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'things' => [
+                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
+                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
+            ],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -100,20 +100,6 @@ GQL;
     /** @test */
     public function it_outputs_nested_replicator_fields()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'things' => [
-                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke', 'extras' => [
-                    ['type' => 'food', 'item' => 'fries'],
-                    ['type' => 'food', 'item' => 'ketchup'],
-                ]],
-                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
-                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water', 'extras' => [
-                    ['type' => 'food', 'item' => 'dressing'],
-                ]],
-            ],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'replicator',
@@ -150,6 +136,20 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'things' => [
+                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke', 'extras' => [
+                    ['type' => 'food', 'item' => 'fries'],
+                    ['type' => 'food', 'item' => 'ketchup'],
+                ]],
+                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water', 'extras' => [
+                    ['type' => 'food', 'item' => 'dressing'],
+                ]],
+            ],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -211,18 +211,6 @@ GQL;
         // is converted appropriately to an Entry. A similar thing would
         // happen for `assets` fields converting to Asset objects, etc.
 
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'things' => [
-                [
-                    'type' => 'relation',
-                    'entry' => '2',
-                ],
-            ],
-        ])->create();
-
-        EntryFactory::collection('blog')->id('2')->data(['title' => 'Other Post'])->create();
-
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'replicator',
@@ -242,6 +230,18 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'things' => [
+                [
+                    'type' => 'relation',
+                    'entry' => '2',
+                ],
+            ],
+        ])->create();
+
+        EntryFactory::collection('blog')->id('2')->data(['title' => 'Other Post'])->create();
 
         $query = <<<'GQL'
 {

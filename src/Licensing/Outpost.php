@@ -2,10 +2,10 @@
 
 namespace Statamic\Licensing;
 
+use Carbon\CarbonInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
 use Statamic\Facades;
@@ -92,7 +92,7 @@ class Outpost
         })->all();
     }
 
-    private function cacheResponse(Carbon $expiration, $contents)
+    private function cacheResponse(CarbonInterface $expiration, $contents)
     {
         $contents = array_merge($contents, [
             'expiry' => $expiration->timestamp,

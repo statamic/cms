@@ -28,7 +28,8 @@ class AugmentedTest extends TestCase
     /** @test */
     public function it_gets_a_single_value_by_key()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
             //
         };
 
@@ -39,14 +40,16 @@ class AugmentedTest extends TestCase
     /** @test */
     public function it_gets_a_single_value_by_key_using_the_value_method_if_it_exists()
     {
-        $thingWithValueMethod = new class($this->thing->data()) extends Thing {
+        $thingWithValueMethod = new class($this->thing->data()) extends Thing
+        {
             public function value($key)
             {
                 return $this->get($key) ? $this->get($key).' (value)' : null;
             }
         };
 
-        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing {
+        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing
+        {
             //
         };
 
@@ -55,21 +58,28 @@ class AugmentedTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_a_value_from_the_thing_if_theres_a_method()
+    public function it_gets_a_value_from_the_thing_if_theres_a_corresponding_method_for_a_key()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing {
-            //
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
+            public function keys()
+            {
+                return ['slug', 'the_slug'];
+            }
         };
 
         $this->assertEquals('the-thing', $augmented->get('slug'));
         $this->assertEquals('the-thing', $augmented->get('the_slug'));
         $this->assertEquals('the-thing', $augmented->get('theSlug'));
+        $this->assertNull($augmented->get('cant_call_me'));
+        $this->assertNull($augmented->get('cantCallMe'));
     }
 
     /** @test */
     public function it_gets_a_value_from_the_augmented_thing_if_theres_a_method()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
             public function slug()
             {
                 return 'the-augmented-thing';
@@ -90,14 +100,21 @@ class AugmentedTest extends TestCase
     public function a_value_object_is_returned_if_the_thing_has_a_blueprint_and_theres_a_matching_field()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
-            ->andReturn($fieldtype = new class extends Fieldtype {
+            ->andReturn($fieldtype = new class extends Fieldtype
+            {
                 public function augment($value)
                 {
                     return 'AUGMENTED '.strtoupper($value);
                 }
             });
 
-        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing {
+        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing
+        {
+            public function keys()
+            {
+                return array_merge(parent::keys(), ['hello', 'slug', 'the_slug']);
+            }
+
             public function hello()
             {
                 return 'world';
@@ -132,14 +149,16 @@ class AugmentedTest extends TestCase
     public function it_can_select_multiple_keys()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
-            ->andReturn($fieldtype = new class extends Fieldtype {
+            ->andReturn($fieldtype = new class extends Fieldtype
+            {
                 public function augment($value)
                 {
                     return 'AUGMENTED '.strtoupper($value);
                 }
             });
 
-        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing {
+        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing
+        {
             public function keys()
             {
                 return ['foo', 'slug', 'the_slug', 'hello', 'supplemented'];
@@ -224,6 +243,11 @@ class Thing
     {
         return $this->slug();
     }
+
+    public function cantCallMe()
+    {
+        return 'nope';
+    }
 }
 
 class BlueprintThing extends Thing
@@ -253,6 +277,9 @@ class BaseAugmentedThing extends AbstractAugmented
 {
     public function keys()
     {
-        return [];
+        return array_keys(array_merge(
+            $this->data->data(),
+            $this->blueprintFields()->all()
+        ));
     }
 }

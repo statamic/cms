@@ -187,9 +187,9 @@ class ImageGenerator
             $path = $this->asset->path();
             $mime = $this->asset->mimeType();
         } else {
-            $path = $this->path;
+            $path = public_path($this->path);
             throw_unless(File::exists($path), new FlysystemFileNotFoundException($path));
-            $mime = File::mimeType(public_path($this->path));
+            $mime = File::mimeType($path);
         }
 
         if ($mime !== null && strncmp($mime, 'image/', 6) !== 0) {

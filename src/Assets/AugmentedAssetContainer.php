@@ -9,6 +9,7 @@ class AugmentedAssetContainer extends AbstractAugmented
     public function keys()
     {
         return [
+            'id',
             'title',
             'handle',
             'disk',

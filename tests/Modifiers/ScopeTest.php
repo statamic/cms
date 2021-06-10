@@ -122,7 +122,8 @@ class AugmentableObject extends ArrayableObject implements Augmentable
 
     public function blueprint()
     {
-        FieldtypeRepository::shouldReceive('find')->andReturn(new class extends Fieldtype {
+        FieldtypeRepository::shouldReceive('find')->andReturn(new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return strtoupper($data).'!';
