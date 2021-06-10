@@ -7,7 +7,7 @@ export default {
     },
 
     props: {
-        url: String,
+        url: String
     },
 
     data() {
