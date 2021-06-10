@@ -84,7 +84,7 @@ export default {
                 data.context = this.context;
             }
 
-            this.$axios.post(this.bulkActionsUrl, data).then(response => {
+            this.$axios.post(this.url+'/list', data).then(response => {
                 this.actions = response.data;
             });
         },

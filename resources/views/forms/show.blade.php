@@ -50,8 +50,7 @@
 
     <form-submission-listing
         form="{{ $form->handle() }}"
-        run-action-url="{{ cp_route('forms.submissions.actions.run', $form->handle()) }}"
-        bulk-actions-url="{{ cp_route('forms.submissions.actions.bulk', $form->handle()) }}"
+        action-url="{{ cp_route('forms.submissions.actions.run', $form->handle()) }}"
         initial-sort-column="datestamp"
         initial-sort-direction="desc"
         :initial-columns="{{ $columns->toJson() }}"

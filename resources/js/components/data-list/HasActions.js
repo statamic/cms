@@ -1,8 +1,7 @@
 export default {
 
     props: {
-        runActionUrl: String,
-        bulkActionsUrl: String,
+        actionUrl: String,
     },
 
     methods: {
