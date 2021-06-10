@@ -130,6 +130,9 @@ class Git
                 return app(Filesystem::class)->exists($path);
             })
             ->filter(function ($path) {
+                return GitProcess::create($path)->isRepo();
+            })
+            ->filter(function ($path) {
                 return GitProcess::create($path)->status();
             })
             ->groupBy(function ($path) {
