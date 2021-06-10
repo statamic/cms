@@ -97,6 +97,6 @@ class ProcessTest extends TestCase
         });
 
         $this->assertTrue($process->hasErrorOutput());
-        $this->assertStringContainsString('command not found', $output);
+        $this->assertStringContainsString('not found', $output);
     }
 }
