@@ -7,6 +7,8 @@ use Statamic\Support\Str;
 
 class Text extends Fieldtype
 {
+    protected $supportedInForms = true;
+
     protected function configFieldItems(): array
     {
         return [

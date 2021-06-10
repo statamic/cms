@@ -10,6 +10,8 @@ use Statamic\Support\Arr;
 
 class Select extends Fieldtype
 {
+    protected $supportedInForms = true;
+
     protected function configFieldItems(): array
     {
         return [

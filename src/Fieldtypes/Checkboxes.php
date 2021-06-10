@@ -9,6 +9,8 @@ use Statamic\GraphQL\Types\LabeledValueType;
 
 class Checkboxes extends Fieldtype
 {
+    protected $supportedInForms = true;
+
     protected function configFieldItems(): array
     {
         return [

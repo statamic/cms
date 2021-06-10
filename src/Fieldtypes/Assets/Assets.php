@@ -15,6 +15,7 @@ class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
     protected $defaultValue = [];
+    protected $supportedInForms = true;
 
     protected function configFieldItems(): array
     {
