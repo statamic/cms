@@ -1,7 +1,7 @@
 <?php
 
-
 namespace Statamic\Auth\Passwords;
+
 use Illuminate\Validation\Rules\Password;
 
 class PasswordDefaults
