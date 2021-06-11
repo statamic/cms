@@ -1,5 +1,26 @@
 # Release Notes
 
+## 3.1.22 (2021-06-11)
+
+### What's new
+- Action classes can customize their toast messages. [#3822](https://github.com/statamic/cms/issues/3822)
+- Sites may specify text direction. [#3815](https://github.com/statamic/cms/issues/3815)
+- Added `form` to Submission. [#3792](https://github.com/statamic/cms/issues/3792)
+- Added `width` attribute to DataList's Table component. [#3762](https://github.com/statamic/cms/issues/3762)
+- Added `maxlength` to the views of form fields that have a `character_limit` set. [#3797](https://github.com/statamic/cms/issues/3797)
+
+### What's improved
+- Updated Dutch translations. [#3834](https://github.com/statamic/cms/issues/3834)
+
+### What's fixed
+- Fixed issue where ticking many items in a listing could fail. [#3298](https://github.com/statamic/cms/issues/3298)
+- Fixed `fatal: not a git repository` errors when using symlinks. [#3829](https://github.com/statamic/cms/issues/3829)
+- Prevented the "Create Fieldset" button disappearing. [#3821](https://github.com/statamic/cms/issues/3821)
+- Added a Submission typehint. [370cdc4ea](https://github.com/statamic/cms/commit/370cdc4ea)
+- Bump browserslist from 4.12.2 to 4.16.6 [#3769](https://github.com/statamic/cms/issues/3769)
+
+
+
 ## 3.1.21 (2021-06-09)
 
 ### What's new
