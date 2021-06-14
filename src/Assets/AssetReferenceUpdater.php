@@ -58,7 +58,7 @@ class AssetReferenceUpdater
      * Update assets fields.
      *
      * @param null|string $dottedPrefix
-     * @param null|array $fields
+     * @param null|\Statamic\Fields\Fields $fields
      * @return $this
      */
     protected function updateAssetsFields($dottedPrefix = null, $fields = null)
@@ -91,44 +91,13 @@ class AssetReferenceUpdater
      */
     protected function updateSingleAsset($dottedPrefix, $field)
     {
-        $data = $this->item->data();
+        $data = $this->item->data()->all();
 
         $dottedKey = $dottedPrefix.$field->handle();
 
         if (Arr::get($data, $dottedKey) !== $this->originalPath) {
             return;
         }
-
-        $this->updateStringReference($dottedKey);
-    }
-
-    /**
-     * Update assets fields with multiple files.
-     *
-     * @param null|string $dottedPrefix
-     * @param \Statamic\Fields\Field $field
-     */
-    protected function updateMultipleAssets($dottedPrefix, $field)
-    {
-        $data = $this->item->data();
-
-        $dottedKey = $dottedPrefix.$field->handle();
-
-        if (! collect(Arr::get($data, $dottedKey))->contains($this->originalPath)) {
-            return;
-        }
-
-        $this->updateArrayReference($dottedPrefix.$field->handle());
-    }
-
-    /**
-     * Update asset path reference in string.
-     *
-     * @param string $dottedKey
-     */
-    protected function updateStringReference($dottedKey)
-    {
-        $data = $this->item->data()->all();
 
         Arr::set($data, $dottedKey, $this->newPath);
 
@@ -138,23 +107,28 @@ class AssetReferenceUpdater
     }
 
     /**
-     * Update asset path reference in array.
+     * Update assets field with multiple files.
      *
-     * @param string $dottedKey
+     * @param null|string $dottedPrefix
+     * @param \Statamic\Fields\Field $field
      */
-    protected function updateArrayReference($dottedKey)
+    protected function updateMultipleAssets($dottedPrefix, $field)
     {
         $data = $this->item->data()->all();
 
-        $fieldData = Arr::dot(Arr::get($data, $dottedKey));
+        $dottedKey = $dottedPrefix.$field->handle();
 
-        foreach ($fieldData as $dottedFieldDataKey => $assetPath) {
-            if ($assetPath === $this->originalPath) {
-                $fieldData[$dottedFieldDataKey] = $this->newPath;
-            }
+        $fieldData = collect(Arr::dot(Arr::get($data, $dottedKey)));
+
+        if (! $fieldData->contains($this->originalPath)) {
+            return;
         }
 
-        Arr::set($data, $dottedKey, $fieldData);
+        $fieldData->transform(function ($value) {
+            return $value === $this->originalPath ? $this->newPath : $value;
+        });
+
+        Arr::set($data, $dottedKey, $fieldData->all());
 
         $this->item->data($data);
 
