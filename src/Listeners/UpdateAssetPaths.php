@@ -39,5 +39,9 @@ class UpdateAssetPaths implements ShouldQueue
         Facades\Entry::all()->each(function ($entry) use ($container, $originalPath, $newPath) {
             AssetReferenceUpdater::item($entry)->updateAssetReferences($container, $originalPath, $newPath);
         });
+
+        Facades\Term::all()->each(function ($term) use ($container, $originalPath, $newPath) {
+            AssetReferenceUpdater::item($term)->updateAssetReferences($container, $originalPath, $newPath);
+        });
     }
 }

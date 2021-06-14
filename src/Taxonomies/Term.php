@@ -217,4 +217,9 @@ class Term implements TermContract
 
         return ($return == $default) ? $this : $return;
     }
+
+    public function fresh()
+    {
+        return Facades\Term::find($this->id());
+    }
 }

@@ -526,6 +526,64 @@ class UpdateAssetPathsTest extends TestCase
         $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.pics'));
     }
 
+    /** @test */
+    public function it_updates_entries()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setBlueprint('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'pic',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'pic' => 'hoff.jpg',
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $entry->get('pic'));
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals('hoff-new.jpg', $entry->fresh()->get('pic'));
+    }
+
+    /** @test */
+    public function it_updates_terms()
+    {
+        $taxonomy = tap(Facades\Taxonomy::make('tags'))->save();
+
+        $this->setBlueprint('taxonomies/tags', [
+            'fields' => [
+                [
+                    'handle' => 'pic',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1
+                    ],
+                ],
+            ],
+        ]);
+
+        $term = tap(Facades\Term::make()->taxonomy($taxonomy)->data([
+            'pic' => 'hoff.jpg',
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $term->get('pic'));
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals('hoff-new.jpg', $term->fresh()->get('pic'));
+    }
+
     protected function setBlueprint($namespace, $blueprintContents)
     {
         $blueprint = tap(Facades\Blueprint::make()->setContents($blueprintContents))->save();
