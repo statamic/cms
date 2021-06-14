@@ -12,6 +12,7 @@ use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Support\Arr;
 
 class Entries extends Relationship
 {
@@ -104,7 +105,7 @@ class Entries extends Relationship
             $collections = $this->getConfiguredCollections();
         }
 
-        return Collection::findByHandle($collections[0]);
+        return Collection::findByHandle(Arr::first($collections));
     }
 
     public function getSortColumn($request)
