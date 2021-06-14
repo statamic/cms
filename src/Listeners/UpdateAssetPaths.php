@@ -45,5 +45,12 @@ class UpdateAssetPaths implements ShouldQueue
             ->each(function ($term) use ($container, $originalPath, $newPath) {
                 AssetReferenceUpdater::item($term)->updateAssetReferences($container, $originalPath, $newPath);
             });
+
+        Facades\GlobalSet::all()
+            ->flatMap
+            ->localizations()
+            ->each(function ($globalSet) use ($container, $originalPath, $newPath) {
+                AssetReferenceUpdater::item($globalSet)->updateAssetReferences($container, $originalPath, $newPath);
+            });
     }
 }

@@ -52,7 +52,7 @@ class UpdateAssetPathsTest extends TestCase
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
-        $this->setBlueprint('collections/articles', [
+        $this->setInBlueprints('collections/articles', [
             'fields' => [
                 [
                     'handle' => 'avatar',
@@ -92,7 +92,7 @@ class UpdateAssetPathsTest extends TestCase
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
-        $this->setBlueprint('collections/articles', [
+        $this->setInBlueprints('collections/articles', [
             'fields' => [
                 [
                     'handle' => 'pics',
@@ -120,7 +120,7 @@ class UpdateAssetPathsTest extends TestCase
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
-        $this->setBlueprint('collections/articles', [
+        $this->setInBlueprints('collections/articles', [
             'fields' => [
                 [
                     'handle' => 'avatar',
@@ -180,7 +180,7 @@ class UpdateAssetPathsTest extends TestCase
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
-        $this->setblueprint('collections/articles', [
+        $this->setInBlueprints('collections/articles', [
             'fields' => [
                 [
                     'handle' => 'reppy',
@@ -261,7 +261,7 @@ class UpdateAssetPathsTest extends TestCase
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
-        $this->setblueprint('collections/articles', [
+        $this->setInBlueprints('collections/articles', [
             'fields' => [
                 [
                     'handle' => 'griddy',
@@ -320,7 +320,7 @@ class UpdateAssetPathsTest extends TestCase
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
-        $this->setblueprint('collections/articles', [
+        $this->setInBlueprints('collections/articles', [
             'fields' => [
                 [
                     'handle' => 'bardo',
@@ -411,7 +411,7 @@ class UpdateAssetPathsTest extends TestCase
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
-        $this->setblueprint('collections/articles', [
+        $this->setInBlueprints('collections/articles', [
             'fields' => [
                 [
                     'handle' => 'avatar',
@@ -539,7 +539,7 @@ class UpdateAssetPathsTest extends TestCase
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
-        $this->setBlueprint('collections/articles', [
+        $this->setInBlueprints('collections/articles', [
             'fields' => [
                 [
                     'handle' => 'pic',
@@ -566,9 +566,9 @@ class UpdateAssetPathsTest extends TestCase
     /** @test */
     public function it_updates_terms()
     {
-        $taxonomy = tap(Facades\Taxonomy::make('tags'))->save();
+        $taxonomy = tap(Facades\Taxonomy::make('tags')->sites(['en', 'fr']))->save();
 
-        $this->setBlueprint('taxonomies/tags', [
+        $this->setInBlueprints('taxonomies/tags', [
             'fields' => [
                 [
                     'handle' => 'pic',
@@ -581,18 +581,69 @@ class UpdateAssetPathsTest extends TestCase
             ],
         ]);
 
-        $term = tap(Facades\Term::make()->taxonomy($taxonomy)->data([
+        $term = Facades\Term::make('test')->taxonomy($taxonomy);
+
+        $term->in('en')->data([
+            'pic' => 'norris.jpg',
+        ]);
+
+        $term->in('fr')->data([
             'pic' => 'hoff.jpg',
-        ]))->save();
+        ]);
 
-        $this->assertEquals('hoff.jpg', $term->get('pic'));
+        $term->save();
 
+        $this->assertEquals('norris.jpg', $term->in('en')->get('pic'));
+        $this->assertEquals('hoff.jpg', $term->in('fr')->get('pic'));
+
+        $this->assetNorris->path('norris-new.jpg')->save();
         $this->assetHoff->path('hoff-new.jpg')->save();
 
-        $this->assertEquals('hoff-new.jpg', $term->fresh()->get('pic'));
+        $this->assertEquals('norris-new.jpg', $term->in('en')->fresh()->get('pic'));
+        $this->assertEquals('hoff-new.jpg', $term->in('fr')->fresh()->get('pic'));
     }
 
-    protected function setBlueprint($namespace, $blueprintContents)
+    /** @test */
+    public function it_updates_global_sets()
+    {
+        $set = Facades\GlobalSet::make('default');
+
+        $set->addLocalization($set->makeLocalization('en')->data(['pic' => 'norris.jpg']));
+        $set->addLocalization($set->makeLocalization('fr')->data(['pic' => 'hoff.jpg']));
+
+        $set->save();
+
+        $this->setSingleBlueprint('globals.default', [
+            'fields' => [
+                [
+                    'handle' => 'pic',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals('norris.jpg', $set->in('en')->get('pic'));
+        $this->assertEquals('hoff.jpg', $set->in('fr')->get('pic'));
+
+        $this->assetNorris->path('norris-new.jpg')->save();
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals('norris-new.jpg', $set->in('en')->fresh()->get('pic'));
+        $this->assertEquals('hoff-new.jpg', $set->in('fr')->fresh()->get('pic'));
+    }
+
+    protected function setSingleBlueprint($namespace, $blueprintContents)
+    {
+        $blueprint = tap(Facades\Blueprint::make()->setContents($blueprintContents))->save();
+
+        Facades\Blueprint::shouldReceive('find')->with($namespace)->andReturn($blueprint);
+    }
+
+    protected function setInBlueprints($namespace, $blueprintContents)
     {
         $blueprint = tap(Facades\Blueprint::make()->setContents($blueprintContents))->save();
 
