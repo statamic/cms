@@ -59,7 +59,7 @@ class UpdateAssetPathsTest extends TestCase
                     'field' => [
                         'type' => 'assets',
                         'container' => 'test_container',
-                        'max_files' => 1
+                        'max_files' => 1,
                     ],
                 ],
                 [
@@ -67,7 +67,7 @@ class UpdateAssetPathsTest extends TestCase
                     'field' => [
                         'type' => 'assets',
                         'container' => 'test_container',
-                        'max_files' => 1
+                        'max_files' => 1,
                     ],
                 ],
             ],
@@ -127,7 +127,7 @@ class UpdateAssetPathsTest extends TestCase
                     'field' => [
                         'type' => 'assets',
                         'container' => 'test_container',
-                        'max_files' => 1
+                        'max_files' => 1,
                     ],
                 ],
                 [
@@ -135,7 +135,7 @@ class UpdateAssetPathsTest extends TestCase
                     'field' => [
                         'type' => 'assets',
                         'container' => 'wrong_container',
-                        'max_files' => 1
+                        'max_files' => 1,
                     ],
                 ],
                 [
@@ -194,7 +194,7 @@ class UpdateAssetPathsTest extends TestCase
                                         'field' => [
                                             'type' => 'assets',
                                             'container' => 'test_container',
-                                            'max_files' => 1
+                                            'max_files' => 1,
                                         ],
                                     ],
                                     [
@@ -273,7 +273,7 @@ class UpdateAssetPathsTest extends TestCase
                                 'field' => [
                                     'type' => 'assets',
                                     'container' => 'test_container',
-                                    'max_files' => 1
+                                    'max_files' => 1,
                                 ],
                             ],
                             [
@@ -334,7 +334,7 @@ class UpdateAssetPathsTest extends TestCase
                                         'field' => [
                                             'type' => 'assets',
                                             'container' => 'test_container',
-                                            'max_files' => 1
+                                            'max_files' => 1,
                                         ],
                                     ],
                                     [
@@ -418,7 +418,7 @@ class UpdateAssetPathsTest extends TestCase
                     'field' => [
                         'type' => 'assets',
                         'container' => 'test_container',
-                        'max_files' => 1
+                        'max_files' => 1,
                     ],
                 ],
                 [
@@ -440,7 +440,7 @@ class UpdateAssetPathsTest extends TestCase
                                                             'field' => [
                                                                 'type' => 'assets',
                                                                 'container' => 'test_container',
-                                                                'max_files' => 1
+                                                                'max_files' => 1,
                                                             ],
                                                         ],
                                                         [
@@ -460,7 +460,7 @@ class UpdateAssetPathsTest extends TestCase
                                                                         'field' => [
                                                                             'type' => 'assets',
                                                                             'container' => 'test_container',
-                                                                            'max_files' => 1
+                                                                            'max_files' => 1,
                                                                         ],
                                                                     ],
                                                                     [
@@ -546,7 +546,7 @@ class UpdateAssetPathsTest extends TestCase
                     'field' => [
                         'type' => 'assets',
                         'container' => 'test_container',
-                        'max_files' => 1
+                        'max_files' => 1,
                     ],
                 ],
             ],
@@ -575,7 +575,7 @@ class UpdateAssetPathsTest extends TestCase
                     'field' => [
                         'type' => 'assets',
                         'container' => 'test_container',
-                        'max_files' => 1
+                        'max_files' => 1,
                     ],
                 ],
             ],
@@ -620,7 +620,7 @@ class UpdateAssetPathsTest extends TestCase
                     'field' => [
                         'type' => 'assets',
                         'container' => 'test_container',
-                        'max_files' => 1
+                        'max_files' => 1,
                     ],
                 ],
             ],

@@ -192,7 +192,7 @@ class AssetReferenceUpdater
 
         collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
             $dottedPrefix = "{$dottedKey}.{$setKey}.";
-            $fields = Arr::get($field->config(), "fields");
+            $fields = Arr::get($field->config(), 'fields');
 
             if ($fields) {
                 $this->updateAssetsFields($dottedPrefix, new Fields($fields));
