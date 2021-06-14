@@ -1,5 +1,16 @@
 # Release Notes
 
+## 3.1.23 (2021-06-14)
+
+### What's improved
+- Updated German, French, and Dutch translations [#3843](https://github.com/statamic/cms/issues/3843) [#3838](https://github.com/statamic/cms/issues/3838) [#3841](https://github.com/statamic/cms/issues/3841)
+
+### What's fixed
+- Fixed validation error when saving entries in a strutured collection without a route. [#3847](https://github.com/statamic/cms/issues/3847)
+- Prevent an error when selecting an entry to mount to a collection. [#3846](https://github.com/statamic/cms/issues/3846)
+- Assets can now access their `mime_type` in templates. [c5858990f](https://github.com/statamic/cms/commit/c5858990f)
+
+
 ## 3.1.22 (2021-06-11)
 
 ### What's new
