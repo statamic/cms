@@ -40,8 +40,10 @@ class UpdateAssetPaths implements ShouldQueue
             AssetReferenceUpdater::item($entry)->updateAssetReferences($container, $originalPath, $newPath);
         });
 
-        Facades\Term::all()->each(function ($term) use ($container, $originalPath, $newPath) {
-            AssetReferenceUpdater::item($term)->updateAssetReferences($container, $originalPath, $newPath);
-        });
+        Facades\Term::all()
+            ->map->term()->flatMap->localizations() // https://github.com/statamic/cms/issues/3274
+            ->each(function ($term) use ($container, $originalPath, $newPath) {
+                AssetReferenceUpdater::item($term)->updateAssetReferences($container, $originalPath, $newPath);
+            });
     }
 }

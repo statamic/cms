@@ -25,6 +25,14 @@ class UpdateAssetPathsTest extends TestCase
             'root' => __DIR__.'/tmp',
         ]]);
 
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            ],
+        ]);
+
         $this->container = tap(Facades\AssetContainer::make()->handle('test_container')->disk('test'))->save();
         $this->assetHoff = tap(Facades\Asset::make()->container('test_container')->path('hoff.jpg'))->save();
         $this->assetNorris = tap(Facades\Asset::make()->container('test_container')->path('norris.jpg'))->save();
