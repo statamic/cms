@@ -23,5 +23,6 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [
         // \Statamic\Taxonomies\TermTracker::class, // TODO
         \Statamic\Listeners\GeneratePresetImageManipulations::class,
+        \Statamic\Listeners\UpdateAssetPaths::class,
     ];
 }
