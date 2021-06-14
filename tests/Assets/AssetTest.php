@@ -957,7 +957,7 @@ class AssetTest extends TestCase
             'size', 'size_bytes', 'size_kilobytes', 'size_megabytes', 'size_gigabytes',
             'size_b', 'size_kb', 'size_mb', 'size_gb',
             'last_modified', 'last_modified_timestamp', 'last_modified_instance',
-            'focus', 'focus_css',
+            'focus', 'focus_css', 'mime_type',
         ];
     }
 }
