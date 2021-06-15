@@ -36,9 +36,10 @@ class UpdateAssetPaths implements ShouldQueue
             return;
         }
 
-        Facades\Entry::all()->each(function ($entry) use ($container, $originalPath, $newPath) {
-            AssetReferenceUpdater::item($entry)->updateAssetReferences($container, $originalPath, $newPath);
-        });
+        Facades\Entry::all()
+            ->each(function ($entry) use ($container, $originalPath, $newPath) {
+                AssetReferenceUpdater::item($entry)->updateAssetReferences($container, $originalPath, $newPath);
+            });
 
         Facades\Term::all()
             ->map->term()->flatMap->localizations() // https://github.com/statamic/cms/issues/3274
@@ -51,6 +52,11 @@ class UpdateAssetPaths implements ShouldQueue
             ->localizations()
             ->each(function ($globalSet) use ($container, $originalPath, $newPath) {
                 AssetReferenceUpdater::item($globalSet)->updateAssetReferences($container, $originalPath, $newPath);
+            });
+
+        Facades\User::all()
+            ->each(function ($user) use ($container, $originalPath, $newPath) {
+                AssetReferenceUpdater::item($user)->updateAssetReferences($container, $originalPath, $newPath);
             });
     }
 }

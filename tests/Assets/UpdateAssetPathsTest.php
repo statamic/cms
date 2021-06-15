@@ -636,6 +636,31 @@ class UpdateAssetPathsTest extends TestCase
         $this->assertEquals('hoff-new.jpg', $set->in('fr')->fresh()->get('pic'));
     }
 
+    /** @test */
+    public function it_updates_users()
+    {
+        $user = tap(Facades\User::make()->email('hoff@example.com')->data(['avatar' => 'hoff.jpg']))->save();
+
+        $this->setSingleBlueprint('user', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals('hoff.jpg', $user->get('avatar'));
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals('hoff-new.jpg', $user->fresh()->get('avatar'));
+    }
+
     protected function setSingleBlueprint($namespace, $blueprintContents)
     {
         $blueprint = tap(Facades\Blueprint::make()->setContents($blueprintContents))->save();
