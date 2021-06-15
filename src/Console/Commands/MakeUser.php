@@ -178,7 +178,7 @@ class MakeUser extends Command
     {
         return $this->validationFails(
             $this->data['password'],
-            ['required', PasswordDefaults::rules()],
+            ['required', PasswordDefaults::rules()]
         );
     }
 
