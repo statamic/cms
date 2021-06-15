@@ -53,6 +53,7 @@ class AugmentedAsset extends AbstractAugmented
                 'width',
                 'orientation',
                 'ratio',
+                'mime_type',
             ]);
         }
 

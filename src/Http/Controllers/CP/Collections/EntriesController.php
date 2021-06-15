@@ -454,6 +454,10 @@ class EntriesController extends CpController
 
     private function entryUri($entry, $tree, $parent)
     {
+        if (! $entry->route()) {
+            return null;
+        }
+
         if (! $tree) {
             return $entry->uri();
         }

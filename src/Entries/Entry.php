@@ -673,6 +673,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function uri()
     {
+        if (! $this->route()) {
+            return null;
+        }
+
         if ($structure = $this->structure()) {
             return $structure->entryUri($this);
         }
