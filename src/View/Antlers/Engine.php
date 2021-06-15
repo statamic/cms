@@ -189,13 +189,4 @@ class Engine implements EngineInterface
             debugbar()->stopMeasure($tag_measure);
         }
     }
-
-    public static function supportsPath($path)
-    {
-        $extensions = collect(self::EXTENSIONS)->map(function ($extension) {
-            return '.'.$extension;
-        })->all();
-
-        return Str::endsWith($path, $extensions);
-    }
 }

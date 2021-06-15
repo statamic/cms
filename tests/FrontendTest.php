@@ -395,6 +395,81 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function xml_antlers_template_with_xml_layout_will_use_both_and_change_the_content_type()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<?xml ?>{{ template_content }}', 'antlers.xml');
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'antlers.xml');
+        $this->createPage('about', ['with' => ['template' => 'feed']]);
+
+        $response = $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+
+        $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
+    }
+
+    /** @test */
+    public function xml_antlers_template_with_non_xml_layout_will_change_content_type_but_avoid_using_the_layout()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<html>{{ template_content }}</html>', 'antlers.html');
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'antlers.xml');
+        $this->createPage('about', ['with' => ['template' => 'feed']]);
+
+        $response = $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+
+        $this->assertEquals('<foo></foo>', $response->getContent());
+    }
+
+    /** @test */
+    public function xml_antlers_layout_will_change_the_content_type()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<?xml ?>{{ template_content }}', 'antlers.xml');
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'antlers.html');
+        $this->createPage('about', ['with' => ['template' => 'feed']]);
+
+        $response = $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+
+        $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
+    }
+
+    /** @test */
+    public function xml_blade_template_will_not_change_content_type()
+    {
+        // Blade doesnt support xml files, but even if it did,
+        // we only want it to happen when using Antlers.
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'blade.xml');
+        $this->createPage('about', ['with' => ['template' => 'feed']]);
+
+        $response = $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+
+        $this->assertEquals('<foo></foo>', $response->getContent());
+    }
+
+    /** @test */
+    public function xml_template_with_custom_content_type_does_not_change_to_xml()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<?xml ?>{{ template_content }}', 'antlers.xml');
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'antlers.xml');
+        $this->createPage('about', ['with' => ['template' => 'feed', 'content_type' => 'json']]);
+
+        $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'application/json');
+    }
+
+    /** @test */
     public function sends_powered_by_header_if_enabled()
     {
         config(['statamic.system.send_powered_by_header' => true]);
