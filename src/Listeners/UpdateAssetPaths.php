@@ -5,7 +5,10 @@ namespace Statamic\Listeners;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Assets\AssetReferenceUpdater;
 use Statamic\Events\AssetSaved;
-use Statamic\Facades;
+use Statamic\Facades\Entry;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Term;
+use Statamic\Facades\User;
 
 class UpdateAssetPaths implements ShouldQueue
 {
@@ -22,9 +25,9 @@ class UpdateAssetPaths implements ShouldQueue
     /**
      * Handle the events.
      *
-     * @param AssetUploaded $event
+     * @param AssetSaved $event
      */
-    public function handle($event)
+    public function handle(AssetSaved $event)
     {
         $asset = $event->asset;
 
@@ -32,31 +35,17 @@ class UpdateAssetPaths implements ShouldQueue
         $originalPath = $asset->getOriginal('path');
         $newPath = $asset->path();
 
-        if ($originalPath === $newPath) {
+        if (! $originalPath || $originalPath === $newPath) {
             return;
         }
 
-        Facades\Entry::all()
-            ->each(function ($entry) use ($container, $originalPath, $newPath) {
-                AssetReferenceUpdater::item($entry)->updateAssetReferences($container, $originalPath, $newPath);
-            });
-
-        Facades\Term::all()
-            ->map->term()->flatMap->localizations() // https://github.com/statamic/cms/issues/3274
-            ->each(function ($term) use ($container, $originalPath, $newPath) {
-                AssetReferenceUpdater::item($term)->updateAssetReferences($container, $originalPath, $newPath);
-            });
-
-        Facades\GlobalSet::all()
-            ->flatMap
-            ->localizations()
-            ->each(function ($globalSet) use ($container, $originalPath, $newPath) {
-                AssetReferenceUpdater::item($globalSet)->updateAssetReferences($container, $originalPath, $newPath);
-            });
-
-        Facades\User::all()
-            ->each(function ($user) use ($container, $originalPath, $newPath) {
-                AssetReferenceUpdater::item($user)->updateAssetReferences($container, $originalPath, $newPath);
+        collect()
+            ->merge(Entry::all())
+            ->merge(Term::all()->map->term()->flatMap->localizations()) // See issue #3274
+            ->merge(GlobalSet::all()->flatMap->localizations())
+            ->merge(User::all())
+            ->each(function ($item) use ($container, $originalPath, $newPath) {
+                AssetReferenceUpdater::item($item)->updateAssetReferences($container, $originalPath, $newPath);
             });
     }
 }
