@@ -178,7 +178,7 @@ class Bard extends Replicator
         })->all();
 
         if ($this->shouldSaveHtml()) {
-            return (new Augmentor($this))->convertToHtml($structure);
+            return (new Augmentor($this))->withStatamicImageUrls()->convertToHtml($structure);
         }
 
         if ($structure === [['type' => 'paragraph']]) {
