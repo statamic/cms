@@ -16,6 +16,7 @@ class Asset extends JsonResource
             'filename' => $this->filename(),
             'basename' => $this->basename(),
             'url' => $this->url(),
+            'reference' => $this->reference(),
             'permalink' => $this->absoluteUrl(),
             'extension' => $this->extension(),
             'downloadUrl' => cp_route('assets.download', base64_encode($this->id())),
