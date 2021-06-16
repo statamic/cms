@@ -138,6 +138,13 @@ class Markdown extends Fieldtype
         ];
     }
 
+    public function preload()
+    {
+        return [
+            'previewUrl' => cp_route('markdown.preview'),
+        ];
+    }
+
     protected function resolveUrlsFromIds($markdown)
     {
         return preg_replace_callback('/\(statamic:\/\/([^)]*)\)/im', function ($matches) {

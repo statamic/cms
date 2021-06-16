@@ -210,8 +210,8 @@ EOT
         $this
             ->post('/!/auth/register', [
                 'email' => 'san@holo.com',
-                'password' => 'chewy',
-                'password_confirmation' => 'chewy',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
             ])
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
@@ -251,8 +251,8 @@ EOT
         $this
             ->post('/!/auth/register', [
                 'email' => 'san@holo.com',
-                'password' => 'chewy',
-                'password_confirmation' => 'chewy',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
                 '_redirect' => '/registration-successful',
             ])
             ->assertSessionHasNoErrors()

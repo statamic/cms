@@ -90,36 +90,6 @@ class Path
     }
 
     /**
-     * Cleans up a given $path, removing any flags and order keys (date-based or number-based).
-     *
-     * Assumes the path will always end with an extension.
-     *
-     * @param string  $path  Path to clean
-     * @return string
-     */
-    public function clean($path)
-    {
-        // Remove draft and hidden flags
-        $path = preg_replace('/\/_[_]?/', '/', $path);
-
-        // Strip the order keys
-        $segments = explode('/', $path);
-        $total_segments = count($segments);
-        foreach ($segments as $i => &$segment) {
-            // Skip the final segment (the basename) if it doesn't contain two periods.
-            // This stops filenames like 404.md from being interpreted with 404 as
-            // the order key, resulting in a borked filename.
-            if ($i + 1 === $total_segments && substr_count($segment, '.') < 2) {
-                continue;
-            }
-
-            $segment = preg_replace(Pattern::orderKey(), '', $segment);
-        }
-
-        return implode('/', $segments);
-    }
-
-    /**
      * Assembles a URL from an ordered list of segments.
      *
      * @param mixed string  Open ended number of arguments

@@ -191,7 +191,15 @@ export default {
                 this.initialPages = this.pages;
                 return response;
             }).catch(e => {
-                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'));
+                let message = e.response ? e.response.data.message : __('Something went wrong');
+
+                // For a validation error, show the first message from any field in the toast.
+                if (e.response && e.response.status === 422) {
+                    const { errors } = e.response.data;
+                    message = errors[Object.keys(errors)[0]][0];
+                }
+
+                this.$toast.error(message);
                 return Promise.reject(e);
             }).finally(() => this.saving = false);
         },

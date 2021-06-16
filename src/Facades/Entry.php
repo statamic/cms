@@ -11,7 +11,6 @@ use Statamic\Contracts\Entries\EntryRepository;
  * @method static \Statamic\Entries\EntryCollection whereInCollection(array $handles)
  * @method static null|\Statamic\Contracts\Entries\Entry find($id)
  * @method static null|\Statamic\Contracts\Entries\Entry findByUri(string $uri)
- * @method static null|\Statamic\Contracts\Entries\Entry findBySlug(string $slug, string $collection)
  * @method static \Statamic\Contracts\Entries\Entry make()
  * @method static \Statamic\Contracts\Entries\QueryBuilder query()
  * @method static void save($entry)
