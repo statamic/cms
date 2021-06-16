@@ -207,6 +207,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');
         Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
         Route::get('relationship/filters', 'RelationshipFieldtypeController@filters')->name('relationship.filters');
+        Route::post('markdown', 'MarkdownFieldtypeController@preview')->name('markdown.preview');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.', 'namespace' => 'API'], function () {
