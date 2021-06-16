@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Statamic\Auth\Passwords\PasswordDefaults;
 
 /**
  * A copy of Illuminate\Auth\ResetsPasswords.
@@ -74,8 +75,8 @@ trait ResetsPasswords
     {
         return [
             'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|confirmed|min:8',
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', PasswordDefaults::rules()],
         ];
     }
 
