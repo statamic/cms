@@ -44,7 +44,6 @@ EOT;
         $this->assertEquals($contents, $disk->get($path));
     }
 
-
     /** @test */
     public function it_resolves_the_correct_disk_from_similar_names()
     {
@@ -77,7 +76,5 @@ EOT;
         $foundAssetLongUrl = Asset::findByUrl($assetLongUrl->url());
         $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetLongUrl);
         $this->assertEquals('test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
-
-
     }
 }
