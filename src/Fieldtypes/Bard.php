@@ -20,6 +20,8 @@ use Statamic\Support\Str;
 
 class Bard extends Replicator
 {
+    use Concerns\ResolvesStatamicUrls;
+
     public $category = ['text', 'structured'];
     protected $defaultValue = '[]';
 
@@ -155,7 +157,7 @@ class Bard extends Replicator
     protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
-            return $value;
+            return $this->resolveStatamicUrls($value);
         }
 
         if ($this->isLegacyData($value)) {

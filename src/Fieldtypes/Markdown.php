@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\Data;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
@@ -10,6 +9,8 @@ use Statamic\Support\Html;
 
 class Markdown extends Fieldtype
 {
+    use Concerns\ResolvesStatamicUrls;
+
     protected function configFieldItems(): array
     {
         return [
@@ -107,7 +108,7 @@ class Markdown extends Fieldtype
             $markdown = $markdown->withSmartPunctuation();
         }
 
-        $value = $this->resolveUrlsFromIds($value);
+        $value = $this->resolveStatamicUrls($value);
 
         $html = $markdown->parse((string) $value);
 
@@ -143,15 +144,5 @@ class Markdown extends Fieldtype
         return [
             'previewUrl' => cp_route('markdown.preview'),
         ];
-    }
-
-    protected function resolveUrlsFromIds($markdown)
-    {
-        return preg_replace_callback('/\(statamic:\/\/([^)]*)\)/im', function ($matches) {
-            $data = Data::find($matches[1]);
-            $url = $data ? $data->url() : $matches[1];
-
-            return "($url)";
-        }, $markdown);
     }
 }

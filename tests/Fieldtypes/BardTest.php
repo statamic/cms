@@ -3,7 +3,9 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
-use Statamic\Facades\Collection;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Bard;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -421,13 +423,13 @@ class BardTest extends TestCase
     /** @test */
     public function it_gets_link_data()
     {
-        tap(Collection::make('pages')->routes('/{slug}'))->save();
+        tap(Facades\Collection::make('pages')->routes('/{slug}'))->save();
         EntryFactory::collection('pages')->id('1')->slug('about')->data(['title' => 'About'])->create();
         EntryFactory::collection('pages')->id('2')->slug('articles')->data(['title' => 'Articles'])->create();
         EntryFactory::collection('pages')->id('3')->slug('contact')->data(['title' => 'Contact'])->create();
         EntryFactory::collection('pages')->id('4')->slug('unused')->data(['title' => 'Unused'])->create();
 
-        $bard = $this->bard(['save_html' => true]);
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
 
         $html = <<<'EOT'
 <p>
@@ -449,6 +451,45 @@ EOT;
             'entry::2' => ['title' => 'Articles', 'permalink' => 'http://localhost/articles'],
             'entry::3' => ['title' => 'Contact', 'permalink' => 'http://localhost/contact'],
         ], $bard->getLinkData($prosemirror));
+    }
+
+    /** @test */
+    public function it_converts_statamic_asset_urls_when_stored_as_html()
+    {
+        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+
+        tap(Facades\AssetContainer::make()->handle('test_container')->disk('test'))->save();
+        tap(Facades\Asset::make()->container('test_container')->path('foo/hoff.jpg'))->save();
+
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
+
+        $html = <<<'EOT'
+<p>
+    Actual asset...
+    <img src="statamic://asset::test_container::foo/hoff.jpg" alt="Asset" />
+    <a href="statamic://asset::test_container::foo/hoff.jpg">Asset Link</a>
+
+    Non-existent asset...
+    <a href="statamic://asset::test_container::nope.jpg">Asset Link</a>
+    <img src="statamic://asset::test_container::nope.jpg" alt="Asset" />
+</p>
+EOT;
+
+        $expected = <<<'EOT'
+<p>
+    Actual asset...
+    <img src="/assets/foo/hoff.jpg" alt="Asset" />
+    <a href="/assets/foo/hoff.jpg">Asset Link</a>
+
+    Non-existent asset...
+    <a href="">Asset Link</a>
+    <img src="" alt="Asset" />
+</p>
+EOT;
+
+        $this->assertEquals($expected, $bard->augment($html));
     }
 
     private function bard($config = [])
