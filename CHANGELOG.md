@@ -1,5 +1,15 @@
 # Release Notes
 
+## 3.1.24 (2021-06-16)
+
+### What's new
+- Add support for defining default password validation rules. [#3823](https://github.com/statamic/cms/3823)
+
+### What's fixed
+- Markdown fieldtype previews are rendered server side so you can see custom parsers. [#3859](https://github.com/statamic/cms/3859)
+- Prevent static caching error when visiting a URL with a really long query string. [#3860](https://github.com/statamic/cms/3860)
+- Fix the size of SVGs in the assets fieldtype when in list mode. [#3854](https://github.com/statamic/cms/3854)
+
 ## 3.1.23 (2021-06-14)
 
 ### What's improved
