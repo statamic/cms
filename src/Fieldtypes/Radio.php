@@ -9,7 +9,7 @@ use Statamic\GraphQL\Types\LabeledValueType;
 
 class Radio extends Fieldtype
 {
-    protected $supportedInForms = true;
+    protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {

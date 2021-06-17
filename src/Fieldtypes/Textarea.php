@@ -7,7 +7,7 @@ use Statamic\Query\Scopes\Filters\Fields\Textarea as TextareaFilter;
 
 class Textarea extends Fieldtype
 {
-    protected $supportedInForms = true;
+    protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {
