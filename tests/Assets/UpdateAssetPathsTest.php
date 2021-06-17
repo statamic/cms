@@ -407,6 +407,106 @@ class UpdateAssetPathsTest extends TestCase
     }
 
     /** @test */
+    public function it_updates_asset_references_in_bard_field()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'bardo' => [
+                [
+                    'content' => [
+                        'type' => 'paragraph',
+                        'content' => [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'statamic://asset::test_container::hoff.jpg',
+                                'alt' => 'hoff',
+                            ]
+                        ],
+                    ]
+                ],
+                [
+                    'content' => [
+                        'type' => 'paragraph',
+                        'content' => [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'statamic://asset::test_container::norris.jpg',
+                                'alt' => 'norris',
+                            ]
+                        ],
+                    ]
+                ],
+            ],
+        ]))->save();
+
+        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.content.attrs.src'));
+        $this->assertEquals('hoff', Arr::get($entry->data(), 'bardo.0.content.content.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->data(), 'bardo.1.content.content.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->data(), 'bardo.1.content.content.attrs.alt'));
+
+        $this->assetHoff->path('content/hoff-new.jpg')->save();
+
+        $this->assertEquals('statamic://asset::test_container::content/hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.content.attrs.src'));
+        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'bardo.0.content.content.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.1.content.content.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'bardo.1.content.content.attrs.alt'));
+    }
+
+    /** @test */
+    public function it_updates_asset_references_in_bard_field_when_saved_as_html()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                        'save_html' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $content = <<<'EOT'
+<p>Some text.</p>
+<img src="statamic://asset::test_container::hoff.jpg">
+</p>More text.</p>
+<img src="statamic://asset::test_container::norris.jpg">
+EOT;
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data(['bardo' => $content]))->save();
+
+        $this->assertEquals($content, $entry->get('bardo'));
+
+        $this->assetHoff->path('content/hoff-new.jpg')->save();
+
+        $expected = <<<'EOT'
+<p>Some text.</p>
+<img src="statamic://asset::test_container::content/hoff-new.jpg">
+</p>More text.</p>
+<img src="statamic://asset::test_container::norris.jpg">
+EOT;
+
+        $this->assertEquals($expected, $entry->fresh()->get('bardo'));
+    }
+
+    /** @test */
     public function it_updates_asset_references_in_markdown_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();

@@ -68,6 +68,7 @@ class AssetReferenceUpdater
 
         $this
             ->updateAssetsFieldValues($dottedPrefix, $fields)
+            ->updateBardFieldValues($dottedPrefix, $fields)
             ->updateMarkdownFieldValues($dottedPrefix, $fields)
             ->updateNestedFieldValues($dottedPrefix, $fields);
     }
@@ -90,6 +91,29 @@ class AssetReferenceUpdater
                 $field->get('max_files') === 1
                     ? $this->updateStringValue($dottedPrefix, $field)
                     : $this->updateArrayValue($dottedPrefix, $field);
+            });
+
+        return $this;
+    }
+
+    /**
+     * Update bard field values.
+     *
+     * @param null|string $dottedPrefix
+     * @param null|\Statamic\Fields\Fields $fields
+     * @return $this
+     */
+    protected function updateBardFieldValues($dottedPrefix, $fields)
+    {
+        $fields
+            ->filter(function ($field) {
+                return $field->type() === 'bard'
+                    && $field->get('container') === $this->container;
+            })
+            ->each(function ($field) use ($dottedPrefix) {
+                $field->get('save_html') === true
+                    ? $this->updateStatamicUrlsInStringValue($dottedPrefix, $field)
+                    : $this->updateStatamicUrlsInBardImage($dottedPrefix, $field);
             });
 
         return $this;
@@ -280,6 +304,51 @@ class AssetReferenceUpdater
         }, $value);
 
         if ($originalValue === $value) {
+            return;
+        }
+
+        Arr::set($data, $dottedKey, $value);
+
+        $this->item->data($data);
+
+        $this->updated = true;
+    }
+
+    /**
+     * Update `statamic://` urls in bard set on item.
+     *
+     * @param null|string $dottedPrefix
+     * @param \Statamic\Fields\Field $field
+     */
+    protected function updateStatamicUrlsInBardImage($dottedPrefix, $field)
+    {
+        $data = $this->item->data()->all();
+
+        $dottedKey = $dottedPrefix.$field->handle();
+
+        $originalValue = Arr::get($data, $dottedKey);
+
+        $changed = false;
+
+        $value = collect($originalValue)
+            ->map(function ($set) use (&$changed) {
+                $prefix = "statamic://asset::{$this->container}::";
+
+                if (Arr::get($set, 'content.content.type') !== 'image') {
+                    return $set;
+                } elseif (Arr::get($set, 'content.content.attrs.src') !== $prefix.$this->originalPath) {
+                    return $set;
+                }
+
+                $set['content']['content']['attrs']['src'] = $prefix.$this->newPath;
+
+                $changed = true;
+
+                return $set;
+            })
+            ->all();
+
+        if (! $changed) {
             return;
         }
 
