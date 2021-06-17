@@ -7,10 +7,13 @@ use Illuminate\Support\Facades\Storage;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Markdown;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class MarkdownTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     public function it_augments_to_html()
     {
