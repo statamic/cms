@@ -4,7 +4,7 @@ namespace Statamic\Fields;
 
 class FieldtypeRepository
 {
-    protected $selectableInForms = [];
+    protected $madeSelectableInForms = [];
 
     public function preloadable()
     {
@@ -36,11 +36,11 @@ class FieldtypeRepository
 
     public function makeSelectableInForms($handle)
     {
-        $this->selectableInForms[] = $handle;
+        $this->madeSelectableInForms[] = $handle;
     }
 
     public function hasBeenMadeSelectableInForms($handle)
     {
-        return in_array($handle, $this->selectableInForms);
+        return in_array($handle, $this->madeSelectableInForms);
     }
 }
