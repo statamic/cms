@@ -47,7 +47,7 @@
                     />
                 </template>
                 <template #option="{ value, display }">
-                    {{ display }} <code class="ml-1">{{ value.replace(':', '') }}</code>
+                    {{ display }} <code class="ml-1">{{ valueWithoutTrailingColon(value) }}</code>
                 </template>
                 <template #no-options="{ search }">
                     <div class="vs__dropdown-option text-left">{{ __('Add') }} <code class="ml-1">{{ search }}</code></div>
@@ -252,6 +252,10 @@ export default {
         updated(rules) {
             this.rules = rules;
         },
+
+        valueWithoutTrailingColon(value) {
+            return this.hasUnfinishedParameters(value) ? value.replace(':', '') : value;
+        }
 
     }
 }

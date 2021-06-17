@@ -246,27 +246,6 @@ class URL
     }
 
     /**
-     * Build a page URL from a path.
-     *
-     * @param string $path
-     * @return string
-     */
-    public function buildFromPath($path)
-    {
-        $path = Path::makeRelative($path);
-
-        $ext = pathinfo($path)['extension'];
-
-        $path = Path::clean($path);
-
-        $path = preg_replace('/^pages/', '', $path);
-
-        $path = preg_replace('#\/(?:[a-z]+\.)?index\.'.$ext.'$#', '', $path);
-
-        return Str::ensureLeft($path, '/');
-    }
-
-    /**
      * Encode a URL.
      *
      * @param string $url

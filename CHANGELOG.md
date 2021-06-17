@@ -1,13 +1,118 @@
 # Release Notes
 
-## 3.1.16 (2020-05-20)
+## 3.1.24 (2021-06-16)
+
+### What's new
+- Add support for defining default password validation rules. [#3823](https://github.com/statamic/cms/3823)
+
+### What's fixed
+- Markdown fieldtype previews are rendered server side so you can see custom parsers. [#3859](https://github.com/statamic/cms/3859)
+- Prevent static caching error when visiting a URL with a really long query string. [#3860](https://github.com/statamic/cms/3860)
+- Fix the size of SVGs in the assets fieldtype when in list mode. [#3854](https://github.com/statamic/cms/3854)
+
+
+
+## 3.1.23 (2021-06-14)
+
+### What's improved
+- Updated German, French, and Dutch translations [#3843](https://github.com/statamic/cms/issues/3843) [#3838](https://github.com/statamic/cms/issues/3838) [#3841](https://github.com/statamic/cms/issues/3841)
+
+### What's fixed
+- Fixed validation error when saving entries in a strutured collection without a route. [#3847](https://github.com/statamic/cms/issues/3847)
+- Prevent an error when selecting an entry to mount to a collection. [#3846](https://github.com/statamic/cms/issues/3846)
+- Assets can now access their `mime_type` in templates. [c5858990f](https://github.com/statamic/cms/commit/c5858990f)
+
+
+
+## 3.1.22 (2021-06-11)
+
+### What's new
+- Action classes can customize their toast messages. [#3822](https://github.com/statamic/cms/issues/3822)
+- Sites may specify text direction. [#3815](https://github.com/statamic/cms/issues/3815)
+- Added `form` to Submission. [#3792](https://github.com/statamic/cms/issues/3792)
+- Added `width` attribute to DataList's Table component. [#3762](https://github.com/statamic/cms/issues/3762)
+- Added `maxlength` to the views of form fields that have a `character_limit` set. [#3797](https://github.com/statamic/cms/issues/3797)
+
+### What's improved
+- Updated Dutch translations. [#3834](https://github.com/statamic/cms/issues/3834)
+
+### What's fixed
+- Fixed issue where ticking many items in a listing could fail. [#3298](https://github.com/statamic/cms/issues/3298)
+- Fixed `fatal: not a git repository` errors when using symlinks. [#3829](https://github.com/statamic/cms/issues/3829)
+- Prevented the "Create Fieldset" button disappearing. [#3821](https://github.com/statamic/cms/issues/3821)
+- Added a Submission typehint. [370cdc4ea](https://github.com/statamic/cms/commit/370cdc4ea)
+- Bump browserslist from 4.12.2 to 4.16.6 [#3769](https://github.com/statamic/cms/issues/3769)
+
+
+
+## 3.1.21 (2021-06-09)
+
+### What's new
+- The `redirect` tag will pass along route parameters when targeting a named route. [#3801](https://github.com/statamic/cms/issues/3801)
+
+### What's fixed
+- Fix entry slug or date changes not being reflected in filename. [#3816](https://github.com/statamic/cms/issues/3816)
+- Fix incorrect blueprint being saved to localized entry files. [#3818](https://github.com/statamic/cms/issues/3818)
+- Fix error when attempting to parse an `image` validation rule. [#3812](https://github.com/statamic/cms/issues/3812)
+
+
+
+## 3.1.20 (2021-06-08)
+
+### What's fixed
+- URI uniqueness is validated per site. [#3808](https://github.com/statamic/cms/issues/3808)
+- Prevent an infinite loop when you manually create an entry file without an ID. [#3807](https://github.com/statamic/cms/issues/3807)
+
+
+
+## 3.1.19 (2021-06-07)
+
+### What's new
+- Allow duplicate entry slugs (mainly so you can have entries of the same slug in different positions of a tree.) [#3671](https://github.com/statamic/cms/issues/3671)
+- Validation replacements. [#3690](https://github.com/statamic/cms/issues/3690)
+- Added an `installed` tag to check for packages within Antlers templates. [#3800](https://github.com/statamic/cms/issues/3800)
+
+### What's fixed
+- The `blueprint` is always saved to an entry. [#3786](https://github.com/statamic/cms/issues/3786)
+- Fix support for multiline `@{{ }}` noparse tags. [#3785](https://github.com/statamic/cms/issues/3785)
+- Bump dns-packet from 1.3.1 to 1.3.4 [#3779](https://github.com/statamic/cms/issues/3779)
+
+
+
+## 3.1.18 (2021-05-28)
+
+### What's improved
+- Updated Dutch and French translations. [#3781](https://github.com/statamic/cms/issues/3781) [#3777](https://github.com/statamic/cms/issues/3777)
+
+### What's fixed
+
+- Fix `@{{ }}` noparse tags with nested braces. [#3784](https://github.com/statamic/cms/issues/3784)
+- Fix an issue where a Grid with `min_rows` inside a Replicator wouldn't work by passing along pre-processed values. [#3782](https://github.com/statamic/cms/issues/3782)
+
+
+
+## 3.1.17 (2021-05-26)
+
+### What's improved
+- Support underscored partials in a partials directory. [statamic/ideas#305](https://github.com/statamic/ideas/issues/305)
+
+### What's fixed
+- A bunch of date related fixes. [#3730](https://github.com/statamic/cms/issues/3730)
+- Fix and improve Stache path handling. Fixes a couple of term related errors. [#3768](https://github.com/statamic/cms/issues/3768)
+- Fix modifiers not working with dynamic array keys. [#3737](https://github.com/statamic/cms/issues/3737)
+- Fix an error when using the `locales` tag on non-content routes. [#3754](https://github.com/statamic/cms/issues/3754)
+- Fix an updater error on certain environments. [#3734](https://github.com/statamic/cms/issues/3734)
+
+
+
+## 3.1.16 (2021-05-20)
 
 ### What's fixed
 - Reverted the lodash and underscore upgrades from 3.1.15 temporarily. [#3750](https://github.com/statamic/cms/issues/3750)
 
 
 
-## 3.1.15 (2020-05-20)
+## 3.1.15 (2021-05-20)
 
 ### What's new
 - You can programmatically get and set a user's preferred locale more easily. [#3725](https://github.com/statamic/cms/issues/3725)
@@ -29,7 +134,7 @@
 
 
 
-## 3.1.14 (2020-05-14)
+## 3.1.14 (2021-05-14)
 
 ### What's new
 - Add Bard node extension helper. [#3657](https://github.com/statamic/cms/issues/3657)
@@ -52,7 +157,7 @@
 
 
 
-## 3.1.13 (2020-05-10)
+## 3.1.13 (2021-05-10)
 
 ### What's improved
 - In Bard, display the asset container option when using the link or image buttons. [#3665](https://github.com/statamic/cms/issues/3665)
@@ -70,7 +175,7 @@
 
 
 
-## 3.1.12 (2020-05-06)
+## 3.1.12 (2021-05-06)
 
 ### What's new
 - Added Duplicate ID tracking with Control Panel and CLI reviewing options. [#3619](https://github.com/statamic/cms/issues/3619)
@@ -92,7 +197,7 @@
 
 
 
-## 3.1.11 (2020-04-28)
+## 3.1.11 (2021-04-28)
 
 ### What's improved
 - Assets uploaded in the selector stack will be automatically selected. [#3604](https://github.com/statamic/cms/issues/3604)
@@ -111,7 +216,7 @@
 
 
 
-## 3.1.10 (2020-04-23)
+## 3.1.10 (2021-04-23)
 
 ### What's improved
 - Improve Laravel Nova compatibility by avoiding conflicting routes. [#3543](https://github.com/statamic/cms/issues/3543)
@@ -135,14 +240,14 @@
 
 
 
-## 3.1.9 (2020-04-19)
+## 3.1.9 (2021-04-19)
 
 ### What's improved
 - Added header to disable Google's FLoC tracking by default. [#3545](https://github.com/statamic/cms/issues/3545)
 
 
 
-## 3.1.8 (2020-04-16)
+## 3.1.8 (2021-04-16)
 
 ### What's fixed
 - Fix n+1 user group and role queries when storing users in the database. [#3527](https://github.com/statamic/cms/issues/3527)
@@ -150,7 +255,7 @@
 
 
 
-## 3.1.7 (2020-04-15)
+## 3.1.7 (2021-04-15)
 
 ### What's new
 - The `link` and `path` tags can output URLs for entries, terms, etc. [#3530](https://github.com/statamic/cms/issues/3530)
@@ -174,7 +279,7 @@
 
 
 
-## 3.1.6 (2020-04-12)
+## 3.1.6 (2021-04-12)
 
 ### What's new
 - Added a `pluck` modifier. [#3502](https://github.com/statamic/cms/issues/3502)
@@ -197,7 +302,7 @@
 - Fix NaN and other glitches in the `time` fieldtype. [#3496](https://github.com/statamic/cms/issues/3496)
 
 
-## 3.1.5 (2020-04-07)
+## 3.1.5 (2021-04-07)
 
 ### What's new
 - The Bard link toolbar allows you to browse for entries. [#3466](https://github.com/statamic/cms/issues/3466)
@@ -212,7 +317,7 @@
 
 
 
-## 3.1.4 (2020-04-06)
+## 3.1.4 (2021-04-06)
 
 ### What's new
 - Ability to push queries and middleware into GraphQL. [#3385](https://github.com/statamic/cms/issues/3385)
@@ -230,7 +335,7 @@
 
 
 
-## 3.1.3 (2020-04-02)
+## 3.1.3 (2021-04-02)
 
 ### What's new
 - Status icons are shown in collections' tree views. [#3461](https://github.com/statamic/cms/issues/3461)
@@ -247,7 +352,7 @@
 
 
 
-## 3.1.2 (2020-03-30)
+## 3.1.2 (2021-03-30)
 
 ### What's improved
 - Prevent the need to hit enter to add a validation rule. [bdf9e03a5](https://github.com/statamic/cms/commit/bdf9e03a5)
@@ -261,7 +366,7 @@
 
 
 
-## 3.1.1 (2020-03-25)
+## 3.1.1 (2021-03-25)
 
 ### What's improved
 - French translations. [#3429](https://github.com/statamic/cms/issues/3429)
@@ -278,14 +383,14 @@
 
 
 
-## 3.1.0 (2020-03-24)
+## 3.1.0 (2021-03-24)
 
 ### What's new
 - Official 3.1 release. 🎉
 
 
 
-## 3.1.0-beta.3 (2020-03-24)
+## 3.1.0-beta.3 (2021-03-24)
 
 ### What's new
 - `form:create` action and method params. [#3411](https://github.com/statamic/cms/issues/3411)
@@ -299,7 +404,7 @@
 
 
 
-## 3.1.0-beta.2 (2020-03-22)
+## 3.1.0-beta.2 (2021-03-22)
 
 ### What's new
 - Added option to set a custom path to git binary. [#3393](https://github.com/statamic/cms/issues/3393)
@@ -325,7 +430,7 @@
 
 
 
-## 3.1.0-beta.1 (2020-03-15)
+## 3.1.0-beta.1 (2021-03-15)
 
 ### What's new
 - You can configure Statamic to use separate authentication from the rest of your app. [#3143](https://github.com/statamic/cms/issues/3143) 
@@ -343,7 +448,7 @@
 
 
 
-## 3.1.0-alpha.4 (2020-03-08)
+## 3.1.0-alpha.4 (2021-03-08)
 
 ### What's new
 - Collection and Nav Trees are now stored separately from their config. [#2768](https://github.com/statamic/cms/issues/2768)
@@ -370,7 +475,7 @@
 
 
 
-## 3.1.0-alpha.3 (2020-02-11)
+## 3.1.0-alpha.3 (2021-02-11)
 
 ### What's new
 - Add site and locale to entries. [#3205](https://github.com/statamic/cms/issues/3205)
@@ -386,7 +491,7 @@
 
 
 
-## 3.1.0-alpha.2 (2020-02-04)
+## 3.1.0-alpha.2 (2021-02-04)
 
 ### What's new
 - Ability to query an entry by slug or URI in GraphQL. [#3193](https://github.com/statamic/cms/issues/3193)
@@ -398,7 +503,7 @@
 
 
 
-## 3.1.0-alpha.1 (2020-02-01)
+## 3.1.0-alpha.1 (2021-02-01)
 
 ### What's new
 - GraphQL [#2982](https://github.com/statamic/cms/issues/2982)
@@ -413,7 +518,7 @@
 
 
 
-## 3.0.49 (2020-03-24)
+## 3.0.49 (2021-03-24)
 
 ### What's new
 - Add markdown option to render form emails. [#3414](https://github.com/statamic/cms/issues/3414)
@@ -425,7 +530,7 @@
 
 
 
-## 3.0.48 (2020-03-22)
+## 3.0.48 (2021-03-22)
 
 ### What's new
 - The Git integration can use a custom queue connection. [#3305](https://github.com/statamic/cms/issues/3305)
@@ -441,7 +546,7 @@
 
 
 
-## 3.0.47 (2020-03-15)
+## 3.0.47 (2021-03-15)
 
 ### What's new
 - Added a `route` param to `redirect` tag. [#3308](https://github.com/statamic/cms/issues/3308)
@@ -457,7 +562,7 @@
 
 
 
-## 3.0.46 (2020-03-05)
+## 3.0.46 (2021-03-05)
 
 ### What's new
 - You can get a user's email via a property. [#3331](https://github.com/statamic/cms/issues/3331)
@@ -469,7 +574,7 @@
 
 
 
-## 3.0.45 (2020-02-22)
+## 3.0.45 (2021-02-22)
 
 ### What's new
 - Add new `chunk` modifier. [849ae0ccb](https://github.com/statamic/cms/commit/849ae0ccb)
@@ -496,7 +601,7 @@
 
 
 
-## 3.0.44 (2020-02-17)
+## 3.0.44 (2021-02-17)
 
 ### What's fixed
 - Allow `view` data to be passed into tags parameters. [#3252](https://github.com/statamic/cms/issues/3252)
@@ -504,7 +609,7 @@
 
 
 
-## 3.0.43 (2020-02-11)
+## 3.0.43 (2021-02-11)
 
 ### What's new
 - Added an `EntryCreated` event. [#3078](https://github.com/statamic/cms/issues/3078)

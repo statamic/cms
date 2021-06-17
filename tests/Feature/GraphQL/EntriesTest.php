@@ -444,16 +444,16 @@ GQL;
     /** @test */
     public function it_sorts_entries_on_multiple_fields()
     {
-        EntryFactory::collection('test')->id('1')->slug('1')->data(['title' => 'Beta', 'number' => 2])->create();
-        EntryFactory::collection('test')->id('2')->slug('2')->data(['title' => 'Alpha', 'number' => 2])->create();
-        EntryFactory::collection('test')->id('3')->slug('3')->data(['title' => 'Alpha', 'number' => 1])->create();
-        EntryFactory::collection('test')->id('4')->slug('4')->data(['title' => 'Beta', 'number' => 1])->create();
-
         $blueprint = Blueprint::makeFromFields([
             'number' => ['type' => 'integer'],
         ])->setHandle('test');
 
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
+
+        EntryFactory::collection('test')->id('1')->slug('1')->data(['title' => 'Beta', 'number' => 2])->create();
+        EntryFactory::collection('test')->id('2')->slug('2')->data(['title' => 'Alpha', 'number' => 2])->create();
+        EntryFactory::collection('test')->id('3')->slug('3')->data(['title' => 'Alpha', 'number' => 1])->create();
+        EntryFactory::collection('test')->id('4')->slug('4')->data(['title' => 'Beta', 'number' => 1])->create();
 
         $query = <<<'GQL'
 {

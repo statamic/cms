@@ -7,10 +7,7 @@
 
         <div class="flex mb-3">
             <h1 class="flex-1">{{ __('Fieldsets') }}</h1>
-
-            @can('create', 'Statamic\Fields\Fieldset')
-                <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ __('Create Fieldset') }}</a>
-            @endcan
+            <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ __('Create Fieldset') }}</a>
         </div>
 
         <fieldset-listing :initial-rows="{{ json_encode($fieldsets) }}"></fieldset-listing>

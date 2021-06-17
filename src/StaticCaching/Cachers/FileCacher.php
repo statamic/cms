@@ -4,6 +4,7 @@ namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
 
 class FileCacher extends AbstractCacher
@@ -42,6 +43,10 @@ class FileCacher extends AbstractCacher
         $content = $this->normalizeContent($content);
 
         $path = $this->getFilePath($request->getUri());
+
+        if (strlen(pathinfo($path, PATHINFO_BASENAME)) > 255) {
+            return Log::debug("Could not write static cache file. File name too long. $path");
+        }
 
         if (! $this->writer->write($path, $content, $this->config('lock_hold_length'))) {
             return;

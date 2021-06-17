@@ -439,7 +439,7 @@ class CollectionsController extends CpController
                         'create' => false,
                         'collections' => Collection::all()->map->handle()->reject(function ($collectionHandle) use ($collection) {
                             return $collectionHandle === $collection->handle();
-                        })->all(),
+                        })->values()->all(),
                     ],
                     'amp' => [
                         'display' => __('Enable AMP'),

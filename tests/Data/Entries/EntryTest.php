@@ -246,11 +246,57 @@ class EntryTest extends TestCase
     public function it_gets_the_uri_from_the_structure()
     {
         $structure = $this->partialMock(CollectionStructure::class);
-        $collection = tap((new Collection)->handle('test')->structure($structure))->save();
+        $collection = tap((new Collection)->handle('test')->structure($structure)->routes('{parent_uri}/{slug}'))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('foo');
         $structure->shouldReceive('entryUri')->with($entry)->once()->andReturn('/structured-uri');
 
         $this->assertEquals('/structured-uri', $entry->uri());
+    }
+
+    /** @test */
+    public function entries_in_a_collection_without_a_route_dont_have_a_uri()
+    {
+        $collection = tap((new Collection)->handle('test'))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug('foo');
+
+        $this->assertNull($entry->uri());
+        $this->assertNull($entry->url());
+    }
+
+    /** @test */
+    public function a_localized_entry_without_a_route_for_that_site_doesnt_have_a_uri()
+    {
+        $collection = tap((new Collection)->handle('test')->routes([
+            'en' => '/test/{slug}',
+        ]))->save();
+        $entry = (new Entry)->collection($collection)->locale('fr')->slug('foo');
+
+        $this->assertNull($entry->uri());
+        $this->assertNull($entry->url());
+    }
+
+    /** @test */
+    public function entries_in_a_structured_collection_without_a_route_dont_have_a_uri()
+    {
+        $structure = $this->partialMock(CollectionStructure::class);
+        $collection = tap((new Collection)->handle('test')->structure($structure))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug('foo');
+
+        $this->assertNull($entry->uri());
+        $this->assertNull($entry->url());
+    }
+
+    /** @test */
+    public function a_localized_entry_in_a_structured_collection_without_a_route_for_that_site_doesnt_have_a_uri()
+    {
+        $structure = $this->partialMock(CollectionStructure::class);
+        $collection = tap((new Collection)->handle('test')->structure($structure)->routes([
+            'en' => '/test/{slug}',
+        ]))->save();
+        $entry = (new Entry)->collection($collection)->locale('fr')->slug('foo');
+
+        $this->assertNull($entry->uri());
+        $this->assertNull($entry->url());
     }
 
     /** @test */
@@ -756,7 +802,10 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving()
     {
+        tap(Collection::make('test'))->save();
+
         $entry = (new Entry)
+            ->collection('test')
             ->id('123')
             ->slug('test')
             ->date('2018-01-01')
@@ -778,18 +827,23 @@ class EntryTest extends TestCase
             'id' => '123',
             'published' => false,
             'content' => 'The content',
+            'blueprint' => 'test',
         ], $entry->fileData());
     }
 
     /** @test */
     public function it_gets_file_contents_for_saving_a_localized_entry()
     {
+        tap(Collection::make('test'))->save();
+
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
 
         Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('test');
 
         $entry = (new Entry)
+            ->collection('test')
             ->id('456')
             ->origin('123')
             ->slug('test')
@@ -815,7 +869,61 @@ class EntryTest extends TestCase
             'origin' => '123',
             'published' => false,
             'content' => 'The content',
+            'blueprint' => 'test',
         ], $entry->fileData());
+    }
+
+    /** @test */
+    public function the_default_blueprint_is_added_to_the_file_contents_when_one_hasnt_been_explicitly_defined()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $entry = (new Entry)->collection('test');
+
+        $this->assertEquals('default', $entry->fileData()['blueprint']);
+    }
+
+    /** @test */
+    public function the_explicit_blueprint_is_added_to_the_file_contents()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $entry = (new Entry)->collection('test')->blueprint('another');
+
+        $this->assertEquals('another', $entry->fileData()['blueprint']);
+    }
+
+    /** @test */
+    public function the_inherited_blueprint_is_added_to_the_localized_file_contents()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $originEntry = $this->mock(Entry::class);
+        $originEntry->shouldReceive('id')->andReturn('123');
+
+        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('another');
+
+        $entry = (new Entry)
+            ->collection('test')
+            ->origin('123'); // do not set blueprint.
+
+        $this->assertEquals('another', $entry->fileData()['blueprint']);
     }
 
     /** @test */

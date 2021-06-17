@@ -14,7 +14,6 @@ use Statamic\Taxonomies\TermCollection;
  * @method static TermCollection whereInTaxonomy(array $handles)
  * @method static TermContract find($id)
  * @method static TermContract findByUri(string $uri, string $site = null)
- * @method static TermContract findBySlug(string $slug, string $taxonomy)
  * @method static save($term)
  * @method static delete($term)
  * @method static TermQueryBuilder query()
