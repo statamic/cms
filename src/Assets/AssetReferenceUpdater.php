@@ -47,7 +47,7 @@ class AssetReferenceUpdater
         $this->originalPath = $originalPath;
         $this->newPath = $newPath;
 
-        $this->updateAssetsFields();
+        $this->updateAssets();
 
         if ($this->updated) {
             $this->item->save();
@@ -59,14 +59,27 @@ class AssetReferenceUpdater
      *
      * @param null|string $dottedPrefix
      * @param null|\Statamic\Fields\Fields $fields
-     * @return $this
      */
-    protected function updateAssetsFields($dottedPrefix = null, $fields = null)
+    protected function updateAssets($dottedPrefix = null, $fields = null)
     {
         $fields = $fields
             ? $fields->all()
             : $this->item->blueprint()->fields()->all();
 
+        $this
+            ->updateAssetsFieldValues($dottedPrefix, $fields)
+            ->updateNestedFieldValues($dottedPrefix, $fields);
+    }
+
+    /**
+     * Update assets field values.
+     *
+     * @param null|string $dottedPrefix
+     * @param null|\Statamic\Fields\Fields $fields
+     * @return $this
+     */
+    protected function updateAssetsFieldValues($dottedPrefix, $fields)
+    {
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'assets'
@@ -74,22 +87,111 @@ class AssetReferenceUpdater
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $field->get('max_files') === 1
-                    ? $this->updateSingleAsset($dottedPrefix, $field)
-                    : $this->updateMultipleAssets($dottedPrefix, $field);
+                    ? $this->updateStringValue($dottedPrefix, $field)
+                    : $this->updateArrayValue($dottedPrefix, $field);
             });
-
-        $this->updateNestedAssetsFields($dottedPrefix, $fields);
 
         return $this;
     }
 
     /**
-     * Update assets field with single file.
+     * Update nested field values.
+     *
+     * @param null|string $dottedPrefix
+     * @param \Illuminate\Support\Collection $fields
+     * @return $this
+     */
+    protected function updateNestedFieldValues($dottedPrefix, $fields)
+    {
+        $fields
+            ->filter(function ($field) {
+                return in_array($field->type(), ['replicator', 'grid', 'bard']);
+            })
+            ->each(function ($field) use ($dottedPrefix) {
+                $method = 'update'.ucfirst($field->type()).'Children';
+                $dottedKey = $dottedPrefix.$field->handle();
+
+                $this->{$method}($dottedKey, $field);
+            });
+
+        return $this;
+    }
+
+    /**
+     * Update replicator field children.
+     *
+     * @param string $dottedKey
+     * @param \Statamic\Fields\Field $field
+     */
+    protected function updateReplicatorChildren($dottedKey, $field)
+    {
+        $data = $this->item->data();
+
+        $sets = Arr::get($data, $dottedKey);
+
+        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
+            $dottedPrefix = "{$dottedKey}.{$setKey}.";
+            $setHandle = Arr::get($set, 'type');
+            $fields = Arr::get($field->config(), "sets.{$setHandle}.fields");
+
+            if ($setHandle && $fields) {
+                $this->updateAssets($dottedPrefix, new Fields($fields));
+            }
+        });
+    }
+
+    /**
+     * Update grid field children.
+     *
+     * @param string $dottedKey
+     * @param \Statamic\Fields\Field $field
+     */
+    protected function updateGridChildren($dottedKey, $field)
+    {
+        $data = $this->item->data();
+
+        $sets = Arr::get($data, $dottedKey);
+
+        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
+            $dottedPrefix = "{$dottedKey}.{$setKey}.";
+            $fields = Arr::get($field->config(), 'fields');
+
+            if ($fields) {
+                $this->updateAssets($dottedPrefix, new Fields($fields));
+            }
+        });
+    }
+
+    /**
+     * Update bard field children.
+     *
+     * @param string $dottedKey
+     * @param \Statamic\Fields\Field $field
+     */
+    protected function updateBardChildren($dottedKey, $field)
+    {
+        $data = $this->item->data();
+
+        $sets = Arr::get($data, $dottedKey);
+
+        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
+            $dottedPrefix = "{$dottedKey}.{$setKey}.attrs.values.";
+            $setHandle = Arr::get($set, 'attrs.values.type');
+            $fields = Arr::get($field->config(), "sets.{$setHandle}.fields");
+
+            if ($setHandle && $fields) {
+                $this->updateAssets($dottedPrefix, new Fields($fields));
+            }
+        });
+    }
+
+    /**
+     * Update string value on item.
      *
      * @param null|string $dottedPrefix
      * @param \Statamic\Fields\Field $field
      */
-    protected function updateSingleAsset($dottedPrefix, $field)
+    protected function updateStringValue($dottedPrefix, $field)
     {
         $data = $this->item->data()->all();
 
@@ -107,12 +209,12 @@ class AssetReferenceUpdater
     }
 
     /**
-     * Update assets field with multiple files.
+     * Update array value on item.
      *
      * @param null|string $dottedPrefix
      * @param \Statamic\Fields\Field $field
      */
-    protected function updateMultipleAssets($dottedPrefix, $field)
+    protected function updateArrayValue($dottedPrefix, $field)
     {
         $data = $this->item->data()->all();
 
@@ -133,93 +235,5 @@ class AssetReferenceUpdater
         $this->item->data($data);
 
         $this->updated = true;
-    }
-
-    /**
-     * Update nested assets fields.
-     *
-     * @param null|string $dottedPrefix
-     * @param \Illuminate\Support\Collection $fields
-     */
-    protected function updateNestedAssetsFields($dottedPrefix, $fields)
-    {
-        $fields
-            ->filter(function ($field) {
-                return in_array($field->type(), ['replicator', 'grid', 'bard']);
-            })
-            ->each(function ($field) use ($dottedPrefix) {
-                $method = 'update'.ucfirst($field->type()).'AssetsFields';
-                $dottedKey = $dottedPrefix.$field->handle();
-
-                $this->{$method}($dottedKey, $field);
-            });
-    }
-
-    /**
-     * Update replicator assets fields.
-     *
-     * @param string $dottedKey
-     * @param \Statamic\Fields\Field $field
-     */
-    protected function updateReplicatorAssetsFields($dottedKey, $field)
-    {
-        $data = $this->item->data();
-
-        $sets = Arr::get($data, $dottedKey);
-
-        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
-            $dottedPrefix = "{$dottedKey}.{$setKey}.";
-            $setHandle = Arr::get($set, 'type');
-            $fields = Arr::get($field->config(), "sets.{$setHandle}.fields");
-
-            if ($setHandle && $fields) {
-                $this->updateAssetsFields($dottedPrefix, new Fields($fields));
-            }
-        });
-    }
-
-    /**
-     * Update grid assets fields.
-     *
-     * @param string $dottedKey
-     * @param \Statamic\Fields\Field $field
-     */
-    protected function updateGridAssetsFields($dottedKey, $field)
-    {
-        $data = $this->item->data();
-
-        $sets = Arr::get($data, $dottedKey);
-
-        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
-            $dottedPrefix = "{$dottedKey}.{$setKey}.";
-            $fields = Arr::get($field->config(), 'fields');
-
-            if ($fields) {
-                $this->updateAssetsFields($dottedPrefix, new Fields($fields));
-            }
-        });
-    }
-
-    /**
-     * Update bard assets fields.
-     *
-     * @param string $dottedKey
-     * @param \Statamic\Fields\Field $field
-     */
-    protected function updateBardAssetsFields($dottedKey, $field)
-    {
-        $data = $this->item->data();
-
-        $sets = Arr::get($data, $dottedKey);
-
-        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
-            $dottedPrefix = "{$dottedKey}.{$setKey}.attrs.values.";
-            $setHandle = Arr::get($set, 'attrs.values.type');
-            $fields = Arr::get($field->config(), "sets.{$setHandle}.fields");
-
-            if ($setHandle && $fields) {
-                $this->updateAssetsFields($dottedPrefix, new Fields($fields));
-            }
-        });
     }
 }
