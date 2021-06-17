@@ -407,6 +407,46 @@ class UpdateAssetPathsTest extends TestCase
     }
 
     /** @test */
+    public function it_updates_asset_references_in_markdown_fields()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'content',
+                    'field' => [
+                        'type' => 'markdown',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $content = <<<'EOT'
+Some text.
+![](statamic://asset::test_container::hoff.jpg)
+More text.
+![](statamic://asset::test_container::norris.jpg)
+EOT;
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data(['content' => $content]))->save();
+
+        $this->assertEquals($content, $entry->get('content'));
+
+        $this->assetHoff->path('content/hoff-new.jpg')->save();
+
+        $expected = <<<'EOT'
+Some text.
+![](statamic://asset::test_container::content/hoff-new.jpg)
+More text.
+![](statamic://asset::test_container::norris.jpg)
+EOT;
+
+        $this->assertEquals($expected, $entry->fresh()->get('content'));
+    }
+
+    /** @test */
     public function it_recursively_updates_nested_asset_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -447,6 +487,13 @@ class UpdateAssetPathsTest extends TestCase
                                                             'handle' => 'pics',
                                                             'field' => [
                                                                 'type' => 'assets',
+                                                                'container' => 'test_container',
+                                                            ],
+                                                        ],
+                                                        [
+                                                            'handle' => 'bio',
+                                                            'field' => [
+                                                                'type' => 'markdown',
                                                                 'container' => 'test_container',
                                                             ],
                                                         ],
@@ -503,6 +550,7 @@ class UpdateAssetPathsTest extends TestCase
                                     'type' => 'set_two',
                                     'product' => 'norris.jpg',
                                     'pics' => ['hoff.jpg', 'norris.jpg'],
+                                    'bio' => '# Markdown: ![](statamic://asset::test_container::norris.jpg)',
                                     'griddy' => [
                                         [
                                             'product' => 'norris.jpg',
@@ -521,6 +569,7 @@ class UpdateAssetPathsTest extends TestCase
         $this->assertEquals('not an asset', Arr::get($entry->data(), 'reppy.0.not_asset'));
         $this->assertEquals('norris.jpg', Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.product'));
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.pics'));
+        $this->assertEquals('# Markdown: ![](statamic://asset::test_container::norris.jpg)', Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.bio'));
         $this->assertEquals('norris.jpg', Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.product'));
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.pics'));
 
@@ -530,6 +579,7 @@ class UpdateAssetPathsTest extends TestCase
         $this->assertEquals('not an asset', Arr::get($entry->fresh()->data(), 'reppy.0.not_asset'));
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.product'));
         $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.pics'));
+        $this->assertEquals('# Markdown: ![](statamic://asset::test_container::content/norris.jpg)', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.bio'));
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.product'));
         $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.pics'));
     }

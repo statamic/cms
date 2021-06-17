@@ -68,6 +68,7 @@ class AssetReferenceUpdater
 
         $this
             ->updateAssetsFieldValues($dottedPrefix, $fields)
+            ->updateMarkdownFieldValues($dottedPrefix, $fields)
             ->updateNestedFieldValues($dottedPrefix, $fields);
     }
 
@@ -89,6 +90,27 @@ class AssetReferenceUpdater
                 $field->get('max_files') === 1
                     ? $this->updateStringValue($dottedPrefix, $field)
                     : $this->updateArrayValue($dottedPrefix, $field);
+            });
+
+        return $this;
+    }
+
+    /**
+     * Update markdown field values.
+     *
+     * @param null|string $dottedPrefix
+     * @param null|\Statamic\Fields\Fields $fields
+     * @return $this
+     */
+    protected function updateMarkdownFieldValues($dottedPrefix, $fields)
+    {
+        $fields
+            ->filter(function ($field) {
+                return $field->type() === 'markdown'
+                    && $field->get('container') === $this->container;
+            })
+            ->each(function ($field) use ($dottedPrefix) {
+                $this->updateStatamicUrlsInStringValue($dottedPrefix, $field);
             });
 
         return $this;
@@ -231,6 +253,37 @@ class AssetReferenceUpdater
         });
 
         Arr::set($data, $dottedKey, $fieldData->all());
+
+        $this->item->data($data);
+
+        $this->updated = true;
+    }
+
+    /**
+     * Update `statamic://` urls in string value on item.
+     *
+     * @param null|string $dottedPrefix
+     * @param \Statamic\Fields\Field $field
+     */
+    protected function updateStatamicUrlsInStringValue($dottedPrefix, $field)
+    {
+        $data = $this->item->data()->all();
+
+        $dottedKey = $dottedPrefix.$field->handle();
+
+        $originalValue = $value = Arr::get($data, $dottedKey);
+
+        $value = preg_replace_callback('/([("]statamic:\/\/[^()"]*::)(.*)([)"])/im', function ($matches) {
+            return $matches[2] === $this->originalPath
+                ? $matches[1].$this->newPath.$matches[3]
+                : $matches[0];
+        }, $value);
+
+        if ($originalValue === $value) {
+            return;
+        }
+
+        Arr::set($data, $dottedKey, $value);
 
         $this->item->data($data);
 
