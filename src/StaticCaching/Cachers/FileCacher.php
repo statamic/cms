@@ -44,7 +44,7 @@ class FileCacher extends AbstractCacher
 
         $path = $this->getFilePath($request->getUri());
 
-        if (strlen(pathinfo($path, PATHINFO_BASENAME)) > 255) {
+        if (strlen(pathinfo($path, PATHINFO_BASENAME)) > $this->config('max_filename_length')) {
             return Log::debug("Could not write static cache file. File name too long. $path");
         }
 
@@ -63,7 +63,7 @@ class FileCacher extends AbstractCacher
     {
         $url = $this->getUrl($request);
 
-        \Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
+        Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly or the URL is too long.');
 
         return File::get($this->getFilePath($url));
     }
@@ -145,10 +145,22 @@ class FileCacher extends AbstractCacher
     {
         $parts = parse_url($url);
 
-        return sprintf('%s%s_%s.html',
+        $query = $this->config('ignore_query_strings') ? '' : array_get($parts, 'query', '');
+
+        $path = sprintf('%s%s_%s.html',
             $this->getCachePath(),
             $parts['path'],
-            $this->config('ignore_query_strings') ? '' : array_get($parts, 'query', '')
+            $query
         );
+
+        if (strlen($query) && strlen(pathinfo($path, PATHINFO_BASENAME)) > $this->config('max_filename_length')) {
+            return sprintf('%s%s_%s.html',
+                $this->getCachePath(),
+                $parts['path'],
+                md5($query)
+            );
+        }
+
+        return $path;
     }
 }

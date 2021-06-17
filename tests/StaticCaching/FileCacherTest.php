@@ -67,6 +67,22 @@ class FileCacherTest extends TestCase
     }
 
     /** @test */
+    public function gets_file_path_from_url_and_hashes_long_query_strings()
+    {
+        $cacher = $this->fileCacher([
+            'path' => 'test/path',
+            'max_filename_length' => 30,
+        ]);
+
+        $query = 'baz=qux&one=two&three=four&five=six';
+
+        $this->assertEquals(
+            'test/path/foo/bar_'.md5($query).'.html',
+            $cacher->getFilePath('http://domain.com/foo/bar?'.$query)
+        );
+    }
+
+    /** @test */
     public function gets_file_path_from_url_and_ignores_query_strings()
     {
         $cacher = $this->fileCacher([
@@ -152,6 +168,6 @@ class FileCacherTest extends TestCase
     {
         $writer = $writer ?: \Mockery::mock(Writer::class);
 
-        return new FileCacher($writer, app(Repository::class), $config);
+        return new FileCacher($writer, app(Repository::class), array_replace(['max_filename_length' => 255], $config));
     }
 }
