@@ -151,7 +151,6 @@ class FieldtypeTest extends TestCase
             'localizable' => true,
             'validatable' => true,
             'defaultable' => true,
-            'selectable' => true,
             'categories' => ['text'],
             'icon' => 'test',
             'config' => [],
