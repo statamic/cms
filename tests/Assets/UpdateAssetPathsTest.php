@@ -433,9 +433,9 @@ class UpdateAssetPathsTest extends TestCase
                             'attrs' => [
                                 'src' => 'statamic://asset::test_container::hoff.jpg',
                                 'alt' => 'hoff',
-                            ]
+                            ],
                         ],
-                    ]
+                    ],
                 ],
                 [
                     'content' => [
@@ -445,9 +445,9 @@ class UpdateAssetPathsTest extends TestCase
                             'attrs' => [
                                 'src' => 'statamic://asset::test_container::norris.jpg',
                                 'alt' => 'norris',
-                            ]
+                            ],
                         ],
-                    ]
+                    ],
                 ],
             ],
         ]))->save();
