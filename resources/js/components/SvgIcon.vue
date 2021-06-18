@@ -1,7 +1,8 @@
 <template>
 
-    <div :class="[ 'svg-icon', { 'using-div': type === 'div', 'using-svg': type === 'svg' } ]"
-        v-html="html"></div>
+    <component :is="type"
+        v-html="html">
+    </component>
 
 </template>
 
