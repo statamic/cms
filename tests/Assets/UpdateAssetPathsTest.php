@@ -811,6 +811,82 @@ EOT;
         $this->assertEquals('hoff-new.jpg', $user->fresh()->get('avatar'));
     }
 
+    /** @test */
+    public function it_only_saves_items_when_there_is_something_to_update()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'pic',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'pics',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'marky',
+                    'field' => [
+                        'type' => 'markdown',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entryOne = tap(Facades\Entry::make()->collection($collection)->data([
+            'pic' => 'hoff.jpg',
+        ]))->save();
+
+        $entryTwo = tap(Facades\Entry::make()->collection($collection)->data([
+            'pic' => 'unrelated.jpg',
+            'pics' => ['unrelated.jpg'],
+            'marky' => '# Markdown ![](statamic://asset::test_container::unrelated.jpg)',
+            'bardo' => [
+                [
+                    'content' => [
+                        'type' => 'paragraph',
+                        'content' => [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'statamic://asset::test_container::unrelated.jpg',
+                                'alt' => 'norris',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        Facades\Entry::shouldReceive('save')->withArgs(function ($arg) use ($entryOne) {
+            return $arg->id() === $entryOne->id();
+        })->once();
+
+        Facades\Entry::shouldReceive('save')->withArgs(function ($arg) use ($entryTwo) {
+            return $arg->id() === $entryTwo->id();
+        })->never();
+
+        Facades\Entry::makePartial();
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+    }
+
     protected function setSingleBlueprint($namespace, $blueprintContents)
     {
         $blueprint = tap(Facades\Blueprint::make()->setContents($blueprintContents))->save();

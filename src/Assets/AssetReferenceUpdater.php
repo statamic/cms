@@ -266,7 +266,7 @@ class AssetReferenceUpdater
 
         $dottedKey = $dottedPrefix.$field->handle();
 
-        $fieldData = collect(Arr::dot(Arr::get($data, $dottedKey)));
+        $fieldData = collect(Arr::dot(Arr::get($data, $dottedKey, [])));
 
         if (! $fieldData->contains($this->originalPath)) {
             return;
