@@ -74,7 +74,7 @@ class AssetFolder implements Contract, Arrayable
 
     public function assetFolders()
     {
-        return $this->container()->assetFolders($this->path);
+        return $this->container()->assetFolders($this->path, false);
     }
 
     public function lastModified()

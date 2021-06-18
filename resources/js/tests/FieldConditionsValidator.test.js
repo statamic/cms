@@ -294,7 +294,9 @@ test('it can call a custom function', () => {
     });
 
     expect(Fields.showField({if: 'reallyLovesAnimals'})).toBe(false);
+    expect(Fields.showField({if: 'custom reallyLovesAnimals'})).toBe(false);
     expect(Fields.showField({unless: 'reallyLovesAnimals'})).toBe(true);
+    expect(Fields.showField({unless: 'custom reallyLovesAnimals'})).toBe(true);
 });
 
 test('it can call a custom function using params against root values', () => {

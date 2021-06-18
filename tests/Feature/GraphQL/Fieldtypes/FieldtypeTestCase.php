@@ -24,10 +24,6 @@ abstract class FieldtypeTestCase extends TestCase
 
     protected function createEntryWithFields($arr)
     {
-        $entry = EntryFactory::collection('test')->id('1')->data(
-            collect($arr)->map->value->all()
-        )->create();
-
         $blueprint = Blueprint::makeFromFields(
             collect($arr)->map->field->all()
         );
@@ -36,7 +32,9 @@ abstract class FieldtypeTestCase extends TestCase
             'blueprint' => $blueprint->setHandle('blueprint'),
         ]));
 
-        return $entry;
+        return EntryFactory::collection('test')->id('1')->data(
+            collect($arr)->map->value->all()
+        )->create();
     }
 
     protected function assertGqlEntryHas($query, $expected)

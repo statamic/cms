@@ -60,6 +60,6 @@ class ServiceProvider extends LaravelProvider
 
     private function setDefaultSchema()
     {
-        config(['graphql.schemas.default' => DefaultSchema::config()]);
+        config(['graphql.schemas.default' => DefaultSchema::class]);
     }
 }

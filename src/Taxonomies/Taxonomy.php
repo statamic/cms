@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ContainsCascadingData;
+use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyDeleted;
@@ -15,14 +16,16 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
 
     protected $handle;
     protected $title;
@@ -36,6 +39,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     public function __construct()
     {
         $this->cascade = collect();
+        $this->supplements = collect();
     }
 
     public function id()
@@ -232,9 +236,23 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
             ->args(func_get_args());
     }
 
+    public function url()
+    {
+        return URL::makeRelative($this->absoluteUrl());
+    }
+
+    public function absoluteUrl()
+    {
+        return URL::tidy(Site::current()->absoluteUrl().$this->uri());
+    }
+
     public function uri()
     {
-        return str_replace('_', '-', '/'.$this->handle);
+        $site = Site::current();
+
+        $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
+
+        return URL::tidy($prefix.str_replace('_', '-', '/'.$this->handle));
     }
 
     public function collection($collection = null)
@@ -315,9 +333,12 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function augmentedArrayData()
     {
-        return [
+        return array_merge([
             'title' => $this->title(),
             'handle' => $this->handle(),
-        ];
+            'uri' => $this->uri(),
+            'url' => $this->url(),
+            'permalink' => $this->absoluteUrl(),
+        ], $this->supplements->all());
     }
 }

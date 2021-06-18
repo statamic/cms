@@ -12,6 +12,7 @@ use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Stores\CollectionTreeStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\NavigationStore;
+use Statamic\Stache\Stores\TaxonomiesStore;
 use Tests\TestCase;
 use Tests\UnlinksPaths;
 
@@ -31,6 +32,7 @@ class EntryRepositoryTest extends TestCase
             (new EntriesStore($this->stache, app('files')))->directory($this->directory),
             (new NavigationStore($this->stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/navigation'),
             (new CollectionTreeStore($this->stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures/collections'),
+            (new TaxonomiesStore($this->stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/taxonomies'),
         ]);
 
         $this->repo = new EntryRepository($this->stache);
@@ -130,7 +132,10 @@ class EntryRepositoryTest extends TestCase
         $this->assertNull($this->repo->find('unknown'));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @deprecated
+     **/
     public function it_gets_entry_by_slug()
     {
         $entry = $this->repo->findBySlug('bravo', 'alphabetical');

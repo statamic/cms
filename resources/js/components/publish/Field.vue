@@ -11,13 +11,13 @@
                 <span :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle, 'cursor-pointer': canToggleLabel }" v-text="labelText" />
                 <i class="required ml-sm" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
+                <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-sm">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
 
                 <button
-                    v-if="!isReadOnly"
+                    v-if="!isReadOnly && !isSection"
                     v-show="syncable && isSynced"
                     class="outline-none"
                     @click="$emit('desynced')"
@@ -27,7 +27,7 @@
                 </button>
 
                 <button
-                    v-if="!isReadOnly"
+                    v-if="!isReadOnly && !isSection"
                     v-show="syncable && !isSynced"
                     class="outline-none"
                     @click="$emit('synced')"
@@ -123,6 +123,14 @@ export default {
             if (this.storeState.isRoot === false && !this.config.localizable) return true;
 
             return this.isLocked || this.readOnly || this.config.read_only || false;
+        },
+
+        isLocalizable() {
+            return this.$config.get('sites').length > 1 && this.config.localizable;
+        },
+
+        isSection() {
+            return this.config.type === 'section';
         },
 
         classes() {

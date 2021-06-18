@@ -44,11 +44,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Date Format
+    | Date Format
     |--------------------------------------------------------------------------
     |
-    | Any time a Carbon date is cast to a string, it should use this format.
+    | Whenever a Carbon date is cast to a string on front-end routes, it will
+    | use this format. On CP routes, the format defined in cp.php is used.
     | You can customize this format using PHP's date string constants.
+    | Setting this value to null will use Carbon's default format.
     |
     | https://www.php.net/manual/en/function.date.php
     |

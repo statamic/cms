@@ -1,9 +1,9 @@
 <template>
 
     <div class="bard-inline-image-container">
-        <div ref="content" />
         <div v-if="src">
             <div class="p-1 text-center">
+                <div ref="content" hidden />
                 <img :src="src" class="block mx-auto" data-drag-handle />
             </div>
 
@@ -112,7 +112,7 @@ export default {
             this.assetId = src.substr(7);
         }
 
-        this.loadAsset(this.assetId);
+        this.loadAsset(this.assetId || src);
     },
 
     watch: {
@@ -171,6 +171,7 @@ export default {
 
         setAsset(asset) {
             this.asset = asset;
+            this.assetId = asset.id;
             this.alt = asset.alt || this.alt;
             this.loading = false;
             this.updateAttrs({ src: this.actualSrc });

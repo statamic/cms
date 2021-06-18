@@ -25,7 +25,8 @@ trait FakesRoles
                     : Role::make()->handle($handle)->addPermission($permissions);
             });
 
-        $fake = new class($roles) extends RoleRepository {
+        $fake = new class($roles) extends RoleRepository
+        {
             protected $roles;
 
             public function __construct($roles)

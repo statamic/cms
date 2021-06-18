@@ -144,7 +144,7 @@ export default {
                 page: this.page,
                 site: this.site,
                 exclusions: this.exclusions,
-                filters: btoa(JSON.stringify(this.activeFilters)),
+                filters: utf8btoa(JSON.stringify(this.activeFilters)),
             }
         },
 

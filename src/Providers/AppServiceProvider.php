@@ -30,7 +30,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
+            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -62,8 +63,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
             return $this->to(cp_route($route, $parameters));
         });
-
-        Carbon::setToStringFormat(config('statamic.system.date_format'));
 
         Carbon::macro('inPreferredFormat', function () {
             return $this->format(

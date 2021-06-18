@@ -1,6 +1,6 @@
 import { Mark, Plugin, TextSelection } from 'tiptap'
 import { updateMark, removeMark, pasteRule } from 'tiptap-commands'
-import { getMarkRange } from 'tiptap-utils'
+import { getMarkAttrs, getMarkRange } from 'tiptap-utils'
 
 export default class Link extends Mark {
 
@@ -12,8 +12,9 @@ export default class Link extends Mark {
         return {
             attrs: {
                 href: { default: null },
-                target: { default: null },
                 rel: { default: null },
+                target: { default: null },
+                title: { default: null },
             },
             inclusive: false,
             parseDOM: [
@@ -21,8 +22,9 @@ export default class Link extends Mark {
                     tag: 'a[href]',
                     getAttrs: dom => ({
                         href: dom.getAttribute('href'),
-                        target: dom.getAttribute('target'),
                         rel: dom.getAttribute('rel'),
+                        target: dom.getAttribute('target'),
+                        title: dom.getAttribute('title'),
                     }),
                 },
             ],
@@ -64,9 +66,10 @@ export default class Link extends Mark {
                             const $end = doc.resolve(range.to)
                             const selection = new TextSelection($start, $end)
                             const transaction = tr.setSelection(selection)
+                            const attrs = getMarkAttrs(view.state, schema.marks.link)
 
                             view.dispatch(transaction)
-                            vm.$emit('link-selected', selection)
+                            vm.$emit('link-selected', attrs)
                         } else {
                             vm.$emit('link-deselected')
                         }

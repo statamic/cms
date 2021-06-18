@@ -27,13 +27,6 @@ class UsersFieldtypeTest extends TestCase
     /** @test */
     public function it_gets_multiple_users()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_users' => [2, 3],
-        ])->create();
-        User::make()->id(2)->set('name', 'Burt')->save();
-        User::make()->id(3)->set('name', 'Janet')->save();
-
         $article = Blueprint::makeFromFields([
             'related_users' => ['type' => 'users'],
         ]);
@@ -41,6 +34,13 @@ class UsersFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_users' => [2, 3],
+        ])->create();
+        User::make()->id(2)->set('name', 'Burt')->save();
+        User::make()->id(3)->set('name', 'Janet')->save();
 
         $query = <<<'GQL'
 {
@@ -74,12 +74,6 @@ GQL;
     /** @test */
     public function it_gets_single_user()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_user' => 2,
-        ])->create();
-        User::make()->id(2)->set('name', 'Burt')->save();
-
         $article = Blueprint::makeFromFields([
             'related_user' => ['type' => 'users', 'max_items' => 1],
         ]);
@@ -87,6 +81,12 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_user' => 2,
+        ])->create();
+        User::make()->id(2)->set('name', 'Burt')->save();
 
         $query = <<<'GQL'
 {

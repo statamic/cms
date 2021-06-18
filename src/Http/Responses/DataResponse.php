@@ -4,6 +4,7 @@ namespace Statamic\Http\Responses;
 
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Str;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -112,13 +113,13 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        if (! $this->isLivePreview() && ! $this->data->published()) {
-            throw new NotFoundHttpException;
+        if ($this->data->published()) {
+            return $this;
         }
 
-        if ($this->isLivePreview()) {
-            $this->headers['X-Statamic-Draft'] = true;
-        }
+        throw_unless($this->isLivePreview(), new NotFoundHttpException);
+
+        $this->headers['X-Statamic-Draft'] = true;
 
         return $this;
     }
@@ -129,19 +130,35 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_if($this->data->private(), new NotFoundHttpException);
+        if (! $this->data->private()) {
+            return $this;
+        }
+
+        throw_unless($this->isLivePreview(), new NotFoundHttpException);
+
+        $this->headers['X-Statamic-Private'] = true;
 
         return $this;
     }
 
-    protected function contents()
+    protected function view()
     {
         return (new View)
             ->template($this->data->template())
             ->layout($this->data->layout())
             ->with($this->with)
-            ->cascadeContent($this->data)
-            ->render();
+            ->cascadeContent($this->data);
+    }
+
+    protected function contents()
+    {
+        $contents = $this->view()->render();
+
+        if ($this->isLivePreview()) {
+            $contents = $this->versionJavascriptModules($contents);
+        }
+
+        return $contents;
     }
 
     protected function cascade()
@@ -151,7 +168,10 @@ class DataResponse implements Responsable
 
     protected function adjustResponseType()
     {
-        $contentType = $this->data->get('content_type', 'html');
+        $contentType = $this->data->get(
+            'content_type',
+            $this->view()->wantsXmlResponse() ? 'xml' : 'html'
+        );
 
         if ($contentType !== 'html') {
             $this->headers['Content-Type'] = self::contentType($contentType);
@@ -179,6 +199,26 @@ class DataResponse implements Responsable
     protected function isLivePreview()
     {
         return $this->request->headers->get('X-Statamic-Live-Preview');
+    }
+
+    protected function versionJavascriptModules($contents)
+    {
+        return preg_replace_callback('~<script[^>]*type=("|\')module\1[^>]*>~i', function ($scriptMatches) {
+            return preg_replace_callback('~src=("|\')(.*?)\1~i', function ($matches) {
+                $quote = $matches[1];
+                $url = $matches[2];
+
+                $parameter = 't='.(microtime(true) * 10000);
+
+                if (Str::contains($url, '?')) {
+                    $url = str_replace('?', "?$parameter&", $url);
+                } else {
+                    $url .= "?$parameter";
+                }
+
+                return 'src='.$quote.$url.$quote;
+            }, $scriptMatches[0]);
+        }, $contents);
     }
 
     public static function contentType($type)

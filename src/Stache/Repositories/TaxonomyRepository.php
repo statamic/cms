@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\TaxonomyRepository as RepositoryContract;
 use Statamic\Facades;
-use Statamic\Facades\Site;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
 
@@ -62,16 +61,16 @@ class TaxonomyRepository implements RepositoryContract
     public function findByUri(string $uri, string $site = null): ?Taxonomy
     {
         $collection = Facades\Collection::all()
-            ->first(function ($collection) use ($uri) {
-                if (Str::startsWith($uri, $collection->url())) {
+            ->first(function ($collection) use ($uri, $site) {
+                if (Str::startsWith($uri, $collection->uri($site))) {
                     return true;
                 }
 
-                return Site::hasMultiple() ? false : Str::startsWith($uri, '/'.$collection->handle());
+                return Str::startsWith($uri, '/'.$collection->handle());
             });
 
         if ($collection) {
-            $uri = Str::after($uri, $collection->url() ?? $collection->handle());
+            $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
         }
 
         // If the collection is mounted to the home page, the uri would have

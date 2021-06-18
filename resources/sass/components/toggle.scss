@@ -100,6 +100,8 @@ $toggle_radius: 20px;
 .publish-sidebar .toggle-fieldtype {
     @apply flex items-center justify-between;
     .field-inner > label { margin: 0; }
+    .toggle-fieldtype-wrapper { margin-left: 8px; }
+    .help-block { margin-top: 4px !important; }
 }
 
 /* Inside a Grid field

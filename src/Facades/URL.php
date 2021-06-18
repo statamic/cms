@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Facade;
  * @method static string format($url)
  * @method static bool isExternal($url)
  * @method static string getSiteUrl()
- * @method static string buildFromPath($path)
  * @method static string encode($url)
  * @method static mixed getDefaultUri($locale, $uri)
  * @method static string gravatar($email, $size = null)

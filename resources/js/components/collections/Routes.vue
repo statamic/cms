@@ -3,7 +3,7 @@
     <div>
         <div v-if="hasMultipleSites">
             <div class="radio-fieldtype mb-1">
-                <radio-fieldtype handle="route_mode" v-model="routeMode" :config="{
+                <radio-fieldtype handle="route_mode" :value="routeMode" @input="setRouteMode" :config="{
                     inline: true,
                     options: {
                         single: 'Single route',
@@ -11,7 +11,7 @@
                     }
                 }" />
             </div>
-            <table class="grid-table" v-if="perSiteRouting">
+            <table class="grid-table" v-if="hasPerSiteRouting">
                 <thead>
                     <tr>
                         <th>Site</th>
@@ -32,8 +32,8 @@
             </table>
         </div>
 
-        <div v-if="!hasMultipleSites || !perSiteRouting">
-            <text-input v-model="singleRoute" class="font-mono text-xs" />
+        <div v-if="!hasMultipleSites || !hasPerSiteRouting">
+            <text-input :value="value" @input="update" class="font-mono text-xs" />
         </div>
     </div>
 
@@ -48,16 +48,17 @@ export default {
 
     data() {
         return {
-            routeMode: null,
-            singleRoute: null,
+            singleValue: null,
+            multipleValue: null,
         }
     },
 
-    created() {
-        this.routeMode = this.identicalRoutes ? 'single' : 'multiple';
-    },
 
     computed: {
+
+        routeMode() {
+            return (typeof this.value === 'string') ? 'single' : 'multiple';
+        },
 
         sites() {
             let state = this.$store.state.publish[this.storeName];
@@ -76,35 +77,38 @@ export default {
             return this.sites.length > 1;
         },
 
-        perSiteRouting() {
+        hasPerSiteRouting() {
             return this.routeMode === 'multiple';
         },
-
-        identicalRoutes() {
-            return _.uniq(Object.values(this.value)).length === 1;
-        }
-
-    },
-
-    watch: {
-
-        singleRoute(route) {
-            this.update(route);
-        },
-
-        routeMode(mode) {
-            if (mode === 'single') {
-                this.singleRoute = Object.values(this.value)[0];
-            } else {
-                let value = {};
-                this.sites.forEach(site => value[site.handle] = '');
-                this.update(value);
-            }
-        }
 
     },
 
     methods: {
+
+        setRouteMode(mode) {
+            if (mode === this.routeMode) return;
+
+            let value;
+
+            if (mode === 'single') {
+                this.multipleValue = this.value;
+
+                value = this.singleValue || Object.values(this.value)[0];
+            } 
+            
+            if (mode === 'multiple') {
+                this.singleValue = this.value;
+                
+                if (this.multipleValue) {
+                    value = this.multipleValue;
+                } else {
+                    value = {};
+                    this.sites.forEach(site => value[site.handle] = '');
+                }
+            }
+
+            if (value) this.update(value);
+        },
 
         updateSiteRoute(site, route) {
             let value = this.value;

@@ -240,34 +240,9 @@ class URL
             return config('app.url');
         }
 
-        $protocol = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443)
-            ? 'https://'
-            : 'http://';
+        $rootUrl = app('request')->root();
 
-        $domain_name = $_SERVER['HTTP_HOST'].'/';
-
-        return $protocol.$domain_name;
-    }
-
-    /**
-     * Build a page URL from a path.
-     *
-     * @param string $path
-     * @return string
-     */
-    public function buildFromPath($path)
-    {
-        $path = Path::makeRelative($path);
-
-        $ext = pathinfo($path)['extension'];
-
-        $path = Path::clean($path);
-
-        $path = preg_replace('/^pages/', '', $path);
-
-        $path = preg_replace('#\/(?:[a-z]+\.)?index\.'.$ext.'$#', '', $path);
-
-        return Str::ensureLeft($path, '/');
+        return Str::ensureRight($rootUrl, '/');
     }
 
     /**

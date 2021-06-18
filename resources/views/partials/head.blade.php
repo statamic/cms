@@ -19,6 +19,10 @@
 <link href="{{ config('statamic.cp.custom_css_url') }}?v={{ Statamic::version() }}" rel="stylesheet" />
 @endif
 
+@foreach (Statamic::availableExternalStyles(request()) as $url)
+    <link href="{{ $url }}" rel="stylesheet" />
+@endforeach
+
 @foreach (Statamic::availableStyles(request()) as $package => $paths)
     @foreach ($paths as $path)
         <link href="{{ Statamic::vendorAssetUrl("$package/css/$path") }}" rel="stylesheet" />
