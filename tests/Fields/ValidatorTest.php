@@ -50,9 +50,11 @@ class ValidatorTest extends TestCase
     public function it_compiles_field_rules()
     {
         $fieldWithItsOwnRules = Mockery::mock(Field::class);
+        $fieldWithItsOwnRules->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $fieldWithItsOwnRules->shouldReceive('rules')->andReturn(['one' => ['required']]);
 
         $fieldWithExtraRules = Mockery::mock(Field::class);
+        $fieldWithExtraRules->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $fieldWithExtraRules->shouldReceive('rules')->andReturn([
             'two' => ['required', 'array'],
             'another' => ['min:2'],
@@ -96,6 +98,7 @@ class ValidatorTest extends TestCase
     public function it_merges_additional_rules_into_field_rules()
     {
         $field = Mockery::mock(Field::class);
+        $field->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $field->shouldReceive('rules')->andReturn([
             'one' => ['required', 'array'],
             'extra' => ['min:2'],
