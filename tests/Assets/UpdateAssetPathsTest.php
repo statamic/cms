@@ -116,66 +116,6 @@ class UpdateAssetPathsTest extends TestCase
     }
 
     /** @test */
-    public function it_doesnt_update_assets_from_another_container()
-    {
-        $collection = tap(Facades\Collection::make('articles'))->save();
-
-        $this->setInBlueprints('collections/articles', [
-            'fields' => [
-                [
-                    'handle' => 'avatar',
-                    'field' => [
-                        'type' => 'assets',
-                        'container' => 'test_container',
-                        'max_files' => 1,
-                    ],
-                ],
-                [
-                    'handle' => 'wrong_avatar',
-                    'field' => [
-                        'type' => 'assets',
-                        'container' => 'wrong_container',
-                        'max_files' => 1,
-                    ],
-                ],
-                [
-                    'handle' => 'pics',
-                    'field' => [
-                        'type' => 'assets',
-                        'container' => 'test_container',
-                    ],
-                ],
-                [
-                    'handle' => 'wrong_pics',
-                    'field' => [
-                        'type' => 'assets',
-                        'container' => 'wrong_container',
-                    ],
-                ],
-            ],
-        ]);
-
-        $entry = tap(Facades\Entry::make()->collection($collection)->data([
-            'avatar' => 'hoff.jpg',
-            'wrong_avatar' => 'hoff.jpg',
-            'pics' => ['hoff.jpg', 'norris.jpg'],
-            'wrong_pics' => ['hoff.jpg', 'norris.jpg'],
-        ]))->save();
-
-        $this->assertEquals('hoff.jpg', $entry->get('avatar'));
-        $this->assertEquals('hoff.jpg', $entry->get('wrong_avatar'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->get('pics'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->get('wrong_pics'));
-
-        $this->assetHoff->path('hoff-new.jpg')->save();
-
-        $this->assertEquals('hoff-new.jpg', $entry->fresh()->get('avatar'));
-        $this->assertEquals('hoff.jpg', $entry->fresh()->get('wrong_avatar'));
-        $this->assertEquals(['hoff-new.jpg', 'norris.jpg'], $entry->fresh()->get('pics'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->fresh()->get('wrong_pics'));
-    }
-
-    /** @test */
     public function it_updates_nested_asset_fields_within_replicator_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -682,6 +622,132 @@ EOT;
         $this->assertEquals('# Markdown: ![](statamic://asset::test_container::content/norris.jpg)', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.bio'));
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.product'));
         $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.pics'));
+    }
+
+    /** @test */
+    public function it_doesnt_update_assets_from_another_container()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'wrong_avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'wrong_container',
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'pics',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'wrong_pics',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'wrong_container',
+                    ],
+                ],
+                [
+                    'handle' => 'marky',
+                    'field' => [
+                        'type' => 'markdown',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'wrong_marky',
+                    'field' => [
+                        'type' => 'markdown',
+                        'container' => 'wrong_container',
+                    ],
+                ],
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'wrong_bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'wrong_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'hoff.jpg',
+            'wrong_avatar' => 'hoff.jpg',
+            'pics' => ['hoff.jpg', 'norris.jpg'],
+            'wrong_pics' => ['hoff.jpg', 'norris.jpg'],
+            'marky' => '# Markdown ![](statamic://asset::test_container::hoff.jpg)',
+            'wrong_marky' => '# Markdown ![](statamic://asset::test_container::hoff.jpg)',
+            'bardo' => [
+                [
+                    'content' => [
+                        'type' => 'paragraph',
+                        'content' => [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'statamic://asset::test_container::hoff.jpg',
+                                'alt' => 'norris',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'wrong_bardo' => [
+                [
+                    'content' => [
+                        'type' => 'paragraph',
+                        'content' => [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'statamic://asset::test_container::hoff.jpg',
+                                'alt' => 'norris',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $entry->get('avatar'));
+        $this->assertEquals('hoff.jpg', $entry->get('wrong_avatar'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->get('pics'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->get('wrong_pics'));
+        $this->assertEquals('# Markdown ![](statamic://asset::test_container::hoff.jpg)', $entry->get('marky'));
+        $this->assertEquals('# Markdown ![](statamic://asset::test_container::hoff.jpg)', $entry->get('wrong_marky'));
+        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.content.attrs.src'));
+        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->data(), 'wrong_bardo.0.content.content.attrs.src'));
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals('hoff-new.jpg', $entry->fresh()->get('avatar'));
+        $this->assertEquals('hoff.jpg', $entry->fresh()->get('wrong_avatar'));
+        $this->assertEquals(['hoff-new.jpg', 'norris.jpg'], $entry->fresh()->get('pics'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->fresh()->get('wrong_pics'));
+        $this->assertEquals('# Markdown ![](statamic://asset::test_container::hoff-new.jpg)', $entry->fresh()->get('marky'));
+        $this->assertEquals('# Markdown ![](statamic://asset::test_container::hoff.jpg)', $entry->fresh()->get('wrong_marky'));
+        $this->assertEquals('statamic://asset::test_container::hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.content.attrs.src'));
+        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->fresh()->data(), 'wrong_bardo.0.content.content.attrs.src'));
     }
 
     /** @test */
