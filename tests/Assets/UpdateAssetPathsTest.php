@@ -751,6 +751,45 @@ EOT;
     }
 
     /** @test */
+    public function it_updates_assets_when_the_container_is_implied()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        // 'container' => 'test_container', // Not required when there is only one container!
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'pics',
+                    'field' => [
+                        'type' => 'assets',
+                        // 'container' => 'test_container', // Not required when there is only one container!
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'hoff.jpg',
+            'pics' => ['hoff.jpg', 'norris.jpg'],
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $entry->get('avatar'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->get('pics'));
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals('hoff-new.jpg', $entry->fresh()->get('avatar'));
+        $this->assertEquals(['hoff-new.jpg', 'norris.jpg'], $entry->fresh()->get('pics'));
+    }
+
+    /** @test */
     public function it_updates_entries()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();

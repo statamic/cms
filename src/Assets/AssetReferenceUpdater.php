@@ -2,6 +2,7 @@
 
 namespace Statamic\Assets;
 
+use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Fields;
 use Statamic\Support\Arr;
 
@@ -85,7 +86,7 @@ class AssetReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'assets'
-                    && $field->get('container') === $this->container;
+                    && $this->getConfiguredAssetsFieldContainer($field) === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $field->get('max_files') === 1
@@ -229,6 +230,25 @@ class AssetReferenceUpdater
                 $this->updateAssets($dottedPrefix, new Fields($fields));
             }
         });
+    }
+
+    /**
+     * Get configured assets field container, or implied asset container if only one exists.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @return string
+     */
+    protected function getConfiguredAssetsFieldContainer($field)
+    {
+        if ($container = $field->get('container')) {
+            return $container;
+        }
+
+        $containers = AssetContainer::all();
+
+        return $containers->count() === 1
+            ? $containers->first()->handle()
+            : null;
     }
 
     /**
