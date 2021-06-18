@@ -111,6 +111,7 @@ class TaxonomyTermsStore extends ChildStore
                 'value' => $value,
                 'slug' => $slug,
                 'entry' => $entry->id(),
+                'collection' => $entry->collectionHandle(),
                 'site' => $entry->locale(),
             ]);
         }

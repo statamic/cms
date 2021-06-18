@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
@@ -24,6 +25,7 @@ abstract class Fieldtype implements Arrayable
     protected $validatable = true;
     protected $defaultable = true;
     protected $selectable = true;
+    protected $selectableInForms = false;
     protected $categories = ['text'];
     protected $rules = [];
     protected $extraRules = [];
@@ -76,6 +78,16 @@ abstract class Fieldtype implements Arrayable
     public function selectable(): bool
     {
         return $this->selectable;
+    }
+
+    public function selectableInForms(): bool
+    {
+        return $this->selectableInForms ?: FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+    }
+
+    public static function makeSelectableInForms()
+    {
+        FieldtypeRepository::makeSelectableInForms(self::handle());
     }
 
     public function categories(): array
@@ -131,7 +143,6 @@ abstract class Fieldtype implements Arrayable
             'localizable' => $this->localizable(),
             'validatable' => $this->validatable(),
             'defaultable' => $this->defaultable(),
-            'selectable'  => $this->selectable(),
             'categories' => $this->categories(),
             'icon' => $this->icon(),
             'config' => $this->configFields()->toPublishArray(),
