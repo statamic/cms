@@ -157,7 +157,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_merges_extra_validation_attributes_from_field_with_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function extraValidationAttributes(): array
             {
                 return [
