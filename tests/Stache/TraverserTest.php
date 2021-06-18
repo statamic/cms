@@ -93,7 +93,8 @@ class TraverserTest extends TestCase
 
         $stache = Mockery::mock(Stache::class);
         $stache->shouldReceive('sites')->andReturn(collect(['en']));
-        $store = new class($stache, app('files')) extends BasicStore {
+        $store = new class($stache, app('files')) extends BasicStore
+        {
             public function key()
             {
             }

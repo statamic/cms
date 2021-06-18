@@ -2,7 +2,6 @@
 
 namespace Tests\Data\Structures;
 
-use Statamic\Structures\Structure;
 use Tests\TestCase;
 
 abstract class StructureTestCase extends TestCase

@@ -5,7 +5,6 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Asset;
-use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Imaging\PresetGenerator;
 

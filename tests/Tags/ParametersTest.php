@@ -21,7 +21,8 @@ class ParametersTest extends TestCase
             ],
         ]);
 
-        $fieldtype = new class extends \Statamic\Fields\Fieldtype {
+        $fieldtype = new class extends \Statamic\Fields\Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;

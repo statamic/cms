@@ -51,7 +51,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_gets_the_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
         };
 
         FieldtypeRepository::shouldReceive('find')
@@ -66,7 +67,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_gets_validation_rules_from_field()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $rules = null;
         };
 
@@ -87,7 +89,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_gets_validation_rules_from_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $rules = 'min:2|max:5';
         };
 
@@ -105,7 +108,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_merges_validation_rules_from_field_with_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $rules = 'min:2|max:5';
         };
 
@@ -126,7 +130,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_merges_extra_fieldtype_rules()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $extraRules = [
                 'test.*.one' => 'required|min:2',
                 'test.*.two' => 'max:2',
@@ -152,7 +157,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_merges_extra_validation_attributes_from_field_with_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function extraValidationAttributes(): array
             {
                 return [
@@ -181,7 +187,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_checks_if_a_field_is_required_when_defined_in_field()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $rules = null;
         };
 
@@ -206,7 +213,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_checks_if_a_field_is_required_when_defined_in_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $rules = 'required|min:2';
         };
 
@@ -225,7 +233,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_checks_if_a_field_is_required_when_defined_as_its_own_field_property()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $rules = null;
         };
 
@@ -258,7 +267,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_adds_nullable_rule_when_not_required()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $rules = null;
         };
 
@@ -298,7 +308,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('example')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 protected $component = 'example';
                 protected $configFields = [
                     'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
@@ -308,7 +319,8 @@ class FieldTest extends TestCase
 
         FieldtypeRepository::shouldReceive('find')
                 ->with('with_processing')
-                ->andReturn(new class extends Fieldtype {
+                ->andReturn(new class extends Fieldtype
+                {
                     public function preProcess($data)
                     {
                         return $data.' preprocessed';
@@ -317,7 +329,8 @@ class FieldTest extends TestCase
 
         FieldtypeRepository::shouldReceive('find')
                 ->with('without_processing')
-                ->andReturn(new class extends Fieldtype {
+                ->andReturn(new class extends Fieldtype
+                {
                     public function preProcess($data)
                     {
                         return $data;
@@ -364,7 +377,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function process($data)
                 {
                     return $data.' processed';
@@ -384,7 +398,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcess($data)
                 {
                     return $data.' preprocessed';
@@ -404,7 +419,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcessIndex($data)
                 {
                     return $data.' preprocessed for index';
@@ -424,7 +440,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcess($data)
                 {
                     return $data.' preprocessed';
@@ -444,7 +461,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcess($data)
                 {
                     return $data.' preprocessed';
@@ -502,7 +520,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_augments_the_value_through_its_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return $data.' augmented';

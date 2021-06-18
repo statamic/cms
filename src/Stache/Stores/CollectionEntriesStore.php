@@ -142,7 +142,8 @@ class CollectionEntriesStore extends ChildStore
             ->expectsRoot($contents['root'] ?? false)
             ->maxDepth($contents['max_depth'] ?? null);
 
-        $tempStructure = new class extends \Statamic\Structures\Structure {
+        $tempStructure = new class extends \Statamic\Structures\Structure
+        {
             public function collections($collections = null)
             {
                 return collect();
