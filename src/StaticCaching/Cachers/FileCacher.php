@@ -44,10 +44,6 @@ class FileCacher extends AbstractCacher
 
         $path = $this->getFilePath($request->getUri());
 
-        if (strlen(pathinfo($path, PATHINFO_BASENAME)) > $this->config('max_filename_length')) {
-            return Log::debug("Could not write static cache file. File name too long. $path");
-        }
-
         if (! $this->writer->write($path, $content, $this->config('lock_hold_length'))) {
             return;
         }
