@@ -50,7 +50,10 @@ class Form implements FormContract, Augmentable
      */
     public function title($title = null)
     {
-        return $this->fluentlyGetOrSet('title')->args(func_get_args());
+        return $this->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return __($title);
+            })->args(func_get_args());
     }
 
     /**
