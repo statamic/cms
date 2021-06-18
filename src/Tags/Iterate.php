@@ -18,10 +18,16 @@ class Iterate extends Tags
     {
         [$keyKey, $valueKey] = $this->getKeyNames();
 
-        return collect($this->context->get($tag))
+        $items = collect($this->context->get($tag))
             ->map(function ($value, $key) use ($keyKey, $valueKey) {
                 return [$keyKey => $key, $valueKey => $value];
-            })->values();
+            });
+
+        if ($limit = $this->params->int('limit')) {
+            $items = $items->take($limit);
+        }
+
+        return $items->values();
     }
 
     /**

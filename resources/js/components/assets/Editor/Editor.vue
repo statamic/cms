@@ -91,8 +91,8 @@
                         <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
-                    <div class="editor-file-actions">
-                        <button v-if="isImage" type="button" class="btn" @click.prevent="openFocalPointEditor">
+                    <div class="editor-file-actions" v-if="!readOnly">
+                        <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="btn" @click.prevent="openFocalPointEditor">
                             {{ __('Set Focal Point') }}
                         </button>
 
@@ -131,11 +131,16 @@
 
                         <div class="editor-form-fields">
                             <div v-if="error" class="bg-red text-white p-2 shadow mb-2" v-text="error" />
-                            <publish-fields :fields="fields" @updated="setFieldValue" @meta-updated="setFieldMeta" />
+                            <publish-fields 
+                                :fields="fields"
+                                :read-only="readOnly"
+                                @updated="setFieldValue"
+                                @meta-updated="setFieldMeta"
+                            />
                         </div>
 
-                        <div class="editor-form-actions text-right">
-                            <button v-if="canRunAction('delete')" type="button" class="btn-danger mr-1" @click="runAction('delete')">
+                        <div class="editor-form-actions text-right" v-if="!readOnly">
+                            <button v-if="allowDeleting && canRunAction('delete')" type="button" class="btn-danger mr-1" @click="runAction('delete')">
                                 {{ __('Delete') }}
                             </button>
                             <button type="button" class="btn-primary" @click="save">
@@ -153,7 +158,7 @@
 
         <portal to="outside">
             <focal-point-editor
-                v-if="showFocalPointEditor"
+                v-if="showFocalPointEditor && isFocalPointEditorEnabled"
                 :data="values.focus"
                 :image="asset.preview"
                 @selected="selectFocalPoint"
@@ -163,7 +168,7 @@
                 v-if="actions.length"
                 :id="id"
                 :actions="actions"
-                :url="runActionUrl"
+                :url="actionUrl"
                 @started="actionStarted"
                 @completed="actionCompleted" />
         </portal>
@@ -191,6 +196,9 @@ export default {
     props: {
         id: {
             required: true
+        },
+        readOnly: {
+            type: Boolean,
         },
         allowDeleting: {
             type: Boolean,
@@ -240,8 +248,12 @@ export default {
         canUseGoogleDocsViewer()
         {
             return Statamic.$config.get('googleDocsViewer');
-        }
+        },
 
+        isFocalPointEditorEnabled()
+        {
+            return Statamic.$config.get("focalPointEditorEnabled");
+        }
     },
 
 
@@ -269,14 +281,14 @@ export default {
         load() {
             this.loading = true;
 
-            const url = cp_url(`assets/${btoa(this.id)}`);
+            const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
             this.$axios.get(url).then(response => {
                 const data = response.data.data;
                 this.asset = data;
                 this.values = data.values;
                 this.meta = data.meta;
-                this.runActionUrl = data.runActionUrl;
+                this.actionUrl = data.actionUrl;
                 this.actions = data.actions;
 
                 this.fieldset = data.blueprint;
@@ -317,7 +329,7 @@ export default {
          */
         save() {
             this.saving = true;
-            const url = cp_url(`assets/${btoa(this.id)}`);
+            const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
             this.$axios.patch(url, this.values).then(response => {
                 this.$emit('saved', response.data.asset);

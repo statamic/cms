@@ -78,7 +78,8 @@
                     v-if="!reordering && canCreate"
                     button-class="btn-primary"
                     :url="createUrl"
-                    :blueprints="blueprints" />
+                    :blueprints="blueprints"
+                    :text="createLabel" />
             </div>
 
         </header>
@@ -91,8 +92,7 @@
             :initial-sort-direction="sortDirection"
             :initial-columns="columns"
             :filters="filters"
-            :run-action-url="runActionUrl"
-            :bulk-actions-url="bulkActionsUrl"
+            :action-url="actionUrl"
             :reordering="reordering"
             :reorder-url="reorderUrl"
             :site="site"
@@ -134,11 +134,13 @@
                         @click="createEntry(blueprint.handle, branch.id)"
                         v-text="blueprints.length > 1 ? blueprint.title : __('Create Child Entry')" />
                 </template>
-                <li class="divider"></li>
-                <dropdown-item
-                    :text="__('Delete')"
-                    class="warning"
-                    @click="deleteTreeBranch(branch, removeBranch, orphanChildren)" />
+                <template v-if="branch.can_delete">
+                    <li class="divider"></li>
+                    <dropdown-item
+                        :text="__('Delete')"
+                        class="warning"
+                        @click="deleteTreeBranch(branch, removeBranch, orphanChildren)" />
+                </template>
             </template>
         </page-tree>
 
@@ -179,6 +181,7 @@ export default {
         handle: { type: String, required: true },
         canCreate: { type: Boolean, required: true },
         createUrl: { type: String, required: true },
+        createLabel: { type: String, required: true },
         blueprints: { type: Array, required: true },
         breadcrumbUrl: { type: String, required: true },
         structured: { type: Boolean, default: false },
@@ -186,8 +189,7 @@ export default {
         sortDirection: { type: String, required: true },
         columns: { type: Array, required: true },
         filters: { type: Array, required: true },
-        runActionUrl: { type: String, required: true },
-        bulkActionsUrl: { type: String, required: true },
+        actionUrl: { type: String, required: true },
         reorderUrl: { type: String, required: true },
         initialSite: { type: String, required: true },
         sites: { type: Array },

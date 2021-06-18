@@ -140,7 +140,9 @@ class CollectionsController extends CpController
             'layout' => $collection->layout(),
             'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
-            'routes' => $collection->routes()->all(),
+            'routes' => $collection->routes()->unique()->count() === 1
+                ? $collection->routes()->first()
+                : $collection->routes()->all(),
             'mount' => optional($collection->mount())->id(),
         ];
 
@@ -266,7 +268,7 @@ class CollectionsController extends CpController
     protected function makeStructure($collection, $maxDepth, $expectsRoot, $sites)
     {
         if (! $structure = $collection->structure()) {
-            $structure = (new CollectionStructure)->collection($collection);
+            $structure = new CollectionStructure;
         }
 
         return $structure
@@ -435,6 +437,9 @@ class CollectionsController extends CpController
                         'type' => 'entries',
                         'max_items' => 1,
                         'create' => false,
+                        'collections' => Collection::all()->map->handle()->reject(function ($collectionHandle) use ($collection) {
+                            return $collectionHandle === $collection->handle();
+                        })->values()->all(),
                     ],
                     'amp' => [
                         'display' => __('Enable AMP'),

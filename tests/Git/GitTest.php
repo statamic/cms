@@ -98,6 +98,38 @@ EOT;
     }
 
     /** @test */
+    public function it_filters_out_external_paths_that_are_not_separate_repos()
+    {
+        // If a user symlinks an assets folder for example, this will fail if not a repo itself.
+        $notARepoPath = Path::resolve(base_path('../../../../..'));
+
+        Config::set('statamic.git.paths', [
+            'content/collections',
+            'content/taxonomies',
+            $notARepoPath,
+        ]);
+
+        $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
+        $this->files->put(base_path('content/taxonomies/tags.yaml'), 'title: Added Tags');
+        $this->files->put(base_path('content/untracked.yaml'), 'title: Untracked File');
+
+        $statuses = Git::statuses();
+        $contentStatus = $statuses->get(Path::resolve(base_path('content')));
+
+        $expectedContentStatus = <<<'EOT'
+ M collections/pages.yaml
+?? taxonomies/tags.yaml
+EOT;
+
+        $this->assertEquals($expectedContentStatus, $contentStatus->status);
+
+        $this->assertEquals(2, $contentStatus->totalCount);
+        $this->assertEquals(1, $contentStatus->addedCount);
+        $this->assertEquals(1, $contentStatus->modifiedCount);
+        $this->assertEquals(0, $contentStatus->deletedCount);
+    }
+
+    /** @test */
     public function it_gets_git_user_info()
     {
         $this->assertEquals('Spock', Git::gitUserName());

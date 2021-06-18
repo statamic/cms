@@ -3,7 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Entry;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 
@@ -13,29 +15,22 @@ class CollectionStructureController extends CpController
     {
         $this->authorize('reorder', $collection);
 
-        $deletedEntries = collect(
-            $request->deletedEntries ?? []
-        )->map(function ($id) {
-            return Entry::find($id);
-        });
+        $contents = $this->toTree($request->pages);
 
-        if ($request->deleteLocalizationBehavior === 'copy') {
-            $deletedEntries->each->detachLocalizations();
-        } else {
-            $deletedEntries->each->deleteDescendants();
-        }
+        $structure = $collection->structure();
+        $tree = $structure->in($request->site);
 
-        $deletedEntries->each->delete();
+        // Clone the tree and add the submitted contents into it so we can
+        // validate URI uniqueness without affecting the real object in memory.
+        $this->validateUniqueUris((clone $tree)->disableUriCache()->tree($contents));
 
-        $tree = $this->toTree($request->pages);
+        // Validate the tree, which will add any missing entries or throw an exception
+        // if somehow the root would end up having child pages, which isn't allowed.
+        $contents = $structure->validateTree($contents, $request->site);
 
-        $tree = $collection->structure()->validateTree($tree, $request->site);
+        $this->deleteEntries($request);
 
-        $collection
-            ->structure()
-            ->in($request->site)
-            ->tree($tree)
-            ->save();
+        $tree->tree($contents)->save();
     }
 
     protected function toTree($items)
@@ -48,5 +43,50 @@ class CollectionStructureController extends CpController
                 'children' => $this->toTree($item['children']),
             ]);
         })->all();
+    }
+
+    private function validateUniqueUris($tree)
+    {
+        if (! $tree->collection()->route($tree->locale())) {
+            return;
+        }
+
+        foreach ($tree->diff()->moved() as $id) {
+            $page = $tree->page($id);
+            $parent = $page->parent();
+
+            $siblings = (! $parent || $parent->isRoot())
+                ? $tree->pages()->all()->slice(1)
+                : $page->parent()->pages()->all();
+
+            $siblings = $siblings->reject(function ($sibling) use ($id) {
+                return $sibling->reference() === $id;
+            });
+
+            $uris = $siblings->map->uri();
+
+            if ($uris->contains($uri = $page->uri())) {
+                throw ValidationException::withMessages(['uri' => trans('statamic::validation.duplicate_uri', ['value' => $uri])]);
+            }
+        }
+    }
+
+    private function deleteEntries($request)
+    {
+        $deletedEntries = collect($request->deletedEntries ?? [])
+            ->map(function ($id) {
+                return Entry::find($id);
+            })
+            ->filter(function ($entry) {
+                return User::current()->can('delete', $entry);
+            });
+
+        if ($request->deleteLocalizationBehavior === 'copy') {
+            $deletedEntries->each->detachLocalizations();
+        } else {
+            $deletedEntries->each->deleteDescendants();
+        }
+
+        $deletedEntries->each->delete();
     }
 }

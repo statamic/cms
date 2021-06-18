@@ -52,6 +52,7 @@ class AugmentedUserTest extends AugmentedTestCase
             ->addToGroup('group_one')
             ->setSupplement('three', 'the "three" value supplemented on the user')
             ->setSupplement('four', 'the "four" value supplemented on the user and in the blueprint')
+            ->setPreferredLocale('en')
         )->save();
 
         $user->setMeta('last_login', '1486131000');
@@ -69,6 +70,7 @@ class AugmentedUserTest extends AugmentedTestCase
             'last_login' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'avatar'     => ['type' => 'string', 'value' => null],
             'api_url'    => ['type' => 'string', 'value' => 'http://localhost/api/users/user-id'],
+            'preferred_locale' => ['type' => 'string', 'value' => 'en'],
 
             'roles'       => ['type' => 'array', 'value' => ['role_one']],
             'is_role_one' => ['type' => 'bool', 'value' => true],

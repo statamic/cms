@@ -16,6 +16,13 @@ class Redirect extends Tags
 
     public function index()
     {
+        if ($route = $this->params->get('route')) {
+            return $this->redirect(route(
+                $route,
+                $this->params->forget('route')->all()
+            ));
+        }
+
         return $this->redirect(
             $this->params->get(['to', 'url'])
         );

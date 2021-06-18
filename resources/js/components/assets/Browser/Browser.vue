@@ -73,8 +73,10 @@
 
                                 </div>
 
+                                <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
+
                                 <data-list-bulk-actions
-                                    :url="bulkActionsUrl"
+                                    :url="actionUrl"
                                     :context="actionContext"
                                     :show-always="mode === 'grid'"
                                     @started="actionStarted"
@@ -101,8 +103,8 @@
                                     <tr v-if="folder && folder.parent_path && !restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
-                                            <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
+                                            <a class="flex items-center cursor-pointer group">
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue"></file-icon>
                                                 ..
                                             </a>
                                         </td>
@@ -111,8 +113,8 @@
                                     <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
-                                            <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
+                                            <a class="flex items-center cursor-pointer group">
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue"></file-icon>
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
@@ -126,7 +128,7 @@
 
                                                 <data-list-inline-actions
                                                     :item="folder.path"
-                                                    :url="runFolderActionUrl"
+                                                    :url="folderActionUrl"
                                                     :actions="folderActions(folder)"
                                                     @started="actionStarted"
                                                     @completed="actionCompleted"
@@ -156,11 +158,11 @@
 
                                 <template slot="actions" slot-scope="{ row: asset }">
                                     <dropdown-list>
-                                        <dropdown-item :text="__('Edit')" @click="edit(asset.id)" />
+                                        <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
-                                            :url="runActionUrl"
+                                            :url="actionUrl"
                                             :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"
@@ -223,6 +225,7 @@
         <asset-editor
             v-if="showAssetEditor"
             :id="editedAssetId"
+            :read-only="! canEdit"
             @closed="closeAssetEditor"
             @saved="assetSaved"
         />
@@ -242,6 +245,7 @@
 <script>
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
+import Breadcrumbs from './Breadcrumbs.vue';
 import FolderCreator from '../Folder/Create.vue';
 import FolderEditor from '../Folder/Edit.vue';
 import Uploader from '../Uploader.vue';
@@ -252,6 +256,7 @@ export default {
     components: {
         AssetThumbnail,
         AssetEditor,
+        Breadcrumbs,
         Uploader,
         Uploads,
         FolderEditor,
@@ -268,14 +273,15 @@ export default {
         selectedAssets: Array,
         maxFiles: Number,
         initialEditingAssetId: String,
+        autoselectUploads: Boolean,
     },
 
     data() {
         return {
             columns: [
-                { label: __('File'), field: 'basename', visible: true },
-                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true },
-                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true },
+                { label: __('File'), field: 'basename', visible: true, sortable: true },
+                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true, sortable: true },
+                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true, sortable: true },
             ],
             containers: [],
             container: {},
@@ -296,9 +302,8 @@ export default {
             sortColumn: 'basename',
             sortDirection: 'asc',
             mode: 'table',
-            runActionUrl: null,
-            bulkActionsUrl: null,
-            runFolderActionUrl: null,
+            actionUrl: null,
+            folderActionUrl: null,
         }
     },
 
@@ -327,9 +332,7 @@ export default {
         },
 
         canEdit() {
-            return true;
-            // TODO
-            // return this.can('assets:'+ this.container.id +':edit')
+            return this.can('edit '+ this.container.id +' assets')
         },
 
         canUpload() {
@@ -449,7 +452,7 @@ export default {
 
             const url = this.searchQuery
                 ? cp_url(`assets/browse/search/${this.container.id}`)
-                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
+                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
 
             this.$axios.get(url, { params: this.parameters }).then(response => {
                 const data = response.data;
@@ -462,9 +465,8 @@ export default {
                 } else {
                     this.folder = data.data.folder;
                     this.folders = data.data.folder.folders;
-                    this.runActionUrl = data.links.run_asset_action;
-                    this.bulkActionsUrl = data.links.bulk_asset_actions;
-                    this.runFolderActionUrl = data.links.run_folder_action;
+                    this.actionUrl = data.links.asset_action;
+                    this.folderActionUrl = data.links.folder_action;
                 }
 
                 this.loadingAssets = false;
@@ -498,9 +500,7 @@ export default {
         },
 
         edit(id) {
-            if (this.canEdit) {
-                this.editedAssetId = id;
-            }
+            this.editedAssetId = id;
         },
 
         closeAssetEditor() {
@@ -522,6 +522,14 @@ export default {
         },
 
         uploadCompleted(asset) {
+            if (this.autoselectUploads) {
+                this.sortColumn = 'last_modified';
+                this.sortDirection = 'desc';
+
+                this.selectedAssets.push(asset.id);
+                this.$emit('selections-updated', this.selectedAssets);
+            }
+
             this.loadAssets();
             this.$toast.success(__(':file uploaded', { file: asset.basename }));
         },

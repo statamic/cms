@@ -10,7 +10,9 @@ use Statamic\Tags\Tags as BaseTags;
 class Tags extends BaseTags
 {
     use Concerns\OutputsItems,
-        Concerns\QueriesConditions;
+        Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\QueriesOrderBys;
     use Concerns\GetsQueryResults {
         results as getQueryResults;
     }
@@ -23,16 +25,20 @@ class Tags extends BaseTags
             return $this->parseNoResults();
         }
 
+        $supplementData = $this->params->get('supplement_data', true);
+
         $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($this->params->get('supplement_data', true))
+            ->withData($supplementData)
             ->limit($this->params->get('limit'))
             ->offset($this->params->get('offset'));
 
         $this->querySite($builder);
         $this->queryStatus($builder);
         $this->queryConditions($builder);
+        $this->queryScopes($builder);
+        $this->queryOrderBys($builder);
 
         $results = $this->getQueryResults($builder);
         $results = $this->addResultTypes($results);
@@ -42,18 +48,18 @@ class Tags extends BaseTags
 
     protected function addResultTypes($results)
     {
-        return $results->supplement('result_type', function ($result) {
-            $type = null;
+        return $results->map(function ($result) {
+            $reference = is_array($result) ? $result['reference'] : $result->reference();
 
-            if ($result instanceof \Statamic\Contracts\Entries\Entry) {
-                $type = 'entry';
-            } elseif ($result instanceof \Statamic\Contracts\Taxonomies\Term) {
-                $type = 'term';
-            } elseif ($result instanceof \Statamic\Contracts\Assets\Asset) {
-                $type = 'asset';
+            [$type, $id] = explode('::', $reference, 2);
+
+            if (is_array($result)) {
+                $result['result_type'] = $type;
+            } else {
+                $result->setSupplement('result_type', $type);
             }
 
-            return $type;
+            return $result;
         });
     }
 

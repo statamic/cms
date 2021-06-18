@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\HasAugmentedInstance;
@@ -16,14 +17,15 @@ use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
 
-class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
+class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified, ContainsSupplementalData;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified, ContainsSupplementalData, ResolvesValues;
 
     protected $locale;
     protected $term;
@@ -103,7 +105,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
         if (func_num_args() === 1) {
             if ($this->isDefaultLocale()) {
                 $this->term->slug($slug);
-            } elseif ($this->term->slug() !== $slug) {
+            } else {
                 $this->set('slug', $slug);
             }
 

@@ -35,8 +35,10 @@ class Structure extends Tags
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
             'include_home' => $this->params->get('include_home'),
+            'show_unpublished' => $this->params->get('show_unpublished', false),
             'site' => $this->params->get('site', Site::current()->handle()),
             'from' => $this->params->get('from'),
+            'max_depth' => $this->params->get('max_depth'),
         ]);
 
         return $this->toArray($tree);
@@ -46,15 +48,6 @@ class Structure extends Tags
     {
         return collect($tree)->map(function ($item) use ($parent, $depth) {
             $page = $item['page'];
-
-            if ($page->reference() && ! $page->referenceExists()) {
-                return null;
-            }
-
-            if (! $this->params->get('show_unpublished') && $page->entry() && ! $page->entry()->published()) {
-                return null;
-            }
-
             $data = $page->toAugmentedArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
@@ -63,7 +56,7 @@ class Structure extends Tags
                 'parent'      => $parent,
                 'depth'       => $depth,
                 'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->url(), '/'),
-                'is_parent'   => Site::current()->url() === $page->url() ? false : URL::isAncestorOf(URL::getCurrent(), $page->url()),
+                'is_parent'   => Site::current()->url() === $page->url() ? false : URL::isAncestorOf(URL::getCurrent(), $page->urlWithoutRedirect()),
                 'is_external' => URL::isExternal($page->absoluteUrl()),
             ]);
         })->filter()->values()->all();

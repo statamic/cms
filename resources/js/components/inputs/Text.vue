@@ -51,8 +51,6 @@ export default {
     mounted() {
         if (this.autoselect) {
             this.$refs.input.select();
-        } else if (this.autofocus) {
-            this.$refs.input.focus();
         }
     }
 }

@@ -4,6 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Statamic\Facades\CP\Nav;
 use Statamic\Statamic;
+use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -102,6 +103,23 @@ class NavItem
     }
 
     /**
+     * Get or set HTML attributes.
+     *
+     * @param array|null $attrs
+     * @return mixed
+     */
+    public function attributes($attrs = null)
+    {
+        if (is_array($attrs) && ! empty($attrs)) {
+            $attrs = Html::attributes($attrs);
+        }
+
+        return $this
+            ->fluentlyGetOrSet('attributes')
+            ->value($attrs);
+    }
+
+    /**
      * Get or set child nav items.
      *
      * @param array|null $items
@@ -121,7 +139,7 @@ class NavItem
 
         $this->children = collect($items)
             ->map(function ($value, $key) {
-                return $value instanceof NavItem
+                return $value instanceof self
                     ? $value
                     : Nav::item($key)->url($value);
             })

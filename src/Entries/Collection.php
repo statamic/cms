@@ -250,7 +250,7 @@ class Collection implements Contract, AugmentableContract
 
         return Blink::once($blink, function () use ($blueprint) {
             return is_null($blueprint)
-                ? $this->entryBlueprints()->first()
+                ? $this->entryBlueprints()->reject->hidden()->first()
                 : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
         });
     }
@@ -345,6 +345,19 @@ class Collection implements Contract, AugmentableContract
             ->args(func_get_args());
     }
 
+    public function createLabel()
+    {
+        $key = "messages.{$this->handle()}_collection_create_entry";
+
+        $translation = __($key);
+
+        if ($translation === $key) {
+            return __('Create Entry');
+        }
+
+        return $translation;
+    }
+
     public function save()
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
@@ -353,10 +366,6 @@ class Collection implements Contract, AugmentableContract
 
         Blink::forget('collection-handles');
         Blink::flushStartingWith("collection-{$this->id()}");
-
-        if ($this->hasStructure()) { // todo: only if the structure changed.
-            $this->updateEntryUris();
-        }
 
         if ($isNew) {
             CollectionCreated::dispatch($this);
@@ -367,9 +376,16 @@ class Collection implements Contract, AugmentableContract
         return $this;
     }
 
-    public function updateEntryUris()
+    public function updateEntryUris($ids = null)
     {
-        Facades\Collection::updateEntryUris($this);
+        Facades\Collection::updateEntryUris($this, $ids);
+
+        return $this;
+    }
+
+    public function updateEntryOrder($ids = null)
+    {
+        Facades\Collection::updateEntryOrder($this, $ids);
 
         return $this;
     }
@@ -436,17 +452,7 @@ class Collection implements Contract, AugmentableContract
         $array['inject'] = Arr::pull($array, 'cascade');
 
         if ($this->hasStructure()) {
-            $array['structure'] = Arr::removeNullValues([
-                'root' => $this->structure()->expectsRoot(),
-                'max_depth' => $this->structure()->maxDepth(),
-                'tree' => $this->structure()->trees()->map(function ($tree) {
-                    return $tree->fileData()['tree'];
-                })->all(),
-            ]);
-
-            if (! Site::hasMultiple()) {
-                $array['structure']['tree'] = $array['structure']['tree'][Site::default()->handle()];
-            }
+            $array['structure'] = $this->structureContents();
         }
 
         return $array;
@@ -536,8 +542,9 @@ class Collection implements Contract, AugmentableContract
             })
             ->setter(function ($structure) {
                 if ($structure) {
-                    $structure->collection($this);
+                    $structure->handle($this->handle());
                 }
+
                 $this->structureContents = null;
                 Blink::forget("collection-{$this->id()}-structure");
 
@@ -556,28 +563,25 @@ class Collection implements Contract, AugmentableContract
 
                 return $contents;
             })
+            ->getter(function ($contents) {
+                if (! $structure = $this->structure()) {
+                    return null;
+                }
+
+                return Arr::removeNullValues([
+                    'root' => $structure->expectsRoot(),
+                    'max_depth' => $structure->maxDepth(),
+                ]);
+            })
             ->args(func_get_args());
     }
 
     protected function makeStructureFromContents()
     {
-        $structure = (new CollectionStructure)
-            ->collection($this)
+        return (new CollectionStructure)
+            ->handle($this->handle())
             ->expectsRoot($this->structureContents['root'] ?? false)
             ->maxDepth($this->structureContents['max_depth'] ?? null);
-
-        $trees = $this->structureContents['tree'];
-
-        if (! Site::hasMultiple()) {
-            $trees = [Site::default()->handle() => $trees];
-        }
-
-        foreach ($trees as $site => $contents) {
-            $tree = $structure->makeTree($site)->tree($contents);
-            $structure->addTree($tree);
-        }
-
-        return $structure;
     }
 
     public function structureHandle()

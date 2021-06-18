@@ -14,7 +14,11 @@ trait HasAvatar
      */
     public function avatar($size = 64)
     {
-        return $this->hasAvatarField() ? $this->avatarFieldUrl() : $this->gravatarUrl($size);
+        if ($this->hasAvatarField() && ($url = $this->avatarFieldUrl())) {
+            return $url;
+        }
+
+        return $this->gravatarUrl($size);
     }
 
     /**
@@ -43,7 +47,7 @@ trait HasAvatar
      */
     public function avatarFieldUrl()
     {
-        return $this->avatarFieldValue()->value()->url();
+        return optional($this->avatarFieldValue()->value())->url();
     }
 
     /**

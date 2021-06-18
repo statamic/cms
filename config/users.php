@@ -80,13 +80,35 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | DB Connection
+    | Database
     |--------------------------------------------------------------------------
     |
-    | Default database connection.
+    | Here you may configure the database connection and its table names.
     |
     */
 
     'database' => config('database.default'),
+
+    'tables' => [
+        'users' => 'users',
+        'role_user' => 'role_user',
+        'group_user' => 'group_user',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Guards
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will use the `web` authentication guard. However,
+    | if you want to run Statamic alongside the default Laravel auth
+    | guard, you can configure that for your cp and/or frontend.
+    |
+    */
+
+    'guards' => [
+        'cp' => 'web',
+        'web' => 'web',
+    ],
 
 ];

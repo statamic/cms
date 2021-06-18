@@ -15,14 +15,16 @@ return [
     |
     */
 
-    'watcher' => true,
+    'watcher' => env('STATAMIC_STACHE_WATCHER', true),
 
     /*
     |--------------------------------------------------------------------------
     | Stores
     |--------------------------------------------------------------------------
     |
-    | Here you may configure which stores are used inside the Stache.
+    | Here you may configure the stores that are used inside the Stache.
+    |
+    | https://statamic.dev/stache#stores
     |
     */
 
@@ -53,6 +55,16 @@ return [
             'directory' => base_path('content/navigation'),
         ],
 
+        'collection-trees' => [
+            'class' => Stores\CollectionTreeStore::class,
+            'directory' => base_path('content/trees/collections'),
+        ],
+
+        'nav-trees' => [
+            'class' => Stores\NavTreeStore::class,
+            'directory' => base_path('content/trees/navigation'),
+        ],
+
         'globals' => [
             'class' => Stores\GlobalsStore::class,
             'directory' => base_path('content/globals'),
@@ -63,10 +75,14 @@ return [
             'directory' => base_path('content/assets'),
         ],
 
-        // 'users' => [
-        //     'class' => Stores\UsersStore::class,
-        //     'directory' => base_path('users'),
-        // ],
+        'assets' => [
+            'class' => Stores\AssetsStore::class,
+        ],
+
+        'users' => [
+            'class' => Stores\UsersStore::class,
+            'directory' => base_path('users'),
+        ],
 
     ],
 

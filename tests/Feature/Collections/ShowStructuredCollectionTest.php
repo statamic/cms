@@ -5,7 +5,6 @@ namespace Tests\Feature\Collections;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
-use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class ShowStructuredCollectionTest extends ShowCollectionTest
@@ -14,11 +13,10 @@ class ShowStructuredCollectionTest extends ShowCollectionTest
 
     public function createCollection($handle)
     {
-        $structure = (new CollectionStructure)->tap(function ($s) {
-            $s->addTree($s->makeTree('en'));
-        });
+        $collection = tap(Collection::make('test')->structureContents(['max_depth' => 10]))->save();
+        $collection->structure()->makeTree('en')->save();
 
-        return tap(Collection::make('test')->structure($structure))->save();
+        return $collection;
     }
 
     /** @test */

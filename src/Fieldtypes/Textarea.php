@@ -7,9 +7,17 @@ use Statamic\Query\Scopes\Filters\Fields\Textarea as TextareaFilter;
 
 class Textarea extends Fieldtype
 {
+    protected $selectableInForms = true;
+
     protected function configFieldItems(): array
     {
         return [
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                'type' => 'text',
+                'width' => 50,
+            ],
             'character_limit' => [
                 'display' => __('Character Limit'),
                 'instructions' => __('statamic::fieldtypes.text.config.character_limit'),

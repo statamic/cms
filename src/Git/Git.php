@@ -74,7 +74,9 @@ class Git
             $message = null;
         }
 
-        CommitJob::dispatch($message)->delay($delayInMinutes ?? null);
+        CommitJob::dispatch($message)
+            ->onConnection(config('statamic.git.queue_connection'))
+            ->delay($delayInMinutes ?? null);
     }
 
     /**
@@ -126,6 +128,9 @@ class Git
             })
             ->filter(function ($path) {
                 return app(Filesystem::class)->exists($path);
+            })
+            ->filter(function ($path) {
+                return GitProcess::create($path)->isRepo();
             })
             ->filter(function ($path) {
                 return GitProcess::create($path)->status();

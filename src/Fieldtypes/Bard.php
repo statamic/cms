@@ -3,10 +3,20 @@
 namespace Statamic\Fieldtypes;
 
 use ProseMirrorToHtml\Renderer;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Site;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\GraphQL\Types\BardSetsType;
+use Statamic\GraphQL\Types\BardTextType;
+use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Bard extends Replicator
 {
@@ -53,7 +63,7 @@ class Bard extends Replicator
                 'type' => 'asset_container',
                 'max_items' => 1,
                 'if' => [
-                    'buttons' => 'contains image',
+                    'buttons' => 'contains_any anchor, image',
                 ],
             ],
             'save_html' => [
@@ -93,6 +103,12 @@ class Bard extends Replicator
                 'width' => 50,
                 'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
             ],
+            'link_collections' => [
+                'display' => __('Link Collections'),
+                'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
+                'type' => 'collections',
+                'mode' => 'select',
+            ],
             'reading_time' => [
                 'display' => __('Show Reading Time'),
                 'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
@@ -110,6 +126,20 @@ class Bard extends Replicator
             'allow_source' => [
                 'display' => __('Allow Source Mode'),
                 'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'enable_input_rules' => [
+                'display' => __('Enable Input Rules'),
+                'instructions' => __('statamic::fieldtypes.bard.config.enable_input_rules'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'enable_paste_rules' => [
+                'display' => __('Enable Paste Rules'),
+                'instructions' => __('statamic::fieldtypes.bard.config.enable_paste_rules'),
                 'type' => 'toggle',
                 'default' => true,
                 'width' => 50,
@@ -340,7 +370,9 @@ class Bard extends Replicator
         })->toArray();
 
         $defaults = collect($this->config('sets'))->map(function ($set) {
-            return (new Fields($set['fields']))->all()->map->defaultValue()->all();
+            return (new Fields($set['fields']))->all()->map(function ($field) {
+                return $field->fieldtype()->preProcess($field->defaultValue());
+            })->all();
         })->all();
 
         $new = collect($this->config('sets'))->map(function ($set, $handle) use ($defaults) {
@@ -353,6 +385,18 @@ class Bard extends Replicator
             })->all();
         })->all();
 
+        $linkCollections = $this->config('link_collections');
+
+        if (empty($linkCollections)) {
+            $site = Site::current()->handle();
+
+            $linkCollections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
+                return Collection::all()->reject(function ($collection) use ($site) {
+                    return is_null($collection->route($site));
+                })->map->handle()->values();
+            });
+        }
+
         return [
             'existing' => $existing,
             'new' => $new,
@@ -360,6 +404,8 @@ class Bard extends Replicator
             'collapsed' => [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
+            'linkCollections' => $linkCollections,
+            'linkData' => (object) $this->getLinkData($value),
         ];
     }
 
@@ -388,5 +434,101 @@ class Bard extends Replicator
 
             return $item;
         })->all();
+    }
+
+    public function toGqlType()
+    {
+        return $this->config('sets') ? parent::toGqlType() : GraphQL::string();
+    }
+
+    public function addGqlTypes()
+    {
+        $types = collect($this->config('sets'))
+            ->each(function ($set, $handle) {
+                $this->fields($handle)->all()->each(function ($field) {
+                    $field->fieldtype()->addGqlTypes();
+                });
+            })
+            ->map(function ($config, $handle) {
+                $type = new ReplicatorSetType($this, $this->gqlSetTypeName($handle), $handle);
+
+                return [
+                    'handle' => $handle,
+                    'name' => $type->name,
+                    'type' => $type,
+                ];
+            })->values();
+
+        $text = new BardTextType($this);
+
+        $types->push([
+            'handle' => 'text',
+            'name' => $text->name,
+            'type' => $text,
+        ]);
+
+        GraphQL::addTypes($types->pluck('type', 'name')->all());
+
+        $union = new BardSetsType($this, $this->gqlSetsTypeName(), $types);
+
+        GraphQL::addType($union);
+    }
+
+    public function getLinkData($value)
+    {
+        return collect($value)->mapWithKeys(function ($node) {
+            return $this->extractLinkDataFromNode($node);
+        })->all();
+    }
+
+    private function extractLinkDataFromNode($node)
+    {
+        $data = collect();
+
+        if ($node['type'] === 'link') {
+            $href = $node['attrs']['href'] ?? null;
+
+            if (Str::startsWith($href, 'statamic://')) {
+                $data = $data->merge($this->getLinkDataForUrl($href));
+            }
+        }
+
+        $childData = collect()
+            ->merge($node['content'] ?? [])
+            ->merge($node['marks'] ?? [])
+            ->mapWithKeys(function ($node) {
+                return $this->extractLinkDataFromNode($node);
+            });
+
+        return $data->merge($childData);
+    }
+
+    private function getLinkDataForUrl($url)
+    {
+        $ref = Str::after($url, 'statamic://');
+        [$type, $id] = explode('::', $ref, 2);
+
+        $data = null;
+
+        switch ($type) {
+            case 'entry':
+                if ($entry = Entry::find($id)) {
+                    $data = [
+                        'title' => $entry->get('title'),
+                        'permalink' => $entry->absoluteUrl(),
+                    ];
+                }
+                break;
+            case 'asset':
+                if ($asset = Asset::find($id)) {
+                    $data = [
+                        'basename' => $asset->basename(),
+                        'thumbnail' => $asset->thumbnailUrl(),
+                    ];
+                }
+                break;
+        }
+
+        return [$ref => $data];
     }
 }

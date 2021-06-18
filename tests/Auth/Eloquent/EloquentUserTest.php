@@ -34,25 +34,29 @@ class EloquentUserTest extends TestCase
     /** @test */
     public function it_gets_roles_already_in_the_db_without_explicitly_assigning_them()
     {
-        $roleA = new class extends Role {
+        $roleA = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'a';
             }
         };
-        $roleB = new class extends Role {
+        $roleB = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'b';
             }
         };
-        $roleC = new class extends Role {
+        $roleC = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'c';
             }
         };
-        $roleD = new class extends Role {
+        $roleD = new class extends Role
+        {
             public function handle(string $handle = null)
             {
                 return 'd';
@@ -67,7 +71,7 @@ class EloquentUserTest extends TestCase
 
         $user = $this->createPermissible();
 
-        \DB::table('role_user')->insert([
+        \DB::table(config('statamic.users.tables.role_user', 'role_user'))->insert([
             ['user_id' => $user->id(), 'role_id' => 'a'],
             ['user_id' => $user->id(), 'role_id' => 'b'],
             ['user_id' => $user->id(), 'role_id' => 'c'],
@@ -107,6 +111,9 @@ class EloquentUserTest extends TestCase
         return [
             'created_at' => Carbon::parse('2019-11-21 23:39:29'),
             'updated_at' => Carbon::parse('2019-11-21 23:39:29'),
+            'preferences' => [
+                'locale' => 'en',
+            ],
         ];
     }
 
@@ -117,6 +124,9 @@ class EloquentUserTest extends TestCase
         return [
             'created_at' => $lt7 ? now()->format('Y-m-d H:i:s') : now()->toISOString(),
             'updated_at' => $lt7 ? now()->format('Y-m-d H:i:s') : now()->toISOString(),
+            'preferences' => [
+                'locale' => 'en',
+            ],
         ];
     }
 }

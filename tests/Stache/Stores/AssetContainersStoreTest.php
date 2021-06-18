@@ -67,6 +67,9 @@ blueprint: test
 EOL;
         $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', $contents);
 
+        // When assets are queried below, it looks for the container.
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('example')->andReturn($item);
+
         $this->assertInstanceOf(AssetContainer::class, $item);
         $this->assertEquals(File::disk('test'), $item->disk());
         $this->assertEquals('example', $item->handle());
@@ -102,8 +105,9 @@ EOL;
             ->with('asset-containers')
             ->andReturn($this->store);
 
-        Facades\Stache::shouldReceive('shouldUpdateIndexes')
-            ->andReturnTrue(); // irrelevant for this test but it gets called during saving
+        // irrelevant for this test but gets called during saving
+        Facades\Stache::shouldReceive('shouldUpdateIndexes')->andReturnTrue();
+        Facades\Stache::shouldReceive('duplicates')->andReturn(optional());
 
         $container = Facades\AssetContainer::make('new')
             ->title('New Container');

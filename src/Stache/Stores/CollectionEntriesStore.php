@@ -3,13 +3,16 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Entries\GetDateFromPath;
+use Statamic\Entries\GetSlugFromPath;
+use Statamic\Entries\GetSuffixFromPath;
+use Statamic\Entries\RemoveSuffixFromPath;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
-use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -63,7 +66,7 @@ class CollectionEntriesStore extends ChildStore
             ->id($id)
             ->collection($collection);
 
-        $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
+        $slug = (new GetSlugFromPath)($path);
 
         if ($origin = array_pull($data, 'origin')) {
             $entry->origin($origin);
@@ -87,7 +90,7 @@ class CollectionEntriesStore extends ChildStore
         }
 
         if (isset($idGenerated) || isset($positionGenerated)) {
-            $entry->save();
+            $this->writeItemToDiskWithoutIncrementing($entry);
         }
 
         return $entry;
@@ -131,31 +134,11 @@ class CollectionEntriesStore extends ChildStore
             return;
         }
 
-        $contents = $collection->structureContents();
-
-        $trees = $contents['tree'] ?? [Site::default()->handle() => $contents['tree']];
-        unset($contents['tree']);
-        $contents['tree'] = $trees;
-
-        $structure = (new CollectionStructure)
-            ->collection($collection)
-            ->expectsRoot($contents['root'] ?? false)
-            ->maxDepth($contents['max_depth'] ?? null);
-
-        $tempStructure = new class extends \Statamic\Structures\Structure {
-            public function collections($collections = null)
-            {
-                return collect();
-            }
-        };
-
-        foreach ($trees as $site => $treeContents) {
-            $structure->addTree(
-                $tempStructure->makeTree($site)->tree($treeContents)->remove($id)
-            );
-        }
-
-        $collection->structure($structure)->save();
+        $collection->structure()->trees()->each(function ($tree) use ($id) {
+            $tree
+                ->remove($id)
+                ->save();
+        });
     }
 
     protected function storeIndexes()
@@ -185,5 +168,46 @@ class CollectionEntriesStore extends ChildStore
         return $indexes->merge(
             $collection->taxonomies()->map->handle()
         )->all();
+    }
+
+    protected function writeItemToDiskWithoutIncrementing($item)
+    {
+        $item->writeFile($item->path());
+    }
+
+    protected function writeItemToDisk($item)
+    {
+        $basePath = $item->buildPath();
+        $suffixlessPath = (new RemoveSuffixFromPath)($item->path());
+
+        if ($basePath !== $suffixlessPath) {
+            // If the path should change (e.g. a new slug or date) then
+            // reset the counter to 1 so the suffix doesn't get maintained.
+            $num = 0;
+        } else {
+            // Otherwise, start from whatever the suffix was.
+            $num = (new GetSuffixFromPath)($item->path()) ?? 0;
+        }
+
+        while (true) {
+            $ext = '.'.$item->fileExtension();
+            $filename = Str::before($basePath, $ext);
+            $suffix = $num ? ".$num" : '';
+            $path = "{$filename}{$suffix}{$ext}";
+
+            if (! $contents = File::get($path)) {
+                break;
+            }
+
+            $itemFromDisk = $this->makeItemFromFile($path, $contents);
+
+            if ($item->id() == $itemFromDisk->id()) {
+                break;
+            }
+
+            $num++;
+        }
+
+        $item->writeFile($path);
     }
 }

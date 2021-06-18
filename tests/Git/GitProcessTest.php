@@ -58,6 +58,22 @@ class GitProcessTest extends TestCase
      * @group integration
      * @test
      */
+    public function it_can_check_if_folder_is_in_git_repo()
+    {
+        $this->assertTrue(Git::create($this->basePath('temp/content'))->isRepo());
+        $this->assertTrue(Git::create($this->basePath('temp/content/collections'))->isRepo());
+        $this->assertTrue(Git::create($this->basePath('temp/content/taxonomies'))->isRepo());
+        $this->assertTrue(Git::create($this->basePath('temp/assets'))->isRepo());
+
+        $notARepoPath = Path::resolve(base_path('../../../../..'));
+
+        $this->assertFalse(Git::create($notARepoPath)->isRepo());
+    }
+
+    /**
+     * @group integration
+     * @test
+     */
     public function it_can_get_git_status_of_parent_repo()
     {
         $this->assertNull(Git::create($this->basePath('temp/content'))->status());

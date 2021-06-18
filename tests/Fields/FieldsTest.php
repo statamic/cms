@@ -432,6 +432,7 @@ class FieldsTest extends TestCase
                 'character_limit' => null,
                 'component' => 'textarea',
                 'antlers' => false,
+                'placeholder' => null,
             ],
         ], $fields->toPublishArray());
     }
@@ -532,7 +533,8 @@ class FieldsTest extends TestCase
     /** @test */
     public function it_processes_each_fields_values_by_its_fieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
+        {
             public function process($data)
             {
                 return $data.' processed';
@@ -571,7 +573,8 @@ class FieldsTest extends TestCase
     /** @test */
     public function it_preprocesses_each_fields_values_by_its_fieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
+        {
             public function preProcess($data)
             {
                 return $data.' preprocessed';
@@ -610,7 +613,8 @@ class FieldsTest extends TestCase
     /** @test */
     public function it_augments_each_fields_values_by_its_fieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return $data.' augmented';
@@ -666,7 +670,8 @@ class FieldsTest extends TestCase
     /** @test */
     public function it_gets_meta_data_from_all_fields()
     {
-        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
+        {
             public function preload()
             {
                 return 'meta data from field '.$this->field->handle().' is '.($this->field->value() * 2);
@@ -748,5 +753,30 @@ class FieldsTest extends TestCase
         Validator::shouldReceive('validate')->once();
 
         $fields->validate(['foo' => 'bar']);
+    }
+
+    /**
+     * @test
+     * @group graphql
+     **/
+    public function it_gets_the_fields_as_graphql_types()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text', 'validate' => 'required']],
+        ]);
+
+        $types = $fields->toGql();
+
+        $this->assertInstanceOf(Collection::class, $types);
+        $this->assertCount(2, $types);
+
+        $this->assertIsArray($types['one']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $types['one']['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['one']['type']);
+
+        $this->assertIsArray($types['two']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $types['two']['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['two']['type']->getWrappedType());
     }
 }

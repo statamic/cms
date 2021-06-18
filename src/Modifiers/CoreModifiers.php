@@ -194,6 +194,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Breaks arrays or collections into smaller ones of a given size.
+     *
+     * @param $value
+     * @return array
+     */
+    public function chunk($value, $params)
+    {
+        return collect($value)
+            ->chunk(Arr::get($params, 0))
+            ->map(function ($chunk) {
+                return ['chunk' => $chunk];
+            })
+            ->all();
+    }
+
+    /**
      * Collapses an array of arrays into a flat array.
      *
      * @param $value
@@ -1211,17 +1227,13 @@ class CoreModifiers extends Modifier
      */
     public function markdown($value, $params)
     {
-        if (! is_string($value)) {
-            return $value;
-        }
-
         $parser = $params[0] ?? 'default';
 
-        if (in_array($parser, [true, 'true', ''])) {
+        if (in_array($parser, [true, 'true', ''], true)) {
             $parser = 'default';
         }
 
-        return Markdown::parser($parser)->parse($value);
+        return Markdown::parser($parser)->parse((string) $value);
     }
 
     /**
@@ -1396,6 +1408,14 @@ class CoreModifiers extends Modifier
      */
     public function optionList($value, $params)
     {
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
+        if (! is_array($value)) {
+            return $value;
+        }
+
         if (count($params) > 1) {
             $params = [implode('|', $params)];
         }
@@ -1453,6 +1473,29 @@ class CoreModifiers extends Modifier
         $partial = 'partials/'.$name.'.html';
 
         return Parse::template(File::disk('resources')->get($partial), $value);
+    }
+
+    /**
+     * Plucks values from a collection of items.
+     *
+     * @param $value
+     * @param $params
+     * @param $context
+     * @return string
+     */
+    public function pluck($value, $params, $context)
+    {
+        $key = $params[0];
+
+        if ($wasArray = is_array($value)) {
+            $value = collect($value);
+        }
+
+        $items = $value->map(function ($item) use ($key) {
+            return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+        });
+
+        return $wasArray ? $items->all() : $items;
     }
 
     /**
@@ -1646,6 +1689,8 @@ class CoreModifiers extends Modifier
         $times = Arr::get($params, 0, 1);
         $times = is_numeric($times) ? $times : Arr::get($context, $times);
 
+        $times = ($times instanceof Value) ? $times->value() : $times;
+
         return str_repeat($value, $times);
     }
 
@@ -1708,9 +1753,11 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function sanitize($value)
+    public function sanitize($value, $params)
     {
-        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
+        $double_encode = (bool) Arr::get($params, 0, false);
+
+        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), $double_encode);
     }
 
     /**
@@ -1784,6 +1831,10 @@ class CoreModifiers extends Modifier
      */
     public function sentenceList($value, $params)
     {
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         if (! is_array($value)) {
             return $value;
         }
@@ -1909,6 +1960,14 @@ class CoreModifiers extends Modifier
 
         $value = $value instanceof Collection ? $value : collect($value);
 
+        // Working with a DataCollection
+        if (method_exists($value, 'multisort')) {
+            $value = $value->multisort(implode(':', $params));
+
+            return $value->values();
+        }
+
+        // Working with array data
         if ($key === 'random') {
             return $value->shuffle();
         }
@@ -2357,9 +2416,11 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function widont($value)
+    public function widont($value, $params)
     {
-        return Str::widont($value);
+        $params = Arr::get($params, 0, '1');
+
+        return Str::widont($value, $params);
     }
 
     /**

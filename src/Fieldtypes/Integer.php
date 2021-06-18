@@ -2,11 +2,13 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
 class Integer extends Fieldtype
 {
     protected $rules = ['integer'];
+    protected $selectableInForms = true;
 
     public function preProcess($data)
     {
@@ -29,5 +31,10 @@ class Integer extends Fieldtype
         }
 
         return (int) $data;
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::int();
     }
 }

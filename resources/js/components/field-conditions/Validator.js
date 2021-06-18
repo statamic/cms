@@ -170,7 +170,7 @@ export default class {
 
     prepareFunctionName(condition) {
         return condition
-            .replace(new RegExp('^custom .'), '')
+            .replace(new RegExp('^custom '), '')
             .split(':')[0];
     }
 
@@ -204,6 +204,10 @@ export default class {
         if (condition.rhs === 'empty') {
             condition.lhs = _.isEmpty(condition.lhs);
             condition.rhs = true;
+        }
+
+        if (_.isObject(condition.lhs)) {
+            return false;
         }
 
         return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);

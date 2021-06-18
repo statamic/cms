@@ -146,4 +146,31 @@ class ValidatorTest extends TestCase
             'extra_two' => 'Extra Two',
         ], $validation->attributes());
     }
+
+    public function it_makes_replacements()
+    {
+        $field = Mockery::mock(Field::class);
+        $field->shouldReceive('rules')->andReturn([
+            'one' => ['required', 'test:{foo}'],
+        ]);
+
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([$field]));
+        $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
+
+        $validation = (new Validator)->fields($fields)->withRules([
+            'one' => 'test:{bar}',
+            'two' => 'another:{baz},{qux},{quux}',
+        ])->withReplacements([
+            'foo' => 'FOO',
+            'bar' => 'BAR',
+            'baz' => 'BAZ',
+            'quux' => 'QUUX',
+        ]);
+
+        $this->assertEquals([
+            'one' => ['required', 'test:FOO', 'test:BAR'],
+            'two' => ['another:BAZ,NULL,QUUX'],
+        ], $validation->rules());
+    }
 }

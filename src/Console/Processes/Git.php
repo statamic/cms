@@ -15,6 +15,20 @@ class Git extends Process
     }
 
     /**
+     * Determine if currently in a git repo.
+     *
+     * @return bool
+     */
+    public function isRepo()
+    {
+        $this->withoutLoggingErrors(function ($process) {
+            $process->root();
+        });
+
+        return ! $this->hasErrorOutput();
+    }
+
+    /**
      * Get git status.
      *
      * @param mixed $subPaths
@@ -54,7 +68,7 @@ class Git extends Process
      */
     private function prepareProcessArguments($parts)
     {
-        return collect(['git'])
+        return collect([config('statamic.git.binary')])
             ->merge($parts)
             ->flatten()
             ->reject(function ($part) {

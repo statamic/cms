@@ -20,14 +20,14 @@ class ReorderEntriesTest extends TestCase
     {
         parent::setUp();
 
-        $this->structure = (new CollectionStructure)->maxDepth(1)->tap(function ($s) {
-            $s->addTree($s->makeTree('en'));
-        });
+        $this->structure = (new CollectionStructure)->handle('test')->maxDepth(1);
 
         $this->collection = Collection::make('test')
             ->sites(['en'])
             ->structure($this->structure)
             ->save();
+
+        $this->structure->makeTree('en')->save();
     }
 
     /** @test */

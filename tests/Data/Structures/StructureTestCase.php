@@ -2,7 +2,6 @@
 
 namespace Tests\Data\Structures;
 
-use Statamic\Structures\Structure;
 use Tests\TestCase;
 
 abstract class StructureTestCase extends TestCase
@@ -41,7 +40,7 @@ abstract class StructureTestCase extends TestCase
             ],
         ];
 
-        $this->assertEquals($tree, $this->structure()->expectsRoot(false)->validateTree($tree, 'en'));
+        $this->assertEquals($tree, $this->structure('test')->expectsRoot(false)->validateTree($tree, 'en'));
     }
 
     /** @test */
@@ -50,7 +49,7 @@ abstract class StructureTestCase extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Root page must be an entry');
 
-        $this->structure()->expectsRoot(true)->validateTree([
+        $this->structure('test')->expectsRoot(true)->validateTree([
             [
                 'title' => 'Not an entry',
                 'url' => '/test',
@@ -61,7 +60,7 @@ abstract class StructureTestCase extends TestCase
     /** @test */
     public function the_root_doesnt_need_to_be_an_entry_if_the_tree_is_empty()
     {
-        $this->assertEquals([], $this->structure()->expectsRoot(true)->validateTree([], 'en'));
+        $this->assertEquals([], $this->structure('test')->expectsRoot(true)->validateTree([], 'en'));
     }
 
     /** @test **/
@@ -74,6 +73,6 @@ abstract class StructureTestCase extends TestCase
             ],
         ];
 
-        $this->assertEquals($tree, $this->structure()->expectsRoot(false)->validateTree($tree, 'en'));
+        $this->assertEquals($tree, $this->structure('test')->expectsRoot(false)->validateTree($tree, 'en'));
     }
 }

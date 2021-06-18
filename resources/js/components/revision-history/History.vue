@@ -25,7 +25,7 @@
                 v-for="group in revisions"
                 :key="group.day"
             >
-                <h6 class="revision-date" v-text="$moment.unix(group.day).format('MMMM D, Y')" />
+                <h6 class="revision-date" v-text="$moment.unix(group.day).format('LL')" />
                 <div class="revision-list">
                     <revision
                         v-for="revision in group.revisions"

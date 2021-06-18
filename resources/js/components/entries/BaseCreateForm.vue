@@ -5,8 +5,9 @@
         publish-container="base"
         :initial-actions="actions"
         method="post"
-        :initial-title="__('Create Entry')"
+        :initial-title="collectionCreateLabel"
         :collection-handle="collectionHandle"
+        :collection-has-routes="collectionHasRoutes"
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
@@ -31,6 +32,8 @@ export default {
     props: [
         'actions',
         'collectionHandle',
+        'collectionCreateLabel',
+        'collectionHasRoutes',
         'fieldset',
         'values',
         'meta',

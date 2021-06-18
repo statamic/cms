@@ -2,9 +2,12 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\GraphQL\Types\GridItemType;
 use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
+use Statamic\Support\Str;
 
 class Grid extends Fieldtype
 {
@@ -100,9 +103,9 @@ class Grid extends Fieldtype
         ]);
     }
 
-    private function fields()
+    public function fields()
     {
-        return new Fields($this->config('fields'), $this->field()->parent());
+        return new Fields($this->config('fields'), $this->field()->parent(), $this->field());
     }
 
     public function rules(): array
@@ -153,8 +156,8 @@ class Grid extends Fieldtype
     public function preload()
     {
         return [
-            'defaults' => $this->defaultRowData(),
-            'new' => $this->fields()->meta(),
+            'defaults' => $this->defaultRowData()->all(),
+            'new' => $this->fields()->meta()->all(),
             'existing' => collect($this->field->value())->mapWithKeys(function ($row) {
                 return [$row['_id'] => $this->fields()->addValues($row)->meta()];
             })->toArray(),
@@ -163,7 +166,9 @@ class Grid extends Fieldtype
 
     protected function defaultRowData()
     {
-        return $this->fields()->all()->map->defaultValue();
+        return $this->fields()->all()->map(function ($field) {
+            return $field->fieldtype()->preProcess($field->defaultValue());
+        });
     }
 
     public function augment($value)
@@ -183,5 +188,26 @@ class Grid extends Fieldtype
         return collect($value)->map(function ($row) use ($method) {
             return $this->fields()->addValues($row)->{$method}()->values()->all();
         })->all();
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::listOf(GraphQL::type($this->gqlItemTypeName()));
+    }
+
+    public function addGqlTypes()
+    {
+        GraphQL::addType($type = new GridItemType($this, $this->gqlItemTypeName()));
+
+        $this->fields()->all()->each(function ($field) {
+            $field->fieldtype()->addGqlTypes();
+        });
+    }
+
+    private function gqlItemTypeName()
+    {
+        return 'GridItem_'.collect($this->field->handlePath())->map(function ($part) {
+            return Str::studly($part);
+        })->join('_');
     }
 }

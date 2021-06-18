@@ -58,9 +58,9 @@ class EntriesStoreTest extends TestCase
             $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
 
             $this->assertEquals(collect([
-                $dir.'/numeric/1.one.md',
-                $dir.'/numeric/2.two.md',
-                $dir.'/numeric/3.three.md',
+                $dir.'/numeric/one.md',
+                $dir.'/numeric/two.md',
+                $dir.'/numeric/three.md',
             ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
         });
 
@@ -128,6 +128,152 @@ class EntriesStoreTest extends TestCase
         $this->assertFileNotExists($path);
 
         $this->assertEquals($path, $this->parent->store('blog')->paths()->get('123'));
+    }
+
+    /** @test */
+    public function it_saves_to_disk_with_modified_path()
+    {
+        $entry = Facades\Entry::make()
+            ->id('123')
+            ->slug('test')
+            ->date('2017-07-04')
+            ->collection('blog');
+
+        $this->parent->store('blog')->save($entry);
+
+        $this->assertFileEqualsString($initialPath = $this->directory.'/blog/2017-07-04.test.md', $entry->fileContents());
+        $this->assertEquals($initialPath, $this->parent->store('blog')->paths()->get('123'));
+
+        $entry->slug('updated');
+        $entry->save();
+
+        $this->assertFileEqualsString($path = $this->directory.'/blog/2017-07-04.updated.md', $entry->fileContents());
+        $this->assertEquals($path, $this->parent->store('blog')->paths()->get('123'));
+
+        @unlink($initialPath);
+        @unlink($path);
+    }
+
+    /** @test */
+    public function it_appends_suffix_to_the_filename_if_one_already_exists()
+    {
+        $existingPath = $this->directory.'/blog/2017-07-04.test.md';
+        file_put_contents($existingPath, $existingContents = "---\nid: existing-id\n---");
+
+        $entry = Facades\Entry::make()->id('new-id')->slug('test')->date('2017-07-04')->collection('blog');
+        $this->parent->store('blog')->save($entry);
+        $newPath = $this->directory.'/blog/2017-07-04.test.1.md';
+        $this->assertFileEqualsString($existingPath, $existingContents);
+        $this->assertFileEqualsString($newPath, $entry->fileContents());
+
+        $anotherEntry = Facades\Entry::make()->id('another-new-id')->slug('test')->date('2017-07-04')->collection('blog');
+        $this->parent->store('blog')->save($anotherEntry);
+        $anotherNewPath = $this->directory.'/blog/2017-07-04.test.2.md';
+        $this->assertFileEqualsString($existingPath, $existingContents);
+        $this->assertFileEqualsString($anotherNewPath, $anotherEntry->fileContents());
+
+        $this->assertEquals($newPath, $this->parent->store('blog')->paths()->get('new-id'));
+        $this->assertEquals($anotherNewPath, $this->parent->store('blog')->paths()->get('another-new-id'));
+
+        @unlink($newPath);
+        @unlink($anotherNewPath);
+        @unlink($existingPath);
+        $this->assertFileNotExists($newPath);
+        $this->assertFileNotExists($anotherNewPath);
+        $this->assertFileNotExists($existingPath);
+    }
+
+    /** @test */
+    public function it_doesnt_append_the_suffix_to_the_filename_if_it_is_itself()
+    {
+        $existingPath = $this->directory.'/blog/2017-07-04.test.md';
+        file_put_contents($existingPath, "---\nid: the-id\n---");
+
+        $entry = Facades\Entry::make()
+            ->id('the-id')
+            ->slug('test')
+            ->date('2017-07-04')
+            ->collection('blog');
+
+        $this->parent->store('blog')->save($entry);
+
+        $pathWithSuffix = $this->directory.'/blog/2017-07-04.test.1.md';
+        $this->assertFileEqualsString($existingPath, $entry->fileContents());
+        $this->assertEquals($existingPath, $this->parent->store('blog')->paths()->get('the-id'));
+
+        @unlink($existingPath);
+        $this->assertFileNotExists($pathWithSuffix);
+        $this->assertFileNotExists($existingPath);
+    }
+
+    /** @test */
+    public function it_doesnt_append_the_suffix_to_an_already_suffixed_filename_if_it_is_itself()
+    {
+        $suffixlessExistingPath = $this->directory.'/blog/2017-07-04.test.md';
+        file_put_contents($suffixlessExistingPath, "---\nid: the-id\n---");
+        $suffixedExistingPath = $this->directory.'/blog/2017-07-04.test.md';
+        file_put_contents($suffixedExistingPath, "---\nid: another-id\n---");
+
+        $entry = Facades\Entry::make()
+            ->id('another-id')
+            ->slug('test')
+            ->date('2017-07-04')
+            ->collection('blog');
+
+        $this->parent->store('blog')->save($entry);
+
+        $pathWithIncrementedSuffix = $this->directory.'/blog/2017-07-04.test.2.md';
+        $this->assertFileEqualsString($suffixedExistingPath, $entry->fileContents());
+        @unlink($suffixedExistingPath);
+        $this->assertFileNotExists($pathWithIncrementedSuffix);
+        $this->assertFileNotExists($suffixedExistingPath);
+
+        $this->assertEquals($suffixedExistingPath, $this->parent->store('blog')->paths()->get('another-id'));
+    }
+
+    /** @test */
+    public function it_keeps_the_suffix_even_if_the_suffixless_path_is_available()
+    {
+        $existingPath = $this->directory.'/blog/2017-07-04.test.1.md';
+        $suffixlessPath = $this->directory.'/blog/2017-07-04.test.md';
+
+        file_put_contents($existingPath, 'id: 123');
+        $entry = $this->parent->store('blog')->makeItemFromFile($existingPath, file_get_contents($existingPath));
+
+        $this->parent->store('blog')->save($entry);
+
+        $this->assertFileEqualsString($existingPath, $entry->fileContents());
+        $this->assertFileNotExists($suffixlessPath);
+
+        $this->assertEquals($existingPath, $this->parent->store('blog')->paths()->get('123'));
+
+        @unlink($existingPath);
+        $this->assertFileNotExists($existingPath);
+    }
+
+    /** @test */
+    public function it_removes_the_suffix_if_it_previously_had_one_but_needs_a_new_path_anyway()
+    {
+        // eg. if the slug is changing, and the filename would be changing anyway,
+        // we shouldn't maintain the suffix.
+
+        $existingPath = $this->directory.'/blog/2017-07-04.test.1.md';
+        $newPath = $this->directory.'/blog/2017-07-04.updated.md';
+
+        file_put_contents($existingPath, 'id: 123');
+        $entry = $this->parent->store('blog')->makeItemFromFile($existingPath, file_get_contents($existingPath));
+
+        $entry->slug('updated');
+
+        $this->parent->store('blog')->save($entry);
+
+        $this->assertFileEqualsString($newPath, $entry->fileContents());
+        $this->assertFileNotExists($existingPath);
+
+        $this->assertEquals($newPath, $this->parent->store('blog')->paths()->get('123'));
+
+        @unlink($newPath);
+        $this->assertFileNotExists($newPath);
     }
 
     /** @test */

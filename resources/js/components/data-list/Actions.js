@@ -53,20 +53,16 @@ export default {
                     response.data.text().then(data => {
                         data = JSON.parse(data);
                         if (data.redirect) window.location = data.redirect;
+                        this.$emit('completed', true, data);
                     });
                 }
-
-                this.$emit('completed');
             }).catch(error => {
                 error.response.data.text().then(data => {
                     data = JSON.parse(data);
-
                     this.$toast.error(data.message);
-
                     if (error.response.status == 422) this.errors = data.errors;
+                    this.$emit('completed', false, data)
                 });
-
-                this.$emit('completed', false)
             });
         },
 

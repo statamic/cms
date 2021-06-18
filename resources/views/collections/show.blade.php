@@ -10,20 +10,20 @@
         breadcrumb-url="{{ cp_route('collections.index') }}"
         :can-create="@can('create', ['Statamic\Contracts\Entries\Entry', $collection]) true @else false @endcan"
         create-url="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"
+        create-label="{{ $collection->createLabel() }}"
         :blueprints='@json($blueprints)'
         sort-column="{{ $collection->sortField() }}"
         sort-direction="{{ $collection->sortDirection() }}"
         :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
-        run-action-url="{{ cp_route('collections.entries.actions.run', $collection->handle()) }}"
-        bulk-actions-url="{{ cp_route('collections.entries.actions.bulk', $collection->handle()) }}"
+        action-url="{{ cp_route('collections.entries.actions.run', $collection->handle()) }}"
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         initial-site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
 
         @if ($collection->hasStructure())
         :structured="{{ Statamic\Support\Str::bool($user->can('reorder', $collection)) }}"
-        structure-pages-url="{{ cp_route('structures.pages.index', $structure->handle()) }}"
+        structure-pages-url="{{ cp_route('structures.pages.index', 'collection::'.$structure->handle()) }}"
         structure-submit-url="{{ cp_route('collections.structure.update', $collection->handle()) }}"
         :structure-max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
         :structure-expects-root="{{ Statamic\Support\Str::bool($structure->expectsRoot()) }}"

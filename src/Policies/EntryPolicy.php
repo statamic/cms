@@ -32,7 +32,22 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
+        if ($this->hasAnotherAuthor($user, $entry)) {
+            return $user->hasPermission("edit other authors {$entry->collectionHandle()} entries");
+        }
+
         return $user->hasPermission("edit {$entry->collectionHandle()} entries");
+    }
+
+    public function editOtherAuthorsEntries($user, $collection, $blueprint = null)
+    {
+        $blueprint = $blueprint ?? $collection->entryBlueprint();
+
+        if ($blueprint->hasField('author') === false) {
+            return true;
+        }
+
+        return $user->hasPermission("edit other authors {$collection->handle()} entries");
     }
 
     public function update($user, $entry)
@@ -58,6 +73,10 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
+        if ($this->hasAnotherAuthor($user, $entry)) {
+            return $user->hasPermission("delete other authors {$entry->collectionHandle()} entries");
+        }
+
         return $user->hasPermission("delete {$entry->collectionHandle()} entries");
     }
 
@@ -65,6 +84,19 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
+        if ($this->hasAnotherAuthor($user, $entry)) {
+            return $user->hasPermission("publish other authors {$entry->collectionHandle()} entries");
+        }
+
         return $user->hasPermission("publish {$entry->collectionHandle()} entries");
+    }
+
+    protected function hasAnotherAuthor($user, $entry)
+    {
+        if ($entry->blueprint()->hasField('author') === false) {
+            return false;
+        }
+
+        return ! $entry->authors()->contains($user->id());
     }
 }

@@ -24,6 +24,9 @@ return [
     'publish_{collection}_entries_desc' => 'Ability to change from draft to published and vice versa',
     'reorder_{collection}_entries' => 'Reorder entries',
     'reorder_{collection}_entries_desc' => 'Enables drag and drop reordering',
+    'edit_other_authors_{collection}_entries' => "Edit other authors' entries",
+    'publish_other_authors_{collection}_entries' => "Manage publish state of other authors' entries",
+    'delete_other_authors_{collection}_entries' => "Delete other authors' entries",
 
     'group_taxonomies' => 'Taxonomies',
     'configure_taxonomies' => 'Configure Taxonomies',
@@ -80,5 +83,7 @@ return [
     'access_utility_desc' => 'Grants access to the :title utility',
 
     'group_misc' => 'Miscellaneous',
+    'resolve_duplicate_ids' => 'Resolve Duplicate IDs',
+    'resolve_duplicate_ids_desc' => 'Grants ability to see and resolve duplicate IDs.',
 
 ];
