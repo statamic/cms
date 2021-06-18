@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.1.25 (2021-06-18)
+
+### What's new
+- Support for `.antlers.xml` views which automatically set the response type to `text/xml`. [#3855](https://github.com/statamic/cms/issues/3855)
+- You can add more fieldtypes to the selector when building Form blueprints. [#3866](https://github.com/statamic/cms/issues/3866)
+- You can set the `width` on `grid` sub-fields in table mode. [#3867](https://github.com/statamic/cms/issues/3867)
+
+### What's improved
+- When using full-measure static caching, pages with really long query strings will fall back to half-measure caching. [#3864](https://github.com/statamic/cms/issues/3864)
+
+### What's fixed
+- Fix filtering of taxonomy terms by collection. [#3870](https://github.com/statamic/cms/issues/3870)
+- Term files will always be created when using the `terms` fieldtype. [#3852](https://github.com/statamic/cms/issues/3852)
+- Fix wrong asset container with similar URLs being resolved. [#3858](https://github.com/statamic/cms/issues/3858)
+- Prevent dispatching invalidation jobs when static caching is disabled. [#3869](https://github.com/statamic/cms/issues/3869)
+
+
+
 ## 3.1.24 (2021-06-16)
 
 ### What's new
