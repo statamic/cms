@@ -24,7 +24,7 @@ abstract class UserGroup implements UserGroupContract
     public function title(string $title = null)
     {
         if (func_num_args() === 0) {
-            return $this->title;
+            return __($this->title);
         }
 
         $this->title = $title;
