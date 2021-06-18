@@ -141,14 +141,18 @@ class DataResponse implements Responsable
         return $this;
     }
 
-    protected function contents()
+    protected function view()
     {
-        $contents = (new View)
+        return (new View)
             ->template($this->data->template())
             ->layout($this->data->layout())
             ->with($this->with)
-            ->cascadeContent($this->data)
-            ->render();
+            ->cascadeContent($this->data);
+    }
+
+    protected function contents()
+    {
+        $contents = $this->view()->render();
 
         if ($this->isLivePreview()) {
             $contents = $this->versionJavascriptModules($contents);
@@ -164,7 +168,10 @@ class DataResponse implements Responsable
 
     protected function adjustResponseType()
     {
-        $contentType = $this->data->get('content_type', 'html');
+        $contentType = $this->data->get(
+            'content_type',
+            $this->view()->wantsXmlResponse() ? 'xml' : 'html'
+        );
 
         if ($contentType !== 'html') {
             $this->headers['Content-Type'] = self::contentType($contentType);
