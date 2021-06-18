@@ -145,7 +145,7 @@ class Collection implements Contract, AugmentableContract
         return $this
             ->fluentlyGetOrSet('title')
             ->getter(function ($title) {
-                return $title ?? ucfirst($this->handle);
+                return __($title) ?? ucfirst($this->handle);
             })
             ->args(func_get_args());
     }
