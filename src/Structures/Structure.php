@@ -40,7 +40,7 @@ abstract class Structure implements StructureContract
         return $this
             ->fluentlyGetOrSet('title')
             ->getter(function ($title) {
-                return $title ?: Str::humanize($this->handle());
+                return __($title) ?: Str::humanize($this->handle());
             })->args(func_get_args());
     }
 
