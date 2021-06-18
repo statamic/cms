@@ -73,7 +73,7 @@
 
                                 </div>
 
-                                <breadcrumbs :path="path" @navigated="selectFolder" />
+                                <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
 
                                 <data-list-bulk-actions
                                     :url="actionUrl"
