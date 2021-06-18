@@ -53,11 +53,12 @@ class FileCacherTest extends TestCase
     {
         $cacher = $this->fileCacher([
             'path' => 'test/path',
+            'max_filename_length' => 16,
         ]);
 
         $this->assertEquals(
-            'test/path/foo/bar_baz=qux&one=two.html',
-            $cacher->getFilePath('http://domain.com/foo/bar?baz=qux&one=two')
+            'test/path/foo/bar/baz/qux_a=b&c=d.html',
+            $cacher->getFilePath('http://domain.com/foo/bar/baz/qux?a=b&c=d')
         );
 
         $this->assertEquals(
@@ -77,7 +78,7 @@ class FileCacherTest extends TestCase
         $query = 'baz=qux&one=two&three=four&five=six';
 
         $this->assertEquals(
-            'test/path/foo/bar_'.md5($query).'.html',
+            'test/path/foo/bar_lqs_'.md5($query).'.html',
             $cacher->getFilePath('http://domain.com/foo/bar?'.$query)
         );
     }
@@ -168,6 +169,6 @@ class FileCacherTest extends TestCase
     {
         $writer = $writer ?: \Mockery::mock(Writer::class);
 
-        return new FileCacher($writer, app(Repository::class), array_replace(['max_filename_length' => 255], $config));
+        return new FileCacher($writer, app(Repository::class), $config);
     }
 }

@@ -48,7 +48,6 @@ class StaticCacheManager extends Manager
             'ignore_query_strings' => $this->app['config']['statamic.static_caching.ignore_query_strings'] ?? false,
             'base_url' => $this->app['request']->root(),
             'locale' => Site::current()->handle(),
-            'max_filename_length' => 255,
         ]);
     }
 }
