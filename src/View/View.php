@@ -20,7 +20,7 @@ class View
     {
         $view = new static;
         $view->template($template);
-        $view->with(array_merge($data, $mergeData));
+        $view->with(array_merge($mergeData, $data));
 
         return $view;
     }
