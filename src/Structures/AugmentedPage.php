@@ -25,9 +25,9 @@ class AugmentedPage extends AugmentedEntry
             ? parent::keys()
             : ['title', 'url', 'uri', 'permalink'];
 
-        return Statamic::isApiRoute()
-            ? $this->apiKeys($keys)
-            : $keys;
+        $keys = Statamic::isApiRoute() ? $this->apiKeys($keys) : $keys;
+
+        return collect($keys)->sort()->values()->all();
     }
 
     private function apiKeys($keys)
