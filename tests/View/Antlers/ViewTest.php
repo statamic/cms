@@ -128,6 +128,18 @@ class ViewTest extends TestCase
     }
 
     /** @test */
+    public function gets_first()
+    {
+        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-noparse.antlers.html'));
+
+        $view = View::first(['template', 'not_found']);
+        $this->assertEquals('template', $view->template());
+
+        $view = View::first(['not_found', 'template']);
+        $this->assertEquals('template', $view->template());
+    }
+
+    /** @test */
     public function gets_data()
     {
         $view = (new View)->with(['foo' => 'bar']);
