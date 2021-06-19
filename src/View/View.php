@@ -3,8 +3,9 @@
 namespace Statamic\View;
 
 use Facades\Statamic\View\Cascade;
+use InvalidArgumentException;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\View\Antlers\Engine as AntlersEngine;
 use Statamic\View\Events\ViewRendered;
 
 class View
@@ -15,17 +16,42 @@ class View
     protected $cascade;
     protected $cascadeContent;
 
-    public static function make($template = null)
+    public static function make($template = null, $data = [], $mergeData = [])
     {
         $view = new static;
         $view->template($template);
+        $view->with(array_merge($data, $mergeData));
 
         return $view;
     }
 
-    public function with($data)
+    public static function first(array $templates, $data = [], $mergeData = [])
     {
-        $this->data = $data;
+        $view = new static;
+
+        $template = Arr::first($templates, function ($template) use ($view) {
+            return $view->exists($template);
+        });
+
+        if (! $template) {
+            throw new InvalidArgumentException('None of the templates in the given array exist.');
+        }
+
+        return $view::make($template, $data, $mergeData);
+    }
+
+    public function exists($template)
+    {
+        return view()->exists($template);
+    }
+
+    public function with($key, $value = null)
+    {
+        if (is_array($key)) {
+            $this->data = array_merge($this->data, $key);
+        } else {
+            $this->data[$key] = $value;
+        }
 
         return $this;
     }
@@ -70,7 +96,10 @@ class View
 
         $contents = view($this->templateViewName(), $cascade);
 
-        if ($this->shouldUseLayout()) {
+        // We only want the template-in-a-layout behavior if the template is Antlers.
+        $isAntlers = Str::endsWith($contents->getPath(), ['.antlers.html', '.antlers.php']);
+
+        if ($this->layout && $isAntlers) {
             $contents = view($this->layoutViewName(), array_merge($cascade, [
                 'template_content' => $contents->withoutExtractions()->render(),
             ]));
@@ -79,59 +108,6 @@ class View
         ViewRendered::dispatch($this);
 
         return $contents->render();
-    }
-
-    private function shouldUseLayout()
-    {
-        if (! $this->layout) {
-            return false;
-        }
-
-        if (! $this->isUsingAntlersTemplate()) {
-            return false;
-        }
-
-        if ($this->isUsingXmlTemplate() && ! $this->isUsingXmlLayout()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function wantsXmlResponse()
-    {
-        if (! $this->isUsingAntlersTemplate()) {
-            return false;
-        }
-
-        return $this->isUsingXmlTemplate() || $this->isUsingXmlLayout();
-    }
-
-    private function isUsingAntlersTemplate()
-    {
-        return Str::endsWith($this->templateViewPath(), collect(AntlersEngine::EXTENSIONS)->map(function ($extension) {
-            return '.'.$extension;
-        })->all());
-    }
-
-    private function isUsingXmlTemplate()
-    {
-        return Str::endsWith($this->templateViewPath(), '.xml');
-    }
-
-    private function isUsingXmlLayout()
-    {
-        return Str::endsWith($this->layoutViewPath(), '.xml');
-    }
-
-    private function templateViewPath()
-    {
-        return view($this->templateViewName())->getPath();
-    }
-
-    private function layoutViewPath()
-    {
-        return view($this->layoutViewName())->getPath();
     }
 
     protected function cascade()
@@ -158,7 +134,7 @@ class View
         return $this->render();
     }
 
-    private function layoutViewName()
+    protected function layoutViewName()
     {
         $view = $this->layout;
 
@@ -169,7 +145,7 @@ class View
         return $view;
     }
 
-    private function templateViewName()
+    protected function templateViewName()
     {
         $view = $this->template;
 
