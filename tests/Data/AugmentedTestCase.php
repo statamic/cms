@@ -14,11 +14,25 @@ class AugmentedTestCase extends TestCase
 
     protected function assertAugmentedCorrectly($expectations, $augmented)
     {
+        $this->assertAllKeysAreAugmented($expectations, $augmented);
+        $this->assertAugmentedAsExpected($expectations, $augmented);
+    }
+
+    protected function assertSubsetAugmentedCorrectly($expectations, $augmented)
+    {
+        $this->assertAugmentedAsExpected($expectations, $augmented);
+    }
+
+    private function assertAllKeysAreAugmented($expectations, $augmented)
+    {
         $this->assertEquals(
             collect($expectations)->keys()->sort()->values()->all(),
             $augmented->keys()
         );
+    }
 
+    private function assertAugmentedAsExpected($expectations, $augmented)
+    {
         foreach ($expectations as $key => $expectation) {
             $actual = $augmented->get($key);
 
