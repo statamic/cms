@@ -14,6 +14,10 @@ class LinkMark extends Link
 
         $tag[0]['attrs']['href'] = $this->convertHref($tag[0]['attrs']['href']);
 
+        if (isset($this->mark->attrs->title)) {
+            $tag[0]['attrs']['title'] = $this->mark->attrs->title;
+        }
+
         return $tag;
     }
 
