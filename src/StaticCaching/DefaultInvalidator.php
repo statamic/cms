@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
@@ -33,6 +34,8 @@ class DefaultInvalidator implements Invalidator
             $this->invalidateNavUrls($item);
         } elseif ($item instanceof GlobalSet) {
             $this->invalidateGlobalUrls($item);
+        } elseif ($item instanceof Collection) {
+            $this->invalidateCollectionUrls($item);
         }
     }
 
@@ -70,5 +73,12 @@ class DefaultInvalidator implements Invalidator
         $this->cacher->invalidateUrls(
             Arr::get($this->rules, "globals.{$set->handle()}.urls")
         );
+    }
+
+    protected function invalidateCollectionUrls($collection)
+    {
+        if ($url = $collection->url()) {
+            $this->cacher->invalidateUrl($url);
+        }
     }
 }
