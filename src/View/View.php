@@ -17,16 +17,16 @@ class View
     protected $cascade;
     protected $cascadeContent;
 
-    public static function make($template = null, $data = [], $mergeData = [])
+    public static function make($template = null, $data = [])
     {
         $view = new static;
         $view->template($template);
-        $view->with(array_merge($mergeData, $data));
+        $view->with($data);
 
         return $view;
     }
 
-    public static function first(array $templates, $data = [], $mergeData = [])
+    public static function first(array $templates, $data = [])
     {
         $template = Arr::first($templates, function ($template) {
             return view()->exists($template);
@@ -36,7 +36,7 @@ class View
             throw new InvalidArgumentException('None of the views in the given array exist.');
         }
 
-        return static::make($template, $data, $mergeData);
+        return static::make($template, $data);
     }
 
     public function with($data)
