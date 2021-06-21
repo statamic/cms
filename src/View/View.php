@@ -28,22 +28,15 @@ class View
 
     public static function first(array $templates, $data = [], $mergeData = [])
     {
-        $view = new static;
-
-        $template = Arr::first($templates, function ($template) use ($view) {
-            return $view->exists($template);
+        $template = Arr::first($templates, function ($template) {
+            return view()->exists($template);
         });
 
         if (! $template) {
             throw new InvalidArgumentException('None of the templates in the given array exist.');
         }
 
-        return $view::make($template, $data, $mergeData);
-    }
-
-    public function exists($template)
-    {
-        return view()->exists($template);
+        return static::make($template, $data, $mergeData);
     }
 
     public function with($data)
