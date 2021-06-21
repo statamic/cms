@@ -33,7 +33,7 @@ class View
         });
 
         if (! $template) {
-            throw new InvalidArgumentException('None of the templates in the given array exist.');
+            throw new InvalidArgumentException('None of the views in the given array exist.');
         }
 
         return static::make($template, $data, $mergeData);
