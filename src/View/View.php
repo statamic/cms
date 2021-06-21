@@ -19,11 +19,9 @@ class View
 
     public static function make($template = null, $data = [])
     {
-        $view = new static;
-        $view->template($template);
-        $view->with($data);
-
-        return $view;
+        return (new static)
+            ->template($template)
+            ->with($data);
     }
 
     public static function first(array $templates, $data = [])
