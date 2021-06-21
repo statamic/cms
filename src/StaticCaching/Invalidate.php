@@ -10,6 +10,8 @@ use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
+use Statamic\Events\NavTreeDeleted;
+use Statamic\Events\NavTreeSaved;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 
@@ -28,6 +30,8 @@ class Invalidate implements ShouldQueue
         NavDeleted::class => 'invalidateNav',
         CollectionTreeSaved::class => 'invalidateCollectionByTree',
         CollectionTreeDeleted::class => 'invalidateCollectionByTree',
+        NavTreeSaved::class => 'invalidateNavByTree',
+        NavTreeDeleted::class => 'invalidateNavByTree',
     ];
 
     public function __construct(Invalidator $invalidator)
@@ -65,5 +69,10 @@ class Invalidate implements ShouldQueue
     public function invalidateCollectionByTree($event)
     {
         $this->invalidator->invalidate($event->tree->collection());
+    }
+
+    public function invalidateNavByTree($event)
+    {
+        $this->invalidator->invalidate($event->tree->structure());
     }
 }
