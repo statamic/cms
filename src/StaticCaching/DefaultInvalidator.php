@@ -7,6 +7,7 @@ use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class DefaultInvalidator implements Invalidator
 {
@@ -51,6 +52,20 @@ class DefaultInvalidator implements Invalidator
     {
         if ($url = $term->url()) {
             $this->cacher->invalidateUrl($url);
+
+            $term->taxonomy()->collections()->each(function ($collection) use ($term) {
+                if (! ($url = $collection->url($term->site()->handle()))) {
+                    return;
+                }
+
+                $url = vsprintf('%s%s/%s', [
+                    Str::ensureRight($url, '/'),
+                    $term->taxonomy()->handle(),
+                    $term->slug(),
+                ]);
+
+                $this->cacher->invalidateUrl($url);
+            });
         }
 
         $this->cacher->invalidateUrls(
