@@ -46,13 +46,9 @@ class View
         return view()->exists($template);
     }
 
-    public function with($key, $value = null)
+    public function with($data)
     {
-        if (is_array($key)) {
-            $this->data = array_merge($this->data, $key);
-        } else {
-            $this->data[$key] = $value;
-        }
+        $this->data = $data;
 
         return $this;
     }

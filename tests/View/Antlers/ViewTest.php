@@ -145,6 +145,10 @@ class ViewTest extends TestCase
         $view = (new View)->with(['foo' => 'bar']);
 
         $this->assertEquals(['foo' => 'bar'], $view->data());
+
+        $view->with(['baz' => 'qux']);
+
+        $this->assertEquals(['baz' => 'qux'], $view->data());
     }
 
     /** @test */
