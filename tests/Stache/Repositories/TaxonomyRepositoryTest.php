@@ -3,9 +3,11 @@
 namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Stache\Repositories\TaxonomyRepository;
 use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Stores\TaxonomiesStore;
 use Statamic\Taxonomies\Taxonomy;
 use Tests\TestCase;
@@ -19,7 +21,10 @@ class TaxonomyRepositoryTest extends TestCase
         $stache = (new Stache)->sites(['en', 'fr']);
         $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/taxonomies';
-        $stache->registerStore((new TaxonomiesStore($stache, app('files')))->directory($this->directory));
+        $stache->registerStores([
+            (new TaxonomiesStore($stache, app('files')))->directory($this->directory),
+            (new CollectionsStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'),
+        ]);
 
         $this->repo = new TaxonomyRepository($stache);
     }
@@ -54,6 +59,28 @@ class TaxonomyRepositoryTest extends TestCase
         });
 
         $this->assertNull($this->repo->findByHandle('unknown'));
+    }
+
+    /** @test */
+    public function it_gets_a_taxonomy_by_uri()
+    {
+        tap($this->repo->findByUri('/categories'), function ($taxonomy) {
+            $this->assertInstanceOf(Taxonomy::class, $taxonomy);
+            $this->assertEquals('categories', $taxonomy->handle());
+            $this->assertEquals('Categories', $taxonomy->title());
+            $this->assertNull($taxonomy->collection());
+        });
+    }
+
+    /** @test */
+    public function it_gets_a_taxonomy_by_uri_with_collection()
+    {
+        tap($this->repo->findByUri('/blog/categories'), function ($taxonomy) {
+            $this->assertInstanceOf(Taxonomy::class, $taxonomy);
+            $this->assertEquals('categories', $taxonomy->handle());
+            $this->assertEquals('Categories', $taxonomy->title());
+            $this->assertEquals(Collection::findByHandle('blog'), $taxonomy->collection());
+        });
     }
 
     /** @test */

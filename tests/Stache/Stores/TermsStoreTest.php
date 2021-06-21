@@ -37,6 +37,6 @@ class TermsStoreTest extends TestCase
         @unlink($path);
         $this->assertFileNotExists($path);
 
-        $this->assertEquals('en::'.$path, $this->parent->store('tags')->paths()->get('en::test'));
+        $this->assertEquals($path, $this->parent->store('tags')->paths()->get('en::test'));
     }
 }

@@ -19,8 +19,8 @@ class Index extends BaseIndex
 
     public function lookup($query)
     {
-        $data = $this->data()->map(function ($item, $id) {
-            return $item + ['id' => $id];
+        $data = $this->data()->map(function ($item, $reference) {
+            return $item + ['reference' => $reference];
         })->values()->toArray();
 
         $comb = new Comb($data, $this->settings());

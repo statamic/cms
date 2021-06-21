@@ -12,6 +12,7 @@ use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Support\Arr;
 
 class Entries extends Relationship
 {
@@ -104,7 +105,7 @@ class Entries extends Relationship
             $collections = $this->getConfiguredCollections();
         }
 
-        return Collection::findByHandle($collections[0]);
+        return Collection::findByHandle(Arr::first($collections));
     }
 
     public function getSortColumn($request)
@@ -204,12 +205,13 @@ class Entries extends Relationship
         if (! is_object($value)) {
             $value = Entry::find($value);
         }
+
         if ($value != null && $parent = $this->field()->parent()) {
             $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
             $value = $value->in($site);
         }
 
-        return $value;
+        return ($value && $value->status() === 'published') ? $value : null;
     }
 
     protected function shallowAugmentValue($value)

@@ -20,6 +20,7 @@ class Stache
     protected $updateIndexes = true;
     protected $lockFactory;
     protected $locks = [];
+    protected $duplicates;
 
     public function __construct()
     {
@@ -83,7 +84,9 @@ class Stache
     {
         Partyline::comment('Clearing Stache...');
 
-        $this->stores()->each->clear();
+        $this->stores()->reverse()->each->clear();
+
+        $this->duplicates()->clear();
 
         Cache::forget('stache::timing');
 
@@ -196,5 +199,14 @@ class Stache
         }
 
         return $this->locks[$name] = $this->lockFactory->createLock($name);
+    }
+
+    public function duplicates()
+    {
+        if ($this->duplicates) {
+            return $this->duplicates;
+        }
+
+        return $this->duplicates = (new Duplicates($this))->load();
     }
 }

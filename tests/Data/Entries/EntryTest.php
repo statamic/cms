@@ -20,7 +20,6 @@ use Statamic\Sites\Site;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
-use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -204,31 +203,41 @@ class EntryTest extends TestCase
 
         $this->assertEquals('/blog/foo', $entryEn->uri());
         $this->assertEquals('/blog/foo', $entryEn->url());
+        $this->assertEquals('/blog/foo', $entryEn->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrl());
+        $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrlWithoutRedirect());
         $this->assertEquals('http://domain.com/amp/blog/foo', $entryEn->ampUrl());
         $this->assertNull($entryEn->redirectUrl());
 
         $this->assertEquals('/le-blog/le-foo', $entryFr->uri());
         $this->assertEquals('/fr/le-blog/le-foo', $entryFr->url());
+        $this->assertEquals('/fr/le-blog/le-foo', $entryFr->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrl());
+        $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrlWithoutRedirect());
         $this->assertEquals('http://domain.com/fr/amp/le-blog/le-foo', $entryFr->ampUrl());
         $this->assertNull($entryFr->redirectUrl());
 
         $this->assertEquals('/das-blog/das-foo', $entryDe->uri());
         $this->assertEquals('/das-blog/das-foo', $entryDe->url());
+        $this->assertEquals('/das-blog/das-foo', $entryDe->urlWithoutRedirect());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrl());
+        $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrlWithoutRedirect());
         $this->assertEquals('http://domain.de/amp/das-blog/das-foo', $entryDe->ampUrl());
         $this->assertNull($entryDe->redirectUrl());
 
         $this->assertEquals('/blog/redirected', $redirectEntry->uri());
         $this->assertEquals('http://example.com/page', $redirectEntry->url());
+        $this->assertEquals('/blog/redirected', $redirectEntry->urlWithoutRedirect());
         $this->assertEquals('http://example.com/page', $redirectEntry->absoluteUrl());
+        $this->assertEquals('http://domain.com/blog/redirected', $redirectEntry->absoluteUrlWithoutRedirect());
         $this->assertNull($redirectEntry->ampUrl());
         $this->assertEquals('http://example.com/page', $redirectEntry->redirectUrl());
 
         $this->assertEquals('/blog/redirect-404', $redirect404Entry->uri());
         $this->assertEquals('/blog/redirect-404', $redirect404Entry->url());
+        $this->assertEquals('/blog/redirect-404', $redirect404Entry->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrl());
+        $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrlWithoutRedirect());
         $this->assertEquals('http://domain.com/amp/blog/redirect-404', $redirect404Entry->ampUrl());
         $this->assertEquals(404, $redirect404Entry->redirectUrl());
     }
@@ -237,11 +246,57 @@ class EntryTest extends TestCase
     public function it_gets_the_uri_from_the_structure()
     {
         $structure = $this->partialMock(CollectionStructure::class);
-        $collection = tap((new Collection)->handle('test')->structure($structure))->save();
+        $collection = tap((new Collection)->handle('test')->structure($structure)->routes('{parent_uri}/{slug}'))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('foo');
         $structure->shouldReceive('entryUri')->with($entry)->once()->andReturn('/structured-uri');
 
         $this->assertEquals('/structured-uri', $entry->uri());
+    }
+
+    /** @test */
+    public function entries_in_a_collection_without_a_route_dont_have_a_uri()
+    {
+        $collection = tap((new Collection)->handle('test'))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug('foo');
+
+        $this->assertNull($entry->uri());
+        $this->assertNull($entry->url());
+    }
+
+    /** @test */
+    public function a_localized_entry_without_a_route_for_that_site_doesnt_have_a_uri()
+    {
+        $collection = tap((new Collection)->handle('test')->routes([
+            'en' => '/test/{slug}',
+        ]))->save();
+        $entry = (new Entry)->collection($collection)->locale('fr')->slug('foo');
+
+        $this->assertNull($entry->uri());
+        $this->assertNull($entry->url());
+    }
+
+    /** @test */
+    public function entries_in_a_structured_collection_without_a_route_dont_have_a_uri()
+    {
+        $structure = $this->partialMock(CollectionStructure::class);
+        $collection = tap((new Collection)->handle('test')->structure($structure))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug('foo');
+
+        $this->assertNull($entry->uri());
+        $this->assertNull($entry->url());
+    }
+
+    /** @test */
+    public function a_localized_entry_in_a_structured_collection_without_a_route_for_that_site_doesnt_have_a_uri()
+    {
+        $structure = $this->partialMock(CollectionStructure::class);
+        $collection = tap((new Collection)->handle('test')->structure($structure)->routes([
+            'en' => '/test/{slug}',
+        ]))->save();
+        $entry = (new Entry)->collection($collection)->locale('fr')->slug('foo');
+
+        $this->assertNull($entry->uri());
+        $this->assertNull($entry->url());
     }
 
     /** @test */
@@ -274,14 +329,17 @@ class EntryTest extends TestCase
 
         $this->assertEquals('/parent', $parent->uri());
         $this->assertEquals('/parent/child', $parent->url());
+        $this->assertEquals('/parent', $parent->urlWithoutRedirect());
         $this->assertEquals('/parent/child', $parent->redirectUrl());
 
         $this->assertEquals('/parent/child', $child->uri());
         $this->assertEquals('/parent/child', $child->url());
+        $this->assertEquals('/parent/child', $child->urlWithoutRedirect());
         $this->assertNull($child->redirectUrl());
 
         $this->assertEquals('/nochildren', $noChildren->uri());
         $this->assertEquals('/nochildren', $noChildren->url());
+        $this->assertEquals('/nochildren', $noChildren->urlWithoutRedirect());
         $this->assertEquals(404, $noChildren->redirectUrl());
     }
 
@@ -744,7 +802,10 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving()
     {
+        tap(Collection::make('test'))->save();
+
         $entry = (new Entry)
+            ->collection('test')
             ->id('123')
             ->slug('test')
             ->date('2018-01-01')
@@ -752,6 +813,8 @@ class EntryTest extends TestCase
             ->data([
                 'title' => 'The title',
                 'array' => ['first one', 'second one'],
+                'null' => null,      // this...
+                'empty' => [], // and this should get stripped out because it's the root. there's no origin to fall back to.
                 'content' => 'The content',
             ]);
 
@@ -764,7 +827,103 @@ class EntryTest extends TestCase
             'id' => '123',
             'published' => false,
             'content' => 'The content',
-        ], Arr::removeNullValues($entry->fileData()));
+            'blueprint' => 'test',
+        ], $entry->fileData());
+    }
+
+    /** @test */
+    public function it_gets_file_contents_for_saving_a_localized_entry()
+    {
+        tap(Collection::make('test'))->save();
+
+        $originEntry = $this->mock(Entry::class);
+        $originEntry->shouldReceive('id')->andReturn('123');
+
+        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('test');
+
+        $entry = (new Entry)
+            ->collection('test')
+            ->id('456')
+            ->origin('123')
+            ->slug('test')
+            ->date('2018-01-01')
+            ->published(false)
+            ->data([
+                'title' => 'The title',
+                'array' => ['first one', 'second one'],
+                'null' => null,      // this...
+                'empty' => [], // and this should not get stripped out, otherwise it would fall back to the origin.
+                'content' => 'The content',
+            ]);
+
+        $this->assertEquals([
+            'title' => 'The title',
+            'array' => [
+                'first one',
+                'second one',
+            ],
+            'null' => null,
+            'empty' => [],
+            'id' => '456',
+            'origin' => '123',
+            'published' => false,
+            'content' => 'The content',
+            'blueprint' => 'test',
+        ], $entry->fileData());
+    }
+
+    /** @test */
+    public function the_default_blueprint_is_added_to_the_file_contents_when_one_hasnt_been_explicitly_defined()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $entry = (new Entry)->collection('test');
+
+        $this->assertEquals('default', $entry->fileData()['blueprint']);
+    }
+
+    /** @test */
+    public function the_explicit_blueprint_is_added_to_the_file_contents()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $entry = (new Entry)->collection('test')->blueprint('another');
+
+        $this->assertEquals('another', $entry->fileData()['blueprint']);
+    }
+
+    /** @test */
+    public function the_inherited_blueprint_is_added_to_the_localized_file_contents()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $originEntry = $this->mock(Entry::class);
+        $originEntry->shouldReceive('id')->andReturn('123');
+
+        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('another');
+
+        $entry = (new Entry)
+            ->collection('test')
+            ->origin('123'); // do not set blueprint.
+
+        $this->assertEquals('another', $entry->fileData()['blueprint']);
     }
 
     /** @test */

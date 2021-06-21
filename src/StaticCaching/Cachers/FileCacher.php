@@ -4,7 +4,10 @@ namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FileCacher extends AbstractCacher
 {
@@ -58,9 +61,13 @@ class FileCacher extends AbstractCacher
     {
         $url = $this->getUrl($request);
 
-        \Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
+        $path = $this->getFilePath($url);
 
-        return File::get($this->getFilePath($url));
+        if (! $this->isLongQueryStringPath($path)) {
+            Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
+        }
+
+        return File::get($path);
     }
 
     public function hasCachedPage(Request $request)
@@ -138,12 +145,25 @@ class FileCacher extends AbstractCacher
      */
     public function getFilePath($url)
     {
-        $parts = parse_url($url);
+        $urlParts = parse_url($url);
+        $pathParts = pathinfo($urlParts['path']);
+        $slug = $pathParts['basename'];
+        $query = $this->config('ignore_query_strings') ? '' : Arr::get($urlParts, 'query', '');
 
-        return sprintf('%s%s_%s.html',
-            $this->getCachePath(),
-            $parts['path'],
-            $this->config('ignore_query_strings') ? '' : array_get($parts, 'query', '')
-        );
+        if ($this->isBasenameTooLong($basename = $slug.'_'.$query.'.html')) {
+            $basename = $slug.'_lqs_'.md5($query).'.html';
+        }
+
+        return $this->getCachePath().$pathParts['dirname'].'/'.$basename;
+    }
+
+    private function isBasenameTooLong($basename)
+    {
+        return strlen($basename) > $this->config('max_filename_length', 255);
+    }
+
+    private function isLongQueryStringPath($path)
+    {
+        return Str::contains($path, '_lqs_');
     }
 }

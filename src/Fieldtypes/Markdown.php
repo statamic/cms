@@ -134,4 +134,11 @@ class Markdown extends Fieldtype
             },
         ];
     }
+
+    public function preload()
+    {
+        return [
+            'previewUrl' => cp_route('markdown.preview'),
+        ];
+    }
 }

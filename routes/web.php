@@ -53,12 +53,14 @@ Route::name('statamic.')->group(function () {
     }
 });
 
-Statamic::additionalWebRoutes();
+if (config('statamic.routes.enabled')) {
+    Statamic::additionalWebRoutes();
 
-/**
- * Front-end
- * All front-end website requests go through a single controller method.
- */
-Route::any('/{segments?}', 'FrontendController@index')
-    ->where('segments', '.*')
-    ->name('statamic.site');
+    /*
+     * Front-end
+     * All front-end website requests go through a single controller method.
+     */
+    Route::any('/{segments?}', 'FrontendController@index')
+        ->where('segments', Statamic::frontendRouteSegmentRegex())
+        ->name('statamic.site');
+}

@@ -47,7 +47,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | When a date is encountered throughout the Control Panel, it will be
-    | rendered in the following format. Any PHP date variables are permitted.
+    | rendered in the following format unless overridden in specific
+    | fields, and so on. Any PHP date variables are permitted.
+    |
+    | This takes precedence over the date_format in system.php.
+    |
+    | https://www.php.net/manual/en/function.date.php
     |
     */
 

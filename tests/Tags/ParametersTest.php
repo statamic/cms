@@ -21,7 +21,8 @@ class ParametersTest extends TestCase
             ],
         ]);
 
-        $fieldtype = new class extends \Statamic\Fields\Fieldtype {
+        $fieldtype = new class extends \Statamic\Fields\Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -204,7 +205,8 @@ class ParametersTest extends TestCase
      */
     public function it_gets_nested_values()
     {
-        $augmentable = new class implements \Statamic\Contracts\Data\Augmentable {
+        $augmentable = new class implements \Statamic\Contracts\Data\Augmentable
+        {
             use \Statamic\Data\HasAugmentedData;
 
             public function augmentedArrayData()

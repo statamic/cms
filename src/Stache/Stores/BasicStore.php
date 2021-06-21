@@ -39,11 +39,6 @@ abstract class BasicStore extends Store
         return $item;
     }
 
-    public function getItemByPath($path)
-    {
-        return $this->getItem($this->getKeyFromPath($path));
-    }
-
     protected function getCachedItem($key)
     {
         $cacheKey = $this->getItemCacheKey($key);
@@ -105,7 +100,7 @@ abstract class BasicStore extends Store
 
         $this->forgetPath($key);
 
-        $this->resolveIndexes()->each->forgetItem($key);
+        $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
     }
 
     protected function writeItemToDisk($item)

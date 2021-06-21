@@ -30,7 +30,6 @@
 
 <script>
 import Actions from './Actions';
-import qs from 'qs';
 
 export default {
 
@@ -77,20 +76,15 @@ export default {
                 return;
             }
 
-            let params = {
+            let data = {
                 selections: this.selections,
             };
 
             if (this.context) {
-                params.context = this.context;
+                data.context = this.context;
             }
 
-            let config = {
-                params,
-                paramsSerializer: params => qs.stringify(params, {arrayFormat: 'brackets'})
-            };
-
-            this.$axios.get(this.url, config).then(response => {
+            this.$axios.post(this.url+'/list', data).then(response => {
                 this.actions = response.data;
             });
         },

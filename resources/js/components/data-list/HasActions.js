@@ -1,8 +1,7 @@
 export default {
 
     props: {
-        runActionUrl: String,
-        bulkActionsUrl: String,
+        actionUrl: String,
     },
 
     methods: {
@@ -11,7 +10,7 @@ export default {
             this.loading = true;
         },
 
-        actionCompleted(successful=null) {
+        actionCompleted(successful=null, response) {
             this.loading = false;
 
             if (successful === false) return;
@@ -19,7 +18,7 @@ export default {
             this.$events.$emit('clear-selections');
             this.$events.$emit('reset-action-modals');
 
-            this.$toast.success(__('Action completed'));
+            this.$toast.success(response.message || __('Action completed'));
 
             this.request();
         }

@@ -13,7 +13,7 @@ class CreateTestUserTables extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create(config('statamic.users.tables.users', 'users'), function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('email')->unique();
@@ -23,13 +23,13 @@ class CreateTestUserTables extends Migration
             $table->timestamps();
         });
 
-        Schema::create('role_user', function (Blueprint $table) {
+        Schema::create(config('statamic.users.tables.role_user', 'role_user'), function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('role_id');
         });
 
-        Schema::create('group_user', function (Blueprint $table) {
+        Schema::create(config('statamic.users.tables.group_user', 'group_user'), function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('group_id');

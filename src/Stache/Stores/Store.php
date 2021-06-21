@@ -6,15 +6,18 @@ use Facades\Statamic\Stache\Traverser;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
+use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
+use Statamic\Support\Arr;
 
 abstract class Store
 {
     protected $directory;
     protected $valueIndex = Indexes\Value::class;
     protected $customIndexes = [];
-    protected $defaultIndexes = ['id'];
+    protected $defaultIndexes = ['id', 'path'];
     protected $storeIndexes = [];
     protected $usedIndexes;
     protected $fileChangesHandled = false;
@@ -22,6 +25,7 @@ abstract class Store
     protected $fileItems;
     protected $shouldCacheFileItems = false;
     protected $modified;
+    protected $keys;
 
     public function directory($directory = null)
     {
@@ -64,15 +68,9 @@ abstract class Store
             return $this->fileItems;
         }
 
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
-
-        $items = $files->map(function ($timestamp, $path) {
-            return $this->getItemByPath($path);
-        })->keyBy(function ($item) {
-            return $this->getItemKey($item);
+        return $this->fileItems = $this->paths()->map(function ($path, $key) {
+            return $this->getItem($key);
         });
-
-        return $this->fileItems = $items;
     }
 
     public function getItemKey($item)
@@ -213,50 +211,36 @@ abstract class Store
             return;
         }
 
-        $modified = $this->adjustModifiedPaths($modified);
-        $deleted = $this->adjustDeletedPaths($deleted);
-
-        // Get a path to key mapping, so we can easily get the keys of existing files.
-        $pathMap = $this->paths()->flip();
-
         // Flush cached instances of deleted items.
         $deleted->each(function ($path) {
-            if ($key = $this->getKeyFromPath($path)) {
+            collect($this->getKeyFromPath($path))->each(function ($key) use ($path) {
                 $this->forgetItem($key);
                 $this->forgetPath($key);
-                $this->resolveIndexes()->each->forgetItem($key);
+                $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
                 $this->handleDeletedItem($path, $key);
-            }
-        });
-
-        // Clear cached paths so we're free to deal with the latest ones. We do this after
-        // forgetting deleted files, otherwise they wouldn't be available in the array.
-        // TODO: It may be more performant to keep the paths instead of clearing them
-        // all, then manually create any added files, and delete any deleted files.
-        $this->clearCachedPaths();
-
-        // Flush the cached instances of modified items.
-        $modified->each(function ($timestamp, $path) use ($pathMap) {
-            if ($key = $pathMap->get($path)) {
-                $this->forgetItem($key);
-            }
-        });
-
-        // Load all the indexes so we're dealing with fresh items in both loops.
-        $indexes = $this->resolveIndexes()->each->load();
-
-        // Remove deleted items from every index.
-        $indexes->each(function ($index) use ($deleted, $pathMap) {
-            $deleted->each(function ($path) use ($index, $pathMap) {
-                if ($key = $pathMap->get($path)) {
-                    $index->forgetItem($key);
-                }
             });
         });
 
         // Get items from every file that was modified.
-        $modified = $modified->map(function ($timestamp, $path) use ($pathMap) {
-            return $this->getItemFromModifiedPath($path, $pathMap);
+        $modified = $modified->flatMap(function ($timestamp, $path) {
+            return Arr::wrap($this->getItemFromModifiedPath($path));
+        });
+
+        // Remove items with duplicate IDs/keys
+        $modified = $modified->reject(function ($item) {
+            try {
+                $this->keys()->add($this->getItemKey($item), $item->path());
+            } catch (DuplicateKeyException $e) {
+                $isDuplicate = true;
+                Stache::duplicates()->track($this, $e->getKey(), $e->getPath());
+            }
+
+            return $isDuplicate ?? false;
+        });
+
+        // Put the items into the cache
+        $modified->each(function ($item) {
+            $this->cacheItem($item);
         });
 
         // There may be duplicate items when we're dealing with items that are split across files.
@@ -271,7 +255,7 @@ abstract class Store
         });
 
         // Update modified items in every index.
-        $indexes->each(function ($index) use ($modified) {
+        $this->resolveIndexes()->filter->isCached()->each(function ($index) use ($modified) {
             $modified->each(function ($item) use ($index) {
                 $index->updateItem($item);
             });
@@ -290,31 +274,15 @@ abstract class Store
         //
     }
 
-    protected function adjustModifiedPaths($paths)
+    protected function getItemFromModifiedPath($path)
     {
-        return $paths;
-    }
-
-    protected function adjustDeletedPaths($paths)
-    {
-        return $paths;
-    }
-
-    protected function getItemFromModifiedPath($path, $pathMap)
-    {
-        if ($key = $pathMap->get($path)) {
-            return $this->getItem($key);
-        }
-
-        $item = $this->makeItemFromFile($path, File::get($path));
-
-        $this->cacheItem($item);
-
-        return $item;
+        return $this->makeItemFromFile($path, File::get($path));
     }
 
     public function paths()
     {
+        $this->handleFileChanges();
+
         if ($this->paths) {
             return $this->paths;
         }
@@ -325,14 +293,32 @@ abstract class Store
 
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
-        $paths = $files->mapWithKeys(function ($timestamp, $path) {
-            $item = $this->makeItemFromFile($path, File::get($path));
-            $this->cacheItem($item);
-
-            return [$this->getItemKey($item) => $path];
+        $fileItems = $files->map(function ($timestamp, $path) {
+            return [
+                'item' => $item = $this->makeItemFromFile($path, File::get($path)),
+                'key' => $this->getItemKey($item),
+                'path' => $path,
+            ];
         });
 
+        $items = $fileItems->reject(function ($item) {
+            try {
+                $this->keys()->add($item['key'], $item['path']);
+            } catch (DuplicateKeyException $e) {
+                $isDuplicate = true;
+                Stache::duplicates()->track($this, $e->getKey(), $e->getPath());
+            }
+
+            return $isDuplicate ?? false;
+        });
+
+        $paths = $items->pluck('path', 'key');
+
         $this->cachePaths($paths);
+
+        $this->keys()->cache();
+
+        Stache::duplicates()->cache();
 
         return $paths;
     }
@@ -344,6 +330,8 @@ abstract class Store
         unset($paths[$key]);
 
         $this->cachePaths($paths);
+
+        $this->keys()->forget($key)->cache();
     }
 
     protected function setPath($key, $path)
@@ -353,6 +341,8 @@ abstract class Store
         $paths[$key] = $path;
 
         $this->cachePaths($paths);
+
+        $this->keys()->set($key, $path)->cache();
     }
 
     protected function cachePaths($paths)
@@ -364,7 +354,7 @@ abstract class Store
         $this->cacheIndexUsage('path');
     }
 
-    protected function clearCachedPaths()
+    public function clearCachedPaths()
     {
         $this->paths = null;
         Cache::forget($this->pathsCacheKey());
@@ -386,9 +376,14 @@ abstract class Store
             app('stache.indexes')->forget("{$this->key()}.{$index->name()}");
         });
 
+        $this->usedIndexes = collect();
         Cache::forget($this->indexUsageCacheKey());
 
         $this->clearCachedPaths();
+
+        $this->keys()->clear();
+
+        Cache::forget("stache::timestamps::{$this->key()}");
     }
 
     public function warm()
@@ -399,5 +394,14 @@ abstract class Store
 
         $this->shouldCacheFileItems = false;
         $this->fileItems = null;
+    }
+
+    public function keys()
+    {
+        if ($this->keys) {
+            return $this->keys;
+        }
+
+        return $this->keys = (new Keys($this))->load();
     }
 }

@@ -688,6 +688,42 @@ class AssetTest extends TestCase
         $this->assertEquals([30, 60], $asset->dimensions());
         $this->assertEquals(30, $asset->width());
         $this->assertEquals(60, $asset->height());
+        $this->assertEquals(0.5, $asset->ratio());
+    }
+
+    /** @test */
+    public function it_gets_dimensions_for_svgs()
+    {
+        Storage::fake('test')->put('foo/image.svg', '<svg width="30" height="60"></svg>');
+        $asset = (new Asset)->path('foo/image.svg')->container($this->container);
+
+        $this->assertEquals([30, 60], $asset->dimensions());
+        $this->assertEquals(30, $asset->width());
+        $this->assertEquals(60, $asset->height());
+        $this->assertEquals(0.5, $asset->ratio());
+    }
+
+    /** @test */
+    public function it_gets_no_dimensions_for_non_images()
+    {
+        $file = UploadedFile::fake()->create('file.txt');
+        Storage::fake('test')->putFileAs('foo', $file, 'file.txt');
+        $asset = (new Asset)->path('foo/file.txt')->container($this->container);
+
+        $this->assertEquals([null, null], $asset->dimensions());
+        $this->assertEquals(null, $asset->width());
+        $this->assertEquals(null, $asset->height());
+        $this->assertEquals(null, $asset->ratio());
+    }
+
+    /** @test */
+    public function it_doesnt_regenerate_the_meta_file_when_getting_non_image_dimensions()
+    {
+        $asset = $this->partialMock(Asset::class);
+
+        $asset->shouldReceive('meta')->times(0);
+
+        $this->assertEquals([null, null], $asset->dimensions());
     }
 
     /** @test */
@@ -921,7 +957,7 @@ class AssetTest extends TestCase
             'size', 'size_bytes', 'size_kilobytes', 'size_megabytes', 'size_gigabytes',
             'size_b', 'size_kb', 'size_mb', 'size_gb',
             'last_modified', 'last_modified_timestamp', 'last_modified_instance',
-            'focus', 'focus_css',
+            'focus', 'focus_css', 'mime_type',
         ];
     }
 }

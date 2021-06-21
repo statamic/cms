@@ -3,9 +3,12 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Support\Str;
 
 class Text extends Fieldtype
 {
+    protected $selectableInForms = true;
+
     protected function configFieldItems(): array
     {
         return [
@@ -65,8 +68,8 @@ class Text extends Fieldtype
 
     public function process($data)
     {
-        if ($this->config('input_type') === 'number') {
-            return (int) $data;
+        if ($data !== null && $this->config('input_type') === 'number') {
+            return Str::contains($data, '.') ? (float) $data : (int) $data;
         }
 
         return $data;

@@ -36,7 +36,16 @@ trait Routable
             return $this->redirectUrl();
         }
 
-        return URL::makeRelative($this->absoluteUrl());
+        return $this->urlWithoutRedirect();
+    }
+
+    public function urlWithoutRedirect()
+    {
+        if (! $url = $this->absoluteUrlWithoutRedirect()) {
+            return null;
+        }
+
+        return URL::makeRelative($url);
     }
 
     public function absoluteUrl()
@@ -45,9 +54,18 @@ trait Routable
             return $this->redirectUrl();
         }
 
+        return $this->absoluteUrlWithoutRedirect();
+    }
+
+    public function absoluteUrlWithoutRedirect()
+    {
+        if (! $uri = $this->uri()) {
+            return null;
+        }
+
         $url = vsprintf('%s/%s', [
             rtrim($this->site()->absoluteUrl(), '/'),
-            ltrim($this->uri(), '/'),
+            ltrim($uri, '/'),
         ]);
 
         return $url === '/' ? $url : rtrim($url, '/');

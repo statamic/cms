@@ -27,6 +27,17 @@ class Composer extends Process
     }
 
     /**
+     * Check if specific package is installed.
+     *
+     * @param string $package
+     * @return bool
+     */
+    public function isInstalled(string $package)
+    {
+        return Lock::file($this->basePath.'composer.lock')->isInstalled($package);
+    }
+
+    /**
      * List installed packages (including dev dependencies).
      *
      * @return \Illuminate\Support\Collection
