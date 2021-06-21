@@ -10,7 +10,7 @@
                 <img class="asset-thumbnail max-h-full max-w-full rounded w-7 h-7 fit-cover lazyloaded" :src="thumbnail" v-if="isImage" />
                 <file-icon :extension="asset.extension" v-else />
             </button>
-            <button @click="edit" class="flex-1 text-sm text-left truncate" :aria-label="__('Edit Asset')">{{ asset.basename }}</button>
+            <button @click="edit" class="flex-1 text-sm text-left truncate" :aria-label="__('Edit Asset')" v-tooltip="asset.basename">{{ asset.basename }}</button>
         </td>
         <td class="p-0 w-8 text-right align-middle">
 

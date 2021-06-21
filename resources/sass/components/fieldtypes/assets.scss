@@ -36,47 +36,6 @@
 
 
 
-/* Leftover bits for reference
-  ========================================================================== */
-
-// .assets-fieldtype .asset-grid-listing .asset-tile {
-//
-//     &.draggable-source--is-dragging {
-//         visibility: hidden;
-//     }
-//
-//     .asset-thumb-container {
-//         position: relative;
-//     }
-//
-//     .asset-filename {
-//         flex-grow: 1;
-//         text-align: center;
-//         text-overflow: ellipsis;
-//         overflow: hidden;
-//         white-space: nowrap;
-//     }
-//
-//     .asset-filesize {
-//         display: none;
-//     }
-// }
-
-
-
-/* In a Replicator fieldtype
-  ========================================================================== */
-
-// .replicator-fieldtype .assets-fieldtype,
-// .grid-fieldtype .grid-stacked .assets-fieldtype {
-//     .manage-assets {
-//         background: rgba(0,0,0,.03);
-//     }
-// }
-//
-
-
-
 /* In a Grid fieldtype
   ========================================================================== */
 
@@ -85,7 +44,6 @@
         padding: 4px;
     }
 }
-
 
 
 
@@ -115,10 +73,3 @@
 
 // hide the 'or drag to upload' text when too narrow
 .assets-fieldtype .narrow .assets-fieldtype-picker .drag-drop-text { display: none; }
-
-// center align the text when it gets really narrow
-// .assets-fieldtype .really-narrow .assets-fieldtype-picker {
-//     @apply flex-col;
-//     .upload-asset-control { @apply ml-0 text-center; }
-//     p { @apply ml-0 mt-1 text-center }
-// }

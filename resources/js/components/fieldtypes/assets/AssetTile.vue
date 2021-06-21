@@ -30,7 +30,7 @@
                              class="svg-img"
                              :style="'background-image:url('+asset.url+')'">
                         </div>
-                        <file-icon v-else type="div" :extension="asset.extension"></file-icon>
+                        <file-icon v-else :extension="asset.extension" class="p-2 h-40 w-40" />
                     </template>
 
                 </template>

@@ -24,7 +24,7 @@ class Assets extends Fieldtype
                 'display' => __('Mode'),
                 'instructions' => __('statamic::fieldtypes.assets.config.mode'),
                 'type' => 'select',
-                'default' => 'grid',
+                'default' => 'list',
                 'options' => [
                     'grid' => __('Grid'),
                     'list' => __('List'),
