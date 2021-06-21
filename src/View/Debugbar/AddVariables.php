@@ -22,6 +22,8 @@ class AddVariables
 
         ksort($variables);
 
-        debugbar()->addCollector(new VariableCollector($variables, 'Variables'));
+        if (! debugbar()->hasCollector('Variables')) {
+            debugbar()->addCollector(new VariableCollector($variables, 'Variables'));
+        }
     }
 }
