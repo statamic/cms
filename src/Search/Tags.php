@@ -42,6 +42,11 @@ class Tags extends BaseTags
 
         $results = $this->getQueryResults($builder);
 
+        // Backwards compatibility. This can be removed in 3.2.
+        if (! $this->params->get('as')) {
+            return $this->output($this->addResultTypes($results));
+        }
+
         $results = $this->output($results);
 
         return $this->addResultTypesToOutput($results);
