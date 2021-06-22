@@ -7,7 +7,6 @@ use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class DefaultInvalidator implements Invalidator
 {
