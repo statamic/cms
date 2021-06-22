@@ -118,6 +118,30 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function page_with_no_explicit_layout_will_not_use_a_layout()
+    {
+        $this->withStandardBlueprints();
+        $this->withoutExceptionHandling();
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', 'Layout {{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
+
+        $page = $this->createPage('about', [
+            'with' => [
+                'title' => 'The About Page',
+                'content' => 'This is the about page.',
+                'template' => 'some_template',
+                'layout' => false,
+            ],
+        ]);
+
+        $response = $this->get('/about')->assertStatus(200);
+
+        $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
+        $response->assertDontSee('Layout');
+    }
+
+    /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed()
     {
         Site::setConfig(['sites' => [
