@@ -319,7 +319,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function collection()
     {
-        return Collection::findByHandle($this->tree->handle());
+        if ($this->reference && $this->referenceExists()) {
+            return $this->entry()->collection();
+        }
+
+        return Collection::findByMount($this);
     }
 
     public function getProtectionScheme()
