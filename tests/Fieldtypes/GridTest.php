@@ -313,6 +313,6 @@ class GridTest extends TestCase
             'things' => [],
         ];
 
-        $this->assertSame($expected, $field->fieldtype()->preload()['defaults']->all());
+        $this->assertSame($expected, $field->fieldtype()->preload()['defaults']);
     }
 }

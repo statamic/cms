@@ -30,11 +30,6 @@ class CollectionsFieldtypeTest extends TestCase
     /** @test */
     public function it_gets_multiple_collections()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_collections' => ['pages', 'events'],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'related_collections' => ['type' => 'collections'],
         ]);
@@ -42,6 +37,11 @@ class CollectionsFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_collections' => ['pages', 'events'],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -75,11 +75,6 @@ GQL;
     /** @test */
     public function it_gets_single_collection()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_collection' => 'pages',
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'related_collection' => ['type' => 'collections', 'max_items' => 1],
         ]);
@@ -87,6 +82,11 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_collection' => 'pages',
+        ])->create();
 
         $query = <<<'GQL'
 {

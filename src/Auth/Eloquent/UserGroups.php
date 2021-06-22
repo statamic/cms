@@ -4,6 +4,7 @@ namespace Statamic\Auth\Eloquent;
 
 use Illuminate\Support\Facades\DB;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Facades\Blink;
 
 class UserGroups
 {
@@ -27,13 +28,15 @@ class UserGroups
      */
     public function all()
     {
-        $groups = collect($this->table()->where('user_id', $this->user->id())->get());
+        return Blink::once("eloquent-user-groups-{$this->user->id()}", function () {
+            $groups = collect($this->table()->where('user_id', $this->user->id())->get());
 
-        if ($groups->isEmpty()) {
-            return collect();
-        }
+            if ($groups->isEmpty()) {
+                return collect();
+            }
 
-        return $groups;
+            return $groups;
+        });
     }
 
     /**

@@ -149,26 +149,34 @@ class Replicator extends Fieldtype
 
     public function preload()
     {
-        return [
-            'existing' => $existing = collect($this->field->value())->mapWithKeys(function ($set) {
-                $config = $this->config("sets.{$set['type']}.fields", []);
+        $existing = collect($this->field->value())->mapWithKeys(function ($set) {
+            $config = $this->config("sets.{$set['type']}.fields", []);
 
-                return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
-            })->toArray(),
-            'new' => collect($this->config('sets'))->map(function ($set, $handle) {
-                return (new Fields($set['fields']))->meta()->put('_', '_');
-            })->toArray(),
-            'defaults' => collect($this->config('sets'))->map(function ($set) {
-                return (new Fields($set['fields']))->all()->map(function ($field) {
-                    return $field->fieldtype()->preProcess($field->defaultValue());
-                });
-            })->all(),
+            return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
+        })->toArray();
+
+        $defaults = collect($this->config('sets'))->map(function ($set) {
+            return (new Fields($set['fields']))->all()->map(function ($field) {
+                return $field->fieldtype()->preProcess($field->defaultValue());
+            })->all();
+        })->all();
+
+        $new = collect($this->config('sets'))->map(function ($set, $handle) use ($defaults) {
+            return (new Fields($set['fields']))->addValues($defaults[$handle])->meta()->put('_', '_');
+        })->toArray();
+
+        $previews = collect($existing)->map(function ($fields) {
+            return collect($fields)->map(function () {
+                return null;
+            })->all();
+        })->all();
+
+        return [
+            'existing' => $existing,
+            'new' => $new,
+            'defaults' => $defaults,
             'collapsed' => [],
-            'previews' => collect($existing)->map(function ($fields) {
-                return collect($fields)->map(function () {
-                    return null;
-                })->all();
-            })->all(),
+            'previews' => $previews,
         ];
     }
 

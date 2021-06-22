@@ -82,6 +82,7 @@ class TermRepository implements RepositoryContract
         return $term->collection($collection);
     }
 
+    /** @deprecated */
     public function findBySlug(string $slug, string $taxonomy): ?Term
     {
         return $this->query()

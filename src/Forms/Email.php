@@ -5,6 +5,7 @@ namespace Statamic\Forms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Config;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
@@ -87,7 +88,7 @@ class Email extends Mailable
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
             'config'     => config()->all(),
-            'fields'     => $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date'])),
+            'fields'     => $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form'])),
             'site_url'   => Config::getSiteUrl(),
             'date'       => now(),
             'now'        => now(),

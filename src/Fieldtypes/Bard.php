@@ -3,9 +3,12 @@
 namespace Statamic\Fieldtypes;
 
 use ProseMirrorToHtml\Renderer;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Data;
+use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Site;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\GraphQL\Types\BardSetsType;
@@ -60,7 +63,7 @@ class Bard extends Replicator
                 'type' => 'asset_container',
                 'max_items' => 1,
                 'if' => [
-                    'buttons' => 'contains image',
+                    'buttons' => 'contains_any anchor, image',
                 ],
             ],
             'save_html' => [
@@ -365,6 +368,18 @@ class Bard extends Replicator
             })->all();
         })->all();
 
+        $linkCollections = $this->config('link_collections');
+
+        if (empty($linkCollections)) {
+            $site = Site::current()->handle();
+
+            $linkCollections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
+                return Collection::all()->reject(function ($collection) use ($site) {
+                    return is_null($collection->route($site));
+                })->map->handle()->values();
+            });
+        }
+
         return [
             'existing' => $existing,
             'new' => $new,
@@ -372,8 +387,8 @@ class Bard extends Replicator
             'collapsed' => [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
-            'linkCollections' => empty($collections = $this->config('link_collections')) ? Collection::handles()->all() : $collections,
-            'linkData' => $this->getLinkData($value),
+            'linkCollections' => $linkCollections,
+            'linkData' => (object) $this->getLinkData($value),
         ];
     }
 
@@ -457,12 +472,7 @@ class Bard extends Replicator
             $href = $node['attrs']['href'] ?? null;
 
             if (Str::startsWith($href, 'statamic://')) {
-                $ref = Str::after($href, 'statamic://');
-                $item = Data::find($ref);
-                $data[$ref] = [
-                    'title' => $item->value('title'),
-                    'permalink' => $item->absoluteUrl(),
-                ];
+                $data = $data->merge($this->getLinkDataForUrl($href));
             }
         }
 
@@ -474,5 +484,34 @@ class Bard extends Replicator
             });
 
         return $data->merge($childData);
+    }
+
+    private function getLinkDataForUrl($url)
+    {
+        $ref = Str::after($url, 'statamic://');
+        [$type, $id] = explode('::', $ref, 2);
+
+        $data = null;
+
+        switch ($type) {
+            case 'entry':
+                if ($entry = Entry::find($id)) {
+                    $data = [
+                        'title' => $entry->get('title'),
+                        'permalink' => $entry->absoluteUrl(),
+                    ];
+                }
+                break;
+            case 'asset':
+                if ($asset = Asset::find($id)) {
+                    $data = [
+                        'basename' => $asset->basename(),
+                        'thumbnail' => $asset->thumbnailUrl(),
+                    ];
+                }
+                break;
+        }
+
+        return [$ref => $data];
     }
 }

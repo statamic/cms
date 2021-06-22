@@ -4,9 +4,12 @@ namespace Statamic;
 
 use Closure;
 use Illuminate\Http\Request;
+use Laravel\Nova\Nova;
 use Statamic\Facades\File;
+use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
 use Stringy\StaticStringy;
 
@@ -241,6 +244,30 @@ class Statamic
         return static::vendorAssetUrl('statamic/cp/'.$url);
     }
 
+    public static function cpDateFormat()
+    {
+        return Preference::get('date_format', config('statamic.cp.date_format'));
+    }
+
+    public static function cpDateTimeFormat()
+    {
+        $format = self::cpDateFormat();
+
+        return DateFormat::containsTime($format) ? $format : $format.' H:i';
+    }
+
+    public static function dateFormat()
+    {
+        return config('statamic.system.date_format');
+    }
+
+    public static function dateTimeFormat()
+    {
+        $format = self::dateFormat();
+
+        return DateFormat::containsTime($format) ? $format : $format.' H:i';
+    }
+
     public static function flash()
     {
         if ($success = session('success')) {
@@ -299,5 +326,16 @@ class Statamic
         foreach ($concrete::bindings() as $abstract => $concrete) {
             app()->bind($abstract, $concrete);
         }
+    }
+
+    public static function frontendRouteSegmentRegex()
+    {
+        $prefix = '';
+
+        if (class_exists(Nova::class)) {
+            $prefix = '(?!'.trim(Nova::path(), '/').')';
+        }
+
+        return $prefix.'.*';
     }
 }

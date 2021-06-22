@@ -1,6 +1,11 @@
 <template>
 
-    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }" @dragstart.stop>
+    <div 
+        class="bard-fieldtype-wrapper"
+        :class="{'bard-fullscreen': fullScreenMode }"
+        @dragstart.stop="ignorePageHeader(true)"
+        @dragend="ignorePageHeader(false)"
+    >
 
         <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar" v-if="showFixedToolbar">
@@ -126,6 +131,7 @@ import css from 'highlight.js/lib/languages/css'
 import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
 import mark from './Mark';
+import node from './Node';
 
 export default {
 
@@ -160,6 +166,7 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
+            pageHeader: null,
         }
     },
 
@@ -221,8 +228,14 @@ export default {
         },
 
         htmlWithReplacedLinks() {
-            return this.html.replaceAll(/\"statamic:\/\/(.*)\"/g, (match, ref) => {
-                return `"${this.meta.linkData[ref].permalink}"`;
+            return this.html.replaceAll(/\"statamic:\/\/(.*?)\"/g, (match, ref) => {
+                const linkData = this.meta.linkData[ref];
+                if (! linkData) {
+                    this.$toast.error(`${__('No link data found for')} ${ref}`);
+                    return '""';
+                }
+
+                return `"${linkData.permalink}"`;
             });
         }
 
@@ -258,6 +271,8 @@ export default {
         this.$keys.bind('esc', this.closeFullscreen)
 
         this.$nextTick(() => this.mounted = true);
+
+        this.pageHeader = document.querySelector('.global-header');
     },
 
     beforeDestroy() {
@@ -514,7 +529,7 @@ export default {
             }
 
             this.$bard.extensionCallbacks.forEach(callback => {
-                let returned = callback({ bard: this, mark });
+                let returned = callback({ bard: this, mark, node });
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
@@ -525,7 +540,14 @@ export default {
 
         updateSetPreviews(set, previews) {
             this.previews[set] = previews;
+        },
+
+        ignorePageHeader(ignore) {
+            if (this.pageHeader) {
+                this.pageHeader.style['pointer-events'] = ignore ? 'none' : 'all';
+            }
         }
+
     }
 }
 </script>

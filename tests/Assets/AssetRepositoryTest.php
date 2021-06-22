@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\AssetRepository;
+use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -41,5 +42,39 @@ mime_type: image/jpeg
 
 EOT;
         $this->assertEquals($contents, $disk->get($path));
+    }
+
+    /** @test */
+    public function it_resolves_the_correct_disk_from_similar_names()
+    {
+        Storage::fake('disk_long', ['url' => 'test_long_url_same_beginning']);
+        Storage::fake('disk_short', ['url' => 'test']);
+        $assetRepository = new AssetRepository;
+
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
+
+        Storage::disk('disk_short')->putFileAs('foo', $file, 'image_in_short.jpg');
+        $realFilePath = Storage::disk('disk_short')->getAdapter()->getPathPrefix().'foo/image_in_short.jpg';
+        touch($realFilePath, $timestamp = Carbon::now()->subMinutes(3)->timestamp);
+
+        $containerShortUrl = tap(AssetContainer::make('container_short')->disk('disk_short'))->save();
+        $assetShortUrl = $containerShortUrl->makeAsset('foo/image_in_short.jpg');
+        $assetRepository->save($assetShortUrl);
+
+        Storage::disk('disk_long')->putFileAs('foo', $file, 'image_in_long.jpg');
+        $realFilePath = Storage::disk('disk_long')->getAdapter()->getPathPrefix().'foo/image_in_long.jpg';
+        touch($realFilePath, $timestamp = Carbon::now()->subMinutes(3)->timestamp);
+
+        $containerLongUrl = tap(AssetContainer::make('container_long')->disk('disk_long'))->save();
+        $assetLongUrl = $containerLongUrl->makeAsset('foo/image_in_long.jpg');
+        $assetRepository->save($assetLongUrl);
+
+        $foundAssetShortUrl = Asset::findByUrl($assetShortUrl->url());
+        $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetShortUrl);
+        $this->assertEquals('test/foo/image_in_short.jpg', $foundAssetShortUrl->url());
+
+        $foundAssetLongUrl = Asset::findByUrl($assetLongUrl->url());
+        $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetLongUrl);
+        $this->assertEquals('test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
     }
 }

@@ -26,6 +26,7 @@
                     class="py-1 border-t bg-grey-20 rounded-b-lg text-sm"
                     :resource-meta="meta"
                     @page-selected="selectPage"
+                    :scroll-to-top="false"
                 />
             </div>
         </data-list>

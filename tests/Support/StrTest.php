@@ -170,4 +170,13 @@ class StrTest extends TestCase
         $this->assertFalse(Str::toBool(''));
         $this->assertFalse(Str::toBool('-1'));
     }
+
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/pull/3698
+     **/
+    public function it_replaces_strings()
+    {
+        $this->assertEquals('FÒÔ bàř', Str::replace('fòô bàř', 'fòô', 'FÒÔ'));
+    }
 }

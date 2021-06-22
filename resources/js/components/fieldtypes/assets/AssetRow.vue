@@ -3,7 +3,7 @@
     <tr class="cursor-grab bg-white hover:bg-grey-10">
         <td class="flex items-center">
             <div v-if="canShowSvg"
-                 class="img svg-img mr-1 h-5 w-5 bg-no-repeat bg-center bg-cover"
+                 class="img svg-img mr-1 h-8 w-8 bg-no-repeat bg-center bg-cover"
                  :style="'background-image:url('+asset.url+')'">
             </div>
             <div class="w-8 h-8 mr-1 cursor-pointer whitespace-no-wrap" v-else>

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Asset;
@@ -164,7 +165,14 @@ class EntriesController extends CpController
 
         $fields = $entry->blueprint()->fields()->addValues($data);
 
-        $fields->validate(Entry::updateRules($collection, $entry));
+        $fields
+            ->validator()
+            ->withRules(Entry::updateRules($collection, $entry))
+            ->withReplacements([
+                'id' => $entry->id(),
+                'collection' => $collection->handle(),
+                'site' => $entry->locale(),
+            ])->validate();
 
         $values = $fields->process()->values();
 
@@ -189,9 +197,9 @@ class EntriesController extends CpController
         }
 
         if ($collection->structure() && ! $collection->orderable()) {
-            $entry->afterSave(function ($entry) use ($parent) {
-                $tree = $entry->structure()->in($entry->locale());
+            $tree = $entry->structure()->in($entry->locale());
 
+            $entry->afterSave(function ($entry) use ($parent, $tree) {
                 if ($parent && optional($tree->page($parent))->isRoot()) {
                     $parent = null;
                 }
@@ -201,6 +209,8 @@ class EntriesController extends CpController
                     ->save();
             });
         }
+
+        $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
@@ -254,13 +264,14 @@ class EntriesController extends CpController
         }
 
         $viewData = [
-            'title' => __('Create Entry'),
+            'title' => $collection->createLabel(),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
             ],
             'values' => $values->all(),
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
+            'collectionCreateLabel' => $collection->createLabel(),
             'collectionHasRoutes' => ! is_null($collection->route($site->handle())),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
@@ -302,7 +313,13 @@ class EntriesController extends CpController
 
         $fields = $blueprint->fields()->addValues($data);
 
-        $fields->validate(Entry::createRules($collection, $site));
+        $fields
+            ->validator()
+            ->withRules(Entry::createRules($collection, $site))
+            ->withReplacements([
+                'collection' => $collection->handle(),
+                'site' => $site->handle(),
+            ])->validate();
 
         $values = $fields->process()->values()->except(['slug', 'date', 'blueprint']);
 
@@ -325,6 +342,8 @@ class EntriesController extends CpController
                 $tree->appendTo($parent, $entry)->save();
             });
         }
+
+        $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled()) {
             $entry->store([
@@ -367,6 +386,12 @@ class EntriesController extends CpController
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
         }
 
+        if ($entry->collection()->dated()) {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
         $fields = $blueprint
             ->fields()
             ->addValues($values)
@@ -377,12 +402,6 @@ class EntriesController extends CpController
             'slug' => $entry->slug(),
             'published' => $entry->published(),
         ]);
-
-        if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
-            $values['date'] = $datetime;
-        }
 
         return [$values->all(), $fields->meta()];
     }
@@ -416,6 +435,44 @@ class EntriesController extends CpController
         }
 
         return $date;
+    }
+
+    private function validateUniqueUri($entry, $tree, $parent)
+    {
+        if (! $uri = $this->entryUri($entry, $tree, $parent)) {
+            return;
+        }
+
+        $existing = Entry::findByUri($uri, $entry->locale());
+
+        if (! $existing || $existing->id() === $entry->id()) {
+            return;
+        }
+
+        throw ValidationException::withMessages(['slug' => __('statamic::validation.unique_uri')]);
+    }
+
+    private function entryUri($entry, $tree, $parent)
+    {
+        if (! $entry->route()) {
+            return null;
+        }
+
+        if (! $tree) {
+            return $entry->uri();
+        }
+
+        $parent = $parent ? $tree->page($parent) : null;
+
+        return app(\Statamic\Contracts\Routing\UrlBuilder::class)
+            ->content($entry)
+            ->merge([
+                'parent_uri' => $parent ? $parent->uri() : null,
+                'slug' => $entry->slug(),
+                // 'depth' => '', // todo
+                'is_root' => false,
+            ])
+            ->build($entry->route());
     }
 
     protected function breadcrumbs($collection)

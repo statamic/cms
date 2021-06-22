@@ -64,6 +64,16 @@ class ComposerTest extends TestCase
      * @group integration
      * @test
      */
+    public function it_can_check_if_package_is_installed()
+    {
+        $this->assertTrue(Composer::isInstalled('statamic/composer-test-example-dependency'));
+        $this->assertFalse(Composer::isInstalled('statamic/another-dependency'));
+    }
+
+    /**
+     * @group integration
+     * @test
+     */
     public function it_can_get_installed_path_of_a_package()
     {
         $this->assertEquals(

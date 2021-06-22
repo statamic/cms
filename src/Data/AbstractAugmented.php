@@ -49,7 +49,7 @@ abstract class AbstractAugmented implements Augmented
             return $this->$method();
         }
 
-        if (method_exists($this->data, $method)) {
+        if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
             return $this->wrapValue($this->data->$method(), $handle);
         }
 

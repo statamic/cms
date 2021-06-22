@@ -29,7 +29,7 @@
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
 
                     <data-list-bulk-actions
-                        :url="bulkActionsUrl"
+                        :url="actionUrl"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -49,7 +49,7 @@
                                 <dropdown-item :text="__('View')" :redirect="submission.url" />
                                 <data-list-inline-actions
                                     :item="submission.id"
-                                    :url="runActionUrl"
+                                    :url="actionUrl"
                                     :actions="submission.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"

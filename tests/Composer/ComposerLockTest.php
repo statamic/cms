@@ -93,6 +93,15 @@ class ComposerLockTest extends TestCase
     }
 
     /** @test */
+    public function it_can_check_if_package_is_installed()
+    {
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
+
+        $this->assertTrue(Lock::file()->isInstalled('package/one'));
+        $this->assertFalse(Lock::file()->isInstalled('package/two'));
+    }
+
+    /** @test */
     public function it_can_get_installed_version_of_a_package_from_composer_lock()
     {
         PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);

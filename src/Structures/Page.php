@@ -164,7 +164,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
         $uris = Blink::store('structure-uris');
 
-        if ($cached = $uris[$this->reference] ?? null) {
+        if ($this->tree->uriCacheEnabled() && ($cached = $uris[$this->reference] ?? null)) {
             return $cached;
         }
 

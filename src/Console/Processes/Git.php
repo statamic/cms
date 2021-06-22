@@ -15,6 +15,20 @@ class Git extends Process
     }
 
     /**
+     * Determine if currently in a git repo.
+     *
+     * @return bool
+     */
+    public function isRepo()
+    {
+        $this->withoutLoggingErrors(function ($process) {
+            $process->root();
+        });
+
+        return ! $this->hasErrorOutput();
+    }
+
+    /**
      * Get git status.
      *
      * @param mixed $subPaths

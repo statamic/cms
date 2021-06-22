@@ -46,13 +46,11 @@ class ViewServiceProvider extends ServiceProvider
             return $this;
         });
 
-        tap($this->app['view'], function ($view) {
-            $resolver = function () {
+        foreach (Engine::EXTENSIONS as $extension) {
+            $this->app['view']->addExtension($extension, 'antlers', function () {
                 return $this->app[Engine::class];
-            };
-            $view->addExtension('antlers.html', 'antlers', $resolver);
-            $view->addExtension('antlers.php', 'antlers', $resolver);
-        });
+            });
+        }
 
         ini_set('pcre.backtrack_limit', config('statamic.system.pcre_backtrack_limit', -1));
     }

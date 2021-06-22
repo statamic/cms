@@ -21,6 +21,7 @@ abstract class Tree implements Contract, Localization
     protected $cachedFlattenedPages;
     protected $original;
     protected $withEntries = false;
+    protected $uriCacheEnabled = true;
 
     public function locale($locale = null)
     {
@@ -117,6 +118,18 @@ abstract class Tree implements Contract, Localization
     public function uris()
     {
         return $this->flattenedPages()->map->uri();
+    }
+
+    public function disableUriCache()
+    {
+        $this->uriCacheEnabled = false;
+
+        return $this;
+    }
+
+    public function uriCacheEnabled()
+    {
+        return $this->uriCacheEnabled;
     }
 
     public function page(string $id): ?Page

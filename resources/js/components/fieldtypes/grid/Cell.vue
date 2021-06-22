@@ -1,6 +1,6 @@
 <template>
 
-    <td class="grid-cell" :class="fieldtypeComponent">
+    <td class="grid-cell" :class="fieldtypeComponent" :width="width">
         <div v-show="showInner">
             <component
                 :is="fieldtypeComponent"
@@ -79,6 +79,12 @@ export default {
 
         hasError() {
             return this.errors.length > 0;
+        },
+
+        width() {
+            if (this.field.width) {
+                return this.field.width + '%';
+            }
         }
 
     }

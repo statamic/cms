@@ -40,7 +40,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified, ResolvesValues;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -332,6 +335,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function path()
     {
+        return $this->initialPath ?? $this->buildPath();
+    }
+
+    public function buildPath()
+    {
         $prefix = '';
 
         if ($this->hasDate()) {
@@ -438,11 +446,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             'id' => $this->id(),
             'origin' => optional($this->origin())->id(),
             'published' => $this->published === false ? false : null,
+            'blueprint' => $this->blueprint()->handle(),
         ]);
-
-        if ($this->blueprint && $this->collection()->entryBlueprints()->count() > 1) {
-            $array['blueprint'] = $this->blueprint;
-        }
 
         $data = $this->data()->all();
 
@@ -667,6 +672,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function uri()
     {
+        if (! $this->route()) {
+            return null;
+        }
+
         if ($structure = $this->structure()) {
             return $structure->entryUri($this);
         }
@@ -717,5 +726,14 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function getProtectionScheme()
     {
         return $this->value('protect');
+    }
+
+    public function resolveGqlValue($field)
+    {
+        if ($field === 'site') {
+            return $this->site();
+        }
+
+        return $this->traitResolveGqlValue($field);
     }
 }

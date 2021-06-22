@@ -20,6 +20,7 @@ class Sets extends Fieldtype
     public function preProcess($data)
     {
         return collect($data)->map(function ($set, $handle) {
+            $set['_id'] = $handle;
             $set['handle'] = $handle;
             $set['fields'] = collect($set['fields'])->map(function ($field, $i) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);

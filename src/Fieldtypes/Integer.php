@@ -8,6 +8,7 @@ use Statamic\Fields\Fieldtype;
 class Integer extends Fieldtype
 {
     protected $rules = ['integer'];
+    protected $selectableInForms = true;
 
     public function preProcess($data)
     {
