@@ -39,6 +39,16 @@ class RoutesTest extends TestCase
                 'hello' => 'world',
             ]);
 
+            Route::statamic('/route-with-null-layout', 'test', [
+                'layout' => null,
+                'hello' => 'world',
+            ]);
+
+            Route::statamic('/route-with-false-layout', 'test', [
+                'layout' => false,
+                'hello' => 'world',
+            ]);
+
             Route::statamic('/route-with-loaded-entry', 'test', [
                 'hello' => 'world',
                 'load' => 'pages-blog',
@@ -109,6 +119,30 @@ class RoutesTest extends TestCase
         $this->get('/route-with-custom-layout')
             ->assertOk()
             ->assertSee('Custom layout Hello world');
+    }
+
+    /**
+     * @test
+     * @dataProvider undefinedLayoutRouteProvider
+     **/
+    public function it_renders_a_view_without_a_layout($route)
+    {
+        $this->withoutExceptionHandling();
+        $this->viewShouldReturnRaw('layout', 'The layout {{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get($route)
+            ->assertOk()
+            ->assertSee('Hello world')
+            ->assertDontSee('The layout');
+    }
+
+    public function undefinedLayoutRouteProvider()
+    {
+        return [
+            'null' => ['route-with-null-layout'],
+            'false' => ['route-with-false-layout'],
+        ];
     }
 
     /** @test */
