@@ -41,9 +41,23 @@ class Tags extends BaseTags
         $this->queryOrderBys($builder);
 
         $results = $this->getQueryResults($builder);
-        $results = $this->addResultTypes($results);
 
-        return $this->output($results);
+        $results = $this->output($results);
+
+        return $this->addResultTypesToOutput($results);
+    }
+
+    protected function addResultTypesToOutput($output)
+    {
+        if (! $this->params->get('paginate')) {
+            return $this->addResultTypes($output);
+        }
+
+        $as = $this->getPaginationResultsKey();
+
+        $output[$as] = $this->addResultTypes($output[$as]);
+
+        return $output;
     }
 
     protected function addResultTypes($results)
