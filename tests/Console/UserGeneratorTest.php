@@ -63,7 +63,7 @@ class UserGeneratorTest extends TestCase
         $this->artisan('statamic:make:user')
             ->expectsQuestion('Email', 'jesses.girl@springfield.com')
             ->expectsQuestion('Name', 'Gertrude')
-            ->expectsQuestion('Password (Your input will be hidden)', 'rickie')
+            ->expectsQuestion('Password (Your input will be hidden)', 'iloverickie')
             ->expectsQuestion('Super user', false)
             ->assertExitCode(0);
 

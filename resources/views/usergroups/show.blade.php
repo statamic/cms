@@ -33,8 +33,7 @@
         listing-key="usergroup-users"
         group="{{ $group->id() }}"
         :filters="{{ $filters->toJson() }}"
-        run-action-url="{{ cp_route('users.actions.run') }}"
-        bulk-actions-url="{{ cp_route('users.actions.bulk') }}"
+        action-url="{{ cp_route('users.actions.run') }}"
     ></user-listing>
 
 @endsection

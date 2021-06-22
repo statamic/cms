@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Processes;
 
+use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Statamic\Console\Processes\Exceptions\ProcessException;
@@ -32,6 +33,16 @@ class Process
      * @var bool
      */
     protected $throwOnFailure = false;
+
+    /**
+     * @var array
+     */
+    protected $errorOutput = [];
+
+    /**
+     * @var bool
+     */
+    protected $logErrorOutput = true;
 
     /**
      * Create new process on path.
@@ -65,6 +76,8 @@ class Process
     {
         $process = $this->newSymfonyProcess($command, $this->basePath);
 
+        $this->errorOutput = [];
+
         if ($cacheKey) {
             $this->runAndCacheOutput($process, $cacheKey);
 
@@ -91,6 +104,8 @@ class Process
     {
         $process = $this->newSymfonyProcess($command, $this->basePath);
 
+        $this->errorOutput = [];
+
         $this->output = null;
 
         $process->run(function ($type, $buffer) use (&$output, $operateOnOutput) {
@@ -103,6 +118,33 @@ class Process
         }
 
         return $this->output;
+    }
+
+    /**
+     * Check if process has error output.
+     *
+     * @return bool
+     */
+    public function hasErrorOutput()
+    {
+        return (bool) $this->errorOutput;
+    }
+
+    /**
+     * Run callback without logging errors.
+     *
+     * @param Closure $callable
+     * @return mixed
+     */
+    public function withoutLoggingErrors(Closure $callback)
+    {
+        $this->logErrorOutput = false;
+
+        $output = $callback($this);
+
+        $this->logErrorOutput = true;
+
+        return $output;
     }
 
     /**
@@ -158,6 +200,12 @@ class Process
         }
 
         if (! $error = trim($buffer)) {
+            return true;
+        }
+
+        $this->errorOutput[] = $buffer;
+
+        if (! $this->logErrorOutput) {
             return;
         }
 
@@ -307,8 +355,8 @@ class Process
 
         // Handle both string and array command formats.
         $process = is_string($command) && method_exists(SymfonyProcess::class, 'fromShellCommandLine')
-            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath)
-            : new SymfonyProcess($command, $path ?? $this->basePath);
+            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, ['HOME' => getenv('HOME')])
+            : new SymfonyProcess($command, $path ?? $this->basePath, ['HOME' => getenv('HOME')]);
 
         $process->setTimeout(null);
 

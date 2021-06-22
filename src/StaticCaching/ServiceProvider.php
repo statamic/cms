@@ -33,6 +33,8 @@ class ServiceProvider extends LaravelServiceProvider
 
     public function boot()
     {
-        Event::subscribe(Invalidate::class);
+        if (config('statamic.static_caching.strategy')) {
+            Event::subscribe(Invalidate::class);
+        }
     }
 }

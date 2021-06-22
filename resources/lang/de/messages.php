@@ -144,7 +144,7 @@ return [
     'role_intro' => 'Rollen sind Gruppen von Zugriffs- und Aktionsberechtigungen, die Benutzer*innen und Benutzergruppen zugewiesen werden können.',
     'role_title_instructions' => 'Gewöhnlich ein einzelnes Substantiv, wie Autor*in oder Admin.',
     'search_utility_description' => 'Zeige und verwalte wichtige Informationen über die Suchindizes von Statamic.',
-    'session_expiry_enter_password' => 'Gib dein Passwort ein, um dort weiterzumachen, wo du aufgehört hast.',
+    'session_expiry_enter_password' => 'Gib dein Passwort ein, um die Bearbeitung fortsetzen zu können.',
     'session_expiry_logged_out_for_inactivity' => 'Du wurdest abgemeldet, weil du eine Zeit lang nicht mehr aktiv warst.',
     'session_expiry_logging_out_in_seconds' => 'Du bist seit einiger Zeit inaktiv und wirst in :seconds Sekunden abgemeldet. Klicke, um deine Sitzung zu verlängern.',
     'session_expiry_new_window' => 'Wird in einem neuen Fenster geöffnet. Komm zurück, sobald du dich angemeldet hast.',

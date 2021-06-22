@@ -34,11 +34,6 @@ class UserRolesFieldtypeTest extends TestCase
     /** @test */
     public function it_gets_multiple_roles()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_roles' => ['admin', 'editors'],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'related_roles' => ['type' => 'user_roles'],
         ]);
@@ -46,6 +41,11 @@ class UserRolesFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_roles' => ['admin', 'editors'],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -79,11 +79,6 @@ GQL;
     /** @test */
     public function it_gets_single_role()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_role' => 'admin',
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'related_role' => ['type' => 'user_roles', 'max_items' => 1],
         ]);
@@ -91,6 +86,11 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_role' => 'admin',
+        ])->create();
 
         $query = <<<'GQL'
 {

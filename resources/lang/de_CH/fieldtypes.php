@@ -41,7 +41,7 @@ return [
     'color.config.theme' => 'Zur Auswahl stehen der klassische und der (einfachere) Mini-Farbwähler.',
     'date.config.columns' => 'Mehrere Monate gleichzeitig in verschiedenen Spalten anzeigen.',
     'date.config.earliest_date' => 'Frühestes auswählbares Datum festlegen.',
-    'date.config.format' => 'Datumsangabe optional mit [moment.js](https://momentjs.com/docs/#/displaying/format/) formatieren.',
+    'date.config.format' => 'Wie soll das Datum im [PHP-Datumsformat](https://www.php.net/manual/en/datetime.format.php) gespeichert werden?',
     'date.config.full_width' => 'Kalender dehnen, um die volle Breite auszunutzen.',
     'date.config.inline' => 'Dropdown Eingabefeld überspringen und den Kalender direkt anzeigen.',
     'date.config.mode' => 'Zwischen Einzel- oder Von/Bis-Modus auswählen (der Von/Bis-Modus deaktiviert die Zeiterfassung).',
