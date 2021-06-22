@@ -4,7 +4,6 @@ namespace Statamic\Entries;
 
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
-use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
