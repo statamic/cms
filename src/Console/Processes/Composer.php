@@ -47,7 +47,7 @@ class Composer extends Process
      */
     public function isInstalled(string $package)
     {
-        return Lock::file($this->basePath.'composer.lock')->isInstalled($package);
+        return Lock::file($this->basePath.'composer.lock')->isPackageInstalled($package);
     }
 
     /**
