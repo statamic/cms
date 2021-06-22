@@ -16,27 +16,28 @@ use Statamic\Support\Str;
 
 abstract class AddonServiceProvider extends ServiceProvider
 {
-    protected $listen = [];
-    protected $subscribe = [];
-    protected $tags = [];
-    protected $scopes = [];
     protected $actions = [];
-    protected $fieldtypes = [];
-    protected $modifiers = [];
-    protected $widgets = [];
-    protected $policies = [];
     protected $commands = [];
-    protected $stylesheets = [];
-    protected $externalStylesheets = [];
-    protected $scripts = [];
     protected $externalScripts = [];
+    protected $externalStylesheets = [];
+    protected $fieldtypes = [];
+    protected $listen = [];
+    protected $middlewareGroups = [];
+    protected $modifiers = [];
+    protected $policies = [];
     protected $publishables = [];
     protected $routes = [];
-    protected $middlewareGroups = [];
+    protected $scopes = [];
+    protected $scripts = [];
+    protected $stylesheets = [];
+    protected $subscribe = [];
+    protected $tags = [];
     protected $updateScripts = [];
     protected $viewNamespace;
-    protected $publishAfterInstall = true;
+    protected $widgets = [];
+
     protected $config = true;
+    protected $publishAfterInstall = true;
     protected $translations = true;
 
     public function boot()
@@ -47,26 +48,26 @@ abstract class AddonServiceProvider extends ServiceProvider
             }
 
             $this
-                ->bootEvents()
-                ->bootTags()
-                ->bootScopes()
                 ->bootActions()
-                ->bootFieldtypes()
-                ->bootModifiers()
-                ->bootWidgets()
                 ->bootCommands()
-                ->bootSchedule()
-                ->bootPolicies()
-                ->bootStylesheets()
-                ->bootScripts()
-                ->bootPublishables()
                 ->bootConfig()
-                ->bootTranslations()
-                ->bootRoutes()
+                ->bootEvents()
+                ->bootFieldtypes()
                 ->bootMiddleware()
+                ->bootModifiers()
+                ->bootPolicies()
+                ->bootPublishables()
+                ->bootPublishAfterInstall()
+                ->bootRoutes()
+                ->bootSchedule()
+                ->bootScopes()
+                ->bootScripts()
+                ->bootStylesheets()
+                ->bootTags()
+                ->bootTranslations()
                 ->bootUpdateScripts()
                 ->bootViews()
-                ->bootPublishAfterInstall();
+                ->bootWidgets();
         });
     }
 
