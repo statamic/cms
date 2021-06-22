@@ -105,7 +105,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
         if (func_num_args() === 1) {
             if ($this->isDefaultLocale()) {
                 $this->term->slug($slug);
-            } elseif ($this->term->slug() !== $slug) {
+            } else {
                 $this->set('slug', $slug);
             }
 
