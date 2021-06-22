@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
+use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
@@ -601,6 +602,12 @@ class Collection implements Contract, AugmentableContract
     public function delete()
     {
         $this->queryEntries()->get()->each->delete();
+
+        if ($this->structure()) {
+            $this->structure()->trees()->each(function ($tree) {
+                app(CollectionTreeRepository::class)->delete($tree);
+            });
+        }
 
         Facades\Collection::delete($this);
 
