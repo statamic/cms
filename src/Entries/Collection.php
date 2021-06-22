@@ -603,10 +603,8 @@ class Collection implements Contract, AugmentableContract
     {
         $this->queryEntries()->get()->each->delete();
 
-        if ($this->structure()) {
-            $this->structure()->trees()->each(function ($tree) {
-                app(CollectionTreeRepository::class)->delete($tree);
-            });
+        if ($structure = $this->structure()) {
+            $structure->trees()->each->delete();
         }
 
         Facades\Collection::delete($this);
