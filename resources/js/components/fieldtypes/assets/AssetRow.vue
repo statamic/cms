@@ -6,11 +6,11 @@
                  class="img svg-img mr-1 h-7 w-7 bg-no-repeat bg-center bg-cover text-center flex items-center justify-center"
                  :style="'background-image:url('+asset.url+')'">
             </div>
-            <button class="w-7 h-7 mr-1 cursor-pointer whitespace-no-wrap flex items-center justify-center" @click="edit" v-else>
+            <button class="w-7 h-7 cursor-pointer whitespace-no-wrap flex items-center justify-center" @click="edit" v-else>
                 <img class="asset-thumbnail max-h-full max-w-full rounded w-7 h-7 fit-cover lazyloaded" :src="thumbnail" v-if="isImage" />
                 <file-icon :extension="asset.extension" v-else />
             </button>
-            <button @click="edit" class="flex-1 text-sm text-left truncate" :aria-label="__('Edit Asset')" v-tooltip="asset.basename">{{ asset.basename }}</button>
+            <button v-if="showFilename" @click="edit" class="flex-1 ml-1 text-sm text-left truncate" :aria-label="__('Edit Asset')" v-tooltip="asset.basename">{{ asset.basename }}</button>
         </td>
         <td class="p-0 w-8 text-right align-middle">
 

@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <div class="asset-meta">
+        <div class="asset-meta" v-if="showFilename">
             <div class="asset-filename" :title="label">{{ label }}</div>
         </div>
     </div>

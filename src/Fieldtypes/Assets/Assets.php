@@ -59,6 +59,13 @@ class Assets extends Fieldtype
                 'default' => true,
                 'width' => 50,
             ],
+            'show_filename' => [
+                'display' => __('Show Filename'),
+                'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'max_files' => [
                 'display' => __('Max Files'),
                 'instructions' => __('statamic::fieldtypes.assets.config.max_files'),

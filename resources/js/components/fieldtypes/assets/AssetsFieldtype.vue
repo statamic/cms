@@ -79,6 +79,7 @@
                                 :key="asset.id"
                                 :asset="asset"
                                 :read-only="isReadOnly"
+                                :show-filename="config.show_filename"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved">
                             </asset-tile>
@@ -101,6 +102,7 @@
                                         :key="asset.id"
                                         :asset="asset"
                                         :read-only="isReadOnly"
+                                        :show-filename="config.show_filename"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved">
                                     </tr>
