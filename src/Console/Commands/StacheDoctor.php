@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Stache;
 use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Support\Str;
@@ -26,6 +27,7 @@ class StacheDoctor extends Command
 
         $this->outputDuplicateIds();
         $this->outputUnconfiguredIndexes();
+        $this->outputOrphanedCollectionTrees();
     }
 
     protected function outputUnconfiguredIndexes()
@@ -89,5 +91,24 @@ class StacheDoctor extends Command
         });
 
         return $duplicates->isNotEmpty();
+    }
+
+    protected function outputOrphanedCollectionTrees()
+    {
+        $store = Stache::store('collection-trees');
+
+        $orphaned = $store->getItemsFromFiles()->filter(function ($tree) {
+            return Collection::findByHandle($tree->handle()) === null;
+        });
+
+        if ($orphaned->isEmpty()) {
+            $this->checkLine('No collection trees without a collection detected.');
+            return;
+        }
+
+        $orphaned->each(function($tree) {
+            $this->line('<fg=red>[✗]</> Found a tree file for missing collection <comment>'.$tree->handle().'</comment>');
+        });
+        $this->output->text('The tree files can be found in '.$store->directory());
     }
 }
