@@ -1,6 +1,19 @@
 <template>
     <div>
 
+        <div class="mb-1 flex justify-end">
+            <a
+                class="text-2xs text-blue mr-2 underline"
+                v-text="__('Expand All')"
+                @click="expandAll"
+            />
+            <a
+                class="text-2xs text-blue mr-1 underline"
+                v-text="__('Collapse All')"
+                @click="collapseAll"
+            />
+        </div>
+
         <div class="loading card" v-if="loading">
             <loading-graphic />
         </div>
@@ -18,6 +31,7 @@
                 :indent="24"
                 @change="treeChanged"
                 @drag="treeDragstart"
+                @nodeOpenChanged="saveTreeState"
             >
                 <tree-branch
                     slot-scope="{ data: page, store, vm }"
@@ -25,8 +39,11 @@
                     :depth="vm.level"
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
-                    :hasCollection="hasCollection"
+                    :has-collection="hasCollection"
+                    :is-open="page.open"
+                    :has-children="page.children.length > 0"
                     @edit="$emit('edit-page', page, vm, store, $event)"
+                    @toggle-open="store.toggleOpen(page)"
                     @removed="pageRemoved"
                     @children-orphaned="childrenOrphaned"
                 >
@@ -52,8 +69,8 @@
 
 <script>
 import * as th from 'tree-helper';
-import {Sortable, Plugins} from '@shopify/draggable';
-import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
+import { Sortable, Plugins } from '@shopify/draggable';
+import { DraggableTree } from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
 
 export default {
@@ -73,6 +90,7 @@ export default {
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
         hasCollection: { type: Boolean, required: true },
+        preferencesPrefix: { type: String },
     },
 
     data() {
@@ -94,7 +112,11 @@ export default {
 
         exclusions() {
             return this.hasCollection ? this.pageIds : [];
-        }
+        },
+
+        preferencesKey() {
+            return this.preferencesPrefix ? `${this.preferencesPrefix}.${this.site}.pagetree` : null;
+        },
 
     },
 
@@ -135,6 +157,7 @@ export default {
 
             return this.$axios.get(url).then(response => {
                 this.pages = response.data.pages;
+                this.loadTreeState(this.pages);
                 this.updateTreeData();
                 this.loading = false;
             });
@@ -201,7 +224,10 @@ export default {
 
                 this.$toast.error(message);
                 return Promise.reject(e);
-            }).finally(() => this.saving = false);
+            }).finally(() => {
+                this.saveTreeState();
+                this.saving = false
+            });
         },
 
         addPages(pages, targetParent) {
@@ -290,7 +316,65 @@ export default {
         pageUpdated(tree) {
             this.pages = tree.getPureData();
             this.$emit('changed');
-        }
+        },
+
+        expandAll() {
+            th.breadthFirstSearch(this.treeData, node => {
+                node.open = true
+            })
+            this.saveTreeState();
+        },
+
+        collapseAll() {
+            th.breadthFirstSearch(this.treeData, node => {
+                node.open = false
+            })
+            this.saveTreeState();
+        },
+
+        loadTreeState(treeData) {
+            if (! this.preferencesKey) {
+                return;
+            }
+
+            const open = this.$preferences.get(this.preferencesKey, []);
+            this.applyTreeState(open, treeData);
+        },
+
+        saveTreeState() {
+            if (! this.preferencesKey) {
+                return;
+            }
+
+            const open = this.getTreeState(this.treeData);
+            return this.$preferences.set(this.preferencesKey, open);
+        },
+
+        getTreeState(nodes, parent = '0') {
+            const open = [];
+         
+            nodes.forEach((node, index) => {
+                if (node.children.length > 0) {
+                    const path = `${parent}.${index}`;
+                    if (node.open) {
+                        open.push(path);
+                    }
+                    open.push(...this.getTreeState(node.children, path));
+                }
+            });
+
+            return open;
+        },
+
+        applyTreeState(open, nodes, parent = '0') {
+            nodes.forEach((node, index) => {
+                if (node.children.length > 0) {
+                    const path = `${parent}.${index}`;
+                    node.open = open.includes(path);
+                    this.applyTreeState(open, node.children, path);
+                }
+            });
+        },
 
     }
 

@@ -6,6 +6,7 @@
 
     <navigation-view
         title="{{ $nav->title() }}"
+        handle="{{ $nav->handle() }}"
         breadcrumb-url="{{ cp_route('navigation.index') }}"
         pages-url="{{ cp_route('structures.pages.index', $nav->handle()) }}"
         submit-url="{{ cp_route('structures.pages.store', $nav->handle()) }}"
