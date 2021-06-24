@@ -223,6 +223,9 @@ class CollectionsController extends CpController
         }
 
         if (! $values['structured']) {
+            if ($structure = $collection->structure()) {
+                $structure->trees()->each->delete();
+            }
             $collection->structure(null);
         } else {
             $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites'] ?? null));
