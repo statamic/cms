@@ -12,13 +12,13 @@
                     v-text="page.title || page.url"
                     :title="page.url || undefined" />
 
-                <button 
+                <button
                     v-if="hasChildren"
-                    class="p-1 text-grey-50 transition duration-100 outline-none"
+                    class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
-                    <svg-icon name="chevron-down-xs" class="h-3" />
+                    <svg-icon name="chevron-down-xs" class="h-2.5" />
                 </button>
 
                 <div v-if="page.collection" class="ml-2 flex items-center">
