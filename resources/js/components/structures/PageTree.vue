@@ -212,6 +212,7 @@ export default {
                 this.$emit('saved');
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;
+                this.saveTreeState();
                 return response;
             }).catch(e => {
                 let message = e.response ? e.response.data.message : __('Something went wrong');
@@ -225,7 +226,6 @@ export default {
                 this.$toast.error(message);
                 return Promise.reject(e);
             }).finally(() => {
-                this.saveTreeState();
                 this.saving = false
             });
         },
