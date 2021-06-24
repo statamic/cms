@@ -103,10 +103,11 @@ class StacheDoctor extends Command
 
         if ($orphaned->isEmpty()) {
             $this->checkLine('No collection trees without a collection detected.');
+
             return;
         }
 
-        $orphaned->each(function($tree) {
+        $orphaned->each(function ($tree) {
             $this->line('<fg=red>[✗]</> Found a tree file for missing collection <comment>'.$tree->handle().'</comment>');
         });
         $this->output->text('The tree files can be found in '.$store->directory());
