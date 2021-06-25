@@ -9,7 +9,7 @@ use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class UpdateAssetPathsTest extends TestCase
+class UpdateAssetReferencesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
