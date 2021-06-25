@@ -10,7 +10,7 @@ use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 
-class UpdateAssetPaths implements ShouldQueue
+class UpdateAssetReferences implements ShouldQueue
 {
     /**
      * Register the listeners for the subscriber.
