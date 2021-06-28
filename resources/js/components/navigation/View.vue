@@ -191,7 +191,7 @@ export default {
             showPageDeletionConfirmation: false,
             pageBeingDeleted: null,
             pageDeletionConfirmCallback: null,
-            preferencesPrefix: `navigations.${this.handle}`,
+            preferencesPrefix: `navs.${this.handle}`,
         }
     },
 
