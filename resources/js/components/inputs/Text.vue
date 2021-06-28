@@ -52,6 +52,9 @@ export default {
         if (this.autoselect) {
             this.$refs.input.select();
         }
+        if (this.focus) {
+            this.$refs.input.focus();
+        }
     }
 }
 </script>

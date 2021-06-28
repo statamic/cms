@@ -46,7 +46,7 @@
     "read-time-estimate": "0.0.2",
     "resize-observer-polyfill": "^1.5.1",
     "speakingurl": "^14.0.1",
-    "striptags": "^3.1.1",
+    "striptags": "^3.2.0",
     "sweetalert": "~1.0.1",
     "tiptap-extensions": "^1.28.6",
     "underscore": "~1.9.2",
