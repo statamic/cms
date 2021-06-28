@@ -178,7 +178,7 @@ class Entries extends Relationship
                     'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
                 ];
             });
-        })->values()->all();
+        })->all();
     }
 
     private function getCreatableTitle($collection, $blueprint, $collectionCount, $blueprintCount)
