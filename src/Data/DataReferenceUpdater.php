@@ -176,6 +176,26 @@ abstract class DataReferenceUpdater
     }
 
     /**
+     * Get original value.
+     *
+     * @return mixed
+     */
+    public function originalValue()
+    {
+        return $this->originalValue;
+    }
+
+    /**
+     * Get new value.
+     *
+     * @return mixed
+     */
+    public function newValue()
+    {
+        return $this->newValue;
+    }
+
+    /**
      * Update string value on item.
      *
      * @param \Statamic\Fields\Field $field
@@ -187,11 +207,11 @@ abstract class DataReferenceUpdater
 
         $dottedKey = $dottedPrefix.$field->handle();
 
-        if (Arr::get($data, $dottedKey) !== $this->originalValue) {
+        if (Arr::get($data, $dottedKey) !== $this->originalValue()) {
             return;
         }
 
-        Arr::set($data, $dottedKey, $this->newValue);
+        Arr::set($data, $dottedKey, $this->newValue());
 
         $this->item->data($data);
 
@@ -212,12 +232,12 @@ abstract class DataReferenceUpdater
 
         $fieldData = collect(Arr::dot(Arr::get($data, $dottedKey, [])));
 
-        if (! $fieldData->contains($this->originalValue)) {
+        if (! $fieldData->contains($this->originalValue())) {
             return;
         }
 
         $fieldData->transform(function ($value) {
-            return $value === $this->originalValue ? $this->newValue : $value;
+            return $value === $this->originalValue() ? $this->newValue() : $value;
         });
 
         Arr::set($data, $dottedKey, $fieldData->all());
