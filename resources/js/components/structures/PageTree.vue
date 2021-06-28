@@ -69,8 +69,8 @@
 
 <script>
 import * as th from 'tree-helper';
-import { Sortable, Plugins } from '@shopify/draggable';
-import { DraggableTree } from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
+import {Sortable, Plugins} from '@shopify/draggable';
+import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
 
 export default {
