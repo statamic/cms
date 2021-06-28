@@ -2,8 +2,6 @@
 
 namespace Tests\Listeners;
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
