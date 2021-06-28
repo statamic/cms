@@ -46,7 +46,7 @@
                 <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
                         <create-button
-                            v-if="canCreate"
+                            v-if="canCreate && creatables.length"
                             :creatables="creatables"
                             :site="site"
                             :component="formComponent"
