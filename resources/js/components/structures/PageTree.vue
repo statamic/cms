@@ -225,9 +225,7 @@ export default {
 
                 this.$toast.error(message);
                 return Promise.reject(e);
-            }).finally(() => {
-                this.saving = false
-            });
+            }).finally(() => this.saving = false);
         },
 
         addPages(pages, targetParent) {
