@@ -9,8 +9,7 @@
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
-                    v-text="page.title || page.url"
-                    :title="page.url || undefined" />
+                    v-text="page.title || page.url" />
 
                 <button
                     v-if="hasChildren"
