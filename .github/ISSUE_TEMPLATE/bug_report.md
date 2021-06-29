@@ -29,7 +29,7 @@ assignees: ''
 
 **Statamic version:** 3.1.{?}
 
-**PHP version:** 8.{?}
+**PHP version:** 7.{?}
 
 **Install method (choose one):**
 - Fresh install from `statamic/statamic`
