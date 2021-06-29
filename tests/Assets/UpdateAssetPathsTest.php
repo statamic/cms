@@ -434,6 +434,7 @@ class UpdateAssetPathsTest extends TestCase
         $content = <<<'EOT'
 <p>Some text.</p>
 <img src="statamic://asset::test_container::hoff.jpg">
+<img src="statamic://asset::test_container::hoff.jpg" alt="test">
 </p>More text.</p>
 <img src="statamic://asset::test_container::norris.jpg">
 EOT;
@@ -447,6 +448,7 @@ EOT;
         $expected = <<<'EOT'
 <p>Some text.</p>
 <img src="statamic://asset::test_container::content/hoff-new.jpg">
+<img src="statamic://asset::test_container::content/hoff-new.jpg" alt="test">
 </p>More text.</p>
 <img src="statamic://asset::test_container::norris.jpg">
 EOT;
