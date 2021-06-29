@@ -113,7 +113,7 @@ export default {
             importPrefix: null,
             fieldSuggestions: fieldsets.flatMap(fieldset => fieldset.fields.map(field => ({
                 value: `${fieldset.handle}.${field.handle}`,
-                label: field.config.display,
+                label: field.config && field.config.display ? field.config.display : field.handle,
                 fieldset: fieldset.title,
             }))),
             fieldsetSuggestions: fieldsets.map(fieldset => ({
