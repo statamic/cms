@@ -366,43 +366,51 @@ class UpdateAssetPathsTest extends TestCase
         $entry = tap(Facades\Entry::make()->collection($collection)->data([
             'bardo' => [
                 [
+                    'type' => 'paragraph',
                     'content' => [
-                        'type' => 'paragraph',
-                        'content' => [
+                        [
                             'type' => 'image',
                             'attrs' => [
-                                'src' => 'statamic://asset::test_container::hoff.jpg',
+                                'src' => 'asset::test_container::hoff.jpg',
                                 'alt' => 'hoff',
                             ],
+                        ],
+                        [
+                            'type' => 'paragraph',
+                            'content' => 'unrelated',
                         ],
                     ],
                 ],
                 [
+                    'type' => 'paragraph',
                     'content' => [
-                        'type' => 'paragraph',
-                        'content' => [
+                        [
                             'type' => 'image',
                             'attrs' => [
-                                'src' => 'statamic://asset::test_container::norris.jpg',
+                                'src' => 'asset::test_container::norris.jpg',
                                 'alt' => 'norris',
                             ],
                         ],
                     ],
                 ],
+                [
+                    'type' => 'paragraph',
+                    'content' => 'unrelated',
+                ],
             ],
         ]))->save();
 
-        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.content.attrs.src'));
-        $this->assertEquals('hoff', Arr::get($entry->data(), 'bardo.0.content.content.attrs.alt'));
-        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->data(), 'bardo.1.content.content.attrs.src'));
-        $this->assertEquals('norris', Arr::get($entry->data(), 'bardo.1.content.content.attrs.alt'));
+        $this->assertEquals('asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.0.attrs.src'));
+        $this->assertEquals('hoff', Arr::get($entry->data(), 'bardo.0.content.0.attrs.alt'));
+        $this->assertEquals('asset::test_container::norris.jpg', Arr::get($entry->data(), 'bardo.1.content.0.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->data(), 'bardo.1.content.0.attrs.alt'));
 
         $this->assetHoff->path('content/hoff-new.jpg')->save();
 
-        $this->assertEquals('statamic://asset::test_container::content/hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.content.attrs.src'));
-        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'bardo.0.content.content.attrs.alt'));
-        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.1.content.content.attrs.src'));
-        $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'bardo.1.content.content.attrs.alt'));
+        $this->assertEquals('asset::test_container::content/hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.0.attrs.src'));
+        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'bardo.0.content.0.attrs.alt'));
+        $this->assertEquals('asset::test_container::norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.alt'));
     }
 
     /** @test */
@@ -701,12 +709,12 @@ EOT;
             'wrong_marky' => '# Markdown ![](statamic://asset::test_container::hoff.jpg)',
             'bardo' => [
                 [
+                    'type' => 'paragraph',
                     'content' => [
-                        'type' => 'paragraph',
-                        'content' => [
+                        [
                             'type' => 'image',
                             'attrs' => [
-                                'src' => 'statamic://asset::test_container::hoff.jpg',
+                                'src' => 'asset::test_container::hoff.jpg',
                                 'alt' => 'norris',
                             ],
                         ],
@@ -715,12 +723,12 @@ EOT;
             ],
             'wrong_bardo' => [
                 [
+                    'type' => 'paragraph',
                     'content' => [
-                        'type' => 'paragraph',
-                        'content' => [
+                        [
                             'type' => 'image',
                             'attrs' => [
-                                'src' => 'statamic://asset::test_container::hoff.jpg',
+                                'src' => 'asset::test_container::hoff.jpg',
                                 'alt' => 'norris',
                             ],
                         ],
@@ -735,8 +743,8 @@ EOT;
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->get('wrong_pics'));
         $this->assertEquals('# Markdown ![](statamic://asset::test_container::hoff.jpg)', $entry->get('marky'));
         $this->assertEquals('# Markdown ![](statamic://asset::test_container::hoff.jpg)', $entry->get('wrong_marky'));
-        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.content.attrs.src'));
-        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->data(), 'wrong_bardo.0.content.content.attrs.src'));
+        $this->assertEquals('asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.0.attrs.src'));
+        $this->assertEquals('asset::test_container::hoff.jpg', Arr::get($entry->data(), 'wrong_bardo.0.content.0.attrs.src'));
 
         $this->assetHoff->path('hoff-new.jpg')->save();
 
@@ -746,8 +754,8 @@ EOT;
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->fresh()->get('wrong_pics'));
         $this->assertEquals('# Markdown ![](statamic://asset::test_container::hoff-new.jpg)', $entry->fresh()->get('marky'));
         $this->assertEquals('# Markdown ![](statamic://asset::test_container::hoff.jpg)', $entry->fresh()->get('wrong_marky'));
-        $this->assertEquals('statamic://asset::test_container::hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.content.attrs.src'));
-        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->fresh()->data(), 'wrong_bardo.0.content.content.attrs.src'));
+        $this->assertEquals('asset::test_container::hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.0.attrs.src'));
+        $this->assertEquals('asset::test_container::hoff.jpg', Arr::get($entry->fresh()->data(), 'wrong_bardo.0.content.0.attrs.src'));
     }
 
     /** @test */
@@ -965,12 +973,12 @@ EOT;
             'marky' => '# Markdown ![](statamic://asset::test_container::unrelated.jpg)',
             'bardo' => [
                 [
+                    'type' => 'paragraph',
                     'content' => [
-                        'type' => 'paragraph',
-                        'content' => [
+                        [
                             'type' => 'image',
                             'attrs' => [
-                                'src' => 'statamic://asset::test_container::unrelated.jpg',
+                                'src' => 'asset::test_container::unrelated.jpg',
                                 'alt' => 'norris',
                             ],
                         ],

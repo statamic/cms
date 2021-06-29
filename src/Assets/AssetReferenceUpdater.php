@@ -335,7 +335,7 @@ class AssetReferenceUpdater
     }
 
     /**
-     * Update `statamic://` urls in bard set on item.
+     * Update asset references in bard set on item.
      *
      * @param null|string $dottedPrefix
      * @param \Statamic\Fields\Field $field
@@ -346,33 +346,32 @@ class AssetReferenceUpdater
 
         $dottedKey = $dottedPrefix.$field->handle();
 
-        $originalValue = Arr::get($data, $dottedKey);
+        $bardPayload = Arr::get($data, $dottedKey, []);
 
-        $changed = false;
-
-        $value = collect($originalValue)
-            ->map(function ($set) use (&$changed) {
-                $prefix = "statamic://asset::{$this->container}::";
-
-                if (Arr::get($set, 'content.content.type') !== 'image') {
-                    return $set;
-                } elseif (Arr::get($set, 'content.content.attrs.src') !== $prefix.$this->originalPath) {
-                    return $set;
-                }
-
-                $set['content']['content']['attrs']['src'] = $prefix.$this->newPath;
-
-                $changed = true;
-
-                return $set;
+        $changed = collect(Arr::dot($bardPayload))
+            ->filter(function ($value, $key) {
+                return preg_match('/(.*)\.(type)/', $key) && $value === 'image';
             })
-            ->all();
+            ->mapWithKeys(function ($value, $key) use ($bardPayload) {
+                $key = str_replace('.type', '.attrs.src', $key);
 
-        if (! $changed) {
+                return [$key => Arr::get($bardPayload, $key)];
+            })
+            ->filter(function ($value) {
+                return $value === "asset::{$this->container}::{$this->originalPath}";
+            })
+            ->map(function ($value) {
+                return "asset::{$this->container}::{$this->newPath}";
+            })
+            ->each(function ($value, $key) use (&$bardPayload) {
+                Arr::set($bardPayload, $key, $value);
+            });
+
+        if ($changed->isEmpty()) {
             return;
         }
 
-        Arr::set($data, $dottedKey, $value);
+        Arr::set($data, $dottedKey, $bardPayload);
 
         $this->item->data($data);
 
