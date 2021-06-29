@@ -225,6 +225,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
+            $value = str_replace('statamic://', '', $value);
             $doc = (new \HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {

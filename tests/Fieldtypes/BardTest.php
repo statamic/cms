@@ -180,7 +180,7 @@ class BardTest extends TestCase
     /** @test */
     public function it_converts_plain_html_into_prosemirror_structure()
     {
-        $data = '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>';
+        $data = '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second <a href="statamic://entry::foo">paragraph</a>. <img src="statamic://asset::assets::lagoa.jpg"></p>';
 
         $expected = [
             [
@@ -194,7 +194,16 @@ class BardTest extends TestCase
             [
                 'type' => 'paragraph',
                 'content' => [
-                    ['type' => 'text', 'text' => 'Second paragraph.'],
+                    ['type' => 'text', 'text' => 'Second '],
+                    ['type' => 'text', 'text' => 'paragraph', 'marks' => [
+                        ['type' => 'link', 'attrs' => ['href' => 'entry::foo']]
+                    ]],
+                    ['type' => 'text', 'text' => '. '],
+                    ['type' => 'image', 'attrs' => [
+                        'alt' => null,
+                        'src' => 'asset::assets::lagoa.jpg',
+                        'title' => null,
+                    ]],
                 ],
             ],
         ];
