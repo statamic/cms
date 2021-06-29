@@ -186,10 +186,10 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 return [$key => Arr::get($bardPayload, $key)];
             })
             ->filter(function ($value) {
-                return $value === "asset::{$this->container}::{$this->originalPath}";
+                return $value === "asset::{$this->container}::{$this->originalValue}";
             })
             ->map(function ($value) {
-                return "asset::{$this->container}::{$this->newPath}";
+                return "asset::{$this->container}::{$this->newValue}";
             })
             ->each(function ($value, $key) use (&$bardPayload) {
                 Arr::set($bardPayload, $key, $value);
