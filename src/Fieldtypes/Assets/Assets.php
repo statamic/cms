@@ -189,7 +189,7 @@ class Assets extends Fieldtype
                 $message = str_replace(':values', join(', ', $parameters), __('statamic::validation.mimetypes'));
             }
 
-            return $message ? new AssetRule($name, $parameters, $message) : $rule;
+            return $message ? new AssetRule($name, $message, $parameters) : $rule;
         })->all();
     }
 

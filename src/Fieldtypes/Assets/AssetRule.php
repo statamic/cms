@@ -7,6 +7,7 @@ use Illuminate\Validation\Concerns\ValidatesAttributes;
 use Statamic\Facades\Asset;
 use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AssetRule implements Rule
 {
@@ -16,11 +17,11 @@ class AssetRule implements Rule
     protected $parameters;
     protected $message;
 
-    public function __construct($name, $parameters = null, $message = null)
+    public function __construct($name, $message, $parameters = null)
     {
         $this->name = $name;
-        $this->parameters = $parameters;
         $this->message = $message;
+        $this->parameters = $parameters;
     }
 
     /**
