@@ -8,8 +8,8 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Field;
-use Statamic\Fieldtypes\Assets\Assets;
 use Statamic\Fieldtypes\Assets\AssetRule;
+use Statamic\Fieldtypes\Assets\Assets;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
