@@ -111,7 +111,9 @@ export default {
             reference: null,
             fieldset: null,
             importPrefix: null,
-            fieldSuggestions: fieldsets.flatMap(fieldset => fieldset.fields.map(field => ({
+            fieldSuggestions: fieldsets.flatMap(fieldset => fieldset.fields.filter(field => {
+                return field.type !== 'import';
+            }).map(field => ({
                 value: `${fieldset.handle}.${field.handle}`,
                 label: field.config.display,
                 fieldset: fieldset.title,
