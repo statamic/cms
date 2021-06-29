@@ -174,7 +174,10 @@ class Assets extends Fieldtype
     {
         return collect(parent::fieldRules())->map(function ($rule) {
             $name = Str::before($rule, ':');
-            $parameters = explode(',', Str::after($rule, ':'));
+
+            $parameters = Str::contains($rule, ':')
+                ? explode(',', Str::after($rule, ':'))
+                : null;
 
             if ($name === 'dimensions') {
                 $message = __('statamic::validation.dimensions');
