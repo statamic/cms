@@ -176,19 +176,17 @@ class Assets extends Fieldtype
             $name = Str::before($rule, ':');
             $parameters = explode(',', Str::after($rule, ':'));
 
-            if ($name === 'image') {
-                return new ImageRule();
+            if ($name === 'dimensions') {
+                $message = __('statamic::validation.dimensions');
+            } elseif ($name === 'image') {
+                $message = __('statamic::validation.image');
+            } elseif ($name === 'mimes') {
+                $message = str_replace(':values', join(', ', $parameters), __('statamic::validation.mimes'));
+            } elseif ($name === 'mimetypes') {
+                $message = str_replace(':values', join(', ', $parameters), __('statamic::validation.mimetypes'));
             }
 
-            if ($name === 'mimes') {
-                return new MimesRule($parameters);
-            }
-
-            if ($name === 'mimetypes') {
-                return new MimetypesRule($parameters);
-            }
-
-            return $rule;
+            return $message ? new AssetRule($name, $parameters, $message) : $rule;
         })->all();
     }
 
