@@ -335,7 +335,7 @@ export default {
                 return;
             }
 
-            const open = this.$preferences.get(this.preferencesKey, []);
+            const open = localStorage.getItem(this.preferencesKey) || [];
             this.applyTreeState(open, treeData);
         },
 
@@ -345,7 +345,7 @@ export default {
             }
 
             const open = this.getTreeState(this.treeData);
-            return this.$preferences.set(this.preferencesKey, open);
+            return localStorage.setItem(this.preferencesKey, open);
         },
 
         getTreeState(nodes, parent = '0') {
