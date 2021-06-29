@@ -335,8 +335,8 @@ export default {
                 return;
             }
 
-            const open = localStorage.getItem(this.preferencesKey) || [];
-            this.applyTreeState(open, treeData);
+            const closed = JSON.parse(localStorage.getItem(this.preferencesKey) || '[]');
+            this.applyTreeState(closed, treeData);
         },
 
         saveTreeState() {
@@ -344,32 +344,32 @@ export default {
                 return;
             }
 
-            const open = this.getTreeState(this.treeData);
-            return localStorage.setItem(this.preferencesKey, open);
+            const closed = this.getTreeState(this.treeData);
+            return localStorage.setItem(this.preferencesKey, JSON.stringify(closed));
         },
 
         getTreeState(nodes, parent = '0') {
-            const open = [];
+            const closed = [];
          
             nodes.forEach((node, index) => {
                 if (node.children.length > 0) {
                     const path = `${parent}.${index}`;
-                    if (node.open) {
-                        open.push(path);
+                    if (! node.open) {
+                        closed.push(path);
                     }
-                    open.push(...this.getTreeState(node.children, path));
+                    closed.push(...this.getTreeState(node.children, path));
                 }
             });
 
-            return open;
+            return closed;
         },
 
-        applyTreeState(open, nodes, parent = '0') {
+        applyTreeState(closed, nodes, parent = '0') {
             nodes.forEach((node, index) => {
                 if (node.children.length > 0) {
                     const path = `${parent}.${index}`;
-                    node.open = open.includes(path);
-                    this.applyTreeState(open, node.children, path);
+                    node.open = ! closed.includes(path);
+                    this.applyTreeState(closed, node.children, path);
                 }
             });
         },
