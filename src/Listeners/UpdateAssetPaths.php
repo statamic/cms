@@ -45,7 +45,9 @@ class UpdateAssetPaths implements ShouldQueue
             ->merge(GlobalSet::all()->flatMap->localizations())
             ->merge(User::all())
             ->each(function ($item) use ($container, $originalPath, $newPath) {
-                AssetReferenceUpdater::item($item)->updateAssetReferences($container, $originalPath, $newPath);
+                AssetReferenceUpdater::item($item)
+                    ->filterByContainer($container)
+                    ->updateReferences($originalPath, $newPath);
             });
     }
 }
