@@ -52,6 +52,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootCommands()
                 ->bootConfig()
                 ->bootEvents()
+                ->bootFieldsets()
                 ->bootFieldtypes()
                 ->bootMiddleware()
                 ->bootModifiers()
@@ -109,6 +110,25 @@ abstract class AddonServiceProvider extends ServiceProvider
         foreach ($this->actions as $class) {
             $class::register();
         }
+
+        return $this;
+    }
+
+    protected function bootFieldsets()
+    {
+        $filename = $this->getAddon()->slug();
+        $directory = $this->getAddon()->directory();
+        $origin = "{$directory}resources/fieldtypes/{$filename}.php";
+
+        if (! $this->config || ! file_exists($origin)) {
+            return $this;
+        }
+
+        $this->mergeConfigFrom($origin, $filename);
+
+        $this->publishes([
+            $origin => config_path("{$filename}.php"),
+        ], "{$filename}-config");
 
         return $this;
     }

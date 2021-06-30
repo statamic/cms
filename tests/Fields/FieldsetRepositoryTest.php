@@ -112,7 +112,6 @@ fields:
 EOT;
 
         File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnTrue();
         File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
             '/path/to/resources/fieldsets/first.yaml',
             '/path/to/resources/fieldsets/second.yaml',
@@ -135,8 +134,6 @@ EOT;
     /** @test */
     public function it_returns_empty_collection_if_fieldset_directory_doesnt_exist()
     {
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
-
         $all = $this->repo->all();
 
         $this->assertInstanceOf(Collection::class, $all);
@@ -171,5 +168,68 @@ EOT;
         ]);
 
         $this->repo->save($fieldset);
+    }
+
+    /** @test  */
+    public function it_gets_a_fieldset_in_a_an_addon_directory()
+    {
+        $contents = <<<'EOT'
+title: Test Fieldset
+fields: []
+EOT;
+        $this->repo->addDirectory('/vendor/foo/resources/fieldsets', 'foo');
+        File::shouldReceive('exists')->with('/vendor/foo/resources/fieldsets/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/vendor/foo/resources/fieldsets/test.yaml')->once()->andReturn($contents);
+
+        $fieldset = $this->repo->find('foo::test');
+
+        $this->assertInstanceOf(Fieldset::class, $fieldset);
+        $this->assertEquals('Test Fieldset', $fieldset->title());
+        $this->assertEquals('test', $fieldset->handle());
+    }
+
+    /** @test */
+    public function it_gets_all_fieldsets_including_addon_ones()
+    {
+        $firstContents = <<<'EOT'
+title: First Fieldset
+fields:
+  one:
+    type: text
+    display: First Field
+EOT;
+        $secondContents = <<<'EOT'
+title: Second Fieldset
+fields:
+  two:
+    type: text
+    display: Second Field
+EOT;
+        $thirdContents = <<<'EOT'
+title: Third Fieldset
+fields:
+  three:
+    type: text
+    display: Third Field
+EOT;
+
+        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
+        File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
+            '/path/to/resources/fieldsets/first.yaml',
+            '/path/to/resources/fieldsets/second.yaml',
+            '/path/to/resources/fieldsets/sub/third.yaml',
+        ]));
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/first.yaml')->once()->andReturn($firstContents);
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/second.yaml')->once()->andReturn($secondContents);
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/third.yaml')->once()->andReturn($thirdContents);
+
+        $all = $this->repo->all();
+
+        $this->assertInstanceOf(Collection::class, $all);
+        $this->assertCount(3, $all);
+        $this->assertEveryItemIsInstanceOf(Fieldset::class, $all);
+        $this->assertEquals(['first', 'second', 'sub.third'], $all->keys()->all());
+        $this->assertEquals(['first', 'second', 'sub.third'], $all->map->handle()->values()->all());
+        $this->assertEquals(['First Fieldset', 'Second Fieldset', 'Third Fieldset'], $all->map->title()->values()->all());
     }
 }

@@ -18,16 +18,19 @@ class FieldsetController extends CpController
 
     public function index(Request $request)
     {
-        $fieldsets = Facades\Fieldset::all()->map(function ($fieldset) {
-            return [
-                'id' => $fieldset->handle(),
-                'handle' => $fieldset->handle(),
-                'title' => $fieldset->title(),
-                'fields' => $fieldset->fields()->all()->count(),
-                'edit_url' => $fieldset->editUrl(),
-                'delete_url' => $fieldset->deleteUrl(),
-            ];
-        })->values();
+        $fieldsets = Facades\Fieldset::all()
+            ->reject(function (Fieldset $fieldset) {
+                return $fieldset->isExternalFieldset();
+            })->map(function (Fieldset $fieldset) {
+                return [
+                    'id' => $fieldset->handle(),
+                    'handle' => $fieldset->handle(),
+                    'title' => $fieldset->title(),
+                    'fields' => $fieldset->fields()->all()->count(),
+                    'edit_url' => $fieldset->editUrl(),
+                    'delete_url' => $fieldset->deleteUrl(),
+                ];
+            })->values();
 
         if ($request->wantsJson()) {
             return $fieldsets;

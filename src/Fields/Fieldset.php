@@ -10,10 +10,13 @@ use Statamic\Support\Str;
 
 class Fieldset
 {
-    protected $handle;
     protected $contents = [];
+    protected $handle;
 
-    public function setHandle(string $handle)
+    /** @var bool */
+    protected $isExternalFieldset = false;
+
+    public function setHandle(string $handle): self
     {
         $this->handle = $handle;
 
@@ -25,7 +28,19 @@ class Fieldset
         return $this->handle;
     }
 
-    public function setContents(array $contents)
+    public function setIsExternalFieldset(bool $isExternalFieldset): self
+    {
+        $this->isExternalFieldset = $isExternalFieldset;
+
+        return $this;
+    }
+
+    public function isExternalFieldset(): bool
+    {
+        return $this->isExternalFieldset;
+    }
+
+    public function setContents(array $contents): self
     {
         $fields = array_get($contents, 'fields', []);
 
