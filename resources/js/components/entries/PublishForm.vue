@@ -436,7 +436,10 @@ export default {
         },
 
         save() {
-            if (!this.canSave) return;
+            if (! this.canSave) {
+                this.quickSave = false;
+                return;
+            }
 
             this.saving = true;
             this.clearErrors();
