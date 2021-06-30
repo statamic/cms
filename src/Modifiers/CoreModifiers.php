@@ -997,7 +997,7 @@ class CoreModifiers extends Modifier
      */
     public function isLowercase($value)
     {
-        return Stringy::isLowercase($value);
+        return Stringy::isLowerCase($value);
     }
 
     /**
