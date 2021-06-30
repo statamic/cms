@@ -94,6 +94,7 @@ class AssetsTest extends TestCase
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
         $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.dimensions'), $replaced[0]->message());
     }
 
     /** @test */
@@ -104,6 +105,7 @@ class AssetsTest extends TestCase
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
         $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.image'), $replaced[0]->message());
     }
 
     /** @test */
@@ -114,6 +116,7 @@ class AssetsTest extends TestCase
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
         $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.mimes', ['values' => 'jpg, png']), $replaced[0]->message());
     }
 
     /** @test */
@@ -124,6 +127,17 @@ class AssetsTest extends TestCase
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
         $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.mimetypes', ['values' => 'image/jpg, image/png']), $replaced[0]->message());
+    }
+
+    /** @test */
+    public function it_doesnt_replace_non_image_related_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['min:3']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertEquals('min:3', $replaced[0]);
     }
 
     public function fieldtype($config = [])
