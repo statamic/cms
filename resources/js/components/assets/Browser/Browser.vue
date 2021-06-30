@@ -1,6 +1,6 @@
 <template>
 
-    <div class="min-h-screen">
+    <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
         <div v-if="initializing" class="loading">
             <loading-graphic  />
         </div>
@@ -44,7 +44,7 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }" :class="modeClass">
-                        <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs }">
+                        <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
                             <div class="relative w-full">
 
                                 <div class="data-list-header">
@@ -123,7 +123,7 @@
 
                                         <td class="actions-column" :colspan="columns.length">
                                             <dropdown-list v-if="folderActions(folder).length">
-                                                <!-- TODO: Do we want folder edit functionality for launch? -->
+                                                <!-- TODO: Folder edit -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
                                                 <data-list-inline-actions
@@ -194,8 +194,8 @@
                                         <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="folder.basename" :title="folder.basename" />
                                     </div>
                                     <!-- Assets -->
-                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="asset in assets" :key="asset.id">
-                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('edit-asset', asset)">
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="(asset, index) in assets" :key="asset.id">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
                                             <div class="absolute inset-0 flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
                                                 <asset-thumbnail :asset="asset" class="h-full w-full" />
                                             </div>
@@ -304,6 +304,8 @@ export default {
             mode: 'table',
             actionUrl: null,
             folderActionUrl: null,
+            shifting: false,
+            lastItemClicked: null
         }
     },
 
@@ -563,20 +565,47 @@ export default {
             return this.selectedAssets.includes(id);
         },
 
-        toggleSelection(id) {
+        toggleSelection(id, index, $event) {
             const i = this.selectedAssets.indexOf(id);
+            this.$refs.browser.focus()
 
             if (i != -1) {
                 this.selectedAssets.splice(i, 1);
             } else if (! this.reachedSelectionLimit) {
-                this.selectedAssets.push(id);
+                if ($event.shiftKey && this.lastItemClicked !== null) {
+                    this.selectRange(
+                        Math.min(this.lastItemClicked, index),
+                        Math.max(this.lastItemClicked, index)
+                    );
+                } else {
+                    this.selectedAssets.push(id);
+                }
             }
             this.$emit('selections-updated', this.selectedAssets);
+            this.lastItemClicked = index;
         },
 
         folderActions(folder) {
             return folder.actions || this.folder.actions || [];
-        }
+        },
+
+        selectRange(from, to) {
+            for (var i = from; i <= to; i++ ) {
+                let asset = this.assets[i].id;
+                if (! this.selectedAssets.includes(asset) && ! this.reachedSelectionLimit) {
+                    this.selectedAssets.push(asset);
+                }
+                this.$emit('selections-updated', this.selectedAssets);
+            };
+        },
+
+        shiftDown() {
+            this.shifting = true
+        },
+
+        clearShift() {
+            this.shifting = false
+        },
 
     }
 
