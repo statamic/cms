@@ -64,15 +64,6 @@ class Site implements Augmentable
         return Str::removeRight($url, '/');
     }
 
-    public function path()
-    {
-        $url = $this->config['url'];
-
-        $url = Str::removeLeft($url, request()->getSchemeAndHttpHost());
-
-        return Str::ensureLeft($url, '/');
-    }
-
     public function relativePath($url)
     {
         $url = Str::ensureRight($url, '/');
