@@ -2,86 +2,53 @@
 
 namespace Statamic\Assets;
 
+use Statamic\Data\DataReferenceUpdater;
 use Statamic\Facades\AssetContainer;
-use Statamic\Fields\Fields;
 use Statamic\Support\Arr;
 
-class AssetReferenceUpdater
+class AssetReferenceUpdater extends DataReferenceUpdater
 {
-    protected $item;
+    /**
+     * @var string
+     */
     protected $container;
-    protected $oldPath;
-    protected $newPath;
-    protected $updated;
 
     /**
-     * Instantiate asset reference updater.
-     *
-     * @param mixed $item
-     */
-    public function __construct($item)
-    {
-        $this->item = $item;
-    }
-
-    /**
-     * Instantiate asset reference updater.
-     *
-     * @param mixed $item
-     * @return static
-     */
-    public static function item($item)
-    {
-        return new static($item);
-    }
-
-    /**
-     * Update asset references.
+     * Filter by container.
      *
      * @param string $container
-     * @param string $originalPath
-     * @param string $newPath
+     * @return $this
      */
-    public function updateAssetReferences(string $container, string $originalPath, string $newPath)
+    public function filterByContainer(string $container)
     {
         $this->container = $container;
-        $this->originalPath = $originalPath;
-        $this->newPath = $newPath;
 
-        $this->updateAssets();
-
-        if ($this->updated) {
-            $this->item->save();
-        }
+        return $this;
     }
 
     /**
-     * Update assets fields.
+     * Recursively update fields.
      *
+     * @param \Illuminate\Support\Collection $fields
      * @param null|string $dottedPrefix
-     * @param null|\Statamic\Fields\Fields $fields
      */
-    protected function updateAssets($dottedPrefix = null, $fields = null)
+    protected function recursivelyUpdateFields($fields, $dottedPrefix = null)
     {
-        $fields = $fields
-            ? $fields->all()
-            : $this->item->blueprint()->fields()->all();
-
         $this
-            ->updateAssetsFieldValues($dottedPrefix, $fields)
-            ->updateBardFieldValues($dottedPrefix, $fields)
-            ->updateMarkdownFieldValues($dottedPrefix, $fields)
-            ->updateNestedFieldValues($dottedPrefix, $fields);
+            ->updateAssetsFieldValues($fields, $dottedPrefix)
+            ->updateBardFieldValues($fields, $dottedPrefix)
+            ->updateMarkdownFieldValues($fields, $dottedPrefix)
+            ->updateNestedFieldValues($fields, $dottedPrefix);
     }
 
     /**
      * Update assets field values.
      *
+     * @param \Illuminate\Support\Collection $fields
      * @param null|string $dottedPrefix
-     * @param null|\Statamic\Fields\Fields $fields
      * @return $this
      */
-    protected function updateAssetsFieldValues($dottedPrefix, $fields)
+    protected function updateAssetsFieldValues($fields, $dottedPrefix)
     {
         $fields
             ->filter(function ($field) {
@@ -90,8 +57,8 @@ class AssetReferenceUpdater
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $field->get('max_files') === 1
-                    ? $this->updateStringValue($dottedPrefix, $field)
-                    : $this->updateArrayValue($dottedPrefix, $field);
+                    ? $this->updateStringValue($field, $dottedPrefix)
+                    : $this->updateArrayValue($field, $dottedPrefix);
             });
 
         return $this;
@@ -100,11 +67,11 @@ class AssetReferenceUpdater
     /**
      * Update bard field values.
      *
+     * @param \Illuminate\Support\Collection $fields
      * @param null|string $dottedPrefix
-     * @param null|\Statamic\Fields\Fields $fields
      * @return $this
      */
-    protected function updateBardFieldValues($dottedPrefix, $fields)
+    protected function updateBardFieldValues($fields, $dottedPrefix)
     {
         $fields
             ->filter(function ($field) {
@@ -113,8 +80,8 @@ class AssetReferenceUpdater
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $field->get('save_html') === true
-                    ? $this->updateStatamicUrlsInStringValue($dottedPrefix, $field)
-                    : $this->updateStatamicUrlsInBardImage($dottedPrefix, $field);
+                    ? $this->updateStatamicUrlsInStringValue($field, $dottedPrefix)
+                    : $this->updateStatamicUrlsInBardImage($field, $dottedPrefix);
             });
 
         return $this;
@@ -123,11 +90,11 @@ class AssetReferenceUpdater
     /**
      * Update markdown field values.
      *
+     * @param \Illuminate\Support\Collection $fields
      * @param null|string $dottedPrefix
-     * @param null|\Statamic\Fields\Fields $fields
      * @return $this
      */
-    protected function updateMarkdownFieldValues($dottedPrefix, $fields)
+    protected function updateMarkdownFieldValues($fields, $dottedPrefix)
     {
         $fields
             ->filter(function ($field) {
@@ -135,101 +102,10 @@ class AssetReferenceUpdater
                     && $field->get('container') === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
-                $this->updateStatamicUrlsInStringValue($dottedPrefix, $field);
+                $this->updateStatamicUrlsInStringValue($field, $dottedPrefix);
             });
 
         return $this;
-    }
-
-    /**
-     * Update nested field values.
-     *
-     * @param null|string $dottedPrefix
-     * @param \Illuminate\Support\Collection $fields
-     * @return $this
-     */
-    protected function updateNestedFieldValues($dottedPrefix, $fields)
-    {
-        $fields
-            ->filter(function ($field) {
-                return in_array($field->type(), ['replicator', 'grid', 'bard']);
-            })
-            ->each(function ($field) use ($dottedPrefix) {
-                $method = 'update'.ucfirst($field->type()).'Children';
-                $dottedKey = $dottedPrefix.$field->handle();
-
-                $this->{$method}($dottedKey, $field);
-            });
-
-        return $this;
-    }
-
-    /**
-     * Update replicator field children.
-     *
-     * @param string $dottedKey
-     * @param \Statamic\Fields\Field $field
-     */
-    protected function updateReplicatorChildren($dottedKey, $field)
-    {
-        $data = $this->item->data();
-
-        $sets = Arr::get($data, $dottedKey);
-
-        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
-            $dottedPrefix = "{$dottedKey}.{$setKey}.";
-            $setHandle = Arr::get($set, 'type');
-            $fields = Arr::get($field->config(), "sets.{$setHandle}.fields");
-
-            if ($setHandle && $fields) {
-                $this->updateAssets($dottedPrefix, new Fields($fields));
-            }
-        });
-    }
-
-    /**
-     * Update grid field children.
-     *
-     * @param string $dottedKey
-     * @param \Statamic\Fields\Field $field
-     */
-    protected function updateGridChildren($dottedKey, $field)
-    {
-        $data = $this->item->data();
-
-        $sets = Arr::get($data, $dottedKey);
-
-        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
-            $dottedPrefix = "{$dottedKey}.{$setKey}.";
-            $fields = Arr::get($field->config(), 'fields');
-
-            if ($fields) {
-                $this->updateAssets($dottedPrefix, new Fields($fields));
-            }
-        });
-    }
-
-    /**
-     * Update bard field children.
-     *
-     * @param string $dottedKey
-     * @param \Statamic\Fields\Field $field
-     */
-    protected function updateBardChildren($dottedKey, $field)
-    {
-        $data = $this->item->data();
-
-        $sets = Arr::get($data, $dottedKey);
-
-        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
-            $dottedPrefix = "{$dottedKey}.{$setKey}.attrs.values.";
-            $setHandle = Arr::get($set, 'attrs.values.type');
-            $fields = Arr::get($field->config(), "sets.{$setHandle}.fields");
-
-            if ($setHandle && $fields) {
-                $this->updateAssets($dottedPrefix, new Fields($fields));
-            }
-        });
     }
 
     /**
@@ -252,64 +128,12 @@ class AssetReferenceUpdater
     }
 
     /**
-     * Update string value on item.
-     *
-     * @param null|string $dottedPrefix
-     * @param \Statamic\Fields\Field $field
-     */
-    protected function updateStringValue($dottedPrefix, $field)
-    {
-        $data = $this->item->data()->all();
-
-        $dottedKey = $dottedPrefix.$field->handle();
-
-        if (Arr::get($data, $dottedKey) !== $this->originalPath) {
-            return;
-        }
-
-        Arr::set($data, $dottedKey, $this->newPath);
-
-        $this->item->data($data);
-
-        $this->updated = true;
-    }
-
-    /**
-     * Update array value on item.
-     *
-     * @param null|string $dottedPrefix
-     * @param \Statamic\Fields\Field $field
-     */
-    protected function updateArrayValue($dottedPrefix, $field)
-    {
-        $data = $this->item->data()->all();
-
-        $dottedKey = $dottedPrefix.$field->handle();
-
-        $fieldData = collect(Arr::dot(Arr::get($data, $dottedKey, [])));
-
-        if (! $fieldData->contains($this->originalPath)) {
-            return;
-        }
-
-        $fieldData->transform(function ($value) {
-            return $value === $this->originalPath ? $this->newPath : $value;
-        });
-
-        Arr::set($data, $dottedKey, $fieldData->all());
-
-        $this->item->data($data);
-
-        $this->updated = true;
-    }
-
-    /**
      * Update `statamic://` urls in string value on item.
      *
-     * @param null|string $dottedPrefix
      * @param \Statamic\Fields\Field $field
+     * @param null|string $dottedPrefix
      */
-    protected function updateStatamicUrlsInStringValue($dottedPrefix, $field)
+    protected function updateStatamicUrlsInStringValue($field, $dottedPrefix)
     {
         $data = $this->item->data()->all();
 
@@ -322,8 +146,8 @@ class AssetReferenceUpdater
         }
 
         $value = preg_replace_callback('/([("]statamic:\/\/[^()"]*::)([^)"]*)([)"])/im', function ($matches) {
-            return $matches[2] === $this->originalPath
-                ? $matches[1].$this->newPath.$matches[3]
+            return $matches[2] === $this->originalValue
+                ? $matches[1].$this->newValue.$matches[3]
                 : $matches[0];
         }, $value);
 
@@ -341,10 +165,10 @@ class AssetReferenceUpdater
     /**
      * Update asset references in bard set on item.
      *
-     * @param null|string $dottedPrefix
      * @param \Statamic\Fields\Field $field
+     * @param null|string $dottedPrefix
      */
-    protected function updateStatamicUrlsInBardImage($dottedPrefix, $field)
+    protected function updateStatamicUrlsInBardImage($field, $dottedPrefix)
     {
         $data = $this->item->data()->all();
 
@@ -362,10 +186,10 @@ class AssetReferenceUpdater
                 return [$key => Arr::get($bardPayload, $key)];
             })
             ->filter(function ($value) {
-                return $value === "asset::{$this->container}::{$this->originalPath}";
+                return $value === "asset::{$this->container}::{$this->originalValue}";
             })
             ->map(function ($value) {
-                return "asset::{$this->container}::{$this->newPath}";
+                return "asset::{$this->container}::{$this->newValue}";
             })
             ->each(function ($value, $key) use (&$bardPayload) {
                 Arr::set($bardPayload, $key, $value);

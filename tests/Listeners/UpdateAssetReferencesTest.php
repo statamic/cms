@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Assets;
+namespace Tests\Listeners;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -9,7 +9,7 @@ use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class UpdateAssetPathsTest extends TestCase
+class UpdateAssetReferencesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 

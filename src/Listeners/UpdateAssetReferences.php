@@ -5,13 +5,11 @@ namespace Statamic\Listeners;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Assets\AssetReferenceUpdater;
 use Statamic\Events\AssetSaved;
-use Statamic\Facades\Entry;
-use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Term;
-use Statamic\Facades\User;
 
-class UpdateAssetPaths implements ShouldQueue
+class UpdateAssetReferences implements ShouldQueue
 {
+    use Concerns\GetsItemsContainingData;
+
     /**
      * Register the listeners for the subscriber.
      *
@@ -39,13 +37,10 @@ class UpdateAssetPaths implements ShouldQueue
             return;
         }
 
-        collect()
-            ->merge(Entry::all())
-            ->merge(Term::all()->map->term()->flatMap->localizations()) // See issue #3274
-            ->merge(GlobalSet::all()->flatMap->localizations())
-            ->merge(User::all())
-            ->each(function ($item) use ($container, $originalPath, $newPath) {
-                AssetReferenceUpdater::item($item)->updateAssetReferences($container, $originalPath, $newPath);
-            });
+        $this->getItemsContainingData()->each(function ($item) use ($container, $originalPath, $newPath) {
+            AssetReferenceUpdater::item($item)
+                ->filterByContainer($container)
+                ->updateReferences($originalPath, $newPath);
+        });
     }
 }

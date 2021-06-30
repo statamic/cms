@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
@@ -31,7 +32,7 @@ use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements AssetContract, Augmentable
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, SyncsOriginalState, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -41,7 +42,7 @@ class Asset implements AssetContract, Augmentable
     protected $container;
     protected $path;
     protected $meta;
-    protected $original;
+    protected $syncOriginalProperties = ['path'];
 
     public function __construct()
     {
@@ -761,19 +762,5 @@ class Asset implements AssetContract, Augmentable
     protected function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
-    }
-
-    public function syncOriginal()
-    {
-        $this->original = [
-            'path' => $this->path,
-        ];
-
-        return $this;
-    }
-
-    public function getOriginal($key = null, $fallback = null)
-    {
-        return Arr::get($this->original, $key, $fallback);
     }
 }

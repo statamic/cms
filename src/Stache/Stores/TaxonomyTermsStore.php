@@ -60,6 +60,7 @@ class TaxonomyTermsStore extends ChildStore
         }
 
         $term->dataForLocale($term->defaultLocale(), $data);
+        $term->syncOriginal();
 
         return $term;
     }
