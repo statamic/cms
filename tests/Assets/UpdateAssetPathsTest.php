@@ -989,12 +989,18 @@ EOT;
             ],
         ]))->save();
 
+        $entryThree = tap(Facades\Entry::make()->collection($collection)->data([]))->save();
+
         Facades\Entry::shouldReceive('save')->withArgs(function ($arg) use ($entryOne) {
             return $arg->id() === $entryOne->id();
         })->once();
 
         Facades\Entry::shouldReceive('save')->withArgs(function ($arg) use ($entryTwo) {
             return $arg->id() === $entryTwo->id();
+        })->never();
+
+        Facades\Entry::shouldReceive('save')->withArgs(function ($arg) use ($entryThree) {
+            return $arg->id() === $entryThree->id();
         })->never();
 
         Facades\Entry::makePartial();

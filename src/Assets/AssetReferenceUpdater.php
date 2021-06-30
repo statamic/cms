@@ -317,6 +317,10 @@ class AssetReferenceUpdater
 
         $originalValue = $value = Arr::get($data, $dottedKey);
 
+        if (! $originalValue) {
+            return;
+        }
+
         $value = preg_replace_callback('/([("]statamic:\/\/[^()"]*::)([^)"]*)([)"])/im', function ($matches) {
             return $matches[2] === $this->originalPath
                 ? $matches[1].$this->newPath.$matches[3]
