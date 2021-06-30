@@ -70,7 +70,7 @@ class AssetRule implements Rule
     }
 
     /**
-     * Make an AssetRule instance if it's a supported rule, or return itself.
+     * Make an AssetRule instance if it's a supported rule, or return what was passed in.
      *
      * @return self|string
      */
