@@ -38,14 +38,9 @@ class Term implements TermContract
 
     public function slug($slug = null)
     {
-        return $this
-            ->fluentlyGetOrSet('slug')
-            ->setter(function ($slug) {
-                $this->syncOriginal();
-
-                return Str::slug($slug);
-            })
-            ->args(func_get_args());
+        return $this->fluentlyGetOrSet('slug')->setter(function ($slug) {
+            return Str::slug($slug);
+        })->args(func_get_args());
     }
 
     public function taxonomy($taxonomy = null)
