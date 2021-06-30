@@ -3,9 +3,11 @@
 namespace Tests\StaticCaching;
 
 use Mockery;
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
@@ -60,12 +62,21 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/term')->once();
+            $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term')->once();
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/tags/one', '/tags/two']);
         });
 
-        $term = tap(Mockery::mock(Term::class), function ($m) {
-            $m->shouldReceive('url')->andReturn('/my/test/term');
+        $collection = Mockery::mock(Collection::class);
+
+        $taxonomy = tap(Mockery::mock(Taxonomy::class), function ($m) use ($collection) {
+            $m->shouldReceive('collections')->andReturn(collect([$collection]));
+        });
+
+        $term = tap(Mockery::mock(Term::class), function ($m) use ($taxonomy) {
+            $m->shouldReceive('url')->andReturn('/my/test/term', '/my/collection/tags/term');
             $m->shouldReceive('taxonomyHandle')->andReturn('tags');
+            $m->shouldReceive('taxonomy')->andReturn($taxonomy);
+            $m->shouldReceive('collection')->andReturn($m);
         });
 
         $invalidator = new Invalidator($cacher, [

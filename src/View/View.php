@@ -135,6 +135,10 @@ class View
 
     private function isUsingXmlLayout()
     {
+        if (! $this->layout) {
+            return false;
+        }
+
         return Str::endsWith($this->layoutViewPath(), '.xml');
     }
 

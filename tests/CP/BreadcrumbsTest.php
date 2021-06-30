@@ -3,6 +3,7 @@
 namespace Tests\CP;
 
 use Illuminate\Contracts\Translation\Translator;
+use Mockery;
 use Statamic\CP\Breadcrumbs;
 use Tests\TestCase;
 
@@ -37,11 +38,13 @@ class BreadcrumbsTest extends TestCase
     /** @test */
     public function it_pushes_a_crumb_into_the_title()
     {
-        app()->instance('translator', $this->mock(Translator::class)
+        $translator = Mockery::mock(app(Translator::class))
+            ->makePartial()
             ->shouldReceive('get')->with('The title', [], null)->once()
             ->andReturn('The translated title')
-            ->getMock()
-        );
+            ->getMock();
+
+        app()->instance('translator', $translator);
 
         $bc = new Breadcrumbs($array = [
             ['text' => 'First', 'url' => '/first'],
