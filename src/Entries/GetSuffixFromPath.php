@@ -14,7 +14,7 @@ class GetSuffixFromPath
 
         $segments = explode('.', pathinfo($path, PATHINFO_FILENAME));
 
-        if ($this->isDate($segments[0])) {
+        if ($this->isDate($segments[0]) || $this->isNumeric($segments[0])) {
             return $segments[2] ?? null;
         }
 
@@ -24,5 +24,10 @@ class GetSuffixFromPath
     private function isDate($str)
     {
         return preg_match('/^\d{4}-\d{2}-\d{2}(-\d{4})?$/', $str);
+    }
+
+    private function isNumeric($str)
+    {
+        return $str == (int) $str;
     }
 }
