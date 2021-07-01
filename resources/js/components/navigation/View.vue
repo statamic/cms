@@ -54,6 +54,7 @@
             :max-depth="maxDepth"
             :expects-root="expectsRoot"
             :site="site"
+            :preferences-prefix="preferencesPrefix"
             @edit-page="editPage"
             @changed="changed = true; targetParent = null;"
             @saved="changed = false"
@@ -168,6 +169,7 @@ export default {
 
     props: {
         title: { type: String, required: true },
+        handle: { type: String, required: true },
         collections: { type: Array, required: true },
         breadcrumbUrl: { type: String, required: true },
         editUrl: { type: String, required: true },
@@ -189,6 +191,7 @@ export default {
             showPageDeletionConfirmation: false,
             pageBeingDeleted: null,
             pageDeletionConfirmCallback: null,
+            preferencesPrefix: `navs.${this.handle}`,
         }
     },
 

@@ -376,4 +376,9 @@ class User extends BaseUser
             'preferences' => $this->preferences(),
         ])->all();
     }
+
+    public function fresh()
+    {
+        return Facades\User::find($this->id);
+    }
 }

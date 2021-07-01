@@ -67,6 +67,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns a string with backslashes added before characters that need to be escaped.
+     *
+     * @param $value
+     * @return string
+     */
+    public function addSlashes($value)
+    {
+        return addslashes($value);
+    }
+
+    /**
      * Creates a sentence list from the given array and the ability to set the glue.
      *
      * @param $value
@@ -997,7 +1008,7 @@ class CoreModifiers extends Modifier
      */
     public function isLowercase($value)
     {
-        return Stringy::isLowercase($value);
+        return Stringy::isLowerCase($value);
     }
 
     /**
