@@ -32,6 +32,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
     protected $url;
     protected $title;
     protected $depth;
+    protected $data = [];
 
     public function setUrl($url)
     {
@@ -225,6 +226,61 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         $this->children = $children;
 
         return $this;
+    }
+
+    public function setData(array $data): self
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function data()
+    {
+        $data = collect($this->data);
+
+        if ($entry = $this->entry()) {
+            $data = $entry->data()->merge($data);
+        }
+
+        return $data;
+    }
+
+    public function values()
+    {
+        $data = collect($this->data);
+
+        if ($entry = $this->entry()) {
+            $data = $entry->values()->merge($data);
+        }
+
+        return $data;
+    }
+
+    public function get(string $key, $fallback = null)
+    {
+        if ($value = $this->data[$key] ?? null) {
+            return $value;
+        }
+
+        if ($entry = $this->entry()) {
+            $value = $entry->get($key);
+        }
+
+        return $value ?? $fallback;
+    }
+
+    public function value(string $key)
+    {
+        if ($value = $this->data[$key] ?? null) {
+            return $value;
+        }
+
+        if ($entry = $this->entry()) {
+            $value = $entry->value($key);
+        }
+
+        return $value;
     }
 
     public function pages()

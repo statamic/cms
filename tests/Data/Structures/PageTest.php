@@ -12,6 +12,7 @@ use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
 use Statamic\Structures\Structure;
 use Statamic\Structures\Tree;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -357,6 +358,79 @@ class PageTest extends TestCase
         $page->setEntry($entry);
 
         $this->assertEquals('hello', $page->testing('123'));
+    }
+
+    /** @test */
+    public function it_gets_values()
+    {
+        $page = new Page;
+
+        $this->assertInstanceOf(Collection::class, $page->data());
+        $this->assertEquals([], $page->data()->all());
+        $this->assertInstanceOf(Collection::class, $page->values());
+        $this->assertEquals([], $page->values()->all());
+        $this->assertNull($page->value('foo'));
+        $this->assertNull($page->get('foo'));
+        $this->assertEquals('fallback', $page->get('unknown', 'fallback'));
+
+        $page->setData(['foo' => 'bar']);
+
+        $this->assertInstanceOf(Collection::class, $page->data());
+        $this->assertEquals(['foo' => 'bar'], $page->data()->all());
+        $this->assertInstanceOf(Collection::class, $page->values());
+        $this->assertEquals(['foo' => 'bar'], $page->values()->all());
+        $this->assertEquals('bar', $page->value('foo'));
+        $this->assertEquals('bar', $page->get('foo'));
+        $this->assertEquals('fallback', $page->get('unknown', 'fallback'));
+    }
+
+    /** @test */
+    public function it_gets_values_and_falls_back_to_values_from_the_entry()
+    {
+        $entry = EntryFactory::id('test-entry')->collection('test')->data([
+            'foo' => 'entry bar',
+            'baz' => 'entry qux'
+        ])->create();
+
+        $tree = $this->mock(Tree::class)->shouldReceive('entry')->with('test-entry')->andReturn($entry)->getMock();
+
+        $page = new Page;
+        $page->setEntry('test-entry');
+        $page->setTree($tree);
+
+        $this->assertInstanceOf(Collection::class, $page->data());
+        $this->assertEquals([
+            'foo' => 'entry bar',
+            'baz' => 'entry qux',
+        ], $page->data()->all());
+        $this->assertInstanceOf(Collection::class, $page->values());
+        $this->assertEquals([
+            'foo' => 'entry bar',
+            'baz' => 'entry qux',
+        ], $page->values()->all());
+        $this->assertEquals('entry bar', $page->value('foo'));
+        $this->assertEquals('entry bar', $page->get('foo'));
+        $this->assertEquals('entry qux', $page->value('baz'));
+        $this->assertEquals('entry qux', $page->get('baz'));
+        $this->assertEquals('fallback', $page->get('unknown', 'fallback'));
+
+        $page->setData(['foo' => 'page bar']);
+
+        $this->assertInstanceOf(Collection::class, $page->data());
+        $this->assertEquals([
+            'foo' => 'page bar',
+            'baz' => 'entry qux',
+        ], $page->data()->all());
+        $this->assertInstanceOf(Collection::class, $page->values());
+        $this->assertEquals([
+            'foo' => 'page bar',
+            'baz' => 'entry qux',
+        ], $page->values()->all());
+        $this->assertEquals('page bar', $page->value('foo'));
+        $this->assertEquals('page bar', $page->get('foo'));
+        $this->assertEquals('entry qux', $page->value('baz'));
+        $this->assertEquals('entry qux', $page->get('baz'));
+        $this->assertEquals('fallback', $page->get('unknown', 'fallback'));
     }
 
     protected function newTree()
