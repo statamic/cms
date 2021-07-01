@@ -735,14 +735,11 @@ class EntryTest extends TestCase
 
         $mock = \Mockery::mock(Facades\Blink::getFacadeRoot())->makePartial();
         Facades\Blink::swap($mock);
-        $mock->shouldReceive('store')->with('structure-page-entries')->once()->andReturn(
-            $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
-        );
         $mock->shouldReceive('store')->with('structure-uris')->once()->andReturn(
             $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
         );
         $mock->shouldReceive('store')->with('structure-entries')->once()->andReturn(
-            $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('flush')->getMock()
+            $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
         );
 
         $entry->save();

@@ -3,12 +3,14 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -157,10 +159,16 @@ class Entries extends Relationship
 
         $collections = $this->getConfiguredCollections();
 
-        return collect($collections)->flatMap(function ($collectionHandle) use ($collections) {
+        $user = User::current();
+
+        return collect($collections)->flatMap(function ($collectionHandle) use ($collections, $user) {
             $collection = Collection::findByHandle($collectionHandle);
 
             throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
+
+            if (! $user->can('create', [EntryContract::class, $collection])) {
+                return null;
+            }
 
             $blueprints = $collection->entryBlueprints();
 
