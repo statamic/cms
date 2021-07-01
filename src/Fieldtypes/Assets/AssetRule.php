@@ -15,12 +15,17 @@ class AssetRule implements Rule
 
     protected $name;
     protected $parameters;
-    protected $message;
 
-    public function __construct($name, $message, $parameters = null)
+    protected static $rules = [
+        'image',
+        'dimensions',
+        'mimes',
+        'mimetypes',
+    ];
+
+    public function __construct($name, $parameters = null)
     {
         $this->name = $name;
-        $this->message = $message;
         $this->parameters = $parameters;
     }
 
@@ -55,6 +60,32 @@ class AssetRule implements Rule
      */
     public function message()
     {
-        return $this->message;
+        $key = 'statamic::validation.'.$this->name;
+
+        if (in_array($this->name, ['mimes', 'mimetypes'])) {
+            $replace = ['values' => join(', ', $this->parameters)];
+        }
+
+        return __($key, $replace ?? []);
+    }
+
+    /**
+     * Make an AssetRule instance if it's a supported rule, or return what was passed in.
+     *
+     * @return self|string
+     */
+    public static function makeFromRule($rule)
+    {
+        $name = Str::before($rule, ':');
+
+        if (! in_array($name, static::$rules)) {
+            return $rule;
+        }
+
+        $parameters = Str::contains($rule, ':')
+            ? explode(',', Str::after($rule, ':'))
+            : null;
+
+        return new AssetRule($name, $parameters);
     }
 }
