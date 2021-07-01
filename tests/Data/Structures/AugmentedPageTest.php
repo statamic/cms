@@ -31,7 +31,7 @@ class AugmentedPageTest extends AugmentedTestCase
 
         $this->assertEquals(
             collect($expected)->sort()->values()->all(),
-            collect($actual)->sort()->values()->all(),
+            collect($actual)->sort()->values()->all()
         );
     }
 
@@ -79,7 +79,7 @@ class AugmentedPageTest extends AugmentedTestCase
 
         $this->assertEquals(
             collect($expected)->sort()->values()->all(),
-            collect($actual)->sort()->values()->all(),
+            collect($actual)->sort()->values()->all()
         );
     }
 
