@@ -1,6 +1,6 @@
 # Release Notes
 
-## 3.1.27 (2021-06-30)
+## 3.1.27 (2021-07-01)
 
 ### What's improved
 - Structure entry eager loading is conditional, and won't happen when loading front-end pages. [#3540](https://github.com/statamic/cms/issues/3540)
