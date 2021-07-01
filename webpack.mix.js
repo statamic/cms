@@ -18,6 +18,7 @@ mix.js(`${src}/js/app.js`, `${dest}/js`);
 mix.extract([
     '@popperjs/core',
     '@shopify/draggable',
+    'alpinejs',
     'autosize',
     'axios',
     'codemirror',
@@ -53,11 +54,12 @@ mix.options({ extractVueStyles: true });
 mix.webpackConfig({
     devtool: 'source-map',
     plugins: [
-        // Vendor files (eg. twitter bootstrap) reference globals
+        // Some vendor files reference globals
         new webpack.ProvidePlugin({ $: "jquery", jQuery: "jquery" }),
 
-        // Our files reference globals
+        // Our files reference globals too
         new webpack.ProvidePlugin({ Vue: "vue" }),
+        new webpack.ProvidePlugin({ Alpine: "Alpine" }),
         new webpack.ProvidePlugin({ _: "underscore" })
     ]
 })

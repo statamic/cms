@@ -1,6 +1,19 @@
 <template>
     <div>
 
+        <div class="mb-1 flex justify-end">
+            <a
+                class="text-2xs text-blue mr-2 underline"
+                v-text="__('Expand All')"
+                @click="expandAll"
+            />
+            <a
+                class="text-2xs text-blue mr-1 underline"
+                v-text="__('Collapse All')"
+                @click="collapseAll"
+            />
+        </div>
+
         <div class="loading card" v-if="loading">
             <loading-graphic />
         </div>
@@ -18,6 +31,7 @@
                 :indent="24"
                 @change="treeChanged"
                 @drag="treeDragstart"
+                @nodeOpenChanged="saveTreeState"
             >
                 <tree-branch
                     slot-scope="{ data: page, store, vm }"
@@ -25,8 +39,11 @@
                     :depth="vm.level"
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
-                    :hasCollection="hasCollection"
+                    :has-collection="hasCollection"
+                    :is-open="page.open"
+                    :has-children="page.children.length > 0"
                     @edit="$emit('edit-page', page, vm, store, $event)"
+                    @toggle-open="store.toggleOpen(page)"
                     @removed="pageRemoved"
                     @children-orphaned="childrenOrphaned"
                 >
@@ -51,8 +68,6 @@
 
 
 <script>
-import * as th from 'tree-helper';
-import {Sortable, Plugins} from '@shopify/draggable';
 import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
 
@@ -73,6 +88,7 @@ export default {
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
         hasCollection: { type: Boolean, required: true },
+        preferencesPrefix: { type: String },
     },
 
     data() {
@@ -94,7 +110,11 @@ export default {
 
         exclusions() {
             return this.hasCollection ? this.pageIds : [];
-        }
+        },
+
+        preferencesKey() {
+            return this.preferencesPrefix ? `${this.preferencesPrefix}.${this.site}.pagetree` : null;
+        },
 
     },
 
@@ -135,6 +155,7 @@ export default {
 
             return this.$axios.get(url).then(response => {
                 this.pages = response.data.pages;
+                this.loadTreeState(this.pages);
                 this.updateTreeData();
                 this.loading = false;
             });
@@ -170,14 +191,14 @@ export default {
 
         validate() {
             let isValid = true;
-            th.depthFirstSearch(this.treeData, (childNode) => {
-                const index = childNode.parent.children.indexOf(childNode);
-                const level = childNode._vm.level;
-                const isRoot = this.expectsRoot && level === 1 && index === 0;
-                if (isRoot && childNode.children.length > 0) {
+            
+            this.traverseTree(this.treeData, (node, { isRoot }) => {
+                if (isRoot && node.children.length) {
                     isValid = false;
+                    return false;
                 } 
             });
+
             return isValid;
         },
 
@@ -189,6 +210,7 @@ export default {
                 this.$emit('saved');
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;
+                this.saveTreeState();
                 return response;
             }).catch(e => {
                 let message = e.response ? e.response.data.message : __('Something went wrong');
@@ -265,34 +287,96 @@ export default {
         },
 
         treeDragstart(node) {
-            // Support for maxDepth.
-            // Adapted from https://github.com/phphe/vue-draggable-nested-tree/blob/a5bcf2ccdb4c2da5a699bf2ddf3443f4e1dba8f9/src/examples/MaxLevel.vue#L56-L75
-            let nodeLevels = 1;
-            th.depthFirstSearch(node, (childNode) => {
-                if (childNode._vm.level > nodeLevels) {
-                    nodeLevels = childNode._vm.level;
-                }
+            let nodeDepth = 1;
+            this.traverseTree(node, (_, { depth }) => {
+                nodeDepth = Math.max(nodeDepth, depth);
             });
-            nodeLevels = nodeLevels - node._vm.level + 1;
-            const childNodeMaxLevel = this.maxDepth - nodeLevels;
-            th.depthFirstSearch(this.treeData, (childNode) => {
-                if (childNode === node) return;
-                const index = childNode.parent.children.indexOf(childNode);
-                const level = childNode._vm.level;
-                const isRoot = this.expectsRoot && level === 1 && index === 0;
-                const isBeyondMaxDepth = level > childNodeMaxLevel;
-                let droppable = true;
-                if (isRoot || isBeyondMaxDepth) droppable = false;
-                this.$set(childNode, 'droppable', droppable);
+            const maxDepth = this.maxDepth - nodeDepth;
+            
+            this.traverseTree(this.treeData, (childNode, { depth, isRoot }) => {
+                if (childNode !== node) {
+                    this.$set(childNode, 'droppable', !isRoot && depth <= maxDepth);
+                }
             });
         },
 
         pageUpdated(tree) {
             this.pages = tree.getPureData();
             this.$emit('changed');
-        }
+        },
+
+        expandAll() {
+            this.traverseTree(this.treeData, node => {
+                node.open = true
+            })
+            this.saveTreeState();
+        },
+
+        collapseAll() {
+            this.traverseTree(this.treeData, node => {
+                node.open = false
+            })
+            this.saveTreeState();
+        },
+
+        loadTreeState(treeData) {
+            if (! this.preferencesKey) {
+                return;
+            }
+
+            const closed = JSON.parse(localStorage.getItem(this.preferencesKey) || '[]');
+            this.applyTreeState(closed, treeData);
+        },
+
+        saveTreeState() {
+            if (! this.preferencesKey) {
+                return;
+            }
+
+            const closed = this.getTreeState(this.treeData);
+            return localStorage.setItem(this.preferencesKey, JSON.stringify(closed));
+        },
+
+        getTreeState(nodes) {
+            const closed = [];
+
+            this.traverseTree(nodes, (node, { path }) => {
+                if (node.children.length && ! node.open) {
+                    closed.push(path);
+                }
+            });
+
+            return closed;
+        },
+
+        applyTreeState(closed, nodes) {
+            this.traverseTree(nodes, (node, { path }) => {
+                if (node.children.length) {
+                    node.open = ! closed.includes(path);
+                }
+            });
+        },
+
+        traverseTree(nodes, callback, parentPath = []) {
+            const nodesArray = Array.isArray(nodes) ? nodes : [nodes];
+            nodesArray.every((node, index) => {
+                const nodePath = [...parentPath, index];
+                const path = nodePath.join('.');
+                const depth = nodePath.length;
+                const isRoot = this.expectsRoot && depth === 1 && index === 0;
+                
+                if (false === callback(node, { path, depth, index, isRoot })) {
+                    return false;
+                }
+                
+                if (node.children.length) {
+                    this.traverseTree(node.children, callback, nodePath);
+                }
+
+                return true;
+            });
+        },
 
     }
-
 }
 </script>
