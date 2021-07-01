@@ -1,5 +1,25 @@
 # Release Notes
 
+## 3.1.27 (2021-06-30)
+
+### What's improved
+- Structure entry eager loading is conditional, and won't happen when loading front-end pages. [#3540](https://github.com/statamic/cms/issues/3540)
+
+### What's fixed
+- Only update Stache indexes when they aren't cached at all yet. [#3936](https://github.com/statamic/cms/issues/3936)
+- Fix `is_parent` being `true` for the home page in the `nav` tag when your site is defined with a full URL. [#3900](https://github.com/statamic/cms/issues/3900)
+- Fix error when getting the dimensions for a zero byte image. [#3935](https://github.com/statamic/cms/issues/3935)
+- That also prevents corrupt images from constantly recalculating their dimensions.
+- Fix `dimensions` validation rule on `assets` fields. [#3922](https://github.com/statamic/cms/issues/3922)
+- Filter out `import` fields from the "add existing field" pane in the Blueprint builder, which was causing JS errors. [#3924](https://github.com/statamic/cms/issues/3924)
+- Make Grid column squeezing rules more specific, which fixes a derpy `date` field. [#3917](https://github.com/statamic/cms/issues/3917)
+- Check permissions for the "Create" button on the `entries` fieldtype. [#3906](https://github.com/statamic/cms/issues/3906)
+- Fix `integer` fieldtype focus state. [6211855ad](https://github.com/statamic/cms/commit/6211855ad)
+- Fix `isLowerCase` method casing. [9f05530bf](https://github.com/statamic/cms/commit/9f05530bf)
+- Fix random invalid popper reference errors. [d8a0f52b9](https://github.com/statamic/cms/commit/d8a0f52b9)
+
+
+
 ## 3.1.26 (2021-06-22)
 
 ### What's new

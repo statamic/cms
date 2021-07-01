@@ -86,11 +86,15 @@ class Dimensions
 
         $manager->copy("source://{$this->asset->path()}", $destination);
 
-        $size = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
+        try {
+            $size = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
+        } catch (\Exception $e) {
+            $size = [0, 0];
+        } finally {
+            $cache->delete($cachePath);
+        }
 
-        $cache->delete($cachePath);
-
-        return $size ? array_splice($size, 0, 2) : [null, null];
+        return $size ? array_splice($size, 0, 2) : [0, 0];
     }
 
     /**

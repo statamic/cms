@@ -106,16 +106,22 @@ export default {
             )
         ));
 
+        const fieldSuggestions = fieldsets.flatMap(fieldset => {
+            return fieldset.fields
+                .filter(field => field.type !== 'import')
+                .map(field => ({
+                    value: `${fieldset.handle}.${field.handle}`,
+                    label: field.config.display,
+                    fieldset: fieldset.title,
+                }));
+        });
+
         return {
             open: false,
             reference: null,
             fieldset: null,
             importPrefix: null,
-            fieldSuggestions: fieldsets.flatMap(fieldset => fieldset.fields.map(field => ({
-                value: `${fieldset.handle}.${field.handle}`,
-                label: field.config.display,
-                fieldset: fieldset.title,
-            }))),
+            fieldSuggestions,
             fieldsetSuggestions: fieldsets.map(fieldset => ({
                 value: fieldset.handle,
                 label: fieldset.title,

@@ -334,15 +334,13 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function asset($path)
     {
-        $asset = Facades\Asset::make()->container($this)->path($path);
+        $asset = $this->makeAsset($path);
 
         if (! $asset->exists()) {
             return null;
         }
 
-        $asset->hydrate();
-
-        return $asset;
+        return $asset->hydrate()->syncOriginal();
     }
 
     /**
