@@ -91,7 +91,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
         if (is_object($reference)) {
             throw_unless($id = $reference->id(), new \Exception('Cannot set an entry without an ID'));
-            Blink::store('structure-page-entries')->put($id, $reference);
+            Blink::store('structure-entries')->put($id, $reference);
             $reference = $id;
         }
 
@@ -106,9 +106,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
             return null;
         }
 
-        return Blink::store('structure-page-entries')->once($this->reference, function () {
-            return $this->tree->entry($this->reference);
-        });
+        if ($cached = Blink::store('structure-entries')->get($this->reference)) {
+            return $cached;
+        }
+
+        return $this->tree->entry($this->reference);
     }
 
     public function reference()
