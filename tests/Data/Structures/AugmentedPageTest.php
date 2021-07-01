@@ -17,6 +17,7 @@ class AugmentedPageTest extends AugmentedTestCase
     {
         $page = Mockery::mock(Page::class);
         $page->shouldReceive('reference')->andReturnFalse();
+        $page->shouldReceive('data')->andReturn(collect(['one' => 'two', 'three' => 'four']));
 
         $augmented = new AugmentedPage($page);
 
@@ -25,6 +26,8 @@ class AugmentedPageTest extends AugmentedTestCase
             'url',
             'uri',
             'permalink',
+            'one',
+            'three',
         ];
 
         $actual = $augmented->keys();
@@ -38,11 +41,15 @@ class AugmentedPageTest extends AugmentedTestCase
     /** @test */
     public function it_gets_entry_keys()
     {
-        $blueprint = Blueprint::makeFromFields([
+        $entryBlueprint = Blueprint::makeFromFields([
             'title' => ['type' => 'text'],
             'foo' => ['type' => 'text'],
             'one' => ['type' => 'text'],
-        ])->setHandle('test');
+        ])->setNamespace('collections.articles')->setHandle('article');
+
+        $pageBlueprint = Blueprint::makeFromFields([
+            'jane' => ['type' => 'text'],
+        ])->setNamespace('navs')->setHandle('pages');
 
         $entry = Mockery::mock(Entry::class);
         $entry->shouldReceive('values')->andReturn(collect([
@@ -53,12 +60,18 @@ class AugmentedPageTest extends AugmentedTestCase
             'alfa' => 'bravo',
             'charlie' => 'delta',
         ]));
-        $entry->shouldReceive('blueprint')->andReturn($blueprint);
+        $entry->shouldReceive('blueprint')->andReturn($entryBlueprint);
 
         $page = Mockery::mock(Page::class);
         $page->shouldReceive('reference')->andReturn('123');
         $page->shouldReceive('referenceExists')->andReturnTrue();
         $page->shouldReceive('entry')->andReturn($entry);
+        $page->shouldReceive('blueprint')->andReturn($pageBlueprint);
+        $page->shouldReceive('data')->andReturn(collect([
+            'john' => 'doe',
+            'jane' => 'doe',
+            'three' => 'four',
+        ]));
 
         $augmented = new AugmentedPage($page);
 
@@ -73,6 +86,10 @@ class AugmentedPageTest extends AugmentedTestCase
             'amp_url', 'api_url', 'collection', 'date', 'edit_url', 'id', 'is_entry',
             'last_modified', 'locale', 'mount', 'order', 'permalink', 'private',
             'published', 'slug', 'status', 'updated_at', 'updated_by', 'uri', 'url',
+            // page blueprint
+            'jane',
+            // page data
+            'john',
         ];
 
         $actual = $augmented->keys();
@@ -86,13 +103,22 @@ class AugmentedPageTest extends AugmentedTestCase
     /** @test */
     public function it_gets_values_from_the_page()
     {
+        $blueprint = Blueprint::makeFromFields([
+            'one' => ['type' => 'text'],
+            'three' => ['type' => 'text'],
+        ]);
+
         $page = Mockery::mock(Page::class);
         $page->shouldReceive('reference')->andReturnFalse();
         $page->shouldReceive('title')->andReturn('The Page Title');
-        $page->shouldReceive('blueprint')->andReturnNull();
+        $page->shouldReceive('blueprint')->andReturn($blueprint);
         $page->shouldReceive('url')->andReturn('/the-url');
         $page->shouldReceive('uri')->andReturn('/the-uri');
         $page->shouldReceive('absoluteUrl')->andReturn('https://site.com/the-permalink');
+        $page->shouldReceive('data')->andReturn(collect(['one' => 'two', 'three' => 'four', 'five' => 'six']));
+        $page->shouldReceive('value')->with('one')->andReturn('two');
+        $page->shouldReceive('value')->with('three')->andReturn('four');
+        $page->shouldReceive('value')->with('five')->andReturn('six');
 
         $augmented = new AugmentedPage($page);
 
@@ -101,6 +127,9 @@ class AugmentedPageTest extends AugmentedTestCase
             'url' => ['type' => 'string', 'value' => '/the-url'],
             'uri' => ['type' => 'string', 'value' => '/the-uri'],
             'permalink' => ['type' => 'string', 'value' => 'https://site.com/the-permalink'],
+            'one' => ['type' => Value::class, 'value' => 'two'],
+            'three' => ['type' => Value::class, 'value' => 'four'],
+            'five' => ['type' => 'string', 'value' => 'six'],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
@@ -109,16 +138,33 @@ class AugmentedPageTest extends AugmentedTestCase
     /** @test */
     public function it_gets_values_from_the_entry()
     {
-        $blueprint = Blueprint::makeFromFields([
+        $entryBlueprint = Blueprint::makeFromFields([
             'title' => ['type' => 'text'],
-        ])->setHandle('test');
+            'one' => ['type' => 'text'],
+        ])->setNamespace('collections.articles')->setHandle('article');
+
+        $pageBlueprint = Blueprint::makeFromFields([
+            'one' => ['type' => 'textarea'],
+            'three' => ['type' => 'textarea'],
+        ])->setNamespace('navs')->setHandle('pages');
 
         $entry = Mockery::mock(Entry::class);
-        $entry->shouldReceive('values')->andReturn(collect(['title' => 'The Entry Title']));
+        $entry->shouldReceive('values')->andReturn(collect([
+            'title' => 'The Entry Title',
+            'one' => 'two',
+            'three' => 'four',
+            'five' => 'six',
+        ]));
         $entry->shouldReceive('supplements')->andReturn(collect());
         $entry->shouldReceive('value')->with('title')->andReturn('The Entry Title');
+        $entry->shouldReceive('value')->with('one')->andReturn('two');
+        $entry->shouldReceive('value')->with('three')->andReturnNull('four');
+        $entry->shouldReceive('value')->with('five')->andReturn('six');
         $entry->shouldReceive('getSupplement')->with('title')->andReturnNull();
-        $entry->shouldReceive('blueprint')->andReturn($blueprint);
+        $entry->shouldReceive('getSupplement')->with('one')->andReturnNull();
+        $entry->shouldReceive('getSupplement')->with('three')->andReturnNull();
+        $entry->shouldReceive('getSupplement')->with('five')->andReturnNull();
+        $entry->shouldReceive('blueprint')->andReturn($entryBlueprint);
         $entry->shouldReceive('url')->andReturn('/the-url');
         $entry->shouldReceive('uri')->andReturn('/the-uri');
         $entry->shouldReceive('absoluteUrl')->andReturn('https://site.com/the-permalink');
@@ -127,14 +173,23 @@ class AugmentedPageTest extends AugmentedTestCase
         $page->shouldReceive('reference')->andReturn('123');
         $page->shouldReceive('referenceExists')->andReturnTrue();
         $page->shouldReceive('entry')->andReturn($entry);
+        $page->shouldReceive('blueprint')->andReturn($pageBlueprint);
+        $page->shouldReceive('data')->andReturn(collect(['one' => 'dos', 'three' => 'quatro', 'five' => 'seis']));
+        $page->shouldReceive('title')->andReturn('The Page Title');
+        $page->shouldReceive('value')->with('one')->andReturn('dos');
+        $page->shouldReceive('value')->with('three')->andReturn('quatro');
+        $page->shouldReceive('value')->with('five')->andReturn('seis');
 
         $augmented = new AugmentedPage($page);
 
         $expectations = [
-            'title' => ['type' => Value::class, 'value' => 'The Entry Title'],
+            'title' => ['type' => Value::class, 'value' => 'The Page Title'],
             'url' => ['type' => 'string', 'value' => '/the-url'],
             'uri' => ['type' => 'string', 'value' => '/the-uri'],
             'permalink' => ['type' => 'string', 'value' => 'https://site.com/the-permalink'],
+            'one' => ['type' => Value::class, 'value' => 'dos', 'fieldtype' => 'textarea'], // assert fieldtype to ensure the field from the page blueprint wins
+            'three' => ['type' => Value::class, 'value' => 'quatro'],
+            'five' => ['type' => 'string', 'value' => 'seis'],
         ];
 
         $this->assertSubsetAugmentedCorrectly($expectations, $augmented);

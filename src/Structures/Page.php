@@ -372,7 +372,8 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function blueprint()
     {
-        return optional($this->entry())->blueprint();
+        // TODO: make the actual blueprint.
+        return new \Statamic\Fields\Blueprint;
     }
 
     public function collection()

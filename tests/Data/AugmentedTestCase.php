@@ -43,6 +43,15 @@ class AugmentedTestCase extends TestCase
             switch ($expectation['type']) {
                 case Value::class:
                     $this->assertSame($expectation['value'], $actual->value(), "Key '{$key}' does not match expected value.");
+
+                    if (isset($expectation['fieldtype'])) {
+                        $this->assertEquals(
+                            $expectation['fieldtype'],
+                            $actual->fieldtype()->handle(),
+                            "Key '{$key}' does not have the expected fieldtype."
+                        );
+                    }
+
                     break;
 
                 case Carbon::class:
