@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Structures;
 
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
 use Mockery;
 use Statamic\Contracts\Structures\Nav;
@@ -12,7 +13,6 @@ use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
 use Statamic\Structures\Structure;
 use Statamic\Structures\Tree;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
