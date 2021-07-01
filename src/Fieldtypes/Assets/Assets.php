@@ -173,23 +173,7 @@ class Assets extends Fieldtype
     public function fieldRules()
     {
         return collect(parent::fieldRules())->map(function ($rule) {
-            $name = Str::before($rule, ':');
-
-            $parameters = Str::contains($rule, ':')
-                ? explode(',', Str::after($rule, ':'))
-                : null;
-
-            if ($name === 'dimensions') {
-                $message = __('statamic::validation.dimensions');
-            } elseif ($name === 'image') {
-                $message = __('statamic::validation.image');
-            } elseif ($name === 'mimes') {
-                $message = str_replace(':values', join(', ', $parameters), __('statamic::validation.mimes'));
-            } elseif ($name === 'mimetypes') {
-                $message = str_replace(':values', join(', ', $parameters), __('statamic::validation.mimetypes'));
-            }
-
-            return $message ? new AssetRule($name, $message, $parameters) : $rule;
+            return AssetRule::makeFromRule($rule);
         })->all();
     }
 
