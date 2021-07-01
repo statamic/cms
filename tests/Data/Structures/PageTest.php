@@ -389,7 +389,7 @@ class PageTest extends TestCase
     {
         $entry = EntryFactory::id('test-entry')->collection('test')->data([
             'foo' => 'entry bar',
-            'baz' => 'entry qux'
+            'baz' => 'entry qux',
         ])->create();
 
         $tree = $this->mock(Tree::class)->shouldReceive('entry')->with('test-entry')->andReturn($entry)->getMock();
