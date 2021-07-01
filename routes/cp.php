@@ -31,6 +31,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::group(['namespace' => 'Structures'], function () {
         Route::resource('navigation', 'NavigationController');
         Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
+
+        Route::get('navigation/{navigation}/blueprint', 'NavigationBlueprintController@edit')->name('navigation.blueprint.edit');
+        Route::patch('navigation/{navigation}/blueprint', 'NavigationBlueprintController@update')->name('navigation.blueprint.update');
     });
 
     Route::group(['namespace' => 'Collections'], function () {
