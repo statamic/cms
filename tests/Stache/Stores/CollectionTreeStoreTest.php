@@ -47,7 +47,7 @@ class CollectionTreeStoreTest extends TestCase
 
         $collectionWithoutStructure = $this->mock(Collection::class);
         $collectionWithoutStructure->shouldReceive('hasStructure')->andReturn(false);
-        
+
         Facades\Collection::shouldReceive('findByHandle')->with('one')->andReturn($collectionWithStructure);
         Facades\Collection::shouldReceive('findByHandle')->with('two')->andReturn($collectionWithStructure);
         Facades\Collection::shouldReceive('findByHandle')->with('no-collection')->andReturn(null);
