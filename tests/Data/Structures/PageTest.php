@@ -70,6 +70,58 @@ class PageTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_title()
+    {
+        $page = new Page;
+
+        $this->assertNull($page->title());
+        $this->assertFalse($page->hasCustomTitle());
+
+        $page->setTitle('Test');
+
+        $this->assertEquals('Test', $page->title());
+        $this->assertTrue($page->hasCustomTitle());
+    }
+
+    /** @test */
+    public function it_gets_the_title_when_referencing_an_entry()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('id')->andReturn('test');
+        $entry->shouldReceive('value')->andReturn('Entry Title');
+
+        $page = new Page;
+
+        $this->assertNull($page->title());
+        $this->assertFalse($page->hasCustomTitle());
+
+        $page->setEntry($entry);
+
+        $this->assertEquals('Entry Title', $page->title());
+        $this->assertFalse($page->hasCustomTitle());
+    }
+
+    /** @test */
+    public function it_gets_the_custom_title_when_referencing_an_entry()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('id')->andReturn('test');
+        $entry->shouldReceive('value')->andReturn('Entry Title');
+
+        $page = new Page;
+
+        $this->assertNull($page->title());
+        $this->assertFalse($page->hasCustomTitle());
+
+        $page
+            ->setEntry($entry)
+            ->setTitle('Custom Title');
+
+        $this->assertEquals('Custom Title', $page->title());
+        $this->assertTrue($page->hasCustomTitle());
+    }
+
+    /** @test */
     public function it_gets_and_sets_the_parent()
     {
         $page = new Page;

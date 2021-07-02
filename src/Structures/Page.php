@@ -84,6 +84,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return optional($this->entry())->value('title');
     }
 
+    public function hasCustomTitle()
+    {
+        return $this->title !== null;
+    }
+
     public function setEntry($reference): self
     {
         if ($reference === null) {
