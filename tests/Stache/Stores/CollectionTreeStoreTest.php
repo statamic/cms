@@ -4,6 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Facades;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
@@ -38,6 +39,19 @@ class CollectionTreeStoreTest extends TestCase
         touch($this->tempDir.'/one.yaml', 1234567890);
         touch($this->tempDir.'/two.yaml', 1234567890);
         touch($this->tempDir.'/non-yaml-file.md', 1234567890);
+        touch($this->tempDir.'/no-collection.yaml', 1234567890);
+        touch($this->tempDir.'/no-structure.yaml', 1234567890);
+
+        $collectionWithStructure = $this->mock(Collection::class);
+        $collectionWithStructure->shouldReceive('hasStructure')->andReturn(true);
+
+        $collectionWithoutStructure = $this->mock(Collection::class);
+        $collectionWithoutStructure->shouldReceive('hasStructure')->andReturn(false);
+        
+        Facades\Collection::shouldReceive('findByHandle')->with('one')->andReturn($collectionWithStructure);
+        Facades\Collection::shouldReceive('findByHandle')->with('two')->andReturn($collectionWithStructure);
+        Facades\Collection::shouldReceive('findByHandle')->with('no-collection')->andReturn(null);
+        Facades\Collection::shouldReceive('findByHandle')->with('no-structure')->andReturn($collectionWithoutStructure);
 
         $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
