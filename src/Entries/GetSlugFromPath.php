@@ -14,7 +14,7 @@ class GetSlugFromPath
 
         $segments = explode('.', $path);
 
-        if ($this->isDate($segments[0]) || $this->isNumeric($segments[0])) {
+        if ($this->isDate($segments[0]) || is_numeric($segments[0])) {
             return $segments[1];
         }
 
@@ -24,10 +24,5 @@ class GetSlugFromPath
     private function isDate($str)
     {
         return preg_match('/^\d{4}-\d{2}-\d{2}(-\d{4})?$/', $str);
-    }
-
-    private function isNumeric($str)
-    {
-        return $str == (int) $str;
     }
 }
