@@ -419,16 +419,20 @@ class PageTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $page->data());
         $this->assertEquals([], $page->data()->all());
+        $this->assertInstanceOf(Collection::class, $page->pageData());
+        $this->assertEquals([], $page->pageData()->all());
         $this->assertInstanceOf(Collection::class, $page->values());
         $this->assertEquals([], $page->values()->all());
         $this->assertNull($page->value('foo'));
         $this->assertNull($page->get('foo'));
         $this->assertEquals('fallback', $page->get('unknown', 'fallback'));
 
-        $page->setData(['foo' => 'bar']);
+        $page->setPageData(['foo' => 'bar']);
 
         $this->assertInstanceOf(Collection::class, $page->data());
         $this->assertEquals(['foo' => 'bar'], $page->data()->all());
+        $this->assertInstanceOf(Collection::class, $page->pageData());
+        $this->assertEquals(['foo' => 'bar'], $page->pageData()->all());
         $this->assertInstanceOf(Collection::class, $page->values());
         $this->assertEquals(['foo' => 'bar'], $page->values()->all());
         $this->assertEquals('bar', $page->value('foo'));
@@ -455,6 +459,8 @@ class PageTest extends TestCase
             'foo' => 'entry bar',
             'baz' => 'entry qux',
         ], $page->data()->all());
+        $this->assertInstanceOf(Collection::class, $page->pageData());
+        $this->assertEquals([], $page->pageData()->all());
         $this->assertInstanceOf(Collection::class, $page->values());
         $this->assertEquals([
             'foo' => 'entry bar',
@@ -466,13 +472,15 @@ class PageTest extends TestCase
         $this->assertEquals('entry qux', $page->get('baz'));
         $this->assertEquals('fallback', $page->get('unknown', 'fallback'));
 
-        $page->setData(['foo' => 'page bar']);
+        $page->setPageData(['foo' => 'page bar']);
 
         $this->assertInstanceOf(Collection::class, $page->data());
         $this->assertEquals([
             'foo' => 'page bar',
             'baz' => 'entry qux',
         ], $page->data()->all());
+        $this->assertInstanceOf(Collection::class, $page->pageData());
+        $this->assertEquals(['foo' => 'page bar'], $page->pageData()->all());
         $this->assertInstanceOf(Collection::class, $page->values());
         $this->assertEquals([
             'foo' => 'page bar',

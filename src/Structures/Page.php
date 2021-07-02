@@ -233,16 +233,21 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return $this;
     }
 
-    public function setData(array $data): self
+    public function setPageData(array $data): self
     {
         $this->data = $data;
 
         return $this;
     }
 
+    public function pageData()
+    {
+        return collect($this->data);
+    }
+
     public function data()
     {
-        $data = collect($this->data);
+        $data = $this->pageData();
 
         if ($entry = $this->entry()) {
             $data = $entry->data()->merge($data);
@@ -253,7 +258,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function values()
     {
-        $data = collect($this->data);
+        $data = $this->pageData();
 
         if ($entry = $this->entry()) {
             $data = $entry->values()->merge($data);
