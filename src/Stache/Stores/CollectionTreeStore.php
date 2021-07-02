@@ -21,7 +21,7 @@ class CollectionTreeStore extends NavTreeStore
 
         [, $handle] = $this->parseTreePath($file->getPathname());
 
-        if (! ($collection = Collection::find($handle))) {
+        if (! ($collection = Collection::findByHandle($handle))) {
             return false;
         }
 
