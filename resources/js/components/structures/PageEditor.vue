@@ -101,6 +101,12 @@ export default {
                 });
             }
 
+            // Remove the "url" field if it's been added to the blueprint by the user.
+            // URL fields only make sense for URL type pages. Entries will have their own URLs.
+            if (this.type == 'entry') {
+                fields.splice(fields.indexOf(fields.find(field => field.handle === 'url')), 1);
+            }
+
             if (isMissingField(fields, 'title')) {
                 fields.unshift({
                     handle: 'title',
