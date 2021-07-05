@@ -32,7 +32,7 @@ class PagesTest extends TestCase
         $pages = (new Pages)
             ->setParent($parent)
             ->setPages([
-                ['entry' => 'one', 'children' => [
+                ['entry' => 'one', 'data' => ['foo' => 'bar'], 'children' => [
                     ['entry' => 'one-one'],
                     ['entry' => 'one-two', 'children' => [
                         ['entry' => 'one-two-one'],
@@ -46,6 +46,7 @@ class PagesTest extends TestCase
         $this->assertCount(3, $list);
         $this->assertEveryItemIsInstanceOf(Page::class, $list);
         $this->assertEquals(['the-root', 'one', 'two'], $list->map->reference()->all());
+        $this->assertEquals(['foo' => 'bar'], $list[1]->pageData()->all());
     }
 
     /** @test */
