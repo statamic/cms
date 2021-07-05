@@ -93,7 +93,7 @@ class NavigationController extends CpController
 
         $this->authorize('update', $nav, __('You are not authorized to configure navs.'));
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($nav)->fields()->addValues($request->all());
 
         $fields->validate();
 
@@ -152,7 +152,7 @@ class NavigationController extends CpController
         return ['redirect' => $structure->showUrl()];
     }
 
-    public function editFormBlueprint()
+    public function editFormBlueprint($nav)
     {
         $contents = [
             'name' => [
@@ -169,6 +169,14 @@ class NavigationController extends CpController
             'options' => [
                 'display' => __('Options'),
                 'fields' => [
+                    'blueprint' => [
+                        'type' => 'html',
+                        'instructions' => __('statamic::messages.navigation_configure_blueprint_instructions'),
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <a href="'.cp_route('navigation.blueprint.edit', $nav->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
+                    ],
                     'collections' => [
                         'display' => __('Collections'),
                         'instructions' => __('statamic::messages.navigation_configure_collections_instructions'),
