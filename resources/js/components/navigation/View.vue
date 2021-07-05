@@ -103,6 +103,10 @@
 
             <template #branch-options="{ branch, removeBranch, orphanChildren, vm, depth }">
                 <dropdown-item
+                    v-if="isEntryBranch(branch)"
+                    :text="__('Edit Entry')"
+                    :redirect="branch.edit_url" />
+                <dropdown-item
                     v-if="depth < maxDepth"
                     :text="__('Add child link to URL')"
                     @click="linkPage(vm)" />
