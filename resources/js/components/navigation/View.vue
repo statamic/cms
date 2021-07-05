@@ -128,6 +128,7 @@
         <page-editor
             v-if="editingPage"
             :type="editingPage.page.id ? 'entry' : 'url'"
+            :editEntryUrl="editingPage.page.id ? editingPage.page.edit_url : null"
             :initial-values="editingPage.page.values"
             :initial-meta="editingPage.page.meta"
             :initial-title="editingPage.page.title"

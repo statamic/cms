@@ -37,6 +37,13 @@
 
                 <div class="p-3">
                     <button @click="submit" class="btn-primary w-full">{{ __('Submit') }}</button>
+
+                    <div class="text-xs mt-2" v-if="type === 'entry'">
+                        <a :href="editEntryUrl" target="_blank" class="flex items-center justify-center text-blue hover:text-blue-dark underline">
+                            <svg-icon name="external-link" class="w-4 h-4 mr-1" />
+                            {{ __('Edit Entry') }}
+                        </a>
+                    </div>
                 </div>
 
             </div>
@@ -56,6 +63,7 @@ export default {
         initialValues: Object,
         initialMeta: Object,
         blueprint: Object,
+        editEntryUrl: String
     },
 
     data() {
