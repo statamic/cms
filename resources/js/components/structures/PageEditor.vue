@@ -1,6 +1,6 @@
 <template>
 
-    <stack narrow name="page-tree-linker" @closed="$emit('closed')">
+    <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
             <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
@@ -8,7 +8,7 @@
                 <button
                     type="button"
                     class="btn-close"
-                    @click="close"
+                    @click="confirmClose(close)"
                     v-html="'&times'" />
             </div>
 
@@ -17,7 +17,7 @@
                 <publish-container
                     v-if="adjustedBlueprint"
                     ref="container"
-                    name="nav-page-editor"
+                    :name="publishContainer"
                     :blueprint="adjustedBlueprint"
                     :values="values"
                     :meta="meta"
@@ -77,7 +77,8 @@ export default {
             error: null,
             errors: {},
             validating: false,
-            saveKeyBinding: null
+            saveKeyBinding: null,
+            publishContainer: 'tree-page'
         }
     },
 
@@ -153,7 +154,21 @@ export default {
 
         initMeta(meta) {
             return {...meta, title: null, url: null};
-        }
+        },
+
+        shouldClose() {
+            if (this.$dirty.has(this.publishContainer)) {
+                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        confirmClose(close) {
+            if (this.shouldClose()) close();
+        },
     },
 
     created() {
