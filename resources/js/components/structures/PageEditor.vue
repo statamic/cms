@@ -84,12 +84,16 @@ export default {
 
     computed: {
         adjustedBlueprint() {
-            let blueprint = clone(this.blueprint);
+            function isMissingField(fields, handle) {
+                return ! fields.some(field => field.handle === handle);
+            }
 
-            // todo only add the fields if they're not already in the blueprint.
+            // This UI only supports the first section
+            const blueprint = clone(this.blueprint);
+            const fields = blueprint.sections[0].fields;
 
-            if (this.type == 'url') {
-                blueprint.sections[0].fields.unshift({
+            if (this.type == 'url' && isMissingField(fields, 'url')) {
+                fields.unshift({
                     handle: 'url',
                     type: 'text',
                     display: __('URL'),
@@ -97,14 +101,16 @@ export default {
                 });
             }
 
-            blueprint.sections[0].fields.unshift({
-                handle: 'title',
-                type: 'text',
-                display: __('Title'),
-                instructions: __('Link display text. Leave blank to use the URL.'),
-            });
+            if (isMissingField(fields, 'title')) {
+                fields.unshift({
+                    handle: 'title',
+                    type: 'text',
+                    display: __('Title'),
+                    instructions: __('Link display text. Leave blank to use the URL.'),
+                });
+            }
 
-            return blueprint;
+            return { ...blueprint, sections: [{ fields }] };
         },
 
         fields() {
