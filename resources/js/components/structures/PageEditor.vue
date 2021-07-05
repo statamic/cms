@@ -25,6 +25,10 @@
                     @updated="values = $event"
                 >
                     <div slot-scope="{ container, setFieldValue, setFieldMeta }">
+                        <div v-if="validating" class="absolute inset-0 z-10 bg-white bg-opacity-75 flex items-center justify-center">
+                            <loading-graphic text="" />
+                        </div>
+
                         <publish-fields
                             :fields="fields"
                             @updated="setFieldValue"
@@ -70,7 +74,9 @@ export default {
         return {
             values: this.initValues(this.initialValues),
             meta: this.initiMeta(this.initialMeta),
-            errors: {}
+            error: null,
+            errors: {},
+            validating: false
         }
     },
 
@@ -109,19 +115,30 @@ export default {
 
     methods: {
         submit() {
+            this.validating = true;
+
             let title = this.values.title;
             let url = this.values.url;
 
-            // todo: actual blueprint validation. submit to server side.
-            if (!title && !url) {
-                alert('You need at least a title or URL.');
-                return;
-            }
+            const postUrl = cp_url('navigation/links/pages'); // todo: get url properly
 
-            this.$emit('submitted', {
-                title,
-                url,
-                values: _.omit(this.values, ['title', 'url']),
+            this.$axios.post(postUrl, {
+                type: this.type,
+                values: this.values
+            }).then(response => {
+                this.$emit('submitted', { title, url, values: _.omit(this.values, ['title', 'url']) });
+            }).catch(e => {
+                this.validating = false;
+                if (e.response && e.response.status === 422) {
+                    const { message, errors } = e.response.data;
+                    this.error = message;
+                    this.errors = errors;
+                    this.$toast.error(message);
+                } else if (e.response) {
+                    this.$toast.error(e.response.data.message);
+                } else {
+                    this.$toast.error(e || 'Something went wrong');
+                }
             });
         },
 

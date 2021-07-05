@@ -34,6 +34,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
         Route::get('navigation/{navigation}/blueprint', 'NavigationBlueprintController@edit')->name('navigation.blueprint.edit');
         Route::patch('navigation/{navigation}/blueprint', 'NavigationBlueprintController@update')->name('navigation.blueprint.update');
+        Route::post('navigation/{navigation}/pages', 'NavigationPagesController@update')->name('navigation.pages.update');
     });
 
     Route::group(['namespace' => 'Collections'], function () {
