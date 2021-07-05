@@ -16,6 +16,7 @@
         :collections="{{ json_encode($collections) }}"
         :max-depth="{{ $nav->maxDepth() ?? 'Infinity' }}"
         :expects-root="{{ $str::bool($expectsRoot) }}"
+        :blueprint="{{ json_encode($blueprint) }}"
     ></navigation-view>
 
 @endsection

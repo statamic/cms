@@ -40,8 +40,9 @@ class StructurePagesController extends CpController
         return collect($items)->map(function ($item) {
             return Arr::removeNullValues([
                 'entry' => $ref = $item['id'] ?? null,
-                'title' => $ref ? null : ($item['title'] ?? null),
+                'title' => $item['title'] ?? null,
                 'url' => $ref ? null : ($item['url'] ?? null),
+                'data' => Arr::removeNullValues($item['values']),
                 'children' => $this->toTree($item['children']),
             ]);
         })->all();

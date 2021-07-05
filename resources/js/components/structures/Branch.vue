@@ -9,7 +9,7 @@
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
-                    v-text="page.title || page.url" />
+                    v-text="title" />
 
                 <button
                     v-if="hasChildren"
@@ -94,6 +94,10 @@ export default {
 
         isText() {
             return this.page.title && !this.page.url;
+        },
+
+        title() {
+            return this.page.title || this.page.entry_title || this.page.url;
         }
 
     },

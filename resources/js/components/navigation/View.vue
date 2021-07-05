@@ -127,14 +127,20 @@
 
         <page-editor
             v-if="editingPage"
+            :type="editingPage.page.id ? 'entry' : 'url'"
+            :initial-values="editingPage.page.values"
+            :initial-meta="editingPage.page.meta"
             :initial-title="editingPage.page.title"
             :initial-url="editingPage.page.url"
+            :blueprint="blueprint"
             @closed="closePageEditor"
             @submitted="updatePage"
         />
 
         <page-editor
             v-if="creatingPage"
+            type="url"
+            :blueprint="blueprint"
             @closed="closePageCreator"
             @submitted="pageCreated"
         />
@@ -178,7 +184,8 @@ export default {
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
         site: { type: String, required: true },
-        sites: { type: Array, required: true }
+        sites: { type: Array, required: true },
+        blueprint: { type: Object, required: true }
     },
 
     data() {
@@ -263,18 +270,14 @@ export default {
             return !this.isEntryBranch(branch) && !this.isLinkBranch(branch);
         },
 
-        editPage(page, vm, store, $event) {
-            if (page.id) {
-                const url = page.edit_url;
-                $event.metaKey ? window.open(url) : window.location = url;
-            } else {
-                this.editingPage = { page, vm, store };
-            }
+        editPage(page, vm, store) {
+            this.editingPage = { page, vm, store };
         },
 
         updatePage(page) {
             this.editingPage.page.url = page.url;
             this.editingPage.page.title = page.title;
+            this.editingPage.page.values = page.values;
             this.$refs.tree.pageUpdated(this.editingPage.store);
 
             this.editingPage = false;

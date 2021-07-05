@@ -83,9 +83,25 @@ class TreeBuilder
             $page = $item['page'];
             $collection = $page->collection();
 
+            // TODO: Refactor? This is only relevant to navs.
+            if ($blueprint = $page->blueprint()) {
+                $values = $page->pageData()->merge([
+                    'title' => $page->title(),
+                    'url' => $page->reference() ? null : $page->url(),
+                ])->all();
+
+                $fields = $blueprint
+                    ->fields()
+                    ->addValues($values)
+                    ->preProcess();
+                $values = $fields->values();
+                $meta = $fields->meta();
+            }
+
             return [
                 'id'          => $page->id(),
-                'title'       => $page->title(),
+                'title'       => $page->hasCustomTitle() ? $page->title() : null,
+                'entry_title' => $page->referenceExists() ? $page->entry()->value('title') : null,
                 'url'         => $page->url(),
                 'edit_url'    => $page->editUrl(),
                 'can_delete'  => $page->referenceExists() ? User::current()->can('delete', $page->entry()) : true,
@@ -98,6 +114,8 @@ class TreeBuilder
                     'edit_url' => $collection->showUrl(),
                     'create_url' => $collection->createEntryUrl(),
                 ],
+                'values' => $values ?? [],
+                'meta' => $meta ?? [],
                 'children'    => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : [],
             ];
         })->values()->all();

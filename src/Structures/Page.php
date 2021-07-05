@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Routing\UrlBuilder;
+use Statamic\Contracts\Structures\Nav;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Blink;
@@ -382,8 +383,10 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function blueprint()
     {
-        // TODO: make the actual blueprint.
-        return new \Statamic\Fields\Blueprint;
+        // TODO: maybe don't have nav-specific logic right here.
+        if ($this->structure() instanceof Nav) {
+            return $this->structure()->blueprint();
+        }
     }
 
     public function collection()
