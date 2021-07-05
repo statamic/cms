@@ -54,7 +54,9 @@ class AugmentedPage extends AugmentedEntry
 
     protected function blueprintFields()
     {
-        $fields = $this->page->blueprint()->fields()->all();
+        $fields = ($pageBlueprint = $this->page->blueprint())
+            ? $pageBlueprint->fields()->all()
+            : collect();
 
         if ($this->page !== $this->data) {
             $entryFields = $this->data->blueprint()->fields()->all();
