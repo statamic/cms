@@ -9,7 +9,7 @@
                 <h1 class="flex-1" v-text="title" />
 
                 <dropdown-list class="mr-1">
-                    <dropdown-item :text="__('Configure Navigation')" :redirect="editUrl" />
+                    <slot name="twirldown" />
                 </dropdown-list>
 
                 <a @click="$refs.tree.cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
