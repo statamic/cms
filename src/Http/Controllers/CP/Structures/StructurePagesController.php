@@ -42,7 +42,7 @@ class StructurePagesController extends CpController
                 'entry' => $ref = $item['id'] ?? null,
                 'title' => $item['title'] ?? null,
                 'url' => $ref ? null : ($item['url'] ?? null),
-                'data' => Arr::removeNullValues($item['values']),
+                'data' => Arr::removeNullValues($item['values'] ?? []),
                 'children' => $this->toTree($item['children']),
             ]);
         })->all();

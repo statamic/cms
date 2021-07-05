@@ -260,6 +260,12 @@ export default {
         },
 
         entriesSelected(pages) {
+            pages = pages.map(page => ({
+                ...page,
+                entry_title: page.title,
+                title: null
+            }));
+
             this.$refs.tree.addPages(pages, this.targetParent);
         },
 

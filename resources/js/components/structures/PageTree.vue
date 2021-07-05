@@ -235,6 +235,7 @@ export default {
                 parent.push({
                     id: selection.id,
                     title: selection.title,
+                    entry_title: selection.entry_title,
                     slug: selection.slug,
                     url: selection.url,
                     edit_url: selection.edit_url,
