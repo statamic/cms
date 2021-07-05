@@ -73,7 +73,7 @@ export default {
     data() {
         return {
             values: this.initValues(this.initialValues),
-            meta: this.initiMeta(this.initialMeta),
+            meta: this.initMeta(this.initialMeta),
             error: null,
             errors: {},
             validating: false,
@@ -151,7 +151,7 @@ export default {
             };
         },
 
-        initiMeta(meta) {
+        initMeta(meta) {
             return {...meta, title: null, url: null};
         }
     },
