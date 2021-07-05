@@ -76,7 +76,8 @@ export default {
             meta: this.initiMeta(this.initialMeta),
             error: null,
             errors: {},
-            validating: false
+            validating: false,
+            saveKeyBinding: null
         }
     },
 
@@ -156,7 +157,14 @@ export default {
     },
 
     created() {
-        this.$keys.bindGlobal('enter', this.submit)
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s'], e => {
+            e.preventDefault();
+            this.submit();
+        });
+    },
+
+    destroyed() {
+        this.saveKeyBinding.destroy();
     }
 
 }
