@@ -47,7 +47,7 @@ return [
     'date.config.mode' => 'Choose between single or range mode (range disables time picker).',
     'date.config.rows' => 'Show multiple months at one time, in rows and columns',
     'date.config.time_enabled' => 'Enable the timepicker.',
-    'date.config.time_required' => 'Require time _in addition_ to date.',
+    'date.config.time_seconds_enabled' => 'Show seconds in the timepicker.',
     'form.config.max_items' => 'The maximum number of selectable forms.',
     'grid.config.add_row' => 'Set the label of the "Add Row" button.',
     'grid.config.fields' => 'Each field becomes a column in the grid table.',
@@ -89,4 +89,5 @@ return [
     'text.config.input_type' => 'Set the HTML5 input type.',
     'text.config.placeholder' => 'Set placeholder text.',
     'text.config.prepend' => 'Add text before (to the left of) the text input.',
+    'time.config.seconds_enabled' => 'Show seconds in the timepicker.',
 ];
