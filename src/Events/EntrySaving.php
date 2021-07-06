@@ -5,10 +5,22 @@ namespace Statamic\Events;
 class EntrySaving extends Event
 {
     public $entry;
+    private $messageStore;
 
     public function __construct($entry)
     {
         $this->entry = $entry;
+        $this->messageStore = app(EntrySavingMessageStore::class);
+    }
+
+    public function addSuccessMessage(string $message)
+    {
+        $this->messageStore->addSuccessMessage($message);
+    }
+
+    public function successMessages(): array
+    {
+        return $this->messageStore->successMessages;
     }
 
     /**
