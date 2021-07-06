@@ -2,12 +2,14 @@
 
 namespace Statamic\Events;
 
+use Statamic\Entries\Entry;
+
 class EntrySaving extends Event
 {
     public $entry;
     private $messageStore;
 
-    public function __construct($entry)
+    public function __construct(Entry $entry)
     {
         $this->entry = $entry;
         $this->messageStore = app(EntrySavingMessageStore::class);
