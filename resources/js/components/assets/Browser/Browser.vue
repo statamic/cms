@@ -409,7 +409,10 @@ export default {
             this.container = this.initialContainer;
         },
 
-        container() {
+        container(container) {
+            this.preferencesPrefix = `assets.${container.id}`;
+            this.mode = this.getPreference('mode') || 'table';
+            this.setInitialPerPage();
             this.loadAssets();
         },
 
@@ -454,9 +457,6 @@ export default {
             this.$axios.get(cp_url('asset-containers')).then(response => {
                 this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
-                this.preferencesPrefix = `assets.${this.container.id}`;
-                this.mode = this.getPreference('mode') || this.mode;
-                this.setInitialPerPage()
             });
         },
 
@@ -471,7 +471,6 @@ export default {
                 const data = response.data;
                 this.assets = data.data.assets;
                 this.meta = data.meta;
-                this.preferencesPrefix = `assets.${this.container.id}`;
 
                 if (this.searchQuery) {
                     this.folder = null;
