@@ -66,6 +66,12 @@ class MakeFieldtype extends GeneratorCommand
 
         $relativePath = $this->getRelativePath($path);
 
+        if ($addon = $this->argument('addon')) {
+            $this->wireUpAddonJs($addon);
+        } else {
+            // $this->wireUpAppJs(); // TODO!
+        }
+
         if ($this->hiddenPathOutput) {
             return;
         }
@@ -87,6 +93,29 @@ class MakeFieldtype extends GeneratorCommand
         $component = str_replace('dummy_name', snake_case($name), $component);
 
         return $component;
+    }
+
+    /**
+     * Wire up addon JS.
+     *
+     * @param string $addon
+     */
+    protected function wireUpAddonJs($addon)
+    {
+        $addonPath = $this->getAddonPath($addon);
+
+        if ($this->files->exists($path = $addonPath.'/../webpack.mix.js')) {
+            $this->files->put($path, $this->files->get($this->getStub('addon/webpack.mix.js.stub')));
+        }
+
+        if ($this->files->exists($path = $addonPath.'/../package.json')) {
+            $this->files->put($path, $this->files->get($this->getStub('addon/package.json.stub')));
+        }
+
+        if ($this->files->exists($path = $addonPath.'/resources/js/addon.js')) {
+            $this->files->put($path, $this->files->get($this->getStub('addon/addon.js.stub')));
+            // TODO: append a line to register fieldtype to addon.js
+        }
     }
 
     /**
