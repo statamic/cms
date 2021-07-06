@@ -104,18 +104,19 @@ class MakeFieldtype extends GeneratorCommand
     {
         $addonPath = $this->getAddonPath($addon);
 
-        if ($this->files->exists($path = $addonPath.'/../webpack.mix.js')) {
+        if (! $this->files->exists($path = $addonPath.'/../webpack.mix.js')) {
             $this->files->put($path, $this->files->get($this->getStub('addon/webpack.mix.js.stub')));
         }
 
-        if ($this->files->exists($path = $addonPath.'/../package.json')) {
+        if (! $this->files->exists($path = $addonPath.'/../package.json')) {
             $this->files->put($path, $this->files->get($this->getStub('addon/package.json.stub')));
         }
 
-        if ($this->files->exists($path = $addonPath.'/resources/js/addon.js')) {
+        if (! $this->files->exists($path = $addonPath.'/resources/js/addon.js')) {
             $this->files->put($path, $this->files->get($this->getStub('addon/addon.js.stub')));
-            // TODO: append a line to register fieldtype to addon.js
         }
+
+        // TODO: append a line to register fieldtype to addon.js
     }
 
     /**
