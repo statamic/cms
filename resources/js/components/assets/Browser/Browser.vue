@@ -508,7 +508,7 @@ export default {
 
         setMode(mode) {
             this.mode = mode;
-            this.setPreference('mode', mode == 'grid' ? 'grid' : null);
+            this.setPreference('mode', mode == 'table' ? null : mode);
         },
 
         edit(id) {
