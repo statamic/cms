@@ -455,7 +455,7 @@ export default {
                 this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
                 this.preferencesPrefix = `assets.${this.container.id}`;
-                this.mode = this.getPreference('mode', this.mode);
+                this.mode = this.getPreference('mode') || this.mode;
                 this.setInitialPerPage()
             });
         },
