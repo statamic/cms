@@ -10,7 +10,7 @@
                     'active': section.handle == active,
                     'has-error': sectionHasError(section.handle)
                 }"
-                @click.prevent="active = section.handle"
+                @click.prevent="setActive(section.handle)"
                 v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
             ></a>
         </div>
@@ -155,6 +155,11 @@ export default {
 
         sectionHasError(handle) {
             return _.chain(this.sectionErrors).values().contains(handle).value();
+        },
+
+        setActive(tab) {
+            this.active = tab;
+            this.$events.$emit('tab-switched', tab);
         }
 
     }
