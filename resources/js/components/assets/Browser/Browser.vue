@@ -481,6 +481,7 @@ export default {
                     this.actionUrl = data.links.asset_action;
                     this.folderActionUrl = data.links.folder_action;
                 }
+
                 this.loadingAssets = false;
                 this.initializing = false;
             }).catch(e => {
