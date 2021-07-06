@@ -250,10 +250,17 @@ import AssetEditor from '../Editor/Editor.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import FolderCreator from '../Folder/Create.vue';
 import FolderEditor from '../Folder/Edit.vue';
+import HasPagination from '../../data-list/HasPagination';
+import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 
 export default {
+
+    mixins: [
+        HasPagination,
+        HasPreferences,
+    ],
 
     components: {
         AssetThumbnail,
@@ -299,7 +306,7 @@ export default {
             creatingFolder: false,
             uploads: [],
             page: 1,
-            perPage: localStorage.getItem('assets-per-page') ?? 25,
+            preferencesPrefix: null,
             meta: {},
             sortColumn: 'basename',
             sortDirection: 'asc',
@@ -447,7 +454,9 @@ export default {
             this.$axios.get(cp_url('asset-containers')).then(response => {
                 this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
-                this.mode = this.$preferences.get(`assets.${this.container.id}.mode`, this.mode);
+                this.preferencesPrefix = `assets.${this.container.id}`;
+                this.mode = this.getPreference('mode', this.mode);
+                this.setInitialPerPage()
             });
         },
 
@@ -462,6 +471,7 @@ export default {
                 const data = response.data;
                 this.assets = data.data.assets;
                 this.meta = data.meta;
+                this.preferencesPrefix = `assets.${this.container.id}`;
 
                 if (this.searchQuery) {
                     this.folder = null;
@@ -472,7 +482,6 @@ export default {
                     this.actionUrl = data.links.asset_action;
                     this.folderActionUrl = data.links.folder_action;
                 }
-
                 this.loadingAssets = false;
                 this.initializing = false;
             }).catch(e => {
@@ -500,16 +509,15 @@ export default {
 
         setMode(mode) {
             this.mode = mode;
-            this.$preferences.set(`assets.${this.container.id}.mode`, mode);
+            this.setPreference('mode', mode == 'grid' ? 'grid' : null);
         },
 
         edit(id) {
             this.editedAssetId = id;
         },
 
-        changePerPage(size) {
-            localStorage.setItem('assets-per-page', size)
-            this.perPage = parseInt(size);
+        resetPage() {
+            this.page = 1;
             this.loadAssets();
         },
 
