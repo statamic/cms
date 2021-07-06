@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
+use InvalidArgumentException;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
@@ -279,7 +280,7 @@ class Date extends Fieldtype
     {
         try {
             return Carbon::createFromFormat($this->saveFormat(), $value);
-        } catch (InvalidFormatException $e) {
+        } catch (InvalidFormatException | InvalidArgumentException $e) {
             return Carbon::parse($value);
         }
     }
