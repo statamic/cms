@@ -515,11 +515,6 @@ export default {
             this.editedAssetId = id;
         },
 
-        resetPage() {
-            this.page = 1;
-            this.loadAssets();
-        },
-
         closeAssetEditor() {
             this.editedAssetId = null;
         },
