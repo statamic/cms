@@ -215,6 +215,8 @@
                             class="mt-3"
                             :resource-meta="meta"
                             @page-selected="page = $event"
+                            @per-page-changed="changePerPage"
+                            :per-page="perPage"
                         />
 
                     </div>
@@ -297,7 +299,7 @@ export default {
             creatingFolder: false,
             uploads: [],
             page: 1,
-            perPage: 30, // TODO: Should come from the controller, or a config.
+            perPage: localStorage.getItem('assets-per-page') ?? 25,
             meta: {},
             sortColumn: 'basename',
             sortDirection: 'asc',
@@ -501,6 +503,12 @@ export default {
 
         edit(id) {
             this.editedAssetId = id;
+        },
+
+        changePerPage(size) {
+            localStorage.setItem('assets-per-page', size)
+            this.perPage = parseInt(size);
+            this.loadAssets();
         },
 
         closeAssetEditor() {
