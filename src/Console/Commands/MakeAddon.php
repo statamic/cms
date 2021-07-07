@@ -78,9 +78,9 @@ class MakeAddon extends GeneratorCommand
         $this
             ->generateComposerJson()
             ->generateServiceProvider()
-            ->generateOptional()
             ->addRepositoryPath()
-            ->installAddon();
+            ->installAddon()
+            ->generateOptional();
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
@@ -207,7 +207,7 @@ class MakeAddon extends GeneratorCommand
     protected function runOptionalAddonGenerator($type)
     {
         $prefix = $this->runningInPlease ? '' : 'statamic:';
-        $arguments = ['name' => studly_case($this->nameSlug), 'addon' => $this->addonPath('src')];
+        $arguments = ['name' => studly_case($this->nameSlug), 'addon' => $this->addonPath()];
 
         if ($this->option('force')) {
             $arguments['--force'] = null;

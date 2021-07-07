@@ -72,10 +72,6 @@ class MakeFieldtype extends GeneratorCommand
             // $this->wireUpAppJs(); // TODO!
         }
 
-        if ($this->hiddenPathOutput) {
-            return;
-        }
-
         $this->comment("Your {$this->typeLower} Vue component awaits at: {$relativePath}");
     }
 
@@ -87,6 +83,7 @@ class MakeFieldtype extends GeneratorCommand
      */
     protected function buildVueComponent($name)
     {
+        // TODO: Replace this with $this->makeFromStub()
         $component = $this->files->get($this->getStub('fieldtype.vue.stub'));
 
         $component = str_replace('DummyName', $name, $component);
@@ -105,21 +102,22 @@ class MakeFieldtype extends GeneratorCommand
         $addonPath = $this->getAddonPath($addon);
 
         $files = [
-            'addon/webpack.mix.js.stub' => '/../webpack.mix.js',
-            'addon/package.json.stub' => '/../package.json',
-            'addon/addon.js.stub' => '/resources/js/addon.js',
-            'addon/.gitignore.stub' => '/../.gitignore',
-            'addon/README.md.stub' => '/../README.md',
+            'addon/webpack.mix.js.stub' => 'webpack.mix.js',
+            'addon/package.json.stub' => 'package.json',
+            'addon/addon.js.stub' => 'resources/js/addon.js',
+            'addon/.gitignore.stub' => '.gitignore',
+            'addon/README.md.stub' => 'README.md',
+        ];
+
+        $data = [
+            'name' => $this->getNameInput(),
+            'package' => $this->package,
+            'root_namespace' => $this->rootNamespace(),
         ];
 
         foreach ($files as $stub => $file) {
-            if (! $this->files->exists($path = $addonPath.$file)) {
-                $this->files->put($path, $this->files->get($this->getStub($stub)));
-            }
+            $this->createFromStub($stub, $addonPath.'/'.$file, $data);
         }
-
-        // TODO: Append a line to register fieldtype to addon.js
-        // TODO: Parse stubs with Antlers to inject proper names
     }
 
     /**
