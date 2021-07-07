@@ -116,6 +116,7 @@ class MakeFieldtype extends GeneratorCommand
             if (! $this->files->exists($path = $addonPath.$file)) {
                 $this->files->put($path, $this->files->get($this->getStub($stub)));
             }
+        }
 
         // TODO: Append a line to register fieldtype to addon.js
         // TODO: Parse stubs with Antlers to inject proper names
