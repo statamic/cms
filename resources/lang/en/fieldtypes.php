@@ -12,6 +12,7 @@ return [
     'assets.config.max_files' => 'The maximum number of selectable assets.',
     'assets.config.mode' => 'Choose your preferred layout style.',
     'assets.config.restrict' => 'Prevent users from navigating to other folders.',
+    'assets.config.show_filename' => 'Show the filename next to the preview image.',
     'bard.config.allow_source' => 'Enable to view the HTML source code while writing.',
     'bard.config.always_show_set_button' => 'Enable to always show the "Add Set" button.',
     'bard.config.buttons' => 'Choose which buttons to show in the toolbar.',
