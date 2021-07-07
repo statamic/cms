@@ -169,7 +169,7 @@ class ExtensionGeneratorTest extends TestCase
 
         $this->assertFileNotExists($path);
 
-        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability']);
+        $this->artisan('statamic:make:addon', ['addon' => 'erso/deaths-tar-vulnerability']);
 
         $this->assertFileExists($composerJson = "$path/composer.json");
         $this->assertStringContainsString('"Erso\\\DeathsTarVulnerability\\\": "src"', $this->files->get($composerJson));
@@ -186,10 +186,10 @@ class ExtensionGeneratorTest extends TestCase
 
         $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
-        $this->artisan('statamic:make:addon', ['package' => 'deaths-tar-vulnerability'])
+        $this->artisan('statamic:make:addon', ['addon' => 'deaths-tar-vulnerability'])
             ->expectsOutput('Please enter a valid composer package name (eg. john/my-addon).');
 
-        $this->artisan('statamic:make:addon', ['package' => 'some/path/deaths-tar-vulnerability'])
+        $this->artisan('statamic:make:addon', ['addon' => 'some/path/deaths-tar-vulnerability'])
             ->expectsOutput('Please enter a valid composer package name (eg. john/my-addon).');
 
         $this->assertFileNotExists($path);
@@ -204,12 +204,12 @@ class ExtensionGeneratorTest extends TestCase
 
         $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
-        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability']);
+        $this->artisan('statamic:make:addon', ['addon' => 'erso/deaths-tar-vulnerability']);
         $this->files->put("$path/src/ServiceProvider.php", 'overwritten stuff');
 
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
 
-        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability'])
+        $this->artisan('statamic:make:addon', ['addon' => 'erso/deaths-tar-vulnerability'])
             ->expectsOutput('Addon already exists!');
 
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
@@ -224,13 +224,13 @@ class ExtensionGeneratorTest extends TestCase
 
         $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
-        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability']);
+        // Setup addon with custom service provider
+        $this->artisan('statamic:make:addon', ['addon' => 'erso/deaths-tar-vulnerability']);
         $this->files->put("$path/src/ServiceProvider.php", 'overwritten stuff');
-
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
 
-        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability', '--force' => null]);
-
+        // Use force option to ensure service provider stub gets copied
+        $this->artisan('statamic:make:addon', ['addon' => 'erso/deaths-tar-vulnerability', '--force' => true]);
         $this->assertStringNotContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }
 
@@ -245,7 +245,7 @@ class ExtensionGeneratorTest extends TestCase
 
         $this->assertFileNotExists($path);
 
-        $this->artisan('statamic:make:addon', ['package' => 'ford/san-holo', '--tag' => null]);
+        $this->artisan('statamic:make:addon', ['addon' => 'ford/san-holo', '--tag' => null]);
 
         $this->assertFileExists("$path/src/Tags/SanHolo.php");
         $this->assertStringContainsString('namespace Ford\SanHolo\Tags;', $this->files->get("$path/src/Tags/SanHolo.php"));
@@ -262,7 +262,7 @@ class ExtensionGeneratorTest extends TestCase
 
         $this->assertFileNotExists($path);
 
-        $this->artisan('statamic:make:addon', ['package' => 'ford/san-holo', '--all' => null]);
+        $this->artisan('statamic:make:addon', ['addon' => 'ford/san-holo', '--all' => null]);
 
         $this->assertFileExists("$path/src/Fieldtypes/SanHolo.php");
         $this->assertStringContainsString('namespace Ford\SanHolo\Fieldtypes;', $this->files->get("$path/src/Fieldtypes/SanHolo.php"));
@@ -286,7 +286,7 @@ class ExtensionGeneratorTest extends TestCase
 
         $path = $this->preparePath('addons/yoda/bag-odah');
 
-        $this->artisan('statamic:make:addon', ['package' => 'yoda/bag-odah']);
+        $this->artisan('statamic:make:addon', ['addon' => 'yoda/bag-odah']);
 
         $this->assertFileNotExists("$path/src/Tags/Yoda.php");
 
