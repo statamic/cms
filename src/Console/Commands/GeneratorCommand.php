@@ -230,6 +230,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         }
 
         $file = Antlers::parse($this->files->get($this->getStub($stub)), $data);
+        $file = str_replace('&lt;?php', '<?php', $file); // because we don't touch the parser on pain of death.
 
         $this->files->put($path, $file);
     }

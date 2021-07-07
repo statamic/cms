@@ -63,7 +63,7 @@ class MakeAddon extends GeneratorCommand
      */
     public function handle()
     {
-        if ($this->validationFails($this->package = $this->argument('package'), new ComposerPackage)) {
+        if ($this->validationFails($this->package = $this->argument('addon'), new ComposerPackage)) {
             return;
         }
 
@@ -77,7 +77,7 @@ class MakeAddon extends GeneratorCommand
 
         $this
             ->generateComposerJson()
-            ->generateServiceProvider()
+            ->generateAddonFiles()
             ->addRepositoryPath()
             ->installAddon()
             ->generateOptional();
@@ -121,19 +121,29 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
-     * Generate service provider.
+     * Generate addon package files.
      *
      * @return $this
      */
-    protected function generateServiceProvider()
+    protected function generateAddonFiles()
     {
-        $provider = $this->files->get($this->getStub('addon/provider.php.stub'));
+        $files = [
+            'addon/provider.php.stub' => 'src/ServiceProvider.php',
+            'addon/.gitignore.stub' => '.gitignore',
+            'addon/README.md.stub' => 'README.md',
+        ];
 
-        $provider = str_replace('DummyNamespace', $this->addonNamespace(), $provider);
+        $data = [
+            'name' => $this->addonTitle(),
+            'package' => $this->package,
+            'namespace' => $this->addonNamespace(),
+        ];
 
-        $this->files->put($this->addonPath('src/ServiceProvider.php'), $provider);
+        foreach ($files as $stub => $file) {
+            $this->createFromStub($stub, $this->addonPath($file), $data);
+        }
 
-        $this->info('Service provider created successfully.');
+        $this->info('Addon package files created successfully.');
 
         return $this;
     }
@@ -297,7 +307,7 @@ class MakeAddon extends GeneratorCommand
     protected function getArguments()
     {
         return [
-            ['package', InputArgument::REQUIRED, 'The package name of the addon (ie. john/my-addon)'],
+            ['addon', InputArgument::REQUIRED, 'The package name of the addon (ie. john/my-addon)'],
         ];
     }
 
