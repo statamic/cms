@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL\Types;
 
+use GraphQL\Type\Definition\NonNull;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Value;
 use Statamic\Structures\Page;
@@ -27,6 +28,10 @@ class PageType extends \Rebing\GraphQL\Support\Type
             ->merge((new PageInterface)->fields())
             ->map(function ($field) {
                 if (is_array($field)) {
+                    if ($field['type'] instanceof NonNull) {
+                        $field['type'] = $field['type']->getWrappedType();
+                    }
+
                     $field['resolve'] = $this->resolver();
                 }
 
