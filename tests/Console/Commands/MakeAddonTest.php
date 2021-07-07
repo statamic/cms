@@ -29,6 +29,7 @@ class MakeAddonTest extends TestCase
 
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/README.md'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/composer.json'));
+        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/.gitignore'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/src/ServiceProvider.php'));
     }
 
@@ -41,6 +42,7 @@ class MakeAddonTest extends TestCase
 
         // Standard addon stuff
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/README.md'));
+        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/.gitignore'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/composer.json'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/src/ServiceProvider.php'));
 
