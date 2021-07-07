@@ -76,7 +76,7 @@ class MakeFieldtype extends GeneratorCommand
             return;
         }
 
-        $this->comment("Your {$this->typeLower} vue component awaits at: {$relativePath}");
+        $this->comment("Your {$this->typeLower} Vue component awaits at: {$relativePath}");
     }
 
     /**
@@ -104,19 +104,21 @@ class MakeFieldtype extends GeneratorCommand
     {
         $addonPath = $this->getAddonPath($addon);
 
-        if (! $this->files->exists($path = $addonPath.'/../webpack.mix.js')) {
-            $this->files->put($path, $this->files->get($this->getStub('addon/webpack.mix.js.stub')));
-        }
+        $files = [
+            'addon/webpack.mix.js.stub' => '/../webpack.mix.js',
+            'addon/package.json.stub' => '/../package.json',
+            'addon/addon.js.stub' => '/resources/js/addon.js',
+            'addon/.gitignore.stub' => '/../.gitignore',
+            'addon/README.md.stub' => '/../README.md',
+        ];
 
-        if (! $this->files->exists($path = $addonPath.'/../package.json')) {
-            $this->files->put($path, $this->files->get($this->getStub('addon/package.json.stub')));
-        }
+        foreach ($files as $stub => $file) {
+            if (! $this->files->exists($path = $addonPath.$file)) {
+                $this->files->put($path, $this->files->get($this->getStub($stub)));
+            }
 
-        if (! $this->files->exists($path = $addonPath.'/resources/js/addon.js')) {
-            $this->files->put($path, $this->files->get($this->getStub('addon/addon.js.stub')));
-        }
-
-        // TODO: append a line to register fieldtype to addon.js
+        // TODO: Append a line to register fieldtype to addon.js
+        // TODO: Parse stubs with Antlers to inject proper names
     }
 
     /**
