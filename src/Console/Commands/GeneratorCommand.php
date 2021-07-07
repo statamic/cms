@@ -225,7 +225,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     protected function createFromStub($stub, $path, $data = [])
     {
-        if ($this->files->exists($path)) {
+        if (! $this->option('force') && $this->files->exists($path)) {
             return;
         }
 
