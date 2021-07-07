@@ -262,10 +262,24 @@ class TermsController extends CpController
             ->blueprint($request->_blueprint)
             ->in($site->handle());
 
+        $slug = $request->slug;
+        $published = $request->get('published'); // TODO
+        $defaultSite = Site::default()->handle();
+
+        // If the term is *not* being created in the default site, we'll copy all the
+        // appropriate values into the default localization since it needs to exist.
+        if ($site->handle() !== $defaultSite) {
+            $term
+                ->in($defaultSite)
+                ->published($published)
+                ->data($values)
+                ->slug($slug);
+        }
+
         $term
-            ->slug($request->slug)
-            ->published($request->get('published')) // TODO
-            ->data($values);
+            ->published($published)
+            ->data($values)
+            ->slug($slug);
 
         if ($term->revisionsEnabled()) {
             $term->store([

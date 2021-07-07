@@ -16,6 +16,7 @@ use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
@@ -105,7 +106,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
         if (func_num_args() === 1) {
             if ($this->isDefaultLocale()) {
                 $this->term->slug($slug);
-            } elseif ($this->term->slug() !== $slug) {
+            } else {
                 $this->set('slug', $slug);
             }
 
@@ -438,5 +439,15 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
     public function getProtectionScheme()
     {
         return $this->value('protect');
+    }
+
+    public function term()
+    {
+        return $this->term;
+    }
+
+    public function fresh()
+    {
+        return Facades\Term::find($this->id())->in($this->locale);
     }
 }

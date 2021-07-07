@@ -27,7 +27,7 @@ assignees: ''
 
 <!-- You can copy/paste the output of `php please support:details` here -->
 
-**Statamic version:** 3.0.{?}
+**Statamic version:** 3.1.{?}
 
 **PHP version:** 7.{?}
 
