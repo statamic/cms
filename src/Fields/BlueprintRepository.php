@@ -19,6 +19,8 @@ class BlueprintRepository
     protected $directory;
     protected $fallbacks = [];
 
+    protected $additionalBlueprints = [];
+
     public function setDirectory(string $directory)
     {
         $this->directory = Path::tidy($directory);
@@ -138,6 +140,20 @@ class BlueprintRepository
                     : $orderA <=> $orderB;
             })
             ->keyBy->handle();
+    }
+
+    public function registerBlueprintGroup(string $namespace, string $title)
+    {
+        $this->additionalBlueprints[$namespace] = $title;
+
+        return $this;
+    }
+
+    public function additionalBlueprints()
+    {
+        return collect($this->additionalBlueprints)->mapWithKeys(function ($title, $namespace) {
+            return [$title => $this->in($namespace)];
+        });
     }
 
     private function filesIn($namespace)
