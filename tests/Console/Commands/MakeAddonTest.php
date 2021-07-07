@@ -50,6 +50,8 @@ class MakeAddonTest extends TestCase
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/package.json'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/webpack.mix.js'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/src/Fieldtypes/KnightRider.php'));
+        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/resources/js/addon.js'));
+        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/resources/js/components/fieldtypes/KnightRider.vue'));
     }
 
     private function makeAddon($addon, $options = [])
