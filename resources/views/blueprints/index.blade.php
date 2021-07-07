@@ -136,6 +136,18 @@
     <h3 class="little-heading pl-0 mb-1">{{ __('Other') }}</h3>
     <div class="card p-0 mb-2">
         <table class="data-table">
+            @foreach (Statamic\Facades\Blueprint::in('') as $blueprint)
+                @if ($blueprint->handle() !== 'user')
+                <tr>
+                    <td>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 mr-2">@cp_svg('drawer-file')</div>
+                            <a href="{{ cp_route('blueprints.edit', ['handle' => $blueprint->handle()]) }}">{{ $blueprint->title() }}</a>
+                        </div>
+                    </td>
+                </tr>
+                @endif
+            @endforeach
             <tr>
                 <td>
                     <div class="flex items-center">

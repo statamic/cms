@@ -144,6 +144,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('fieldsets/quick', 'FieldsetController@quickStore');
         Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
         Route::get('blueprints', 'BlueprintController@index')->name('blueprints.index');
+        Route::get('blueprints/{handle}', 'BlueprintController@edit')->name('blueprints.edit');
+        Route::patch('blueprints/{handle}', 'BlueprintController@update')->name('blueprints.update');
         Route::get('fieldtypes', 'FieldtypesController@index');
     });
 
