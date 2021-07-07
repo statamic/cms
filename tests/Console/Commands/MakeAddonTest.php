@@ -55,7 +55,7 @@ class MakeAddonTest extends TestCase
     private function makeAddon($addon, $options = [])
     {
         $this->artisan('statamic:make:addon', array_merge([
-            'package' => $addon,
+            'addon' => $addon,
             '--no-interaction' => true,
         ], $options));
     }
