@@ -673,7 +673,9 @@ class EntryTest extends TestCase
     public function it_saves_through_the_api()
     {
         Event::fake();
-        $entry = (new Entry)->id('a')->collection(new Collection);
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
@@ -697,7 +699,8 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        $entry = (new Entry)->id('1')->collection(new Collection);
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('1')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('1')->times(3)->andReturn(null, $entry, $entry);
@@ -714,7 +717,9 @@ class EntryTest extends TestCase
     public function it_saves_quietly()
     {
         Event::fake();
-        $entry = (new Entry)->id('a')->collection(new Collection);
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
@@ -749,7 +754,9 @@ class EntryTest extends TestCase
     public function it_performs_callbacks_after_saving_but_before_the_saved_event_and_only_once()
     {
         Event::fake();
-        $entry = (new Entry)->id('a')->collection(new Collection);
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->times(2)->andReturn(null, $entry);
@@ -775,6 +782,98 @@ class EntryTest extends TestCase
         $this->assertEquals(1, $callbackTwoRan);
 
         // TODO: How to test that the callbacks are run *before* the EntrySaved event?
+    }
+
+    /** @test */
+    public function it_auto_publishes_entry_if_configured()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->autoPublish(true)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertIsObject($entry->descendants()->get('fr'));
+        $this->assertIsObject($entry->descendants()->get('de'));
+    }
+
+    /** @test */
+    public function it_does_not_auto_publish_if_not_configured()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertNull($entry->descendants()->get('fr'));
+        $this->assertNull($entry->descendants()->get('de'));
+    }
+
+    /** @test */
+    public function it_does_not_auto_publish_in_site_not_configured_for_collection()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->autoPublish(true)
+            ->sites(['en', 'fr'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertIsObject($entry->descendants()->get('fr'));
+        $this->assertNull($entry->descendants()->get('de'));
     }
 
     /** @test */
