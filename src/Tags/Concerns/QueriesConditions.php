@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
