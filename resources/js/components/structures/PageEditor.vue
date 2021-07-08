@@ -150,9 +150,6 @@ export default {
         submit() {
             this.validating = true;
 
-            let title = this.values.title;
-            let url = this.values.url;
-
             const postUrl = cp_url('navigation/links/pages'); // todo: get url properly
 
             this.$axios.post(postUrl, {
