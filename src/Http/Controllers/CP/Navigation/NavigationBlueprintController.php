@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP\Structures;
+namespace Statamic\Http\Controllers\CP\Navigation;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\Nav;

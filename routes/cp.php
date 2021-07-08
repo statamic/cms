@@ -28,7 +28,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
-    Route::group(['namespace' => 'Structures'], function () {
+    Route::group(['namespace' => 'Navigation'], function () {
         Route::resource('navigation', 'NavigationController');
 
         Route::get('navigation/{navigation}/blueprint', 'NavigationBlueprintController@edit')->name('navigation.blueprint.edit');
