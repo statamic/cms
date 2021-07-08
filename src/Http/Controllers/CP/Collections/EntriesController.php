@@ -78,7 +78,7 @@ class EntriesController extends CpController
         $blueprint = $entry->blueprint();
 
         if (! $blueprint) {
-            throw new BlueprintDoesNotExistException("Blueprint [{$entry->get('blueprint')}] does not exist. It may have been renamed or deleted.");
+            throw new BlueprintDoesNotExistException($entry->get('blueprint'));
         }
 
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
