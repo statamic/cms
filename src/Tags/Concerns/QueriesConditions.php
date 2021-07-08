@@ -322,8 +322,6 @@ trait QueriesConditions
 
             if (! $augmentedValue && $value instanceof Entry) {
                 $value = $value->id();
-            } elseif (! $augmentedValue && $value instanceof Term) {
-                $value = $value->id();
             } else {
                 $value = $augmentedValue;
             }
