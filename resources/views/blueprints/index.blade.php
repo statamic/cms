@@ -142,7 +142,7 @@
                         <td>
                             <div class="flex items-center">
                                 <div class="w-4 h-4 mr-2">@cp_svg('drawer-file')</div>
-                                <a href="{{ cp_route('cp.blueprints.edit', ['handle' => $blueprint->namespace() ? $blueprint->namespace() . '.' . $blueprint->handle() : $blueprint->handle()]) }}">{{ $blueprint->title() }}</a>
+                                <a href="{{ cp_route('blueprints.edit', ['handle' => $blueprint->namespace() ? $blueprint->namespace() . '.' . $blueprint->handle() : $blueprint->handle()]) }}">{{ $blueprint->title() }}</a>
                             </div>
                         </td>
                     </tr>
