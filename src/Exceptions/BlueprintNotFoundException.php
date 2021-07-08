@@ -10,7 +10,7 @@ use Facade\IgnitionContracts\Solution;
 use Statamic\Facades\Blueprint;
 use Statamic\Statamic;
 
-class BlueprintDoesNotExistException extends Exception implements ProvidesSolution
+class BlueprintNotFoundException extends Exception implements ProvidesSolution
 {
     protected $blueprintHandle;
 
