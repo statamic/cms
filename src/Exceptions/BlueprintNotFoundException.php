@@ -23,8 +23,8 @@ class BlueprintNotFoundException extends Exception implements ProvidesSolution
 
     public function getSolution(): Solution
     {
-        $description = ($suggestedCollection = $this->getSuggestedBlueprint())
-            ? "Did you mean `$suggestedCollection`?"
+        $description = ($suggestedBlueprint = $this->getSuggestedBlueprint())
+            ? "Did you mean `$suggestedBlueprint`?"
             : 'Are you sure the blueprint exists?';
 
         return BaseSolution::create("The {$this->blueprintHandle} blueprint was not found.")
