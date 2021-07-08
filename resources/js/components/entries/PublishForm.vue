@@ -472,7 +472,8 @@ export default {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
                 }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                if (!this.isCreating) this.$toast.success(__('Saved'));
+                const successMessage = response.data.data.cp_message_success
+                if (!this.isCreating) this.$toast.success(successMessage);
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));
