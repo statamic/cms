@@ -1,0 +1,27 @@
+version: "3.5"
+services:
+  composer:
+    build: docker/composer
+    volumes:
+      - .:/app
+    network_mode: bridge # not required, but may speed up the internet connection
+  npm:
+    build: docker/npm
+    command: i
+    volumes:
+      - .:/app
+    network_mode: bridge # not required, but may speed up the internet connection
+  npm-watch:
+    build: docker/npm
+    command: run watch
+    volumes:
+      - .:/app
+    depends_on:
+      - npm
+  test:
+    build: docker/php
+    command: vendor/bin/phpunit
+    volumes:
+      - .:/app
+    depends_on:
+      - composer
