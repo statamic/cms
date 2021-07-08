@@ -87,6 +87,9 @@ export default {
             function isMissingField(fields, handle) {
                 return ! fields.some(field => field.handle === handle);
             }
+            function hasField(fields, handle) {
+                return ! isMissingField(fields, handle);
+            }
 
             // This UI only supports the first section
             const blueprint = clone(this.blueprint);
@@ -103,7 +106,7 @@ export default {
 
             // Remove the "url" field if it's been added to the blueprint by the user.
             // URL fields only make sense for URL type pages. Entries will have their own URLs.
-            if (this.type == 'entry') {
+            if (this.type == 'entry' && hasField(fields, 'url')) {
                 fields.splice(fields.indexOf(fields.find(field => field.handle === 'url')), 1);
             }
 
