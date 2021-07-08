@@ -58,14 +58,12 @@ class NavigationTreeController extends CpController
     private function toTree($items)
     {
         return collect($items)->map(function ($item) {
-            $values = Arr::except($item['values'], ['title', 'url']);
-            $values = Arr::only($values, $item['localizedFields']);
-            $data = Arr::removeNullValues($values);
+            $data = Arr::only($item['values'], $item['localizedFields']);
 
             return Arr::removeNullValues([
-                'entry' => $ref = $item['id'] ?? null,
-                'title' => in_array('title', $item['localizedFields']) ? $item['title'] : null,
-                'url' => $ref ? null : ($item['url'] ?? null),
+                'entry' => $item['id'] ?? null,
+                'title' => Arr::pull($data, 'title'),
+                'url' => Arr::pull($data, 'url'),
                 'data' => $data,
                 'children' => $this->toTree($item['children']),
             ]);
