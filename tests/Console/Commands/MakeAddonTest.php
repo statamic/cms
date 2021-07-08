@@ -2,22 +2,17 @@
 
 namespace Tests\Console\Commands;
 
-use Illuminate\Filesystem\Filesystem;
 use Tests\TestCase;
 
 class MakeAddonTest extends TestCase
 {
-    protected $files;
+    use Concerns\PreparesGeneratedPaths;
 
-    public function setUp(): void
+    public function tearDown(): void
     {
-        parent::setUp();
+        $this->cleanupPaths();
 
-        $this->files = app(Filesystem::class);
-
-        if ($this->files->exists($path = base_path('addons'))) {
-            $this->files->deleteDirectory($path);
-        }
+        parent::tearDown();
     }
 
     /** @test */

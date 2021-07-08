@@ -220,7 +220,7 @@ class MakeAddon extends GeneratorCommand
         $arguments = ['name' => studly_case($this->nameSlug), 'addon' => $this->addonPath()];
 
         if ($this->option('force')) {
-            $arguments['--force'] = null;
+            $arguments['--force'] = true;
         }
 
         $this->call("{$prefix}make:{$type}", $arguments);

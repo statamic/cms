@@ -2,26 +2,17 @@
 
 namespace Tests\Console\Commands;
 
-use Illuminate\Filesystem\Filesystem;
 use Tests\TestCase;
 
 class MakeFieldtypeTest extends TestCase
 {
-    protected $files;
+    use Concerns\PreparesGeneratedPaths;
 
-    public function setUp(): void
+    public function tearDown(): void
     {
-        parent::setUp();
+        $this->cleanupPaths();
 
-        $this->files = app(Filesystem::class);
-
-        if ($this->files->exists($path = base_path('app/Fieldtypes'))) {
-            $this->files->deleteDirectory($path);
-        }
-
-        if ($this->files->exists($path = resource_path('js/components/fieldtypes'))) {
-            $this->files->deleteDirectory($path);
-        }
+        parent::tearDown();
     }
 
     /** @test */

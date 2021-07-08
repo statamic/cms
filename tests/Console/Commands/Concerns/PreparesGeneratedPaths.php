@@ -19,23 +19,27 @@ trait PreparesGeneratedPaths
 
     protected function cleanupPaths()
     {
+        $files = app(Filesystem::class);
+
         foreach ($this->testedPaths as $path) {
-            $this->files->isDirectory($path)
-                ? $this->files->deleteDirectory($path)
-                : $this->files->delete($path);
+            $files->isDirectory($path)
+                ? $files->deleteDirectory($path)
+                : $files->delete($path);
         }
 
         $dirs = [
             base_path('addons'),
             base_path('app/Actions'),
             base_path('app/Fieldtypes'),
+            base_path('app/Modifiers'),
             base_path('app/Scopes'),
             base_path('app/Tags'),
             base_path('app/Widgets'),
+            resource_path('js/components'),
         ];
 
         foreach ($dirs as $dir) {
-            $this->files->deleteDirectory($dir, true);
+            $files->deleteDirectory($dir, true);
         }
     }
 }
