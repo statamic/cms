@@ -153,7 +153,7 @@ class BlueprintRepository
     {
         return collect($this->additionalBlueprints)->mapWithKeys(function ($title, $namespace) {
             return [$title => $this->in($namespace)];
-        });
+        })->filter();
     }
 
     private function filesIn($namespace)
