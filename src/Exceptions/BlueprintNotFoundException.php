@@ -23,7 +23,7 @@ class BlueprintNotFoundException extends Exception implements ProvidesSolution
 
     public function getSolution(): Solution
     {
-        $description = ($suggestedCollection = $this->getSuggestedCollection())
+        $description = ($suggestedCollection = $this->getSuggestedBlueprint())
             ? "Did you mean `$suggestedCollection`?"
             : 'Are you sure the blueprint exists?';
 
@@ -34,7 +34,7 @@ class BlueprintNotFoundException extends Exception implements ProvidesSolution
             ]);
     }
 
-    protected function getSuggestedCollection()
+    protected function getSuggestedBlueprint()
     {
         return StringComparator::findClosestMatch(
             Blueprint::in('.')->map->handle()->flatten()->all(),
