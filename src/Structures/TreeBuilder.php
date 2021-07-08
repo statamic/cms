@@ -85,24 +85,18 @@ class TreeBuilder
 
             // TODO: Refactor? This is only relevant to navs.
             if ($blueprint = $page->blueprint()) {
-                $values = $page->pageData()->merge([
-                    'title' => $page->title(),
-                    'url' => $page->reference() ? null : $page->url(),
-                ])->all();
+                [$values, $meta] = $this->extractFromFields($page, $blueprint);
 
-                $fields = $blueprint
-                    ->fields()
-                    ->addValues($values)
-                    ->preProcess();
-                $values = $fields->values();
-                $meta = $fields->meta();
+                if ($entry = $page->entry()) {
+                    [$originValues, $originMeta] = $this->extractFromFields($entry, $blueprint);
+                }
             }
 
             return [
                 'id'          => $page->id(),
                 'title'       => $page->hasCustomTitle() ? $page->title() : null,
                 'entry_title' => $page->referenceExists() ? $page->entry()->value('title') : null,
-                'url'         => $page->url(),
+                'url'         => $page->referenceExists() ? null : $page->url(),
                 'edit_url'    => $page->editUrl(),
                 'can_delete'  => $page->referenceExists() ? User::current()->can('delete', $page->entry()) : true,
                 'slug'        => $page->slug(),
@@ -114,10 +108,69 @@ class TreeBuilder
                     'edit_url' => $collection->showUrl(),
                     'create_url' => $collection->createEntryUrl(),
                 ],
-                'values' => $values ?? [],
-                'meta' => $meta ?? [],
                 'children'    => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : [],
+
+                // only needed for navs
+                'entryCollection' => $page->referenceExists() ? $page->entry()->collectionHandle() : null,
+                'entryBlueprint' => $page->referenceExists() ? $page->entry()->blueprint()->handle() : null,
+                'values' => $values ?? null,
+                'meta' => $meta ?? null,
+                'originValues' => $originValues ?? null,
+                'originMeta' => $originMeta ?? null,
+                'localizedFields' => $page->pageData()->keys()
+                    ->when($page->hasCustomTitle(), function ($keys) {
+                        return $keys->push('title');
+                    })->unique()->all(),
+
             ];
         })->values()->all();
+    }
+
+    private function extractFromFields($page, $blueprint)
+    {
+        $values = $page instanceof Page
+            ? $this->getPageValues($page)
+            : $this->getEntryValues($page);
+
+        $fields = $blueprint
+            ->ensureField('title', [])
+            ->ensureField('url', [])
+            ->fields()
+            ->addValues($values)
+            ->preProcess();
+
+        $values = $fields->values();
+
+        return [$values->all(), $fields->meta()];
+    }
+
+    private function getPageValues($page)
+    {
+        $entryValues = ($entry = $page->entry())
+            ? $this->getEntryValues($entry)
+            : collect();
+
+        return collect($entryValues)
+            ->merge($page->pageData())
+            ->merge([
+                'title' => $page->title(),
+                'url' => $page->reference() ? null : $page->url(),
+            ])->all();
+    }
+
+    private function getEntryValues($entry)
+    {
+        // todo: we dont need all the entry data, just the ones that also exist in the page blueprint.
+
+        // The values should only be data merged with the origin data.
+        // We don't want injected collection values, which $entry->values() would have given us.
+        $target = $entry;
+        $values = $target->data();
+        while ($target->hasOrigin()) {
+            $target = $target->origin();
+            $values = $target->data()->merge($values);
+        }
+
+        return $values->all();
     }
 }

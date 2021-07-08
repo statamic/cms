@@ -55,6 +55,7 @@
             :expects-root="expectsRoot"
             :site="site"
             :preferences-prefix="preferencesPrefix"
+            @pages-loaded="pagesLoaded"
             @edit-page="editPage"
             @changed="changed = true; targetParent = null;"
             @saved="changed = false"
@@ -135,9 +136,12 @@
             :editEntryUrl="editingPage.page.id ? editingPage.page.edit_url : null"
             :initial-values="editingPage.page.values"
             :initial-meta="editingPage.page.meta"
-            :initial-title="editingPage.page.title"
-            :initial-url="editingPage.page.url"
+            :initial-origin-values="editingPage.page.originValues"
+            :initial-origin-meta="editingPage.page.originMeta"
+            :initial-localized-fields="editingPage.page.localizedFields"
             :blueprint="blueprint"
+            :syncable-fields="getSyncableFields(editingPage.page)"
+            @localized-fields-updated="editingPage.page.localizedFields = $event"
             @closed="closePageEditor"
             @submitted="updatePage"
         />
@@ -204,6 +208,7 @@ export default {
             pageBeingDeleted: null,
             pageDeletionConfirmCallback: null,
             preferencesPrefix: `navs.${this.handle}`,
+            syncableFields: null
         }
     },
 
@@ -285,10 +290,10 @@ export default {
             this.editingPage = { page, vm, store };
         },
 
-        updatePage(page) {
-            this.editingPage.page.url = page.url;
-            this.editingPage.page.title = page.title;
-            this.editingPage.page.values = page.values;
+        updatePage(values) {
+            this.editingPage.page.url = values.url;
+            this.editingPage.page.title = values.title;
+            this.editingPage.page.values = values;
             this.$refs.tree.pageUpdated(this.editingPage.store);
 
             this.editingPage = false;
@@ -328,7 +333,16 @@ export default {
 
         siteSelected(site) {
             window.location = site.url;
-        }
+        },
+
+        pagesLoaded(response) {
+            this.syncableFields = response.data.syncableFields;
+        },
+
+        getSyncableFields(page) {
+            const blueprint = `${page.entryCollection}.${page.entryBlueprint}`;
+            return this.syncableFields[blueprint];
+        },
 
     }
 

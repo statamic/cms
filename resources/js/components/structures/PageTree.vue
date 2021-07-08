@@ -158,6 +158,7 @@ export default {
                 this.loadTreeState(this.pages);
                 this.updateTreeData();
                 this.loading = false;
+                this.$emit('pages-loaded', response);
             });
         },
 

@@ -22,17 +22,22 @@
                     :values="values"
                     :meta="meta"
                     :errors="errors"
+                    :localized-fields="localizedFields"
                     @updated="values = $event"
                 >
-                    <div slot-scope="{ container, setFieldValue, setFieldMeta }">
+                    <div slot-scope="{ container, setFieldMeta }">
                         <div v-if="validating" class="absolute inset-0 z-10 bg-white bg-opacity-75 flex items-center justify-center">
                             <loading-graphic text="" />
                         </div>
 
                         <publish-fields
                             :fields="fields"
+                            :syncable="type == 'entry'"
+                            :syncable-fields="syncableFields"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
+                            @synced="syncField"
+                            @desynced="desyncField"
                             @focus="container.$emit('focus', $event)"
                             @blur="container.$emit('blur', $event)"
                         />
@@ -62,18 +67,23 @@ export default {
 
     props: {
         type: String,
-        initialTitle: String,
-        initialUrl: String,
         initialValues: Object,
         initialMeta: Object,
+        initialOriginValues: Object,
+        initialOriginMeta: Object,
+        initialLocalizedFields: Array,
         blueprint: Object,
+        syncableFields: Array,
         editEntryUrl: String
     },
 
     data() {
         return {
-            values: this.initValues(this.initialValues),
-            meta: this.initMeta(this.initialMeta),
+            values: _.clone(this.initialValues),
+            meta: _.clone(this.initialMeta),
+            originValues: this.initialOriginValues || {},
+            originMeta: this.initialOriginMeta || {},
+            localizedFields: _.clone(this.initialLocalizedFields),
             error: null,
             errors: {},
             validating: false,
@@ -130,6 +140,12 @@ export default {
         }
     },
 
+    watch: {
+        localizedFields(fields) {
+            this.$emit('localized-fields-updated', fields);
+        }
+    },
+
     methods: {
         submit() {
             this.validating = true;
@@ -143,7 +159,7 @@ export default {
                 type: this.type,
                 values: this.values
             }).then(response => {
-                this.$emit('submitted', { title, url, values: _.omit(this.values, ['title', 'url']) });
+                this.$emit('submitted', this.values);
             }).catch(e => {
                 this.validating = false;
                 if (e.response && e.response.status === 422) {
@@ -159,18 +175,6 @@ export default {
             });
         },
 
-        initValues(values) {
-            return {
-                ...values,
-                title: this.initialTitle,
-                url: this.initialUrl
-            };
-        },
-
-        initMeta(meta) {
-            return {...meta, title: null, url: null};
-        },
-
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
                 if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
@@ -183,6 +187,31 @@ export default {
 
         confirmClose(close) {
             if (this.shouldClose()) close();
+        },
+
+        syncField(handle) {
+            if (! confirm('Are you sure? This field\'s value will be replaced by the value in the original entry.'))
+                return;
+
+            this.localizedFields = this.localizedFields.filter(field => field !== handle);
+            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
+
+            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
+            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
+            this.meta[handle] = this.originMeta[handle];
+        },
+
+        desyncField(handle) {
+            if (!this.localizedFields.includes(handle))
+                this.localizedFields.push(handle);
+
+            this.$refs.container.dirty();
+        },
+
+        setFieldValue(handle, value) {
+            this.desyncField(handle);
+
+            this.$refs.container.setFieldValue(handle, value);
         },
     },
 
