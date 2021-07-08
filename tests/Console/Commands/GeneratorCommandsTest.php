@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\Console;
+namespace Tests\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
 use Tests\TestCase;
 
-class ExtensionGeneratorTest extends TestCase
+class GeneratorCommandsTest extends TestCase
 {
-    public $testedPaths = [];
+    use Concerns\PreparesGeneratedPaths;
 
     public function setUp(): void
     {
@@ -296,36 +296,5 @@ class ExtensionGeneratorTest extends TestCase
 
         $this->assertFileExists("$path/src/Tags/Yoda.php");
         $this->assertStringContainsString('namespace Yoda\BagOdah\Tags;', $this->files->get("$path/src/Tags/Yoda.php"));
-    }
-
-    private function preparePath($path)
-    {
-        $path = base_path($path);
-
-        $this->testedPaths[] = $path;
-
-        return $path;
-    }
-
-    private function cleanupPaths()
-    {
-        foreach ($this->testedPaths as $path) {
-            $this->files->isDirectory($path)
-                ? $this->files->deleteDirectory($path)
-                : $this->files->delete($path);
-        }
-
-        $dirs = [
-            base_path('addons'),
-            base_path('app/Actions'),
-            base_path('app/Fieldtypes'),
-            base_path('app/Scopes'),
-            base_path('app/Tags'),
-            base_path('app/Widgets'),
-        ];
-
-        foreach ($dirs as $dir) {
-            $this->files->deleteDirectory($dir, true);
-        }
     }
 }
