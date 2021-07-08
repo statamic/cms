@@ -3,35 +3,34 @@
 namespace Statamic\Http\Controllers\CP\Structures;
 
 use Illuminate\Http\Request;
+use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
-use Statamic\Facades\Structure;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Structures\CollectionStructure;
-use Statamic\Structures\Nav;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class StructurePagesController extends CpController
+class NavigationTreeController extends CpController
 {
     public function index(Request $request, $handle)
     {
-        $structure = Structure::find($handle);
+        $nav = Nav::find($handle);
+
         $site = $request->site ?? Site::selected()->handle();
 
         $pages = (new TreeBuilder)->buildForController([
-            'structure' => $handle,
+            'structure' => $nav,
             'include_home' => true,
             'site' => $site,
         ]);
 
         return [
             'pages' => $pages,
-            'syncableFields' => $this->getSyncableFields($structure), // todo: only needed for navs
+            'syncableFields' => $this->getSyncableFields($nav),
         ];
     }
 
-    private function getSyncableFields(Nav $nav)
+    private function getSyncableFields($nav)
     {
         $navFields = $nav->blueprint()->fields()->all()->keys();
 
@@ -44,28 +43,19 @@ class StructurePagesController extends CpController
         })->all();
     }
 
-    public function store(Request $request, $structure)
+    public function update(Request $request, $structure)
     {
-        $structure = Structure::find($structure);
+        $structure = Nav::find($structure);
 
-        if ($structure instanceof CollectionStructure) {
-            return $this->storeCollection($structure, $request);
-        }
+        $tree = $this->toTree($request->pages);
 
-        return $this->storeNav($structure, $request);
-    }
-
-    private function storeNav(Nav $nav, Request $request)
-    {
-        $tree = $this->toNavTree($request->pages);
-
-        $nav
+        $structure
             ->in($request->site)
             ->tree($tree)
             ->save();
     }
 
-    private function toNavTree($items)
+    private function toTree($items)
     {
         return collect($items)->map(function ($item) {
             $values = Arr::except($item['values'], ['title', 'url']);
@@ -77,29 +67,7 @@ class StructurePagesController extends CpController
                 'title' => in_array('title', $item['localizedFields']) ? $item['title'] : null,
                 'url' => $ref ? null : ($item['url'] ?? null),
                 'data' => $data,
-                'children' => $this->toNavTree($item['children']),
-            ]);
-        })->all();
-    }
-
-    private function storeCollection(CollectionStructure $structure, Request $request)
-    {
-        $tree = $this->toCollectionTree($request->pages);
-
-        $structure
-            ->in($request->site)
-            ->tree($tree)
-            ->save();
-    }
-
-    private function toCollectionTree($items)
-    {
-        return collect($items)->map(function ($item) {
-            return Arr::removeNullValues([
-                'entry' => $ref = $item['id'] ?? null,
-                'title' => $item['title'] ?? null,
-                'url' => $ref ? null : ($item['url'] ?? null),
-                'children' => $this->toCollectionTree($item['children']),
+                'children' => $this->toTree($item['children']),
             ]);
         })->all();
     }

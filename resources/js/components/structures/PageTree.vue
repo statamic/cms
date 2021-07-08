@@ -207,7 +207,7 @@ export default {
             this.saving = true;
             const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot, ...this.submitParameters };
 
-            return this.$axios.post(this.submitUrl, payload).then(response => {
+            return this.$axios.patch(this.submitUrl, payload).then(response => {
                 this.$emit('saved');
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;
