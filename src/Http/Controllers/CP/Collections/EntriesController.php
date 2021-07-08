@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Exceptions\BlueprintDoesNotExistException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -75,6 +76,10 @@ class EntriesController extends CpController
         $entry = $entry->fromWorkingCopy();
 
         $blueprint = $entry->blueprint();
+
+        if (! $blueprint) {
+            throw new BlueprintDoesNotExistException("Blueprint [{$entry->get('blueprint')}] does not exist. It may have been renamed or deleted.");
+        }
 
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
             $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
