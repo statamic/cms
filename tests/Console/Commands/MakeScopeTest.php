@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class MakeScopeTest extends TestCase
 {
-    use Concerns\PreparesGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths;
 
     public function setUp(): void
     {

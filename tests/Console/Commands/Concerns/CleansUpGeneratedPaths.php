@@ -4,29 +4,10 @@ namespace Tests\Console\Commands\Concerns;
 
 use Illuminate\Filesystem\Filesystem;
 
-trait PreparesGeneratedPaths
+trait CleansUpGeneratedPaths
 {
-    protected $testedPaths = [];
-
-    protected function preparePath($path)
-    {
-        $path = base_path($path);
-
-        $this->testedPaths[] = $path;
-
-        return $path;
-    }
-
     protected function cleanupPaths()
     {
-        $files = app(Filesystem::class);
-
-        foreach ($this->testedPaths as $path) {
-            $files->isDirectory($path)
-                ? $files->deleteDirectory($path)
-                : $files->delete($path);
-        }
-
         $dirs = [
             base_path('addons'),
             base_path('app/Actions'),
@@ -39,7 +20,7 @@ trait PreparesGeneratedPaths
         ];
 
         foreach ($dirs as $dir) {
-            $files->deleteDirectory($dir, true);
+            app(Filesystem::class)->deleteDirectory($dir, true);
         }
     }
 }

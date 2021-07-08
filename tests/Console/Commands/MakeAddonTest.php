@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class MakeAddonTest extends TestCase
 {
-    use Concerns\PreparesGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths;
 
     public function setUp(): void
     {

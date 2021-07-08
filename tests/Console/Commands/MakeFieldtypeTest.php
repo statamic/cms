@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class MakeFieldtypeTest extends TestCase
 {
-    use Concerns\PreparesGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths;
 
     public function setUp(): void
     {

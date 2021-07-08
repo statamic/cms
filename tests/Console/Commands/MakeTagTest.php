@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class MakeTagTest extends TestCase
 {
-    use Concerns\PreparesGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths;
 
     public function setUp(): void
     {
