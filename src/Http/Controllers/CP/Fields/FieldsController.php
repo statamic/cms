@@ -76,7 +76,17 @@ class FieldsController extends CpController
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
                 'type' => 'text',
-                'width' => 50,
+                'width' => 25,
+            ],
+            'show_label' => [
+                'display' => __('Show Label'),
+                'instructions' => __('statamic::messages.fields_show_label_instructions'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 25,
+                'unless' => [
+                    'type' => 'section',
+                ],
             ],
             'instructions' => [
                 'display' => __('Instructions'),

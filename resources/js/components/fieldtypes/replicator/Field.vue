@@ -2,7 +2,7 @@
 
     <div class="p-2 m-0" :class="classes">
 
-        <label class="block">
+        <label class="block" v-if="field.show_label">
             {{ display }}
             <i class="required" v-if="field.required">*</i>
             <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm" v-text="__('Read Only')" />

@@ -7,7 +7,7 @@
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
-            <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
+            <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId" v-if="config.show_label">
                 <span :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle, 'cursor-pointer': canToggleLabel }" v-text="labelText" />
                 <i class="required ml-sm" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />

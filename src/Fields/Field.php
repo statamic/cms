@@ -85,6 +85,11 @@ class Field implements Arrayable
         return array_get($this->config, 'instructions');
     }
 
+    public function showLabel()
+    {
+        return array_get($this->config, 'show_label', true);
+    }
+
     public function rules()
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
@@ -176,6 +181,7 @@ class Field implements Arrayable
             'type' => $this->type(),
             'display' => $this->display(),
             'instructions' => $this->instructions(),
+            'show_label' => $this->showLabel(),
             'required' => $this->isRequired(),
         ]);
     }
@@ -187,6 +193,7 @@ class Field implements Arrayable
             'type' => $this->type(),
             'display' => $this->display(),
             'instructions' => $this->instructions(),
+            'show_label' => $this->showLabel(),
             'config' => array_except($this->preProcessedConfig(), 'type'),
         ];
     }

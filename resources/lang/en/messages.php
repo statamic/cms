@@ -65,6 +65,7 @@ return [
     'fields_handle_instructions' => 'The field\'s template variable.',
     'fields_instructions_instructions' => 'Shown under the field\'s display label, like this very text. Markdown is supported.',
     'fields_listable_instructions' => 'Control the column visibility of this field.',
+    'fields_show_label_instructions' => 'Show the display label in publish forms.',
     'fieldset_import_fieldset_instructions' => 'The fieldset to be imported.',
     'fieldset_import_prefix_instructions' => 'The prefix that should be applied to each field when they are imported. eg. hero_',
     'fieldset_intro' => 'Fieldsets are an optional companion to blueprints, acting as reusable partials that can be used within blueprints.',
