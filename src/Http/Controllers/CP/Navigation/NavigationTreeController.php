@@ -18,6 +18,8 @@ class NavigationTreeController extends CpController
 
         $site = $request->site ?? Site::selected()->handle();
 
+        $nav->in($site)->ensureBranchIds();
+
         $pages = (new TreeBuilder)->buildForController([
             'structure' => $nav,
             'include_home' => true,
