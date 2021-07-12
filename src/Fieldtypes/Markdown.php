@@ -75,6 +75,11 @@ class Markdown extends Fieldtype
         ];
     }
 
+    protected function defaultConfigFieldItem(): ?array
+    {
+        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'markdown']);
+    }
+
     public function filter()
     {
         return new MarkdownFilter($this);

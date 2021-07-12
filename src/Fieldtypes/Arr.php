@@ -34,6 +34,11 @@ class Arr extends Fieldtype
         ];
     }
 
+    protected function defaultConfigFieldItem(): ?array
+    {
+        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'yaml']);
+    }
+
     public function preProcess($data)
     {
         return array_replace($this->blankKeyed(), $data ?? []);

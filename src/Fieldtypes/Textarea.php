@@ -32,6 +32,11 @@ class Textarea extends Fieldtype
         ];
     }
 
+    protected function defaultConfigFieldItem(): ?array
+    {
+        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'textarea']);
+    }
+
     public function filter()
     {
         return new TextareaFilter($this);

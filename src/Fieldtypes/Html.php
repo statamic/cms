@@ -16,4 +16,9 @@ class Html extends Fieldtype
             'mode' => 'htmlmixed',
         ],
     ];
+
+    protected function defaultConfigFieldItem(): ?array
+    {
+        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'html']);
+    }
 }

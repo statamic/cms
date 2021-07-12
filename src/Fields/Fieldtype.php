@@ -158,7 +158,13 @@ abstract class Fieldtype implements Arrayable
 
     public function configFields(): Fields
     {
-        $fields = collect($this->configFieldItems())->map(function ($field, $handle) {
+        $fields = collect($this->configFieldItems());
+
+        if ($this->defaultable() && $item = $this->defaultConfigFieldItem()) {
+            $fields->put('default', $item);
+        }
+
+        $fields = $fields->map(function ($field, $handle) {
             return compact('handle', 'field');
         });
 
@@ -168,6 +174,16 @@ abstract class Fieldtype implements Arrayable
     protected function configFieldItems(): array
     {
         return $this->configFields;
+    }
+
+    protected function defaultConfigFieldItem(): ?array
+    {
+        return [
+            'display' => __('Default Value'),
+            'instructions' => __('statamic::messages.fields_default_instructions'),
+            'type' => 'text',
+            'width' => 50,
+        ];
     }
 
     public function icon()

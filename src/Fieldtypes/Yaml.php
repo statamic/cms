@@ -7,6 +7,11 @@ use Statamic\Fields\Fieldtype;
 
 class Yaml extends Fieldtype
 {
+    protected function defaultConfigFieldItem(): ?array
+    {
+        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'yaml']);
+    }
+
     // Turn the YAML back into a string
     public function preProcess($data)
     {

@@ -9,6 +9,11 @@ class Toggle extends Fieldtype
 {
     protected $defaultValue = false;
 
+    protected function defaultConfigFieldItem(): ?array
+    {
+        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'toggle']);
+    }
+
     public function preProcess($data)
     {
         return (bool) $data;

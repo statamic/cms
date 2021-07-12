@@ -14,6 +14,7 @@ use Statamic\Support\Str;
 class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
+    protected $defaultable = false;
     protected $defaultValue = [];
     protected $selectableInForms = true;
 

@@ -9,6 +9,11 @@ class Lists extends Fieldtype
 {
     protected static $handle = 'list';
 
+    protected function defaultConfigFieldItem(): ?array
+    {
+        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'list']);
+    }
+
     public function preProcess($data)
     {
         if (is_null($data)) {

@@ -13,6 +13,7 @@ use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
+    protected $defaultable = false;
     protected $defaultValue = [];
 
     protected function configFieldItems(): array
