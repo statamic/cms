@@ -24,7 +24,7 @@ class BlueprintController extends CpController
     {
         $blueprint = Blueprint::find($handle);
 
-        if (!$blueprint) {
+        if (! $blueprint) {
             abort(404, __('Blueprint not found'));
         }
 
@@ -41,7 +41,7 @@ class BlueprintController extends CpController
 
         $blueprint = Blueprint::find($handle);
 
-        if (!$blueprint) {
+        if (! $blueprint) {
             abort(404, __('Blueprint not found'));
         }
 
