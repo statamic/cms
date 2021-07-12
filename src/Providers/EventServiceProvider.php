@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Statamic\Events\EntrySavingMessageStore;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -24,4 +25,11 @@ class EventServiceProvider extends ServiceProvider
         // \Statamic\Taxonomies\TermTracker::class, // TODO
         \Statamic\Listeners\GeneratePresetImageManipulations::class,
     ];
+
+    function register()
+    {
+        $this->app->singleton(EntrySavingMessageStore::class, function () {
+            return new EntrySavingMessageStore();
+        });
+    }
 }
