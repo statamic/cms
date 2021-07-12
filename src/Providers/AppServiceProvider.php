@@ -125,6 +125,10 @@ class AppServiceProvider extends ServiceProvider
             return (new \Statamic\Fields\FieldsetRepository)
                 ->setDirectory(resource_path('fieldsets'));
         });
+
+        $this->app->singleton(Statamic\Events\EntrySavingMessageStore::class, function () {
+            return new Statamic\Events\EntrySavingMessageStore();
+        });
     }
 
     protected function registerMiddlewareGroup()
