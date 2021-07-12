@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Navigation;
 use Illuminate\Http\Request;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
+use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Arr;
@@ -12,6 +13,8 @@ use Statamic\Support\Str;
 
 class NavigationTreeController extends CpController
 {
+    private $data;
+
     public function index(Request $request, $handle)
     {
         $nav = Nav::find($handle);
@@ -45,30 +48,67 @@ class NavigationTreeController extends CpController
         })->all();
     }
 
-    public function update(Request $request, $structure)
+    public function update(Request $request, $nav)
     {
-        $structure = Nav::find($structure);
+        $nav = Nav::find($nav);
 
-        $tree = $this->toTree($request->pages);
+        $tree = $nav->in($request->site);
 
-        $structure
-            ->in($request->site)
-            ->tree($tree)
-            ->save();
+        $this->data = $this->flattenExistingBranchData([], $tree->tree());
+
+        $blueprint = $nav->blueprint()
+            ->ensureField('title', ['type' => 'text'])
+            ->ensureField('url', ['type' => 'text']);
+
+        $this->updateData($request->data, $blueprint);
+
+        $tree = $this->reorderTree($request->tree);
+
+        $nav->in($request->site)->tree($tree)->save();
     }
 
-    private function toTree($items)
+    private function updateData(array $data, Blueprint $blueprint)
     {
-        return collect($items)->map(function ($item) {
-            $data = Arr::only($item['values'], $item['localizedFields']);
+        collect($data)->each(function ($branch, $id) use ($blueprint) {
+            $data = $blueprint->fields()
+                ->addValues($branch['values'])
+                ->process()
+                ->values()
+                ->only($branch['localizedFields']);
 
-            return Arr::removeNullValues([
-                'entry' => $item['id'] ?? null,
-                'title' => Arr::pull($data, 'title'),
-                'url' => Arr::pull($data, 'url'),
-                'data' => $data,
-                'children' => $this->toTree($item['children']),
+            $this->data[$id] = Arr::removeNullValues([
+                'id' => $id,
+                'entry' => $branch['entry'] ?? null,
+                'title' => $data->pull('title'),
+                'url' => $data->pull('url'),
+                'data' => $data->all(),
             ]);
+        });
+    }
+
+    private function flattenExistingBranchData($data, $branches)
+    {
+        foreach ($branches as $branch) {
+            $data[$branch['id']] = Arr::except($branch, 'children');
+
+            if ($children = $branch['children'] ?? false) {
+                $data = $data + $this->flattenExistingBranchData($data, $children);
+            }
+        }
+
+        return $data;
+    }
+
+    private function reorderTree($tree)
+    {
+        return collect($tree)->map(function ($branch) {
+            $item = $this->data[$branch['id']];
+
+            if ($children = $branch['children']) {
+                $item['children'] = $this->reorderTree($children);
+            }
+
+            return $item;
         })->all();
     }
 }
