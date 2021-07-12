@@ -97,7 +97,6 @@ export default {
             saving: false,
             pages: [],
             treeData: [],
-            pageIds: [],
             soundDropUrl: this.$config.get('resourceUrl') + '/audio/click.mp3',
         }
     },
@@ -108,10 +107,6 @@ export default {
             return _.findWhere(this.localizations, { active: true });
         },
 
-        exclusions() {
-            return this.hasCollection ? this.pageIds : [];
-        },
-
         preferencesKey() {
             return this.preferencesPrefix ? `${this.preferencesPrefix}.${this.site}.pagetree` : null;
         },
@@ -119,17 +114,6 @@ export default {
     },
 
     watch: {
-
-        pages: {
-            deep: true,
-            handler(pages) {
-                this.pageIds = this.getPageIds(pages);
-            }
-        },
-
-        pageIds(ids) {
-            this.$emit('page-ids-updated', ids);
-        },
 
         site(site) {
             this.getPages();
@@ -160,17 +144,6 @@ export default {
                 this.loading = false;
                 this.$emit('pages-loaded', response);
             });
-        },
-
-        getPageIds(pages) {
-            let ids = [];
-            pages.forEach(page => {
-                ids.push(page.id);
-                if (page.children.length) {
-                    ids = [...ids, ...this.getPageIds(page.children)];
-                }
-            })
-            return ids;
         },
 
         treeChanged(node, tree) {
