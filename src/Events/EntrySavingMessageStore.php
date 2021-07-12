@@ -15,4 +15,14 @@ class EntrySavingMessageStore
     {
         return $this->successMessages;
     }
+
+    public function getMessage(): string
+    {
+        $successMessages = $this->successMessages();
+        if (empty($successMessages)) {
+            return __('Saved');
+        } else {
+            return join(PHP_EOL, $successMessages);
+        }
+    }
 }
