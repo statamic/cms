@@ -178,7 +178,7 @@ export default {
                 this.updateTreeData();
                 return;
             }
-            
+
             this.treeUpdated(tree);
         },
 
@@ -192,12 +192,12 @@ export default {
 
         validate() {
             let isValid = true;
-            
+
             this.traverseTree(this.treeData, (node, { isRoot }) => {
                 if (isRoot && node.children.length) {
                     isValid = false;
                     return false;
-                } 
+                }
             });
 
             return isValid;
@@ -294,7 +294,7 @@ export default {
                 nodeDepth = Math.max(nodeDepth, depth);
             });
             const maxDepth = this.maxDepth - nodeDepth;
-            
+
             this.traverseTree(this.treeData, (childNode, { depth, isRoot }) => {
                 if (childNode !== node) {
                     this.$set(childNode, 'droppable', !isRoot && depth <= maxDepth);
@@ -366,11 +366,11 @@ export default {
                 const path = nodePath.join('.');
                 const depth = nodePath.length;
                 const isRoot = this.expectsRoot && depth === 1 && index === 0;
-                
+
                 if (false === callback(node, { path, depth, index, isRoot })) {
                     return false;
                 }
-                
+
                 if (node.children.length) {
                     this.traverseTree(node.children, callback, nodePath);
                 }
