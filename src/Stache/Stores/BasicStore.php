@@ -55,11 +55,13 @@ abstract class BasicStore extends Store
 
         $cacheKey = $this->getItemCacheKey($key);
 
+        Blink::forget($cacheKey);
         Cache::forever($cacheKey, $item);
     }
 
     public function forgetItem($key)
     {
+        Blink::forget($this->getItemCacheKey($key));
         Cache::forget($this->getItemCacheKey($key));
     }
 
