@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Events\EntrySavingMessageStore;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -225,7 +226,9 @@ class EntriesController extends CpController
             $entry->updateLastModified(User::current())->save();
         }
 
-        return new EntryResource($entry->fresh());
+        $successMessage = $this->getEntrySavingSuccessMessage();
+
+        return new EntryResource($entry, $successMessage);
     }
 
     public function create(Request $request, $collection, $site)
@@ -354,7 +357,9 @@ class EntriesController extends CpController
             $entry->updateLastModified(User::current())->save();
         }
 
-        return new EntryResource($entry);
+        $successMessage = $this->getEntrySavingSuccessMessage();
+
+        return new EntryResource($entry, $successMessage);
     }
 
     public function destroy($collection, $entry)
@@ -435,6 +440,18 @@ class EntriesController extends CpController
         }
 
         return $date;
+    }
+
+    protected function getEntrySavingSuccessMessage(): string
+    {
+        $messageStore = app(EntrySavingMessageStore::class);
+        $successMessages = $messageStore->successMessages();
+
+        if (empty($successMessages)) {
+            return __('Saved');
+        } else {
+            return join('\n', $successMessages);
+        }
     }
 
     private function validateUniqueUri($entry, $tree, $parent)
