@@ -62,7 +62,7 @@ class UpdateNavigationTreeTest extends TestCase
         $this
             ->actingAs($user)
             ->update($nav, [
-                'tree' => [
+                'pages' => [
                     ['id' => 'id1', 'children' => []],
                     ['id' => 'id3', 'children' => []],
                     ['id' => 'new-1', 'children' => []],

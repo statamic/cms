@@ -62,7 +62,7 @@ class NavigationTreeController extends CpController
 
         $this->updateData($request->data, $blueprint);
 
-        $tree = $this->reorderTree($request->tree);
+        $tree = $this->reorderTree($request->pages);
 
         $nav->in($request->site)->tree($tree)->save();
     }
