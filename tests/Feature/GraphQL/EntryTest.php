@@ -4,8 +4,6 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
-use Statamic\Entries\Entry;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Structures\CollectionStructure;
