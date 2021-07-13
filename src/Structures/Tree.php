@@ -79,10 +79,14 @@ abstract class Tree implements Contract, Localization
             return null;
         }
 
+        $branch = $this->root();
+
         return (new Page)
-            ->setId($this->root()[$this->idKey()])
             ->setTree($this)
-            ->setEntry($this->root()['entry'] ?? null)
+            ->setId($branch[$this->idKey()] ?? null)
+            ->setEntry($branch['entry'] ?? null)
+            ->setUrl($branch['url'] ?? null)
+            ->setTitle($branch['title'] ?? null)
             ->setRoute($this->route())
             ->setDepth(1)
             ->setRoot(true);
