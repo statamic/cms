@@ -8,12 +8,6 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class FieldsController extends CpController
 {
-    protected $reserverd = [
-        'content_type',
-        'length',
-        'slug',
-    ];
-
     public function __construct()
     {
         $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
@@ -75,6 +69,19 @@ class FieldsController extends CpController
 
     protected function blueprint($blueprint)
     {
+        $reserverd = [
+            'elseif',
+            'endif',
+            'endunless',
+            'if',
+            'reference',
+            'resource',
+            'unless',
+            'value',
+            'content_type',
+            'length',
+        ];
+
         $prepends = collect([
             'display' => [
                 'display' => __('Display'),
@@ -86,7 +93,7 @@ class FieldsController extends CpController
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
                 'type' => 'text',
-                'validate' => 'required|not_in:'.join(',', $this->reserverd),
+                'validate' => 'required|not_in:'.join(',', $reserverd),
                 'width' => 50,
             ],
             'instructions' => [
