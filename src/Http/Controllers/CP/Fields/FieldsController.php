@@ -8,6 +8,12 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class FieldsController extends CpController
 {
+    protected $reserverd = [
+        'content_type',
+        'length',
+        'slug',
+    ];
+
     public function __construct()
     {
         $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
@@ -58,6 +64,10 @@ class FieldsController extends CpController
             ->addValues($request->values)
             ->process();
 
+        $fields->validate([], [
+            'handle.not_in' => __('statamic::messages.fields_handle_reserved'),
+        ]);
+
         $values = array_merge($request->values, $fields->values()->all());
 
         return $values;
@@ -76,6 +86,7 @@ class FieldsController extends CpController
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
                 'type' => 'text',
+                'validate' => 'required|not_in:'.join(',', $this->reserverd),
                 'width' => 50,
             ],
             'instructions' => [
