@@ -64,6 +64,7 @@ class Pages
             $page = (new Page)
                 ->setTree($this->tree)
                 ->setParent($this->parent)
+                ->setId($branch[$this->tree->idKey()] ?? null)
                 ->setEntry($branch['entry'] ?? null)
                 ->setUrl($branch['url'] ?? null)
                 ->setTitle($branch['title'] ?? null)

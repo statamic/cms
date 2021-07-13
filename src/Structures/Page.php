@@ -30,6 +30,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
     protected $parent;
     protected $children;
     protected $isRoot = false;
+    protected $id;
     protected $url;
     protected $title;
     protected $depth;
@@ -330,9 +331,16 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return optional($this->entry())->editUrl();
     }
 
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function id()
     {
-        return optional($this->entry())->id();
+        return $this->id;
     }
 
     public function in($site)

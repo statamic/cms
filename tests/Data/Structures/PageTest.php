@@ -306,9 +306,9 @@ class PageTest extends TestCase
             ->setEntry((new Entry)->id('123'))
             ->setRoute('')
             ->setChildren([
-                ['entry' => 'one'],
-                ['entry' => 'two', 'children' => [
-                    ['entry' => 'three'],
+                ['id' => 'one'],
+                ['id' => 'two', 'children' => [
+                    ['id' => 'three'],
                 ]],
             ]);
 
@@ -316,20 +316,19 @@ class PageTest extends TestCase
         $this->assertInstanceOf(Pages::class, $pages);
         $this->assertCount(2, $pages->all());
         $this->assertEveryItemIsInstanceOf(Page::class, $pages->all());
-        $this->assertEquals(['one', 'two'], $pages->all()->map->reference()->all());
+        $this->assertEquals(['one', 'two'], $pages->all()->map->id()->all());
     }
 
     /** @test */
     public function it_gets_flattened_pages()
     {
-        EntryAPI::shouldReceive('find')->with('one')
         $page = (new Page)
             ->setTree($this->newTree())
             ->setChildren([
-                ['entry' => 'one'],
-                ['entry' => 'two', 'children' => [
-                    ['entry' => 'three', 'children' => [
-                        ['entry' => 'four'],
+                ['id' => 'one'],
+                ['id' => 'two', 'children' => [
+                    ['id' => 'three', 'children' => [
+                        ['id' => 'four'],
                     ]],
                 ]],
             ]);
@@ -338,7 +337,7 @@ class PageTest extends TestCase
         $this->assertInstanceOf(Collection::class, $flattened);
         $this->assertCount(4, $flattened);
         $this->assertEveryItemIsInstanceOf(Page::class, $flattened);
-        $this->assertEquals(['one', 'two', 'three', 'four'], $flattened->map->reference()->all());
+        $this->assertEquals(['one', 'two', 'three', 'four'], $flattened->map->id()->all());
     }
 
     /** @test */
