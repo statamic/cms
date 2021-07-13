@@ -323,72 +323,8 @@ class PageTest extends TestCase
     public function it_gets_flattened_pages()
     {
         EntryAPI::shouldReceive('find')->with('one')
-            ->andReturn(new class extends Entry
-            {
-                public function id($slug = null)
-                {
-                    return 'one';
-                }
-
-                public function slug($slug = null)
-                {
-                    return 'one';
-                }
-            });
-
-        EntryAPI::shouldReceive('find')->with('two')
-            ->andReturn(new class extends Entry
-            {
-                public function id($slug = null)
-                {
-                    return 'two';
-                }
-
-                public function slug($slug = null)
-                {
-                    return 'two';
-                }
-            });
-
-        EntryAPI::shouldReceive('find')->with('three')
-            ->andReturn(new class extends Entry
-            {
-                public function id($slug = null)
-                {
-                    return 'three';
-                }
-
-                public function slug($slug = null)
-                {
-                    return 'three';
-                }
-            });
-
-        EntryAPI::shouldReceive('find')->with('four')
-            ->andReturn(new class extends Entry
-            {
-                public function id($slug = null)
-                {
-                    return 'four';
-                }
-
-                public function slug($slug = null)
-                {
-                    return 'four';
-                }
-            });
-
-        $entry = Mockery::mock(Page::class);
-        $entry->shouldReceive('id')->andReturn('root');
-        $entry->shouldReceive('slug')->andReturn('');
-
-        $tree = $this->newTree()->setStructure(
-            $this->mock(Structure::class)->shouldReceive('collection')->andReturnFalse()->getMock()
-        );
-
         $page = (new Page)
-            ->setTree($tree)
-            ->setEntry($entry)
+            ->setTree($this->newTree())
             ->setChildren([
                 ['entry' => 'one'],
                 ['entry' => 'two', 'children' => [
