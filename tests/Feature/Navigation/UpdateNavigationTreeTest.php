@@ -4,6 +4,7 @@ namespace Tests\Feature\Navigation;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Facades\Statamic\Structures\BranchIdGenerator;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
@@ -21,8 +22,7 @@ class UpdateNavigationTreeTest extends TestCase
     private function mockTextFieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('text')
-            ->andReturn(new class extends Fieldtype
-            {
+            ->andReturn(new class extends Fieldtype {
                 public function process($value)
                 {
                     if (! $value) {
@@ -47,6 +47,7 @@ class UpdateNavigationTreeTest extends TestCase
             'qux' => ['type' => 'text'],
         ]);
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
+        BranchIdGenerator::shouldReceive('generate')->times(2)->andReturn('newly-generated-id1', 'newly-generated-id2');
 
         $user = tap(User::make()->makeSuper())->save();
         $nav = tap(Nav::make('test'))->save();
@@ -66,10 +67,11 @@ class UpdateNavigationTreeTest extends TestCase
                 'pages' => [
                     ['id' => 'id1', 'children' => []],
                     ['id' => 'id3', 'children' => []],
-                    ['id' => 'new-1', 'children' => []],
+                    ['id' => 'new-standard-page', 'children' => []],
                     ['id' => 'id2', 'children' => [
                         ['id' => 'id4', 'children' => []],
                     ]],
+                    ['id' => 'new-entry-page', 'children' => []],
                 ],
                 'data' => [
                     'id1' => [
@@ -96,20 +98,33 @@ class UpdateNavigationTreeTest extends TestCase
                         ],
                         'localizedFields' => ['title', 'foo', 'baz', 'qux'],
                     ],
-                    'new-1' => [
+                    'new-standard-page' => [
                         'values' => [
                             'title' => 'New Branch',
                         ],
                         'localizedFields' => ['title'],
+                        'new' => true,
+                    ],
+                    'new-entry-page' => [
+                        'entry' => '789',
+                        'values' => [],
+                        'new' => true,
+                        'localizedFields' => [],
                     ],
                 ],
             ])
-            ->assertOk();
+            ->assertOk()
+            ->assertJson([
+                'generatedIds' => [
+                    'new-standard-page' => 'newly-generated-id1',
+                    'new-entry-page' => 'newly-generated-id2',
+                ],
+            ]);
 
         $this->assertEquals([
             ['id' => 'id1', 'title' => 'Updated URL (processed)', 'url' => 'http://updated-example.com (processed)'],
             ['id' => 'id3', 'entry' => '123'],
-            ['id' => 'new-1', 'title' => 'New Branch (processed)'],
+            ['id' => 'newly-generated-id1', 'title' => 'New Branch (processed)'],
             ['id' => 'id2', 'title' => 'Updated Just Text (processed)', 'children' => [
                 ['id' => 'id4', 'entry' => '456', 'title' => 'Overridden title (processed)', 'data' => [
                     'foo' => 'Overridden foo (processed)',
@@ -117,6 +132,7 @@ class UpdateNavigationTreeTest extends TestCase
                     'qux' => null, // entry has a value. If they were stripped out, it would fall back to the entry's value.
                 ]],
             ]],
+            ['id' => 'newly-generated-id2', 'entry' => '789'],
         ], $nav->in('en')->tree());
     }
 

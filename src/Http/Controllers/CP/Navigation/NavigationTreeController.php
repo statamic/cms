@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Navigation;
 
+use Facades\Statamic\Structures\BranchIdGenerator;
 use Illuminate\Http\Request;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
@@ -13,6 +14,7 @@ use Statamic\Support\Arr;
 class NavigationTreeController extends CpController
 {
     private $data;
+    private $generatedIds = [];
 
     public function index(Request $request, $handle)
     {
@@ -48,6 +50,10 @@ class NavigationTreeController extends CpController
         $tree = $this->reorderTree($request->pages);
 
         $nav->in($request->site)->tree($tree)->save();
+
+        return [
+            'generatedIds' => $this->generatedIds,
+        ];
     }
 
     private function updateData(array $data, Blueprint $blueprint)
@@ -58,6 +64,12 @@ class NavigationTreeController extends CpController
                 ->process()
                 ->values()
                 ->only($branch['localizedFields']);
+
+            if ($branch['new'] ?? false) {
+                $newId = BranchIdGenerator::generate();
+                $this->generatedIds[$id] = $newId;
+                $id = $newId;
+            }
 
             $this->data[$id] = Arr::removeNullValues([
                 'id' => $id,
@@ -85,7 +97,9 @@ class NavigationTreeController extends CpController
     private function reorderTree($tree)
     {
         return collect($tree)->map(function ($branch) {
-            $item = $this->data[$branch['id']];
+            $id = $this->generatedIds[$branch['id']] ?? $branch['id'];
+
+            $item = $this->data[$id];
 
             if ($children = $branch['children']) {
                 $item['children'] = $this->reorderTree($children);

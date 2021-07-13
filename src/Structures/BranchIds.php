@@ -2,26 +2,10 @@
 
 namespace Statamic\Structures;
 
-use Statamic\Support\Str;
+use Facades\Statamic\Structures\BranchIdGenerator;
 
 class BranchIds
 {
-    protected $generator;
-
-    public function __construct()
-    {
-        $this->generator = function () {
-            return (string) Str::uuid();
-        };
-    }
-
-    public function setIdGenerator(callable $generator)
-    {
-        $this->generator = $generator;
-
-        return $this;
-    }
-
     public function ensure(array $tree)
     {
         return collect($tree)->map(function ($branch) {
@@ -31,7 +15,7 @@ class BranchIds
 
     private function ensureIdOnBranch($branch)
     {
-        $id = $branch['id'] ?? ($this->generator)();
+        $id = $branch['id'] ?? BranchIdGenerator::generate();
 
         if ($branch['children'] ?? false) {
             $branch['children'] = $this->ensure($branch['children']);

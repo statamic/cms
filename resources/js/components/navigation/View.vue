@@ -58,7 +58,7 @@
             :preferences-prefix="preferencesPrefix"
             @edit-page="editPage"
             @changed="changed = true; targetParent = null;"
-            @saved="changed = false"
+            @saved="treeSaved"
             @canceled="changed = false"
         >
             <template #empty>
@@ -169,6 +169,7 @@ import PageEditor from '../structures/PageEditor.vue';
 import PageSelector from '../structures/PageSelector.vue';
 import RemovePageConfirmation from './RemovePageConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
+import uniqid from 'uniqid';
 
 export default {
 
@@ -234,7 +235,7 @@ export default {
 
         submissionData() {
             return _.mapObject(this.publishInfo, value => {
-                return _.pick(value, ['entry', 'values', 'localizedFields']);
+                return _.pick(value, ['entry', 'values', 'localizedFields', 'new']);
             });
         }
 
@@ -271,9 +272,20 @@ export default {
         entriesSelected(pages) {
             pages = pages.map(page => ({
                 ...page,
+                id: uniqid(),
+                entry: page.id,
                 entry_title: page.title,
                 title: null
             }));
+
+            pages.forEach(page => {
+                this.publishInfo = {...this.publishInfo, [page.id]: {
+                    entry: page.entry,
+                    values: {},
+                    localizedFields: {},
+                    new: true
+                }};
+            });
 
             this.$refs.tree.addPages(pages, this.targetParent);
         },
@@ -346,7 +358,28 @@ export default {
 
         updateLocalizedFields(fields) {
             this.publishInfo[this.editingPage.page.id].localizedFields = fields;
-        }
+        },
+
+        treeSaved(response) {
+            this.changed = false;
+
+            this.replaceGeneratedIds(response.data.generatedIds);
+        },
+
+        replaceGeneratedIds(ids) {
+            for (let [oldId, newId] of Object.entries(ids)) {
+                // Replace the ID in the publishInfo so if the tree is saved again, its
+                // data will be submitted using the real ID, and now the temp JS one.
+                this.$set(this.publishInfo, newId, { ...this.publishInfo[oldId], new: false });
+                this.$delete(this.publishInfo, oldId);
+
+                // Replace the ID in the branch within the tree.
+                // Same as above, but in the tree itself.
+                let branch = this.$refs.tree.getNodeByBranchId(oldId);
+                branch.id = newId;
+                this.$refs.tree.pageUpdated(branch._vm.store);
+            }
+        },
 
     }
 

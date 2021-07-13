@@ -68,6 +68,7 @@
 
 
 <script>
+import * as th from 'tree-helper';
 import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
 
@@ -193,7 +194,7 @@ export default {
             };
 
             return this.$axios.patch(this.submitUrl, payload).then(response => {
-                this.$emit('saved');
+                this.$emit('saved', response);
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;
                 this.saveTreeState();
@@ -364,6 +365,19 @@ export default {
                 return true;
             });
         },
+
+        getNodeByBranchId(id) {
+            let branch;
+
+            th.breadthFirstSearch(this.treeData, (node) => {
+                if (node.id === id) {
+                    branch = node
+                    return false
+                }
+            });
+
+            return branch;
+        }
 
     }
 }

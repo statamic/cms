@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Structures;
 
+use Facades\Statamic\Structures\BranchIdGenerator;
 use Statamic\Structures\BranchIds;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -27,11 +28,11 @@ class BranchIdsTest extends TestCase
             ]],
         ];
 
-        $ensured = (new BranchIds)->setIdGenerator(function () {
-            static $num = 0;
+        BranchIdGenerator::shouldReceive('generate')->times(7)->andReturn(
+            'id1', 'id2', 'id3', 'id4', 'id5', 'id6', 'id7'
+        );
 
-            return 'id'.++$num;
-        })->ensure($tree);
+        $ensured = (new BranchIds)->ensure($tree);
 
         $this->assertSame([
             ['id' => 'id1', 'title' => 'First'],
