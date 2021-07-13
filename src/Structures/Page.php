@@ -90,6 +90,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return $this->title !== null;
     }
 
+    public function hasCustomUrl()
+    {
+        return $this->url !== null;
+    }
+
     public function setEntry($reference): self
     {
         if ($reference === null) {

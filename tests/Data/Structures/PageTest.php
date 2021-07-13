@@ -181,6 +181,7 @@ class PageTest extends TestCase
             ->setEntry($entry);
 
         $this->assertEquals('/foo/the/parent/uri/bar/entry-slug', $page->uri());
+        $this->assertFalse($page->hasCustomUrl());
     }
 
     /** @test */
@@ -206,6 +207,7 @@ class PageTest extends TestCase
         $this->assertEquals('http://localhost/the/actual/entry/uri', $page->absoluteUrl());
         $this->assertEquals('http://localhost/the/actual/entry/uri', $page->absoluteUrlWithoutRedirect());
         $this->assertFalse($page->isRedirect());
+        $this->assertFalse($page->hasCustomUrl());
     }
 
     /** @test */
@@ -231,6 +233,7 @@ class PageTest extends TestCase
         $this->assertEquals('http://example.com/page', $page->absoluteUrl());
         $this->assertEquals('http://localhost/the/actual/entry/uri', $page->absoluteUrlWithoutRedirect());
         $this->assertTrue($page->isRedirect());
+        $this->assertFalse($page->hasCustomUrl());
     }
 
     /** @test */
@@ -250,6 +253,7 @@ class PageTest extends TestCase
         $this->assertEquals('http://localhost/blog', $page->absoluteUrl());
         $this->assertEquals('http://localhost/blog', $page->absoluteUrlWithoutRedirect());
         $this->assertFalse($page->isRedirect());
+        $this->assertTrue($page->hasCustomUrl());
     }
 
     /** @test */
@@ -269,6 +273,7 @@ class PageTest extends TestCase
         $this->assertEquals('https://google.com', $page->absoluteUrl());
         $this->assertEquals('https://google.com', $page->absoluteUrlWithoutRedirect());
         $this->assertFalse($page->isRedirect());
+        $this->assertTrue($page->hasCustomUrl());
     }
 
     /** @test */
@@ -288,6 +293,7 @@ class PageTest extends TestCase
         $this->assertNull($page->absoluteUrl());
         $this->assertNull($page->absoluteUrlWithoutRedirect());
         $this->assertFalse($page->isRedirect());
+        $this->assertFalse($page->hasCustomUrl());
     }
 
     /** @test */
