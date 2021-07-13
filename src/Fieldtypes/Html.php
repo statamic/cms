@@ -17,8 +17,15 @@ class Html extends Fieldtype
         ],
     ];
 
-    protected function defaultConfigFieldItem(): ?array
+    protected function configFieldItems(): array
     {
-        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'html']);
+        return [
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'textarea',
+                'width' => 100,
+            ],
+        ];
     }
 }

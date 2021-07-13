@@ -7,9 +7,16 @@ use Statamic\Fields\Fieldtype;
 
 class Yaml extends Fieldtype
 {
-    protected function defaultConfigFieldItem(): ?array
+    protected function configFieldItems(): array
     {
-        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'yaml']);
+        return [
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'yaml',
+                'width' => 100,
+            ],
+        ];
     }
 
     // Turn the YAML back into a string

@@ -18,6 +18,12 @@ class ButtonGroup extends Fieldtype
                 'type' => 'array',
                 'value_header' => __('Label'),
             ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
+            ],
         ];
     }
 

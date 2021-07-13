@@ -72,12 +72,13 @@ class Markdown extends Fieldtype
                 'type' => 'toggle',
                 'width' => 50,
             ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'markdown',
+                'width' => 100,
+            ],
         ];
-    }
-
-    protected function defaultConfigFieldItem(): ?array
-    {
-        return array_replace(parent::defaultConfigFieldItem(), ['type' => 'markdown']);
     }
 
     public function filter()
