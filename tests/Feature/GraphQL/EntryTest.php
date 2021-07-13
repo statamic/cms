@@ -183,11 +183,9 @@ GQL;
 
         $query = <<<'GQL'
 {
-    entry(id: "child") {
-        ... on Entry_Nodes_Node {
-            parent {
-                id
-            }
+    entry(id: "4") {
+        parent {
+            title
         }
     }
 }
@@ -200,7 +198,7 @@ GQL;
             ->assertExactJson(['data' => [
                 'entry' => [
                     'parent' => [
-                        'id' => 'parent',
+                        'title' => 'Event One',
                     ],
                 ],
             ]]);
@@ -213,11 +211,9 @@ GQL;
 
         $query = <<<'GQL'
 {
-    entry(id: "parent") {
-        ... on Entry_Nodes_Node {
-            parent {
-                id
-            }
+    entry(id: "3") {
+        parent {
+            id
         }
     }
 }
@@ -366,22 +362,13 @@ GQL;
 
     private function createStructuredCollection()
     {
-        $collection = Collection::make('nodes')->title('Nodes')->routes(['en' => '{parent_uri}/{slug}']);
+        $collection = Collection::find('events');
         $structure = (new CollectionStructure)->maxDepth(3);
         $collection->structure($structure)->save();
 
-        $blueprint = Blueprint::makeFromFields([]);
-        BlueprintRepository::shouldReceive('in')->with('collections/nodes')->andReturn(collect([
-            'event' => $blueprint->setHandle('node'),
-        ]));
-
-        collect(['parent', 'child'])->each(function ($name) {
-            (new Entry)->collection('nodes')->blueprint('node')->id($name)->slug($name)->save();
-        });
-
         $collection->structure()->in('en')->tree([
-            ['entry' => 'parent', 'children' => [
-                ['entry' => 'child'],
+            ['entry' => '3', 'children' => [
+                ['entry' => '4'],
             ]],
         ])->save();
     }
