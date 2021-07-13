@@ -51,11 +51,11 @@
             :has-collection="false"
             :pages-url="pagesUrl"
             :submit-url="submitUrl"
+            :submit-parameters="{ data: submissionData }"
             :max-depth="maxDepth"
             :expects-root="expectsRoot"
             :site="site"
             :preferences-prefix="preferencesPrefix"
-            @pages-loaded="pagesLoaded"
             @edit-page="editPage"
             @changed="changed = true; targetParent = null;"
             @saved="changed = false"
@@ -132,23 +132,21 @@
 
         <page-editor
             v-if="editingPage"
-            :type="editingPage.page.id ? 'entry' : 'url'"
-            :editEntryUrl="editingPage.page.id ? editingPage.page.edit_url : null"
-            :initial-values="editingPage.page.values"
-            :initial-meta="editingPage.page.meta"
-            :initial-origin-values="editingPage.page.originValues"
-            :initial-origin-meta="editingPage.page.originMeta"
-            :initial-localized-fields="editingPage.page.localizedFields"
+            :site="site"
+            :id="editingPage.page.id"
+            :entry="editingPage.page.entry"
+            :editEntryUrl="editingPage.page.entry ? editingPage.page.edit_url : null"
+            :publish-info="publishInfo[editingPage.page.id]"
             :blueprint="blueprint"
-            :syncable-fields="getSyncableFields(editingPage.page)"
-            @localized-fields-updated="editingPage.page.localizedFields = $event"
+            @publish-info-updated="updatePublishInfo"
+            @localized-fields-updated="updateLocalizedFields"
             @closed="closePageEditor"
             @submitted="updatePage"
         />
 
         <page-editor
             v-if="creatingPage"
-            type="url"
+            :site="site"
             :blueprint="blueprint"
             @closed="closePageCreator"
             @submitted="pageCreated"
@@ -208,7 +206,7 @@ export default {
             pageBeingDeleted: null,
             pageDeletionConfirmCallback: null,
             preferencesPrefix: `navs.${this.handle}`,
-            syncableFields: null
+            publishInfo: {},
         }
     },
 
@@ -232,6 +230,12 @@ export default {
 
         hasCollections() {
             return this.collections.length > 0;
+        },
+
+        submissionData() {
+            return _.mapObject(this.publishInfo, value => {
+                return _.pick(value, ['entry', 'values', 'localizedFields']);
+            });
         }
 
     },
@@ -275,7 +279,7 @@ export default {
         },
 
         isEntryBranch(branch) {
-            return !!branch.id;
+            return !!branch.entry;
         },
 
         isLinkBranch(branch) {
@@ -295,6 +299,7 @@ export default {
             this.editingPage.page.title = values.title;
             this.editingPage.page.values = values;
             this.$refs.tree.pageUpdated(this.editingPage.store);
+            this.publishInfo[this.editingPage.page.id].values = values;
 
             this.editingPage = false;
         },
@@ -335,14 +340,13 @@ export default {
             window.location = site.url;
         },
 
-        pagesLoaded(response) {
-            this.syncableFields = response.data.syncableFields;
+        updatePublishInfo(info) {
+            this.publishInfo = { ...this.publishInfo, [this.editingPage.page.id]: info };
         },
 
-        getSyncableFields(page) {
-            const blueprint = `${page.entryCollection}.${page.entryBlueprint}`;
-            return this.syncableFields[blueprint];
-        },
+        updateLocalizedFields(fields) {
+            this.publishInfo[this.editingPage.page.id].localizedFields = fields;
+        }
 
     }
 

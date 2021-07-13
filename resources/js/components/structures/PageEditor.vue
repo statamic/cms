@@ -12,10 +12,15 @@
                     v-html="'&times'" />
             </div>
 
-            <div class="flex-1 overflow-auto">
+            <div v-if="loading" class="flex-1 overflow-auto relative">
+                <div class="absolute inset-0 z-10 bg-white bg-opacity-75 flex items-center justify-center text-center">
+                    <loading-graphic />
+                </div>
+            </div>
+
+            <div v-else class="flex-1 overflow-auto">
 
                 <publish-container
-                    v-if="adjustedBlueprint"
                     ref="container"
                     :name="publishContainer"
                     :blueprint="adjustedBlueprint"
@@ -66,24 +71,24 @@
 export default {
 
     props: {
-        type: String,
-        initialValues: Object,
-        initialMeta: Object,
-        initialOriginValues: Object,
-        initialOriginMeta: Object,
-        initialLocalizedFields: Array,
+        id: String,
+        entry: String,
+        site: String,
+        publishInfo: Object,
         blueprint: Object,
-        syncableFields: Array,
         editEntryUrl: String
     },
 
     data() {
         return {
-            values: _.clone(this.initialValues),
-            meta: _.clone(this.initialMeta),
-            originValues: this.initialOriginValues || {},
-            originMeta: this.initialOriginMeta || {},
-            localizedFields: _.clone(this.initialLocalizedFields),
+            type: this.entry ? 'entry' : 'page',
+            values: null,
+            meta: null,
+            originValues: null,
+            originMeta: null,
+            localizedFields: null,
+            syncableFields: null,
+            loading: true,
             error: null,
             errors: {},
             validating: false,
@@ -210,6 +215,44 @@ export default {
 
             this.$refs.container.setFieldValue(handle, value);
         },
+
+        getPageValues() {
+            if (this.publishInfo) {
+                this.updatePublishInfo(this.publishInfo);
+                this.loading = false;
+                return;
+            }
+
+            const handle = 'links'; // todo
+            const url = cp_url(`navigation/${handle}/pages/${this.id}/edit`) + `?site=${this.site}`;
+
+            this.$axios.get(url).then(response => {
+                this.updatePublishInfo(response.data);
+                this.emitPublishInfoUpdated();
+                this.loading = false;
+            });
+        },
+
+        updatePublishInfo(info) {
+            this.values = info.values;
+            this.originValues = info.originValues;
+            this.meta = info.meta;
+            this.originMeta = info.originMeta;
+            this.localizedFields = info.localizedFields;
+            this.syncableFields = info.syncableFields;
+        },
+
+        emitPublishInfoUpdated() {
+            this.$emit('publish-info-updated', {
+                values: this.values,
+                originValues: this.originValues,
+                meta: this.meta,
+                originMeta: this.originMeta,
+                localizedFields: this.localizedFields,
+                syncableFields: this.syncableFields,
+                entry: this.entry
+            });
+        }
     },
 
     created() {
@@ -217,6 +260,8 @@ export default {
             e.preventDefault();
             this.submit();
         });
+
+        this.getPageValues();
     },
 
     destroyed() {

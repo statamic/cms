@@ -36,6 +36,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('navigation/{navigation}/tree', 'NavigationTreeController@index')->name('navigation.tree.index');
         Route::patch('navigation/{navigation}/tree', 'NavigationTreeController@update')->name('navigation.tree.update');
         Route::post('navigation/{navigation}/pages', 'NavigationPagesController@update')->name('navigation.pages.update');
+        Route::get('navigation/{navigation}/pages/{edit}/edit', 'NavigationPagesController@edit')->name('navigation.pages.edit');
     });
 
     Route::group(['namespace' => 'Collections'], function () {

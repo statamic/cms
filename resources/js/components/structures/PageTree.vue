@@ -142,7 +142,6 @@ export default {
                 this.loadTreeState(this.pages);
                 this.updateTreeData();
                 this.loading = false;
-                this.$emit('pages-loaded', response);
             });
         },
 
@@ -176,9 +175,22 @@ export default {
             return isValid;
         },
 
+        cleanPagesForSubmission(pages) {
+            return _.map(pages, page => ({
+                id: page.id,
+                children: this.cleanPagesForSubmission(page.children)
+            }));
+        },
+
         save() {
             this.saving = true;
-            const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot, ...this.submitParameters };
+
+            const payload = {
+                pages: this.cleanPagesForSubmission(this.pages),
+                site: this.site,
+                expectsRoot: this.expectsRoot,
+                ...this.submitParameters
+            };
 
             return this.$axios.patch(this.submitUrl, payload).then(response => {
                 this.$emit('saved');
@@ -208,6 +220,7 @@ export default {
             pages.forEach(selection => {
                 parent.push({
                     id: selection.id,
+                    entry: selection.entry,
                     title: selection.title,
                     entry_title: selection.entry_title,
                     slug: selection.slug,

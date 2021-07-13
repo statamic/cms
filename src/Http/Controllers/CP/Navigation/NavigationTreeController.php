@@ -9,7 +9,6 @@ use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class NavigationTreeController extends CpController
 {
@@ -29,23 +28,7 @@ class NavigationTreeController extends CpController
             'site' => $site,
         ]);
 
-        return [
-            'pages' => $pages,
-            'syncableFields' => $this->getSyncableFields($nav),
-        ];
-    }
-
-    private function getSyncableFields($nav)
-    {
-        $navFields = $nav->blueprint()->fields()->all()->keys();
-
-        return $nav->collections()->flatMap(function ($collection) {
-            return $collection->entryBlueprints();
-        })->keyBy(function ($blueprint) {
-            return Str::after($blueprint->namespace(), 'collections.').'.'.$blueprint->handle();
-        })->map(function ($blueprint) use ($navFields) {
-            return $blueprint->fields()->all()->keys()->intersect($navFields)->values()->all();
-        })->all();
+        return ['pages' => $pages];
     }
 
     public function update(Request $request, $nav)
