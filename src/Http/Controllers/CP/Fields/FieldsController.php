@@ -70,16 +70,16 @@ class FieldsController extends CpController
     protected function blueprint($blueprint)
     {
         $reserverd = [
+            'content_type',
             'elseif',
             'endif',
             'endunless',
             'if',
+            'length',
             'reference',
             'resource',
             'unless',
             'value',
-            'content_type',
-            'length',
         ];
 
         $prepends = collect([
