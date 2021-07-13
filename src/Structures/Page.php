@@ -350,7 +350,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
                 return null;
             }
 
-            return $this->setEntry($entry->id());
+            return $this->structure()->in($site)->findByEntry($entry->id());
         }
 
         return $this;
