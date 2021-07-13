@@ -2,7 +2,6 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -12,6 +11,7 @@ class Validator
     protected $fields;
     protected $replacements = [];
     protected $extraRules = [];
+    protected $context = [];
 
     public function make()
     {
@@ -28,6 +28,13 @@ class Validator
     public function withRules($rules)
     {
         $this->extraRules = $rules;
+
+        return $this;
+    }
+
+    public function withContext($context)
+    {
+        $this->context = $context;
 
         return $this;
     }
@@ -50,7 +57,7 @@ class Validator
         }
 
         return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
-            return $carry->merge($field->rules());
+            return $carry->merge($field->setValidationContext($this->context)->rules());
         }, collect());
     }
 
@@ -84,17 +91,15 @@ class Validator
             $this->fields->preProcessValidatables()->values()->all(),
             $this->rules(),
             [],
-            $this->fieldAttributes()
+            $this->attributes()
         );
     }
 
-    private function fieldAttributes()
+    public function attributes()
     {
-        return $this->fields->all()->map(function ($field) {
-            $handle = 'validation.attributes.'.$field->handle();
-
-            return Lang::has($handle) ? Lang::get($handle) : $field->display();
-        })->all();
+        return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
+            return $carry->merge($field->validationAttributes());
+        }, collect())->all();
     }
 
     private function parse($rule)

@@ -50,9 +50,11 @@ class ValidatorTest extends TestCase
     public function it_compiles_field_rules()
     {
         $fieldWithItsOwnRules = Mockery::mock(Field::class);
+        $fieldWithItsOwnRules->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $fieldWithItsOwnRules->shouldReceive('rules')->andReturn(['one' => ['required']]);
 
         $fieldWithExtraRules = Mockery::mock(Field::class);
+        $fieldWithExtraRules->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $fieldWithExtraRules->shouldReceive('rules')->andReturn([
             'two' => ['required', 'array'],
             'another' => ['min:2'],
@@ -96,6 +98,7 @@ class ValidatorTest extends TestCase
     public function it_merges_additional_rules_into_field_rules()
     {
         $field = Mockery::mock(Field::class);
+        $field->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $field->shouldReceive('rules')->andReturn([
             'one' => ['required', 'array'],
             'extra' => ['min:2'],
@@ -118,6 +121,35 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
+    public function it_compiles_field_attributes()
+    {
+        $fieldWithNoExtraAttributes = Mockery::mock(Field::class);
+        $fieldWithNoExtraAttributes->shouldReceive('validationAttributes')->andReturn(['one' => 'One']);
+
+        $fieldWithExtraAttributes = Mockery::mock(Field::class);
+        $fieldWithExtraAttributes->shouldReceive('validationAttributes')->andReturn([
+            'two' => 'Two',
+            'extra_one' => 'Extra One',
+            'extra_two' => 'Extra Two',
+        ]);
+
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([
+            $fieldWithNoExtraAttributes,
+            $fieldWithExtraAttributes,
+        ]));
+        $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
+
+        $validation = (new Validator)->fields($fields);
+
+        $this->assertEquals([
+            'one' => 'One',
+            'two' => 'Two',
+            'extra_one' => 'Extra One',
+            'extra_two' => 'Extra Two',
+        ], $validation->attributes());
+    }
+
     public function it_makes_replacements()
     {
         $field = Mockery::mock(Field::class);
