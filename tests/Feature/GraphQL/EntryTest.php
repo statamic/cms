@@ -181,7 +181,7 @@ GQL;
     {
         $this->createStructuredCollection();
 
-$query = <<<'GQL'
+        $query = <<<'GQL'
 {
     entry(id: "child") {
         ... on Entry_Nodes_Node {
@@ -211,7 +211,7 @@ GQL;
     {
         $this->createStructuredCollection();
 
-$query = <<<'GQL'
+        $query = <<<'GQL'
 {
     entry(id: "parent") {
         ... on Entry_Nodes_Node {
