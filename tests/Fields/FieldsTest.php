@@ -738,6 +738,7 @@ class FieldsTest extends TestCase
         Validator::shouldReceive('make')->once()->andReturnSelf();
         Validator::shouldReceive('fields')->once()->andReturnSelf();
         Validator::shouldReceive('withRules')->with([])->once()->andReturnSelf();
+        Validator::shouldReceive('withMessages')->with([])->once()->andReturnSelf();
         Validator::shouldReceive('validate')->once();
 
         $fields->validate();
@@ -750,6 +751,7 @@ class FieldsTest extends TestCase
         Validator::shouldReceive('make')->once()->andReturnSelf();
         Validator::shouldReceive('fields')->once()->andReturnSelf();
         Validator::shouldReceive('withRules')->with(['foo' => 'bar'])->once()->andReturnSelf();
+        Validator::shouldReceive('withMessages')->with([])->once()->andReturnSelf();
         Validator::shouldReceive('validate')->once();
 
         $fields->validate(['foo' => 'bar']);
