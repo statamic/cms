@@ -108,7 +108,8 @@ class Installer
             ->makeSuperUser()
             ->reticulateSplines()
             ->removeStarterKit()
-            ->removeRepository();
+            ->removeRepository()
+            ->removeComposerJsonBackup();
     }
 
     /**
@@ -185,7 +186,7 @@ class Installer
         try {
             Composer::withoutQueue()->throwOnFailure()->requireDev($this->package);
         } catch (ProcessException $exception) {
-            $this->rollbackWithError("Error installing starter kit [{$this->package}].");
+            $this->rollbackWithError("Error installing starter kit [{$this->package}].", $exception->getMessage());
         }
 
         return $this;
@@ -346,7 +347,7 @@ class Installer
         try {
             Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($package, $version, '--dry-run');
         } catch (ProcessException $exception) {
-            $this->rollbackWithError("Cannot install due to error with [{$package}] dependency.");
+            $this->rollbackWithError("Cannot install due to error with [{$package}] dependency.", $exception->getMessage());
         }
     }
 
@@ -422,8 +423,20 @@ class Installer
     {
         $this->console->info('Cleaning up temporary files...');
 
-        Composer::withoutQueue()->throwOnFailure(false)->removeDev($this->package);
+        if (Composer::isInstalled($this->package)) {
+            Composer::withoutQueue()->throwOnFailure(false)->removeDev($this->package);
+        }
 
+        return $this;
+    }
+
+    /**
+     * Remove composer.json backup.
+     *
+     * @return $this
+     */
+    protected function removeComposerJsonBackup()
+    {
         $this->files->delete(base_path('composer.json.bak'));
 
         return $this;
@@ -461,7 +474,7 @@ class Installer
     }
 
     /**
-     * Backup composer.json file.
+     * Restore composer.json file.
      *
      * @return $this
      */
@@ -476,15 +489,32 @@ class Installer
      * Rollback with error.
      *
      * @param string $error
+     * @param string|null $output
      * @throws StarterKitException
      */
-    protected function rollbackWithError($error)
+    protected function rollbackWithError($error, $output = null)
     {
         $this
             ->removeStarterKit()
-            ->restoreComposerJson();
+            ->restoreComposerJson()
+            ->removeComposerJsonBackup();
+
+        if ($output) {
+            $this->console->line($this->tidyComposerErrorOutput($output));
+        }
 
         throw new StarterKitException($error);
+    }
+
+    /**
+     * Remove the `require [--dev] [--dry-run] [--prefer-source]...` stuff from the end of composer error output.
+     *
+     * @param string $output
+     * @return string
+     */
+    protected function tidyComposerErrorOutput($output)
+    {
+        return preg_replace("/\\n\\nrequire \[.*$/", '', $output);
     }
 
     /**
