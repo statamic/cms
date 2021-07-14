@@ -55,7 +55,7 @@ abstract class BasicStore extends Store
 
         $cacheKey = $this->getItemCacheKey($key);
 
-        Blink::forget($cacheKey);
+        Blink::put($cacheKey, $item);
         Cache::forever($cacheKey, $item);
     }
 
