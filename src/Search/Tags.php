@@ -54,7 +54,7 @@ class Tags extends BaseTags
 
     protected function addResultTypesToOutput($output)
     {
-        if (! $this->params->get('paginate')) {
+        if (! $this->params->get('paginate') && ! $this->params->get('as')) {
             return $this->addResultTypes($output);
         }
 
