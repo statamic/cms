@@ -74,9 +74,9 @@ class Process
      */
     public function run($command, $cacheKey = null)
     {
-        $process = $this->newSymfonyProcess($command, $this->basePath);
+        $this->resetOutput();
 
-        $this->errorOutput = [];
+        $process = $this->newSymfonyProcess($command, $this->basePath);
 
         if ($cacheKey) {
             $this->runAndCacheOutput($process, $cacheKey);
@@ -87,7 +87,7 @@ class Process
         $output = $this->runAndReturnOutput($process);
 
         if ($this->throwOnFailure && $process->getExitCode() > 0) {
-            $this->throwException();
+            $this->throwException($output);
         }
 
         return $output;
@@ -102,19 +102,19 @@ class Process
      */
     public function runAndOperateOnOutput($command, $operateOnOutput)
     {
+        $this->resetOutput();
+
         $process = $this->newSymfonyProcess($command, $this->basePath);
 
-        $this->errorOutput = [];
-
-        $this->output = null;
-
         $process->run(function ($type, $buffer) use (&$output, $operateOnOutput) {
-            $this->logErrorOutput($type, $buffer);
+            $this->prepareErrorOutput($type, $buffer);
             $this->output .= $operateOnOutput($buffer);
         });
 
+        $this->logErrorOutput();
+
         if ($this->throwOnFailure && $process->getExitCode() > 0) {
-            $this->throwException();
+            $this->throwException($this->output);
         }
 
         return $this->output;
@@ -155,12 +155,14 @@ class Process
      */
     private function runAndReturnOutput($process)
     {
-        $this->output = null;
+        $this->resetOutput();
 
         $process->run(function ($type, $buffer) use (&$output) {
-            $this->logErrorOutput($type, $buffer);
+            $this->prepareErrorOutput($type, $buffer);
             $this->output .= $buffer;
         });
+
+        $this->logErrorOutput();
 
         return $this->normalizeOutput($this->output);
     }
@@ -173,27 +175,29 @@ class Process
      */
     private function runAndCacheOutput($process, $cacheKey)
     {
-        $this->output = null;
+        $this->resetOutput();
 
         Cache::forget($cacheKey);
 
         $this->appendOutputToCache($cacheKey, null);
 
         $process->run(function ($type, $buffer) use ($cacheKey) {
-            $this->logErrorOutput($type, $buffer);
+            $this->prepareErrorOutput($type, $buffer);
             $this->appendOutputToCache($cacheKey, $buffer);
         });
+
+        $this->logErrorOutput();
 
         $this->setCompletedOnCache($cacheKey);
     }
 
     /**
-     * Log error (stderr) output.
+     * Prepare error (stderr) output.
      *
      * @param string $type
      * @param string $buffer
      */
-    private function logErrorOutput($type, $buffer)
+    private function prepareErrorOutput($type, $buffer)
     {
         if ($type !== 'err') {
             return;
@@ -203,13 +207,25 @@ class Process
             return true;
         }
 
-        $this->errorOutput[] = $buffer;
+        $this->errorOutput[] = $error;
+    }
 
+    /**
+     * Log error output.
+     */
+    private function logErrorOutput()
+    {
         if (! $this->logErrorOutput) {
             return;
         }
 
+        if (! $this->hasErrorOutput()) {
+            return;
+        }
+
         $process = (new \ReflectionClass($this))->getShortName();
+
+        $error = collect($this->errorOutput)->implode("\n");
 
         Log::error("{$process} Process: {$error}");
     }
@@ -366,10 +382,20 @@ class Process
     /**
      * Throw exception.
      *
+     * @param string $output
      * @throws ProcessException
      */
-    protected function throwException()
+    protected function throwException(string $output)
     {
-        throw new ProcessException;
+        throw new ProcessException($output);
+    }
+
+    /**
+     * Reset output.
+     */
+    private function resetOutput()
+    {
+        $this->output = null;
+        $this->errorOutput = [];
     }
 }
