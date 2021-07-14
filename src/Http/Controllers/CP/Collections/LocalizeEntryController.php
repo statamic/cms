@@ -13,6 +13,7 @@ class LocalizeEntryController extends CpController
         $request->validate(['site' => 'required']);
 
         $localized = $entry->makeLocalization($site = $request->site);
+        $entry->addLocalization($localized);
 
         $this->addToStructure($collection, $entry, $localized);
 
