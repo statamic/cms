@@ -4,10 +4,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
-use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Support\Str;
 
 class ScaffoldCollectionController extends CpController
 {
