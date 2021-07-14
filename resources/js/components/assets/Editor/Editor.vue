@@ -49,7 +49,7 @@
 
                 <div class="editor-preview">
 
-                    <div 
+                    <div
                         v-if="asset.isImage || asset.isSvg || asset.isAudo || asset.isVideo"
                         class="editor-preview-image"
                     >
@@ -57,7 +57,7 @@
                             <!-- Image -->
                             <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb" />
 
-                            <!-- SVG --> 
+                            <!-- SVG -->
                             <div v-else-if="asset.isSvg" class="bg-checkerboard h-full w-full flex flex-col">
                                 <div class="flex border-b-2 border-grey-90">
                                     <div class="flex-1 order-r p-2 border-grey-90 flex items-center justify-center">
@@ -132,7 +132,7 @@
 
                         <div class="editor-form-fields">
                             <div v-if="error" class="bg-red text-white p-2 shadow mb-2" v-text="error" />
-                            <publish-fields 
+                            <publish-fields
                                 :fields="fields"
                                 :read-only="readOnly"
                                 @updated="setFieldValue"
