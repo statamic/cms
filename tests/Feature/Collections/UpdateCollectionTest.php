@@ -71,6 +71,8 @@ class UpdateCollectionTest extends TestCase
             ])
             ->assertOk();
 
+        $collection = \Statamic\Facades\Collection::find($collection->handle());
+
         $this->assertCount(1, Collection::all());
         $updated = Collection::all()->first();
         $this->assertEquals('Updated title', $updated->title());

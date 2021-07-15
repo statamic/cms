@@ -143,11 +143,12 @@ class EntryTest extends TestCase
         $collection = tap(Collection::make('test'))->save();
         $origin = (new Entry)->collection('test');
         $entry = (new Entry)->origin($origin)->collection('test');
+        $entry->save();
 
         $this->assertNull($entry->value('test'));
 
-        $collection->cascade(['test' => 'from collection']);
-        $this->assertEquals('from collection', $entry->value('test'));
+        $collection->cascade(['test' => 'from collection'])->save();
+        $this->assertEquals('from collection', $entry->fresh()->value('test'));
 
         $origin->set('test', 'from origin');
         $this->assertEquals('from origin', $entry->value('test'));
@@ -929,12 +930,13 @@ class EntryTest extends TestCase
         $collection = tap(Collection::make('test'))->save();
         $origin = (new Entry)->collection($collection);
         $entry = (new Entry)->collection($collection)->origin($origin);
+        $entry->save();
 
         // defaults to default
         $this->assertEquals('default', $entry->template());
 
         // collection level overrides the default
-        $collection->template('foo');
+        $collection->template('foo')->save();
         $this->assertEquals('foo', $entry->template());
 
         // origin overrides collection
@@ -953,12 +955,13 @@ class EntryTest extends TestCase
         $collection = tap(Collection::make('test'))->save();
         $origin = (new Entry)->collection($collection);
         $entry = (new Entry)->collection($collection)->origin($origin);
+        $entry->save();
 
         // defaults to layout
         $this->assertEquals('layout', $entry->layout());
 
         // collection level overrides the default
-        $collection->layout('foo');
+        $collection->layout('foo')->save();
         $this->assertEquals('foo', $entry->layout());
 
         // origin overrides collection
@@ -1067,7 +1070,8 @@ class EntryTest extends TestCase
         $this->assertTrue($return);
         $this->assertCount(1, Facades\Entry::all());
         $this->assertCount(0, $entry->descendants());
-        $this->assertCount(0, $localization->descendants());
+        $this->assertNull($localization->fresh());
+        $this->assertNull($deeperLocalization->fresh());
     }
 
     /** @test */
@@ -1124,6 +1128,7 @@ class EntryTest extends TestCase
         ], $frenchCanadian->data()->all());
 
         $return = $english->detachLocalizations();
+        $french = $french->fresh();
 
         $this->assertTrue($return);
         $this->assertEquals('English', $english->value('title'));
@@ -1145,7 +1150,7 @@ class EntryTest extends TestCase
             'drink' => 'Water',
         ], $french->data()->all());
 
-        $this->assertEquals($french, $frenchCanadian->origin());
+        $this->assertEquals($french, $frenchCanadian->origin()->fresh());
         $this->assertEquals('French Canadian', $frenchCanadian->value('title'));
         $this->assertEquals('Poutine', $frenchCanadian->value('food'));
         $this->assertEquals('Water', $frenchCanadian->value('drink'));

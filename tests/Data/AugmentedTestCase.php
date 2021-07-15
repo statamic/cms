@@ -28,7 +28,7 @@ class AugmentedTestCase extends TestCase
 
             switch ($expectation['type']) {
                 case Value::class:
-                    $this->assertSame($expectation['value'], $actual->value(), "Key '{$key}' does not match expected value.");
+                    $this->assertEquals($expectation['value'], $actual->value(), "Key '{$key}' does not match expected value.");
                     break;
 
                 case Carbon::class:
@@ -44,7 +44,7 @@ class AugmentedTestCase extends TestCase
 
                 default:
                     if (isset($expectation['value'])) {
-                        $this->assertSame(
+                        $this->assertEquals(
                             $expectation['value'],
                             $actual,
                             "Key '{$key}' does not match expected value."
