@@ -50,7 +50,7 @@
                 <div class="editor-preview">
 
                     <div
-                        v-if="asset.isImage || asset.isSvg || asset.isAudo || asset.isVideo"
+                        v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo"
                         class="editor-preview-image"
                     >
                         <div class="image-wrapper">
