@@ -13,6 +13,7 @@ use Statamic\Statamic;
 class BlueprintNotFoundException extends Exception implements ProvidesSolution
 {
     protected $blueprintHandle;
+    protected $namespace;
 
     public function __construct($blueprintHandle, $namespace = null)
     {
