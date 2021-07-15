@@ -144,6 +144,7 @@ class NestedFieldsTest extends TestCase
                     'prepend' => null,
                     'append' => null,
                     'antlers' => false,
+                    'default' => null,
                     'component' => 'text',
                     'width' => 50,
                     'display' => 'Second Field',

@@ -60,6 +60,7 @@ return [
     'field_validation_advanced_instructions' => 'Add more advanced validation to this field.',
     'field_validation_required_instructions' => 'Control whether or not this field is required.',
     'fields_blueprints_description' => 'Blueprints define the fields for content structures like collections, taxonomies, users, and forms.',
+    'fields_default_instructions' => 'Set the default value.',
     'fields_display_instructions' => 'The field\'s label shown in the Control Panel.',
     'fields_fieldsets_description' => 'Fieldsets are simple, flexible, and completely optional groupings of fields that help to organize reusable, pre-configured fields.',
     'fields_handle_instructions' => 'The field\'s template variable.',
