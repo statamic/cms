@@ -38,7 +38,7 @@
 
         <div class="flex justify-center mt-4">
             <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit" @click="submit">
-                {{ __('Create Resources')}}
+                {{ __('Create Views')}}
             </button>
         </div>
     </div>
