@@ -27,7 +27,7 @@ class Role extends BaseRole
     public function title(string $title = null)
     {
         if (is_null($title)) {
-            return $this->title;
+            return __($this->title);
         }
 
         $this->title = $title;
