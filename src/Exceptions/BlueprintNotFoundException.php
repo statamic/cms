@@ -14,11 +14,12 @@ class BlueprintNotFoundException extends Exception implements ProvidesSolution
 {
     protected $blueprintHandle;
 
-    public function __construct($blueprintHandle)
+    public function __construct($blueprintHandle, $namespace = null)
     {
         parent::__construct("Blueprint [{$blueprintHandle}] not found");
 
         $this->blueprintHandle = $blueprintHandle;
+        $this->namespace = $namespace;
     }
 
     public function getSolution(): Solution
@@ -36,8 +37,12 @@ class BlueprintNotFoundException extends Exception implements ProvidesSolution
 
     protected function getSuggestedBlueprint()
     {
+        if (! $this->namespace) {
+            return null;
+        }
+
         return StringComparator::findClosestMatch(
-            Blueprint::in('.')->map->handle()->flatten()->all(),
+            Blueprint::in($this->namespace)->map->handle()->flatten()->all(),
             $this->blueprintHandle
         );
     }
