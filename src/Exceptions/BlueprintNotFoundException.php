@@ -42,7 +42,7 @@ class BlueprintNotFoundException extends Exception implements ProvidesSolution
         }
 
         return StringComparator::findClosestMatch(
-            Blueprint::in($this->namespace)->map->handle()->flatten()->all(),
+            Blueprint::in($this->namespace)->map->handle()->values()->all(),
             $this->blueprintHandle
         );
     }
