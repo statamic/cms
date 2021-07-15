@@ -84,8 +84,7 @@ class MakeAddon extends GeneratorCommand
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
-        $this->info('Addon created successfully.');
-        $this->comment("Your addon files await at: {$relativePath}");
+        $this->info("Your addon package is ready: <comment>{$relativePath}</comment>");
     }
 
     /**
@@ -115,7 +114,7 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put($this->addonPath('composer.json'), $json);
 
-        $this->info('Composer configuration created successfully.');
+        $this->line('Composer config created successfully.');
 
         return $this;
     }
@@ -139,11 +138,12 @@ class MakeAddon extends GeneratorCommand
             'namespace' => $this->addonNamespace(),
         ];
 
+        $this->info("Scaffolding the addon package boilerplate...");
+        $this->info("-------------------------------------------------------");
         foreach ($files as $stub => $file) {
             $this->createFromStub($stub, $this->addonPath($file), $data);
+            $this->line($this->addonPath($file));
         }
-
-        $this->info('Addon package files created successfully.');
 
         return $this;
     }
@@ -204,6 +204,8 @@ class MakeAddon extends GeneratorCommand
 
         if (! Str::contains($output, "Discovered Addon: {$this->package}")) {
             $this->error('An error was encountered while installing your addon!');
+        } else {
+            $this->info('Addon installed successfully.');
         }
 
         return $this;

@@ -72,7 +72,9 @@ class MakeFieldtype extends GeneratorCommand
             // $this->wireUpAppJs(); // TODO!
         }
 
-        $this->comment("Your {$this->typeLower} Vue component awaits at: {$relativePath}");
+        if (! $addon) {
+            $this->line("Your {$this->typeLower} Vue component awaits: <comment>{$relativePath}</comment>");
+        }
     }
 
     /**
@@ -105,8 +107,6 @@ class MakeFieldtype extends GeneratorCommand
             'addon/webpack.mix.js.stub' => 'webpack.mix.js',
             'addon/package.json.stub' => 'package.json',
             'addon/addon.js.stub' => 'resources/js/addon.js',
-            'addon/.gitignore.stub' => '.gitignore',
-            'addon/README.md.stub' => 'README.md',
         ];
 
         $data = [
@@ -115,8 +115,12 @@ class MakeFieldtype extends GeneratorCommand
             'root_namespace' => $this->rootNamespace(),
         ];
 
+        $this->info("Scaffolding the Vue component boilerplate...");
+        $this->info("--------------------------------------------------------------");
         foreach ($files as $stub => $file) {
-            $this->createFromStub($stub, $addonPath.'/'.$file, $data);
+            $path = $addonPath.'/'.$file;
+            $this->createFromStub($stub, $path, $data);
+            $this->line($path);
         }
     }
 

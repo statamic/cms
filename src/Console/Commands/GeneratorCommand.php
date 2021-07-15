@@ -33,7 +33,9 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
 
         $relativePath = $this->getRelativePath($this->getPath($this->qualifyClass($this->getNameInput())));
 
-        $this->comment("Your {$this->typeLower} class awaits at: {$relativePath}");
+        if (! $addon) {
+            $this->line("Your {$this->typeLower} class awaits: <comment>{$relativePath}</comment>");
+        }
     }
 
     /**
