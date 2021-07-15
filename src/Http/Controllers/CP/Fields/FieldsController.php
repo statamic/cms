@@ -69,7 +69,7 @@ class FieldsController extends CpController
 
     protected function blueprint($blueprint)
     {
-        $reserverd = [
+        $reserved = [
             'content_type',
             'elseif',
             'endif',
@@ -93,7 +93,7 @@ class FieldsController extends CpController
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
                 'type' => 'text',
-                'validate' => 'required|not_in:'.join(',', $reserverd),
+                'validate' => 'required|not_in:'.implode(',', $reserved),
                 'width' => 50,
             ],
             'instructions' => [
