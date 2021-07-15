@@ -78,7 +78,7 @@ class EntriesController extends CpController
         $blueprint = $entry->blueprint();
 
         if (! $blueprint) {
-            throw new BlueprintNotFoundException($entry->get('blueprint'));
+            throw new BlueprintNotFoundException($entry->value('blueprint'));
         }
 
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
