@@ -1,5 +1,37 @@
 # Release Notes
 
+## 3.1.28 (2021-07-15)
+
+### What's new
+- The `link` fieldtype can have its collections specified, and it defaults to only collections with routes. [#3973](https://github.com/statamic/cms/issues/3973)
+- Sites can now have arbitrary attributes. [#3996](https://github.com/statamic/cms/issues/3996)
+- Added GraphQL support for the `array` fieldtype. [#3972](https://github.com/statamic/cms/issues/3972)
+- Added a `session:has` tag. [#3958](https://github.com/statamic/cms/issues/3958)
+
+### What's improved
+- The blueprint builder will prevent you from adding fields with reserved words. [#3989](https://github.com/statamic/cms/issues/3989)
+- The blueprint builder will allow you to set default field values.  [#3982](https://github.com/statamic/cms/issues/3982)
+- The collection scaffolder now just creates views. [#3997](https://github.com/statamic/cms/issues/3997)
+- In listings that only ever require a single selection, you no longer need to unselect before selecting its replacement. [#3950](https://github.com/statamic/cms/issues/3950)
+
+### What's fixed
+- Fix "create navigation" button not appearing when you have permission. [#4005](https://github.com/statamic/cms/issues/4005)
+- Fix asset meta data disappearing when renaming programmatically. [#3964](https://github.com/statamic/cms/issues/3964)
+- Collection trees will be deleted when setting a collection to not orderable. [#3901](https://github.com/statamic/cms/issues/3901)
+- Prevent video previews blowing out the UI of the asset editor. [#3975](https://github.com/statamic/cms/issues/3975)
+- Support collections in the `reverse` modifier. [#4003](https://github.com/statamic/cms/issues/4003)
+- Prevent the Live Preview toolbar covering the Bard toolbar. [#3979](https://github.com/statamic/cms/issues/3979)
+- Tree files are ignored if they don't have a matching collection. [#3948](https://github.com/statamic/cms/issues/3948)
+- Consolidate the Stache's `getItemFilter` and `getFileFilter` methods. [#4001](https://github.com/statamic/cms/issues/4001)
+- Fix `search` tag when the `as` param is used without `paginate`. [#4000](https://github.com/statamic/cms/issues/4000)
+- Fix static caching invalidation mismatch when using trusted proxies and SSL. [#3939](https://github.com/statamic/cms/issues/3939)
+- Fix removing users from groups when using Eloquent. [#3951](https://github.com/statamic/cms/issues/3951)
+- Fix table word wrap weirdness. [#2550](https://github.com/statamic/cms/issues/2550)
+- Fix `code` fieldtype not loading, and `textarea` fieldtype not being the correct height when in inactive tabs. [#3955](https://github.com/statamic/cms/issues/3955)
+- Fix site specific views not loading. [#3944](https://github.com/statamic/cms/issues/3944)
+
+
+
 ## 3.1.27 (2021-07-01)
 
 ### What's improved
