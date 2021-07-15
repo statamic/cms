@@ -138,8 +138,8 @@ class MakeAddon extends GeneratorCommand
             'namespace' => $this->addonNamespace(),
         ];
 
-        $this->info("Scaffolding the addon package boilerplate...");
-        $this->info("-------------------------------------------------------");
+        $this->info('Scaffolding the addon package boilerplate...');
+        $this->info('-------------------------------------------------------');
         foreach ($files as $stub => $file) {
             $this->createFromStub($stub, $this->addonPath($file), $data);
             $this->line($this->addonPath($file));

@@ -115,8 +115,8 @@ class MakeFieldtype extends GeneratorCommand
             'root_namespace' => $this->rootNamespace(),
         ];
 
-        $this->info("Scaffolding the Vue component boilerplate...");
-        $this->info("--------------------------------------------------------------");
+        $this->info('Scaffolding the Vue component boilerplate...');
+        $this->info('--------------------------------------------------------------');
         foreach ($files as $stub => $file) {
             $path = $addonPath.'/'.$file;
             $this->createFromStub($stub, $path, $data);
