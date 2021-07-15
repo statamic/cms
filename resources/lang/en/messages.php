@@ -63,7 +63,6 @@ return [
     'fields_display_instructions' => 'The field\'s label shown in the Control Panel.',
     'fields_fieldsets_description' => 'Fieldsets are simple, flexible, and completely optional groupings of fields that help to organize reusable, pre-configured fields.',
     'fields_handle_instructions' => 'The field\'s template variable.',
-    'fields_handle_reserved' => 'You can\'t use \':input\' as a handle because it is a reserverd word.',
     'fields_instructions_instructions' => 'Shown under the field\'s display label, like this very text. Markdown is supported.',
     'fields_listable_instructions' => 'Control the column visibility of this field.',
     'fieldset_import_fieldset_instructions' => 'The fieldset to be imported.',

@@ -59,7 +59,7 @@ class FieldsController extends CpController
             ->process();
 
         $fields->validate([], [
-            'handle.not_in' => __('statamic::messages.fields_handle_reserved'),
+            'handle.not_in' => __('statamic::validation.reserved'),
         ]);
 
         $values = array_merge($request->values, $fields->values()->all());
