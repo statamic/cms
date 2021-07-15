@@ -79,7 +79,7 @@ class FieldsController extends CpController
             'reference',
             'resource',
             'unless',
-            'value',
+            'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
         ];
 
         $prepends = collect([
