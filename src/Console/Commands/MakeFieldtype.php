@@ -56,7 +56,7 @@ class MakeFieldtype extends GeneratorCommand
             $this->generateVueComponent();
         }
 
-        if (! $this->option('php') && $this->argument('addon') && 'make sure we are making this the first time') {
+        if (! $this->option('php') && $this->argument('addon')) {
             $this->updateServiceProvider();
         }
     }
@@ -77,11 +77,8 @@ class MakeFieldtype extends GeneratorCommand
         if ($addon = $this->argument('addon')) {
             $this->wireUpAddonJs($addon);
         } else {
-            // $this->wireUpAppJs(); // TODO!
-        }
-
-        if (! $addon) {
             $this->line("Your {$this->typeLower} Vue component awaits: <comment>{$relativePath}</comment>");
+            $this->info("Don't forget to import and register your Fieldtype component in <comment>resources/js/cp.js</comment>");
         }
     }
 
