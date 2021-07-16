@@ -64,6 +64,7 @@ class InstallTest extends TestCase
         $this->assertFileNotExists(base_path('copied.md'));
 
         $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
             'github.com/*' => Http::response('', 200),
             '*' => Http::response('', 404),
         ]);
@@ -82,6 +83,7 @@ class InstallTest extends TestCase
         $this->assertFileNotExists(base_path('copied.md'));
 
         $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
             'bitbucket.org/*' => Http::response('', 200),
             '*' => Http::response('', 404),
         ]);
@@ -100,6 +102,7 @@ class InstallTest extends TestCase
         $this->assertFileNotExists(base_path('copied.md'));
 
         $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
             'gitlab.com/*' => Http::response('', 200),
             '*' => Http::response('', 404),
         ]);
@@ -135,6 +138,7 @@ class InstallTest extends TestCase
         );
 
         $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
             'github.com/*' => Http::response('', 200),
             '*' => Http::response('', 404),
         ]);
@@ -473,6 +477,7 @@ EOT;
     private function installCoolRunnings($options = [], $customFake = null)
     {
         Http::fake($customFake ?? [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
             'repo.packagist.org/*' => Http::response('', 200),
             '*' => Http::response('', 404),
         ]);
