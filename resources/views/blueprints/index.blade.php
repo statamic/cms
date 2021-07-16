@@ -133,6 +133,24 @@
     </div>
     @endforeach
 
+    @foreach (Statamic\Facades\Blueprint::additionalBlueprints() as $title => $blueprints)
+        <h3 class="little-heading pl-0 mb-1">{{ $title }}</h3>
+        <div class="card p-0 mb-2">
+            <table class="data-table">
+                @foreach ($blueprints as $blueprint)
+                    <tr>
+                        <td>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 mr-2">@cp_svg('blueprint')</div>
+                                <a href="{{ cp_route('blueprints.edit', ['handle' => $blueprint->namespace() ? $blueprint->namespace() . '.' . $blueprint->handle() : $blueprint->handle()]) }}">{{ $blueprint->title() }}</a>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
+    @endforeach
+
     <h3 class="little-heading pl-0 mb-1">{{ __('Other') }}</h3>
     <div class="card p-0 mb-2">
         <table class="data-table">
