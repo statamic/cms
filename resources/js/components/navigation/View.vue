@@ -146,6 +146,7 @@
 
         <page-editor
             v-if="creatingPage"
+            creating
             :site="site"
             :blueprint="blueprint"
             @closed="closePageCreator"
@@ -281,9 +282,7 @@ export default {
             pages.forEach(page => {
                 this.publishInfo = {...this.publishInfo, [page.id]: {
                     entry: page.entry,
-                    values: {},
-                    localizedFields: {},
-                    new: true
+                    new: true,
                 }};
             });
 

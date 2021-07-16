@@ -47,7 +47,7 @@ class UpdateNavigationTreeTest extends TestCase
             'qux' => ['type' => 'text'],
         ]);
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
-        BranchIdGenerator::shouldReceive('generate')->times(2)->andReturn('newly-generated-id1', 'newly-generated-id2');
+        BranchIdGenerator::shouldReceive('generate')->times(3)->andReturn('newly-generated-id1', 'newly-generated-id2', 'newly-generated-id3');
 
         $user = tap(User::make()->makeSuper())->save();
         $nav = tap(Nav::make('test'))->save();
@@ -72,6 +72,7 @@ class UpdateNavigationTreeTest extends TestCase
                         ['id' => 'id4', 'children' => []],
                     ]],
                     ['id' => 'new-entry-page', 'children' => []],
+                    ['id' => 'new-entry-page-with-values', 'children' => []],
                 ],
                 'data' => [
                     'id1' => [
@@ -107,8 +108,12 @@ class UpdateNavigationTreeTest extends TestCase
                     ],
                     'new-entry-page' => [
                         'entry' => '789',
-                        'values' => [],
                         'new' => true,
+                    ],
+                    'new-entry-page-with-values' => [
+                        'entry' => '910',
+                        'new' => true,
+                        'values' => [],
                         'localizedFields' => [],
                     ],
                 ],
@@ -133,6 +138,7 @@ class UpdateNavigationTreeTest extends TestCase
                 ]],
             ]],
             ['id' => 'newly-generated-id2', 'entry' => '789'],
+            ['id' => 'newly-generated-id3', 'entry' => '910'],
         ], $nav->in('en')->tree());
     }
 

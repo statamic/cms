@@ -11,6 +11,36 @@ use Statamic\Structures\Page;
 class NavigationPagesController extends CpController
 {
     /**
+     * The "create" action, which doesn't actually render the page, but rather
+     * returns values, meta, etc for the page editor component.
+     */
+    public function create(Request $request, $nav)
+    {
+        $nav = Nav::find($nav);
+
+        $blueprint = $nav->blueprint();
+
+        $page = (new Page)
+            ->setTree($nav->in($request->site))
+            ->setEntry($request->entry);
+
+        [$values, $meta] = $this->extractValuesAndMeta($page, $blueprint);
+
+        if ($entry = $page->entry()) {
+            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
+        }
+
+        return [
+            'values' => $values,
+            'meta' => $meta,
+            'originValues' => $originValues ?? null,
+            'originMeta' => $originMeta ?? null,
+            'localizedFields' => $this->getLocalizedFields($page),
+            'syncableFields' => $this->getSyncableFields($nav, $entry),
+        ];
+    }
+
+    /**
      * The "edit" action, which doesn't actually render the page, but rather
      * returns values, meta, etc for the the page editor component.
      */

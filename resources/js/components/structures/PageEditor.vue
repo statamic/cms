@@ -76,7 +76,8 @@ export default {
         site: String,
         publishInfo: Object,
         blueprint: Object,
-        editEntryUrl: String
+        editEntryUrl: String,
+        creating: Boolean
     },
 
     data() {
@@ -217,18 +218,30 @@ export default {
         },
 
         getPageValues() {
-            if (this.publishInfo) {
+            const hasPublishValues = this.publishInfo && this.publishInfo.hasOwnProperty('values');
+
+            if (hasPublishValues) {
                 this.updatePublishInfo(this.publishInfo);
                 this.loading = false;
                 return;
             }
 
             const handle = 'links'; // todo
-            const url = cp_url(`navigation/${handle}/pages/${this.id}/edit`) + `?site=${this.site}`;
+            const creating = this.creating || !hasPublishValues;
+
+            let url = creating
+                ? cp_url(`navigation/${handle}/pages/create`)
+                : cp_url(`navigation/${handle}/pages/${this.id}/edit`);
+
+            url += `?site=${this.site}`;
+
+            if (creating && this.type == 'entry') {
+                url += `&entry=${this.entry}`;
+            }
 
             this.$axios.get(url).then(response => {
                 this.updatePublishInfo(response.data);
-                this.emitPublishInfoUpdated();
+                this.emitPublishInfoUpdated(this.publishInfo.new ?? false);
                 this.loading = false;
             });
         },
@@ -242,7 +255,7 @@ export default {
             this.syncableFields = info.syncableFields;
         },
 
-        emitPublishInfoUpdated() {
+        emitPublishInfoUpdated(isNew) {
             this.$emit('publish-info-updated', {
                 values: this.values,
                 originValues: this.originValues,
@@ -250,7 +263,8 @@ export default {
                 originMeta: this.originMeta,
                 localizedFields: this.localizedFields,
                 syncableFields: this.syncableFields,
-                entry: this.entry
+                entry: this.entry,
+                new: isNew
             });
         }
     },
