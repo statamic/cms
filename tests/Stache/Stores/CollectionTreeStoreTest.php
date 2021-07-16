@@ -4,6 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Facades;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
@@ -39,6 +40,12 @@ class CollectionTreeStoreTest extends TestCase
         touch($this->tempDir.'/two.yaml', 1234567890);
         touch($this->tempDir.'/non-yaml-file.md', 1234567890);
 
+        $collectionWithStructure = $this->mock(Collection::class);
+        $collectionWithStructure->shouldReceive('hasStructure')->andReturn(true);
+
+        Facades\Collection::shouldReceive('findByHandle')->with('one')->andReturn($collectionWithStructure);
+        Facades\Collection::shouldReceive('findByHandle')->with('two')->andReturn($collectionWithStructure);
+
         $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
         $dir = Path::tidy($this->tempDir);
@@ -49,6 +56,35 @@ class CollectionTreeStoreTest extends TestCase
 
         // Sanity check. Make sure the file is there but wasn't included.
         $this->assertTrue(file_exists($dir.'/non-yaml-file.md'));
+    }
+
+    /** @test */
+    public function it_only_gets_files_for_trees_with_a_structured_collection()
+    {
+        touch($this->tempDir.'/totally-cool.yaml', 1234567890);
+        touch($this->tempDir.'/no-collection.yaml', 1234567890);
+        touch($this->tempDir.'/no-structure.yaml', 1234567890);
+
+        $collectionWithStructure = $this->mock(Collection::class);
+        $collectionWithStructure->shouldReceive('hasStructure')->andReturn(true);
+
+        $collectionWithoutStructure = $this->mock(Collection::class);
+        $collectionWithoutStructure->shouldReceive('hasStructure')->andReturn(false);
+
+        Facades\Collection::shouldReceive('findByHandle')->with('totally-cool')->andReturn($collectionWithStructure);
+        Facades\Collection::shouldReceive('findByHandle')->with('no-collection')->andReturn(null);
+        Facades\Collection::shouldReceive('findByHandle')->with('no-structure')->andReturn($collectionWithoutStructure);
+
+        $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
+
+        $dir = Path::tidy($this->tempDir);
+        $this->assertEquals([
+            $dir.'/totally-cool.yaml' => 1234567890,
+        ], $files->all());
+
+        // Sanity check. Make sure the files are there but weren't included.
+        $this->assertTrue(file_exists($dir.'/no-collection.yaml'));
+        $this->assertTrue(file_exists($dir.'/no-structure.yaml'));
     }
 
     /** @test */

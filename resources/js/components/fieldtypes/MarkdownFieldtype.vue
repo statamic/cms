@@ -70,7 +70,7 @@
                             <div class="flex w-full">
                                 <div class="markdown-cheatsheet-helper">
                                     <button class="text-link flex items-center" @click="showCheatsheet = true" :aria-label="__('Show Markdown Cheatsheet')">
-                                        <svg-icon name="markdown-icon" class="w-6 items-start mr-px" />
+                                        <svg-icon name="markdown-icon" class="w-6 h-4 items-start mr-1" />
                                         <span>{{ __('Markdown Cheatsheet') }}</span>
                                     </button>
                                 </div>

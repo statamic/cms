@@ -9,7 +9,7 @@
                     <dropdown-list>
                         <dropdown-item v-if="collection.editable" :text="__('Edit Collection')" :redirect="collection.edit_url" />
                         <dropdown-item v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" :redirect="collection.blueprints_url" />
-                        <dropdown-item v-if="collection.editable" :text="__('Scaffold Resources')" :redirect="collection.scaffold_url" />
+                        <dropdown-item v-if="collection.editable" :text="__('Scaffold Views')" :redirect="collection.scaffold_url" />
                         <dropdown-item
                             v-if="collection.deleteable"
                             :text="__('Delete Collection')"

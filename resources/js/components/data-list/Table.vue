@@ -40,11 +40,11 @@
                     <input
                         v-if="!reorderable"
                         type="checkbox"
-                        v-model="sharedState.selections"
-                        :disabled="reachedSelectionLimit && !sharedState.selections.includes(row.id)"
-                        :id="`checkbox-${row.id}`"
                         :value="row.id"
-                        @click="checkboxClicked($event, index)"
+                        :checked="isSelected(row.id)"
+                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(row.id)"
+                        :id="`checkbox-${row.id}`"
+                        @click="checkboxClicked(row, index, $event)"
                     />
                 </td>
                 <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width">
@@ -139,6 +139,10 @@ export default {
             return this.sharedState.selections.length === this.sharedState.maxSelections;
         },
 
+        singleSelect() {
+            return this.sharedState.maxSelections === 1;
+        },
+
         visibleColumns() {
             const columns = this.sharedState.columns.filter(column => column.visible);
 
@@ -213,12 +217,24 @@ export default {
             };
         },
 
-        toggleSelection(id, index) {
+        isSelected(id) {
+            return this.sharedState.selections.includes(id);
+        },
+
+        toggleSelection(id) {
             const i = this.sharedState.selections.indexOf(id);
 
-            if (i != -1) {
+            if (i > -1) {
                 this.sharedState.selections.splice(i, 1);
-            } else if (! this.reachedSelectionLimit) {
+
+                return;
+            }
+
+            if (this.singleSelect) {
+                this.sharedState.selections.pop();
+            }
+
+            if (! this.reachedSelectionLimit) {
                 this.sharedState.selections.push(id);
             }
         },
@@ -231,13 +247,15 @@ export default {
             this.shifting = false
         },
 
-        checkboxClicked($event, index) {
+        checkboxClicked(row, index, $event) {
             this.$refs.table.focus();
             if ($event.shiftKey && this.lastItemClicked !== null) {
                 this.selectRange(
                     Math.min(this.lastItemClicked, index),
                     Math.max(this.lastItemClicked, index)
                 );
+            } else {
+                this.toggleSelection(row.id, index)
             }
 
             if ($event.target.checked) {
