@@ -13,6 +13,7 @@ final class LicenseManager
     private $kitLicenseKey;
     private $siteLicenseKey;
     private $console;
+    private $details;
     private $valid = false;
 
     /**
@@ -85,18 +86,21 @@ final class LicenseManager
      */
     private function performValidation()
     {
-        if ($this->isFreeStarterKit()) {
-            return $this->clearKitLicenseKey()->setValid();
+        if (! $this->outpostGetStarterKitDetails()) {
+            return $this->error('Cannot connect to [statamic.com] to validate license!');
         }
 
-        $this->info("Validating starter kit license for [{$this->package}]...");
+        if ($this->isFreeStarterKit()) {
+            return $this->clearKitLicenseKey()->setValid(false);
+        }
+
+        $this->info('Validating starter kit license...');
 
         if (! $this->kitLicenseKey && ! $this->siteLicenseKey) {
             return $this
                 ->error('Cannot find site license!')
-                ->comment('Go to [url] and register a site license,')
-                ->comment('Attach your starter kit license to your site,')
-                ->comment('Then re-run this command.');
+                ->comment('This is a paid starter kit. If you haven\'t already, you may purchase a license at:')
+                ->comment("https://statamic.com/starter-kits/{$this->package}");
         }
 
         if ($this->outpostValidatesKitLicense() || $this->outpostValidatesSiteLicense()) {
@@ -105,8 +109,26 @@ final class LicenseManager
 
         return $this
             ->error("Invalid license for [{$this->package}]!")
-            ->comment('Please can purchase a license at [url],')
-            ->comment('Then re-run this command.');
+            ->comment('If you haven\'t already, you may purchase a license at:')
+            ->comment("https://statamic.com/starter-kits/{$this->package}");
+    }
+
+    /**
+     * Get starter kit details from outpost.
+     *
+     * @return $this
+     */
+    private function outpostGetStarterKitDetails()
+    {
+        $response = Http::get(self::OUTPOST_ENDPOINT.$this->package);
+
+        if ($response->status() !== 200) {
+            return false;
+        }
+
+        $this->details = $response['data'];
+
+        return $this;
     }
 
     /**
@@ -116,13 +138,11 @@ final class LicenseManager
      */
     private function isFreeStarterKit()
     {
-        $response = Http::get(self::OUTPOST_ENDPOINT.$this->package);
-
-        if ($response->status() !== 200) {
-            return false;
+        if ($this->details === false) {
+            return true;
         }
 
-        return ! $response['data']['price'];
+        return ! $this->details['price'];
     }
 
     /**
@@ -188,13 +208,17 @@ final class LicenseManager
     }
 
     /**
-     * Set valid status to true.
+     * Set validated status to true.
      *
      * @return $this
      */
-    private function setValid()
+    private function setValid($outputMessage = true)
     {
         $this->valid = true;
+
+        if ($outputMessage) {
+            $this->info('Starter kit license valid!');
+        }
 
         return $this;
     }
