@@ -8,6 +8,7 @@ use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\StarterKits\Installer as StarterKitInstaller;
+use Statamic\StarterKits\LicenseManager as StarterKitLicenseManager;
 
 class StarterKitInstall extends Command
 {
@@ -20,6 +21,7 @@ class StarterKitInstall extends Command
      */
     protected $signature = 'statamic:starter-kit:install
         { package? : Specify the starter kit package to install }
+        { --license-key= : Provide explicit starter kit license key }
         { --with-config : Copy starter-kit.yaml config for development }
         { --without-dependencies : Install without dependencies }
         { --force : Force install and allow dependency errors }
@@ -45,18 +47,24 @@ class StarterKitInstall extends Command
             return;
         }
 
+        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license-key'), $this);
+
+        if (! $licenseManager->isValid()) {
+            return;
+        }
+
         if ($cleared = $this->shouldClear()) {
             $this->call('statamic:site:clear', ['--no-interaction' => true]);
         }
 
-        $installer = (new StarterKitInstaller)
+        $installer = StarterKitInstaller::package($package, $licenseManager, $this)
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
             ->withUser($cleared && $this->input->isInteractive())
             ->force($this->option('force'));
 
         try {
-            $installer->install($package, $this);
+            $installer->install();
         } catch (StarterKitException $exception) {
             $this->error($exception->getMessage());
 
