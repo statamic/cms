@@ -2,9 +2,9 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Console\RunsInPlease;
 use Archetype\Facades\PHPFile;
 use PhpParser\BuilderFactory;
+use Statamic\Console\RunsInPlease;
 
 class MakeModifier extends GeneratorCommand
 {
@@ -38,7 +38,7 @@ class MakeModifier extends GeneratorCommand
      */
     protected $stub = 'modifier.php.stub';
 
-        /**
+    /**
      * Execute the console command.
      *
      * @return bool|null
@@ -61,14 +61,14 @@ class MakeModifier extends GeneratorCommand
     {
         $factory = new BuilderFactory();
 
-        $modifierClassValue = $factory->classConstFetch('Modifiers\\' . $this->getNameInput(), 'class');
+        $modifierClassValue = $factory->classConstFetch('Modifiers\\'.$this->getNameInput(), 'class');
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
                     ->add()->protected()->property('modifiers', $modifierClassValue)
                     ->save();
 
-            $this->info("Modifier component registered in your Addon ServiceProvider.");
+            $this->info('Modifier component registered in your Addon ServiceProvider.');
         } catch (\Exception $e) {
             $this->info("Don't forget to register the Modifier class in your addon's ServiceProvider.php");
         }
