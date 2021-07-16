@@ -118,7 +118,11 @@ final class LicenseManager
     {
         $response = Http::get(self::OUTPOST_ENDPOINT.$this->package);
 
-        return $response->status() != 404 && ! $response['data']['price'];
+        if ($response->status() !== 200) {
+            return false;
+        }
+
+        return ! $response['data']['price'];
     }
 
     /**
@@ -137,11 +141,15 @@ final class LicenseManager
             'site_license' => $this->siteLicenseKey,
         ]);
 
+        if ($response->status() !== 200) {
+            return false;
+        }
+
         if (! $this->kitLicenseKey && $response['data']['kit_license']) {
             $this->kitLicenseKey = $response['data']['kit_license'];
         }
 
-        return $response->status() != 404 && $response['data']['valid'] === true;
+        return $response['data']['valid'] === true;
     }
 
     /**
@@ -160,7 +168,11 @@ final class LicenseManager
             'kit_license' => $this->kitLicenseKey,
         ]);
 
-        return $response->status() != 404 && $response['data']['valid'] === true;
+        if ($response->status() !== 200) {
+            return false;
+        }
+
+        return $response['data']['valid'] === true;
     }
 
     /**
