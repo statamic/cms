@@ -70,7 +70,7 @@ class StaticWarm extends Command
             ->merge($this->customRoutes())
             ->merge($this->entries())
             ->merge($this->terms())
-            ->merge($this->scopedTerms()) // TODO obsolete?
+            ->merge($this->scopedTerms()) // TODO Obsolete now that all terms have are saved as a file?
             ->unique()
             ->values();
     }
