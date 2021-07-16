@@ -55,7 +55,7 @@ class MakeTag extends GeneratorCommand
     }
 
     /**
-     * Update the Service Provider to register fieldtype components.
+     * Update the Service Provider to register the Tag component.
      */
     protected function updateServiceProvider()
     {
@@ -70,7 +70,7 @@ class MakeTag extends GeneratorCommand
 
             $this->info('Tag component registered in your Addon ServiceProvider.');
         } catch (\Exception $e) {
-            $this->info("Don't forget to register the tag class in your addon's ServiceProvider.php");
+            $this->info("Don't forget to register the Tag class in your addon's ServiceProvider.php");
         }
     }
 
