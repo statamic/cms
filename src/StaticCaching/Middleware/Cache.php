@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 
@@ -28,7 +29,12 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return response($this->cacher->getCachedPage($request))->header('X-Statamic-Cache', 'hit');
+            $response = response($this->cacher->getCachedPage($request));
+            if (config('statamic.static_caching.send_static_cache_header')) {
+                $response->header('X-Statamic-Static-Cache', 'hit');
+            }
+
+            return $response;
         }
 
         $response = $next($request);
@@ -37,7 +43,11 @@ class Cache
             $this->cacher->cachePage($request, $response);
         }
 
-        return $response->header('X-Statamic-Cache', 'miss');
+        if (config('statamic.static_caching.send_static_cache_header')) {
+            $response->header('X-Statamic-Static-Cache', 'miss');
+        }
+
+        return $response;
     }
 
     private function canBeCached($request)
@@ -48,6 +58,10 @@ class Cache
 
         if (Statamic::isCpRoute()) {
             return false;
+        }
+
+        if ($this->canBeBypassed()) {
+            return $this->shouldBeBypassed() ? false : true; // Flip (true/false)
         }
 
         return true;
@@ -71,6 +85,32 @@ class Cache
             return false;
         }
 
+        if ($this->canBeBypassed()) {
+            return $this->shouldBeBypassed() ? false : true; // Flip (true/false)
+        }
+
         return true;
+    }
+
+    private function canBeBypassed()
+    {
+        $bypass = $this->cacher->config('bypass');
+
+        return $bypass['logged_in'] ?? false || ! empty($bypass['roles']);
+    }
+
+    private function shouldBeBypassed()
+    {
+        $bypass = $this->cacher->config('bypass');
+
+        if (! Auth::guest()) {
+            if (is_array($bypass['roles']) && ! empty($bypass['roles'])) {
+                return Auth::user()->hasRole($bypass['roles']);
+            }
+
+            return $bypass['logged_in'] ?? false;
+        }
+
+        return false;
     }
 }

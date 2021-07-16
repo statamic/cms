@@ -16,6 +16,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Send the Static-Cache Header
+    |--------------------------------------------------------------------------
+    |
+    | Here you may enable the X-Statamic-Static-Cache HTTP response header.
+    | This may be useful for debugging.
+    |
+    | When enabled X-Statamic-Static-Cache will appear in the response headers
+    | with either 'hit' or 'miss' depending on if the content was served by
+    | the cache, where 'hit' means that it was and 'miss' means that it was not.
+    |
+    | This will work as expected with the half strategy, however when using the
+    | full strategy, misses will should still show up in the headers as expected,
+    | but because full cache hits aren't processed by Statamic then we won't be able to
+    | add the hit status to the X-Statamic-Static-Cache header.
+    */
+
+    'send_static_cache_header' => env('STATAMIC_STATIC_CACHING_HEADER', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Caching Strategies
     |--------------------------------------------------------------------------
     |
