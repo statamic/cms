@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\AbstractCacher;
 
 class Cache
 {
@@ -85,21 +86,27 @@ class Cache
 
     private function canBeBypassed()
     {
-        $bypass = $this->cacher->config('bypass');
+        if ($this->cacher instanceof AbstractCacher) {
+            $bypass = $this->cacher->config('bypass', []);
 
-        return $bypass['logged_in'] ?? false || ! empty($bypass['roles']);
+            return ! empty($bypass['roles']) || isset($bypass['logged_in']);
+        }
+
+        return false;
     }
 
     private function shouldBeBypassed()
     {
-        $bypass = $this->cacher->config('bypass');
+        if ($this->cacher instanceof AbstractCacher) {
+            $bypass = $this->cacher->config('bypass', []);
 
-        if (! Auth::guest()) {
-            if (is_array($bypass['roles']) && ! empty($bypass['roles'])) {
-                return Auth::user()->hasRole($bypass['roles']);
+            if (! Auth::guest()) {
+                if (is_array($bypass['roles']) && ! empty($bypass['roles'])) {
+                    return Auth::user()->hasRole($bypass['roles']);
+                }
+
+                return isset($bypass['logged_in']) ? $bypass['logged_in'] : false;
             }
-
-            return $bypass['logged_in'] ?? false;
         }
 
         return false;
