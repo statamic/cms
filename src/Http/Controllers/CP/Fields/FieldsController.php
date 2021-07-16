@@ -55,14 +55,13 @@ class FieldsController extends CpController
 
         $fields = $blueprint
             ->fields()
-            ->addValues($request->values)
-            ->process();
+            ->addValues($request->values);
 
         $fields->validate([], [
             'handle.not_in' => __('statamic::validation.reserved'),
         ]);
 
-        $values = array_merge($request->values, $fields->values()->all());
+        $values = array_merge($request->values, $fields->process()->values()->all());
 
         return $values;
     }
