@@ -116,8 +116,6 @@ class AssetRepository implements Contract
 
     public function save($asset)
     {
-        $asset->writeMeta($asset->generateMeta());
-
         $store = Stache::store('assets::'.$asset->containerHandle());
 
         $cache = $asset->container()->contents();
@@ -131,6 +129,8 @@ class AssetRepository implements Contract
         }
 
         $cache->save();
+
+        $asset->writeMeta($asset->generateMeta());
 
         $store->save($asset);
     }

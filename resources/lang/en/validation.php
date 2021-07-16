@@ -130,6 +130,7 @@ return [
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',
     'unique_uri' => 'This URI has already been taken.',
     'duplicate_uri' => 'Duplicate URI :value',
+    'reserved' => 'This is a reserved word.',
 
     /*
     |--------------------------------------------------------------------------

@@ -308,30 +308,9 @@
         flex-direction: column;
     }
 
-    .audio-wrapper,
-    .video-wrapper {
-        align-items: center;
-        display: flex;
-        height: 100%;
-        padding: 30px;
-        audio, video {
-            box-shadow: 0 0 30px rgba(black, .35);
-            text-align: center;
-            width: 100%;
-        }
-    }
-
     .image-wrapper {
-        flex: 1 1 auto;
-        position: relative;
-
-        img {
-			@apply absolute w-auto h-auto max-w-full max-h-full;
-			box-shadow: 0 0 32px rgba(0, 0, 0, .35);
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
+        @apply flex items-center justify-center max-w-full max-h-full h-full overflow-hidden;
+        > * { box-shadow: 0 0 32px rgba(0, 0, 0, .35); }
     }
 
     .editor-file-actions {

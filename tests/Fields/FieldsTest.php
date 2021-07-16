@@ -420,6 +420,7 @@ class FieldsTest extends TestCase
                 'prepend' => null,
                 'append' => null,
                 'antlers' => false,
+                'default' => null,
             ],
             [
                 'handle' => 'two',
@@ -433,6 +434,7 @@ class FieldsTest extends TestCase
                 'component' => 'textarea',
                 'antlers' => false,
                 'placeholder' => null,
+                'default' => null,
             ],
         ], $fields->toPublishArray());
     }
@@ -487,6 +489,7 @@ class FieldsTest extends TestCase
                 'instructions' => null,
                 'required' => false,
                 'antlers' => false,
+                'default' => null,
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -502,6 +505,7 @@ class FieldsTest extends TestCase
                 'instructions' => null,
                 'required' => false,
                 'antlers' => false,
+                'default' => null,
             ],
         ], $fields->toPublishArray());
     }
@@ -738,6 +742,7 @@ class FieldsTest extends TestCase
         Validator::shouldReceive('make')->once()->andReturnSelf();
         Validator::shouldReceive('fields')->once()->andReturnSelf();
         Validator::shouldReceive('withRules')->with([])->once()->andReturnSelf();
+        Validator::shouldReceive('withMessages')->with([])->once()->andReturnSelf();
         Validator::shouldReceive('validate')->once();
 
         $fields->validate();
@@ -750,6 +755,7 @@ class FieldsTest extends TestCase
         Validator::shouldReceive('make')->once()->andReturnSelf();
         Validator::shouldReceive('fields')->once()->andReturnSelf();
         Validator::shouldReceive('withRules')->with(['foo' => 'bar'])->once()->andReturnSelf();
+        Validator::shouldReceive('withMessages')->with([])->once()->andReturnSelf();
         Validator::shouldReceive('validate')->once();
 
         $fields->validate(['foo' => 'bar']);

@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Request as RequestFacade;
 use Statamic\StaticCaching\Cacher;
 use Statamic\Support\Str;
 
@@ -48,7 +49,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function getBaseUrl()
     {
-        return $this->config('base_url');
+        return $this->config('base_url') ?? RequestFacade::root();
     }
 
     /**
