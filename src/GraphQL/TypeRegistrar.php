@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL;
 
 use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Types\ArrayType;
 use Statamic\GraphQL\Types\AssetContainerType;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\GraphQL\Types\CollectionStructureType;
@@ -33,6 +34,7 @@ class TypeRegistrar
             return;
         }
 
+        GraphQL::addType(ArrayType::class);
         GraphQL::addType(JsonArgument::class);
         GraphQL::addType(DateRangeType::class);
         GraphQL::addType(SiteType::class);

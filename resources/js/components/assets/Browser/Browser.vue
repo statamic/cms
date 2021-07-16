@@ -214,7 +214,9 @@
                         <data-list-pagination
                             class="mt-3"
                             :resource-meta="meta"
+                            :per-page="perPage"
                             @page-selected="page = $event"
+                            @per-page-changed="changePerPage"
                         />
 
                     </div>
@@ -248,10 +250,17 @@ import AssetEditor from '../Editor/Editor.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import FolderCreator from '../Folder/Create.vue';
 import FolderEditor from '../Folder/Edit.vue';
+import HasPagination from '../../data-list/HasPagination';
+import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 
 export default {
+
+    mixins: [
+        HasPagination,
+        HasPreferences,
+    ],
 
     components: {
         AssetThumbnail,
@@ -297,7 +306,7 @@ export default {
             creatingFolder: false,
             uploads: [],
             page: 1,
-            perPage: 30, // TODO: Should come from the controller, or a config.
+            preferencesPrefix: null,
             meta: {},
             sortColumn: 'basename',
             sortDirection: 'asc',
@@ -400,7 +409,10 @@ export default {
             this.container = this.initialContainer;
         },
 
-        container() {
+        container(container) {
+            this.preferencesPrefix = `assets.${container.id}`;
+            this.mode = this.getPreference('mode') || 'table';
+            this.setInitialPerPage();
             this.loadAssets();
         },
 
@@ -445,7 +457,6 @@ export default {
             this.$axios.get(cp_url('asset-containers')).then(response => {
                 this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
-                this.mode = this.$preferences.get(`assets.${this.container.id}.mode`, this.mode);
             });
         },
 
@@ -498,7 +509,7 @@ export default {
 
         setMode(mode) {
             this.mode = mode;
-            this.$preferences.set(`assets.${this.container.id}.mode`, mode);
+            this.setPreference('mode', mode == 'table' ? null : mode);
         },
 
         edit(id) {

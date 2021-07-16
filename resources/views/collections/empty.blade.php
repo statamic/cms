@@ -47,7 +47,7 @@
                 @cp_svg('crane')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-                <h3 class="mb-1 text-blue">{{ __('Scaffold Resources') }} &rarr;</h3>
+                <h3 class="mb-1 text-blue">{{ __('Scaffold Views') }} &rarr;</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
             </div>
         </a>

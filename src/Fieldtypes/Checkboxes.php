@@ -27,6 +27,12 @@ class Checkboxes extends Fieldtype
                 'key_header' => __('Key (Value)'),
                 'value_header' => __('Label'),
             ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
+            ],
         ];
     }
 

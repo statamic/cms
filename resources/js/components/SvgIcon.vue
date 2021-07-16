@@ -1,35 +1,22 @@
-<template>
-
-    <div :class="[ 'svg-icon', { 'using-div': type === 'div', 'using-svg': type === 'svg' } ]"
-        v-html="html"></div>
-
-</template>
-
-
 <script>
 export default {
-
     props: {
         name: String,
-        type: {
-            type: String,
-            default() {
-                return 'svg';
-            }
+        inline: {
+            type: Boolean,
+            default: true
         }
     },
+    render(createElement) {
+        const compiledTemplate = Vue.compile(this.getInlineIcon());
 
-    computed: {
-
-        html() {
-            if (this.type === 'div') {
-                return `<div style="background-image: url('${resource_url('svg/'+this.name+'.svg')}')"></div>`;
-            }
-
+        return compiledTemplate.render.call(this, createElement);
+    },
+    methods: {
+        getInlineIcon() {
             return require(`!!html-loader!./../../svg/${this.name}.svg`);
+
         }
-
     }
-
 }
 </script>
