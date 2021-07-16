@@ -22,7 +22,8 @@ class UpdateNavigationTreeTest extends TestCase
     private function mockTextFieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('text')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function process($value)
                 {
                     if (! $value) {
