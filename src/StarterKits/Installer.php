@@ -482,7 +482,7 @@ final class Installer
      */
     protected function expireLicense()
     {
-        if ($this->licenseManager->hasKitLicenseKey()) {
+        if ($this->licenseManager->hasValidKitLicenseKey()) {
             $this->licenseManager->expireLicense();
         }
 
