@@ -2,9 +2,9 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Console\RunsInPlease;
 use Archetype\Facades\PHPFile;
 use PhpParser\BuilderFactory;
+use Statamic\Console\RunsInPlease;
 
 class MakeTag extends GeneratorCommand
 {
@@ -61,19 +61,18 @@ class MakeTag extends GeneratorCommand
     {
         $factory = new BuilderFactory();
 
-        $tagsClassValue = $factory->classConstFetch('Tags\\' . $this->getNameInput(), 'class');
+        $tagsClassValue = $factory->classConstFetch('Tags\\'.$this->getNameInput(), 'class');
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
                     ->add()->protected()->property('tags', $tagsClassValue)
                     ->save();
 
-            $this->info("Tag component registered in your Addon ServiceProvider.");
+            $this->info('Tag component registered in your Addon ServiceProvider.');
         } catch (\Exception $e) {
             $this->info("Don't forget to register the tag class in your addon's ServiceProvider.php");
         }
     }
-
 
     /**
      * Build the class with the given name.

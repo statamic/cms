@@ -2,15 +2,12 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Console\RunsInPlease;
-use Symfony\Component\Console\Input\InputOption;
 use Archetype\Facades\PHPFile;
-use PhpParser\PrettyPrinter;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\Scalar\MagicConst\Dir;
-use PhpParser\Node\Scalar\MagicConst\Class_;
 use PhpParser\Node\Scalar\String_;
-
+use Statamic\Console\RunsInPlease;
+use Symfony\Component\Console\Input\InputOption;
 
 class MakeFieldtype extends GeneratorCommand
 {
@@ -147,7 +144,7 @@ class MakeFieldtype extends GeneratorCommand
             new String_('/../dist/js/addon.js')
         );
 
-        $fieldtypeClassValue = $factory->classConstFetch('Fieldtypes\\' . $this->getNameInput(), 'class');
+        $fieldtypeClassValue = $factory->classConstFetch('Fieldtypes\\'.$this->getNameInput(), 'class');
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
@@ -155,7 +152,7 @@ class MakeFieldtype extends GeneratorCommand
                     ->add()->protected()->property('fieldtypes', $fieldtypeClassValue)
                     ->save();
 
-            $this->info("Fieldtype components registered in your Addon ServiceProvider.");
+            $this->info('Fieldtype components registered in your Addon ServiceProvider.');
         } catch (\Exception $e) {
             $this->info("Don't forget to register the Fieldtype class and scripts in your ServiceProvider.php");
         }

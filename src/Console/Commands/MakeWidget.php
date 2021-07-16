@@ -2,9 +2,10 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Console\RunsInPlease;
 use Archetype\Facades\PHPFile;
 use PhpParser\BuilderFactory;
+use Statamic\Console\RunsInPlease;
+
 class MakeWidget extends GeneratorCommand
 {
     use RunsInPlease;
@@ -56,7 +57,7 @@ class MakeWidget extends GeneratorCommand
     }
 
     /**
-     * Generate the widget view file
+     * Generate the widget view file.
      *
      * @param string $addon
      */
@@ -85,19 +86,18 @@ class MakeWidget extends GeneratorCommand
     {
         $factory = new BuilderFactory();
 
-        $widgetClassValue = $factory->classConstFetch('Widgets\\' . $this->getNameInput(), 'class');
+        $widgetClassValue = $factory->classConstFetch('Widgets\\'.$this->getNameInput(), 'class');
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
                     ->add()->protected()->property('widgets', $widgetClassValue)
                     ->save();
 
-            $this->info("Widget component registered in your Addon ServiceProvider.");
+            $this->info('Widget component registered in your Addon ServiceProvider.');
         } catch (\Exception $e) {
             $this->info("Don't forget to register the Widget class in your addon's ServiceProvider.php");
         }
     }
-
 
     /**
      * Build the class with the given name.
