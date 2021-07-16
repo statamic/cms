@@ -28,7 +28,7 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return response($this->cacher->getCachedPage($request));
+            return response($this->cacher->getCachedPage($request))->header('X-Statamic-Cache', 'hit');
         }
 
         $response = $next($request);
@@ -37,7 +37,7 @@ class Cache
             $this->cacher->cachePage($request, $response);
         }
 
-        return $response;
+        return $response->header('X-Statamic-Cache', 'miss');
     }
 
     private function canBeCached($request)
