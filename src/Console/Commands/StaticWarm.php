@@ -80,11 +80,11 @@ class StaticWarm extends Command
         // TODO test
         return collect(app('router')->getRoutes()->getRoutes())
             ->filter(function ($route) {
-                return $route->getActionName() === FrontendController::class . '@route'
+                return $route->getActionName() === FrontendController::class.'@route'
                     && !Str::contains($route->uri(), '{');
             })
             ->map(function (Route $route) {
-                return URL::tidy(Str::start($route->uri(), config('app.url') . '/'));
+                return URL::tidy(Str::start($route->uri(), config('app.url').'/'));
             });
     }
 
