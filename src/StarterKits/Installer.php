@@ -5,29 +5,52 @@ namespace Statamic\StarterKits;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use Statamic\Console\NullConsole;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
 
-class Installer
+final class Installer
 {
+    protected $package;
+    protected $licenseManager;
     protected $files;
     protected $withConfig;
     protected $withoutDependencies;
     protected $withUser;
     protected $force;
-    protected $package;
     protected $console;
     protected $url;
 
     /**
      * Instantiate starter kit installer.
+     *
+     * @param string $package
+     * @param LicenseManager $licenseManager
+     * @param mixed $console
      */
-    public function __construct()
+    public function __construct(string $package, LicenseManager $licenseManager, $console = null)
     {
+        $this->package = $package;
+        $this->licenseManager = $licenseManager;
+        $this->console = $console ?? new Nullconsole;
+
         $this->files = app(Filesystem::class);
+    }
+
+    /**
+     * Instantiate starter kit installer.
+     *
+     * @param string $package
+     * @param LicenseManager $licenseManager
+     * @param mixed $console
+     * @return static
+     */
+    public static function package(string $package, LicenseManager $licenseManager, $console = null)
+    {
+        return new static($package, $licenseManager, $console);
     }
 
     /**
@@ -85,17 +108,12 @@ class Installer
     /**
      * Install starter kit.
      *
-     * @param string $package
-     * @param mixed $console
      * @throws StarterKitException
      */
-    public function install($package, $console = null)
+    public function install()
     {
-        $this->package = $package;
-        $this->console = $console;
-
         $this
-            // ->checkLicense()
+            ->validateLicense()
             ->backupComposerJson()
             ->detectRepositoryUrl()
             ->prepareRepository()
@@ -109,7 +127,22 @@ class Installer
             ->reticulateSplines()
             ->removeStarterKit()
             ->removeRepository()
-            ->removeComposerJsonBackup();
+            ->removeComposerJsonBackup()
+            ->expireLicense();
+    }
+
+    /**
+     * Check with license manager to determine whether or not to continue with installation.
+     *
+     * @return $this
+     */
+    protected function validateLicense()
+    {
+        if (! $this->licenseManager->isValid()) {
+            throw new StarterKitException;
+        }
+
+        return $this;
     }
 
     /**
@@ -438,6 +471,20 @@ class Installer
     protected function removeComposerJsonBackup()
     {
         $this->files->delete(base_path('composer.json.bak'));
+
+        return $this;
+    }
+
+    /**
+     * Expire starter kit license on successful installation.
+     *
+     * @return $this
+     */
+    protected function expireLicense()
+    {
+        if ($this->licenseManager->hasKitLicenseKey()) {
+            $this->licenseManager->expireLicense();
+        }
 
         return $this;
     }
