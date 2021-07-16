@@ -13,11 +13,10 @@ use Illuminate\Support\Collection;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
-use Statamic\Entries\Entry as Entry;
+use Statamic\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
-use Statamic\Support\Str;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
@@ -67,25 +66,12 @@ class StaticWarm extends Command
     private function uris(): Collection
     {
         return collect()
-            ->merge($this->customRoutes())
             ->merge($this->entries())
             ->merge($this->terms())
-            ->merge($this->scopedTerms()) // TODO Obsolete now that all terms have are saved as a file?
+            ->merge($this->scopedTerms())
+            ->merge($this->customRoutes())
             ->unique()
             ->values();
-    }
-
-    protected function customRoutes(): Collection
-    {
-        // TODO test
-        return collect(app('router')->getRoutes()->getRoutes())
-            ->filter(function ($route) {
-                return $route->getActionName() === FrontendController::class.'@route'
-                    && ! Str::contains($route->uri(), '{');
-            })
-            ->map(function (Route $route) {
-                return URL::tidy(Str::start($route->uri(), config('app.url').'/'));
-            });
     }
 
     protected function entries(): Collection
@@ -106,7 +92,6 @@ class StaticWarm extends Command
             ->map->absoluteUrl();
     }
 
-    // TODO Obsolete?
     protected function scopedTerms(): Collection
     {
         return Facades\Collection::all()
@@ -116,7 +101,6 @@ class StaticWarm extends Command
             ->map->absoluteUrl();
     }
 
-    // TODO Obsolete?
     protected function getCollectionTerms($collection)
     {
         return $collection->taxonomies()
@@ -124,5 +108,18 @@ class StaticWarm extends Command
                 return $taxonomy->queryTerms()->get();
             })
             ->map->collection($collection);
+    }
+
+    protected function customRoutes(): Collection
+    {
+        $action = FrontendController::class.'@route';
+
+        return collect(app('router')->getRoutes()->getRoutes())
+            ->filter(function (Route $route) use ($action) {
+                return $route->getActionName() === $action && ! $route->hasParameters();
+            })
+            ->map(function (Route $route) {
+                return URL::makeAbsolute($route->uri());
+            });
     }
 }
