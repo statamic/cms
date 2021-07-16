@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.1.29 (2021-07-16)
+
+### What's fixed
+- Fix validation on blueprint editor. [#4015](https://github.com/statamic/cms/issues/4015)
+
+
+
 ## 3.1.28 (2021-07-15)
 
 ### What's new
