@@ -10,7 +10,7 @@
     "license": "proprietary",
     "require": {
         "ext-json": "*",
-        "ajthinking/archetype": "^0.2.4",
+        "ajthinking/archetype": "^0.2.5",
         "composer/composer": "^1.10.22 || ^2.0.13",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
@@ -20,7 +20,6 @@
         "league/csv": "^9.0",
         "league/glide": "^1.1",
         "michelf/php-smartypants": "^1.8",
-        "nikic/php-parser": "^4.11",
         "pixelfear/composer-dist-plugin": "^0.1.4",
         "rebing/graphql-laravel": "^6.5",
         "spatie/blink": "^1.1.2",
