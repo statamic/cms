@@ -31,12 +31,24 @@ return [
         'half' => [
             'driver' => 'application',
             'expiry' => null,
+            'bypass' => [
+                'logged_in' => false,
+                'roles' => [
+                    //
+                ],
+            ],
         ],
 
         'full' => [
             'driver' => 'file',
             'path' => public_path('static'),
             'lock_hold_length' => 0,
+            'bypass' => [
+                'logged_in' => false,
+                'roles' => [
+                    //
+                ],
+            ],
         ],
 
     ],
