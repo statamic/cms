@@ -3,7 +3,8 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
-
+use Archetype\Facades\PHPFile;
+use PhpParser\BuilderFactory;
 class MakeScope extends GeneratorCommand
 {
     use RunsInPlease;
@@ -35,4 +36,40 @@ class MakeScope extends GeneratorCommand
      * @var string
      */
     protected $stub = 'scope.php.stub';
+
+    /**
+     * Execute the console command.
+     *
+     * @return bool|null
+     */
+    public function handle()
+    {
+        if (parent::handle() === false) {
+            return false;
+        }
+
+        if ($this->argument('addon')) {
+            $this->updateServiceProvider();
+        }
+    }
+
+    /**
+     * Update the Service Provider to register the scope component.
+     */
+    protected function updateServiceProvider()
+    {
+        $factory = new BuilderFactory();
+
+        $scopeClassValue = $factory->classConstFetch('Scopes\\' . $this->getNameInput(), 'class');
+
+        try {
+            PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
+                    ->add()->protected()->property('scopes', $scopeClassValue)
+                    ->save();
+
+            $this->info("Scope component registered in your Addon ServiceProvider.");
+        } catch (\Exception $e) {
+            $this->info("Don't forget to register the Scope class in your addon's ServiceProvider.php");
+        }
+    }
 }

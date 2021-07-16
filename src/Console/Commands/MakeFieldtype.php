@@ -4,6 +4,13 @@ namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
 use Symfony\Component\Console\Input\InputOption;
+use Archetype\Facades\PHPFile;
+use PhpParser\PrettyPrinter;
+use PhpParser\BuilderFactory;
+use PhpParser\Node\Scalar\MagicConst\Dir;
+use PhpParser\Node\Scalar\MagicConst\Class_;
+use PhpParser\Node\Scalar\String_;
+
 
 class MakeFieldtype extends GeneratorCommand
 {
@@ -51,10 +58,14 @@ class MakeFieldtype extends GeneratorCommand
         if (! $this->option('php')) {
             $this->generateVueComponent();
         }
+
+        if (! $this->option('php') && $this->argument('addon') && 'make sure we are making this the first time') {
+            $this->updateServiceProvider();
+        }
     }
 
     /**
-     * Generate vue component.
+     * Generate Vue component.
      */
     protected function generateVueComponent()
     {
@@ -121,6 +132,32 @@ class MakeFieldtype extends GeneratorCommand
             $path = $addonPath.'/'.$file;
             $this->createFromStub($stub, $path, $data);
             $this->line($path);
+        }
+    }
+
+    /**
+     * Update the Service Provider to register fieldtype components.
+     */
+    protected function updateServiceProvider()
+    {
+        $factory = new BuilderFactory();
+
+        $scriptsValue = $factory->concat(
+            new Dir,
+            new String_('/../dist/js/addon.js')
+        );
+
+        $fieldtypeClassValue = $factory->classConstFetch('Fieldtypes\\' . $this->getNameInput(), 'class');
+
+        try {
+            PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
+                    ->add()->protected()->property('scripts', $scriptsValue)
+                    ->add()->protected()->property('fieldtypes', $fieldtypeClassValue)
+                    ->save();
+
+            $this->info("Fieldtype components registered in your Addon ServiceProvider.");
+        } catch (\Exception $e) {
+            $this->info("Don't forget to register the Fieldtype class and scripts in your ServiceProvider.php");
         }
     }
 
