@@ -50,6 +50,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         return [
             \Statamic\Providers\StatamicServiceProvider::class,
             \Rebing\GraphQL\GraphQLServiceProvider::class,
+            \Archetype\ServiceProvider::class,
         ];
     }
 
