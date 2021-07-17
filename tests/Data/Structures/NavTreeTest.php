@@ -2,9 +2,12 @@
 
 namespace Tests\Data\Structures;
 
+use Facades\Statamic\Structures\BranchIds;
 use Statamic\Facades\Blink;
+use Statamic\Facades\File;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
 use Statamic\Structures\NavTree;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -15,12 +18,14 @@ class NavTreeTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use UnlinksPaths;
 
+    private $directory;
+
     public function setUp(): void
     {
         parent::setUp();
 
         $stache = $this->app->make('stache');
-        $stache->store('nav-trees')->directory($this->directory = '/path/to/structures/navigation');
+        $stache->store('nav-trees')->directory($this->directory = $this->fakeStacheDirectory.$this->directory.'');
     }
 
     /** @test */
@@ -55,7 +60,7 @@ class NavTreeTest extends TestCase
     public function it_gets_the_path()
     {
         $tree = Nav::make('links')->makeTree('en');
-        $this->assertEquals('/path/to/structures/navigation/links.yaml', $tree->path());
+        $this->assertEquals($this->directory.'/links.yaml', $tree->path());
     }
 
     /** @test */
@@ -66,6 +71,46 @@ class NavTreeTest extends TestCase
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
         ]]);
         $tree = Nav::make('links')->makeTree('en');
-        $this->assertEquals('/path/to/structures/navigation/en/links.yaml', $tree->path());
+        $this->assertEquals($this->directory.'/en/links.yaml', $tree->path());
+    }
+
+    /** @test */
+    public function it_can_ensure_ids_have_been_generated()
+    {
+        BranchIds::shouldReceive('ensure')
+            ->with($existingTree = [['title' => 'Branch']])
+            ->andReturn($updatedTree = [['id' => 'the-id', 'title' => 'Branch']])
+            ->once();
+
+        $nav = tap(Nav::make('links'))->save();
+        $tree = tap($nav->makeTree('en', $existingTree))->save();
+
+        $this->assertEquals(['tree' => $existingTree], YAML::file($tree->path())->parse());
+
+        $return = $tree->ensureBranchIds();
+
+        $this->assertEquals($tree, $return);
+        $this->assertEquals($updatedTree, $tree->tree());
+        $this->assertEquals(['tree' => $updatedTree], YAML::file($tree->path())->parse());
+    }
+
+    /** @test */
+    public function it_doesnt_save_tree_when_ensuring_ids_if_nothing_changed()
+    {
+        BranchIds::shouldReceive('ensure')
+            ->with($existingTree = [['id' => 'the-id', 'title' => 'Branch']])
+            ->andReturn($existingTree)
+            ->once();
+
+        $nav = tap(Nav::make('links'))->save();
+        $tree = tap($nav->makeTree('en', $existingTree))->save();
+
+        File::put($tree->path(), $existingFileContents = 'different contents to show that it doesnt re-save');
+
+        $return = $tree->ensureBranchIds();
+
+        $this->assertEquals($tree, $return);
+        $this->assertEquals($existingTree, $tree->tree());
+        $this->assertEquals($existingFileContents, File::get($tree->path()));
     }
 }

@@ -115,6 +115,7 @@ return [
     'licensing_utility_description' => 'Oglejte si in razrešite podrobnosti o licenciranju.',
     'max_depth_instructions' => 'Nastavite lahko največje število ravni. Pustite prazno brez omejitev.',
     'max_items_instructions' => 'Nastavite največje število izbirnih elementov.',
+    'navigation_configure_blueprint_instructions' => 'Izberite med obstoječimi načrti ali ustvarite novega.',
     'navigation_configure_collections_instructions' => 'Omogoči povezavo do vnosov v teh zbirkah.',
     'navigation_configure_handle_instructions' => 'Uporablja se za sklicevanje na to navigacijo na čelni strani. Pozneje se spreminjati ni trivialno.',
     'navigation_configure_intro' => 'Navigacije so večstopenjski seznami povezav, ki jih je mogoče uporabiti za izdelavo navbarov, nogic, zemljevidov mest in drugih oblik čelne navigacije.',

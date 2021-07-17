@@ -25,49 +25,48 @@ class PagesTest extends TestCase
     public function it_gets_a_list_of_pages()
     {
         $parent = Mockery::mock(Page::class);
-        $parent->shouldReceive('reference')->andReturn('the-root');
-        $parent->shouldReceive('flattenedPages')->andReturn(collect());
-        $parent->shouldReceive('uri')->andReturn('/root');
+        $parent->shouldReceive('id')->andReturn('the-root');
 
         $pages = (new Pages)
+            ->setTree($this->newTree())
             ->setParent($parent)
             ->setPages([
-                ['entry' => 'one', 'children' => [
-                    ['entry' => 'one-one'],
-                    ['entry' => 'one-two', 'children' => [
-                        ['entry' => 'one-two-one'],
+                ['id' => 'one', 'data' => ['foo' => 'bar'], 'children' => [
+                    ['id' => 'one-one'],
+                    ['id' => 'one-two', 'children' => [
+                        ['id' => 'one-two-one'],
                     ]],
                 ]],
-                ['entry' => 'two'],
+                ['id' => 'two'],
             ]);
 
         $list = $pages->all();
         $this->assertInstanceOf(Collection::class, $list);
         $this->assertCount(3, $list);
         $this->assertEveryItemIsInstanceOf(Page::class, $list);
-        $this->assertEquals(['the-root', 'one', 'two'], $list->map->reference()->all());
+        $this->assertEquals(['the-root', 'one', 'two'], $list->map->id()->all());
+        $this->assertEquals(['foo' => 'bar'], $list[1]->pageData()->all());
     }
 
     /** @test */
     public function it_gets_flattened_pages()
     {
         $parent = Mockery::mock(Page::class);
-        $parent->shouldReceive('reference')->andReturn('the-root');
         $parent->shouldReceive('flattenedPages')->andReturn(collect());
-        $parent->shouldReceive('uri')->andReturn('/root');
+        $parent->shouldReceive('id')->andReturn('the-root');
 
         $pages = (new Pages)
             ->setTree($this->newTree())
             ->setParent($parent)
             ->setRoute('{parent_uri}/{slug}')
             ->setPages([
-                ['entry' => 'one', 'children' => [
-                    ['entry' => 'one-one'],
-                    ['entry' => 'one-two', 'children' => [
-                        ['entry' => 'one-two-one'],
+                ['id' => 'one', 'children' => [
+                    ['id' => 'one-one'],
+                    ['id' => 'one-two', 'children' => [
+                        ['id' => 'one-two-one'],
                     ]],
                 ]],
-                ['entry' => 'two'],
+                ['id' => 'two'],
             ]);
 
         $this->assertEquals([
@@ -77,7 +76,7 @@ class PagesTest extends TestCase
             'one-two',
             'one-two-one',
             'two',
-        ], $pages->flattenedPages()->map->reference()->all());
+        ], $pages->flattenedPages()->map->id()->all());
     }
 
     protected function newTree()

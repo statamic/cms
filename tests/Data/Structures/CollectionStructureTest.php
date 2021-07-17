@@ -344,18 +344,4 @@ class CollectionStructureTest extends StructureTestCase
 
         $this->assertTrue($structure->save());
     }
-
-    /** @test **/
-    public function the_root_doesnt_need_to_be_an_entry_if_the_tree_is_empty()
-    {
-        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
-        parent::the_root_doesnt_need_to_be_an_entry_if_the_tree_is_empty();
-    }
-
-    /** @test **/
-    public function the_root_doesnt_need_to_be_an_entry_when_not_expecting_root()
-    {
-        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
-        parent::the_root_doesnt_need_to_be_an_entry_when_not_expecting_root();
-    }
 }

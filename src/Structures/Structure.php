@@ -86,10 +86,6 @@ abstract class Structure implements StructureContract
             return $tree;
         }
 
-        if (! empty($tree) && ! isset($tree[0]['entry'])) {
-            throw new \Exception('Root page must be an entry');
-        }
-
         throw_if(isset($tree[0]['children']), new \Exception('Root page cannot have children'));
 
         return $tree;

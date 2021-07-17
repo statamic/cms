@@ -61,4 +61,9 @@ class CollectionTree extends Tree
     {
         return app(CollectionTreeRepository::class);
     }
+
+    public function idKey()
+    {
+        return 'entry';
+    }
 }

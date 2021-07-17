@@ -5,9 +5,11 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Structures\Nav as Contract;
 use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Events\NavBlueprintFound;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -103,5 +105,15 @@ class Nav extends Structure implements Contract
     public function existsIn($site)
     {
         return $this->trees()->has($site);
+    }
+
+    public function blueprint()
+    {
+        $blueprint = Blueprint::find('navigation.'.$this->handle())
+            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('navigation');
+
+        NavBlueprintFound::dispatch($blueprint, $this);
+
+        return $blueprint;
     }
 }

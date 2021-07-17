@@ -115,6 +115,7 @@ return [
     'licensing_utility_description' => 'Visualizza e risolvi i dettagli della licenza.',
     'max_depth_instructions' => 'Imposta il numero massimo di livelli di profondità di una pagina. Lascia vuoto per nessun limite.',
     'max_items_instructions' => 'Imposta il numero massimo di voci selezionabili.',
+    'navigation_configure_blueprint_instructions' => 'Scegli tra i progetti esistenti o creane uno nuovo.',
     'navigation_configure_collections_instructions' => 'Abilita il collegamento alle voci in queste raccolte.',
     'navigation_configure_handle_instructions' => 'Utilizzato come riferimento a questo menu sul frontend. Non è semplice modificarlo successivamente.',
     'navigation_configure_intro' => 'I menu sono elenchi multi-livello di collegamenti che possono essere utilizzati per creare barre di navigazione, footer, sitemap e così via.',

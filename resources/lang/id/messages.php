@@ -115,6 +115,7 @@ return [
     'licensing_utility_description' => 'Lihat dan selesaikan detail lisensi.',
     'max_depth_instructions' => 'Tetapkan jumlah maksimum halaman level yang dapat disarangkan. Biarkan kosong untuk tidak ada batas.',
     'max_items_instructions' => 'Tetapkan jumlah maksimum item yang dapat dipilih.',
+    'navigation_configure_blueprint_instructions' => 'Pilih dari Cetak Biru yang ada atau buat yang baru.',
     'navigation_configure_collections_instructions' => 'Aktifkan penautan ke entri dalam koleksi ini.',
     'navigation_configure_handle_instructions' => 'Digunakan untuk mereferensikan navigasi ini di frontend. Tidak sepele untuk berubah nanti.',
     'navigation_configure_intro' => 'Navigasi adalah daftar tautan multi-level yang dapat digunakan untuk membuat bilah navigasi, footer, peta situs, dan bentuk navigasi frontend lainnya..',

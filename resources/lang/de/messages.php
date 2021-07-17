@@ -118,6 +118,7 @@ return [
     'licensing_utility_description' => 'Lizenzdetails anzeigen und auflösen.',
     'max_depth_instructions' => 'Maximale Anzahl von Ebenen festlegen, in denen Seiten verschachtelt werden dürfen. Für eine unbegrenzte Tiefe leer lassen.',
     'max_items_instructions' => 'Maximale Anzahl auswählbarer Einträge festlegen.',
+    'navigation_configure_blueprint_instructions' => 'Wähle aus vorhandenen Blueprints oder erstelle einen Neuen.',
     'navigation_configure_collections_instructions' => 'Aus diesen Sammlungen können Einträge verknüpft werden.',
     'navigation_configure_handle_instructions' => 'Verweist im Frontend auf diese Navigation. Es ist nicht unproblematisch, dies nachträglich zu ändern.',
     'navigation_configure_intro' => 'Navigationen sind mehrstufige Linklisten, mit denen Navbars, Footers, Sitemaps und andere Formen der Frontend-Navigation erstellt werden können.',

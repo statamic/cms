@@ -24,6 +24,11 @@ abstract class Tree implements Contract, Localization
     protected $uriCacheEnabled = true;
     protected $syncOriginalProperties = ['tree'];
 
+    public function idKey()
+    {
+        return 'id';
+    }
+
     public function locale($locale = null)
     {
         return $this->fluentlyGetOrSet('locale')->args(func_get_args());
@@ -55,11 +60,7 @@ abstract class Tree implements Contract, Localization
             return null;
         }
 
-        if (! $root = $this->tree()[0] ?? null) {
-            return null;
-        }
-
-        return $root['entry'];
+        return $this->tree()[0] ?? null;
     }
 
     public function handle($handle = null)
@@ -78,9 +79,14 @@ abstract class Tree implements Contract, Localization
             return null;
         }
 
+        $branch = $this->root();
+
         return (new Page)
             ->setTree($this)
-            ->setEntry($this->root())
+            ->setId($branch[$this->idKey()] ?? null)
+            ->setEntry($branch['entry'] ?? null)
+            ->setUrl($branch['url'] ?? null)
+            ->setTitle($branch['title'] ?? null)
             ->setRoute($this->route())
             ->setDepth(1)
             ->setRoot(true);
@@ -133,7 +139,22 @@ abstract class Tree implements Contract, Localization
         return $this->uriCacheEnabled;
     }
 
-    public function page(string $id): ?Page
+    /**
+     * @deprecated  Use find() instead.
+     */
+    public function page($id): ?Page
+    {
+        return $this->find($id);
+    }
+
+    public function find($id): ?Page
+    {
+        return $this->flattenedPages()
+            ->keyBy->id()
+            ->get($id);
+    }
+
+    public function findByEntry($id)
     {
         return $this->flattenedPages()
             ->filter->reference()
@@ -228,9 +249,9 @@ abstract class Tree implements Contract, Localization
         }
 
         if (is_string($page)) {
-            $page = ['entry' => $page];
+            $page = [$this->idKey() => $page];
         } elseif (is_object($page)) {
-            $page = ['entry' => $page->id()];
+            $page = [$this->idKey() => $page->id()];
         }
 
         if ($parent) {
@@ -247,7 +268,7 @@ abstract class Tree implements Contract, Localization
         foreach ($branches as &$branch) {
             $children = $branch['children'] ?? [];
 
-            if ($branch['entry'] === $parent) {
+            if ($branch[$this->idKey()] === $parent) {
                 $children[] = $page;
                 $branch['children'] = $children;
                 break;
@@ -271,7 +292,7 @@ abstract class Tree implements Contract, Localization
             return $this;
         }
 
-        if ($this->structure()->expectsRoot() && Arr::get($this->tree, '0.entry') === $target) {
+        if ($this->structure()->expectsRoot() && Arr::get($this->tree, '0.id') === $target) {
             throw new \Exception('Root page cannot have children');
         }
 
@@ -298,7 +319,7 @@ abstract class Tree implements Contract, Localization
         $match = null;
 
         foreach ($branches as $key => &$branch) {
-            if ($branch['entry'] === $entry) {
+            if ($branch[$this->idKey()] === $entry) {
                 $match = $branch;
                 unset($branches[$key]);
                 break;

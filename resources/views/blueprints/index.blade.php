@@ -73,6 +73,26 @@
         @endif
     @endforeach
 
+    @foreach (Statamic\Facades\Nav::all() as $nav)
+        @if ($loop->first)
+        <h3 class="little-heading pl-0 mb-1">{{ __('Navigation') }}</h3>
+        <div class="card p-0 mb-2">
+            <table class="data-table">
+        @endif
+                <tr>
+                    <td>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 mr-2">@cp_svg('hierarchy-files')</div>
+                            <a href="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}">{{ $nav->title() }}</a>
+                        </div>
+                    </td>
+                </tr>
+        @if ($loop->last)
+            </table>
+        </div>
+        @endif
+    @endforeach
+
     @foreach (Statamic\Facades\GlobalSet::all() as $set)
         @if ($loop->first)
         <h3 class="little-heading pl-0 mb-1">{{ __('Globals') }}</h3>

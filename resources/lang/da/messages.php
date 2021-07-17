@@ -116,6 +116,7 @@ return [
     'licensing_utility_description' => 'Se og løs licensoplysninger.',
     'max_depth_instructions' => 'Indstil et maksimalt antal niveauer, der muligvis er indlejret. Uden begrænsning hvis denne indstilling er blank.',
     'max_items_instructions' => 'Indstil et maksimalt antal valgbare emner.',
+    'navigation_configure_blueprint_instructions' => 'Vælg mellem eksisterende blueprints, eller opret et nyt.',
     'navigation_configure_collections_instructions' => 'Aktiver link til poster i disse samlinger.',
     'navigation_configure_handle_instructions' => 'Bruges til at henvise til denne navigation på frontend. Det er besværligt at ændre senere.',
     'navigation_configure_intro' => 'Navigationer er lister over flere niveauer af links, der kan bruges til at oprette navbars, sidefødder, sitemaps og andre former for frontend navigation.',

@@ -68,6 +68,7 @@
 
 
 <script>
+import * as th from 'tree-helper';
 import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
 
@@ -97,7 +98,6 @@ export default {
             saving: false,
             pages: [],
             treeData: [],
-            pageIds: [],
             soundDropUrl: this.$config.get('resourceUrl') + '/audio/click.mp3',
         }
     },
@@ -108,10 +108,6 @@ export default {
             return _.findWhere(this.localizations, { active: true });
         },
 
-        exclusions() {
-            return this.hasCollection ? this.pageIds : [];
-        },
-
         preferencesKey() {
             return this.preferencesPrefix ? `${this.preferencesPrefix}.${this.site}.pagetree` : null;
         },
@@ -119,17 +115,6 @@ export default {
     },
 
     watch: {
-
-        pages: {
-            deep: true,
-            handler(pages) {
-                this.pageIds = this.getPageIds(pages);
-            }
-        },
-
-        pageIds(ids) {
-            this.$emit('page-ids-updated', ids);
-        },
 
         site(site) {
             this.getPages();
@@ -161,23 +146,12 @@ export default {
             });
         },
 
-        getPageIds(pages) {
-            let ids = [];
-            pages.forEach(page => {
-                ids.push(page.id);
-                if (page.children.length) {
-                    ids = [...ids, ...this.getPageIds(page.children)];
-                }
-            })
-            return ids;
-        },
-
         treeChanged(node, tree) {
             if (!this.validate()) {
                 this.updateTreeData();
                 return;
             }
-            
+
             this.treeUpdated(tree);
         },
 
@@ -191,23 +165,36 @@ export default {
 
         validate() {
             let isValid = true;
-            
+
             this.traverseTree(this.treeData, (node, { isRoot }) => {
                 if (isRoot && node.children.length) {
                     isValid = false;
                     return false;
-                } 
+                }
             });
 
             return isValid;
         },
 
+        cleanPagesForSubmission(pages) {
+            return _.map(pages, page => ({
+                id: page.id,
+                children: this.cleanPagesForSubmission(page.children)
+            }));
+        },
+
         save() {
             this.saving = true;
-            const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot, ...this.submitParameters };
 
-            return this.$axios.post(this.submitUrl, payload).then(response => {
-                this.$emit('saved');
+            const payload = {
+                pages: this.cleanPagesForSubmission(this.pages),
+                site: this.site,
+                expectsRoot: this.expectsRoot,
+                ...this.submitParameters
+            };
+
+            return this.$axios.patch(this.submitUrl, payload).then(response => {
+                this.$emit('saved', response);
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;
                 this.saveTreeState();
@@ -234,7 +221,9 @@ export default {
             pages.forEach(selection => {
                 parent.push({
                     id: selection.id,
+                    entry: selection.entry,
                     title: selection.title,
+                    entry_title: selection.entry_title,
                     slug: selection.slug,
                     url: selection.url,
                     edit_url: selection.edit_url,
@@ -292,7 +281,7 @@ export default {
                 nodeDepth = Math.max(nodeDepth, depth);
             });
             const maxDepth = this.maxDepth - nodeDepth;
-            
+
             this.traverseTree(this.treeData, (childNode, { depth, isRoot }) => {
                 if (childNode !== node) {
                     this.$set(childNode, 'droppable', !isRoot && depth <= maxDepth);
@@ -364,11 +353,11 @@ export default {
                 const path = nodePath.join('.');
                 const depth = nodePath.length;
                 const isRoot = this.expectsRoot && depth === 1 && index === 0;
-                
+
                 if (false === callback(node, { path, depth, index, isRoot })) {
                     return false;
                 }
-                
+
                 if (node.children.length) {
                     this.traverseTree(node.children, callback, nodePath);
                 }
@@ -376,6 +365,19 @@ export default {
                 return true;
             });
         },
+
+        getNodeByBranchId(id) {
+            let branch;
+
+            th.breadthFirstSearch(this.treeData, (node) => {
+                if (node.id === id) {
+                    branch = node
+                    return false
+                }
+            });
+
+            return branch;
+        }
 
     }
 }
