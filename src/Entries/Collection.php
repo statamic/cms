@@ -600,14 +600,14 @@ class Collection implements Contract, AugmentableContract
 
     public function delete()
     {
+        if ($structure = $this->structure()) {
+            $structure->trees()->each->delete();
+        }
+
         $this->queryEntries()->get()->each(function ($entry) {
             $entry->deleteDescendants();
             $entry->delete();
         });
-
-        if ($structure = $this->structure()) {
-            $structure->trees()->each->delete();
-        }
 
         Facades\Collection::delete($this);
 
