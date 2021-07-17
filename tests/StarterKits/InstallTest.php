@@ -500,6 +500,56 @@ EOT;
         $this->assertFileNotExists(base_path('copied.md'));
     }
 
+    /** @test */
+    public function it_installs_paid_starter_kit_with_kit_license_key()
+    {
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileNotExists(base_path('copied.md'));
+
+        $this->installCoolRunnings(['--license-key' => 'kit-key'], [
+            'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
+                'price' => 100,
+            ]], 200),
+            'outpost.*/v3/starter-kits/validate/kit' => Http::response(['data' => [
+                'kit_license' => 'kit-key',
+                'valid' => true,
+            ]], 200),
+            '*' => Http::response('', 200),
+        ]);
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileNotExists(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_doesnt_install_paid_starter_kit_with_invalid_kit_license_key()
+    {
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileNotExists(base_path('copied.md'));
+
+        $this->installCoolRunnings(['--license-key' => 'kit-key'], [
+            'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
+                'price' => 100,
+            ]], 200),
+            'outpost.*/v3/starter-kits/validate/kit' => Http::response(['data' => [
+                'kit_license' => 'kit-key',
+                'valid' => false,
+            ]], 200),
+            '*' => Http::response('', 200),
+        ]);
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileNotExists(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileNotExists(base_path('copied.md'));
+    }
+
     private function kitRepoPath($path = null)
     {
         return collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/');
