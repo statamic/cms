@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\AbstractCacher;
 
 class Cache
 {
@@ -30,7 +31,7 @@ class Cache
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             $response = response($this->cacher->getCachedPage($request));
-            if (config('statamic.static_caching.send_static_cache_header')) {
+            if (config('statamic.static_caching.send_static_cache_header') && $this->cacher instanceof AbstractCacher) {
                 $response->header('X-Statamic-Static-Cache', 'hit');
             }
 
@@ -43,7 +44,7 @@ class Cache
             $this->cacher->cachePage($request, $response);
         }
 
-        if (config('statamic.static_caching.send_static_cache_header')) {
+        if (config('statamic.static_caching.send_static_cache_header') && $this->cacher instanceof AbstractCacher) {
             $response->header('X-Statamic-Static-Cache', 'miss');
         }
 
