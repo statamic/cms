@@ -1,6 +1,6 @@
 <template>
 
-    <td class="grid-cell" :class="fieldtypeComponent" :width="width">
+    <td class="grid-cell" :class="classes" :width="width">
         <div v-show="showInner">
             <component
                 :is="fieldtypeComponent"
@@ -68,6 +68,10 @@ export default {
     inject: ['grid'],
 
     computed: {
+
+        classes() {
+            return [this.fieldtypeComponent, this.field.classes];
+        },
 
         fieldtypeComponent() {
             return `${this.field.component || this.field.type}-fieldtype`;

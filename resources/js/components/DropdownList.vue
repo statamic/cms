@@ -7,7 +7,7 @@
                 </button>
             </slot>
         </template>
-        <slot />
+        <template #default><slot /></template>
     </popover>
 </template>
 

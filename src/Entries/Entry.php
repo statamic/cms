@@ -305,9 +305,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         Facades\Entry::save($this);
 
         if ($this->id()) {
-            Blink::store('structure-page-entries')->forget($this->id());
             Blink::store('structure-uris')->forget($this->id());
-            Blink::store('structure-entries')->flush();
+            Blink::store('structure-entries')->forget($this->id());
         }
 
         $this->taxonomize();

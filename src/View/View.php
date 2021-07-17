@@ -3,6 +3,8 @@
 namespace Statamic\View;
 
 use Facades\Statamic\View\Cascade;
+use InvalidArgumentException;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine as AntlersEngine;
 use Statamic\View\Events\ViewRendered;
@@ -15,12 +17,24 @@ class View
     protected $cascade;
     protected $cascadeContent;
 
-    public static function make($template = null)
+    public static function make($template = null, $data = [])
     {
-        $view = new static;
-        $view->template($template);
+        return (new static)
+            ->template($template)
+            ->with($data);
+    }
 
-        return $view;
+    public static function first(array $templates, $data = [])
+    {
+        $template = Arr::first($templates, function ($template) {
+            return view()->exists($template);
+        });
+
+        if (! $template) {
+            throw new InvalidArgumentException('None of the views in the given array exist.');
+        }
+
+        return static::make($template, $data);
     }
 
     public function with($data)
@@ -121,6 +135,10 @@ class View
 
     private function isUsingXmlLayout()
     {
+        if (! $this->layout) {
+            return false;
+        }
+
         return Str::endsWith($this->layoutViewPath(), '.xml');
     }
 

@@ -1,5 +1,85 @@
 # Release Notes
 
+## 3.1.29 (2021-07-16)
+
+### What's fixed
+- Fix validation on blueprint editor. [#4015](https://github.com/statamic/cms/issues/4015)
+
+
+
+## 3.1.28 (2021-07-15)
+
+### What's new
+- The `link` fieldtype can have its collections specified, and it defaults to only collections with routes. [#3973](https://github.com/statamic/cms/issues/3973)
+- Sites can now have arbitrary attributes. [#3996](https://github.com/statamic/cms/issues/3996)
+- Added GraphQL support for the `array` fieldtype. [#3972](https://github.com/statamic/cms/issues/3972)
+- Added a `session:has` tag. [#3958](https://github.com/statamic/cms/issues/3958)
+
+### What's improved
+- The blueprint builder will prevent you from adding fields with reserved words. [#3989](https://github.com/statamic/cms/issues/3989)
+- The blueprint builder will allow you to set default field values.  [#3982](https://github.com/statamic/cms/issues/3982)
+- The collection scaffolder now just creates views. [#3997](https://github.com/statamic/cms/issues/3997)
+- In listings that only ever require a single selection, you no longer need to unselect before selecting its replacement. [#3950](https://github.com/statamic/cms/issues/3950)
+
+### What's fixed
+- Fix "create navigation" button not appearing when you have permission. [#4005](https://github.com/statamic/cms/issues/4005)
+- Fix asset meta data disappearing when renaming programmatically. [#3964](https://github.com/statamic/cms/issues/3964)
+- Collection trees will be deleted when setting a collection to not orderable. [#3901](https://github.com/statamic/cms/issues/3901)
+- Prevent video previews blowing out the UI of the asset editor. [#3975](https://github.com/statamic/cms/issues/3975)
+- Support collections in the `reverse` modifier. [#4003](https://github.com/statamic/cms/issues/4003)
+- Prevent the Live Preview toolbar covering the Bard toolbar. [#3979](https://github.com/statamic/cms/issues/3979)
+- Tree files are ignored if they don't have a matching collection. [#3948](https://github.com/statamic/cms/issues/3948)
+- Consolidate the Stache's `getItemFilter` and `getFileFilter` methods. [#4001](https://github.com/statamic/cms/issues/4001)
+- Fix `search` tag when the `as` param is used without `paginate`. [#4000](https://github.com/statamic/cms/issues/4000)
+- Fix static caching invalidation mismatch when using trusted proxies and SSL. [#3939](https://github.com/statamic/cms/issues/3939)
+- Fix removing users from groups when using Eloquent. [#3951](https://github.com/statamic/cms/issues/3951)
+- Fix table word wrap weirdness. [#2550](https://github.com/statamic/cms/issues/2550)
+- Fix `code` fieldtype not loading, and `textarea` fieldtype not being the correct height when in inactive tabs. [#3955](https://github.com/statamic/cms/issues/3955)
+- Fix site specific views not loading. [#3944](https://github.com/statamic/cms/issues/3944)
+
+
+
+## 3.1.27 (2021-07-01)
+
+### What's improved
+- Structure entry eager loading is conditional, and won't happen when loading front-end pages. [#3540](https://github.com/statamic/cms/issues/3540)
+
+### What's fixed
+- Only update Stache indexes when they aren't cached at all yet. [#3936](https://github.com/statamic/cms/issues/3936)
+- Fix `is_parent` being `true` for the home page in the `nav` tag when your site is defined with a full URL. [#3900](https://github.com/statamic/cms/issues/3900)
+- Fix error when getting the dimensions for a zero byte image. [#3935](https://github.com/statamic/cms/issues/3935)
+- That also prevents corrupt images from constantly recalculating their dimensions.
+- Fix `dimensions` validation rule on `assets` fields. [#3922](https://github.com/statamic/cms/issues/3922)
+- Filter out `import` fields from the "add existing field" pane in the Blueprint builder, which was causing JS errors. [#3924](https://github.com/statamic/cms/issues/3924)
+- Make Grid column squeezing rules more specific, which fixes a derpy `date` field. [#3917](https://github.com/statamic/cms/issues/3917)
+- Check permissions for the "Create" button on the `entries` fieldtype. [#3906](https://github.com/statamic/cms/issues/3906)
+- Fix `integer` fieldtype focus state. [6211855ad](https://github.com/statamic/cms/commit/6211855ad)
+- Fix `isLowerCase` method casing. [9f05530bf](https://github.com/statamic/cms/commit/9f05530bf)
+- Fix random invalid popper reference errors. [d8a0f52b9](https://github.com/statamic/cms/commit/d8a0f52b9)
+
+
+
+## 3.1.26 (2021-06-22)
+
+### What's new
+- The `View::make()` method can now accept data.
+- Added a `View::first()` method that uses the first view that exists in a given array. [#3880](https://github.com/statamic/cms/issues/3880)
+
+
+### What's fixed
+- Fixed pagination in the `search:results` tag. [#3894](https://github.com/statamic/cms/issues/3894)
+- Static caching: Collection-based term URLs get invalidated when saving a term. [#3884](https://github.com/statamic/cms/issues/3884)
+- Static caching: Reordering a collection will invalidate the URL where it's mounted. [#3885](https://github.com/statamic/cms/issues/3885)
+- Static caching: Saving a nav tree will trigger invalidation. [#3882](https://github.com/statamic/cms/issues/3882)
+- Prevent error for entries with `layout: false`, or routes with `layout: false`/`null`. [#3893](https://github.com/statamic/cms/issues/3893)
+- Apply field config `classes` to `grid` fields. [#3881](https://github.com/statamic/cms/issues/3881)
+- Improve handling of creating terms in a non-default site. [#3441](https://github.com/statamic/cms/issues/3441)
+- Fix errors when importing single fields into Blueprints. [#3249](https://github.com/statamic/cms/issues/3249)
+- Prevent seeing asset breadcrumbs when navigation is restricted. [#3873](https://github.com/statamic/cms/issues/3873)
+- Fixed the "Create Folder" field not gaining focus in some browsers. [#3874](https://github.com/statamic/cms/issues/3874)
+- Bump `striptags` from 3.1.1 to 3.2.0 [#3879](https://github.com/statamic/cms/issues/3879)
+
+
 ## 3.1.25 (2021-06-18)
 
 ### What's new

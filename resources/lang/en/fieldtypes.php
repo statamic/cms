@@ -55,6 +55,7 @@ return [
     'grid.config.min_rows' => 'Set a minimum number of creatable rows.',
     'grid.config.mode' => 'Choose your preferred layout style.',
     'grid.config.reorderable' => 'Enable to allow row reordering.',
+    'link.config.collections' => 'Entries from these collections will be available. Leaving this empty will make entries from routable collections available.',
     'markdown.config.automatic_line_breaks' => 'Enables automatic line breaks.',
     'markdown.config.automatic_links' => 'Enables automatic linking of any URLs.',
     'markdown.config.container' => 'Choose which asset container to use for this field.',

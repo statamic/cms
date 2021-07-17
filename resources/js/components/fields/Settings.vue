@@ -48,6 +48,7 @@
                 :blueprint="blueprint"
                 :values="values"
                 :meta="meta"
+                :errors="errors"
                 :is-root="true"
                 @updated="values = $event"
             >
@@ -118,6 +119,8 @@ export default {
         return {
             values: null,
             meta: null,
+            error: null,
+            errors: {},
             editedFields: clone(this.overrides),
             isHandleModified: true,
             activeTab: 'settings',
@@ -230,13 +233,31 @@ export default {
         },
 
         commit() {
+            this.clearErrors();
+
             this.$axios.post(cp_url('fields/update'), {
                 type: this.type,
                 values: this.values
             }).then(response => {
                 this.$emit('committed', response.data, this.editedFields);
                 this.close();
-            });
+            }).catch(e => this.handleAxiosError(e));
+        },
+
+        handleAxiosError(e) {
+            if (e.response && e.response.status === 422) {
+                const { message, errors } = e.response.data;
+                this.error = message;
+                this.errors = errors;
+                this.$toast.error(message);
+            } else {
+                this.$toast.error(__('Something went wrong'));
+            }
+        },
+
+        clearErrors() {
+            this.error = null;
+            this.errors = {};
         },
 
         close() {

@@ -26,7 +26,7 @@ class TaxonomyTermsStore extends ChildStore
         'site' => Indexes\Terms\Site::class,
     ];
 
-    public function getFileFilter(SplFileInfo $file)
+    public function getItemFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory(), '/');
         $relative = $file->getPathname();

@@ -4,11 +4,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
-use Statamic\Facades;
 use Statamic\Facades\File;
-use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Support\Str;
 
 class ScaffoldCollectionController extends CpController
 {
@@ -23,11 +20,6 @@ class ScaffoldCollectionController extends CpController
     {
         $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
 
-        // Make the blueprint
-        if ($blueprint = $this->request->get('blueprint')) {
-            $this->makeBlueprint($blueprint, $collection);
-        }
-
         // Make the index template
         if ($index = $this->request->get('index')) {
             $this->makeTemplate($index);
@@ -38,34 +30,11 @@ class ScaffoldCollectionController extends CpController
             $this->makeTemplate($show);
         }
 
-        session()->flash('success', __('Resources scaffolded'));
+        session()->flash('success', __('Views created sucessfully'));
 
         return [
             'redirect' => route('statamic.cp.collections.show', $request->collection->handle()),
         ];
-    }
-
-    private function makeBlueprint($title, $collection)
-    {
-        $handle = Str::snake($title);
-
-        // Don't overwrite existing
-        if (Facades\Blueprint::find($handle)) {
-            return;
-        }
-
-        $blueprint = (new Blueprint)
-            ->setHandle($handle)
-            ->setNamespace('collections.'.$collection->handle())
-            ->setContents([
-                'title' => $title,
-                'sections' => [
-                    'main' => [
-                        'display' => __('Main'),
-                        'fields' => [],
-                    ],
-                ],
-            ])->save();
     }
 
     private function makeTemplate($filename)

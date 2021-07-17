@@ -49,45 +49,46 @@
 
                 <div class="editor-preview">
 
-                    <div class="editor-preview-image" v-if="isImage">
+                    <div
+                        v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo"
+                        class="editor-preview-image"
+                    >
                         <div class="image-wrapper">
-                            <img :src="asset.preview" class="asset-thumb" />
+                            <!-- Image -->
+                            <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb" />
+
+                            <!-- SVG -->
+                            <div v-else-if="asset.isSvg" class="bg-checkerboard h-full w-full flex flex-col">
+                                <div class="flex border-b-2 border-grey-90">
+                                    <div class="flex-1 order-r p-2 border-grey-90 flex items-center justify-center">
+                                        <img :src="asset.url" class="asset-thumb w-4 h-4" />
+                                    </div>
+                                    <div class="flex-1 border-l border-r p-2 border-grey-90 flex items-center justify-center">
+                                        <img :src="asset.url" class="asset-thumb w-12 h-12" />
+                                    </div>
+                                    <div class="flex-1 border-l p-2 border-grey-90 flex items-center justify-center">
+                                        <img :src="asset.url" class="asset-thumb w-24 h-24" />
+                                    </div>
+                                </div>
+                                <div class="min-h-0 p-2 flex items-center justify-center">
+                                    <img :src="asset.url" class="asset-thumb w-2/3 max-w-full max-h-full" />
+                                </div>
+                            </div>
+
+                            <!-- Audio -->
+                            <audio v-else-if="asset.isAudio" :src="asset.url" controls preload="auto"></audio>
+
+                            <!-- Video -->
+                            <video v-else-if="asset.isVideo" :src="asset.url" controls></video>
                         </div>
                     </div>
 
-                    <div class="editor-preview-image" v-if="asset.isSvg">
-                        <div class="bg-checkerboard h-full w-full">
-                            <div class="hidden md:grid md:grid-cols-3 border-b-2 border-grey-90">
-                                <div class="border-r p-2 border-grey-90 flex items-center justify-center">
-                                    <img :src="asset.url" class="asset-thumb w-4 h-4" />
-                                </div>
-                                <div class="border-l border-r p-2 border-grey-90 flex items-center justify-center">
-                                    <img :src="asset.url" class="asset-thumb w-12 h-12" />
-                                </div>
-                                <div class="border-l p-2 border-grey-90 flex items-center justify-center">
-                                    <img :src="asset.url" class="asset-thumb w-24 h-24" />
-                                </div>
-                            </div>
-                            <div class="h-full flex items-center justify-center">
-                                <img :src="asset.url" class="asset-thumb w-2/3 max-h-screen-1/2 relative md:-top-6" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="audio-wrapper" v-if="asset.isAudio">
-                        <audio :src="asset.url" controls preload="auto"></audio>
-                    </div>
-
-                    <div class="video-wrapper" v-if="asset.isVideo">
-                        <video :src="asset.url" controls></video>
-                    </div>
-
-                    <div class="h-full" v-if="asset.extension == 'pdf'">
+                    <div class="h-full" v-else-if="asset.extension == 'pdf'">
                         <object :data="asset.url" type="application/pdf" width="100%" height="100%">
                         </object>
                     </div>
 
-                    <div class="h-full" v-if="asset.isPreviewable && canUseGoogleDocsViewer">
+                    <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
                         <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
@@ -131,7 +132,7 @@
 
                         <div class="editor-form-fields">
                             <div v-if="error" class="bg-red text-white p-2 shadow mb-2" v-text="error" />
-                            <publish-fields 
+                            <publish-fields
                                 :fields="fields"
                                 :read-only="readOnly"
                                 @updated="setFieldValue"
