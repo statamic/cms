@@ -2,8 +2,8 @@
 
 namespace Statamic\Console\Commands;
 
+use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -17,6 +17,7 @@ use Statamic\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
+use Statamic\Support\Str;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
@@ -46,7 +47,7 @@ class StaticWarm extends Command
             'fulfilled' => function (Response $response, $index) use ($uris) {
                 $this->checkLine($uris->get($index));
             },
-            'rejected' => function (RequestException $e, $index) use ($uris) {
+            'rejected' => function (Exception $e, $index) use ($uris) {
                 $this->crossLine($uris->get($index));
             },
         ]);
@@ -116,10 +117,10 @@ class StaticWarm extends Command
 
         return collect(app('router')->getRoutes()->getRoutes())
             ->filter(function (Route $route) use ($action) {
-                return $route->getActionName() === $action && ! $route->hasParameters();
+                return $route->getActionName() === $action && ! Str::contains($route->uri(), '{');
             })
             ->map(function (Route $route) {
-                return URL::makeAbsolute($route->uri());
+                return URL::tidy(Str::start($route->uri(), config('app.url').'/'));
             });
     }
 }
