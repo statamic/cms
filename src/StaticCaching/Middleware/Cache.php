@@ -3,7 +3,6 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
@@ -61,10 +60,6 @@ class Cache
             return false;
         }
 
-        if ($this->canBeBypassed()) {
-            return $this->shouldBeBypassed() ? false : true; // Flip (true/false)
-        }
-
         return true;
     }
 
@@ -86,32 +81,6 @@ class Cache
             return false;
         }
 
-        if ($this->canBeBypassed()) {
-            return $this->shouldBeBypassed() ? false : true; // Flip (true/false)
-        }
-
         return true;
-    }
-
-    private function canBeBypassed()
-    {
-        $bypass = $this->cacher->config('bypass');
-
-        return $bypass['logged_in'] ?? false || ! empty($bypass['roles']);
-    }
-
-    private function shouldBeBypassed()
-    {
-        $bypass = $this->cacher->config('bypass');
-
-        if (! Auth::guest()) {
-            if (is_array($bypass['roles']) && ! empty($bypass['roles'])) {
-                return Auth::user()->hasRole($bypass['roles']);
-            }
-
-            return $bypass['logged_in'] ?? false;
-        }
-
-        return false;
     }
 }
