@@ -19,7 +19,7 @@ class CollectionTreeStore extends NavTreeStore
             return false;
         }
 
-        [, $handle] = $this->parseTreePath($file->getPathname());
+        [, $handle] = $this->parseTreePath($file->getRelativePathname());
 
         if (! ($collection = Collection::findByHandle($handle))) {
             return false;
