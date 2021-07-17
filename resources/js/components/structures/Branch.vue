@@ -13,7 +13,7 @@
 
                 <button
                     v-if="hasChildren"
-                    class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none"
+                    class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
