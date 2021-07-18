@@ -227,6 +227,10 @@ class Statamic
             $attrs = " class=\"{$attrs}\"";
         }
 
+        if (config('statamic.cp.icons_cdn')) {
+            return sprintf('<img src="%s" %s />', asset("vendor/statamic/cp/svg/{$name}.svg"), $attrs);
+        }
+
         $svg = StaticStringy::collapseWhitespace(
             File::get(public_path("vendor/statamic/cp/svg/{$name}.svg"))
         );
