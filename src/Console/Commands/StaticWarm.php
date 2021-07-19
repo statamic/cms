@@ -33,6 +33,12 @@ class StaticWarm extends Command
             return 1;
         }
 
+        if (! config('statamic.static_caching.strategy')) {
+            $this->error('Static caching is not enabled.');
+
+            return 1;
+        }
+
         $this->info('Warming the static cache.');
 
         $this->warm();
