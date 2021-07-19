@@ -65,13 +65,11 @@ class StatamicTest extends TestCase
     }
 
     /** @test */
-    public function it_renders_svg_as_image_tag_with_icons_cdn_enabled()
+    public function it_renders_svg_as_image_tag_with_icons_cdn_url_enabled()
     {
-        config(['statamic.cp.icons_cdn' => true]);
+        config(['statamic.cp.icons_cdn_url' => 'http://cdn_url/']);
 
-        File::put(public_path('vendor/statamic/cp/svg/test.svg'), '<svg the totally real svg');
-
-        $this->assertStringStartsWith('<img src=', Statamic::svg('test'));
+        $this->assertStringStartsWith('<img src="http://cdn_url/vendor/statamic/cp/svg/test.svg"', Statamic::svg('test'));
     }
 
     /** @test */
