@@ -234,7 +234,15 @@ class MakeAddon extends GeneratorCommand
     protected function runOptionalAddonGenerator($type)
     {
         $prefix = $this->runningInPlease ? '' : 'statamic:';
-        $arguments = ['name' => studly_case($this->nameSlug), 'addon' => $this->addonPath()];
+
+        $name = studly_case($this->nameSlug);
+
+        // Prevent conflicts when also creating a scope, since they're in the same directory.
+        if ($type === 'filter') {
+            $name .= 'Filter';
+        }
+
+        $arguments = ['name' => $name, 'addon' => $this->addonPath()];
 
         if ($this->option('force')) {
             $arguments['--force'] = true;
