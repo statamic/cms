@@ -27,6 +27,12 @@ class StaticWarm extends Command
 
     public function handle()
     {
+        if (version_compare(app()->version(), '8', '<')) {
+            $this->error('Laravel version must be at least 8.0.0 to use this command.');
+
+            return 1;
+        }
+
         $this->info('Warming the static cache.');
 
         $this->warm();
