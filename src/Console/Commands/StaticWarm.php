@@ -39,9 +39,11 @@ class StaticWarm extends Command
             return 1;
         }
 
-        $this->info('Warming the static cache.');
+        $this->line('Warming the static cache...');
 
         $this->warm();
+
+        $this->info('The static cache has been warmed.');
 
         return 0;
     }
