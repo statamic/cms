@@ -111,10 +111,6 @@ return [
     |
     | Disables inline SVG rendering if icons are hosted on an external CDN.
     |
-    | e.g for Laravel Vapor add the following to your production .ENV
-    |
-    | STATAMIC_ICONS_CDN_URL="${ASSET_URL}"
-    |
     */
 
     'icons_cdn_url' => env('STATAMIC_ICONS_CDN_URL', null),
