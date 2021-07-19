@@ -78,7 +78,7 @@ class MakeFieldtype extends GeneratorCommand
             $this->wireUpAddonJs($addon);
         } else {
             $this->line("Your {$this->typeLower} Vue component awaits: <comment>{$relativePath}</comment>");
-            $this->comment("Don't forget to import and register your Fieldtype component in <comment>resources/js/addon.js</comment>");
+            $this->comment("Don't forget to import and register your Fieldtype component in resources/js/addon.js");
         }
     }
 
@@ -114,7 +114,7 @@ class MakeFieldtype extends GeneratorCommand
         $addonPath = $this->getAddonPath($addon);
 
         if ($this->fieldtypeAlreadyExists()) {
-            $this->comment("Don't forget to import and register your new Fieldtype component in <comment>resources/js/addon.js</comment>");
+            $this->comment("Don't forget to import and register your new Fieldtype component in resources/js/addon.js");
 
             return;
         }
