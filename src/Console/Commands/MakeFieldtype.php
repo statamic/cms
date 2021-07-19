@@ -84,7 +84,7 @@ class MakeFieldtype extends GeneratorCommand
 
     protected function fieldtypeAlreadyExists()
     {
-        return $this->files->exists($this->getAddonPath($this->argument('addon')). '/resources/js/addon.js');
+        return $this->files->exists($this->getAddonPath($this->argument('addon')).'/resources/js/addon.js');
     }
 
     /**
@@ -115,6 +115,7 @@ class MakeFieldtype extends GeneratorCommand
 
         if ($this->fieldtypeAlreadyExists()) {
             $this->comment("Don't forget to import and register your new Fieldtype component in <comment>{$addonPath}/resources/js/addon.js</comment>");
+
             return;
         }
 
