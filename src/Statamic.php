@@ -226,6 +226,11 @@ class Statamic
         if ($attrs) {
             $attrs = " class=\"{$attrs}\"";
         }
+        if ($icons_cdn_url = config('statamic.cp.icons_cdn_url', null)) {
+            $icons_cdn_url = StaticStringy::ensureRight($icons_cdn_url, '/');
+
+            return "<img src=\"{$icons_cdn_url}vendor/statamic/cp/svg/{$name}.svg\" ${attrs} />";
+        }
 
         $svg = StaticStringy::collapseWhitespace(
             File::get(public_path("vendor/statamic/cp/svg/{$name}.svg"))

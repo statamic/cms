@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 
@@ -53,6 +54,30 @@ class StatamicTest extends TestCase
     public function it_gets_the_cp_date_format()
     {
         $this->assertEquals('cp-date-format', Statamic::cpDateFormat());
+    }
+
+    /** @test */
+    public function it_renders_svg_inline_by_default()
+    {
+        File::put(public_path('vendor/statamic/cp/svg/test.svg'), '<svg the totally real svg');
+
+        $this->assertStringStartsWith('<svg ', Statamic::svg('test'));
+    }
+
+    /** @test */
+    public function it_renders_svg_as_image_tag_with_icons_cdn_url_enabled()
+    {
+        config(['statamic.cp.icons_cdn_url' => 'http://cdn_url/']);
+
+        $this->assertStringStartsWith('<img src="http://cdn_url/vendor/statamic/cp/svg/test.svg"', Statamic::svg('test'));
+    }
+
+    /** @test */
+    public function it_renders_svg_as_image_tag_with_icons_cdn_url_enabled_and_ensures_trailing_slash()
+    {
+        config(['statamic.cp.icons_cdn_url' => 'http://cdn_url']);
+
+        $this->assertStringStartsWith('<img src="http://cdn_url/vendor/statamic/cp/svg/test.svg"', Statamic::svg('test'));
     }
 
     /** @test */
