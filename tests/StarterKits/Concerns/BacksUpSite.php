@@ -24,6 +24,7 @@ trait BacksUpSite
         if ($files->exists(base_path('../site-backup'))) {
             $files->cleanDirectory($basePath);
             $files->copyDirectory($basePath.'/../site-backup', $basePath, true);
+            $files->deleteDirectory($basePath.'/../site-backup');
         }
     }
 }

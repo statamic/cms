@@ -21,6 +21,7 @@ trait BacksUpComposerJson
 
         if ($files->exists(base_path('composer.json.bak'))) {
             $files->copy(base_path('composer.json.bak'), base_path('composer.json'));
+            $files->delete(base_path('composer.json.bak'));
         }
     }
 }
