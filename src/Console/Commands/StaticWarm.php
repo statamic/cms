@@ -64,6 +64,8 @@ class StaticWarm extends Command
 
     private function outputResponseLine(string $uri, Response $response): void
     {
+        $uri = Str::start(Str::after($uri, config('app.url')), '/');
+
         $response->ok() ? $this->checkLine($uri) : $this->crossLine($uri);
     }
 
