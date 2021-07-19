@@ -155,8 +155,6 @@ class MakeFieldtype extends GeneratorCommand
                     ->add()->protected()->property('scripts', $scriptsValue)
                     ->add()->protected()->property('fieldtypes', $fieldtypeClassValue)
                     ->save();
-
-            $this->info("Fieldtype components registered in service provider successfully.");
         } catch (\Exception $e) {
             $this->comment("Don't forget to register the Fieldtype class and scripts in your addon's service provider.");
         }
