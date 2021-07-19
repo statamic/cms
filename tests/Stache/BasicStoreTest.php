@@ -35,16 +35,17 @@ class BasicStoreTest extends TestCase
     }
 
     /** @test */
-    public function items_are_different_instances_every_time()
+    public function items_are_the_same_instance_every_time()
     {
-        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+        config(['cache.default' => 'file']);
         \Illuminate\Support\Facades\Cache::clear();
 
         file_put_contents($this->tempDir.'/foo.yaml', '');
 
         $this->assertNotNull($one = $this->store->getItem('foo'));
         $this->assertNotNull($two = $this->store->getItem('foo'));
-        $this->assertNotSame($one, $two);
+
+        $this->assertSame($one, $two);
     }
 
     /** @test */
