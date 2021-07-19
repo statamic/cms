@@ -8,11 +8,14 @@ use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
+use Statamic\Events\FormCreated;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
+use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Statamic;
@@ -30,6 +33,8 @@ class Form implements FormContract, Augmentable
     protected $store;
     protected $email;
     protected $metrics;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     /**
      * Get or set the handle.
@@ -139,11 +144,40 @@ class Form implements FormContract, Augmentable
         return config('statamic.forms.forms')."/{$this->handle()}.yaml";
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        $result = $this->save();
+
+        $this->withEvents = true;
+
+        return $result;
+    }
+
     /**
      * Save form.
      */
     public function save()
     {
+        $isNew = is_null(FormFacade::find($this->handle()));
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($this->withEvents) {
+            if (FormSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         $data = collect([
             'title' => $this->title,
             'honeypot' => $this->honeypot,
@@ -161,7 +195,17 @@ class Form implements FormContract, Augmentable
 
         File::put($this->path(), YAML::dump($data));
 
-        FormSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($this->withEvents) {
+            if ($isNew) {
+                FormCreated::dispatch($this);
+            }
+
+            FormSaved::dispatch($this);
+        }
     }
 
     /**

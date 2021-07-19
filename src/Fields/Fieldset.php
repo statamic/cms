@@ -3,8 +3,10 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldsetRepository;
+use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetSaved;
+use Statamic\Events\FieldsetSaving;
 use Statamic\Facades;
 use Statamic\Support\Str;
 
@@ -12,6 +14,8 @@ class Fieldset
 {
     protected $handle;
     protected $contents = [];
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function setHandle(string $handle)
     {
@@ -75,11 +79,50 @@ class Fieldset
         return cp_route('fieldsets.destroy', $this->handle());
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        $result = $this->save();
+
+        $this->withEvents = true;
+
+        return $result;
+    }
+
     public function save()
     {
+        $isNew = is_null(Facades\Fieldset::find($this->handle()));
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($this->withEvents) {
+            if (FieldsetSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         FieldsetRepository::save($this);
 
-        FieldsetSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($this->withEvents) {
+            if ($isNew) {
+                FieldsetCreated::dispatch($this);
+            }
+
+            FieldsetSaved::dispatch($this);
+        }
 
         return $this;
     }
