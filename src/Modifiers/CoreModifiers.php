@@ -1100,6 +1100,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a string to kebab-case.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function kebab($value, $params)
+    {
+        return Str::kebab($value);
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @param $value
@@ -1962,6 +1974,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a string to snake_case.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function snake($value, $params)
+    {
+        return Str::snake($value);
+    }
+
+    /**
      * Sort an array by key $params[0] and direction $params[1].
      *
      * @param $value
@@ -2046,6 +2070,18 @@ class CoreModifiers extends Modifier
         }
 
         return Str::stripTags($value, (array) $tags);
+    }
+
+    /**
+     * Converts a string to StudlyCase.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function studly($value, $params)
+    {
+        return Str::studly($value);
     }
 
     /**

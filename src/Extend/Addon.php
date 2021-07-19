@@ -14,7 +14,7 @@ final class Addon
 {
     /**
      * The identifier.
-     * Typically a composer package name. eg. statamic/bloodhound.
+     * Typically a composer package name. eg. statamic/trapper-keeper.
      *
      * @var string
      */
@@ -42,14 +42,14 @@ final class Addon
     protected $marketplaceSellerSlug;
 
     /**
-     * The addon's namespace. eg. "Statamic\Addons\Bloodhound".
+     * The addon's namespace. eg. "Statamic\Addons\TrapperKeeper".
      *
      * @var string
      */
     protected $namespace;
 
     /**
-     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound".
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/trapper-keeper".
      *
      * @var string
      */
@@ -70,7 +70,7 @@ final class Addon
     protected $provider;
 
     /**
-     * The name of the addon. eg. "Bloodhound Search".
+     * The name of the addon. eg. "Trapper Keeper".
      *
      * @var string
      */
@@ -182,7 +182,7 @@ final class Addon
 
     /**
      * The ID (in a vendor/package format)
-     * eg. statamic/bloodhound.
+     * eg. statamic/trapper-keeper.
      *
      * @return string
      */
@@ -193,7 +193,7 @@ final class Addon
 
     /**
      * The composer package string
-     * eg. statamic/bloodhound.
+     * eg. statamic/trapper-keeper.
      *
      * @return string
      */
@@ -204,7 +204,7 @@ final class Addon
 
     /**
      * The composer package name string
-     * eg. in statamic/blodhound, it's bloodhound.
+     * eg. in statamic/trapper-keeper, it's trapper-keeper.
      *
      * @return string
      */
@@ -215,7 +215,7 @@ final class Addon
 
     /**
      * The composer vendor name string
-     * eg. in statamic/blodhound, it's statamic.
+     * eg. in statamic/trapper-keeper, it's statamic.
      *
      * @return string
      */
@@ -400,7 +400,7 @@ final class Addon
     }
 
     /**
-     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound/".
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/trapper-keeper/".
      *
      * @return string
      */

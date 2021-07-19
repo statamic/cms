@@ -63,7 +63,7 @@ class MakeAddon extends GeneratorCommand
      */
     public function handle()
     {
-        if ($this->validationFails($this->package = $this->argument('package'), new ComposerPackage)) {
+        if ($this->validationFails($this->package = $this->argument('addon'), new ComposerPackage)) {
             return;
         }
 
@@ -77,15 +77,15 @@ class MakeAddon extends GeneratorCommand
 
         $this
             ->generateComposerJson()
-            ->generateServiceProvider()
-            ->generateOptional()
+            ->generateAddonFiles()
             ->addRepositoryPath()
-            ->installAddon();
+            ->installAddon()
+            ->generateOptional();
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
-        $this->info('Addon created successfully.');
-        $this->comment("Your addon files await at: {$relativePath}");
+        $this->info("Your addon package is ready: <comment>{$relativePath}</comment>");
+        $this->line('Learn how to build addons in our docs: <comment>https://statamic.dev/extending/addons</comment>');
     }
 
     /**
@@ -115,25 +115,36 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put($this->addonPath('composer.json'), $json);
 
-        $this->info('Composer configuration created successfully.');
+        $this->line('Composer config created successfully.');
 
         return $this;
     }
 
     /**
-     * Generate service provider.
+     * Generate addon package files.
      *
      * @return $this
      */
-    protected function generateServiceProvider()
+    protected function generateAddonFiles()
     {
-        $provider = $this->files->get($this->getStub('addon/provider.php.stub'));
+        $files = [
+            'addon/provider.php.stub' => 'src/ServiceProvider.php',
+            'addon/.gitignore.stub' => '.gitignore',
+            'addon/README.md.stub' => 'README.md',
+        ];
 
-        $provider = str_replace('DummyNamespace', $this->addonNamespace(), $provider);
+        $data = [
+            'name' => $this->addonTitle(),
+            'package' => $this->package,
+            'namespace' => $this->addonNamespace(),
+        ];
 
-        $this->files->put($this->addonPath('src/ServiceProvider.php'), $provider);
-
-        $this->info('Service provider created successfully.');
+        $this->info('Scaffolding the addon package boilerplate...');
+        $this->info('-------------------------------------------------------');
+        foreach ($files as $stub => $file) {
+            $this->createFromStub($stub, $this->addonPath($file), $data);
+            $this->line($this->addonPath($file));
+        }
 
         return $this;
     }
@@ -145,7 +156,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function generateOptional()
     {
-        collect(['fieldtype', 'scope', 'modifier', 'tag', 'widget'])
+        collect(['fieldtype', 'scope', 'modifier', 'tag', 'widget', 'action', 'filter'])
             ->filter(function ($type) {
                 return $this->option($type) || $this->option('all');
             })
@@ -194,6 +205,8 @@ class MakeAddon extends GeneratorCommand
 
         if (! Str::contains($output, "Discovered Addon: {$this->package}")) {
             $this->error('An error was encountered while installing your addon!');
+        } else {
+            $this->info('Addon installed successfully.');
         }
 
         return $this;
@@ -207,10 +220,10 @@ class MakeAddon extends GeneratorCommand
     protected function runOptionalAddonGenerator($type)
     {
         $prefix = $this->runningInPlease ? '' : 'statamic:';
-        $arguments = ['name' => studly_case($this->nameSlug), 'addon' => $this->addonPath('src')];
+        $arguments = ['name' => studly_case($this->nameSlug), 'addon' => $this->addonPath()];
 
         if ($this->option('force')) {
-            $arguments['--force'] = null;
+            $arguments['--force'] = true;
         }
 
         $this->call("{$prefix}make:{$type}", $arguments);
@@ -297,7 +310,7 @@ class MakeAddon extends GeneratorCommand
     protected function getArguments()
     {
         return [
-            ['package', InputArgument::REQUIRED, 'The package name of the addon (ie. john/my-addon)'],
+            ['addon', InputArgument::REQUIRED, 'The package name of the addon (ie. john/my-addon)'],
         ];
     }
 
@@ -310,7 +323,9 @@ class MakeAddon extends GeneratorCommand
     {
         return array_merge(parent::getOptions(), [
             ['all',       'a', InputOption::VALUE_NONE, 'Generate everything and the kitchen sink with the addon'],
+            ['action',     null, InputOption::VALUE_NONE, 'Create a new action with the addon'],
             ['fieldtype', 'f', InputOption::VALUE_NONE, 'Create a new fieldtype with the addon'],
+            ['filter',     null, InputOption::VALUE_NONE, 'Create a new filter with the addon'],
             ['scope',     's', InputOption::VALUE_NONE, 'Create a new scope with the addon'],
             ['modifier',  'm', InputOption::VALUE_NONE, 'Create a new modifier with the addon'],
             ['tag',       't', InputOption::VALUE_NONE, 'Create a new tag with the addon'],
