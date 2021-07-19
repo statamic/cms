@@ -73,6 +73,14 @@ class StatamicTest extends TestCase
     }
 
     /** @test */
+    public function it_renders_svg_as_image_tag_with_icons_cdn_url_enabled_and_ensures_trailing_slash()
+    {
+        config(['statamic.cp.icons_cdn_url' => 'http://cdn_url']);
+
+        $this->assertStringStartsWith('<img src="http://cdn_url/vendor/statamic/cp/svg/test.svg"', Statamic::svg('test'));
+    }
+
+    /** @test */
     public function it_gets_the_users_preferred_date_format_when_requesting_cp_format_but_not_the_system_format()
     {
         $user = tap(User::make())->save();
