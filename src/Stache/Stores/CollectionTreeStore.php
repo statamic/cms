@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\Collection;
+use Statamic\Facades\Path;
 use Statamic\Structures\CollectionTree;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -19,7 +20,7 @@ class CollectionTreeStore extends NavTreeStore
             return false;
         }
 
-        [, $handle] = $this->parseTreePath($file->getPathname());
+        [, $handle] = $this->parseTreePath(Path::tidy($file->getPathname()));
 
         if (! ($collection = Collection::findByHandle($handle))) {
             return false;
