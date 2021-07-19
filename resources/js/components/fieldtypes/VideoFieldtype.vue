@@ -44,7 +44,7 @@ export default {
 
         value(value) {
             this.data = value;
-        },
+        }
 
     },
 
@@ -54,7 +54,6 @@ export default {
     },
 
     computed: {
-
         embed() {
             if (this.data.includes('youtube')) {
                 return this.data.replace('watch?v=', 'embed/');
@@ -88,9 +87,7 @@ export default {
                 this.data.includes('.mov') ||
                 this.data.includes('.webm')
             )
-        },
-
+        }
     },
-
 };
 </script>
