@@ -61,7 +61,7 @@ class MakeAction extends GeneratorCommand
     {
         $factory = new BuilderFactory();
 
-        $actionClassValue = $factory->classConstFetch('Action\\'.$this->getNameInput(), 'class');
+        $actionClassValue = $factory->classConstFetch('Actions\\'.$this->getNameInput(), 'class');
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
