@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class MakeAddon extends GeneratorCommand
 {
-    use RunsInPlease, ValidatesInput;
+    use RunsInPlease, ValidatesInput, EnhancesCommands;
 
     /**
      * The name of the console command.
@@ -76,15 +77,14 @@ class MakeAddon extends GeneratorCommand
         }
 
         $this
-            ->generateComposerJson()
             ->generateAddonFiles()
-            ->addRepositoryPath()
             ->installAddon()
             ->generateOptional();
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
-        $this->info("Your addon package is ready: <comment>{$relativePath}</comment>");
+        $this->output->newLine();
+        $this->info("🎉 Your addon package is ready: <comment>{$relativePath}</comment>");
         $this->line('Learn how to build addons in our docs: <comment>https://statamic.dev/extending/addons</comment>');
     }
 
@@ -115,8 +115,6 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put($this->addonPath('composer.json'), $json);
 
-        $this->line('Composer config created successfully.');
-
         return $this;
     }
 
@@ -127,6 +125,10 @@ class MakeAddon extends GeneratorCommand
      */
     protected function generateAddonFiles()
     {
+        $this->line('Creating addon...');
+
+        $this->generateComposerJson();
+
         $files = [
             'addon/provider.php.stub' => 'src/ServiceProvider.php',
             'addon/.gitignore.stub' => '.gitignore',
@@ -139,12 +141,10 @@ class MakeAddon extends GeneratorCommand
             'namespace' => $this->addonNamespace(),
         ];
 
-        $this->info('Scaffolding the addon package boilerplate...');
-        $this->info('-------------------------------------------------------');
         foreach ($files as $stub => $file) {
             $this->createFromStub($stub, $this->addonPath($file), $data);
-            $this->line($this->addonPath($file));
         }
+        $this->checkInfo('Addon boilerplate created successfully.');
 
         return $this;
     }
@@ -156,13 +156,23 @@ class MakeAddon extends GeneratorCommand
      */
     protected function generateOptional()
     {
-        collect(['fieldtype', 'scope', 'modifier', 'tag', 'widget', 'action', 'filter'])
+        $optional = collect(['fieldtype', 'scope', 'modifier', 'tag', 'widget', 'action', 'filter'])
             ->filter(function ($type) {
                 return $this->option($type) || $this->option('all');
-            })
-            ->each(function ($type) {
-                $this->runOptionalAddonGenerator($type);
             });
+
+        if ($optional->isEmpty()) {
+            return $this;
+        }
+
+        $this->output->newLine();
+        $this->line('Generating additional addon components...');
+
+        $optional->each(function ($type) {
+            $this->runOptionalAddonGenerator($type);
+        });
+
+        $this->checkInfo('Additional components created successfully.');
 
         return $this;
     }
@@ -185,7 +195,7 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put(base_path('composer.json'), $json);
 
-        $this->info('Repository added to your application composer configuration successfully.');
+        $this->info("Repository added to your application's composer.json successfully.");
 
         return $this;
     }
@@ -197,7 +207,9 @@ class MakeAddon extends GeneratorCommand
      */
     protected function installAddon()
     {
-        $this->info('Installing your addon...');
+        $this->output->newLine();
+        $this->line('Installing your addon with Composer. This may take a moment...');
+        $this->addRepositoryPath();
 
         $output = Composer::runAndOperateOnOutput(['require', $this->package], function ($output) {
             return $this->outputFromSymfonyProcess($output);
@@ -208,6 +220,8 @@ class MakeAddon extends GeneratorCommand
         } else {
             $this->info('Addon installed successfully.');
         }
+
+        $this->checkInfo('Addon installed successfully.');
 
         return $this;
     }
