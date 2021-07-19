@@ -59,6 +59,9 @@ class EntryInterface extends InterfaceType
             'site' => [
                 'type' => GraphQL::nonNull(GraphQL::type(SiteType::NAME)),
             ],
+            'parent' => [
+                'type' => GraphQL::type(EntryInterface::NAME),
+            ],
         ];
 
         foreach ($this->extraFields() as $field => $closure) {
