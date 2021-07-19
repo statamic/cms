@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching\Middleware;
 use Closure;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\AbstractCacher;
 
 class Cache
 {
@@ -28,13 +29,22 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return response($this->cacher->getCachedPage($request));
+            $response = response($this->cacher->getCachedPage($request));
+            if (config('statamic.static_caching.send_static_cache_header') && $this->cacher instanceof AbstractCacher) {
+                $response->header('X-Statamic-Static-Cache', 'hit');
+            }
+
+            return $response;
         }
 
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
             $this->cacher->cachePage($request, $response);
+        }
+
+        if (config('statamic.static_caching.send_static_cache_header') && $this->cacher instanceof AbstractCacher) {
+            $response->header('X-Statamic-Static-Cache', 'miss');
         }
 
         return $response;
