@@ -3,6 +3,7 @@
 namespace Statamic\Console\Processes;
 
 use Closure;
+use Composer\Util\Platform;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Statamic\Support\Arr;
@@ -315,10 +316,23 @@ class Process
             $command = (string) $command;
         }
 
+        $composerEnv = [
+            'HOME' => getenv('HOME'),
+            // 'COMPOSER_HOME' => getenv('COMPOSER_HOME'),
+            // 'COMPOSER_CACHE_DIR' => getenv('COMPOSER_CACHE_DIR'),
+            // 'COMPOSER_AUTH' => getenv('COMPOSER_AUTH'),
+            // 'USERPROFILE' => getenv('USERPROFILE'),
+        ];
+
+        // if (Platform::isWindows()) {
+        //     $composerEnv['APPDATA'] = getenv('APPDATA');
+        //     $composerEnv['LOCALAPPDATA'] = getenv('LOCALAPPDATA');
+        // }
+
         // Handle both string and array command formats.
         $process = is_string($command) && method_exists(SymfonyProcess::class, 'fromShellCommandLine')
-            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, ['HOME' => getenv('HOME')])
-            : new SymfonyProcess($command, $path ?? $this->basePath, ['HOME' => getenv('HOME')]);
+            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, $composerEnv)
+            : new SymfonyProcess($command, $path ?? $this->basePath, $composerEnv);
 
         $process->setTimeout(null);
 
