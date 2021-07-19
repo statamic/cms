@@ -68,9 +68,9 @@ class MakeScope extends GeneratorCommand
                     ->add()->protected()->property('scopes', $scopeClassValue)
                     ->save();
 
-            $this->info('Scope component registered in your Addon ServiceProvider.');
+            $this->info('Scope registered in service provider successfully.');
         } catch (\Exception $e) {
-            $this->info("Don't forget to register the Scope class in your addon's ServiceProvider.php");
+            $this->comment("Don't forget to register the Scope class in your addon's service provider.");
         }
     }
 }

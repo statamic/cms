@@ -68,9 +68,9 @@ class MakeAction extends GeneratorCommand
                     ->add()->protected()->property('actions', $actionClassValue)
                     ->save();
 
-            $this->info('Action component registered in your Addon ServiceProvider.');
+            $this->info('Action registered in service provider successfully.');
         } catch (\Exception $e) {
-            $this->info("Don't forget to register the Action class in your addon's ServiceProvider.php");
+            $this->comment("Don't forget to register the Action class in your addon's service provider.");
         }
     }
 }

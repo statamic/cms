@@ -68,9 +68,9 @@ class MakeTag extends GeneratorCommand
                     ->add()->protected()->property('tags', $tagsClassValue)
                     ->save();
 
-            $this->info('Tag component registered in your Addon ServiceProvider.');
+            $this->info('Tag registered in service provider successfully.');
         } catch (\Exception $e) {
-            $this->info("Don't forget to register the Tag class in your addon's ServiceProvider.php");
+            $this->comment("Don't forget to register the Tag class in your addon's service provider.");
         }
     }
 

@@ -93,9 +93,9 @@ class MakeWidget extends GeneratorCommand
                     ->add()->protected()->property('widgets', $widgetClassValue)
                     ->save();
 
-            $this->info('Widget component registered in your Addon ServiceProvider.');
+            $this->info("Widget registered in service provider successfully.");
         } catch (\Exception $e) {
-            $this->info("Don't forget to register the Widget class in your addon's ServiceProvider.php");
+            $this->info("Don't forget to register the Widget class in your addon's service provider.");
         }
     }
 

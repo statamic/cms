@@ -68,9 +68,9 @@ class MakeModifier extends GeneratorCommand
                     ->add()->protected()->property('modifiers', $modifierClassValue)
                     ->save();
 
-            $this->info('Modifier component registered in your Addon ServiceProvider.');
+            $this->info('Modifier registered in service provider successfully.');
         } catch (\Exception $e) {
-            $this->info("Don't forget to register the Modifier class in your addon's ServiceProvider.php");
+            $this->comment("Don't forget to register the Modifier class in your addon's service provider.");
         }
     }
 }
