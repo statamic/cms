@@ -2,14 +2,11 @@
 
 namespace Statamic\Console\Commands;
 
-use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Pool;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
+use Illuminate\Http\Client\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
@@ -39,29 +36,23 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client();
-
-        $uris = $this->uris();
-
-        $pool = new Pool($client, $this->requests(), [
-            'fulfilled' => function (Response $response, $index) use ($uris) {
-                $this->checkLine($uris->get($index));
-            },
-            'rejected' => function (Exception $e, $index) use ($uris) {
-                $this->crossLine($uris->get($index));
-            },
-        ]);
-
-        $promise = $pool->promise();
-
-        $promise->wait();
+        Http::pool(function ($pool) {
+            return $this->requests($pool);
+        });
     }
 
-    private function requests(): array
+    private function requests($pool): array
     {
-        return $this->uris()->map(function ($uri) {
-            return new Request('GET', $uri);
+        return $this->uris()->map(function ($uri) use ($pool) {
+            $pool->get($uri)->then(function ($response) use ($uri) {
+                $this->outputResponseLine($uri, $response);
+            });
         })->all();
+    }
+
+    private function outputResponseLine(string $uri, Response $response): void
+    {
+        $response->ok() ? $this->checkLine($uri) : $this->crossLine($uri);
     }
 
     private function uris(): Collection
