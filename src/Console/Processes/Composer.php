@@ -8,7 +8,8 @@ use Statamic\Jobs\RunComposer;
 
 class Composer extends Process
 {
-    public $memoryLimit;
+    protected $memoryLimit;
+    protected $withoutQueue = false;
 
     /**
      * Instantiate composer process.
@@ -27,6 +28,18 @@ class Composer extends Process
     }
 
     /**
+     * Run without queue.
+     *
+     * @return $this
+     */
+    public function withoutQueue()
+    {
+        $this->withoutQueue = true;
+
+        return $this;
+    }
+
+    /**
      * Check if specific package is installed.
      *
      * @param string $package
@@ -34,7 +47,7 @@ class Composer extends Process
      */
     public function isInstalled(string $package)
     {
-        return Lock::file($this->basePath.'composer.lock')->isInstalled($package);
+        return Lock::file($this->basePath.'composer.lock')->isPackageInstalled($package);
     }
 
     /**
@@ -44,10 +57,17 @@ class Composer extends Process
      */
     public function installed()
     {
+        $lock = Lock::file($this->basePath.'composer.lock');
+
+        if (! $lock->exists()) {
+            return collect();
+        }
+
         return collect($this->runJsonComposerCommand('show', '--direct', '--no-plugins')->installed)
             ->keyBy('name')
-            ->map(function ($package) {
+            ->map(function ($package) use ($lock) {
                 $package->version = $this->normalizeVersion($package->version);
+                $package->dev = $lock->isDevPackageInstalled($package->name);
 
                 return $package;
             });
@@ -56,14 +76,18 @@ class Composer extends Process
     /**
      * Get installed version of a specific package.
      *
-     * We can easily use composer.lock in this case, which is more performant than running composer show.
-     *
      * @param string $package
      * @return string
      */
     public function installedVersion(string $package)
     {
-        $version = Lock::file($this->basePath.'composer.lock')->getInstalledVersion($package);
+        $lock = Lock::file($this->basePath.'composer.lock');
+
+        if (! $lock->exists()) {
+            return null;
+        }
+
+        $version = $lock->getInstalledVersion($package);
 
         return $this->normalizeVersion($version);
     }
@@ -87,22 +111,51 @@ class Composer extends Process
      *
      * @param string $package
      * @param string|null $version
+     * @param mixed $extraParams
      */
-    public function require(string $package, string $version = null)
+    public function require(string $package, string $version = null, ...$extraParams)
     {
-        $version
-            ? $this->queueComposerCommand('require', $package, $version, '--update-with-dependencies')
-            : $this->queueComposerCommand('require', $package, '--update-with-dependencies');
+        if ($version) {
+            $parts[] = $version;
+        }
+
+        $parts[] = '--update-with-dependencies';
+
+        $parts = array_merge($parts, $extraParams);
+
+        $this->queueComposerCommand('require', $package, ...$parts);
+    }
+
+    /**
+     * Require a dev package.
+     *
+     * @param string $package
+     * @param string|null $version
+     */
+    public function requireDev(string $package, string $version = null, ...$extraParams)
+    {
+        $this->require($package, $version, '--dev', ...$extraParams);
     }
 
     /**
      * Remove a package.
      *
      * @param string $package
+     * @param mixed $extraParams
      */
-    public function remove(string $package)
+    public function remove(string $package, ...$extraParams)
     {
-        $this->queueComposerCommand('remove', $package);
+        $this->queueComposerCommand('remove', $package, ...$extraParams);
+    }
+
+    /**
+     * Remove a dev package.
+     *
+     * @param string $package
+     */
+    public function removeDev(string $package)
+    {
+        $this->remove($package, '--dev');
     }
 
     /**
@@ -165,11 +218,17 @@ class Composer extends Process
      * @param mixed $parts
      * @return mixed
      */
-    private function runComposerCommand(...$parts)
+    public function runComposerCommand(...$parts)
     {
         return $this->run($this->prepareProcessArguments($parts));
     }
 
+    /**
+     * Run json composer command.
+     *
+     * @param mixed $parts
+     * @return string
+     */
     private function runJsonComposerCommand(...$parts)
     {
         $output = $this->runComposerCommand(...array_merge($parts, ['--format=json']));
@@ -189,6 +248,10 @@ class Composer extends Process
      */
     private function queueComposerCommand($command, $package, ...$extraParams)
     {
+        if ($this->withoutQueue) {
+            return $this->runComposerCommand($command, $package, ...$extraParams);
+        }
+
         $parts = array_merge([$command, $package], $extraParams);
 
         dispatch(new RunComposer($this->prepareProcessArguments($parts), $this->getCacheKey($package)));
@@ -206,7 +269,7 @@ class Composer extends Process
             $this->phpBinary(),
             "-d memory_limit={$this->memoryLimit}",
             'vendor/bin/composer',
-            '--ansi',
+            $this->colorized ? '--ansi' : '--no-ansi',
         ], $parts);
     }
 

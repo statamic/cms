@@ -126,13 +126,31 @@ class Lock
      * @param string $package
      * @return bool
      */
-    public function isInstalled(string $package)
+    public function isPackageInstalled(string $package)
     {
         $this->ensureExists();
 
-        return collect(json_decode($this->files->get($this->path))->packages)
-            ->keyBy('name')
-            ->has($package);
+        $lock = json_decode($this->files->get($this->path), true);
+
+        return collect($lock['packages'] ?? [])
+            ->merge($lock['packages-dev'] ?? [])
+            ->pluck('name')
+            ->contains($package);
+    }
+
+    /**
+     * Check if package is installed as dev dependency.
+     *
+     * @param string $package
+     * @return bool
+     */
+    public function isDevPackageInstalled(string $package)
+    {
+        $this->ensureExists();
+
+        return collect(json_decode($this->files->get($this->path), true)['packages-dev'] ?? [])
+            ->pluck('name')
+            ->contains($package);
     }
 
     /**

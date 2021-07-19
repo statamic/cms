@@ -35,7 +35,7 @@ class UserGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function it_can_make_a_user_interactively()
+    public function it_can_make_a_super_user_interactively()
     {
         $this->assertEmpty(User::all());
 
@@ -43,7 +43,7 @@ class UserGeneratorTest extends TestCase
             ->expectsQuestion('Email', 'jason@ifyoucantescapeit.org')
             ->expectsQuestion('Name', 'Jason')
             ->expectsQuestion('Password (Your input will be hidden)', 'midnight')
-            ->expectsQuestion('Super user', 'yes')
+            ->expectsQuestion('Super user', true)
             ->assertExitCode(0);
 
         $user = User::all()->first();
@@ -53,6 +53,25 @@ class UserGeneratorTest extends TestCase
         $this->assertEquals('Jason', $user->get('name'));
         $this->assertNotNull($user->password());
         $this->assertTrue($user->isSuper());
+    }
+
+    /** @test */
+    public function it_can_make_a_non_super_user_interactively()
+    {
+        $this->assertEmpty(User::all());
+
+        $this->artisan('statamic:make:user')
+            ->expectsQuestion('Email', 'jesses.girl@springfield.com')
+            ->expectsQuestion('Name', 'Gertrude')
+            ->expectsQuestion('Password (Your input will be hidden)', 'iloverickie')
+            ->expectsQuestion('Super user', false)
+            ->assertExitCode(0);
+
+        $user = User::all()->first();
+
+        $this->assertNotEmpty($user->id());
+        $this->assertEquals('jesses.girl@springfield.com', $user->email());
+        $this->assertFalse($user->isSuper());
     }
 
     /** @test */
@@ -68,5 +87,20 @@ class UserGeneratorTest extends TestCase
 
         $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com'])
             ->expectsOutput('A user with this email already exists.');
+    }
+
+    /** @test */
+    public function it_generates_with_and_without_super_option()
+    {
+        $this->assertEmpty(User::all());
+
+        $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com', '--super' => true]);
+        $this->artisan('statamic:make:user', ['email' => 'jesses.girl@springfield.com']);
+
+        $jason = User::all()->first();
+        $girl = User::all()->last();
+
+        $this->assertTrue($jason->isSuper());
+        $this->assertFalse($girl->isSuper());
     }
 }

@@ -78,7 +78,7 @@ class ProcessTest extends TestCase
     {
         $process = Process::create();
 
-        Log::shouldReceive('error');
+        Log::shouldReceive('error')->times(1);
 
         $process->run('not-a-command');
 

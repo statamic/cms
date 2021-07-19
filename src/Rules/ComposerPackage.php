@@ -25,6 +25,6 @@ class ComposerPackage implements Rule
      */
     public function message()
     {
-        return 'Please enter a valid composer package name (eg. john/my-addon).';
+        return 'Please enter a valid composer package name (eg. hasselhoff/kung-fury).';
     }
 }
