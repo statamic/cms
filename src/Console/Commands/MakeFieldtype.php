@@ -78,8 +78,13 @@ class MakeFieldtype extends GeneratorCommand
             $this->wireUpAddonJs($addon);
         } else {
             $this->line("Your {$this->typeLower} Vue component awaits: <comment>{$relativePath}</comment>");
-            $this->info("Don't forget to import and register your Fieldtype component in <comment>resources/js/cp.js</comment>");
+            $this->comment("Don't forget to import and register your Fieldtype component in <comment>resources/js/addon.js</comment>");
         }
+    }
+
+    protected function fieldtypeAlreadyExists()
+    {
+        return $this->files->exists($this->getAddonPath($this->argument('addon')). '/resources/js/addon.js');
     }
 
     /**
@@ -108,6 +113,11 @@ class MakeFieldtype extends GeneratorCommand
     {
         $addonPath = $this->getAddonPath($addon);
 
+        if ($this->fieldtypeAlreadyExists()) {
+            $this->comment("Don't forget to import and register your new Fieldtype component in <comment>{$addonPath}/resources/js/addon.js</comment>");
+            return;
+        }
+
         $files = [
             'addon/webpack.mix.js.stub' => 'webpack.mix.js',
             'addon/package.json.stub' => 'package.json',
@@ -120,12 +130,8 @@ class MakeFieldtype extends GeneratorCommand
             'root_namespace' => $this->rootNamespace(),
         ];
 
-        $this->info('Scaffolding the Vue component boilerplate...');
-        $this->info('--------------------------------------------------------------');
         foreach ($files as $stub => $file) {
-            $path = $addonPath.'/'.$file;
-            $this->createFromStub($stub, $path, $data);
-            $this->line($path);
+            $this->createFromStub($stub, $addonPath.'/'.$file, $data);
         }
     }
 
@@ -151,7 +157,7 @@ class MakeFieldtype extends GeneratorCommand
 
             $this->info('Fieldtype components registered in your Addon ServiceProvider.');
         } catch (\Exception $e) {
-            $this->info("Don't forget to register the Fieldtype class and scripts in your ServiceProvider.php");
+            $this->comment("Don't forget to register the Fieldtype class and scripts in your ServiceProvider.php");
         }
     }
 
