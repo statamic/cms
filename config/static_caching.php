@@ -27,7 +27,7 @@ return [
     | the cache, where 'hit' means that it was and 'miss' means that it was not.
     |
     | This will work as expected with the half strategy, however when using the
-    | full strategy, misses will should still show up in the headers as expected,
+    | full strategy, misses should still show up in the headers as expected,
     | but because full cache hits aren't processed by Statamic then we won't be able to
     | add the hit status to the X-Statamic-Static-Cache header.
     */
