@@ -226,9 +226,8 @@ class Statamic
         if ($attrs) {
             $attrs = " class=\"{$attrs}\"";
         }
-
-        if (config('statamic.cp.icons_cdn')) {
-            return sprintf('<img src="%s" %s />', asset("vendor/statamic/cp/svg/{$name}.svg"), $attrs);
+        if ($icons_cdn_url = config('statamic.cp.icons_cdn_url', null)) {
+            return "<img src=\"{$icons_cdn_url}vendor/statamic/cp/svg/{$name}.svg\" ${attrs} />";
         }
 
         $svg = StaticStringy::collapseWhitespace(
