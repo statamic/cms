@@ -114,7 +114,7 @@ class MakeFieldtype extends GeneratorCommand
         $addonPath = $this->getAddonPath($addon);
 
         if ($this->fieldtypeAlreadyExists()) {
-            $this->comment("Don't forget to import and register your new Fieldtype component in <comment>{$addonPath}/resources/js/addon.js</comment>");
+            $this->comment("Don't forget to import and register your new Fieldtype component in <comment>resources/js/addon.js</comment>");
 
             return;
         }
