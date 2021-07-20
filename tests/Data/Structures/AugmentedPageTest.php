@@ -23,6 +23,7 @@ class AugmentedPageTest extends AugmentedTestCase
 
         $expected = [
             'id',
+            'entry_id',
             'title',
             'url',
             'uri',
@@ -91,6 +92,8 @@ class AugmentedPageTest extends AugmentedTestCase
             'jane',
             // page data
             'john',
+            // page keys
+            'entry_id',
         ];
 
         $actual = $augmented->keys();
@@ -133,6 +136,7 @@ class AugmentedPageTest extends AugmentedTestCase
             'three' => ['type' => Value::class, 'value' => 'four'],
             'five' => ['type' => 'string', 'value' => 'six'],
             'id' => ['type' => 'string', 'value' => 'page-id'],
+            'entry_id' => ['type' => 'string', 'value' => null],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
@@ -170,6 +174,7 @@ class AugmentedPageTest extends AugmentedTestCase
         $entry->shouldReceive('blueprint')->andReturn($entryBlueprint);
         $entry->shouldReceive('url')->andReturn('/the-url');
         $entry->shouldReceive('uri')->andReturn('/the-uri');
+        $entry->shouldReceive('id')->andReturn('123');
         $entry->shouldReceive('absoluteUrl')->andReturn('https://site.com/the-permalink');
 
         $page = Mockery::mock(Page::class);
@@ -195,6 +200,7 @@ class AugmentedPageTest extends AugmentedTestCase
             'three' => ['type' => Value::class, 'value' => 'quatro'],
             'five' => ['type' => 'string', 'value' => 'seis'],
             'id' => ['type' => 'string', 'value' => 'page-id'],
+            'entry_id' => ['type' => 'string', 'value' => '123'],
         ];
 
         $this->assertSubsetAugmentedCorrectly($expectations, $augmented);

@@ -262,6 +262,7 @@ GQL;
 fragment Page on TreeBranch {
     page {
         id
+        entry_id
         title
         slug
         ... on EntryPage_Blog_Article {
@@ -285,6 +286,7 @@ GQL;
                             'depth' => 1,
                             'page' => [
                                 'id' => 'id-one',
+                                'entry_id' => '1',
                                 'title' => 'Standard Blog Post',
                                 'slug' => 'standard-blog-post',
                                 'intro' => 'The intro',
@@ -294,6 +296,7 @@ GQL;
                                     'depth' => 2,
                                     'page' => [
                                         'id' => 'id-two',
+                                        'entry_id' => '2',
                                         'title' => 'Art Directed Blog Post',
                                         'slug' => 'art-directed-blog-post',
                                         'hero_image' => 'hero.jpg',

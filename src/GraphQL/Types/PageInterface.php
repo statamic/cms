@@ -33,6 +33,10 @@ class PageInterface extends EntryInterface
     {
         $fields = parent::fields();
 
+        $fields['entry_id'] = [
+            'type' => GraphQL::ID(),
+        ];
+
         $fields['title']['type'] = GraphQL::string();
 
         return $fields;

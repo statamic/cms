@@ -28,7 +28,9 @@ class AugmentedPage extends AugmentedEntry
             ? parent::keys()
             : ['title', 'url', 'uri', 'permalink', 'id']);
 
-        $keys = $keys->merge($this->page->data()->keys());
+        $keys = $keys
+            ->merge($this->page->data()->keys())
+            ->merge(['entry_id']);
 
         $keys = Statamic::isApiRoute() ? $this->apiKeys($keys) : $keys;
 
@@ -69,5 +71,10 @@ class AugmentedPage extends AugmentedEntry
     protected function id()
     {
         return $this->page->id();
+    }
+
+    protected function entryId()
+    {
+        return $this->page->reference();
     }
 }
