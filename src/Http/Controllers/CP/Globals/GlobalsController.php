@@ -18,6 +18,8 @@ class GlobalsController extends CpController
     {
         $globals = GlobalSet::all()->filter(function ($set) {
             return User::current()->can('view', $set);
+        })->filter(function ($set) {
+            return $set->in(Site::selected()->handle()) !== null;
         })->tap(function ($globals) {
             $this->authorizeIf($globals->isEmpty(), 'create', GlobalSetContract::class);
         })->map(function ($set) {

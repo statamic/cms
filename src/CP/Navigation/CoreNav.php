@@ -121,7 +121,9 @@ class CoreNav
             ->icon('earth')
             ->can('index', GlobalSet::class)
             ->children(function () {
-                return GlobalSetAPI::all()->sortBy->title()->map(function ($globalSet) {
+                return GlobalSetAPI::all()->filter(function ($globalSet) {
+                    return $globalSet->in(Site::selected()->handle()) !== null;
+                })->sortBy->title()->map(function ($globalSet) {
                     $globalSet = $globalSet->in(Site::selected()->handle());
 
                     return Nav::item($globalSet->title())
