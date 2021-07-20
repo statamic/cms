@@ -148,6 +148,8 @@ export default {
 
     watch: {
         localizedFields(fields) {
+            if (this.loading) return;
+
             this.$emit('localized-fields-updated', fields);
         }
     },
@@ -218,16 +220,17 @@ export default {
         },
 
         getPageValues() {
-            const hasPublishValues = this.publishInfo && this.publishInfo.hasOwnProperty('values');
+            const hasPublishInfo = !!this.publishInfo;
+            const hasPublishInfoWithValues = hasPublishInfo && this.publishInfo.hasOwnProperty('values');
 
-            if (hasPublishValues) {
+            if (hasPublishInfo && hasPublishInfoWithValues) {
                 this.updatePublishInfo(this.publishInfo);
                 this.loading = false;
                 return;
             }
 
             const handle = 'links'; // todo
-            const creating = this.creating || !hasPublishValues;
+            const creating = this.creating || (hasPublishInfo && !hasPublishInfoWithValues);
 
             let url = creating
                 ? cp_url(`navigation/${handle}/pages/create`)
@@ -241,7 +244,7 @@ export default {
 
             this.$axios.get(url).then(response => {
                 this.updatePublishInfo(response.data);
-                this.emitPublishInfoUpdated(this.publishInfo.new ?? false);
+                this.emitPublishInfoUpdated(hasPublishInfo && this.publishInfo.new);
                 this.loading = false;
             });
         },
