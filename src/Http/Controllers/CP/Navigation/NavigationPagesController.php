@@ -151,6 +151,8 @@ class NavigationPagesController extends CpController
      */
     public function update(Request $request, $nav)
     {
+        $request->validate(['type' => 'required|in:url,entry']);
+
         $nav = Nav::find($nav);
 
         $blueprint = $this->ensureFields($nav->blueprint(), $request);

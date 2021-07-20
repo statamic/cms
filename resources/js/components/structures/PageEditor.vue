@@ -82,7 +82,7 @@ export default {
 
     data() {
         return {
-            type: this.entry ? 'entry' : 'page',
+            type: this.entry ? 'entry' : 'url',
             values: null,
             meta: null,
             originValues: null,
