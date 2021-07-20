@@ -134,7 +134,7 @@ class AssetFolder implements Contract, Arrayable
         return $this;
     }
 
-   /**
+    /**
      * Rename the folder.
      *
      * @param string $filename
@@ -218,5 +218,4 @@ class AssetFolder implements Contract, Arrayable
 
         return $newPath;
     }
-
 }
