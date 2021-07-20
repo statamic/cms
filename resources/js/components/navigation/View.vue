@@ -149,6 +149,8 @@
             creating
             :site="site"
             :blueprint="blueprint"
+            @publish-info-updated="updatePendingCreatedPagePublishInfo"
+            @localized-fields-updated="updatePendingCreatedPageLocalizedFields"
             @closed="closePageCreator"
             @submitted="pageCreated"
         />
@@ -320,20 +322,31 @@ export default {
         },
 
         openPageCreator() {
-            this.creatingPage = true;
+            this.creatingPage = { info: null };
         },
 
         closePageCreator() {
             this.creatingPage = false;
         },
 
-        pageCreated(page) {
-            this.closePageCreator();
-            this.$refs.tree.addPages([{
-                title: page.title,
-                url: page.url,
+        pageCreated(values) {
+            const page = {
+                id: uniqid(),
+                title: values.title,
+                url: values.url,
                 children: []
-            }], this.targetParent);
+            };
+
+            this.$set(this.publishInfo, page.id, {
+                ...this.creatingPage.info,
+                values,
+                entry: null,
+                new: true,
+            });
+
+            this.$refs.tree.addPages([page], this.targetParent);
+
+            this.closePageCreator();
         },
 
         deleteTreeBranch(branch, removeFromUi, orphanChildren) {
@@ -355,8 +368,16 @@ export default {
             this.publishInfo = { ...this.publishInfo, [this.editingPage.page.id]: info };
         },
 
+        updatePendingCreatedPagePublishInfo(info) {
+            this.creatingPage.info = info;
+        },
+
         updateLocalizedFields(fields) {
             this.publishInfo[this.editingPage.page.id].localizedFields = fields;
+        },
+
+        updatePendingCreatedPageLocalizedFields(fields) {
+            this.creatingPage.info.localizedFields = fields;
         },
 
         treeSaved(response) {
@@ -378,7 +399,7 @@ export default {
                 branch.id = newId;
                 this.$refs.tree.pageUpdated(branch._vm.store);
             }
-        },
+        }
 
     }
 
