@@ -22,6 +22,7 @@ class AugmentedPageTest extends AugmentedTestCase
         $augmented = new AugmentedPage($page);
 
         $expected = [
+            'id',
             'title',
             'url',
             'uri',
@@ -109,6 +110,7 @@ class AugmentedPageTest extends AugmentedTestCase
         ]);
 
         $page = Mockery::mock(Page::class);
+        $page->shouldReceive('id')->andReturn('page-id');
         $page->shouldReceive('reference')->andReturnFalse();
         $page->shouldReceive('title')->andReturn('The Page Title');
         $page->shouldReceive('blueprint')->andReturn($blueprint);
@@ -130,6 +132,7 @@ class AugmentedPageTest extends AugmentedTestCase
             'one' => ['type' => Value::class, 'value' => 'two'],
             'three' => ['type' => Value::class, 'value' => 'four'],
             'five' => ['type' => 'string', 'value' => 'six'],
+            'id' => ['type' => 'string', 'value' => 'page-id'],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
@@ -170,6 +173,7 @@ class AugmentedPageTest extends AugmentedTestCase
         $entry->shouldReceive('absoluteUrl')->andReturn('https://site.com/the-permalink');
 
         $page = Mockery::mock(Page::class);
+        $page->shouldReceive('id')->andReturn('page-id');
         $page->shouldReceive('reference')->andReturn('123');
         $page->shouldReceive('referenceExists')->andReturnTrue();
         $page->shouldReceive('entry')->andReturn($entry);
@@ -190,6 +194,7 @@ class AugmentedPageTest extends AugmentedTestCase
             'one' => ['type' => Value::class, 'value' => 'dos', 'fieldtype' => 'textarea'], // assert fieldtype to ensure the field from the page blueprint wins
             'three' => ['type' => Value::class, 'value' => 'quatro'],
             'five' => ['type' => 'string', 'value' => 'seis'],
+            'id' => ['type' => 'string', 'value' => 'page-id'],
         ];
 
         $this->assertSubsetAugmentedCorrectly($expectations, $augmented);

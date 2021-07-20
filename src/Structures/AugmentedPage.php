@@ -26,7 +26,7 @@ class AugmentedPage extends AugmentedEntry
     {
         $keys = collect($this->hasEntry
             ? parent::keys()
-            : ['title', 'url', 'uri', 'permalink']);
+            : ['title', 'url', 'uri', 'permalink', 'id']);
 
         $keys = $keys->merge($this->page->data()->keys());
 
@@ -64,5 +64,10 @@ class AugmentedPage extends AugmentedEntry
         }
 
         return $fields;
+    }
+
+    protected function id()
+    {
+        return $this->page->id();
     }
 }

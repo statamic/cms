@@ -78,12 +78,14 @@ GQL;
         tree {
             depth
             page {
+                id
                 title
                 url
             }
             children {
                 depth
                 page {
+                    id
                     title
                     url
                 }
@@ -103,6 +105,7 @@ GQL;
                         [
                             'depth' => 1,
                             'page' => [
+                                'id' => 'id-one',
                                 'title' => 'One',
                                 'url' => '/one',
                             ],
@@ -110,6 +113,7 @@ GQL;
                                 [
                                     'depth' => 2,
                                     'page' => [
+                                        'id' => 'id-one-nested',
                                         'title' => 'Nested',
                                         'url' => '/one/nested',
                                     ],
@@ -119,6 +123,7 @@ GQL;
                         [
                             'depth' => 1,
                             'page' => [
+                                'id' => 'id-two',
                                 'title' => 'Two',
                                 'url' => '/two',
                             ],
@@ -127,6 +132,7 @@ GQL;
                         [
                             'depth' => 1,
                             'page' => [
+                                'id' => 'id-just-url',
                                 'title' => null,
                                 'url' => '/just-url',
                             ],
@@ -226,9 +232,11 @@ GQL;
         Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
             $nav->makeTree('en', [
                 [
+                    'id' => 'id-one',
                     'entry' => '1',
                     'children' => [
                         [
+                            'id' => 'id-two',
                             'entry' => '2',
                         ],
                     ],
@@ -276,7 +284,7 @@ GQL;
                         [
                             'depth' => 1,
                             'page' => [
-                                'id' => '1',
+                                'id' => 'id-one',
                                 'title' => 'Standard Blog Post',
                                 'slug' => 'standard-blog-post',
                                 'intro' => 'The intro',
@@ -285,7 +293,7 @@ GQL;
                                 [
                                     'depth' => 2,
                                     'page' => [
-                                        'id' => '2',
+                                        'id' => 'id-two',
                                         'title' => 'Art Directed Blog Post',
                                         'slug' => 'art-directed-blog-post',
                                         'hero_image' => 'hero.jpg',
@@ -354,18 +362,22 @@ GQL;
         Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
             $nav->makeTree('en', [
                 [
+                    'id' => 'id-one',
                     'url' => '/one',
                     'title' => 'One',
                     'children' => [
                         [
+                            'id' => 'id-one-nested',
                             'url' => '/one/nested',
                             'title' => 'Nested',
                             'children' => [
                                 [
+                                    'id' => 'id-one-nested-doublenested',
                                     'url' => '/one/nested/double-nested',
                                     'title' => 'Double Nested',
                                     'children' => [
                                         [
+                                            'id' => 'id-one-nested-doublenested-tripenested',
                                             'url' => '/one/nested/double-nested/triple-nested',
                                             'title' => 'Triple Nested',
                                         ],
@@ -376,27 +388,33 @@ GQL;
                     ],
                 ],
                 [
+                    'id' => 'id-two',
                     'url' => '/two',
                     'title' => 'Two',
                 ],
                 [
+                    'id' => 'id-just-url',
                     'url' => '/just-url',
                 ],
             ])->save();
             $nav->makeTree('fr', [
                 [
+                    'id' => 'id-fr-one',
                     'url' => '/fr-one',
                     'title' => 'Fr One',
                     'children' => [
                         [
+                            'id' => 'id-fr-one-nested',
                             'url' => '/fr-one/fr-nested',
                             'title' => 'Fr Nested',
                             'children' => [
                                 [
+                                    'id' => 'id-fr-one-nested-doublenested',
                                     'url' => '/fr-one/fr-nested/fr-double-nested',
                                     'title' => 'Fr Double Nested',
                                     'children' => [
                                         [
+                                            'id' => 'id-fr-one-nested-doublenested-tripenested',
                                             'url' => '/fr-one/fr-nested/fr-double-nested/fr-triple-nested',
                                             'title' => 'Fr Triple Nested',
                                         ],
@@ -407,6 +425,7 @@ GQL;
                     ],
                 ],
                 [
+                    'id' => 'id-fr-two',
                     'url' => '/fr-two',
                     'title' => 'Fr Two',
                 ],
