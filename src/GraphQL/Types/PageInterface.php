@@ -29,6 +29,15 @@ class PageInterface extends EntryInterface
         GraphQL::addType(PageType::class);
     }
 
+    public function fields(): array
+    {
+        $fields = parent::fields();
+
+        $fields['title']['type'] = GraphQL::string();
+
+        return $fields;
+    }
+
     protected function extraFields()
     {
         return collect(GraphQL::getExtraTypeFields(static::NAME))

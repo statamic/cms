@@ -78,11 +78,13 @@ GQL;
         tree {
             depth
             page {
+                title
                 url
             }
             children {
                 depth
                 page {
+                    title
                     url
                 }
             }
@@ -100,17 +102,34 @@ GQL;
                     'tree' => [
                         [
                             'depth' => 1,
-                            'page' => ['url' => '/one'],
+                            'page' => [
+                                'title' => 'One',
+                                'url' => '/one',
+                            ],
                             'children' => [
                                 [
                                     'depth' => 2,
-                                    'page' => ['url' => '/one/nested'],
+                                    'page' => [
+                                        'title' => 'Nested',
+                                        'url' => '/one/nested',
+                                    ],
                                 ],
                             ],
                         ],
                         [
                             'depth' => 1,
-                            'page' => ['url' => '/two'],
+                            'page' => [
+                                'title' => 'Two',
+                                'url' => '/two',
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'depth' => 1,
+                            'page' => [
+                                'title' => null,
+                                'url' => '/just-url',
+                            ],
                             'children' => [],
                         ],
                     ],
@@ -187,6 +206,11 @@ GQL;
                         [
                             'depth' => 1,
                             'page' => ['url' => '/two'],
+                            'children' => [],
+                        ],
+                        [
+                            'depth' => 1,
+                            'page' => ['url' => '/just-url'],
                             'children' => [],
                         ],
                     ],
@@ -354,6 +378,9 @@ GQL;
                 [
                     'url' => '/two',
                     'title' => 'Two',
+                ],
+                [
+                    'url' => '/just-url',
                 ],
             ])->save();
             $nav->makeTree('fr', [
