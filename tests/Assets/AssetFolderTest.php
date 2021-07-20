@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetFolder as Folder;
 use Statamic\Contracts\Assets\AssetContainer;
@@ -251,6 +252,77 @@ class AssetFolderTest extends TestCase
         ], $container->contents()->cached()->keys()->all());
 
         // TODO: assert about event
+    }
+
+    /** @test */
+    public function it_can_be_moved_to_another_folder()
+    {
+        Storage::fake('local');
+
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+
+        $paths = collect([
+            'move/one.txt', 
+            'move/two.txt',
+            'move/sub/three.txt',
+            'move/sub/subsub/four.txt',
+            'destination/folder/five.txt', 
+        ]);
+
+        $disk = Storage::disk('local');
+
+        $paths->each(function ($path) use ($disk, $container) {
+            $disk->put($path, '');
+            $container->makeAsset($path)->save();
+        });
+
+        $paths->each(function ($path) use ($disk) {
+            $metaPath = Str::beforeLast($path, '/').'/.meta/'.Str::afterLast($path, '/').'.yaml';
+            $disk->assertExists($path);
+            $disk->assertExists($metaPath);
+        });
+
+        $this->assertCount(10, $disk->allFiles());
+
+        $this->assertEquals([
+            'move',
+            'move/sub',
+            'move/sub/subsub',
+            'destination',
+            'destination/folder',
+        ], $container->folders()->all());
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('move');
+
+        $folder->move('destination/folder');
+
+        $disk->assertMissing('move');
+        $disk->assertMissing('move/sub');
+        $disk->assertMissing('move/sub/subsub');
+        $disk->assertExists('destination/folder/move');
+        $disk->assertExists('destination/folder/move/sub');
+        $disk->assertExists('destination/folder/move/sub/subsub');
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/move',
+            'destination/folder/move/sub',
+            'destination/folder/move/sub/subsub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/five.txt',
+            'destination/folder/move',
+            'destination/folder/move/sub',
+            'destination/folder/move/sub/subsub',
+        ], $container->contents()->cached()->keys()->all());
     }
 
     /** @test */
