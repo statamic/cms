@@ -134,6 +134,49 @@ class AssetFolder implements Contract, Arrayable
         return $this;
     }
 
+   /**
+     * Rename the folder.
+     *
+     * @param string $filename
+     * @return AssetFolder
+     * @throws \Exception
+     */
+    public function rename($name)
+    {
+        return $this->move(optional($this->parent())->path(), $name);
+    }
+
+    /**
+     * Move the folder to a different location.
+     *
+     * @param string      $parent   The destination folder relative to the container.
+     * @param string|null $name     The new folder name, if renaming.
+     * @return AssetFolder
+     * @throws \Exception
+     */
+    public function move($parent, $name = null)
+    {
+        if (Str::startsWith($parent, $this->path())) {
+            throw new \Exception(__('Folder cannot be moved to its own subfolder.'));
+        }
+
+        $name = $name ?: $this->basename();
+        $oldPath = $this->path();
+        $newPath = Str::removeLeft(Path::tidy($parent.'/'.$name), '/');
+
+        if ($oldPath === $newPath) {
+            return $this;
+        }
+
+        $newPath = $this->ensureUniquePath($newPath);
+
+        $folder = $this->container->assetFolder($newPath)->save();
+        $this->container()->assets($oldPath, true)->each->move($newPath);
+        $this->delete();
+
+        return $folder;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -163,4 +206,17 @@ class AssetFolder implements Contract, Arrayable
             'basename' => $this->basename(),
         ];
     }
+
+    protected function ensureUniquePath($path, $count = 0)
+    {
+        $suffix = $count ? "-$count" : '';
+        $newPath = Str::removeLeft($path.$suffix, '/');
+
+        if ($this->disk()->exists($newPath)) {
+            return $this->ensureUniquePath($path, $count + 1);
+        }
+
+        return $newPath;
+    }
+
 }

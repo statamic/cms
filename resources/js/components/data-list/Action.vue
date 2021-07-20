@@ -104,6 +104,8 @@ export default {
         },
 
         confirm() {
+            this.confirming = false;
+
             this.$emit('selected', this.action, this.values);
         },
 

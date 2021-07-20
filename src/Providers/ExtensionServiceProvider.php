@@ -30,6 +30,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\SendPasswordReset::class,
         Actions\MoveAsset::class,
         Actions\RenameAsset::class,
+        Actions\MoveAssetFolder::class,
+        Actions\RenameAssetFolder::class,
     ];
 
     protected $fieldtypes = [
