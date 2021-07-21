@@ -112,4 +112,21 @@ return [
     'ajax_timeout' => '600000',
     'pcre_backtrack_limit' => '-1',
 
+    /*
+    |--------------------------------------------------------------------------
+    | System Environment Variables
+    |--------------------------------------------------------------------------
+    |
+    | Sometimes external processes `Composer` require additional environment variables.
+    | Here you can add any variables from getenv() that you would like to pass from Statamic.
+    | Simply specifiy the environment variable by name, example: 'HOME' will return the value of getenv('HOME')
+    |
+    | HOME and LARAVEL_SAIL will automatically attempt to be passed to the process.
+    */
+    'system_environment_variables' => [
+        // 'HOME',
+        // 'COMPOSER_HOME',
+        // 'COMPOSER_AUTH',
+    ],
+
 ];
