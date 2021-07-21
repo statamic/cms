@@ -70,9 +70,9 @@ class UpdateTaxonomyTest extends TestCase
                 'collections' => ['one', 'three'],
             ])
             ->assertOk();
-            
+
         $taxonomy = Taxonomy::find($taxonomy->handle());
-        
+
         // Taxonomies don't change on one, just updated, so clear taxonomies blink cache
         Blink::forget("collection-{$collectionOne->handle()}-taxonomies-*");
 
