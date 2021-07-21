@@ -30,7 +30,7 @@ abstract class BasicStore extends Store
         }
 
         if ($item = $this->getCachedItem($key)) {
-            return $item;
+            return clone $item;
         }
 
         $item = $this->makeItemFromFile($path, File::get($path));
