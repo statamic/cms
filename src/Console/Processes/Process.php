@@ -3,7 +3,6 @@
 namespace Statamic\Console\Processes;
 
 use Closure;
-use Composer\Util\Platform;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Statamic\Support\Arr;
@@ -41,6 +40,11 @@ class Process
     protected $logErrorOutput = true;
 
     /**
+     * @var array
+     */
+    protected $env = [];
+
+    /**
      * Create new process on path.
      *
      * @param string|null $basePath
@@ -48,6 +52,39 @@ class Process
     public function __construct($basePath = null)
     {
         $this->basePath = str_finish($basePath ?? base_path(), '/');
+
+        $this->constructEnv();
+    }
+
+    /**
+     * Construct the environment variables that will be passed to the process.
+     *
+     * @return void
+     */
+    protected function constructEnv()
+    {
+        $filteredEnv = array_merge([
+            'HOME',
+            'LARAVEL_SAIL',
+        ], config('statamic.system.system_environment_variables', []));
+
+        $this->env = collect(getenv())
+            ->only($filteredEnv)
+            ->toArray();
+
+        if ($this->isRunningInSail() && ! isset($this->env['HOME'])) {
+            $this->env['HOME'] = '/home/sail';
+        }
+    }
+
+    /**
+     * Check to see if Statamic is running in Laravel Sail.
+     *
+     * @return bool
+     */
+    protected function isRunningInSail(): bool
+    {
+        return isset($this->env['LARAVEL_SAIL']) && $this->env['LARAVEL_SAIL'] === '1';
     }
 
     /**
@@ -102,7 +139,7 @@ class Process
         $process->run(function ($type, $buffer) use (&$output, $operateOnOutput) {
             $this->logErrorOutput($type, $buffer);
             $this->output .= $operateOnOutput($buffer);
-        });
+        }, $this->env);
 
         return $this->output;
     }
@@ -147,7 +184,7 @@ class Process
         $process->run(function ($type, $buffer) use (&$output) {
             $this->logErrorOutput($type, $buffer);
             $this->output .= $buffer;
-        });
+        }, $this->env);
 
         return $this->normalizeOutput($this->output);
     }
@@ -169,7 +206,7 @@ class Process
         $process->run(function ($type, $buffer) use ($cacheKey) {
             $this->logErrorOutput($type, $buffer);
             $this->appendOutputToCache($cacheKey, $buffer);
-        });
+        }, $this->env);
 
         $this->setCompletedOnCache($cacheKey);
     }
@@ -316,23 +353,10 @@ class Process
             $command = (string) $command;
         }
 
-        $composerEnv = [
-            'HOME' => getenv('HOME'),
-            // 'COMPOSER_HOME' => getenv('COMPOSER_HOME'),
-            // 'COMPOSER_CACHE_DIR' => getenv('COMPOSER_CACHE_DIR'),
-            // 'COMPOSER_AUTH' => getenv('COMPOSER_AUTH'),
-            // 'USERPROFILE' => getenv('USERPROFILE'),
-        ];
-
-        // if (Platform::isWindows()) {
-        //     $composerEnv['APPDATA'] = getenv('APPDATA');
-        //     $composerEnv['LOCALAPPDATA'] = getenv('LOCALAPPDATA');
-        // }
-
         // Handle both string and array command formats.
         $process = is_string($command) && method_exists(SymfonyProcess::class, 'fromShellCommandLine')
-            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, $composerEnv)
-            : new SymfonyProcess($command, $path ?? $this->basePath, $composerEnv);
+            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, $this->env)
+            : new SymfonyProcess($command, $path ?? $this->basePath, $this->env);
 
         $process->setTimeout(null);
 
