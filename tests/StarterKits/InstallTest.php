@@ -445,7 +445,7 @@ EOT;
     }
 
     /** @test */
-    public function it_installs_paid_starter_kit_with_site_license_key()
+    public function it_installs_paid_starter_kit_with_valid_license_key()
     {
         Config::set('statamic.system.license_key', 'site-key');
 
@@ -457,9 +457,7 @@ EOT;
             'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
                 'price' => 100,
             ]], 200),
-            'outpost.*/v3/starter-kits/validate/site' => Http::response(['data' => [
-                'site_license' => 'site-key',
-                'kit_license' => 'kit-key',
+            'outpost.*/v3/starter-kits/validate' => Http::response(['data' => [
                 'valid' => true,
             ]], 200),
             '*' => Http::response('', 200),
@@ -473,7 +471,7 @@ EOT;
     }
 
     /** @test */
-    public function it_doesnt_install_paid_starter_kit_with_invalid_site_license_key()
+    public function it_doesnt_install_paid_starter_kit_with_invalid_license_key()
     {
         Config::set('statamic.system.license_key', 'site-key');
 
@@ -485,59 +483,7 @@ EOT;
             'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
                 'price' => 100,
             ]], 200),
-            'outpost.*/v3/starter-kits/validate/site' => Http::response(['data' => [
-                'site_license' => 'site-key',
-                'kit_license' => 'kit-key',
-                'valid' => false,
-            ]], 200),
-            '*' => Http::response('', 200),
-        ]);
-
-        $this->assertFalse(Blink::has('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertFileNotExists(base_path('composer.json.bak'));
-        $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
-    }
-
-    /** @test */
-    public function it_installs_paid_starter_kit_with_kit_license_key()
-    {
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
-
-        $this->installCoolRunnings(['--license-key' => 'kit-key'], [
-            'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
-                'price' => 100,
-            ]], 200),
-            'outpost.*/v3/starter-kits/validate/kit' => Http::response(['data' => [
-                'kit_license' => 'kit-key',
-                'valid' => true,
-            ]], 200),
-            '*' => Http::response('', 200),
-        ]);
-
-        $this->assertFalse(Blink::has('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertFileNotExists(base_path('composer.json.bak'));
-        $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileExists(base_path('copied.md'));
-    }
-
-    /** @test */
-    public function it_doesnt_install_paid_starter_kit_with_invalid_kit_license_key()
-    {
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
-
-        $this->installCoolRunnings(['--license-key' => 'kit-key'], [
-            'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
-                'price' => 100,
-            ]], 200),
-            'outpost.*/v3/starter-kits/validate/kit' => Http::response(['data' => [
-                'kit_license' => 'kit-key',
+            'outpost.*/v3/starter-kits/validate' => Http::response(['data' => [
                 'valid' => false,
             ]], 200),
             '*' => Http::response('', 200),
