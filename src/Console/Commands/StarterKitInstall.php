@@ -21,7 +21,7 @@ class StarterKitInstall extends Command
      */
     protected $signature = 'statamic:starter-kit:install
         { package? : Specify the starter kit package to install }
-        { --license-key= : Provide explicit starter kit license key }
+        { --license= : Provide explicit starter kit license key }
         { --with-config : Copy starter-kit.yaml config for development }
         { --without-dependencies : Install without dependencies }
         { --force : Force install and allow dependency errors }
@@ -47,7 +47,7 @@ class StarterKitInstall extends Command
             return;
         }
 
-        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license-key'), $this);
+        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this);
 
         if (! $licenseManager->isValid()) {
             return;
