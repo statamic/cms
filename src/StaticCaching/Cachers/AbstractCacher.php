@@ -5,7 +5,6 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as RequestFacade;
-use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -285,14 +284,6 @@ abstract class AbstractCacher implements Cacher
      */
     public function canBeCached(Request $request): bool
     {
-        if ($request->method() !== 'GET') {
-            return false;
-        }
-
-        if (Statamic::isCpRoute()) {
-            return false;
-        }
-
         return true;
     }
 
@@ -316,14 +307,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function shouldBeCached(Request $request, Response $response)
     {
-        // Only GET requests should be cached. For instance, Live Preview hits frontend URLs as
-        // POST requests to preview the changes. We don't want those to trigger any caching,
-        // or else pending changes will be shown immediately, even without hitting save.
-        if ($request->method() !== 'GET') {
-            return false;
-        }
-
-        if (Statamic::isCpRoute()) {
+        if (! $this->canBeCached($request)) {
             return false;
         }
 
