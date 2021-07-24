@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 
 class Cache
@@ -26,12 +27,27 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        if ($this->cacher->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return $this->cacher->response($request, response(null));
+        if ($this->canBeCached($request) && $this->cacher->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
+            $response = response(null); // Pass empty request to Cacher, Cacher will add the content.
+
+            return $this->cacher->response($request, $response);
         }
 
         $response = $next($request);
 
         return $this->cacher->response($request, $response);
+    }
+
+    private function canBeCached($request)
+    {
+        if ($request->method() !== 'GET') {
+            return false;
+        }
+
+        if (Statamic::isCpRoute()) {
+            return false;
+        }
+
+        return true;
     }
 }
