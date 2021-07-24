@@ -28,7 +28,7 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($this->canBeCached($request) && $this->cacher->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            $response = response(null); // Pass empty request to Cacher, Cacher will add the content.
+            $response = response(null); // Pass empty response to Cacher, Cacher will add the content.
 
             return $this->cacher->response($request, $response);
         }
