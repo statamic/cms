@@ -53,12 +53,12 @@ class NullCacher implements Cacher
         return false;
     }
 
-    public function canBeBypassed()
+    public function canBeBypassed(Request $request)
     {
         return false;
     }
 
-    public function shouldBeBypassed()
+    public function shouldBeBypassed(Request $request)
     {
         return false;
     }

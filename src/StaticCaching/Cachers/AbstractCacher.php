@@ -329,7 +329,7 @@ abstract class AbstractCacher implements Cacher
      * @param \Illuminate\Http\Request $request
      * @return bool
      */
-    public function canBeBypassed()
+    public function canBeBypassed(Request $request)
     {
         return false;
     }
@@ -340,7 +340,7 @@ abstract class AbstractCacher implements Cacher
      * @param \Illuminate\Http\Request $request
      * @return bool
      */
-    public function shouldBeBypassed()
+    public function shouldBeBypassed(Request $request)
     {
         return false;
     }
@@ -354,7 +354,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function response(Request $request, Response $response)
     {
-        if ($this->canBeBypassed() && $this->shouldBeBypassed()) {
+        if ($this->canBeBypassed($request) && $this->shouldBeBypassed($request)) {
             // Cache will be bypassed.
             $status = 'BYPASS';
         } elseif ($this->canBeCached($request) && $this->hasCachedPage($request)) {

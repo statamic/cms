@@ -85,7 +85,7 @@ interface Cacher
      * @param \Illuminate\Http\Request $request
      * @return bool
      */
-    public function canBeBypassed();
+    public function canBeBypassed(Request $request);
 
     /**
      * Check if the cache should be bypassed.
@@ -93,7 +93,7 @@ interface Cacher
      * @param \Illuminate\Http\Request $request
      * @return bool
      */
-    public function shouldBeBypassed();
+    public function shouldBeBypassed(Request $request);
 
     /**
      * Return the response from the cache, or dont.
