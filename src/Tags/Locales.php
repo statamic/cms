@@ -141,6 +141,10 @@ class Locales extends Tags
             return $this->data;
         }
 
+        if ($self = $this->context->get('self')) {
+            return $this->data = $self;
+        }
+
         $id = $this->params->get('id', $this->context->get('id'));
 
         return $this->data = Data::find($id);

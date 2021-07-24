@@ -94,4 +94,9 @@ abstract class AbstractAugmented implements Augmented
             ? $blueprint->fields()->all()
             : collect();
     }
+
+    protected function self()
+    {
+        return $this->data;
+    }
 }

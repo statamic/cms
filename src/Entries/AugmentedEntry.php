@@ -39,6 +39,7 @@ class AugmentedEntry extends AbstractAugmented
             'last_modified',
             'updated_at',
             'updated_by',
+            'self',
         ];
     }
 

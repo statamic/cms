@@ -32,6 +32,7 @@ class AugmentedTerm extends AbstractAugmented
             'edit_url',
             'updated_at',
             'updated_by',
+            'self',
         ];
     }
 
