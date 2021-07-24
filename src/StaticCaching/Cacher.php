@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 interface Cacher
 {
@@ -15,17 +16,34 @@ interface Cacher
     public function cachePage(Request $request, $content);
 
     /**
+     * Check if a page can be cached.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    public function canBeCached(Request $request);
+
+    /**
      * Check if a page has been cached.
      *
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @return bool
      */
     public function hasCachedPage(Request $request);
 
     /**
+     * Check if a page should be cached.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param Response $response
+     * @return bool
+     */
+    public function shouldBeCached(Request $request, Response $response);
+
+    /**
      * Get a cached page.
      *
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @return string
      */
     public function getCachedPage(Request $request);
@@ -60,4 +78,29 @@ interface Cacher
      * @return \Illuminate\Support\Collection
      */
     public function getUrls($domain = null);
+
+    /**
+     * Check if the cache can be bypassed.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    public function canBeBypassed();
+
+    /**
+     * Check if the cache should be bypassed.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    public function shouldBeBypassed();
+
+    /**
+     * Return the response from the cache, or dont.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param Response $response
+     * @return Response
+     */
+    public function response(Request $request, Response $response);
 }
