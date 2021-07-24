@@ -4,10 +4,11 @@ namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request as RequestFacade;
+use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractCacher implements Cacher
 {
@@ -276,8 +277,123 @@ abstract class AbstractCacher implements Cacher
         return $this->normalizeKey($this->makeHash($domain).'.urls');
     }
 
+    /**
+     * Check if a page can be cached.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    public function canBeCached(Request $request): bool
+    {
+        if ($request->method() !== 'GET') {
+            return false;
+        }
+
+        if (Statamic::isCpRoute()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if a given URL should be excluded from caching.
+     *
+     * @param \Illuminate\Http\Request $url
+     * @return bool
+     */
     public function hasCachedPage(Request $request)
     {
         return $this->getCachedPage($request) !== null;
+    }
+
+    /**
+     * Check if a page should be cached.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param Response $response
+     * @return bool
+     */
+    public function shouldBeCached(Request $request, Response $response)
+    {
+        // Only GET requests should be cached. For instance, Live Preview hits frontend URLs as
+        // POST requests to preview the changes. We don't want those to trigger any caching,
+        // or else pending changes will be shown immediately, even without hitting save.
+        if ($request->method() !== 'GET') {
+            return false;
+        }
+
+        if (Statamic::isCpRoute()) {
+            return false;
+        }
+
+        // Draft and private pages should not be cached.
+        if ($response->headers->has('X-Statamic-Draft') || $response->headers->has('X-Statamic-Private')) {
+            return false;
+        }
+
+        if ($response->getStatusCode() !== 200 || $response->getContent() == '') {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the cache can be bypassed.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    public function canBeBypassed()
+    {
+        return false;
+    }
+
+    /**
+     * Check if the cache should be bypassed.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    public function shouldBeBypassed()
+    {
+        return false;
+    }
+
+    /**
+     * Return the response from the cache, or dont.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param Response $response
+     * @return Response
+     */
+    public function response(Request $request, Response $response)
+    {
+        if ($this->canBeBypassed() && $this->shouldBeBypassed()) {
+            // Cache will be bypassed.
+            $status = 'BYPASS';
+        } elseif ($this->canBeCached($request) && $this->hasCachedPage($request)) {
+            // Page is cached, use cache.
+            $response->setContent($this->getCachedPage($request));
+            $status = 'HIT';
+        } elseif ($this->canBeCached($request) && ! $this->hasCachedPage($request)) {
+            // Page is not cached, cache it.
+            $this->cachePage($request, $response);
+            $status = 'MISS';
+        } elseif (! $this->canBeCached($request) || ! $this->shouldBeCached($request, $response)) {
+            // Cache will be bypassed.
+            $status = 'BYPASS';
+        } else {
+            // Cache was not hit/used.
+            $status = 'MISS';
+        }
+
+        if (config('statamic.static_caching.send_static_cache_header') && method_exists($response, 'header')) {
+            // Set cache header to: [ HIT | MISS | BYPASS ]
+            $response->header(config('statamic.static_caching.static_cache_header', 'X-Statamic-Static-Cache'), $status);
+        }
+
+        return $response;
     }
 }
