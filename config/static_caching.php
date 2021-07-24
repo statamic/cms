@@ -92,4 +92,25 @@ return [
 
     'ignore_query_strings' => false,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Static-Cache Header
+    |--------------------------------------------------------------------------
+    |
+    | Here you may enable the X-Statamic-Static-Cache HTTP response header.
+    | This may be useful for debugging.
+    |
+    | Feel free to rename the header below.
+    |
+    | When enabled the header will appear in the response headers
+    | with either 'HIT', 'MISS' or 'BYPASS' depending on if the content was served by
+    | the cache.
+    |
+    | This will work as expected with the half strategy, however when using the
+    | full strategy, misses should still show up in the headers as expected,
+    | but because full cache hits aren't processed by Statamic then we won't be able to
+    | add the hit status to the Static Cache header.
+    */
+    'static_cache_header' => 'X-Statamic-Static-Cache',
+    'send_static_cache_header' => env('STATAMIC_STATIC_CACHING_HEADER', false),
 ];
