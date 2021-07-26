@@ -2,31 +2,38 @@
    TABS
    ========================================================================== */
 
+.tabs-container.offset-for-sidebar {
+    width: calc(100% - 320px);
+}
+
 .tabs {
-    @apply .flex .w-full items-end overflow-hidden pl-1 -ml-1;
+    @apply flex items-end overflow-hidden px-1 -ml-1;
     height: 48px;
 
-    a {
-        @apply .bg-grey-10 .py-sm .px-2 .leading-tight .text-xs .w-auto .relative .flex .items-center .justify-center rounded-t-md shadow border-b border-grey-30 select-none;
+    .tab-button {
+        @apply whitespace-no-wrap bg-grey-10 py-sm px-2 flex-shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-grey-30 select-none;
         height: 94%;
         min-height: 94%;
-
     }
 
-    a.active {
-        @apply bg-white text-blue border-t-2 border-blue relative .h-full .min-h-full border-b-0;
+    .tab-button.active {
+        @apply bg-white text-blue border-t-2 border-blue relative h-full min-h-full border-b-0 outline-none;
         z-index: 1;
     }
 
-    a.ghost {
-        @apply bg-transparent relative .h-full .min-h-full shadow-none border-none text-grey-50 px-3;
+    .tab-button:active, .tab-button:focus {
+        @apply bg-white text-blue border-b-0 outline-none;
+    }
+
+    .tab-button.ghost {
+        @apply bg-transparent relative h-full min-h-full shadow-none border-none text-grey-50 px-3;
         min-width: 0;
         &:hover {
             @apply text-blue;
         }
     }
 
-    a.has-error {
+    .tab-button.has-error {
         @apply text-red;
 
         &.active {
@@ -36,8 +43,8 @@
 }
 
 @screen md {
-    .tabs a {
-        min-width: 140px;
+    .tabs .tab-button {
+        min-width: 100px;
     }
 }
 
@@ -46,5 +53,5 @@
   ========================================================================== */
 
 @screen md {
-    .tabs a { @apply .text-base; }
+    .tabs .tab-button { @apply .text-base; }
 }
