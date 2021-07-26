@@ -171,7 +171,8 @@ class AssetFolder implements Contract, Arrayable
         $newPath = $this->ensureUniquePath($newPath);
 
         $folder = $this->container->assetFolder($newPath)->save();
-        $this->container()->assets($oldPath, true)->each->move($newPath);
+        $this->container()->assetFolders($oldPath)->each->move($newPath);
+        $this->container()->assets($oldPath)->each->move($newPath);
         $this->delete();
 
         return $folder;
