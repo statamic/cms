@@ -33,12 +33,6 @@ class RenameAssetFolder extends Action
         return 'Are you sure you want to rename this folder?|Are you sure you want to rename these :count folders?';
     }
 
-    public function warningText()
-    {
-        /** @translation */
-        return 'messages.rename_asset_folder_warning';
-    }
-
     public function run($folders, $values)
     {
         $name = strtolower($values['name']);
