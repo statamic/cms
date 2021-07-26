@@ -30,7 +30,7 @@ class RenameAssetFolder extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Are you sure you want to rename this asset folder?|Are you sure you want to rename these :count asset folders?';
+        return 'Are you sure you want to rename this folder?|Are you sure you want to rename these :count folders?';
     }
 
     public function run($folders, $values)
