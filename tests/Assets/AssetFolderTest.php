@@ -303,6 +303,7 @@ class AssetFolderTest extends TestCase
         $disk->assertMissing('move');
         $disk->assertMissing('move/sub');
         $disk->assertMissing('move/sub/subsub');
+
         $disk->assertExists('destination/folder/move');
         $disk->assertExists('destination/folder/move/sub');
         $disk->assertExists('destination/folder/move/sub/subsub');
@@ -322,6 +323,10 @@ class AssetFolderTest extends TestCase
             'destination/folder/move',
             'destination/folder/move/sub',
             'destination/folder/move/sub/subsub',
+            'destination/folder/move/sub/subsub/four.txt',
+            'destination/folder/move/sub/three.txt',
+            'destination/folder/move/one.txt',
+            'destination/folder/move/two.txt',
         ], $container->contents()->cached()->keys()->all());
     }
 
