@@ -7,7 +7,7 @@
 }
 
 .tabs {
-    @apply flex items-end overflow-hidden pl-1 -ml-1;
+    @apply flex items-end overflow-hidden px-1 -ml-1;
     height: 48px;
 
     .tab-button {
