@@ -264,11 +264,11 @@ class AssetFolderTest extends TestCase
         Facades\AssetContainer::shouldReceive('save')->with($container);
 
         $paths = collect([
-            'move/one.txt', 
+            'move/one.txt',
             'move/two.txt',
             'move/sub/three.txt',
             'move/sub/subsub/four.txt',
-            'destination/folder/five.txt', 
+            'destination/folder/five.txt',
         ]);
 
         $disk = Storage::disk('local');
