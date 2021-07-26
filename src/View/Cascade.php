@@ -79,7 +79,6 @@ class Cascade
 
     public function hydrate()
     {
-        $this->data([]);
         $this->sections = collect();
 
         return $this
