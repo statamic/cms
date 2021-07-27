@@ -2,6 +2,7 @@
 
 namespace Tests\Assets;
 
+use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -202,6 +203,26 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
+    public function it_adds_a_gitkeep_file_when_saving()
+    {
+        Storage::fake('local');
+
+        $container = $this->mock(AssetContainer::class);
+        $container->shouldReceive('disk')->andReturn($disk = Storage::disk('local'));
+        $container->shouldReceive('foldersCacheKey')->andReturn('irrelevant for test');
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path($path = 'path/to/folder');
+
+        $disk->assertMissing($path.'/.gitkeep');
+
+        $folder->save();
+
+        $disk->assertExists($path.'/.gitkeep');
+    }
+
+    /** @test */
     public function deleting_a_folder_deletes_the_assets_and_directory()
     {
         Storage::fake('local');
@@ -257,11 +278,8 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_can_be_moved_to_another_folder()
     {
-        Storage::fake('local');
-
-        $container = Facades\AssetContainer::make('test')->disk('local');
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
-        Facades\AssetContainer::shouldReceive('save')->with($container);
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
 
         $paths = collect([
             'move/one.txt',
@@ -270,8 +288,6 @@ class AssetFolderTest extends TestCase
             'move/sub/subsub/four.txt',
             'destination/folder/five.txt',
         ]);
-
-        $disk = Storage::disk('local');
 
         $paths->each(function ($path) use ($disk, $container) {
             $disk->put($path, '');
@@ -331,6 +347,86 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
+    public function it_cannot_be_moved_to_its_own_subfolder()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $path = 'move/sub/foo.txt';
+        $disk->put($path, '');
+        $container->makeAsset($path)->save();
+
+        $this->assertCount(2, $disk->allFiles());
+
+        $this->assertEquals([
+            'move',
+            'move/sub',
+        ], $container->folders()->all());
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('move');
+
+        $this->expectException(Exception::class);
+
+        $folder->move('move/sub');
+
+        $this->assertEquals([
+            'move',
+            'move/sub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'move',
+            'move/sub',
+            'move/sub/foo.txt',
+        ], $container->contents()->cached()->keys()->all());
+    }
+
+    /** @test */
+    public function it_can_be_renamed()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $path = 'before/sub/foo.txt';
+        $disk->put($path, '');
+        $container->makeAsset($path)->save();
+
+        $this->assertCount(2, $disk->allFiles());
+
+        $this->assertEquals([
+            'before',
+            'before/sub',
+        ], $container->folders()->all());
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('before');
+
+        $folder->rename('after');
+
+        $disk->assertMissing('before');
+        $disk->assertMissing('before/sub');
+        $disk->assertMissing('before/sub/foo.txt');
+
+        $disk->assertExists('after');
+        $disk->assertExists('after/sub');
+        $disk->assertExists('after/sub/foo.txt');
+
+        $this->assertEquals([
+            'after',
+            'after/sub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'after',
+            'after/sub',
+            'after/sub/foo.txt',
+        ], $container->contents()->cached()->keys()->all());
+    }
+
+    /** @test */
     public function it_gets_the_parent_folder()
     {
         $container = $this->mock(AssetContainer::class);
@@ -381,5 +477,16 @@ class AssetFolderTest extends TestCase
             'parent_path' => 'grandparent/parent',
             'basename' => 'child',
         ], $folder->toArray());
+    }
+
+    private function containerWithDisk()
+    {
+        Storage::fake('local');
+
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+
+        return $container;
     }
 }
