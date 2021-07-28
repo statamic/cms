@@ -157,6 +157,23 @@ EOT;
         $this->assertEquals(1, $status->addedCount);
         $this->assertEquals(0, $status->modifiedCount);
         $this->assertEquals(0, $status->deletedCount);
+
+        Git::commit();
+
+        $this->files->put($externalPath.'/statement.txt', 'Change statement again.');
+
+        $status = Git::statuses()->get(Path::resolve(base_path('content')));
+
+        $expectedStatus = <<<'EOT'
+ M assets-linked/statement.txt
+EOT;
+
+        $this->assertEquals($expectedStatus, $status->status);
+
+        $this->assertEquals(1, $status->totalCount);
+        $this->assertEquals(0, $status->addedCount);
+        $this->assertEquals(1, $status->modifiedCount);
+        $this->assertEquals(0, $status->deletedCount);
     }
 
     /** @test */
