@@ -1,5 +1,20 @@
 # Release Notes
 
+## 3.1.31 (2021-07-28)
+
+### What's new
+- Ability to query individual entries in a specific site using GraphQL. [#4055](https://github.com/statamic/cms/issues/4055)
+
+### What's improved
+- Publish form tabs now overflow into a dropdown when there's no more room. [#4051](https://github.com/statamic/cms/issues/4051)
+- Field handles are shown when hovering over labels for a moment. [statamic/ideas#302](https://github.com/statamic/ideas/issues/302)
+
+### What's fixed
+- Fix newly uploaded assets showing incorrect metadata. [#4059](https://github.com/statamic/cms/issues/4059)
+- Fix updating of entry's `author` field when user doesn't have permission to edit author. [#4052](https://github.com/statamic/cms/issues/4052)
+
+
+
 ## 3.1.30 (2021-07-26)
 
 ### What's new
