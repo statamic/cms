@@ -27,18 +27,21 @@
         </div>
 
         <div class="publish-tabs tabs">
-            <a :class="{ 'active': activeTab === 'settings' }"
+            <button class="tab-button"
+            :class="{ 'active': activeTab === 'settings' }"
                 @click="activeTab = 'settings'"
                 v-text="__('Settings')"
-            ></a>
-            <a class="z-5" :class="{ 'active': activeTab === 'conditions' }"
+            />
+            <button class="tab-button"
+            :class="{ 'active': activeTab === 'conditions' }"
                 @click="activeTab = 'conditions'"
                 v-text="__('Conditions')"
-            ></a>
-            <a :class="{ 'active': activeTab === 'validation' }"
+            />
+            <button class="tab-button"
+            :class="{ 'active': activeTab === 'validation' }"
                 @click="activeTab = 'validation'"
                 v-text="__('Validation')"
-            ></a>
+            />
         </div>
 
         <div class="card rounded-tl-none" v-if="!loading">
