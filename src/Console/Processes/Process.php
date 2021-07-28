@@ -5,6 +5,7 @@ namespace Statamic\Console\Processes;
 use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -323,5 +324,29 @@ class Process
         $process->setTimeout(null);
 
         return $process;
+    }
+
+    /**
+     * Get process base path.
+     *
+     * @return string
+     */
+    public function getBasePath()
+    {
+        return preg_replace('/(.*)\/$/', '$1', $this->basePath);
+    }
+
+    /**
+     * Clone process from parent relative to base path.
+     *
+     * @return Process
+     */
+    public function fromParent()
+    {
+        $that = clone $this;
+
+        $that->basePath = str_finish(Path::resolve($this->basePath.'/../'), '/');
+
+        return $that;
     }
 }
