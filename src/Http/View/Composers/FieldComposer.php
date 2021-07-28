@@ -12,6 +12,7 @@ class FieldComposer
     const VIEWS = [
         'statamic::*.blueprints.edit',
         'statamic::fieldsets.edit',
+        'statamic::blueprints.edit',
     ];
 
     protected $fieldsetFields;
