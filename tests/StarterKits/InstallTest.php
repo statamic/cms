@@ -9,6 +9,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Tests\TestCase;
 
 class InstallTest extends TestCase
@@ -111,6 +112,20 @@ class InstallTest extends TestCase
         $this->assertEquals('https://gitlab.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
         $this->assertFileNotExists($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_installs_successfully_without_pinging_cloud_when_local_option_is_passed()
+    {
+        Http::fake(function ($request) {
+            return Str::contains($request->url(), 'outpost.')
+                ? Http::response(['data' => ['price' => null]], 200)
+                : $this->fail('We should not be checking cloud for repo when passing `--local` option.');
+        });
+
+        $this->installCoolRunnings(['--local' => true]);
+
         $this->assertFileExists(base_path('copied.md'));
     }
 

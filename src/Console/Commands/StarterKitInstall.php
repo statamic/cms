@@ -22,7 +22,8 @@ class StarterKitInstall extends Command
     protected $signature = 'statamic:starter-kit:install
         { package? : Specify the starter kit package to install }
         { --license= : Provide explicit starter kit license key }
-        { --with-config : Copy starter-kit.yaml config for development }
+        { --local : Install from local repo configured in composer config.json }
+        { --with-config : Copy starter-kit.yaml config for local development }
         { --without-dependencies : Install without dependencies }
         { --force : Force install and allow dependency errors }
         { --clear-site : Clear site before installing }';
@@ -58,6 +59,7 @@ class StarterKitInstall extends Command
         }
 
         $installer = StarterKitInstaller::package($package, $licenseManager, $this)
+            ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
             ->withUser($cleared && $this->input->isInteractive())

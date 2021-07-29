@@ -17,6 +17,7 @@ final class Installer
     protected $package;
     protected $licenseManager;
     protected $files;
+    protected $fromLocalRepo;
     protected $withConfig;
     protected $withoutDependencies;
     protected $withUser;
@@ -54,7 +55,20 @@ final class Installer
     }
 
     /**
-     * Install with starter-kit config for development purposes.
+     * Install from local repo configured in composer config.json.
+     *
+     * @param bool $fromLocalRepo
+     * @return $this
+     */
+    public function fromLocalRepo($fromLocalRepo = false)
+    {
+        $this->fromLocalRepo = $fromLocalRepo;
+
+        return $this;
+    }
+
+    /**
+     * Install with starter-kit config for local development purposes.
      *
      * @param bool $withConfig
      * @return $this
@@ -164,6 +178,10 @@ final class Installer
      */
     protected function detectRepositoryUrl()
     {
+        if ($this->fromLocalRepo) {
+            return $this;
+        }
+
         if (Http::get("https://repo.packagist.org/p2/{$this->package}.json")->status() === 200) {
             return $this;
         }
@@ -186,7 +204,7 @@ final class Installer
      */
     protected function prepareRepository()
     {
-        if (! $this->url) {
+        if ($this->fromLocalRepo || ! $this->url) {
             return $this;
         }
 
@@ -496,7 +514,7 @@ final class Installer
      */
     protected function removeRepository()
     {
-        if (! $this->url) {
+        if ($this->fromLocalRepo || ! $this->url) {
             return $this;
         }
 
