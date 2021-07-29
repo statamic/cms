@@ -132,7 +132,7 @@ EOT;
     }
 
     /** @test */
-    public function it_can_run_git_commands_from_symlinked_repo_folders()
+    public function it_can_handle_configured_paths_that_are_symlinks()
     {
         $externalPath = Path::resolve(base_path('../assets-external'));
         $symlinkPath = base_path('content/assets-linked');
@@ -156,23 +156,6 @@ EOT;
         $this->assertEquals(1, $status->totalCount);
         $this->assertEquals(1, $status->addedCount);
         $this->assertEquals(0, $status->modifiedCount);
-        $this->assertEquals(0, $status->deletedCount);
-
-        Git::commit();
-
-        $this->files->put($externalPath.'/statement.txt', 'Change statement again.');
-
-        $status = Git::statuses()->get(Path::resolve(base_path('content')));
-
-        $expectedStatus = <<<'EOT'
- M assets-linked/statement.txt
-EOT;
-
-        $this->assertEquals($expectedStatus, $status->status);
-
-        $this->assertEquals(1, $status->totalCount);
-        $this->assertEquals(0, $status->addedCount);
-        $this->assertEquals(1, $status->modifiedCount);
         $this->assertEquals(0, $status->deletedCount);
     }
 
