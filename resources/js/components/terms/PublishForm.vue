@@ -21,7 +21,7 @@
 
                 <save-button-options
                     v-if="!readOnly"
-                    :show-options="!revisionsEnabled"
+                    :show-options="!revisionsEnabled && !isInline"
                     :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
@@ -269,6 +269,7 @@ export default {
         amp: Boolean,
         initialPublished: Boolean,
         isCreating: Boolean,
+        isInline: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
         initialPermalink: String,
@@ -443,17 +444,25 @@ export default {
                     response
                 })
                 .then(() => {
+                    // If revisions are enabled, just emit event.
+                    if (this.revisionsEnabled) {
+                        this.$nextTick(() => this.$emit('saved', response));
+                        return;
+                    }
+
                     // If the user has opted to create another entry, redirect them to create page.
-                    if (! this.revisionsEnabled && this.afterSaveOption === 'create_another') {
+                    if (!this.isInline && this.afterSaveOption === 'create_another') {
                         window.location = this.createAnotherUrl;
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (! this.revisionsEnabled && this.afterSaveOption === null) {
+                    else if (!this.isInline && this.afterSaveOption === null) {
                         window.location = this.listingUrl;
                     }
 
-                    // Otherwise, leave them on the edit form and emit an event.
+                    // Otherwise, leave them on the edit form and emit an event. We need to wait until after
+                    // the hooks are resolved because if this form is being shown in a stack, we only
+                    // want to close it once everything's done.
                     else {
                         this.$nextTick(() => this.$emit('saved', response));
                     }
