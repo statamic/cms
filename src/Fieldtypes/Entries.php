@@ -55,6 +55,7 @@ class Entries extends Relationship
         return array_merge(parent::configFieldItems(), [
             'create' => [
                 'display' => __('Allow Creating'),
+                'instructions' => __('statamic::fieldtypes.entries.config.create'),
                 'type' => 'toggle',
                 'default' => true,
                 'width' => 50,
