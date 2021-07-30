@@ -2,6 +2,7 @@
 
 namespace Tests\Fields;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Mockery;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
@@ -151,7 +152,6 @@ class FieldtypeTest extends TestCase
             'localizable' => true,
             'validatable' => true,
             'defaultable' => true,
-            'selectable' => true,
             'categories' => ['text'],
             'icon' => 'test',
             'config' => [],
@@ -340,6 +340,23 @@ class FieldtypeTest extends TestCase
         $type = (new TestFieldtype)->toGqlType();
 
         $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $type);
+    }
+
+    /** @test */
+    public function it_can_make_a_fieldtype_selectable_in_forms()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public static $handle = 'test';
+        };
+
+        $this->assertFalse($fieldtype->selectableInForms());
+        $this->assertFalse(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
+
+        $fieldtype::makeSelectableInForms();
+
+        $this->assertTrue($fieldtype->selectableInForms());
+        $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
     }
 }
 

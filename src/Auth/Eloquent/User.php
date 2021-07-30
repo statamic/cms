@@ -206,7 +206,7 @@ class User extends BaseUser
     public function removeFromGroup($group)
     {
         $groups = collect(array_wrap($group))->map(function ($group) {
-            return is_string($group) ? group::find($group) : $group;
+            return is_string($group) ? UserGroup::find($group) : $group;
         })->filter();
 
         $groups->each(function ($group) {

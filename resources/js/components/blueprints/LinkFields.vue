@@ -100,46 +100,52 @@ export default {
     },
 
     data() {
-        let fields = this.$config.get('fieldsetFields');
-        let fieldsets = this.$config.get('fieldsets');
+        const fieldsets = JSON.parse(JSON.stringify(
+            Object.values(this.$config.get('fieldsets')).filter(fieldset => 
+                fieldset.handle != this.excludeFieldset
+            )
+        ));
+
+        const fieldSuggestions = fieldsets.flatMap(fieldset => {
+            return fieldset.fields
+                .filter(field => field.type !== 'import')
+                .map(field => ({
+                    value: `${fieldset.handle}.${field.handle}`,
+                    label: field.config.display,
+                    fieldset: fieldset.title,
+                }));
+        });
 
         return {
             open: false,
             reference: null,
             fieldset: null,
             importPrefix: null,
-            fieldSuggestions: Object.values(fields).filter(field => {
-                return field.fieldset.handle != this.excludeFieldset;
-            }).map(field => {
-                return {
-                    value: `${field.fieldset.handle}.${field.handle}`,
-                    label: field.display,
-                    fieldset: fieldsets[field.fieldset.handle].title
-                };
-            }),
-            fieldsetSuggestions: Object.values(fieldsets).filter(fieldset => {
-                return fieldset.handle != this.excludeFieldset;
-            }).map(fieldset => {
-                return {
-                    value: fieldset.handle,
-                    label: fieldset.title,
-                };
-            })
+            fieldSuggestions,
+            fieldsetSuggestions: fieldsets.map(fieldset => ({
+                value: fieldset.handle,
+                label: fieldset.title,
+            })),
+            fieldsets,
         }
     },
 
     methods: {
 
         linkField() {
-            const field = JSON.parse(JSON.stringify(window.Statamic.$config.get('fieldsetFields')[this.reference]));
+            const [fieldsetHandle, fieldHandle] = this.reference.split('.');
+
+            const field = this.fieldsets
+                .find(fieldset => fieldset.handle === fieldsetHandle).fields
+                .find(field => field.handle === fieldHandle);
+
+            field.config.isNew = true;
 
             this.linkAndClose({
+                ...field,
                 _id: uniqid(),
                 type: 'reference',
-                fieldtype: field.type,
                 field_reference: this.reference,
-                handle: field.handle,
-                config: { ...field.config, isNew: true },
                 config_overrides: []
             });
         },

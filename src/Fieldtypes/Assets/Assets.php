@@ -15,6 +15,7 @@ class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
     protected $defaultValue = [];
+    protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {
@@ -172,22 +173,7 @@ class Assets extends Fieldtype
     public function fieldRules()
     {
         return collect(parent::fieldRules())->map(function ($rule) {
-            $name = Str::before($rule, ':');
-            $parameters = explode(',', Str::after($rule, ':'));
-
-            if ($name === 'image') {
-                return new ImageRule();
-            }
-
-            if ($name === 'mimes') {
-                return new MimesRule($parameters);
-            }
-
-            if ($name === 'mimetypes') {
-                return new MimetypesRule($parameters);
-            }
-
-            return $rule;
+            return AssetRule::makeFromRule($rule);
         })->all();
     }
 

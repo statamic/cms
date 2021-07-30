@@ -92,8 +92,7 @@
             :initial-sort-direction="sortDirection"
             :initial-columns="columns"
             :filters="filters"
-            :run-action-url="runActionUrl"
-            :bulk-actions-url="bulkActionsUrl"
+            :action-url="actionUrl"
             :reordering="reordering"
             :reorder-url="reorderUrl"
             :site="site"
@@ -190,8 +189,7 @@ export default {
         sortDirection: { type: String, required: true },
         columns: { type: Array, required: true },
         filters: { type: Array, required: true },
-        runActionUrl: { type: String, required: true },
-        bulkActionsUrl: { type: String, required: true },
+        actionUrl: { type: String, required: true },
         reorderUrl: { type: String, required: true },
         initialSite: { type: String, required: true },
         sites: { type: Array },

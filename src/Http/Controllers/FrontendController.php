@@ -59,15 +59,19 @@ class FrontendController extends Controller
 
         $this->addViewPaths();
 
-        $contents = (new View)
+        $view = (new View)
             ->template($view)
             ->layout(Arr::get($data, 'layout', 'layout'))
             ->with($data)
-            ->cascadeContent($this->getLoadedRouteItem($data))
-            ->render();
+            ->cascadeContent($this->getLoadedRouteItem($data));
 
-        return response($contents, 200, [
-            'Content-Type' => DataResponse::contentType($data['content_type'] ?? 'html'),
+        $contentType = DataResponse::contentType(
+            $data['content_type']
+            ?? ($view->wantsXmlResponse() ? 'xml' : 'html')
+        );
+
+        return response($view->render(), 200, [
+            'Content-Type' => $contentType,
         ]);
     }
 

@@ -90,8 +90,10 @@
 }
 
 // Fixed toolbar inside the live preview
-.live-preview-fields .bard-fixed-toolbar { top: 0; }
-.live-preview-fields .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 40px; }
+.live-preview-fields-narrow .bard-fixed-toolbar { top: 0; }
+.live-preview-fields-wide .bard-fixed-toolbar { top: -24px; }
+.live-preview-fields-narrow .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 40px; }
+.live-preview-fields-wide .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
 
 // Fixed toolbar inside a stack
 .stack-content .bard-fixed-toolbar { top: -24px; }
@@ -101,10 +103,6 @@
     // Fixed toolbar below fixed global header
     .bard-fixed-toolbar { top: 52px; }
     .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 92px; }
-
-    // Fixed toolbar inside the live preview
-    .live-preview-fields .bard-fixed-toolbar { top: -24px; }
-    .live-preview-fields .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
 
     // Fixed toolbar inside a stack
     .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }

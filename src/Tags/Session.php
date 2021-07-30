@@ -64,6 +64,11 @@ class Session extends Tags
         return $this->returnableSession();
     }
 
+    public function has()
+    {
+        return session()->has($this->params->get('key'));
+    }
+
     protected function returnableSession()
     {
         if (! $this->isPair) {

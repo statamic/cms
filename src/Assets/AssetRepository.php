@@ -62,7 +62,7 @@ class AssetRepository implements Contract
 
     protected function resolveContainerFromUrl($url)
     {
-        return AssetContainer::all()->sortBy(function ($container) {
+        return AssetContainer::all()->sortByDesc(function ($container) {
             return strlen($container->url());
         })->first(function ($container, $id) use ($url) {
             return starts_with($url, $container->url())

@@ -10,6 +10,8 @@ use Statamic\Support\Arr;
 
 class Select extends Fieldtype
 {
+    protected $selectableInForms = true;
+
     protected function configFieldItems(): array
     {
         return [
@@ -75,6 +77,12 @@ class Select extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.any.config.cast_booleans'),
                 'type' => 'toggle',
                 'default' => false,
+                'width' => 50,
+            ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
                 'width' => 50,
             ],
         ];

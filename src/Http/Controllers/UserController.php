@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Statamic\Auth\Passwords\PasswordDefaults;
 use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
@@ -48,8 +49,8 @@ class UserController extends Controller
         $fields = $blueprint->fields()->addValues($request->all());
 
         $fieldRules = $fields->validator()->withRules([
-            'email' => 'required|email|unique_user_value',
-            'password' => 'required|confirmed',
+            'email' => ['required', 'email', 'unique_user_value'],
+            'password' => ['required', 'confirmed', PasswordDefaults::rules()],
         ])->rules();
 
         $validator = Validator::make($request->all(), $fieldRules);

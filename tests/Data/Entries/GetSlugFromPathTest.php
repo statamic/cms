@@ -29,7 +29,7 @@ class GetSlugFromPathTest extends TestCase
             'time with id suffix' => ['post', '2015-01-01-1300.post.id-suffix.md'],
             'no date with id suffix' => ['post', 'post.id-suffix.md'],
             'no date but slug thats a number' => ['404', '404.md'],
-            'no date but slug with number with id suffix' => ['2nd-post', '2nd-post.md'],
+            'no date but slug with number with id suffix' => ['2nd-post', '2nd-post.id-suffix.md'],
         ];
     }
 }

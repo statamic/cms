@@ -8,6 +8,19 @@ use Statamic\Fields\Fieldtype;
 class Integer extends Fieldtype
 {
     protected $rules = ['integer'];
+    protected $selectableInForms = true;
+
+    protected function configFieldItems(): array
+    {
+        return [
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+        ];
+    }
 
     public function preProcess($data)
     {
