@@ -11,6 +11,10 @@
                     :class="{ 'text-sm font-medium': isTopLevel }"
                     v-text="page.title || page.url" />
 
+                <span class="ml-1 font-mono text-2xs">
+                    {{ page.slug }}
+                </span>
+
                 <div v-if="page.collection" class="ml-2 flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
                     <div class="ml-sm">
