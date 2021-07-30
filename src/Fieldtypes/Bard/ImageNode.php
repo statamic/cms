@@ -24,7 +24,7 @@ class ImageNode extends Node
 
         if (Str::startsWith($attrs->src, 'asset::')) {
             $id = Str::after($attrs->src, 'asset::');
-            $attrs->src = $this->getUrl();
+            $attrs->src = $this->getUrl($id);
         }
 
         return [
