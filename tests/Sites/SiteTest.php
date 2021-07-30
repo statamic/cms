@@ -237,6 +237,7 @@ class SiteTest extends TestCase
             'short_locale' => 'en',
             'url' => 'http://test.com',
             'direction' => 'ltr',
+            'attributes' => [],
         ], $values->all());
 
         $this->assertEquals(

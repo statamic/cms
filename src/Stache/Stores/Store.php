@@ -179,7 +179,7 @@ abstract class Store
         $existing = collect(Cache::get($cacheKey, []));
 
         // Get the files and timestamps from the filesystem right now.
-        $files = Traverser::filter([$this, 'getFileFilter'])->traverse($this);
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         // Cache the files and timestamps, ready for comparisons on the next request.
         // We'll do it now since there are multiple early returns coming up.

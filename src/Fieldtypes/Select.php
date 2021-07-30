@@ -79,6 +79,12 @@ class Select extends Fieldtype
                 'default' => false,
                 'width' => 50,
             ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
+            ],
         ];
     }
 

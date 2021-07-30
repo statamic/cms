@@ -22,7 +22,7 @@
                 </div>
 
                 <div class="publish-tabs tabs rounded-none rounded-t -mx-1px shadow-none" v-if="showContainerTabs">
-                    <a v-for="item in containers" :key="item.id"
+                    <button class="tab-button" v-for="item in containers" :key="item.id"
                         v-text="item.title"
                         :class="{
                             active: item.id === container.id,

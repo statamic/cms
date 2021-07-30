@@ -37,7 +37,7 @@
                 <dropdown-item :text="__('Edit Blueprints')" redirect="{{ cp_route('collections.blueprints.index', $collection) }}"></dropdown-item>
             @endcan
             @can('edit', $collection)
-                <dropdown-item :text="__('Scaffold Resources')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
+                <dropdown-item :text="__('Scaffold Views')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
             @endcan
             @can('delete', $collection)
                 <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">

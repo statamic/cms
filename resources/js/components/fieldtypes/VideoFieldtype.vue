@@ -17,7 +17,7 @@
 
         <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
             <div class="video-preview">
-                <iframe v-if="isEmbeddable" width="560" height="315" :src="embed" frameborder="0"></iframe>
+                <iframe v-if="isEmbeddable && canShowIframe" width="560" height="315" :src="embed" frameborder="0" allow="fullscreen"></iframe>
                 <video controls v-if="isVideo" :src="embed" width="560" height="315"></video>
             </div>
         </div>
@@ -31,7 +31,8 @@ export default {
 
     data() {
         return {
-            data: this.value || ''
+            data: this.value || '',
+            canShowIframe: false,
         }
     },
 
@@ -45,6 +46,11 @@ export default {
             this.data = value;
         }
 
+    },
+
+    mounted() {
+        // Showing the iframe right away causes Vue to stop in Safari.
+        this.canShowIframe = true;
     },
 
     computed: {
