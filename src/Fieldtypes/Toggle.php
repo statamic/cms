@@ -9,6 +9,18 @@ class Toggle extends Fieldtype
 {
     protected $defaultValue = false;
 
+    protected function configFieldItems(): array
+    {
+        return [
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
+        ];
+    }
+
     public function preProcess($data)
     {
         return (bool) $data;

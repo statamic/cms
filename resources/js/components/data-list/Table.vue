@@ -41,9 +41,10 @@
                         v-if="!reorderable"
                         type="checkbox"
                         :value="row.id"
-                        v-model="sharedState.selections"
-                        :disabled="reachedSelectionLimit && !sharedState.selections.includes(row.id)"
+                        :checked="isSelected(row.id)"
+                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(row.id)"
                         :id="`checkbox-${row.id}`"
+                        @click="toggleSelection(row.id)"
                     />
                 </td>
                 <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row)" :width="column.width">
@@ -131,6 +132,10 @@ export default {
             return this.sharedState.selections.length === this.sharedState.maxSelections;
         },
 
+        singleSelect() {
+            return this.sharedState.maxSelections === 1;
+        },
+
         visibleColumns() {
             const columns = this.sharedState.columns.filter(column => column.visible);
 
@@ -191,12 +196,24 @@ export default {
             }
         },
 
+        isSelected(id) {
+            return this.sharedState.selections.includes(id);
+        },
+
         toggleSelection(id) {
             const i = this.sharedState.selections.indexOf(id);
 
-            if (i != -1) {
+            if (i > -1) {
                 this.sharedState.selections.splice(i, 1);
-            } else if (! this.reachedSelectionLimit) {
+
+                return;
+            }
+
+            if (this.singleSelect) {
+                this.sharedState.selections.pop();
+            }
+
+            if (! this.reachedSelectionLimit) {
                 this.sharedState.selections.push(id);
             }
         }

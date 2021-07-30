@@ -6,7 +6,6 @@ use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
-use Symfony\Component\Finder\SplFileInfo;
 
 class UsersStore extends BasicStore
 {
@@ -49,10 +48,5 @@ class UsersStore extends BasicStore
         // $this->queueGroups($user);
 
         return $user;
-    }
-
-    public function filter(SplFileInfo $file)
-    {
-        return $file->getExtension() === 'yaml';
     }
 }

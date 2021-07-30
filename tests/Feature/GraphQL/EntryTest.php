@@ -4,7 +4,9 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -168,6 +170,37 @@ GQL;
             ->assertExactJson(['data' => [
                 'entry' => [
                     'id' => '4',
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_queries_an_entry_in_a_specific_site()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        Collection::find('events')->routes('/events/{slug}')->sites(['en', 'fr'])->save();
+
+        EntryFactory::collection('events')->locale('fr')->origin('4')->id('44')->slug('event-two')->create();
+
+        $query = <<<'GQL'
+{
+    entry(uri: "/events/event-two", site: "fr") {
+        id
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'id' => '44',
                 ],
             ]]);
     }
