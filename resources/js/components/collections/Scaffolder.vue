@@ -7,19 +7,6 @@
              <table class="data-table border rounded">
                 <tbody>
                     <tr>
-                        <td class="checkbox-column border-r" @click="selected.blueprint = ! selected.blueprint">
-                            <div class="flex items-center h-full">
-                                <input type="checkbox" v-model="selected.blueprint" class="mr-2" id="field_blueprint" />
-                            </div>
-                        </td>
-                        <td class="border-r">
-                            <label for="field_blueprint" v-text="__('Blueprint')" />
-                        </td>
-                        <td :class="{'opacity-25': ! selected.blueprint }">
-                            <input type="text" v-model="blueprint" class="input-text">
-                        </td>
-                    </tr>
-                    <tr>
                         <td class="checkbox-column border-r" @click="selected.index = ! selected.index">
                             <div class="flex items-center h-full">
                                 <input type="checkbox" v-model="selected.index" class="mr-2" id="field_index" />
@@ -51,7 +38,7 @@
 
         <div class="flex justify-center mt-4">
             <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit" @click="submit">
-                {{ __('Create Resources')}}
+                {{ __('Create Views')}}
             </button>
         </div>
     </div>
@@ -69,7 +56,6 @@ export default {
 
     data() {
         return {
-            blueprint: this.title,
             index: this.handle + '/index',
             show: this.handle + '/show',
             selected: {
@@ -87,10 +73,6 @@ export default {
 
         files() {
             var files = {};
-
-            if (this.selected.blueprint) {
-                files.blueprint = this.blueprint;
-            }
 
             if (this.selected.index) {
                 files.index = this.index;

@@ -21,7 +21,7 @@ class CollectionsStore extends BasicStore
         return $item->handle();
     }
 
-    public function getFileFilter(SplFileInfo $file)
+    public function getItemFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory, '/');
         $relative = str_after(Path::tidy($file->getPathname()), $dir);

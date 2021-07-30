@@ -173,6 +173,7 @@ export default {
             uploads: [],
             count: {},
             escBinding: null,
+            markdownPreviewText: null
         };
     },
 
@@ -191,6 +192,10 @@ export default {
                     document.body.style.removeProperty("overflow")
                 }
             }
+        },
+
+        mode(mode) {
+            if (mode === 'preview') this.updateMarkdownPreview();
         }
 
     },
@@ -540,14 +545,17 @@ export default {
             return this.config.restrict_assets || false;
         },
 
-        markdownPreviewText() {
-            return markdown(this.data);
-        },
-
         replicatorPreview() {
             return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
         },
+
+        updateMarkdownPreview() {
+            this.$axios
+                .post(this.meta.previewUrl, { value: this.data, config: this.config })
+                .then(response => this.markdownPreviewText = response.data)
+                .catch(e => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
+        }
     },
 
     mounted() {

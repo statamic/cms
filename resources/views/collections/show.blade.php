@@ -16,8 +16,7 @@
         sort-direction="{{ $collection->sortDirection() }}"
         :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
-        run-action-url="{{ cp_route('collections.entries.actions.run', $collection->handle()) }}"
-        bulk-actions-url="{{ cp_route('collections.entries.actions.bulk', $collection->handle()) }}"
+        action-url="{{ cp_route('collections.entries.actions.run', $collection->handle()) }}"
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         initial-site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
@@ -38,7 +37,7 @@
                 <dropdown-item :text="__('Edit Blueprints')" redirect="{{ cp_route('collections.blueprints.index', $collection) }}"></dropdown-item>
             @endcan
             @can('edit', $collection)
-                <dropdown-item :text="__('Scaffold Resources')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
+                <dropdown-item :text="__('Scaffold Views')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
             @endcan
             @can('delete', $collection)
                 <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">

@@ -118,6 +118,30 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function page_with_no_explicit_layout_will_not_use_a_layout()
+    {
+        $this->withStandardBlueprints();
+        $this->withoutExceptionHandling();
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', 'Layout {{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
+
+        $page = $this->createPage('about', [
+            'with' => [
+                'title' => 'The About Page',
+                'content' => 'This is the about page.',
+                'template' => 'some_template',
+                'layout' => false,
+            ],
+        ]);
+
+        $response = $this->get('/about')->assertStatus(200);
+
+        $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
+        $response->assertDontSee('Layout');
+    }
+
+    /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed()
     {
         Site::setConfig(['sites' => [
@@ -392,6 +416,81 @@ class FrontendTest extends TestCase
 
         // Laravel adds utf-8 if the content-type starts with text/
         $this->get('about')->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+    }
+
+    /** @test */
+    public function xml_antlers_template_with_xml_layout_will_use_both_and_change_the_content_type()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<?xml ?>{{ template_content }}', 'antlers.xml');
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'antlers.xml');
+        $this->createPage('about', ['with' => ['template' => 'feed']]);
+
+        $response = $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+
+        $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
+    }
+
+    /** @test */
+    public function xml_antlers_template_with_non_xml_layout_will_change_content_type_but_avoid_using_the_layout()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<html>{{ template_content }}</html>', 'antlers.html');
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'antlers.xml');
+        $this->createPage('about', ['with' => ['template' => 'feed']]);
+
+        $response = $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+
+        $this->assertEquals('<foo></foo>', $response->getContent());
+    }
+
+    /** @test */
+    public function xml_antlers_layout_will_change_the_content_type()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<?xml ?>{{ template_content }}', 'antlers.xml');
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'antlers.html');
+        $this->createPage('about', ['with' => ['template' => 'feed']]);
+
+        $response = $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+
+        $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
+    }
+
+    /** @test */
+    public function xml_blade_template_will_not_change_content_type()
+    {
+        // Blade doesnt support xml files, but even if it did,
+        // we only want it to happen when using Antlers.
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'blade.xml');
+        $this->createPage('about', ['with' => ['template' => 'feed']]);
+
+        $response = $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+
+        $this->assertEquals('<foo></foo>', $response->getContent());
+    }
+
+    /** @test */
+    public function xml_template_with_custom_content_type_does_not_change_to_xml()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<?xml ?>{{ template_content }}', 'antlers.xml');
+        $this->viewShouldReturnRaw('feed', '<foo></foo>', 'antlers.xml');
+        $this->createPage('about', ['with' => ['template' => 'feed', 'content_type' => 'json']]);
+
+        $this
+            ->get('about')
+            ->assertHeader('Content-Type', 'application/json');
     }
 
     /** @test */

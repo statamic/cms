@@ -11,38 +11,15 @@ class FieldtypesController extends CpController
     {
         $fieldtypes = app('statamic.fieldtypes')
             ->unique() // Remove any dupes in the case of aliases. Aliases are defined later so they will win.
-            ->map(function ($class) use ($request) {
-                $fieldtype = app($class);
-                $arr = $fieldtype->toArray();
-
-                if ($request->forms) {
-                    $arr['selectable'] = $this->supportedInForms($fieldtype->handle());
-                }
-
-                return $arr;
-            })
-            // ->dd()
-            ->sortBy('handle');
+            ->map(function ($class) {
+                return app($class);
+            });
 
         if ($request->selectable) {
-            $fieldtypes = $fieldtypes->filter->selectable;
+            $selectableMethod = $request->forms ? 'selectableInForms' : 'selectable';
+            $fieldtypes = $fieldtypes->filter->$selectableMethod();
         }
 
-        // TODO: Make sure the configs get preprocessed.
-
-        return $fieldtypes->values();
-    }
-
-    private function supportedInForms($fieldtype)
-    {
-        return in_array($fieldtype, [
-            'assets',
-            'checkboxes',
-            'integer',
-            'radio',
-            'select',
-            'text',
-            'textarea',
-        ]);
+        return $fieldtypes->sortBy->handle()->values();
     }
 }

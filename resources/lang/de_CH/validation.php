@@ -90,6 +90,8 @@ return [
     'duplicate_field_handle' => 'Feld mit dem Handle :handle kann nicht mehr als einmal verwendet werden.',
     'one_site_without_origin' => 'Mindestens eine Website darf keine Quelle enthalten.',
     'origin_cannot_be_disabled' => 'Kann keine deaktivierte Quelle auswählen.',
+    'unique_uri' => 'Diese URI ist bereits vergeben.',
+    'duplicate_uri' => 'Doppelte URI :value',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',
     'attributes' => [],
 ];

@@ -5,12 +5,27 @@ namespace Statamic\Fieldtypes;
 use Facades\Statamic\Routing\ResolveRedirect;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Str;
 
 class Link extends Fieldtype
 {
+    protected function configFieldItems(): array
+    {
+        return [
+            'collections' => [
+                'display' => __('Collections'),
+                'instructions' => __('statamic::fieldtypes.link.config.collections'),
+                'type' => 'collections',
+                'mode' => 'select',
+            ],
+        ];
+    }
+
     public function augment($value)
     {
         $redirect = ResolveRedirect::resolve($value, $this->field->parent());
@@ -34,10 +49,22 @@ class Link extends Fieldtype
 
         $entryFieldtype = $entryField->fieldtype();
 
+        $collections = $this->config('collections');
+
+        if (empty($collections)) {
+            $site = Site::current()->handle();
+
+            $collections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
+                return Facades\Collection::all()->reject(function ($collection) use ($site) {
+                    return is_null($collection->route($site));
+                })->map->handle()->values();
+            });
+        }
+
         return [
             'showFirstChildOption' => $this->showFirstChildOption(),
             'entry' => [
-                'config' => $entryFieldtype->config(),
+                'config' => array_merge($entryFieldtype->config(), ['collections' => $collections]),
                 'meta' => $entryFieldtype->preload(),
             ],
         ];

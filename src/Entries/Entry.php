@@ -305,9 +305,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         Facades\Entry::save($this);
 
         if ($this->id()) {
-            Blink::store('structure-page-entries')->forget($this->id());
             Blink::store('structure-uris')->forget($this->id());
-            Blink::store('structure-entries')->flush();
+            Blink::store('structure-entries')->forget($this->id());
         }
 
         $this->taxonomize();
@@ -455,7 +454,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             'id' => $this->id(),
             'origin' => optional($this->origin())->id(),
             'published' => $this->published === false ? false : null,
-            'blueprint' => $this->blueprint ?? $this->collection()->entryBlueprint()->handle(),
+            'blueprint' => $this->blueprint()->handle(),
         ]);
 
         $data = $this->data()->all();
@@ -681,6 +680,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function uri()
     {
+        if (! $this->route()) {
+            return null;
+        }
+
         if ($structure = $this->structure()) {
             return $structure->entryUri($this);
         }
