@@ -36,7 +36,7 @@
             </a>
         @endif
         @if (Route::has('horizon.index') && $user->can('viewHorizon'))
-            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="/{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
+            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
                 @cp_svg('charts')
             </a>
         @endif
