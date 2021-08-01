@@ -35,8 +35,8 @@
                 @cp_svg('telescope')
             </a>
         @endif
-        @if (Route::has('nova.index') && $user->can('viewNova'))
-            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('nova.index') }}" target="_blank" v-tooltip="'Laravel Nova'">
+        @if (config('nova.path') && $user->can('viewNova'))
+            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ config('nova.domain').'/'.config('nova.path').'/dashboards/main' }}" target="_blank" v-tooltip="'Laravel Nova'">
                 @cp_svg('nova')
             </a>
         @endif
