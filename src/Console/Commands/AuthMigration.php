@@ -27,9 +27,9 @@ class AuthMigration extends Command
         // Laravel Password Resets
         $laravelPasswordMigration = '2014_10_12_100000_create_password_resets_table';
         if (! File::exists(database_path("migrations/{$laravelPasswordMigration}.php"))) {
-            File::put(
-                database_path("migrations/{$laravelPasswordMigration}.php"),
-                File::get(__DIR__."/stubs/auth/{$laravelPasswordMigration}.php.stub")
+            File::copy(
+                __DIR__."/stubs/auth/{$laravelPasswordMigration}.php.stub",
+                database_path("migrations/{$laravelPasswordMigration}.php")
             );
 
             $this->line("<info>Created Migration:</info> {$laravelPasswordMigration}");
