@@ -113,7 +113,7 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        $date = Carbon::createFromFormat($this->saveFormat($value), $value);
+        $date = $this->config('parse_from_format', true) ? Carbon::createFromFormat($this->saveFormat($value), $value) : Carbon::parse($value);
 
         return $date->format($vueFormat);
     }
