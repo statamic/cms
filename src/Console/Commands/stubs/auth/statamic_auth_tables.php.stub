@@ -25,6 +25,22 @@ class StatamicAuthTables extends Migration
             $table->integer('user_id');
             $table->string('group_id');
         });
+
+        if (! Schema::hasTable('password_resets')) {
+            Schema::create('password_resets', function (Blueprint $table) {
+                $table->string('email')->index();
+                $table->string('token');
+                $table->timestamp('created_at')->nullable();
+            });
+        }
+
+        if (! Schema::hasTable('password_activations')) {
+            Schema::create('password_activations', function (Blueprint $table) {
+                $table->string('email')->index();
+                $table->string('token');
+                $table->timestamp('created_at')->nullable();
+            });
+        }
     }
 
     /**
@@ -42,5 +58,7 @@ class StatamicAuthTables extends Migration
 
          Schema::dropIfExists('ROLE_USER_TABLE');
          Schema::dropIfExists('GROUP_USER_TABLE');
+
+         Schema::dropIfExists('password_activations');
      }
 }
