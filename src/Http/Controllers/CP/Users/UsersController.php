@@ -8,6 +8,7 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
@@ -41,16 +42,31 @@ class UsersController extends CpController
         ]);
     }
 
+    protected function indexQuery()
+    {
+        $query = User::query();
+
+        if ($search = request('search')) {
+            if (Search::indexes()->keys()->contains('users')) {
+                return Search::index('users')->ensureExists()->search($search);
+            }
+
+            $query->where('name', 'like', '%'.$search.'%');
+        }
+
+        return $query;
+    }
+
     protected function json($request)
     {
         $query = $request->group
             ? UserGroup::find($request->group)->queryUsers()
-            : User::query();
+            : $this->indexQuery();
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters);
 
         $users = $query
-            ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
+            ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
 
         return (new Users($users))
