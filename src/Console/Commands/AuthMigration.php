@@ -24,18 +24,6 @@ class AuthMigration extends Command
 
     public function handle()
     {
-        // Laravel Password Resets
-        $laravelPasswordMigration = '2014_10_12_100000_create_password_resets_table';
-        if (! File::exists(database_path("migrations/{$laravelPasswordMigration}.php"))) {
-            File::copy(
-                __DIR__."/stubs/auth/{$laravelPasswordMigration}.php.stub",
-                database_path("migrations/{$laravelPasswordMigration}.php")
-            );
-
-            $this->line("<info>Created Migration:</info> {$laravelPasswordMigration}");
-        }
-
-        // Statamic Auth Migration
         $from = __DIR__.'/stubs/auth/statamic_auth_tables.php.stub';
         $file = date('Y_m_d_His', time()).'_statamic_auth_tables';
         $to = database_path("migrations/{$file}.php");
