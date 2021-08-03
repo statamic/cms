@@ -92,6 +92,7 @@ return [
     'origin_cannot_be_disabled' => 'Kann keine deaktivierte Quelle auswählen.',
     'unique_uri' => 'Diese URI ist bereits vergeben.',
     'duplicate_uri' => 'Doppelte URI :value',
+    'reserved' => 'Dies ist ein reserviertes Wort.',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',
     'attributes' => [],
 ];
