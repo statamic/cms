@@ -35,6 +35,11 @@
                 @cp_svg('telescope')
             </a>
         @endif
+        @if (Route::has('horizon.index') && \Laravel\Horizon\Horizon::check(request()))
+            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
+                @cp_svg('horizon')
+            </a>
+        @endif
         <dropdown-list v-cloak>
             <template v-slot:trigger>
                 <button class="hidden md:block h-6 w-6 ml-2 p-sm text-grey hover:text-grey-80" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
