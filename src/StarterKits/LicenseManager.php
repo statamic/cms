@@ -72,8 +72,9 @@ final class LicenseManager
         }
 
         Http::post(self::OUTPOST_ENDPOINT.'expire', [
-            'package' => $this->package,
             'license' => $this->licenseKey,
+            'site_license' => config('statamic.system.license_key'),
+            'package' => $this->package,
         ]);
     }
 
