@@ -36,8 +36,8 @@
             </a>
         @endif
         
-        @if (config('nova.path') && \Laravel\Nova\Nova::check(request()))
-            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('nova.path') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
+        @if (config('nova.path') && (app()->environment('local') || $user->can('viewNova')))
+            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
                 @cp_svg('nova')
             </a>
         @endif
