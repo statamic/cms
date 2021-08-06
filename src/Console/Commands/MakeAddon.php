@@ -202,7 +202,7 @@ class MakeAddon extends GeneratorCommand
 
         $packagename = explode('/', $this->package);
 
-        $json = str_replace('DummyFileName.js', "{$$packagename[1]}.js", $json);
+        $json = str_replace('DummyFileName.js', "{$packagename[1]}.js", $json);
 
         $this->files->put($this->addonPath('webpack.mix.js'), $json);
 
