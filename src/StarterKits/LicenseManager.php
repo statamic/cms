@@ -73,7 +73,7 @@ final class LicenseManager
 
         Http::post(self::OUTPOST_ENDPOINT.'expire', [
             'license' => $this->licenseKey,
-            'site_license' => config('statamic.system.license_key'),
+            'configured_site_license' => config('statamic.system.license_key'),
             'package' => $this->package,
         ]);
     }
@@ -156,8 +156,9 @@ final class LicenseManager
         }
 
         $response = Http::post(self::OUTPOST_ENDPOINT.'validate', [
-            'package' => $this->package,
             'license' => $this->licenseKey,
+            'configured_site_license' => config('statamic.system.license_key'),
+            'package' => $this->package,
         ]);
 
         if ($response->status() !== 200) {
