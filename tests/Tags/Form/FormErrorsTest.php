@@ -11,7 +11,7 @@ class FormErrorsTest extends FormTestCase
             ->post('/!/forms/contact')
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/');
-            
+
         $output = $this->tag(<<<'EOT'
 {{ form:errors in="contact" }}
     <p class="error">{{ value }}</p>
