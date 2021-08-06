@@ -471,6 +471,8 @@ EOT;
         $this->installCoolRunnings([], [
             'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
                 'price' => 100,
+                'slug' => 'cool-runnings',
+                'seller' => ['slug' => 'statamic'],
             ]], 200),
             'outpost.*/v3/starter-kits/validate' => Http::response(['data' => [
                 'valid' => true,
@@ -497,6 +499,8 @@ EOT;
         $this->installCoolRunnings([], [
             'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
                 'price' => 100,
+                'slug' => 'cool-runnings',
+                'seller' => ['slug' => 'statamic'],
             ]], 200),
             'outpost.*/v3/starter-kits/validate' => Http::response(['data' => [
                 'valid' => false,
