@@ -95,11 +95,15 @@ final class LicenseManager
 
         $this->info('Validating starter kit license...');
 
+        $sellerSlug = $this->details['seller']['slug'];
+        $kitSlug = $this->details['slug'];
+        $marketplaceUrl = "https://statamic.com/starter-kits/{$sellerSlug}/{$kitSlug}";
+
         if (! $this->licenseKey) {
             return $this
                 ->error("License required for [{$this->package}]!")
                 ->comment('This is a paid starter kit. If you haven\'t already, you may purchase a license at:')
-                ->comment("https://statamic.com/starter-kits/{$this->package}");
+                ->comment($marketplaceUrl);
         }
 
         if ($this->outpostValidatesLicense()) {
@@ -109,7 +113,7 @@ final class LicenseManager
         return $this
             ->error("Invalid license for [{$this->package}]!")
             ->comment('If you haven\'t already, you may purchase a license at:')
-            ->comment("https://statamic.com/starter-kits/{$this->package}");
+            ->comment($marketplaceUrl);
     }
 
     /**
