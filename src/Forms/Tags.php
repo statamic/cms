@@ -58,7 +58,7 @@ class Tags extends BaseTags
 
         $data = array_merge(
             $form->toArray(),
-            $this->getFormSession($this->sessionHandle()),
+            $this->getFormSession($this->sessionHandle())
         );
         $data['fields'] = $this->getFields($this->sessionHandle());
 
