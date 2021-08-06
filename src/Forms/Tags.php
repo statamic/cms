@@ -54,14 +54,13 @@ class Tags extends BaseTags
     public function create()
     {
         $formHandle = $this->getForm();
-        $form = Form::find($formHandle);
-        $sessionHandle = "form.{$formHandle}";
+        $form = $this->form();
 
         $data = array_merge(
             $form->toArray(),
-            ['fields' => $this->getFields($sessionHandle)],
-            $this->getFormSession($sessionHandle),
+            $this->getFormSession($this->sessionHandle()),
         );
+        $data['fields'] = $this->getFields($this->sessionHandle());
 
         $this->addToDebugBar($data, $formHandle);
 
@@ -102,29 +101,20 @@ class Tags extends BaseTags
      */
     public function errors()
     {
-        if (! $handle = $this->getForm()) {
+        if (! $sessionHandle = $this->sessionHandle()) {
             return false;
         }
 
-        // TODO: Refactor this method to use GetsFormSession `getFormSession()` trait method.
+        $errors = $this->getFormSession($sessionHandle)['errors'];
 
-        $formHasErrors = session()->has('errors')
-            ? $this->getFormSession($handle)['errors']
-            : false;
-
-        if (! $formHasErrors) {
-            return false;
+        // If this is a single tag just output a boolean.
+        if ($this->content === '') {
+            return ! empty($errors);
         }
 
-        $errors = [];
-
-        foreach (session('errors')->getBag('form.'.$formset)->all() as $error) {
-            $errors[]['value'] = $error;
-        }
-
-        return ($this->content === '')    // If this is a single tag...
-            ? ! empty($errors)             // just output a boolean.
-            : $this->parseLoop($errors);  // Otherwise, parse the content loop.
+        return $this->parseLoop(collect($errors)->map(function ($error) {
+            return ['value' => $error];
+        }));
     }
 
     /**
@@ -134,14 +124,12 @@ class Tags extends BaseTags
      */
     public function success()
     {
-        if (! $formset = $this->getForm()) {
+        if (! $sessionHandle = $this->sessionHandle()) {
             return false;
         }
 
-        // TODO: Refactor this method to use GetsFormSession `getFormSession()` trait method.
-        // Also should probably output success string instead of `true` boolean for consistency.
-
-        return session()->has("form.{$formset}.success");
+        // TODO: Should probably output success string instead of `true` boolean for consistency.
+        return $this->getFromFormSession($sessionHandle, 'success');
     }
 
     /**
@@ -163,7 +151,7 @@ class Tags extends BaseTags
      */
     public function submissions()
     {
-        $submissions = Form::find($this->getForm())->submissions();
+        $submissions = $this->form()->submissions();
 
         return $this->output($submissions);
     }
@@ -185,15 +173,15 @@ class Tags extends BaseTags
      */
     protected function getForm()
     {
-        if (! $form = $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'))) {
+        if (! $handle = $this->formHandle()) {
             throw new \Exception('A form handle is required on Form tags. Please refer to the docs for more information.');
         }
 
-        if (! Form::find($form)) {
-            throw new \Exception("Form with handle [$form] cannot be found.");
+        if (! $this->form()) {
+            throw new \Exception("Form with handle [$handle] cannot be found.");
         }
 
-        return $form;
+        return $handle;
     }
 
     /**
@@ -204,7 +192,7 @@ class Tags extends BaseTags
      */
     protected function getFields($sessionHandle)
     {
-        return Form::find($this->getForm())->fields()
+        return $this->form()->fields()
             ->map(function ($field) use ($sessionHandle) {
                 return $this->getRenderableField($field, $sessionHandle);
             })
@@ -239,6 +227,25 @@ class Tags extends BaseTags
             // Collector doesn't exist yet. We'll create it.
             debugbar()->addCollector(new ConfigCollector($debug, 'Forms'));
         }
+    }
+
+    protected function sessionHandle()
+    {
+        return 'form.'.$this->getForm();
+    }
+
+    protected function form()
+    {
+        $handle = $this->formHandle();
+
+        return Blink::once("form-$handle", function () use ($handle) {
+            return Form::find($handle);
+        });
+    }
+
+    protected function formHandle()
+    {
+        return $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'));
     }
 
     public function eventUrl($url, $relative = true)
