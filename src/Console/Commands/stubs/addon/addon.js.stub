@@ -1,0 +1,5 @@
+// import AddonTest from './components/fieldtypes/AddonTest.vue'
+
+// Statamic.booting(() => {
+//     Statamic.component('addon_test-fieldtype', AddonTest)
+// })

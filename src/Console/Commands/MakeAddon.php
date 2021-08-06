@@ -76,9 +76,12 @@ class MakeAddon extends GeneratorCommand
         }
 
         $this
+            ->generateAddonJs()
             ->generateComposerJson()
+            ->generatePackageJson()
             ->generateServiceProvider()
             ->generateOptional()
+            ->generateWebpackMixJson()
             ->addRepositoryPath()
             ->installAddon();
 
@@ -101,6 +104,22 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
+     * Generate addon.js.
+     *
+     * @return $this
+     */
+    protected function generateAddonJs()
+    {
+        $json = $this->files->get($this->getStub('addon/addon.js.stub'));
+
+        $this->files->put($this->addonPath('resources/js/addon.js'), $json);
+
+        $this->info('addon.js created successfully.');
+
+        return $this;
+    }
+
+    /**
      * Generate composer.json.
      *
      * @return $this
@@ -116,6 +135,22 @@ class MakeAddon extends GeneratorCommand
         $this->files->put($this->addonPath('composer.json'), $json);
 
         $this->info('Composer configuration created successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Generate package.json.
+     *
+     * @return $this
+     */
+    protected function generatePackageJson()
+    {
+        $json = $this->files->get($this->getStub('addon/package.json.stub'));
+
+        $this->files->put($this->addonPath('package.json'), $json);
+
+        $this->info('package.json configuration created successfully.');
 
         return $this;
     }
@@ -152,6 +187,26 @@ class MakeAddon extends GeneratorCommand
             ->each(function ($type) {
                 $this->runOptionalAddonGenerator($type);
             });
+
+        return $this;
+    }
+
+    /**
+     * Generate webpack.mix.json.
+     *
+     * @return $this
+     */
+    protected function generateWebpackMixJson()
+    {
+        $json = $this->files->get($this->getStub('addon/webpack.mix.json.stub'));
+
+        $packagename = explode('/', $this->package);
+
+        $json = str_replace('DummyFileName.js', "{$$packagename[1]}.js", $json);
+
+        $this->files->put($this->addonPath('webpack.mix.json'), $json);
+
+        $this->info('webpack.mix.json configuration created successfully.');
 
         return $this;
     }
