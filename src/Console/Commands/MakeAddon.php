@@ -81,7 +81,7 @@ class MakeAddon extends GeneratorCommand
             ->generatePackageJson()
             ->generateServiceProvider()
             ->generateOptional()
-            ->generateWebpackMixJson()
+            ->generateWebpackMixJs()
             ->addRepositoryPath()
             ->installAddon();
 
@@ -192,21 +192,21 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
-     * Generate webpack.mix.json.
+     * Generate webpack.mix.js.
      *
      * @return $this
      */
-    protected function generateWebpackMixJson()
+    protected function generateWebpackMixJs()
     {
-        $json = $this->files->get($this->getStub('addon/webpack.mix.json.stub'));
+        $json = $this->files->get($this->getStub('addon/webpack.mix.js.stub'));
 
         $packagename = explode('/', $this->package);
 
         $json = str_replace('DummyFileName.js', "{$$packagename[1]}.js", $json);
 
-        $this->files->put($this->addonPath('webpack.mix.json'), $json);
+        $this->files->put($this->addonPath('webpack.mix.js'), $json);
 
-        $this->info('webpack.mix.json configuration created successfully.');
+        $this->info('webpack.mix.js configuration created successfully.');
 
         return $this;
     }
