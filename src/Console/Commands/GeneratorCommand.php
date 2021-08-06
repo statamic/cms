@@ -198,7 +198,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
 
         // Otherwise, specify addon base path.
         else {
-            $basePath = $basePath.'/resources/js';
+            $basePath = $basePath.'/../resources/js';
         }
 
         return $basePath.Str::ensureLeft($file, '/');
