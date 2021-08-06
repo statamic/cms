@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Structures\CollectionStructure;
@@ -67,12 +69,16 @@ GQL;
             ],
         ]);
 
+        BlueprintRepository::partialMock();
+        $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']])->setHandle('pages');
+        BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect(['pages' => $blueprint]));
+
         $collection = Collection::make('pages')->title('Pages')->routes('{parent_uri}/{slug}')->sites(['en', 'fr']);
         $structure = (new CollectionStructure)->maxDepth(3)->expectsRoot(true);
         $collection->structure($structure)->save();
 
-        EntryFactory::collection('pages')->id('home')->slug('home')->data(['title' => 'Home'])->create();
-        EntryFactory::collection('pages')->id('about')->slug('about')->data(['title' => 'About'])->create();
+        EntryFactory::collection('pages')->id('home')->slug('home')->data(['title' => 'Home', 'foo' => 'bar'])->create();
+        EntryFactory::collection('pages')->id('about')->slug('about')->data(['title' => 'About', 'foo' => 'baz'])->create();
         EntryFactory::collection('pages')->id('team')->slug('team')->data(['title' => 'Team'])->create();
 
         EntryFactory::collection('pages')->locale('fr')->id('fr-home')->slug('fr-home')->data(['title' => 'Fr Home'])->create();
@@ -105,6 +111,9 @@ GQL;
                     id
                     title
                     url
+                    ... on EntryPage_Pages_Pages {
+                        foo
+                    }
                 }
                 children {
                     depth
@@ -112,6 +121,9 @@ GQL;
                         id
                         title
                         url
+                        ... on EntryPage_Pages_Pages {
+                            foo
+                        }
                     }
                 }
             }
@@ -121,6 +133,9 @@ GQL;
                     id
                     title
                     url
+                    ... on EntryPage_Pages_Pages {
+                        foo
+                    }
                 }
                 children {
                     depth
@@ -128,6 +143,9 @@ GQL;
                         id
                         title
                         url
+                        ... on EntryPage_Pages_Pages {
+                            foo
+                        }
                     }
                 }
             }
@@ -152,6 +170,7 @@ GQL;
                                     'id' => 'home',
                                     'title' => 'Home',
                                     'url' => '/',
+                                    'foo' => 'bar',
                                 ],
                                 'children' => [],
                             ],
@@ -161,6 +180,7 @@ GQL;
                                     'id' => 'about',
                                     'title' => 'About',
                                     'url' => '/about',
+                                    'foo' => 'baz',
                                 ],
                                 'children' => [
                                     [
@@ -169,6 +189,7 @@ GQL;
                                             'id' => 'team',
                                             'title' => 'Team',
                                             'url' => '/about/team',
+                                            'foo' => null,
                                         ],
                                     ],
                                 ],
@@ -181,6 +202,7 @@ GQL;
                                     'id' => 'fr-home',
                                     'title' => 'Fr Home',
                                     'url' => '/fr',
+                                    'foo' => null,
                                 ],
                                 'children' => [],
                             ],
@@ -190,6 +212,7 @@ GQL;
                                     'id' => 'fr-about',
                                     'title' => 'Fr About',
                                     'url' => '/fr/fr-about',
+                                    'foo' => null,
                                 ],
                                 'children' => [
                                     [
@@ -198,6 +221,7 @@ GQL;
                                             'id' => 'fr-team',
                                             'title' => 'Fr Team',
                                             'url' => '/fr/fr-about/fr-team',
+                                            'foo' => null,
                                         ],
                                     ],
                                 ],

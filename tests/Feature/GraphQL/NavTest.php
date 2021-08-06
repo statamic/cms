@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -81,6 +82,9 @@ GQL;
                 id
                 title
                 url
+                ... on NavPage_Footer {
+                    foo
+                }
             }
             children {
                 depth
@@ -88,6 +92,9 @@ GQL;
                     id
                     title
                     url
+                    ... on NavPage_Footer {
+                        foo
+                    }
                 }
             }
         }
@@ -108,6 +115,7 @@ GQL;
                                 'id' => 'id-one',
                                 'title' => 'One',
                                 'url' => '/one',
+                                'foo' => 'bar',
                             ],
                             'children' => [
                                 [
@@ -116,6 +124,7 @@ GQL;
                                         'id' => 'id-one-nested',
                                         'title' => 'Nested',
                                         'url' => '/one/nested',
+                                        'foo' => 'baz',
                                     ],
                                 ],
                             ],
@@ -126,6 +135,7 @@ GQL;
                                 'id' => 'id-two',
                                 'title' => 'Two',
                                 'url' => '/two',
+                                'foo' => null,
                             ],
                             'children' => [],
                         ],
@@ -135,6 +145,7 @@ GQL;
                                 'id' => 'id-just-url',
                                 'title' => null,
                                 'url' => '/just-url',
+                                'foo' => null,
                             ],
                             'children' => [],
                         ],
@@ -229,15 +240,20 @@ GQL;
     {
         $this->createEntries();
 
-        Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
+        $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
+        BlueprintRepository::shouldReceive('find')->with('navigation.footer')->andReturn($blueprint);
+
+        Nav::make('footer')->title('Footer')->collections(['blog'])->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
             $nav->makeTree('en', [
                 [
                     'id' => 'id-one',
                     'entry' => '1',
+                    'data' => ['foo' => 'bar'],
                     'children' => [
                         [
                             'id' => 'id-two',
                             'entry' => '2',
+                            'data' => ['foo' => 'baz'],
                         ],
                     ],
                 ],
@@ -265,10 +281,12 @@ fragment Page on TreeBranch {
         entry_id
         title
         slug
-        ... on EntryPage_Blog_Article {
+        ... on NavEntryPage_Footer_Blog_Article {
+            foo
             intro
         }
-        ... on EntryPage_Blog_ArtDirected {
+        ... on NavEntryPage_Footer_Blog_ArtDirected {
+            foo
             hero_image
         }
     }
@@ -290,6 +308,7 @@ GQL;
                                 'title' => 'Standard Blog Post',
                                 'slug' => 'standard-blog-post',
                                 'intro' => 'The intro',
+                                'foo' => 'bar',
                             ],
                             'children' => [
                                 [
@@ -300,6 +319,7 @@ GQL;
                                         'title' => 'Art Directed Blog Post',
                                         'slug' => 'art-directed-blog-post',
                                         'hero_image' => 'hero.jpg',
+                                        'foo' => 'baz',
                                     ],
                                 ],
                             ],
@@ -312,6 +332,7 @@ GQL;
     /** @test */
     public function it_queries_the_tree_inside_a_nav_in_a_specific_site()
     {
+        config(['app.debug' => true]);
         $this->createFooterNav();
 
         $query = <<<'GQL'
@@ -321,11 +342,17 @@ GQL;
             depth
             page {
                 url
+                ... on NavPage_Footer {
+                    foo
+                }
             }
             children {
                 depth
                 page {
                     url
+                    ... on NavPage_Footer {
+                        foo
+                    }
                 }
             }
         }
@@ -342,17 +369,17 @@ GQL;
                     'tree' => [
                         [
                             'depth' => 1,
-                            'page' => ['url' => '/fr-one'],
+                            'page' => ['url' => '/fr-one', 'foo' => 'le-bar'],
                             'children' => [
                                 [
                                     'depth' => 2,
-                                    'page' => ['url' => '/fr-one/fr-nested'],
+                                    'page' => ['url' => '/fr-one/fr-nested', 'foo' => null],
                                 ],
                             ],
                         ],
                         [
                             'depth' => 1,
-                            'page' => ['url' => '/fr-two'],
+                            'page' => ['url' => '/fr-two', 'foo' => null],
                             'children' => [],
                         ],
                     ],
@@ -362,17 +389,22 @@ GQL;
 
     private function createFooterNav()
     {
+        $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
+        BlueprintRepository::shouldReceive('find')->with('navigation.footer')->andReturn($blueprint);
+
         Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
             $nav->makeTree('en', [
                 [
                     'id' => 'id-one',
                     'url' => '/one',
                     'title' => 'One',
+                    'data' => ['foo' => 'bar'],
                     'children' => [
                         [
                             'id' => 'id-one-nested',
                             'url' => '/one/nested',
                             'title' => 'Nested',
+                            'data' => ['foo' => 'baz'],
                             'children' => [
                                 [
                                     'id' => 'id-one-nested-doublenested',
@@ -405,6 +437,7 @@ GQL;
                     'id' => 'id-fr-one',
                     'url' => '/fr-one',
                     'title' => 'Fr One',
+                    'data' => ['foo' => 'le-bar'],
                     'children' => [
                         [
                             'id' => 'id-fr-one-nested',
