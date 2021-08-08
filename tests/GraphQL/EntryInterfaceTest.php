@@ -44,7 +44,6 @@ class EntryInterfaceTest extends TestCase
 
         EntryInterface::addTypes();
 
-        GraphQL::shouldHaveReceived('addType')->with(EntryInterface::class)->once();
         GraphQL::shouldHaveReceived('addTypes')->withArgs(function ($args) {
             $this->assertEveryItemIsInstanceOf(EntryType::class, $args);
             $this->assertEquals($expected = [

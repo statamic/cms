@@ -50,7 +50,6 @@ class PageInterfaceTest extends TestCase
 
         PageInterface::addTypes();
 
-        GraphQL::shouldHaveReceived('addType')->with(PageInterface::class)->once();
         GraphQL::shouldHaveReceived('addType')->with(PageType::class)->once();
         GraphQL::shouldHaveReceived('addTypes')->withArgs(function ($args) {
             $this->assertEquals($expected = [

@@ -49,6 +49,12 @@ class TypeRegistrar
         GraphQL::addType(UserGroupType::class);
         GraphQL::addType(RoleType::class);
         GraphQL::addType(TableRowType::class);
+        GraphQL::addType(PageInterface::class);
+        GraphQL::addType(EntryInterface::class);
+        GraphQL::addType(TermInterface::class);
+        GraphQL::addType(AssetInterface::class);
+        GraphQL::addType(GlobalSetInterface::class);
+
         PageInterface::addTypes();
         EntryInterface::addTypes();
         TermInterface::addTypes();

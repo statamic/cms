@@ -33,7 +33,6 @@ class PageInterface extends EntryInterface
 
     public static function addTypes()
     {
-        GraphQL::addType(self::class);
         GraphQL::addType(PageType::class);
         GraphQL::addTypes(array_merge(static::getNavPageTypes(), static::getNavEntryPageTypes()));
     }

@@ -84,8 +84,6 @@ class EntryInterface extends InterfaceType
 
     public static function addTypes()
     {
-        GraphQL::addType(self::class);
-
         $combinations = Collection::all()
             ->flatMap(function ($collection) {
                 return $collection
