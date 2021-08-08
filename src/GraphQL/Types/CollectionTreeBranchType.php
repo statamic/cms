@@ -10,13 +10,18 @@ class CollectionTreeBranchType extends TreeBranchType
 
     public function fields(): array
     {
-        return parent::fields() + [
-            'page' => [
+        $fields = [
+            'entry' => [
                 'type' => GraphQL::type(EntryInterface::NAME),
                 'resolve' => function ($branch) {
                     return $branch['page']->entry();
                 },
             ],
         ];
+
+        $fields['page'] = $fields['entry'];
+        $fields['page']['deprecationReason'] = 'Replaced by `entry`';
+
+        return array_merge(parent::fields(), $fields);
     }
 }

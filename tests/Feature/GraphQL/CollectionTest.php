@@ -107,7 +107,7 @@ GQL;
             expects_root
             englishTree: tree {
                 depth
-                page {
+                entry {
                     id
                     title
                     url
@@ -117,7 +117,7 @@ GQL;
                 }
                 children {
                     depth
-                    page {
+                    entry {
                         id
                         title
                         url
@@ -129,7 +129,7 @@ GQL;
             }
             frenchTree: tree(site: "fr") {
                 depth
-                page {
+                entry {
                     id
                     title
                     url
@@ -139,7 +139,7 @@ GQL;
                 }
                 children {
                     depth
-                    page {
+                    entry {
                         id
                         title
                         url
@@ -166,7 +166,7 @@ GQL;
                         'englishTree' => [
                             [
                                 'depth' => 1,
-                                'page' => [
+                                'entry' => [
                                     'id' => 'home',
                                     'title' => 'Home',
                                     'url' => '/',
@@ -176,7 +176,7 @@ GQL;
                             ],
                             [
                                 'depth' => 1,
-                                'page' => [
+                                'entry' => [
                                     'id' => 'about',
                                     'title' => 'About',
                                     'url' => '/about',
@@ -185,7 +185,7 @@ GQL;
                                 'children' => [
                                     [
                                         'depth' => 2,
-                                        'page' => [
+                                        'entry' => [
                                             'id' => 'team',
                                             'title' => 'Team',
                                             'url' => '/about/team',
@@ -198,7 +198,7 @@ GQL;
                         'frenchTree' => [
                             [
                                 'depth' => 1,
-                                'page' => [
+                                'entry' => [
                                     'id' => 'fr-home',
                                     'title' => 'Fr Home',
                                     'url' => '/fr',
@@ -208,7 +208,7 @@ GQL;
                             ],
                             [
                                 'depth' => 1,
-                                'page' => [
+                                'entry' => [
                                     'id' => 'fr-about',
                                     'title' => 'Fr About',
                                     'url' => '/fr/fr-about',
@@ -217,7 +217,7 @@ GQL;
                                 'children' => [
                                     [
                                         'depth' => 2,
-                                        'page' => [
+                                        'entry' => [
                                             'id' => 'fr-team',
                                             'title' => 'Fr Team',
                                             'url' => '/fr/fr-about/fr-team',
