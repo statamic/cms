@@ -396,7 +396,6 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function blueprint()
     {
-        // TODO: maybe don't have nav-specific logic right here.
         if ($this->structure() instanceof Nav) {
             return $this->structure()->blueprint();
         }
