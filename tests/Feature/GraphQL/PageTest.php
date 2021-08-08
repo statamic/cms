@@ -65,32 +65,32 @@ GQL;
     {
         return ['data' => [
             'nav' => [
-                    'tree' => [
-                        [
-                            'depth' => 1,
-                            'page' => [
-                                'entry_id' => 'home',
-                                'custom' => 'custom home',
-                            ],
-                            'children' => [],
+                'tree' => [
+                    [
+                        'depth' => 1,
+                        'page' => [
+                            'entry_id' => 'home',
+                            'custom' => 'custom home',
                         ],
-                        [
-                            'depth' => 1,
-                            'page' => [
-                                'entry_id' => 'about',
-                                'custom' => 'custom about',
-                            ],
-                            'children' => [
-                                [
-                                    'depth' => 2,
-                                    'page' => [
-                                        'entry_id' => 'team',
-                                        'custom' => 'custom team',
-                                    ],
+                        'children' => [],
+                    ],
+                    [
+                        'depth' => 1,
+                        'page' => [
+                            'entry_id' => 'about',
+                            'custom' => 'custom about',
+                        ],
+                        'children' => [
+                            [
+                                'depth' => 2,
+                                'page' => [
+                                    'entry_id' => 'team',
+                                    'custom' => 'custom team',
                                 ],
                             ],
                         ],
                     ],
+                ],
             ],
         ]];
     }
