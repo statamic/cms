@@ -7,7 +7,7 @@ use Statamic\Contracts\Structures\Nav;
 use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
 
-class NavPageType extends \Rebing\GraphQL\Support\Type
+class NavBasicPageType extends \Rebing\GraphQL\Support\Type
 {
     protected $nav;
 
@@ -19,19 +19,21 @@ class NavPageType extends \Rebing\GraphQL\Support\Type
 
     public static function buildName(Nav $nav): string
     {
-        return 'NavPage_'.Str::studly($nav->handle());
+        return 'NavBasicPage_'.Str::studly($nav->handle());
     }
 
     public function interfaces(): array
     {
         return [
             GraphQL::type(PageInterface::NAME),
+            GraphQL::type(NavPageInterface::buildName($this->nav)),
         ];
     }
 
     public function fields(): array
     {
-        return $this->nav->blueprint()->fields()->toGql()
+        return collect()
+            ->merge((new NavPageInterface($this->nav))->fields())
             ->merge((new PageInterface)->fields())
             ->map(function ($field) {
                 if (is_array($field)) {

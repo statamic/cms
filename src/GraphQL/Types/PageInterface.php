@@ -5,7 +5,7 @@ namespace Statamic\GraphQL\Types;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Nav;
 
-class PageInterface extends EntryInterface
+class PageInterface extends \Rebing\GraphQL\Support\InterfaceType
 {
     const NAME = 'PageInterface';
 
@@ -16,64 +16,61 @@ class PageInterface extends EntryInterface
     public function resolveType($page)
     {
         $structure = $page->structure();
-        $isNav = $structure instanceof \Statamic\Contracts\Structures\Nav;
 
-        if ($entry = $page->entry()) {
-            return GraphQL::type($isNav
-                ? NavEntryPageType::buildName($structure, $entry->collection(), $entry->blueprint())
-                : EntryPageType::buildName($entry->collection(), $entry->blueprint())
-            );
-        }
+        $type = ($entry = $page->entry())
+            ? NavEntryPageType::buildName($structure, $entry->collection(), $entry->blueprint())
+            : NavBasicPageType::buildName($structure);
 
-        return GraphQL::type($isNav
-            ? NavPageType::buildName($structure)
-            : PageType::NAME
-        );
+        return GraphQL::type($type);
     }
 
     public static function addTypes()
     {
-        GraphQL::addType(PageType::class);
-        GraphQL::addTypes(array_merge(static::getNavPageTypes(), static::getNavEntryPageTypes()));
+        $types = Nav::all()->flatMap(function ($nav) {
+            $types = array_merge([new NavBasicPageType($nav)], static::getNavEntryPageTypes($nav));
+
+            return array_merge([new NavPageInterface($nav)], $types);
+        })->all();
+
+        GraphQL::addTypes($types);
     }
 
     public function fields(): array
     {
-        $fields = parent::fields();
-
-        $fields['entry_id'] = [
-            'type' => GraphQL::ID(),
+        $fields = [
+            'id' => [
+                'type' => GraphQL::nonNull(GraphQL::id()),
+            ],
+            'title' => [
+                'type' => GraphQL::string(),
+            ],
+            'url' => [
+                'type' => GraphQL::string(),
+            ],
+            'permalink' => [
+                'type' => GraphQL::string(),
+            ],
+            'entry_id' => [
+                'type' => GraphQL::ID(),
+            ],
         ];
 
-        $fields['title']['type'] = GraphQL::string();
+        foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {
+            $fields[$field] = $closure();
+        }
 
         return $fields;
     }
 
-    protected function extraFields()
+    private static function getNavEntryPageTypes($nav)
     {
-        return collect(GraphQL::getExtraTypeFields(static::NAME))
-            ->merge(GraphQL::getExtraTypeFields(EntryInterface::NAME));
-    }
-
-    private static function getNavPageTypes()
-    {
-        return Nav::all()->map(function ($nav) {
-            return new NavPageType($nav);
-        })->all();
-    }
-
-    private static function getNavEntryPageTypes()
-    {
-        return Nav::all()->flatMap(function ($nav) {
-            return $nav->collections()->flatMap(function ($collection) use ($nav) {
-                return $collection
-                    ->entryBlueprints()
-                    ->each->addGqlTypes()
-                    ->map(function ($blueprint) use ($nav, $collection) {
-                        return compact('nav', 'collection', 'blueprint');
-                    });
-            });
+        return $nav->collections()->flatMap(function ($collection) use ($nav) {
+            return $collection
+                ->entryBlueprints()
+                ->each->addGqlTypes()
+                ->map(function ($blueprint) use ($nav, $collection) {
+                    return compact('nav', 'collection', 'blueprint');
+                });
         })->map(function ($item) {
             return new NavEntryPageType($item['nav'], $item['collection'], $item['blueprint']);
         })->all();

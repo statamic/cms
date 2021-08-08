@@ -32,24 +32,18 @@ class NavEntryPageType extends \Rebing\GraphQL\Support\Type
     {
         return [
             GraphQL::type(PageInterface::NAME),
+            GraphQL::type(EntryInterface::NAME),
+            GraphQL::type(NavPageInterface::buildName($this->nav)),
         ];
     }
 
     public function fields(): array
     {
-        // Merge the fields from the nav blueprint and the entry blueprint, where the
-        // nav blueprint fields take precedence if the same field is defined in both.
-        $fields = $this->blueprint->fields()->toGql()
-            ->merge($this->nav->blueprint()->fields()->toGql());
-
-        return $fields
+        return collect()
+            ->merge($this->blueprint->fields()->toGql())
+            ->merge((new NavPageInterface($this->nav))->fields())
             ->merge((new PageInterface)->fields())
-            // ->merge(collect(GraphQL::getExtraTypeFields(EntryInterface::NAME))->map(function ($closure) {
-            //     return $closure();
-            // }))
-            // ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
-            //     return $closure();
-            // }))
+            ->merge((new EntryInterface)->fields())
             ->map(function ($arr) {
                 if (is_array($arr)) {
                     $arr['resolve'] = $arr['resolve'] ?? $this->resolver();

@@ -3,7 +3,9 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -16,12 +18,6 @@ class NavTest extends TestCase
     use EnablesQueries;
 
     protected $enabledQueries = ['navs'];
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        BlueprintRepository::partialMock();
-    }
 
     /**
      * @test
@@ -149,6 +145,16 @@ GQL;
                             ],
                             'children' => [],
                         ],
+                        [
+                            'depth' => 1,
+                            'page' => [
+                                'id' => 'id-entry',
+                                'title' => 'Entry Title',
+                                'url' => '/blog/the-entry',
+                                'foo' => 'overridden foo',
+                            ],
+                            'children' => [],
+                        ],
                     ],
                 ],
             ]]);
@@ -171,14 +177,14 @@ GQL;
     }
 }
 
-fragment Children on TreeBranch {
+fragment Children on NavTreeBranch {
     depth
     page {
         url
     }
 }
 
-fragment RecursiveChildren on TreeBranch {
+fragment RecursiveChildren on NavTreeBranch {
     children {
         ...Children
         children {
@@ -230,6 +236,11 @@ GQL;
                             'page' => ['url' => '/just-url'],
                             'children' => [],
                         ],
+                        [
+                            'depth' => 1,
+                            'page' => ['url' => '/blog/the-entry'],
+                            'children' => [],
+                        ],
                     ],
                 ],
             ]]);
@@ -240,6 +251,7 @@ GQL;
     {
         $this->createEntries();
 
+        BlueprintRepository::partialMock();
         $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
         BlueprintRepository::shouldReceive('find')->with('navigation.footer')->andReturn($blueprint);
 
@@ -256,6 +268,11 @@ GQL;
                             'data' => ['foo' => 'baz'],
                         ],
                     ],
+                ],
+                [
+                    'id' => 'id-not-entry',
+                    'url' => '/not-an-entry',
+                    'title' => 'Not an entry',
                 ],
             ])->save();
         })->save();
@@ -275,15 +292,18 @@ GQL;
     }
 }
 
-fragment Page on TreeBranch {
+fragment Page on NavTreeBranch {
     page {
         id
         entry_id
         title
-        slug
+        ... on EntryInterface {
+            slug
+        }
         ... on NavEntryPage_Footer_Blog_Article {
             foo
             intro
+            edit_url
         }
         ... on NavEntryPage_Footer_Blog_ArtDirected {
             foo
@@ -309,6 +329,7 @@ GQL;
                                 'slug' => 'standard-blog-post',
                                 'intro' => 'The intro',
                                 'foo' => 'bar',
+                                'edit_url' => 'http://localhost/cp/collections/blog/entries/1/standard-blog-post',
                             ],
                             'children' => [
                                 [
@@ -323,6 +344,15 @@ GQL;
                                     ],
                                 ],
                             ],
+                        ],
+                        [
+                            'depth' => 1,
+                            'page' => [
+                                'id' => 'id-not-entry',
+                                'entry_id' => null,
+                                'title' => 'Not an entry',
+                            ],
+                            'children' => [],
                         ],
                     ],
                 ],
@@ -389,10 +419,14 @@ GQL;
 
     private function createFooterNav()
     {
+        Collection::make('blog')->routes('/blog/{slug}')->save();
+        EntryFactory::id('1')->slug('the-entry')->collection('blog')->data(['title' => 'Entry Title', 'foo' => 'foo in entry'])->create();
+
+        BlueprintRepository::partialMock();
         $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
         BlueprintRepository::shouldReceive('find')->with('navigation.footer')->andReturn($blueprint);
 
-        Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
+        Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->collections(['blog'])->tap(function ($nav) {
             $nav->makeTree('en', [
                 [
                     'id' => 'id-one',
@@ -430,6 +464,11 @@ GQL;
                 [
                     'id' => 'id-just-url',
                     'url' => '/just-url',
+                ],
+                [
+                    'id' => 'id-entry',
+                    'entry' => '1',
+                    'data' => ['foo' => 'overridden foo'],
                 ],
             ])->save();
             $nav->makeTree('fr', [

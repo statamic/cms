@@ -8,7 +8,6 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Fields\Blueprint;
 use Statamic\GraphQL\Types\PageInterface;
-use Statamic\GraphQL\Types\PageType;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -50,18 +49,20 @@ class PageInterfaceTest extends TestCase
 
         PageInterface::addTypes();
 
-        GraphQL::shouldHaveReceived('addType')->with(PageType::class)->once();
         GraphQL::shouldHaveReceived('addTypes')->withArgs(function ($args) {
             $this->assertEquals($expected = [
                 'NavPage_FirstOne',
-                'NavPage_SecondOne',
-                'NavPage_ThirdOne',
+                'NavBasicPage_FirstOne',
                 'NavEntryPage_FirstOne_BlogPosts_Article',
                 'NavEntryPage_FirstOne_BlogPosts_ArtDirected',
                 'NavEntryPage_FirstOne_MenuItems_Appetizer',
                 'NavEntryPage_FirstOne_MenuItems_Entree',
+                'NavPage_SecondOne',
+                'NavBasicPage_SecondOne',
                 'NavEntryPage_SecondOne_BlogPosts_Article',
                 'NavEntryPage_SecondOne_BlogPosts_ArtDirected',
+                'NavPage_ThirdOne',
+                'NavBasicPage_ThirdOne',
             ], $actual = collect($args)->map->name->all());
 
             return $actual === $expected;

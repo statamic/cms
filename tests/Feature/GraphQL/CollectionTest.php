@@ -111,7 +111,7 @@ GQL;
                     id
                     title
                     url
-                    ... on EntryPage_Pages_Pages {
+                    ... on Entry_Pages_Pages {
                         foo
                     }
                 }
@@ -121,7 +121,7 @@ GQL;
                         id
                         title
                         url
-                        ... on EntryPage_Pages_Pages {
+                        ... on Entry_Pages_Pages {
                             foo
                         }
                     }
@@ -133,7 +133,7 @@ GQL;
                     id
                     title
                     url
-                    ... on EntryPage_Pages_Pages {
+                    ... on Entry_Pages_Pages {
                         foo
                     }
                 }
@@ -143,7 +143,7 @@ GQL;
                         id
                         title
                         url
-                        ... on EntryPage_Pages_Pages {
+                        ... on Entry_Pages_Pages {
                             foo
                         }
                     }
