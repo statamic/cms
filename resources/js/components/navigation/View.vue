@@ -138,6 +138,7 @@
             :editEntryUrl="editingPage.page.entry ? editingPage.page.edit_url : null"
             :publish-info="publishInfo[editingPage.page.id]"
             :blueprint="blueprint"
+            :handle="handle"
             @publish-info-updated="updatePublishInfo"
             @localized-fields-updated="updateLocalizedFields"
             @closed="closePageEditor"
@@ -149,6 +150,7 @@
             creating
             :site="site"
             :blueprint="blueprint"
+            :handle="handle"
             @publish-info-updated="updatePendingCreatedPagePublishInfo"
             @localized-fields-updated="updatePendingCreatedPageLocalizedFields"
             @closed="closePageCreator"

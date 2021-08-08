@@ -76,6 +76,7 @@ export default {
         site: String,
         publishInfo: Object,
         blueprint: Object,
+        handle: String,
         editEntryUrl: String,
         creating: Boolean
     },
@@ -158,7 +159,7 @@ export default {
         submit() {
             this.validating = true;
 
-            const postUrl = cp_url('navigation/links/pages'); // todo: get url properly
+            const postUrl = cp_url(`navigation/${this.handle}/pages`);
 
             this.$axios.post(postUrl, {
                 type: this.type,
@@ -229,12 +230,11 @@ export default {
                 return;
             }
 
-            const handle = 'links'; // todo
             const creating = this.creating || (hasPublishInfo && !hasPublishInfoWithValues);
 
             let url = creating
-                ? cp_url(`navigation/${handle}/pages/create`)
-                : cp_url(`navigation/${handle}/pages/${this.id}/edit`);
+                ? cp_url(`navigation/${this.handle}/pages/create`)
+                : cp_url(`navigation/${this.handle}/pages/${this.id}/edit`);
 
             url += `?site=${this.site}`;
 
