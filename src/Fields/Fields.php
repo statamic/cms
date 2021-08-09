@@ -260,9 +260,9 @@ class Fields
         return Validator::make()->fields($this);
     }
 
-    public function validate($extraRules = [])
+    public function validate($extraRules = [], $customMessages = [])
     {
-        return $this->validator()->withRules($extraRules)->validate();
+        return $this->validator()->withRules($extraRules)->withMessages($customMessages)->validate();
     }
 
     public function toGql()

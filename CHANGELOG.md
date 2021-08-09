@@ -1,5 +1,79 @@
 # Release Notes
 
+## 3.1.32 (2021-07-28)
+
+### What's fixed
+- When we designed the [tab overflow](https://github.com/statamic/cms/issues/4051) UI, we neglected the other tabs in the control panel. They look like tabs again.
+
+## 3.1.31 (2021-07-28)
+
+### What's new
+- Ability to query individual entries in a specific site using GraphQL. [#4055](https://github.com/statamic/cms/issues/4055)
+
+### What's improved
+- Publish form tabs now overflow into a dropdown when there's no more room. [#4051](https://github.com/statamic/cms/issues/4051)
+- Field handles are shown when hovering over labels for a moment. [statamic/ideas#302](https://github.com/statamic/ideas/issues/302)
+
+### What's fixed
+- Fix newly uploaded assets showing incorrect metadata. [#4059](https://github.com/statamic/cms/issues/4059)
+- Fix updating of entry's `author` field when user doesn't have permission to edit author. [#4052](https://github.com/statamic/cms/issues/4052)
+
+
+
+## 3.1.30 (2021-07-26)
+
+### What's new
+- Added a command to warm the static cache. [#4016](https://github.com/statamic/cms/issues/4016)
+
+### What's improved
+- A more helpful exception is thrown when editing an entry that has an invalid blueprint. [#3977](https://github.com/statamic/cms/issues/3977)
+
+### What's fixed
+- Fix asset editor overflow issues. [#4043](https://github.com/statamic/cms/issues/4043)
+- Fix tree path issue on Windows. [#4024](https://github.com/statamic/cms/issues/4024)
+- Fix issue where video fieldtypes would prevent asset selection. [#3978](https://github.com/statamic/cms/issues/3978)
+
+
+
+## 3.1.29 (2021-07-16)
+
+### What's fixed
+- Fix validation on blueprint editor. [#4015](https://github.com/statamic/cms/issues/4015)
+
+
+
+## 3.1.28 (2021-07-15)
+
+### What's new
+- The `link` fieldtype can have its collections specified, and it defaults to only collections with routes. [#3973](https://github.com/statamic/cms/issues/3973)
+- Sites can now have arbitrary attributes. [#3996](https://github.com/statamic/cms/issues/3996)
+- Added GraphQL support for the `array` fieldtype. [#3972](https://github.com/statamic/cms/issues/3972)
+- Added a `session:has` tag. [#3958](https://github.com/statamic/cms/issues/3958)
+
+### What's improved
+- The blueprint builder will prevent you from adding fields with reserved words. [#3989](https://github.com/statamic/cms/issues/3989)
+- The blueprint builder will allow you to set default field values.  [#3982](https://github.com/statamic/cms/issues/3982)
+- The collection scaffolder now just creates views. [#3997](https://github.com/statamic/cms/issues/3997)
+- In listings that only ever require a single selection, you no longer need to unselect before selecting its replacement. [#3950](https://github.com/statamic/cms/issues/3950)
+
+### What's fixed
+- Fix "create navigation" button not appearing when you have permission. [#4005](https://github.com/statamic/cms/issues/4005)
+- Fix asset meta data disappearing when renaming programmatically. [#3964](https://github.com/statamic/cms/issues/3964)
+- Collection trees will be deleted when setting a collection to not orderable. [#3901](https://github.com/statamic/cms/issues/3901)
+- Prevent video previews blowing out the UI of the asset editor. [#3975](https://github.com/statamic/cms/issues/3975)
+- Support collections in the `reverse` modifier. [#4003](https://github.com/statamic/cms/issues/4003)
+- Prevent the Live Preview toolbar covering the Bard toolbar. [#3979](https://github.com/statamic/cms/issues/3979)
+- Tree files are ignored if they don't have a matching collection. [#3948](https://github.com/statamic/cms/issues/3948)
+- Consolidate the Stache's `getItemFilter` and `getFileFilter` methods. [#4001](https://github.com/statamic/cms/issues/4001)
+- Fix `search` tag when the `as` param is used without `paginate`. [#4000](https://github.com/statamic/cms/issues/4000)
+- Fix static caching invalidation mismatch when using trusted proxies and SSL. [#3939](https://github.com/statamic/cms/issues/3939)
+- Fix removing users from groups when using Eloquent. [#3951](https://github.com/statamic/cms/issues/3951)
+- Fix table word wrap weirdness. [#2550](https://github.com/statamic/cms/issues/2550)
+- Fix `code` fieldtype not loading, and `textarea` fieldtype not being the correct height when in inactive tabs. [#3955](https://github.com/statamic/cms/issues/3955)
+- Fix site specific views not loading. [#3944](https://github.com/statamic/cms/issues/3944)
+
+
+
 ## 3.1.27 (2021-07-01)
 
 ### What's improved
@@ -492,7 +566,7 @@
 ## 3.1.0-beta.1 (2021-03-15)
 
 ### What's new
-- You can configure Statamic to use separate authentication from the rest of your app. [#3143](https://github.com/statamic/cms/issues/3143) 
+- You can configure Statamic to use separate authentication from the rest of your app. [#3143](https://github.com/statamic/cms/issues/3143)
 - Added support for the `mimetypes` validation rule. [#3290](https://github.com/statamic/cms/issues/3290)
 
 ### What's improved
@@ -833,7 +907,7 @@
 
 ## 3.0.34 (2020-12-09)
 
-### What's new 
+### What's new
 - PHP 8 support. [#2944](https://github.com/statamic/cms/issues/2944)
 
 ### What's fixed

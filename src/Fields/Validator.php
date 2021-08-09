@@ -12,6 +12,7 @@ class Validator
     protected $fields;
     protected $replacements = [];
     protected $extraRules = [];
+    protected $customMessages = [];
 
     public function make()
     {
@@ -28,6 +29,13 @@ class Validator
     public function withRules($rules)
     {
         $this->extraRules = $rules;
+
+        return $this;
+    }
+
+    public function withMessages($messages)
+    {
+        $this->customMessages = $messages;
 
         return $this;
     }
@@ -83,7 +91,7 @@ class Validator
         return LaravelValidator::validate(
             $this->fields->preProcessValidatables()->values()->all(),
             $this->rules(),
-            [],
+            $this->customMessages,
             $this->fieldAttributes()
         );
     }

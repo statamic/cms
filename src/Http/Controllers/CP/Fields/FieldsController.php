@@ -55,16 +55,32 @@ class FieldsController extends CpController
 
         $fields = $blueprint
             ->fields()
-            ->addValues($request->values)
-            ->process();
+            ->addValues($request->values);
 
-        $values = array_merge($request->values, $fields->values()->all());
+        $fields->validate([], [
+            'handle.not_in' => __('statamic::validation.reserved'),
+        ]);
+
+        $values = array_merge($request->values, $fields->process()->values()->all());
 
         return $values;
     }
 
     protected function blueprint($blueprint)
     {
+        $reserved = [
+            'content_type',
+            'elseif',
+            'endif',
+            'endunless',
+            'if',
+            'length',
+            'reference',
+            'resource',
+            'unless',
+            'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
+        ];
+
         $prepends = collect([
             'display' => [
                 'display' => __('Display'),
@@ -76,6 +92,7 @@ class FieldsController extends CpController
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
                 'type' => 'text',
+                'validate' => 'required|not_in:'.implode(',', $reserved),
                 'width' => 50,
             ],
             'instructions' => [

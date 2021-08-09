@@ -25,7 +25,7 @@ class CollectionEntriesStore extends ChildStore
         return $this->collection ?? Collection::findByHandle($this->childKey);
     }
 
-    public function getFileFilter(SplFileInfo $file)
+    public function getItemFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory(), '/');
         $relative = Path::tidy($file->getPathname());

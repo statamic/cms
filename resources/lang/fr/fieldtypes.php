@@ -55,6 +55,7 @@ return [
     'grid.config.min_rows' => 'Définissez un nombre minimal de rangées pouvant être créées.',
     'grid.config.mode' => 'Choisissez votre disposition préférée.',
     'grid.config.reorderable' => 'Activez cette option pour autoriser la réorganisation des rangées.',
+    'link.config.collections' => 'Les entrées de ces collections seront disponibles. Si vous laissez cette zone à blanc, les entrées des collections routables seront disponibles.',
     'markdown.config.automatic_line_breaks' => 'Active les sauts de ligne automatiques.',
     'markdown.config.automatic_links' => 'Active la liaison automatique de toutes les URL.',
     'markdown.config.container' => 'Choisissez quel conteneur de ressources à utiliser pour ce champ.',
