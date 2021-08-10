@@ -29,11 +29,11 @@
                             :class="{ 'flex items-center pr-2': hasCollections }"
                             @click="addLink"
                         >
-                            {{ __('Add Link') }}
+                            {{ __('Add Nav Item') }}
                             <svg-icon name="chevron-down-xs" class="w-2 ml-2" v-if="hasCollections" />
                         </button>
                     </template>
-                    <dropdown-item :text="__('Link to URL')" @click="linkPage()" />
+                    <dropdown-item :text="__('Add Nav Item')" @click="linkPage()" />
                     <dropdown-item :text="__('Link to Entry')" @click="linkEntries()" />
                 </dropdown-list>
 
