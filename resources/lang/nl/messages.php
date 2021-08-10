@@ -118,6 +118,7 @@ return [
     'licensing_utility_description' => 'Bekijk en los licentiegegevens op.',
     'max_depth_instructions' => 'Stel een maximum aan het aantal pagina\'s dat genest mag worden. Laat leeg voor geen limiet.',
     'max_items_instructions' => 'Stel een maximum aan het aantal items dat geselecteerd mag worden.',
+    'navigation_configure_blueprint_instructions' => 'Kies uit bestaande blueprints of maak een nieuwe aan.',
     'navigation_configure_collections_instructions' => 'Sta toe dat er naar entries in deze collectie gelinkt mogen worden.',
     'navigation_configure_handle_instructions' => 'Wordt gebruikt om aan deze navigatie te refereren aan in de frontend. Het is niet persé eenvoudig om dit nadien te wijzigen.',
     'navigation_configure_intro' => 'Navigaties zijn multi-level lijsten met links die gebruikt kunnen worden om navigatiemenu\'s, footers, sitemaps en andere frontendnavigaties te maken.',
