@@ -4,7 +4,7 @@
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
             <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
-                {{ __('Link') }}
+                {{ headerText }}
                 <button
                     type="button"
                     class="btn-close"
@@ -100,6 +100,10 @@ export default {
     },
 
     computed: {
+        headerText() {
+            return this.entry ? __('Link to Entry') : __('Nav Item');
+        },
+
         adjustedBlueprint() {
             function isMissingField(fields, handle) {
                 return ! fields.some(field => field.handle === handle);
