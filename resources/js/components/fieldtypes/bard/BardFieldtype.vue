@@ -1,6 +1,6 @@
 <template>
 
-    <div 
+    <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
         @dragstart.stop="ignorePageHeader(true)"
@@ -394,13 +394,17 @@ export default {
 
             // Get the configured buttons and swap them with corresponding objects
             let buttons = selectedButtons.map(button => {
-                return _.findWhere(availableButtons(), { name: button.toLowerCase() })
-                    || button;
+                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
             });
 
             // Let addons add, remove, or control the position of buttons.
             this.$bard.buttonCallbacks.forEach(callback => {
-                let returned = callback(buttons);
+                // Let's pass two variables to the callback:
+                // buttons: Can be used to manipulate the array per reference. The callback can also simply return
+                //          a single or an array of buttons.
+                // selectedButtons: An array of strings of the buttons that have been selected to be available in this
+                //                  specific field.
+                const returned = callback(buttons, selectedButtons);
 
                 // No return value means they intend to manipulate the
                 // buttons object manually. Just continue on.
@@ -408,7 +412,7 @@ export default {
 
                 buttons = buttons.concat(
                     Array.isArray(returned) ? returned : [returned]
-                );
+                ).filter(button => selectedButtons.includes(button.name));
             });
 
             // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
