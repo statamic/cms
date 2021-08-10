@@ -12,14 +12,14 @@
                 <div class="flex-none pr-1 flex">
                     <width-selector v-model="width" class="mr-1" />
                     <button v-if="canDefineLocalizable"
-                        class="hover:text-grey-100 mr-1"
+                        class="hover:text-grey-100 mr-1 flex items-center"
                         :class="{ 'text-grey-100': localizable, 'text-grey-60': !localizable }"
                         v-tooltip="__('Localizable')"
                         @click="localizable = !localizable"
                     >
                         <svg-icon name="earth" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100"><svg-icon name="trash" /></button>
+                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100 flex items-center"><svg-icon name="trash" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
