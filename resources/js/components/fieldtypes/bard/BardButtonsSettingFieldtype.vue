@@ -58,7 +58,23 @@ export default {
     methods: {
 
         initButtons() {
-            let available = addButtonHtml(availableButtons());
+            // Get all default buttons first
+            let available = availableButtons();
+
+            // Add custom buttons from a project or addon
+            this.$bard.buttonCallbacks.map(callback => {
+                let returned = callback(available);
+
+                // No return value means they intend to manipulate the
+                // buttons object manually. Just continue on.
+                if (!returned) return;
+
+                available = available.concat(
+                    Array.isArray(returned) ? returned : [returned]
+                );
+            })
+
+            available = addButtonHtml(available);
 
             let buttons = available.map(button => {
                 button.enabled = this.data.includes(button.name);
