@@ -37,6 +37,6 @@ class ImageNode extends Node
 
     protected function getUrl($id)
     {
-        return Asset::find($id)->url();
+        return optional(Asset::find($id))->url();
     }
 }
