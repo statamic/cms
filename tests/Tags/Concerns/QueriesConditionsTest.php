@@ -527,7 +527,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('where')->with('somefield', 'somevalue');
+        $query->shouldReceive('where')->with('somefield', 'somevalue')->once();
 
         $class->query($query);
     }
@@ -560,7 +560,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('whereIn')->with('somefield', ['somevalue']);
+        $query->shouldReceive('whereIn')->with('somefield', ['somevalue'])->once();
 
         $class->query($query);
     }
@@ -593,7 +593,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('whereIn')->with('somefield', ['somevalue']);
+        $query->shouldReceive('whereIn')->with('somefield', ['somevalue'])->once();
 
         $class->query($query);
     }
@@ -620,7 +620,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('where')->with('somefield', 'foo');
+        $query->shouldReceive('where')->with('somefield', 'foo')->once();
 
         $class->query($query);
     }
@@ -649,7 +649,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('where')->with('somefield', 'somevalue');
+        $query->shouldReceive('where')->never();
 
         $class->query($query);
     }
