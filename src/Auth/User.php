@@ -136,6 +136,17 @@ abstract class User implements
         return Facades\User::blueprint();
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        $result = $this->save();
+
+        $this->withEvents = true;
+
+        return $result;
+    }
+
     public function save()
     {
         $isNew = is_null(Facades\User::find($this->getAuthIdentifier()));
