@@ -68,13 +68,12 @@
   "devDependencies": {
     "babel-jest": "^24.9.0",
     "cross-env": "^5.2.1",
-    "kind-of": ">=6.0.3",
     "jest": "^24.9.0",
+    "kind-of": ">=6.0.3",
     "laravel-mix": "^5.0.7",
     "sass": "^1.26.2",
     "sass-loader": "^8.0.2",
     "tailwindcss": "^1.2.0",
-    "tar": "^5.0.5",
     "vue-template-compiler": "^2.6.11"
   },
   "jest": {
