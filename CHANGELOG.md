@@ -1,5 +1,33 @@
 # Release Notes
 
+## 3.1.33 (2021-08-13)
+
+### What's new
+- Add Laravel Nova and Horizon links to CP. [#4076](https://github.com/statamic/cms/issues/4076) [#4074](https://github.com/statamic/cms/issues/4074)
+
+### What's improved
+- Updated French and German translations. [#4057](https://github.com/statamic/cms/issues/4057) [#4078](https://github.com/statamic/cms/issues/4078)
+
+### What's fixed
+- Fix GraphQL error when trying to get `parent` entry. [#3971](https://github.com/statamic/cms/issues/3971)
+- GraphQL uses floats instead of integers for image dimensions. [#4107](https://github.com/statamic/cms/issues/4107)
+- The `video` fieldtype no longer strips the `?` from YouTube URLs. [#4104](https://github.com/statamic/cms/issues/4104)
+- Add `password_activations` table to the `auth:migration` command stub. [#4079](https://github.com/statamic/cms/issues/4079)
+- Update the config stubs used by the `clear:site` command. [#4060](https://github.com/statamic/cms/issues/4060)
+- The `markdown` field's `cmd+left` behavior now works the way you expect it to. [ad0c05bb4](https://github.com/statamic/cms/commit/ad0c05bb4)
+- Fix blueprint card corners. [#4103](https://github.com/statamic/cms/issues/4103)
+- Fix tab overflow dropdown in LivePreview pane. [a1c3f5bdb](https://github.com/statamic/cms/commit/a1c3f5bdb)
+- Hide "Add Set" button when there are no sets. [#4083](https://github.com/statamic/cms/issues/4083)
+- Prevent showing the Laravel Telescope link when the user doesn't have permission. [#4075](https://github.com/statamic/cms/issues/4075)
+- Fix view scaffolding tpyo. [#4077](https://github.com/statamic/cms/issues/4077)
+- Add toggle for "create" config option on `entries` and `terms` fieldtypes. [#4069](https://github.com/statamic/cms/issues/4069)
+- Bump `path-parse` from 1.0.6 to 1.0.7 [#4110](https://github.com/statamic/cms/issues/4110)
+- Remove unused `tar` dependency. [c963ac8b5](https://github.com/statamic/cms/commit/c963ac8b5)
+- Fix QueriesConditionTest [#4113](https://github.com/statamic/cms/issues/4113)
+- Add more assertions for ternary conditions inside tag parameters [#4111](https://github.com/statamic/cms/issues/4111)
+
+
+
 ## 3.1.32 (2021-07-28)
 
 ### What's fixed
