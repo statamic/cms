@@ -3,8 +3,8 @@
 namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
-use Statamic\Facades\GraphQL;
 use Statamic\Facades\Form;
+use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Types\FormType;
 
 class FormsQuery extends Query
