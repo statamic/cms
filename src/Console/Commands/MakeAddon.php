@@ -4,10 +4,10 @@ namespace Statamic\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Statamic\Console\EnhancesCommands;
+use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
-use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -76,10 +76,16 @@ class MakeAddon extends GeneratorCommand
             return;
         }
 
-        $this
-            ->generateAddonFiles()
-            ->installAddon()
-            ->generateOptional();
+        try {
+            $this
+                ->generateAddonFiles()
+                ->installAddon()
+                ->generateOptional();
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+
+            return 1;
+        }
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
@@ -211,14 +217,12 @@ class MakeAddon extends GeneratorCommand
         $this->line('Installing your addon with Composer. This may take a moment...');
         $this->addRepositoryPath();
 
-        $output = Composer::runAndOperateOnOutput(['require', $this->package], function ($output) {
-            return $this->outputFromSymfonyProcess($output);
-        });
-
-        if (! Str::contains($output, "Discovered Addon: {$this->package}")) {
-            $this->error('An error was encountered while installing your addon!');
-        } else {
-            $this->info('Addon installed successfully.');
+        try {
+            Composer::withoutQueue()->throwOnFailure()->require($this->package.'derp');
+        } catch (ProcessException $exception) {
+            $this->line($exception->getMessage());
+            $this->output->newLine();
+            throw new \Exception('An error was encountered while installing your addon!');
         }
 
         $this->checkInfo('Addon installed successfully.');
@@ -300,28 +304,6 @@ class MakeAddon extends GeneratorCommand
     protected function addonTitle()
     {
         return str_replace('-', ' ', title_case($this->nameSlug));
-    }
-
-    /**
-     * Clean up symfony process output and output to cli.
-     *
-     * @param string $output
-     * @return string
-     */
-    private function outputFromSymfonyProcess(string $output)
-    {
-        // Remove terminal color codes.
-        $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
-
-        // Remove new lines.
-        $output = preg_replace('/[\r\n]+$/', '', $output);
-
-        // If not a blank line, output to terminal.
-        if (! empty(trim($output))) {
-            $this->line($output);
-        }
-
-        return $output;
     }
 
     /**
