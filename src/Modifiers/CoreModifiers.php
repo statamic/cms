@@ -1737,6 +1737,10 @@ class CoreModifiers extends Modifier
      */
     public function reverse($value)
     {
+        if ($value instanceof Collection) {
+            return $value->reverse();
+        }
+
         if (is_array($value)) {
             return array_reverse($value);
         }

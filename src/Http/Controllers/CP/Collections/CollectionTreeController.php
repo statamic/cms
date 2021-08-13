@@ -4,13 +4,29 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Arr;
 
-class CollectionStructureController extends CpController
+class CollectionTreeController extends CpController
 {
+    public function index(Request $request, Collection $collection)
+    {
+        $site = $request->site ?? Site::selected()->handle();
+
+        $pages = (new TreeBuilder)->buildForController([
+            'structure' => $collection->structure(),
+            'include_home' => true,
+            'site' => $site,
+        ]);
+
+        return ['pages' => $pages];
+    }
+
     public function update(Request $request, $collection)
     {
         $this->authorize('reorder', $collection);
@@ -33,7 +49,7 @@ class CollectionStructureController extends CpController
         $tree->tree($contents)->save();
     }
 
-    protected function toTree($items)
+    private function toTree($items)
     {
         return collect($items)->map(function ($item) {
             return Arr::removeNullValues([

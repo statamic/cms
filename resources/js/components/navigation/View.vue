@@ -9,7 +9,7 @@
                 <h1 class="flex-1" v-text="title" />
 
                 <dropdown-list class="mr-1">
-                    <dropdown-item :text="__('Configure Navigation')" :redirect="editUrl" />
+                    <slot name="twirldown" />
                 </dropdown-list>
 
                 <a @click="$refs.tree.cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
@@ -29,11 +29,11 @@
                             :class="{ 'flex items-center pr-2': hasCollections }"
                             @click="addLink"
                         >
-                            {{ __('Add Link') }}
+                            {{ __('Add Nav Item') }}
                             <svg-icon name="chevron-down-xs" class="w-2 ml-2" v-if="hasCollections" />
                         </button>
                     </template>
-                    <dropdown-item :text="__('Link to URL')" @click="linkPage()" />
+                    <dropdown-item :text="__('Add Nav Item')" @click="linkPage()" />
                     <dropdown-item :text="__('Link to Entry')" @click="linkEntries()" />
                 </dropdown-list>
 
@@ -51,13 +51,14 @@
             :has-collection="false"
             :pages-url="pagesUrl"
             :submit-url="submitUrl"
+            :submit-parameters="{ data: submissionData }"
             :max-depth="maxDepth"
             :expects-root="expectsRoot"
             :site="site"
             :preferences-prefix="preferencesPrefix"
             @edit-page="editPage"
             @changed="changed = true; targetParent = null;"
-            @saved="changed = false"
+            @saved="treeSaved"
             @canceled="changed = false"
         >
             <template #empty>
@@ -103,6 +104,10 @@
 
             <template #branch-options="{ branch, removeBranch, orphanChildren, vm, depth }">
                 <dropdown-item
+                    v-if="isEntryBranch(branch)"
+                    :text="__('Edit Entry')"
+                    :redirect="branch.edit_url" />
+                <dropdown-item
                     v-if="depth < maxDepth"
                     :text="__('Add child link to URL')"
                     @click="linkPage(vm)" />
@@ -127,14 +132,27 @@
 
         <page-editor
             v-if="editingPage"
-            :initial-title="editingPage.page.title"
-            :initial-url="editingPage.page.url"
+            :site="site"
+            :id="editingPage.page.id"
+            :entry="editingPage.page.entry"
+            :editEntryUrl="editingPage.page.entry ? editingPage.page.edit_url : null"
+            :publish-info="publishInfo[editingPage.page.id]"
+            :blueprint="blueprint"
+            :handle="handle"
+            @publish-info-updated="updatePublishInfo"
+            @localized-fields-updated="updateLocalizedFields"
             @closed="closePageEditor"
             @submitted="updatePage"
         />
 
         <page-editor
             v-if="creatingPage"
+            creating
+            :site="site"
+            :blueprint="blueprint"
+            :handle="handle"
+            @publish-info-updated="updatePendingCreatedPagePublishInfo"
+            @localized-fields-updated="updatePendingCreatedPageLocalizedFields"
             @closed="closePageCreator"
             @submitted="pageCreated"
         />
@@ -156,6 +174,7 @@ import PageEditor from '../structures/PageEditor.vue';
 import PageSelector from '../structures/PageSelector.vue';
 import RemovePageConfirmation from './RemovePageConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
+import uniqid from 'uniqid';
 
 export default {
 
@@ -178,7 +197,8 @@ export default {
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
         site: { type: String, required: true },
-        sites: { type: Array, required: true }
+        sites: { type: Array, required: true },
+        blueprint: { type: Object, required: true }
     },
 
     data() {
@@ -192,6 +212,7 @@ export default {
             pageBeingDeleted: null,
             pageDeletionConfirmCallback: null,
             preferencesPrefix: `navs.${this.handle}`,
+            publishInfo: {},
         }
     },
 
@@ -215,6 +236,12 @@ export default {
 
         hasCollections() {
             return this.collections.length > 0;
+        },
+
+        submissionData() {
+            return _.mapObject(this.publishInfo, value => {
+                return _.pick(value, ['entry', 'values', 'localizedFields', 'new']);
+            });
         }
 
     },
@@ -248,11 +275,26 @@ export default {
         },
 
         entriesSelected(pages) {
+            pages = pages.map(page => ({
+                ...page,
+                id: uniqid(),
+                entry: page.id,
+                entry_title: page.title,
+                title: null
+            }));
+
+            pages.forEach(page => {
+                this.publishInfo = {...this.publishInfo, [page.id]: {
+                    entry: page.entry,
+                    new: true,
+                }};
+            });
+
             this.$refs.tree.addPages(pages, this.targetParent);
         },
 
         isEntryBranch(branch) {
-            return !!branch.id;
+            return !!branch.entry;
         },
 
         isLinkBranch(branch) {
@@ -263,19 +305,16 @@ export default {
             return !this.isEntryBranch(branch) && !this.isLinkBranch(branch);
         },
 
-        editPage(page, vm, store, $event) {
-            if (page.id) {
-                const url = page.edit_url;
-                $event.metaKey ? window.open(url) : window.location = url;
-            } else {
-                this.editingPage = { page, vm, store };
-            }
+        editPage(page, vm, store) {
+            this.editingPage = { page, vm, store };
         },
 
-        updatePage(page) {
-            this.editingPage.page.url = page.url;
-            this.editingPage.page.title = page.title;
+        updatePage(values) {
+            this.editingPage.page.url = values.url;
+            this.editingPage.page.title = values.title;
+            this.editingPage.page.values = values;
             this.$refs.tree.pageUpdated(this.editingPage.store);
+            this.publishInfo[this.editingPage.page.id].values = values;
 
             this.editingPage = false;
         },
@@ -285,20 +324,31 @@ export default {
         },
 
         openPageCreator() {
-            this.creatingPage = true;
+            this.creatingPage = { info: null };
         },
 
         closePageCreator() {
             this.creatingPage = false;
         },
 
-        pageCreated(page) {
-            this.closePageCreator();
-            this.$refs.tree.addPages([{
-                title: page.title,
-                url: page.url,
+        pageCreated(values) {
+            const page = {
+                id: uniqid(),
+                title: values.title,
+                url: values.url,
                 children: []
-            }], this.targetParent);
+            };
+
+            this.$set(this.publishInfo, page.id, {
+                ...this.creatingPage.info,
+                values,
+                entry: null,
+                new: true,
+            });
+
+            this.$refs.tree.addPages([page], this.targetParent);
+
+            this.closePageCreator();
         },
 
         deleteTreeBranch(branch, removeFromUi, orphanChildren) {
@@ -314,6 +364,43 @@ export default {
 
         siteSelected(site) {
             window.location = site.url;
+        },
+
+        updatePublishInfo(info) {
+            this.publishInfo = { ...this.publishInfo, [this.editingPage.page.id]: info };
+        },
+
+        updatePendingCreatedPagePublishInfo(info) {
+            this.creatingPage.info = info;
+        },
+
+        updateLocalizedFields(fields) {
+            this.publishInfo[this.editingPage.page.id].localizedFields = fields;
+        },
+
+        updatePendingCreatedPageLocalizedFields(fields) {
+            this.creatingPage.info.localizedFields = fields;
+        },
+
+        treeSaved(response) {
+            this.changed = false;
+
+            this.replaceGeneratedIds(response.data.generatedIds);
+        },
+
+        replaceGeneratedIds(ids) {
+            for (let [oldId, newId] of Object.entries(ids)) {
+                // Replace the ID in the publishInfo so if the tree is saved again, its
+                // data will be submitted using the real ID, and now the temp JS one.
+                this.$set(this.publishInfo, newId, { ...this.publishInfo[oldId], new: false });
+                this.$delete(this.publishInfo, oldId);
+
+                // Replace the ID in the branch within the tree.
+                // Same as above, but in the tree itself.
+                let branch = this.$refs.tree.getNodeByBranchId(oldId);
+                branch.id = newId;
+                this.$refs.tree.pageUpdated(branch._vm.store);
+            }
         }
 
     }

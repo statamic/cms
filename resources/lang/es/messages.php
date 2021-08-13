@@ -117,6 +117,7 @@ return [
     'licensing_utility_description' => 'Ver y resolver los detalles de la licencia.',
     'max_depth_instructions' => 'Establece el número máximo de niveles en los que una página pueda ser anidada. Déjalo en blanco para que sea ilimitado.',
     'max_items_instructions' => 'Establece un número máximo de elementos seleccionables.',
+    'navigation_configure_blueprint_instructions' => 'Elige entre planos existentes o crea uno nuevo.',
     'navigation_configure_collections_instructions' => 'Habilita el enlace a entradas en estas colecciones.',
     'navigation_configure_handle_instructions' => 'Se usa para hacer referencia a esta navegación en la interfaz. Es complicado cambiarlo más tarde.',
     'navigation_configure_intro' => 'Las navegaciones son listas de enlaces de varios niveles que se pueden utilizar para crear barras de navegación, menús, mapas del sitio y cualquier forma de navegación en el front-end.',

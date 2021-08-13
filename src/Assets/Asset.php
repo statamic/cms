@@ -365,7 +365,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function isVideo()
     {
-        return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm']);
+        return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
     }
 
     /**

@@ -10,7 +10,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class UpdateCollectionStructureTest extends TestCase
+class UpdateCollectionTreeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use FakesRoles;
@@ -194,8 +194,8 @@ class UpdateCollectionStructureTest extends TestCase
             'deletedEntries' => [],
         ];
 
-        return $this->postJson(
-            cp_route('collections.structure.update', $collection->handle()),
+        return $this->patchJson(
+            cp_route('collections.tree.update', $collection->handle()),
             array_merge($validParams, $payload)
         );
     }

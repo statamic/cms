@@ -8,7 +8,12 @@
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
             <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
-                <span :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle, 'cursor-pointer': canToggleLabel }" v-text="labelText" />
+                <span :class="{
+                    'font-mono bg-grey-20 py-px px-sm text-xs': showHandle,
+                    'cursor-pointer': canToggleLabel,
+                    'text-grey-60': syncable && isSynced
+                    }"
+                v-text="labelText" />
                 <i class="required ml-sm" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
                 <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-sm">
@@ -22,7 +27,7 @@
                     class="outline-none"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="hyperlink" class="h-4 ml-sm w-4 text-grey-60"
+                    <svg-icon name="hyperlink" class="h-4 w-4 ml-.5 mt-sm text-grey-60"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
@@ -32,7 +37,7 @@
                     class="outline-none"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 ml-sm w-4 text-grey-60"
+                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-.5 mt-sm text-grey-60"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>

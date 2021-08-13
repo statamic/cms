@@ -117,6 +117,7 @@ return [
     'licensing_utility_description' => '檢視並解析授權詳情。',
     'max_depth_instructions' => '設定頁面可嵌套的最大層級數。留空表示無限制。',
     'max_items_instructions' => '設定最大可選項目的數量。',
+    'navigation_configure_blueprint_instructions' => '從現有的藍圖中選擇或建立新藍圖。',
     'navigation_configure_collections_instructions' => '允許連結到這些條目集中的條目。',
     'navigation_configure_handle_instructions' => '用於在前端參照到此導航。設定後將難以更改。',
     'navigation_configure_intro' => '導航列是多層級的連結列表，可用於建構導航列、頁腳連結、網站地圖、以及其他格式的前端導航。',
