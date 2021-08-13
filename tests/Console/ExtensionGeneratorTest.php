@@ -187,10 +187,10 @@ class ExtensionGeneratorTest extends TestCase
         $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
         $this->artisan('statamic:make:addon', ['package' => 'deaths-tar-vulnerability'])
-            ->expectsOutput('Please enter a valid composer package name (eg. john/my-addon).');
+            ->expectsOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).');
 
         $this->artisan('statamic:make:addon', ['package' => 'some/path/deaths-tar-vulnerability'])
-            ->expectsOutput('Please enter a valid composer package name (eg. john/my-addon).');
+            ->expectsOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).');
 
         $this->assertFileNotExists($path);
     }
