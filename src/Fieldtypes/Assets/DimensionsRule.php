@@ -53,7 +53,6 @@ class DimensionsRule implements Rule
             }
 
             return true;
-
         });
     }
 
