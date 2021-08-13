@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Statamic\Console\Processes\Exceptions\ProcessException;
+use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process as SymfonyProcess;
@@ -368,7 +369,6 @@ class Process
         if (! is_array($command)) {
             $command = (string) $command;
         }
-
         // Handle both string and array command formats.
         $process = is_string($command) && method_exists(SymfonyProcess::class, 'fromShellCommandLine')
             ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, ['HOME' => getenv('HOME')])
@@ -397,5 +397,29 @@ class Process
     {
         $this->output = null;
         $this->errorOutput = [];
+    }
+
+    /**
+     * Get process base path.
+     *
+     * @return string
+     */
+    public function getBasePath()
+    {
+        return preg_replace('/(.*)\/$/', '$1', $this->basePath);
+    }
+
+    /**
+     * Clone process from parent relative to base path.
+     *
+     * @return Process
+     */
+    public function fromParent()
+    {
+        $that = clone $this;
+
+        $that->basePath = str_finish(Path::resolve($this->basePath.'/../'), '/');
+
+        return $that;
     }
 }

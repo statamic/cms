@@ -45,8 +45,6 @@ class GlobalSetInterface extends InterfaceType
 
     public static function addTypes()
     {
-        GraphQL::addType(self::class);
-
         GraphQL::addTypes(GlobalSet::all()->each(function ($globals) {
             optional($globals->blueprint())->addGqlTypes();
         })->mapInto(GlobalSetType::class)->all());

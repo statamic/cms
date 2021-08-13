@@ -115,6 +115,7 @@ return [
     'licensing_utility_description' => 'Ver e resolver detalhes de licenciamento.',
     'max_depth_instructions' => 'O número máximo de níveis em uma página pode estar encadeado. Deixe em branco sem limite.',
     'max_items_instructions' => 'Defina um número máximo de itens seleccionáveis.',
+    'navigation_configure_blueprint_instructions' => 'Escolha entre os diagramas existentes ou crie um novo.',
     'navigation_configure_collections_instructions' => 'Habilitar a ligação às entradas nestas colecções.',
     'navigation_configure_handle_instructions' => 'Utilizado para fazer referência a esta navegação no frontend. É não trivial mudar mais tarde.',
     'navigation_configure_intro' => 'As navegações são listas de vários níveis de ligações que podem ser usados para construir barras de navegação, rodapés, sitesmaps e outras formas de navegação front-end.',
