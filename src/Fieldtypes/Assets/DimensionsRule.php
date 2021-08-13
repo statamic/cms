@@ -3,7 +3,6 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Contracts\Validation\Rule;
-use InvalidArgumentException;
 use Statamic\Facades\Asset;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
