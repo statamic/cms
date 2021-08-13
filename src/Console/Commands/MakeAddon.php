@@ -218,7 +218,7 @@ class MakeAddon extends GeneratorCommand
         $this->addRepositoryPath();
 
         try {
-            Composer::withoutQueue()->throwOnFailure()->require($this->package.'derp');
+            Composer::withoutQueue()->throwOnFailure()->require($this->package);
         } catch (ProcessException $exception) {
             $this->line($exception->getMessage());
             $this->output->newLine();
