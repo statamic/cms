@@ -79,6 +79,7 @@ class StaticWarm extends Command
             ->merge($this->scopedTerms())
             ->merge($this->customRoutes())
             ->unique()
+            ->sort()
             ->values();
     }
 
