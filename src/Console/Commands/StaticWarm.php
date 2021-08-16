@@ -23,7 +23,7 @@ class StaticWarm extends Command
     use EnhancesCommands;
 
     protected $name = 'statamic:static:warm';
-    protected $description = 'Warms the static cache by visiting all URLs.';
+    protected $description = 'Warms the static cache by visiting all URLs';
 
     public function handle()
     {
