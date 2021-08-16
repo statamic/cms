@@ -24,7 +24,7 @@ class FieldsetRepository
 
     public function find(string $handle): ?Fieldset
     {
-        if ($cached = array_get($this->fieldsets, $handle)) {
+        if ($cached = Arr::get($this->fieldsets, $handle)) {
             return $cached;
         }
 
@@ -32,24 +32,20 @@ class FieldsetRepository
         $path = str_replace('.', '/', $handle);
 
         if (Str::contains($handle, '::')) {
-            
-        }
-        $directory = $this->directories()->first(function ($directory) use ($path) {
-            return File::exists("{$directory}/{$path}.yaml");
-        });
+            [$key, $fieldsetHandle] = explode('::', $handle);
 
-        if (! $directory) {
+            if (! $directory = $this->getDirectory($key)) {
+                return null;
+            }
+
+            return $this->addFieldset($handle, "{$directory}/{$fieldsetHandle}.yaml");
+        }
+
+        if (! File::exists($path = "{$this->directory}/{$path}.yaml")) {
             return null;
         }
 
-        $fieldset = (new Fieldset)
-            ->setHandle($handle)
-            ->setIsExternalFieldset(! Str::startsWith($directory, resource_path()))
-            ->setContents(YAML::file("{$directory}/{$path}.yaml")->parse());
-
-        $this->fieldsets[$handle] = $fieldset;
-
-        return $fieldset;
+        return $this->addFieldset($handle, $path);
     }
 
     public function exists(string $handle): bool
@@ -110,7 +106,7 @@ class FieldsetRepository
 
     public function directories(): Collection
     {
-        return collect($this->fieldsetDirectories)->merge($this->directory);
+        return collect($this->fieldsetDirectories)->values()->merge($this->directory);
     }
 
     private function getFieldsetsByDirectory(string $directory): Collection
@@ -128,5 +124,14 @@ class FieldsetRepository
                     ->setContents(YAML::file($file)->parse());
             })
             ->keyBy->handle();
+    }
+
+    private function addFieldset(string $handle, string $path): Fieldset
+    {
+        return tap(new Fieldset, function (Fieldset $fieldset) use ($handle, $path) {
+            $this->fieldsets[$handle] = $fieldset
+                ->setHandle($handle)
+                ->setContents(YAML::file($path)->parse());
+        });
     }
 }
