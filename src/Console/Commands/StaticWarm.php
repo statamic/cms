@@ -2,11 +2,14 @@
 
 namespace Statamic\Console\Commands;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Pool;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
-use Illuminate\Http\Client\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Http;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
@@ -27,18 +30,6 @@ class StaticWarm extends Command
 
     public function handle()
     {
-        if (version_compare(app()->version(), '8', '<')) {
-            $this->error('Laravel version must be at least 8.0.0 to use this command.');
-
-            return 1;
-        }
-
-        if (! config('statamic.static_caching.strategy')) {
-            $this->error('Static caching is not enabled.');
-
-            return 1;
-        }
-
         $this->line('Warming the static cache...');
 
         $this->warm();
@@ -50,25 +41,47 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        Http::pool(function ($pool) {
-            return $this->requests($pool);
-        });
+        $client = new Client();
+
+        $pool = new Pool($client, $this->requests(), [
+            'fulfilled' => [$this, 'outputSuccessLine'],
+            'rejected' => [$this, 'outputFailureLine'],
+        ],);
+
+        $promise = $pool->promise();
+
+        $promise->wait();
     }
 
-    private function requests($pool): array
+    public function outputSuccessLine(Response $response, $index): void
     {
-        return $this->uris()->map(function ($uri) use ($pool) {
-            $pool->get($uri)->then(function ($response) use ($uri) {
-                $this->outputResponseLine($uri, $response);
-            });
+        $this->checkLine($this->getRelativeUri($index));
+    }
+
+    public function outputFailureLine(RequestException $reason, $index): void
+    {
+        $uri = $this->getRelativeUri($index);
+
+        if ($reason->hasResponse()) {
+            $response = $reason->getResponse();
+            $message = $response->getStatusCode().' '.$response->getReasonPhrase();
+        } else {
+            $message = $reason->getMessage();
+        }
+
+        $this->crossLine("$uri → <comment>$message</comment>");
+    }
+
+    private function getRelativeUri(int $index): string
+    {
+        return Str::start(Str::after($this->uris()->get($index), config('app.url')), '/');
+    }
+
+    private function requests(): array
+    {
+        return $this->uris()->map(function ($uri) {
+            return new Request('GET', $uri);
         })->all();
-    }
-
-    private function outputResponseLine(string $uri, Response $response): void
-    {
-        $uri = Str::start(Str::after($uri, config('app.url')), '/');
-
-        $response->ok() ? $this->checkLine($uri) : $this->crossLine($uri);
     }
 
     private function uris(): Collection
@@ -79,6 +92,7 @@ class StaticWarm extends Command
             ->merge($this->scopedTerms())
             ->merge($this->customRoutes())
             ->unique()
+            ->sort(SORT_NATURAL)
             ->values();
     }
 
