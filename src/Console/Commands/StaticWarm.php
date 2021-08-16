@@ -46,7 +46,7 @@ class StaticWarm extends Command
         $pool = new Pool($client, $this->requests(), [
             'fulfilled' => [$this, 'outputSuccessLine'],
             'rejected' => [$this, 'outputFailureLine'],
-        ],);
+        ]);
 
         $promise = $pool->promise();
 
