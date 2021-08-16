@@ -178,14 +178,14 @@ title: Test Fieldset
 fields: []
 EOT;
         $this->repo->addDirectory('/vendor/foo/resources/fieldsets', 'foo');
-        File::shouldReceive('exists')->with('/vendor/foo/resources/fieldsets/test.yaml')->once()->andReturnTrue();
+
         File::shouldReceive('get')->with('/vendor/foo/resources/fieldsets/test.yaml')->once()->andReturn($contents);
 
         $fieldset = $this->repo->find('foo::test');
 
         $this->assertInstanceOf(Fieldset::class, $fieldset);
         $this->assertEquals('Test Fieldset', $fieldset->title());
-        $this->assertEquals('test', $fieldset->handle());
+        $this->assertEquals('foo::test', $fieldset->handle());
     }
 
     /** @test */
