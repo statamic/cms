@@ -88,10 +88,10 @@ class AssetInterface extends InterfaceType
                 'type' => GraphQL::string(),
             ],
             'height' => [
-                'type' => GraphQL::int(),
+                'type' => GraphQL::float(),
             ],
             'width' => [
-                'type' => GraphQL::int(),
+                'type' => GraphQL::float(),
             ],
             'orientation' => [
                 'type' => GraphQL::string(),

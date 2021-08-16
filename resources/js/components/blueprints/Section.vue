@@ -6,9 +6,9 @@
             'w-full': isEditing || isSingle
         }"
     >
-        <div class="blueprint-section-card card p-0 h-full flex flex-col">
+        <div class="blueprint-section-card card p-0 h-full flex rounded-t flex-col">
 
-            <div class="bg-grey-20 border-b text-sm flex rounded-t;" v-if="!isSingle">
+            <div class="bg-grey-20 border-b text-sm flex rounded-t" v-if="!isSingle">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-1.5 py-1 flex-1">
                     <span class="font-medium mr-1">

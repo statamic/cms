@@ -32,6 +32,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StarterKitExport::class,
         Commands\StarterKitInstall::class,
         Commands\StaticClear::class,
+        Commands\StaticWarm::class,
         // Commands\MakeUserMigration::class,
         Commands\SupportDetails::class,
         Commands\AuthMigration::class,

@@ -17,7 +17,7 @@
 
         <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
             <div class="video-preview">
-                <iframe v-if="isEmbeddable" width="560" height="315" :src="embed" frameborder="0"></iframe>
+                <iframe v-if="isEmbeddable && canShowIframe" width="560" height="315" :src="embed" frameborder="0" allow="fullscreen"></iframe>
                 <video controls v-if="isVideo" :src="embed" width="560" height="315"></video>
             </div>
         </div>
@@ -31,15 +31,16 @@ export default {
 
     data() {
         return {
-            data: this.value || ''
+            data: this.value || '',
+            canShowIframe: false,
         }
     },
 
     watch: {
 
-        data(value) {
+        data: _.debounce(function (value)  {
             this.update(value);
-        },
+        }, 500),
 
         value(value) {
             this.data = value;
@@ -47,21 +48,33 @@ export default {
 
     },
 
+    mounted() {
+        // Showing the iframe right away causes Vue to stop in Safari.
+        this.canShowIframe = true;
+    },
+
     computed: {
         embed() {
-            if (this.data.includes('youtube')) {
-                return this.data.replace('watch?v=', 'embed/');
+            let embed_url = this.data;
+
+            if (embed_url.includes('youtube')) {
+                embed_url = embed_url.replace('watch?v=', 'embed/');
             }
 
-            if (this.data.includes('youtu.be')) {
-                return this.data.replace('youtu.be', 'www.youtube.com/embed');
+            if (embed_url.includes('youtu.be')) {
+                embed_url = embed_url.replace('youtu.be', 'www.youtube.com/embed');
             }
 
-            if (this.data.includes('vimeo')) {
-                return this.data.replace('/vimeo.com', '/player.vimeo.com/video');
+            if (embed_url.includes('vimeo')) {
+                embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
             }
 
-            return this.data;
+            // make sure additional query parameters are included
+            if (embed_url.includes('&')) {
+                embed_url = embed_url.replace('&', '?');
+            }
+
+            return embed_url;
         },
 
         isEmbeddable() {

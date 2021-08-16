@@ -571,7 +571,10 @@ export default {
             tabindex: 0,
             autoRefresh: true,
             readOnly: self.isReadOnly ? 'nocursor' : false,
-            extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
+            extraKeys: {
+                "Enter": "newlineAndIndentContinueMarkdownList",
+                "Cmd-Left": "goLineLeftSmart"
+            }
         });
 
         self.codemirror.on('change', function (cm) {

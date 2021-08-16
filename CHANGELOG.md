@@ -1,5 +1,68 @@
 # Release Notes
 
+## 3.1.33 (2021-08-13)
+
+### What's new
+- Add Laravel Nova and Horizon links to CP. [#4076](https://github.com/statamic/cms/issues/4076) [#4074](https://github.com/statamic/cms/issues/4074)
+
+### What's improved
+- Updated French and German translations. [#4057](https://github.com/statamic/cms/issues/4057) [#4078](https://github.com/statamic/cms/issues/4078)
+
+### What's fixed
+- Fix GraphQL error when trying to get `parent` entry. [#3971](https://github.com/statamic/cms/issues/3971)
+- GraphQL uses floats instead of integers for image dimensions. [#4107](https://github.com/statamic/cms/issues/4107)
+- The `video` fieldtype no longer strips the `?` from YouTube URLs. [#4104](https://github.com/statamic/cms/issues/4104)
+- Add `password_activations` table to the `auth:migration` command stub. [#4079](https://github.com/statamic/cms/issues/4079)
+- Update the config stubs used by the `clear:site` command. [#4060](https://github.com/statamic/cms/issues/4060)
+- The `markdown` field's `cmd+left` behavior now works the way you expect it to. [ad0c05bb4](https://github.com/statamic/cms/commit/ad0c05bb4)
+- Fix blueprint card corners. [#4103](https://github.com/statamic/cms/issues/4103)
+- Fix tab overflow dropdown in LivePreview pane. [a1c3f5bdb](https://github.com/statamic/cms/commit/a1c3f5bdb)
+- Hide "Add Set" button when there are no sets. [#4083](https://github.com/statamic/cms/issues/4083)
+- Prevent showing the Laravel Telescope link when the user doesn't have permission. [#4075](https://github.com/statamic/cms/issues/4075)
+- Fix view scaffolding tpyo. [#4077](https://github.com/statamic/cms/issues/4077)
+- Add toggle for "create" config option on `entries` and `terms` fieldtypes. [#4069](https://github.com/statamic/cms/issues/4069)
+- Bump `path-parse` from 1.0.6 to 1.0.7 [#4110](https://github.com/statamic/cms/issues/4110)
+- Remove unused `tar` dependency. [c963ac8b5](https://github.com/statamic/cms/commit/c963ac8b5)
+- Fix QueriesConditionTest [#4113](https://github.com/statamic/cms/issues/4113)
+- Add more assertions for ternary conditions inside tag parameters [#4111](https://github.com/statamic/cms/issues/4111)
+
+
+
+## 3.1.32 (2021-07-28)
+
+### What's fixed
+- When we designed the [tab overflow](https://github.com/statamic/cms/issues/4051) UI, we neglected the other tabs in the control panel. They look like tabs again.
+
+## 3.1.31 (2021-07-28)
+
+### What's new
+- Ability to query individual entries in a specific site using GraphQL. [#4055](https://github.com/statamic/cms/issues/4055)
+
+### What's improved
+- Publish form tabs now overflow into a dropdown when there's no more room. [#4051](https://github.com/statamic/cms/issues/4051)
+- Field handles are shown when hovering over labels for a moment. [statamic/ideas#302](https://github.com/statamic/ideas/issues/302)
+
+### What's fixed
+- Fix newly uploaded assets showing incorrect metadata. [#4059](https://github.com/statamic/cms/issues/4059)
+- Fix updating of entry's `author` field when user doesn't have permission to edit author. [#4052](https://github.com/statamic/cms/issues/4052)
+
+
+
+## 3.1.30 (2021-07-26)
+
+### What's new
+- Added a command to warm the static cache. [#4016](https://github.com/statamic/cms/issues/4016)
+
+### What's improved
+- A more helpful exception is thrown when editing an entry that has an invalid blueprint. [#3977](https://github.com/statamic/cms/issues/3977)
+
+### What's fixed
+- Fix asset editor overflow issues. [#4043](https://github.com/statamic/cms/issues/4043)
+- Fix tree path issue on Windows. [#4024](https://github.com/statamic/cms/issues/4024)
+- Fix issue where video fieldtypes would prevent asset selection. [#3978](https://github.com/statamic/cms/issues/3978)
+
+
+
 ## 3.1.29 (2021-07-16)
 
 ### What's fixed
@@ -531,7 +594,7 @@
 ## 3.1.0-beta.1 (2021-03-15)
 
 ### What's new
-- You can configure Statamic to use separate authentication from the rest of your app. [#3143](https://github.com/statamic/cms/issues/3143) 
+- You can configure Statamic to use separate authentication from the rest of your app. [#3143](https://github.com/statamic/cms/issues/3143)
 - Added support for the `mimetypes` validation rule. [#3290](https://github.com/statamic/cms/issues/3290)
 
 ### What's improved
@@ -872,7 +935,7 @@
 
 ## 3.0.34 (2020-12-09)
 
-### What's new 
+### What's new
 - PHP 8 support. [#2944](https://github.com/statamic/cms/issues/2944)
 
 ### What's fixed
