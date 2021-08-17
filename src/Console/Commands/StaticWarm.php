@@ -69,9 +69,9 @@ class StaticWarm extends Command
 
         if ($reason->hasResponse()) {
             $response = $reason->getResponse();
-            
+
             $message = $response->getStatusCode().' '.$response->getReasonPhrase();
-            
+
             if ($response->getStatusCode() == 500) {
                 $message .= "\n".Message::bodySummary($response, 500);
             }
