@@ -53,9 +53,17 @@ class FieldsetRepository
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
-        return $this->directories()->contains(function ($directory) use ($path) {
-            return File::exists("{$directory}/{$path}.yaml");
-        });
+        if (Str::contains($handle, '::')) {
+            [$key, $fieldsetHandle] = explode('::', $handle);
+
+            if (! $directory = $this->getDirectory($key)) {
+                return false;
+            }
+
+            return File::exists("{$directory}/{$fieldsetHandle}.yaml");
+        }
+
+        return File::exists("{$this->directory}/{$path}.yaml");
     }
 
     public function make($handle = null): Fieldset
@@ -65,16 +73,14 @@ class FieldsetRepository
 
     public function all(): Collection
     {
-        $fieldsets = $this->directories()
-            ->flatMap(function (string $directory) {
-                return $this->getFieldsetsByDirectory($directory);
+        $externalFieldsets = $this->fieldsetDirectories()
+            ->flatMap(function (string $directory, string $key) {
+                return $this->getFieldsetsByDirectory($directory, $key);
             });
 
-        if ($fieldsets->isEmpty()) {
-            return collect();
-        }
-
-        return $fieldsets;
+        return $this
+            ->getFieldsetsByDirectory($this->directory)
+            ->merge($externalFieldsets);
     }
 
     public function save(Fieldset $fieldset)
@@ -104,23 +110,26 @@ class FieldsetRepository
         return Arr::get($this->fieldsetDirectories, $key);
     }
 
-    public function directories(): Collection
+    public function fieldsetDirectories(): Collection
     {
-        return collect($this->fieldsetDirectories)->values()->merge($this->directory);
+        return collect($this->fieldsetDirectories);
     }
 
-    private function getFieldsetsByDirectory(string $directory): Collection
+    private function getFieldsetsByDirectory(string $directory, string $key = null): Collection
     {
         return File::withAbsolutePaths()
             ->getFilesByTypeRecursively($directory, 'yaml')
-            ->map(function ($file) use ($directory) {
+            ->map(function ($file) use ($directory, $key) {
                 $basename = str_after($file, str_finish($directory, '/'));
                 $handle = str_before($basename, '.yaml');
                 $handle = str_replace('/', '.', $handle);
 
-                return (new Fieldset)
-                    ->setHandle($handle)
-                    ->setIsExternalFieldset(! Str::startsWith($directory, resource_path()))
+                if ($key) {
+                    $handle = "{$key}::{$handle}";
+                }
+
+                return $this
+                    ->make($handle)
                     ->setContents(YAML::file($file)->parse());
             })
             ->keyBy->handle();

@@ -11,6 +11,8 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
@@ -116,19 +118,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldsets()
     {
-        $filename = $this->getAddon()->slug();
-        $directory = $this->getAddon()->directory();
-        $origin = "{$directory}resources/fieldtypes/{$filename}.php";
-
-        if (! $this->config || ! file_exists($origin)) {
+        if (! File::exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
             return $this;
         }
 
-        $this->mergeConfigFrom($origin, $filename);
-
-        $this->publishes([
-            $origin => config_path("{$filename}.php"),
-        ], "{$filename}-config");
+        Fieldset::addDirectory($path, $this->getAddon()->slug());
 
         return $this;
     }
