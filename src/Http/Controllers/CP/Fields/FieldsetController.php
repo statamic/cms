@@ -8,6 +8,7 @@ use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FieldsetController extends CpController
 {
@@ -20,7 +21,7 @@ class FieldsetController extends CpController
     {
         $fieldsets = Facades\Fieldset::all()
             ->reject(function (Fieldset $fieldset) {
-                return $fieldset->isExternalFieldset();
+                return Str::contains($fieldset->handle(), '::');
             })->map(function (Fieldset $fieldset) {
                 return [
                     'id' => $fieldset->handle(),

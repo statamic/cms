@@ -13,9 +13,6 @@ class Fieldset
     protected $contents = [];
     protected $handle;
 
-    /** @var bool */
-    protected $isExternalFieldset = false;
-
     public function setHandle(string $handle): self
     {
         $this->handle = $handle;
@@ -26,18 +23,6 @@ class Fieldset
     public function handle(): ?string
     {
         return $this->handle;
-    }
-
-    public function setIsExternalFieldset(bool $isExternalFieldset): self
-    {
-        $this->isExternalFieldset = $isExternalFieldset;
-
-        return $this;
-    }
-
-    public function isExternalFieldset(): bool
-    {
-        return $this->isExternalFieldset;
     }
 
     public function setContents(array $contents): self
