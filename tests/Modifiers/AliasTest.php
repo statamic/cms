@@ -23,8 +23,8 @@ class AliasTest extends TestCase
         $this->assertEquals(['as' => $collection], $this->modify($collection, 'as'));
     }
 
-    public function modify($arr, $limit)
+    public function modify($arr, $as)
     {
-        return Modify::value($arr)->alias($limit)->fetch();
+        return Modify::value($arr)->alias($as)->fetch();
     }
 }
