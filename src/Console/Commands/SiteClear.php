@@ -153,8 +153,8 @@ class SiteClear extends Command
             return;
         }
 
-        // Don't remove the extra disk provided with statamic/statamic
-        if ($disk === 'assets') {
+        // Don't remove any of the default disks.
+        if (in_array($disk, ['local', 'public', 's3', 'assets'])) {
             return;
         }
 
