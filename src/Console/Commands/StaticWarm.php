@@ -28,9 +28,13 @@ class StaticWarm extends Command
     protected $name = 'statamic:static:warm';
     protected $description = 'Warms the static cache by visiting all URLs.';
 
+    private $uris;
+
     public function handle()
     {
-        $this->line('Warming the static cache...');
+        $this->line('Please wait. This may take a while if you have a lot of content.');
+
+        $this->comment('Warming the static cache...');
 
         $this->warm();
 
@@ -77,7 +81,7 @@ class StaticWarm extends Command
         return Str::start(Str::after($this->uris()->get($index), config('app.url')), '/');
     }
 
-    private function requests(): array
+    private function requests()
     {
         return $this->uris()->map(function ($uri) {
             return new Request('GET', $uri);
@@ -86,36 +90,45 @@ class StaticWarm extends Command
 
     private function uris(): Collection
     {
-        return collect()
-            ->merge($this->entries())
-            ->merge($this->terms())
-            ->merge($this->scopedTerms())
-            ->merge($this->customRoutes())
-            ->unique()
-            ->sort(SORT_NATURAL)
-            ->values();
+        if (! $this->uris) {
+            $this->uris = collect()
+                ->merge($this->entries())
+                ->merge($this->terms())
+                ->merge($this->scopedTerms())
+                ->merge($this->customRoutes())
+                ->unique()
+                ->sort()
+                ->values();
+        }
+
+        return $this->uris;
     }
 
     protected function entries(): Collection
     {
-        return Facades\Entry::all()
-            ->reject(function (Entry $entry) {
-                return is_null($entry->uri());
-            })
-            ->filter(function (Entry $entry) {
-                return $entry->published();
-            })
-            ->map->absoluteUrl();
+        $this->comment('- Collecting entry URLs...');
+
+        return Facades\Entry::all()->map(function (Entry $entry) {
+            if (! $entry->published() || $entry->private()) {
+                return null;
+            }
+
+            return $entry->absoluteUrl();
+        })->filter();
     }
 
     protected function terms(): Collection
     {
+        $this->comment('- Collecting term URLs...');
+
         return Facades\Term::all()
             ->map->absoluteUrl();
     }
 
     protected function scopedTerms(): Collection
     {
+        $this->comment('- Collecting scoped term URLs...');
+
         return Facades\Collection::all()
             ->flatMap(function (EntriesCollection $collection) {
                 return $this->getCollectionTerms($collection);
@@ -134,6 +147,8 @@ class StaticWarm extends Command
 
     protected function customRoutes(): Collection
     {
+        $this->comment('- Collecting custom route URLs...');
+
         $action = FrontendController::class.'@route';
 
         return collect(app('router')->getRoutes()->getRoutes())
