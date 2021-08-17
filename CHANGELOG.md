@@ -3,23 +3,23 @@
 ## 3.2.0-beta.1 (2021-08-17)
 
 ### What's new
-- A brand new Starter Kit experience. [#3755](https://github.com/statamic/cms/issues/3755)
-- Navs may now have blueprints. [#3941](https://github.com/statamic/cms/issues/3941)
-- Improved the addon / extension `make` commands. [#3965](https://github.com/statamic/cms/issues/3965)
-- A bunch of UI improvements. [#3967](https://github.com/statamic/cms/issues/3967)
+- A brand new Starter Kit experience that's objectively better in every possible way (just you wait and see). [#3755](https://github.com/statamic/cms/issues/3755)
+- Navs can now have their own blueprints. 🎉 [#3941](https://github.com/statamic/cms/issues/3941)
+- Addon/extension `make` commands now do all the boilerplate work for you, including wiring up `webpack` because nobody wants to do that. [#3965](https://github.com/statamic/cms/issues/3965)
+- An entire Pringles can full of UI improvements that definitely doesn't have a fake snake coiled up inside. [#3967](https://github.com/statamic/cms/issues/3967)
 - Added Alpine.js to the Control Panel. [#3903](https://github.com/statamic/cms/issues/3903)
-- You can select multiple rows in CP tables by holding shift. [#3907](https://github.com/statamic/cms/issues/3907)
-- References get updated in content when you move or rename assets or terms. [#3850](https://github.com/statamic/cms/issues/3850) [#3912](https://github.com/statamic/cms/issues/3912)
-- The items in the nav or collection tree views are collapsible. [#3899](https://github.com/statamic/cms/issues/3899)
+- You can now select multiple rows in CP tables by clicking one, holding down shift, and clicking another. [#3907](https://github.com/statamic/cms/issues/3907)
+- References get automatically updated throughout content when you move or rename assets and terms. [#3850](https://github.com/statamic/cms/issues/3850) [#3912](https://github.com/statamic/cms/issues/3912)
+- Nav and collection tree items are now are collapsible. [#3899](https://github.com/statamic/cms/issues/3899)
 - Added a pagination size selector to the asset browser. [#3957](https://github.com/statamic/cms/issues/3957)
 
 ### What's changing
-- Cmd+s always does a quick save. [#3910](https://github.com/statamic/cms/issues/3910)
+- `cmd`+`s` now does a _quick_ save (and `cmd`+`return` does the full thing). [#3910](https://github.com/statamic/cms/issues/3910)
 
 ### What's fixed
-- Fixed Git error when using symlinks. [#4062](https://github.com/statamic/cms/issues/4062)
+- Fixed git error when using symlinks. [#4062](https://github.com/statamic/cms/issues/4062)
 - Prevent an error when users move or rename assets. [#4068](https://github.com/statamic/cms/issues/4068)
-- The `site:clear` command won't remove 
+- The `site:clear` command will no longer remove the default filesystem disk configs.
 
 
 ## 3.1.33 (2021-08-13)
