@@ -1,5 +1,20 @@
 # Release Notes
 
+## 3.1.34 (2021-08-17)
+
+### What's new
+- Add `add_slashes` modifier. [74208d23e](https://github.com/statamic/cms/commit/74208d23e)
+- Add `getKey` method to `User` class. [#4122](https://github.com/statamic/cms/issues/4122)
+
+### What's improved
+- Adjusted German translations. [#4126](https://github.com/statamic/cms/issues/4126)
+- Align command descriptions. [#4125](https://github.com/statamic/cms/issues/4125)
+
+### What's fixed
+- Fix data-table's rounded corners hover state. [1ea06666b](https://github.com/statamic/cms/commit/1ea06666b)
+
+
+
 ## 3.1.33 (2021-08-13)
 
 ### What's new
