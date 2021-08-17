@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
+use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
@@ -68,7 +69,12 @@ class StaticWarm extends Command
 
         if ($reason->hasResponse()) {
             $response = $reason->getResponse();
+            
             $message = $response->getStatusCode().' '.$response->getReasonPhrase();
+            
+            if ($response->getStatusCode() == 500) {
+                $message .= "\n".Message::bodySummary($response, 500);
+            }
         } else {
             $message = $reason->getMessage();
         }
