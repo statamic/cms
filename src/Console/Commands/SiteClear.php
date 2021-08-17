@@ -153,6 +153,11 @@ class SiteClear extends Command
             return;
         }
 
+        // Don't remove any of the default disks.
+        if (in_array($disk, ['local', 'public', 's3', 'assets'])) {
+            return;
+        }
+
         // TODO: Maybe we can eventually bring in and extract this to statamic/migrator's Configurator class...
         $filesystemsPath = config_path('filesystems.php');
         $config = $this->files->get($filesystemsPath);
