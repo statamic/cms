@@ -205,31 +205,28 @@ fields:
     type: text
     display: Second Field
 EOT;
-        $thirdContents = <<<'EOT'
-title: Third Fieldset
-fields:
-  three:
-    type: text
-    display: Third Field
-EOT;
+
+        $this->repo->addDirectory('/vendor/foo/resources/fieldsets', 'foo');
 
         File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
         File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
             '/path/to/resources/fieldsets/first.yaml',
-            '/path/to/resources/fieldsets/second.yaml',
-            '/path/to/resources/fieldsets/sub/third.yaml',
         ]));
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/first.yaml')->once()->andReturn($firstContents);
-        File::shouldReceive('get')->with('/path/to/resources/fieldsets/second.yaml')->once()->andReturn($secondContents);
-        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/third.yaml')->once()->andReturn($thirdContents);
+
+        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
+        File::shouldReceive('getFilesByTypeRecursively')->with('/vendor/foo/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
+            '/vendor/foo/resources/fieldsets/second.yaml',
+        ]));
+        File::shouldReceive('get')->with('/vendor/foo/resources/fieldsets/second.yaml')->once()->andReturn($secondContents);
 
         $all = $this->repo->all();
 
         $this->assertInstanceOf(Collection::class, $all);
-        $this->assertCount(3, $all);
+        $this->assertCount(2, $all);
         $this->assertEveryItemIsInstanceOf(Fieldset::class, $all);
-        $this->assertEquals(['first', 'second', 'sub.third'], $all->keys()->all());
-        $this->assertEquals(['first', 'second', 'sub.third'], $all->map->handle()->values()->all());
-        $this->assertEquals(['First Fieldset', 'Second Fieldset', 'Third Fieldset'], $all->map->title()->values()->all());
+        $this->assertEquals(['first', 'foo::second'], $all->keys()->all());
+        $this->assertEquals(['first', 'foo::second'], $all->map->handle()->values()->all());
+        $this->assertEquals(['First Fieldset', 'Second Fieldset'], $all->map->title()->values()->all());
     }
 }
