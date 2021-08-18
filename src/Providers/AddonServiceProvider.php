@@ -11,6 +11,8 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
@@ -452,6 +454,17 @@ abstract class AddonServiceProvider extends ServiceProvider
                 '--force' => true,
             ]);
         });
+
+        return $this;
+    }
+
+    protected function bootFieldsets()
+    {
+        if (! File::exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
+            return $this;
+        }
+
+        Fieldset::addDirectory($path, $this->getAddon()->slug());
 
         return $this;
     }
