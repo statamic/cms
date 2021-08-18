@@ -69,20 +69,20 @@ return [
         'presets' => [
             // 'small' => ['w' => 200, 'h' => 200, 'q' => 75, 'fit' => 'crop'],
         ],
-        
+
         /*
         |--------------------------------------------------------------------------
         | Watermarks base path
         |--------------------------------------------------------------------------
         |
         | To help make it easier in your Glide tags to reference your watermark
-        | assets without needing to pass the entire asset path, you can provide 
-        | the base path to the folder containing your watermark. This will be the 
+        | assets without needing to pass the entire asset path, you can provide
+        | the base path to the folder containing your watermark. This will be the
         | prefix for the "mark" attribute in your Glide tag.
         |
         */
 
-        'watermarks_path' => public_path('assets')
+        'watermarks_path' => public_path('assets'),
     ],
 
     /*

@@ -23,7 +23,7 @@ class GlideServer
             'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
             'cache_with_file_extensions' => true,
             'presets' => Image::manipulationPresets(),
-            'watermarks' => $this->watermarksPath()
+            'watermarks' => $this->watermarksPath(),
         ]);
     }
 
@@ -38,10 +38,9 @@ class GlideServer
             ? Config::get('statamic.assets.image_manipulation.cache_path')
             : storage_path('statamic/glide');
     }
-    
-    
+
     /**
-     * Get glide watermarks path
+     * Get glide watermarks path.
      *
      * @return string
      */
