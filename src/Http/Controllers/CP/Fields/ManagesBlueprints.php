@@ -101,8 +101,8 @@ trait ManagesBlueprints
     {
         $handle = Str::slug($request->title, '_');
 
-        if (Facades\Blueprint::find($handle)) {
-            throw ValidationException::withMessages([__('A blueprint with that name already exists.')]);
+        if (Facades\Blueprint::in($namespace)->has($handle)) {
+            throw ValidationException::withMessages(['title' => __('A blueprint with that name already exists.')]);
         }
 
         $blueprint = (new Blueprint)
