@@ -11,35 +11,32 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
-use Statamic\Facades\Fieldset;
-use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
 abstract class AddonServiceProvider extends ServiceProvider
 {
-    protected $actions = [];
-    protected $commands = [];
-    protected $externalScripts = [];
-    protected $externalStylesheets = [];
-    protected $fieldtypes = [];
     protected $listen = [];
-    protected $middlewareGroups = [];
-    protected $modifiers = [];
-    protected $policies = [];
-    protected $publishables = [];
-    protected $routes = [];
-    protected $scopes = [];
-    protected $scripts = [];
-    protected $stylesheets = [];
     protected $subscribe = [];
     protected $tags = [];
+    protected $scopes = [];
+    protected $actions = [];
+    protected $fieldtypes = [];
+    protected $modifiers = [];
+    protected $widgets = [];
+    protected $policies = [];
+    protected $commands = [];
+    protected $stylesheets = [];
+    protected $externalStylesheets = [];
+    protected $scripts = [];
+    protected $externalScripts = [];
+    protected $publishables = [];
+    protected $routes = [];
+    protected $middlewareGroups = [];
     protected $updateScripts = [];
     protected $viewNamespace;
-    protected $widgets = [];
-
-    protected $config = true;
     protected $publishAfterInstall = true;
+    protected $config = true;
     protected $translations = true;
 
     public function boot()
@@ -50,27 +47,26 @@ abstract class AddonServiceProvider extends ServiceProvider
             }
 
             $this
-                ->bootActions()
-                ->bootCommands()
-                ->bootConfig()
                 ->bootEvents()
-                ->bootFieldsets()
-                ->bootFieldtypes()
-                ->bootMiddleware()
-                ->bootModifiers()
-                ->bootPolicies()
-                ->bootPublishables()
-                ->bootPublishAfterInstall()
-                ->bootRoutes()
-                ->bootSchedule()
-                ->bootScopes()
-                ->bootScripts()
-                ->bootStylesheets()
                 ->bootTags()
+                ->bootScopes()
+                ->bootActions()
+                ->bootFieldtypes()
+                ->bootModifiers()
+                ->bootWidgets()
+                ->bootCommands()
+                ->bootSchedule()
+                ->bootPolicies()
+                ->bootStylesheets()
+                ->bootScripts()
+                ->bootPublishables()
+                ->bootConfig()
                 ->bootTranslations()
+                ->bootRoutes()
+                ->bootMiddleware()
                 ->bootUpdateScripts()
                 ->bootViews()
-                ->bootWidgets();
+                ->bootPublishAfterInstall();
         });
     }
 
@@ -112,17 +108,6 @@ abstract class AddonServiceProvider extends ServiceProvider
         foreach ($this->actions as $class) {
             $class::register();
         }
-
-        return $this;
-    }
-
-    protected function bootFieldsets()
-    {
-        if (! File::exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
-            return $this;
-        }
-
-        Fieldset::addDirectory($path, $this->getAddon()->slug());
 
         return $this;
     }
