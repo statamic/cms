@@ -135,7 +135,6 @@ return [
     'publish_actions_publish' => '對該工作複本做出的更改將套用至該條目，且將立即發佈。',
     'publish_actions_schedule' => '對該工作複本做出的更改將套用至該條目，且將在所選日期顯示為已發佈。',
     'publish_actions_unpublish' => '目前的修訂版將不發佈。',
-    'rename_asset_warning' => '重新命名素材將不會更新所有該素材的參照，將導致網站內出現中斷的連結。',
     'reset_password_notification_body' => '你會收到此電子郵件時因為我們收到了重設密碼的請求。',
     'reset_password_notification_no_action' => '若你未要求重設密碼，則不需進一步操作。',
     'reset_password_notification_subject' => '重設密碼通知',

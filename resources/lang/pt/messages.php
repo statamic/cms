@@ -133,7 +133,6 @@ return [
     'publish_actions_publish' => 'As alterações na cópia de trabalho serão aplicadas à entrada e serão publicadas imediatamente.',
     'publish_actions_schedule' => 'As alterações na cópia de trabalho serão aplicadas à entrada e aparecerão publicadas na data seleccionada.',
     'publish_actions_unpublish' => 'A revisão actual não será publicada.',
-    'rename_asset_warning' => 'Renomear um arquivo não actualizará quaisquer referências ao mesmo, o que pode resultar em links quebrados no seu website.',
     'reset_password_notification_body' => 'Recebeu este email porque foi feita uma solicitação de redefinição de senha para sua conta.',
     'reset_password_notification_no_action' => 'Se não solicitou uma redefinição de senha, nenhuma acção adicional será necessária.',
     'reset_password_notification_subject' => 'Redefinir notificação de senha',

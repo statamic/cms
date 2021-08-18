@@ -133,7 +133,6 @@ return [
     'publish_actions_publish' => 'Perubahan pada salinan pekerjaan akan diterapkan ke entri dan akan segera diterbitkan.',
     'publish_actions_schedule' => 'Perubahan pada salinan pekerjaan akan diterapkan ke entri dan itu akan muncul diterbitkan pada tanggal yang dipilih.',
     'publish_actions_unpublish' => 'Revisi saat ini tidak akan dipublikasikan.',
-    'rename_asset_warning' => 'Mengganti nama aset tidak akan memperbarui referensi apa pun ke aset tersebut, yang dapat mengakibatkan tautan rusak di situs Anda.',
     'reset_password_notification_body' => 'Anda menerima email ini karena kami menerima permintaan pengaturan ulang kata sandi untuk akun Anda.',
     'reset_password_notification_no_action' => 'Jika Anda tidak meminta pengaturan ulang kata sandi, tidak ada tindakan lebih lanjut yang diperlukan.',
     'reset_password_notification_subject' => 'Atur Ulang Pemberitahuan Kata Sandi',

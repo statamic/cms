@@ -134,7 +134,6 @@ return [
     'publish_actions_publish' => 'Ændringer i arbejdskopien anvendes og den offentliggøres straks.',
     'publish_actions_schedule' => 'Ændringer i arbejdskopien anvendes og den vises offentliggjort på den valgte dato.',
     'publish_actions_unpublish' => 'Den aktuelle revision vil ikke blive offentliggjort.',
-    'rename_asset_warning' => 'Omdøbning af et aktiv opdaterer ikke nogen referencer til det, hvilket kan resultere i ødelagte links på dit websted.',
     'reset_password_notification_body' => 'Du modtager denne e-mail, fordi vi modtog en anmodning om nulstilling af adgangskode til din konto.',
     'reset_password_notification_no_action' => 'Hvis du ikke anmodede om nulstilling af adgangskode, er der ikke behov for yderligere handling.',
     'reset_password_notification_subject' => 'Nulstil adgangskode besked',

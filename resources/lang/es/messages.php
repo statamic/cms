@@ -135,7 +135,6 @@ return [
     'publish_actions_publish' => 'Los cambios en la copia de trabajo se aplicarán a la entrada y se publicarán de inmediato.',
     'publish_actions_schedule' => 'Los cambios en la copia de trabajo se aplicarán a la entrada y aparecerá publicada en la fecha seleccionada.',
     'publish_actions_unpublish' => 'La revisión actual se ocultará.',
-    'rename_asset_warning' => 'Cambiar el nombre de un medio no actualizará ninguna referencia a él, lo que puede resultar en enlaces rotos dentro de tu sitio.',
     'reset_password_notification_body' => 'Te enviamos este correo electrónico porque recibimos una solicitud de restablecimiento de contraseña para tu cuenta.',
     'reset_password_notification_no_action' => 'Si no solicitaste un restablecimiento de contraseña, tienes que hacer nada más.',
     'reset_password_notification_subject' => 'Notificación de restablecimiento de contraseña',
