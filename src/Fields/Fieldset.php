@@ -10,10 +10,10 @@ use Statamic\Support\Str;
 
 class Fieldset
 {
-    protected $contents = [];
     protected $handle;
+    protected $contents = [];
 
-    public function setHandle(string $handle): self
+    public function setHandle(string $handle)
     {
         $this->handle = $handle;
 
@@ -25,7 +25,7 @@ class Fieldset
         return $this->handle;
     }
 
-    public function setContents(array $contents): self
+    public function setContents(array $contents)
     {
         $fields = array_get($contents, 'fields', []);
 
