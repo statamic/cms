@@ -137,7 +137,6 @@ return [
     'publish_actions_publish' => 'Les modifications apportées à la copie de travail s’appliqueront à l’entrée et celle-ci sera publiée immédiatement.',
     'publish_actions_schedule' => 'Les modifications apportées à la copie de travail s’appliqueront à l’entrée et celle-ci paraîtra publiée à la date sélectionnée.',
     'publish_actions_unpublish' => 'La révision actuelle sera dépubliée.',
-    'rename_asset_warning' => 'Renommer une ressource ne mettra à jour aucune des références qui pointent vers elle, ce qui pourrait entraîner l’apparition de liens brisés sur votre site.',
     'reset_password_notification_body' => 'Vous recevez cet email car nous avons reçu une demande de réinitialisation du mot de passe pour votre compte.',
     'reset_password_notification_no_action' => 'Si vous n’avez pas demandé de réinitialisation de mot de passe, aucune autre action n’est requise.',
     'reset_password_notification_subject' => 'Notification de réinitialisation du mot de passe',
