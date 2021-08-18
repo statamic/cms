@@ -121,7 +121,7 @@ export default {
                     handle: 'url',
                     type: 'text',
                     display: __('URL'),
-                    instructions: __('Enter any internal or external URL. Leave blank for a text-only item.'),
+                    instructions: __('Enter any internal or external URL.'),
                 });
             }
 
@@ -135,8 +135,7 @@ export default {
                 fields.unshift({
                     handle: 'title',
                     type: 'text',
-                    display: __('Title'),
-                    instructions: __('Link display text. Leave blank to use the URL.'),
+                    display: __('Title')
                 });
             }
 
