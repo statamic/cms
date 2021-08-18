@@ -68,6 +68,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootMiddleware()
                 ->bootUpdateScripts()
                 ->bootViews()
+                ->bootFieldsets()
                 ->bootPublishAfterInstall();
         });
     }
