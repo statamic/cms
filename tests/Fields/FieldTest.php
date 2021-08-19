@@ -292,7 +292,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('example')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 protected $component = 'example';
                 protected $configFields = [
                     'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
@@ -302,7 +303,8 @@ class FieldTest extends TestCase
 
         FieldtypeRepository::shouldReceive('find')
                 ->with('with_processing')
-                ->andReturn(new class extends Fieldtype {
+                ->andReturn(new class extends Fieldtype
+                {
                     public function preProcess($data)
                     {
                         return $data.' preprocessed';
@@ -311,7 +313,8 @@ class FieldTest extends TestCase
 
         FieldtypeRepository::shouldReceive('find')
                 ->with('without_processing')
-                ->andReturn(new class extends Fieldtype {
+                ->andReturn(new class extends Fieldtype
+                {
                     public function preProcess($data)
                     {
                         return $data;
@@ -358,7 +361,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function process($data)
                 {
                     return $data.' processed';
@@ -378,7 +382,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcess($data)
                 {
                     return $data.' preprocessed';
@@ -398,7 +403,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcessIndex($data)
                 {
                     return $data.' preprocessed for index';
@@ -418,7 +424,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcess($data)
                 {
                     return $data.' preprocessed';
@@ -438,7 +445,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcess($data)
                 {
                     return $data.' preprocessed';
