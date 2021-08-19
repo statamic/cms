@@ -14,11 +14,9 @@ use Throwable;
 
 class PreviewController extends CpController
 {
-    protected $view;
-
     public function show()
     {
-        return view($this->view);
+        return view('statamic::entries.preview');
     }
 
     public function edit(Request $request, $_, $data)

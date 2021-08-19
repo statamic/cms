@@ -9,8 +9,6 @@ use Statamic\Http\Controllers\CP\PreviewController;
 
 class TermPreviewController extends PreviewController
 {
-    protected $view = 'statamic::terms.preview';
-
     public function create(Request $request, $taxonomy, $site)
     {
         $this->authorize('create', [TermContract::class, $taxonomy]);

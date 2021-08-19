@@ -9,8 +9,6 @@ use Statamic\Http\Controllers\CP\PreviewController;
 
 class EntryPreviewController extends PreviewController
 {
-    protected $view = 'statamic::entries.preview';
-
     public function create(Request $request, $collection, $site)
     {
         $this->authorize('create', [EntryContract::class, $collection]);
