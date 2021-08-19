@@ -69,4 +69,24 @@ class AugmentedTermTest extends AugmentedTestCase
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
     }
+
+    /** @test */
+    public function supplemented_title_is_used()
+    {
+        tap(Taxonomy::make('test'))->save();
+
+        $term = Term::make()
+            ->taxonomy('test')
+            ->blueprint('test')
+            ->in('en')
+            ->slug('term-slug')
+            ->data(['title' => 'Actual Title'])
+            ->setSupplement('title', 'Supplemented Title');
+
+        $augmented = new AugmentedTerm($term);
+
+        $title = $augmented->get('title');
+        $this->assertInstanceOf(Value::class, $title);
+        $this->assertEquals('Supplemented Title', $title->value());
+    }
 }
