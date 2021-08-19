@@ -44,7 +44,7 @@ export default {
     data() {
 
         return {
-            option: this.initialOption(),
+            option: this.meta.initialOption,
             options: this.initialOptions(),
             urlValue: this.meta.initialUrl,
             selectedEntries: this.meta.initialSelectedEntries,
@@ -87,20 +87,6 @@ export default {
     },
 
     methods: {
-
-        initialOption() {
-            if (! this.value) {
-                return this.config.required ? 'url' : null;
-            }
-
-            if (this.value === '@child') {
-                return 'first-child';
-            } else if (this.value.startsWith('entry::')) {
-                return 'entry';
-            } else {
-                return 'url';
-            }
-        },
 
         initialOptions() {
             return [

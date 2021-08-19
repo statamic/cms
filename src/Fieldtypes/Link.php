@@ -46,12 +46,28 @@ class Link extends Fieldtype
         return [
             'initialUrl' => $url,
             'initialSelectedEntries' => $selectedEntry ? [$selectedEntry] : [],
+            'initialOption' => $this->initialOption($value, $selectedEntry),
             'showFirstChildOption' => $this->showFirstChildOption(),
             'entry' => [
                 'config' => $entryFieldtype->config(),
                 'meta' => $entryFieldtype->preload(),
             ],
         ];
+    }
+
+    private function initialOption($value, $entry)
+    {
+        if (! $value) {
+            return $this->field->isRequired() ? 'url' : null;
+        }
+
+        if ($value === '@child') {
+            return 'first-child';
+        } elseif ($entry) {
+            return 'entry';
+        }
+
+        return 'url';
     }
 
     private function nestedEntriesFieldtype($value): Fieldtype
