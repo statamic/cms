@@ -8,7 +8,6 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Facades\Site;
-use Statamic\Http\Controllers\CP\CpController;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Throwable;
