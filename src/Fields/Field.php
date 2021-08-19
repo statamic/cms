@@ -24,6 +24,16 @@ class Field implements Arrayable
         $this->config = $config;
     }
 
+    public function isEmpty()
+    {
+        return empty($this->value);
+    }
+
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
     public function newInstance()
     {
         return (new static($this->handle, $this->config))

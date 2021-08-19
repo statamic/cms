@@ -11,6 +11,22 @@ use Tests\TestCase;
 class FieldsetTest extends TestCase
 {
     /** @test */
+    public function it_can_check_empty()
+    {
+        $fieldset = new Fieldset;
+
+        $this->assertTrue($fieldset->isEmpty());
+        $this->assertFalse($fieldset->isNotEmpty());
+
+        $fieldset->setContents([
+            'title' => 'Test',
+        ]);
+
+        $this->assertFalse($fieldset->isEmpty());
+        $this->assertTrue($fieldset->isNotEmpty());
+    }
+
+    /** @test */
     public function it_gets_the_handle()
     {
         $fieldset = new Fieldset;

@@ -23,6 +23,16 @@ class Fields
             ->setItems($items);
     }
 
+    public function isEmpty()
+    {
+        return $this->fields->isEmpty();
+    }
+
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
     public function setItems($items)
     {
         if ($items instanceof Collection) {

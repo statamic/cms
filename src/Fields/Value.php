@@ -31,6 +31,16 @@ class Value implements IteratorAggregate, JsonSerializable
         }
     }
 
+    public function isEmpty()
+    {
+        return empty($this->raw);
+    }
+
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
     public function raw()
     {
         return $this->raw;

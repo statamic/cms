@@ -13,6 +13,16 @@ class Fieldset
     protected $handle;
     protected $contents = [];
 
+    public function isEmpty()
+    {
+        return empty($this->contents);
+    }
+
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
     public function setHandle(string $handle)
     {
         $this->handle = $handle;
