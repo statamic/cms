@@ -174,6 +174,12 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $this->updateStatamicUrlsInLinkNodes($field, $dottedPrefix);
     }
 
+    /**
+     * Update asset references in bard image nodes.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @param null|string $dottedPrefix
+     */
     private function updateStatamicUrlsInImageNodes($field, $dottedPrefix)
     {
         $data = $this->item->data()->all();
@@ -212,6 +218,12 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $this->updated = true;
     }
 
+    /**
+     * Update asset references in bard link nodes.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @param null|string $dottedPrefix
+     */
     private function updateStatamicUrlsInLinkNodes($field, $dottedPrefix)
     {
         $data = $this->item->data()->all();
