@@ -8,6 +8,8 @@
     <entry-publish-form
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
+        :dropdown-actions="{{ $dropdownActions }}"
+        action-url="{{ cp_route('collections.entries.actions.run', $collection) }}"
         method="patch"
         collection-handle="{{ $collection }}"
         :collection-has-routes="{{ Statamic\Support\Str::bool($collectionHasRoutes) }}"

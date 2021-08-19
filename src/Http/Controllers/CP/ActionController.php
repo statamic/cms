@@ -37,6 +37,14 @@ abstract class ActionController extends CpController
 
         if ($redirect = $action->redirect($items, $values)) {
             return ['redirect' => $redirect];
+        /*
+        } elseif (in_array($action->handle(), ['unpublish', 'publish'])) {
+            // TODO Refresh the current edit page? Seems bit rubbish - probably need to update published state using Vue
+            return ['redirect' => true];
+        } elseif ($action->handle() === 'delete') {
+            // TODO Return back to the index screen
+            return ['redirect' => route('statamic.cp.collections.index')];
+        */
         } elseif ($download = $action->download($items, $values)) {
             return $download instanceof Response ? $download : response()->download($download);
         }

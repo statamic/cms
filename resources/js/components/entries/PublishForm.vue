@@ -11,8 +11,16 @@
                 </div>
             </h1>
 
-            <dropdown-list class="mr-2" v-if="canEditBlueprint">
-                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            <dropdown-list class="mr-2" v-if="dropdownActions || canEditBlueprint">
+                <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                
+                <data-list-inline-actions
+                    :item="this.id"
+                    :url="actionUrl"
+                    :actions="dropdownActions"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                />
             </dropdown-list>
 
             <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
@@ -257,11 +265,12 @@ import PublishActions from './PublishActions';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History';
 import HasPreferences from '../data-list/HasPreferences';
+import HasActions from '../data-list/HasActions';
 
 export default {
 
     mixins: [
-        HasPreferences,
+        HasPreferences, HasActions
     ],
 
     components: {
@@ -301,10 +310,14 @@ export default {
         createAnotherUrl: String,
         listingUrl: String,
         collectionHasRoutes: Boolean,
+        dropdownActions: Array,
+        actionUrl: String,
+
     },
 
     data() {
         return {
+            id: null,
             actions: this.initialActions,
             saving: false,
             localizing: false,
@@ -659,6 +672,7 @@ export default {
 
             this.$refs.container.dirty();
         }
+
     },
 
     mounted() {
@@ -667,8 +681,8 @@ export default {
             if (this.confirmingPublish) return;
             this.save();
         });
-
         this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
+        this.id = this.$store.state.publish.base.values.id;
     },
 
     created() {
