@@ -47,6 +47,7 @@ class Nav extends Structure
 
         $crumbs = $crumbs->values()->map(function ($crumb) {
             $crumb->setSupplement('is_current', URL::getCurrent() === $crumb->url());
+            $crumb->setSupplement('view_exists', view()->exists($crumb->template()));
 
             return $crumb;
         });
