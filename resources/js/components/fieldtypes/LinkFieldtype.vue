@@ -121,13 +121,12 @@ export default {
         },
 
         initialUrlValue() {
-            return (this.value && this.value  !== '@child' && !this.value.startsWith('entry::')) ? this.value : null;
+            return (this.value && this.value !== '@child' && !this.value.startsWith('entry::')) ? this.value : null;
         },
 
         initialSelectedEntries() {
             return (this.value && this.value.startsWith('entry::')) ? [this.value.substr(7)] : [];
         },
-
 
         entriesSelected(entries) {
             this.selectedEntries = entries;
