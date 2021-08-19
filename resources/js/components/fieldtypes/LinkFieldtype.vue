@@ -44,10 +44,10 @@ export default {
     data() {
 
         return {
-            option: null,
-            options: [],
-            urlValue: null,
-            selectedEntries: [],
+            option: this.initialOption(),
+            options: this.initialOptions(),
+            urlValue: this.initialUrlValue(),
+            selectedEntries: this.initialSelectedEntries()
         }
 
     },
@@ -86,26 +86,21 @@ export default {
 
     },
 
-    created() {
-        this.options = this.initialOptions();
-
-        if (! this.value) {
-            this.option = this.config.required ? 'url' : null;
-            return;
-        }
-
-        if (this.value === '@child') {
-            this.option = 'first-child';
-        } else if (this.value.startsWith('entry::')) {
-            this.option = 'entry';
-            this.selectedEntries = [this.value.substr(7)];
-        } else {
-            this.option = 'url';
-            this.urlValue = this.value;
-        }
-    },
-
     methods: {
+
+        initialOption() {
+            if (! this.value) {
+                return this.config.required ? 'url' : null;
+            }
+
+            if (this.value === '@child') {
+                return 'first-child';
+            } else if (this.value.startsWith('entry::')) {
+                return 'entry';
+            } else {
+                return 'url';
+            }
+        },
 
         initialOptions() {
             return [
@@ -124,6 +119,15 @@ export default {
 
             ].filter(option => option);
         },
+
+        initialUrlValue() {
+            return (this.value && this.value  !== '@child' && !this.value.startsWith('entry::')) ? this.value : null;
+        },
+
+        initialSelectedEntries() {
+            return (this.value && this.value.startsWith('entry::')) ? [this.value.substr(7)] : [];
+        },
+
 
         entriesSelected(entries) {
             this.selectedEntries = entries;
