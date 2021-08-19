@@ -46,8 +46,8 @@ export default {
         return {
             option: this.initialOption(),
             options: this.initialOptions(),
-            urlValue: this.initialUrlValue(),
-            selectedEntries: this.initialSelectedEntries()
+            urlValue: this.meta.initialUrl,
+            selectedEntries: this.meta.initialSelectedEntries,
         }
 
     },
@@ -118,14 +118,6 @@ export default {
                 { label: __('Entry'), value: 'entry' }
 
             ].filter(option => option);
-        },
-
-        initialUrlValue() {
-            return (this.value && this.value !== '@child' && !this.value.startsWith('entry::')) ? this.value : null;
-        },
-
-        initialSelectedEntries() {
-            return (this.value && this.value.startsWith('entry::')) ? [this.value.substr(7)] : [];
         },
 
         entriesSelected(entries) {
