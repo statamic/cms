@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
+use Psr\Http\Client\ClientExceptionInterface;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
@@ -63,11 +64,11 @@ class StaticWarm extends Command
         $this->checkLine($this->getRelativeUri($index));
     }
 
-    public function outputFailureLine(RequestException $exception, $index): void
+    public function outputFailureLine(ClientExceptionInterface $exception, $index): void
     {
         $uri = $this->getRelativeUri($index);
 
-        if ($exception->hasResponse()) {
+        if ($exception instanceof RequestException && $exception->hasResponse()) {
             $response = $exception->getResponse();
 
             $message = $response->getStatusCode().' '.$response->getReasonPhrase();
