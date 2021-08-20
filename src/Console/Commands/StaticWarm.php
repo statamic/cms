@@ -34,6 +34,12 @@ class StaticWarm extends Command
 
     public function handle()
     {
+        if (! config('statamic.static_caching.strategy')) {
+            $this->error('Static caching is not enabled.');
+
+            return 1;
+        }
+
         $this->comment('Please wait. This may take a while if you have a lot of content.');
 
         $this->warm();
