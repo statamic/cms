@@ -2,12 +2,10 @@
 
 namespace Statamic\Console\Commands;
 
-use Facades\Statamic\Imaging\GlideServer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use League\Glide\Server;
 use Statamic\Console\RunsInPlease;
-use Statamic\Facades\File;
-use Statamic\Facades\Folder;
 
 class GlideClear extends Command
 {
@@ -34,16 +32,17 @@ class GlideClear extends Command
      */
     public function handle()
     {
-        // Get the glide server cache path.
-        $cachePath = GlideServer::cachePath();
+        // Get the glide server cache file system.
+        $filesystem = app(Server::class)->getCache();
 
         // Delete the cached images.
-        collect(Folder::getFilesRecursively($cachePath))->each(function ($path) {
-            File::delete($path);
+        collect($filesystem->listContents())->each(function ($item) use ($filesystem) {
+            if ($item['type'] === 'dir') {
+                $filesystem->deleteDir($item['path']);
+            } else {
+                $filesystem->delete($item['path']);
+            }
         });
-
-        // Clean up subfolders.
-        Folder::deleteEmptySubfolders($cachePath);
 
         // Remove the cached keys so the middleware doesn't try to load a non existent image.
         collect(Cache::get('glide::paths', []))->keys()->each(function ($key) {

@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Facades\Statamic\Imaging\GlideServer;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Support\ServiceProvider;
 use League\Glide\Server;
 use Statamic\Contracts\Imaging\ImageManipulator;
@@ -49,8 +50,12 @@ class GlideServiceProvider extends ServiceProvider
         $route = Config::get('statamic.assets.image_manipulation.route');
 
         if (Config::get('statamic.assets.image_manipulation.cache')) {
+            $route = ($disk = Config::get('statamic.assets.image_manipulation.cache_disk'))
+                ? $this->app->make(FilesystemFactory::class)->disk($disk)->url('')
+                : Str::start($route, '/');
+
             return new StaticUrlBuilder($this->app->make(ImageGenerator::class), [
-                'route' => Str::start($route, '/'),
+                'route' => $route,
             ]);
         }
 
