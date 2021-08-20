@@ -350,7 +350,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
 
     public function toLivePreviewResponse($request, $extras)
     {
-        Cascade::set('live_preview', $extras);
+        Cascade::preserveData()->set('live_preview', $extras);
 
         return $this->toResponse($request);
     }

@@ -17,6 +17,7 @@ class Cascade
     protected $data;
     protected $content;
     protected $sections;
+    protected $preserveData = false;
 
     public function __construct(Request $request, Site $site, array $data = [])
     {
@@ -79,7 +80,10 @@ class Cascade
 
     public function hydrate()
     {
-        $this->data([]);
+        if (! $this->preserveData) {
+            $this->data([]);
+        }
+
         $this->sections = collect();
 
         return $this
@@ -198,6 +202,13 @@ class Cascade
             $viewModel = new $class($this);
             $this->data = array_merge($this->data, $viewModel->data());
         }
+
+        return $this;
+    }
+
+    public function preserveData()
+    {
+        $this->preserveData = true;
 
         return $this;
     }

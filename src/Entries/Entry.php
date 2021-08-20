@@ -395,7 +395,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function toLivePreviewResponse($request, $extras)
     {
-        Cascade::set('live_preview', $extras);
+        Cascade::preserveData()->set('live_preview', $extras);
 
         return $this->toResponse($request);
     }
