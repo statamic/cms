@@ -39,8 +39,8 @@
 
             <div
                 class="help-block -mt-1"
-                v-if="config.instructions"
-                v-html="$options.filters.markdown(config.instructions)" />
+                v-if="instructions && config.instructions_position !== 'below'"
+                v-html="instructions" />
         </div>
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
@@ -67,6 +67,11 @@
         <div v-if="hasError">
             <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
+
+        <div
+            class="help-block mt-1"
+            v-if="instructions && config.instructions_position === 'below'"
+            v-html="instructions" />
     </div>
     </publish-field-meta>
 
@@ -113,6 +118,12 @@ export default {
 
         fieldtypeComponentExists() {
             return Vue.options.components[this.fieldtypeComponent] !== undefined;
+        },
+
+        instructions() {
+            return this.config.instructions
+                ? this.$options.filters.markdown(this.config.instructions)
+                : null
         },
 
         hasError() {

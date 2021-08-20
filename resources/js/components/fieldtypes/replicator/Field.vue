@@ -8,14 +8,13 @@
             <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm" v-text="__('Read Only')" />
         </label>
 
-        <div
-            class="help-block"
-            v-if="field.instructions"
-            v-html="$options.filters.markdown(field.instructions)" />
+        <template v-if="field.instructions_position !== 'below'">
+            <div class="help-block" v-if="instructions" v-html="instructions" />
 
-        <div v-if="hasError">
-            <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
-        </div>
+            <div v-if="hasError">
+                <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
+            </div>
+        </template>
 
         <component
             :is="fieldtypeComponent"
@@ -32,6 +31,14 @@
             @blur="$emit('blur')"
             @replicator-preview-updated="$emit('replicator-preview-updated', $event)"
         />
+
+        <template v-if="field.instructions_position === 'below'">
+            <div v-if="hasError">
+                <small class="help-block text-red mt-1" v-for="(error, i) in errors" :key="i" v-text="error" />
+            </div>
+
+            <div class="help-block mt-1" v-if="instructions" v-html="instructions" />
+        </template>
 
     </div>
 
@@ -79,6 +86,12 @@ export default {
 
         display() {
             return this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1)
+        },
+
+        instructions() {
+            return this.field.instructions
+                ? this.$options.filters.markdown(this.field.instructions)
+                : null
         },
 
         hasError() {
