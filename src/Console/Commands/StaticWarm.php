@@ -63,12 +63,12 @@ class StaticWarm extends Command
         $this->checkLine($this->getRelativeUri($index));
     }
 
-    public function outputFailureLine(RequestException $reason, $index): void
+    public function outputFailureLine(RequestException $exception, $index): void
     {
         $uri = $this->getRelativeUri($index);
 
-        if ($reason->hasResponse()) {
-            $response = $reason->getResponse();
+        if ($exception->hasResponse()) {
+            $response = $exception->getResponse();
 
             $message = $response->getStatusCode().' '.$response->getReasonPhrase();
 
@@ -76,7 +76,7 @@ class StaticWarm extends Command
                 $message .= "\n".Message::bodySummary($response, 500);
             }
         } else {
-            $message = $reason->getMessage();
+            $message = $exception->getMessage();
         }
 
         $this->crossLine("$uri → <comment>$message</comment>");
