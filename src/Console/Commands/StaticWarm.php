@@ -102,17 +102,17 @@ class StaticWarm extends Command
 
     private function uris(): Collection
     {
-        if (! $this->uris) {
-            $this->uris = collect()
-                ->merge($this->entries())
-                ->merge($this->terms())
-                ->merge($this->customRoutes())
-                ->unique()
-                ->sort()
-                ->values();
+        if ($this->uris) {
+            return $this->uris;
         }
 
-        return $this->uris;
+        return $this->uris = collect()
+            ->merge($this->entries())
+            ->merge($this->terms())
+            ->merge($this->customRoutes())
+            ->unique()
+            ->sort()
+            ->values();
     }
 
     protected function entries(): Collection
