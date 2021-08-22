@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags\Collection;
 
+use Illuminate\Support\Carbon;
 use Statamic\Facades\Entry;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
@@ -19,9 +20,7 @@ class Collection extends Tags
     {
         $this->params['from'] = $this->method;
 
-        return $this->output(
-            $this->entries()->get()
-        );
+        return $this->outputIndex();
     }
 
     /**
@@ -33,9 +32,7 @@ class Collection extends Tags
             return $this->context->value('collection');
         }
 
-        return $this->output(
-            $this->entries()->get()
-        );
+        return $this->outputIndex();
     }
 
     /**
@@ -102,5 +99,34 @@ class Collection extends Tags
     protected function currentEntry()
     {
         return Entry::find($this->params->get('current', $this->context->get('id')));
+    }
+
+    protected function outputIndex()
+    {
+        $entries = $this->entries()->get();
+
+        if (! $this->params->get('group_by_date')) {
+            return $this->output($entries);
+        }
+
+        if ($this->params->get('paginate')) {
+            throw new \Exception("Paginating entries grouped by date isn't currently supported.");
+        }
+
+        return $this->output($this->groupByDate($entries));
+    }
+
+    protected function groupByDate($entries)
+    {
+        [$format, $field] = array_replace([null, null], explode('|', $this->params['group_by_date']));
+
+        return collect($entries)->groupBy(function ($entry) use ($format, $field) {
+            return ($field
+                ? Carbon::parse($entry->get($field))
+                : $entry->date()
+            )->format($format);
+        })->map(function ($entries, $date) {
+            return ['date' => $date, 'entries' => $entries];
+        })->values();
     }
 }

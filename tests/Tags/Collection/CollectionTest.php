@@ -255,6 +255,65 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_groups_entries_by_date()
+    {
+        $this->foods->dated(true)->save();
+
+        $this->makeEntry($this->foods, 'a')->date('2019-02-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2019-02-06')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2019-02-06')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2019-03-02')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'e')->date('2019-03-03')->set('title', 'Egg')->save();
+
+        $this->setTagParameters(['in' => 'foods', 'group_by_date' => 'M Y']);
+        $this->assertCount(2, $groups = $this->collectionTag->index());
+        $this->assertEquals('Mar 2019', $groups[0]['date']);
+        $this->assertEquals('Feb 2019', $groups[1]['date']);
+        $this->assertEquals(['Egg', 'Danish'], $this->getTitles($groups[0]['entries']));
+        $this->assertEquals(['Banana', 'Carrot', 'Apple'], $this->getTitles($groups[1]['entries']));
+
+        $this->setTagParameters(['in' => 'foods', 'group_by_date' => 'Y-m-d', 'sort' => 'date:asc']);
+        $groups = $this->collectionTag->index();
+        $this->assertCount(4, $groups = $this->collectionTag->index());
+        $this->assertEquals('2019-02-01', $groups[0]['date']);
+        $this->assertEquals('2019-02-06', $groups[1]['date']);
+        $this->assertEquals('2019-03-02', $groups[2]['date']);
+        $this->assertEquals('2019-03-03', $groups[3]['date']);
+        $this->assertEquals(['Apple'], $this->getTitles($groups[0]['entries']));
+        $this->assertEquals(['Banana', 'Carrot'], $this->getTitles($groups[1]['entries']));
+        $this->assertEquals(['Danish'], $this->getTitles($groups[2]['entries']));
+        $this->assertEquals(['Egg'], $this->getTitles($groups[3]['entries']));
+    }
+
+    /** @test */
+    public function it_groups_entries_by_a_custom_date_field()
+    {
+        $this->makeEntry($this->foods, 'a')->set('custom_date', '2019-02-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->set('custom_date', '2019-02-06')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->set('custom_date', '2019-02-06')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->set('custom_date', '2019-03-02')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'e')->set('custom_date', '2019-03-03')->set('title', 'Egg')->save();
+
+        $this->setTagParameters(['in' => 'foods', 'group_by_date' => 'M Y|custom_date', 'sort_by' => 'date:desc|title:asc']);
+        $this->assertCount(2, $groups = $this->collectionTag->index());
+        $this->assertEquals('Feb 2019', $groups[0]['date']);
+        $this->assertEquals('Mar 2019', $groups[1]['date']);
+        $this->assertEquals(['Apple', 'Banana', 'Carrot'], $this->getTitles($groups[0]['entries']));
+        $this->assertEquals(['Danish', 'Egg'], $this->getTitles($groups[1]['entries']));
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_using_group_by_date_with_pagination()
+    {
+        $this->setTagParameters(['in' => 'foods', 'group_by_date' => 'M Y', 'paginate' => true]);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Paginating entries grouped by date isn't currently supported.");
+
+        $this->collectionTag->index();
+    }
+
+    /** @test */
     public function it_counts_entries_in_a_collection()
     {
         $this->makePosts();
@@ -539,7 +598,12 @@ class CollectionTest extends TestCase
 
     protected function runTagAndGetTitles($tagMethod)
     {
-        return $this->collectionTag->{$tagMethod}()->map->get('title')->values()->all();
+        return $this->getTitles($this->collectionTag->{$tagMethod}());
+    }
+
+    protected function getTitles($entries)
+    {
+        return $entries->map->get('title')->values()->all();
     }
 
     protected function makeStructure($tree, $collection)
