@@ -105,7 +105,7 @@ class CoreModifiers extends Modifier
      */
     public function alias($value, $params)
     {
-        if (! is_array($value)) {
+        if (! (is_array($value) || $value instanceof Collection)) {
             return;
         }
 
