@@ -27,12 +27,16 @@
 
 .live-preview .publish-tabs {
     @apply bg-grey-30 ml-0 pl-0;
-    a {
+    .tab-button {
         border-radius: 0;
         height: 100%;
         min-width: 100px;
         border: none;
     }
+}
+
+.live-preview .tabs-container {
+    @apply bg-grey-30;
 }
 
 .live-preview .publish-section-actions-footer {

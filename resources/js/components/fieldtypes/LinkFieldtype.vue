@@ -2,7 +2,7 @@
     <div class="flex items-center">
 
         <!-- Link type selector -->
-        <div class="w-48 mr-2">
+        <div class="w-40 mr-2">
             <v-select
                 v-model="option"
                 :options="options"

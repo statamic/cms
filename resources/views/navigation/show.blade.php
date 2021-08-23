@@ -6,15 +6,26 @@
 
     <navigation-view
         title="{{ $nav->title() }}"
+        handle="{{ $nav->handle() }}"
         breadcrumb-url="{{ cp_route('navigation.index') }}"
-        pages-url="{{ cp_route('structures.pages.index', $nav->handle()) }}"
-        submit-url="{{ cp_route('structures.pages.store', $nav->handle()) }}"
+        pages-url="{{ cp_route('navigation.tree.index', $nav->handle()) }}"
+        submit-url="{{ cp_route('navigation.tree.update', $nav->handle()) }}"
         edit-url="{{ $nav->editUrl() }}"
         site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
         :collections="{{ json_encode($collections) }}"
         :max-depth="{{ $nav->maxDepth() ?? 'Infinity' }}"
         :expects-root="{{ $str::bool($expectsRoot) }}"
-    ></navigation-view>
+        :blueprint="{{ json_encode($blueprint) }}"
+    >
+        <template #twirldown>
+            @can('edit', $nav)
+                <dropdown-item :text="__('Edit Navigation')" redirect="{{ $nav->editUrl() }}"></dropdown-item>
+            @endcan
+            @can('configure fields')
+                <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}"></dropdown-item>
+            @endcan
+        </template>
+    </navigation-view>
 
 @endsection

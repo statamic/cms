@@ -1,5 +1,91 @@
 # Release Notes
 
+## 3.2.0-beta.1 (2021-08-17)
+
+### What's new
+- A brand new Starter Kit experience that's objectively better in every possible way (just you wait and see). [#3755](https://github.com/statamic/cms/issues/3755)
+- Navs can now have their own blueprints. 🎉 [#3941](https://github.com/statamic/cms/issues/3941)
+- Addon/extension `make` commands now do all the boilerplate work for you, including wiring up `webpack` because nobody wants to do that. [#3965](https://github.com/statamic/cms/issues/3965)
+- An entire Pringles can full of UI improvements that definitely doesn't have a fake snake coiled up inside. [#3967](https://github.com/statamic/cms/issues/3967)
+- Added Alpine.js to the Control Panel. [#3903](https://github.com/statamic/cms/issues/3903)
+- You can now select multiple rows in CP tables by clicking one, holding down shift, and clicking another. [#3907](https://github.com/statamic/cms/issues/3907)
+- References get automatically updated throughout content when you move or rename assets and terms. [#3850](https://github.com/statamic/cms/issues/3850) [#3912](https://github.com/statamic/cms/issues/3912)
+- Nav and collection tree items are now are collapsible. [#3899](https://github.com/statamic/cms/issues/3899)
+- Added a pagination size selector to the asset browser. [#3957](https://github.com/statamic/cms/issues/3957)
+
+### What's changing
+- `cmd`+`s` now does a _quick_ save (and `cmd`+`return` does the full thing). [#3910](https://github.com/statamic/cms/issues/3910)
+
+### What's fixed
+- Fixed git error when using symlinks. [#4062](https://github.com/statamic/cms/issues/4062)
+- Prevent an error when users move or rename assets. [#4068](https://github.com/statamic/cms/issues/4068)
+- The `site:clear` command will no longer remove the default filesystem disk configs.
+
+
+
+## 3.1.34 (2021-08-17)
+
+### What's new
+- Add `add_slashes` modifier. [74208d23e](https://github.com/statamic/cms/commit/74208d23e)
+- Add `getKey` method to `User` class. [#4122](https://github.com/statamic/cms/issues/4122)
+
+### What's improved
+- Adjusted German translations. [#4126](https://github.com/statamic/cms/issues/4126)
+- Align command descriptions. [#4125](https://github.com/statamic/cms/issues/4125)
+
+### What's fixed
+- Fix data-table's rounded corners hover state. [1ea06666b](https://github.com/statamic/cms/commit/1ea06666b)
+
+
+
+## 3.1.33 (2021-08-13)
+
+### What's new
+- Add Laravel Nova and Horizon links to CP. [#4076](https://github.com/statamic/cms/issues/4076) [#4074](https://github.com/statamic/cms/issues/4074)
+
+### What's improved
+- Updated French and German translations. [#4057](https://github.com/statamic/cms/issues/4057) [#4078](https://github.com/statamic/cms/issues/4078)
+
+### What's fixed
+- Fix GraphQL error when trying to get `parent` entry. [#3971](https://github.com/statamic/cms/issues/3971)
+- GraphQL uses floats instead of integers for image dimensions. [#4107](https://github.com/statamic/cms/issues/4107)
+- The `video` fieldtype no longer strips the `?` from YouTube URLs. [#4104](https://github.com/statamic/cms/issues/4104)
+- Add `password_activations` table to the `auth:migration` command stub. [#4079](https://github.com/statamic/cms/issues/4079)
+- Update the config stubs used by the `clear:site` command. [#4060](https://github.com/statamic/cms/issues/4060)
+- The `markdown` field's `cmd+left` behavior now works the way you expect it to. [ad0c05bb4](https://github.com/statamic/cms/commit/ad0c05bb4)
+- Fix blueprint card corners. [#4103](https://github.com/statamic/cms/issues/4103)
+- Fix tab overflow dropdown in LivePreview pane. [a1c3f5bdb](https://github.com/statamic/cms/commit/a1c3f5bdb)
+- Hide "Add Set" button when there are no sets. [#4083](https://github.com/statamic/cms/issues/4083)
+- Prevent showing the Laravel Telescope link when the user doesn't have permission. [#4075](https://github.com/statamic/cms/issues/4075)
+- Fix view scaffolding tpyo. [#4077](https://github.com/statamic/cms/issues/4077)
+- Add toggle for "create" config option on `entries` and `terms` fieldtypes. [#4069](https://github.com/statamic/cms/issues/4069)
+- Bump `path-parse` from 1.0.6 to 1.0.7 [#4110](https://github.com/statamic/cms/issues/4110)
+- Remove unused `tar` dependency. [c963ac8b5](https://github.com/statamic/cms/commit/c963ac8b5)
+- Fix QueriesConditionTest [#4113](https://github.com/statamic/cms/issues/4113)
+- Add more assertions for ternary conditions inside tag parameters [#4111](https://github.com/statamic/cms/issues/4111)
+
+
+
+## 3.1.32 (2021-07-28)
+
+### What's fixed
+- When we designed the [tab overflow](https://github.com/statamic/cms/issues/4051) UI, we neglected the other tabs in the control panel. They look like tabs again.
+
+## 3.1.31 (2021-07-28)
+
+### What's new
+- Ability to query individual entries in a specific site using GraphQL. [#4055](https://github.com/statamic/cms/issues/4055)
+
+### What's improved
+- Publish form tabs now overflow into a dropdown when there's no more room. [#4051](https://github.com/statamic/cms/issues/4051)
+- Field handles are shown when hovering over labels for a moment. [statamic/ideas#302](https://github.com/statamic/ideas/issues/302)
+
+### What's fixed
+- Fix newly uploaded assets showing incorrect metadata. [#4059](https://github.com/statamic/cms/issues/4059)
+- Fix updating of entry's `author` field when user doesn't have permission to edit author. [#4052](https://github.com/statamic/cms/issues/4052)
+
+
+
 ## 3.1.30 (2021-07-26)
 
 ### What's new
@@ -546,7 +632,7 @@
 ## 3.1.0-beta.1 (2021-03-15)
 
 ### What's new
-- You can configure Statamic to use separate authentication from the rest of your app. [#3143](https://github.com/statamic/cms/issues/3143) 
+- You can configure Statamic to use separate authentication from the rest of your app. [#3143](https://github.com/statamic/cms/issues/3143)
 - Added support for the `mimetypes` validation rule. [#3290](https://github.com/statamic/cms/issues/3290)
 
 ### What's improved
@@ -887,7 +973,7 @@
 
 ## 3.0.34 (2020-12-09)
 
-### What's new 
+### What's new
 - PHP 8 support. [#2944](https://github.com/statamic/cms/issues/2944)
 
 ### What's fixed

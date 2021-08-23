@@ -28,18 +28,27 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
-    Route::group(['namespace' => 'Structures'], function () {
+    Route::group(['namespace' => 'Navigation'], function () {
         Route::resource('navigation', 'NavigationController');
-        Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
+
+        Route::get('navigation/{navigation}/blueprint', 'NavigationBlueprintController@edit')->name('navigation.blueprint.edit');
+        Route::patch('navigation/{navigation}/blueprint', 'NavigationBlueprintController@update')->name('navigation.blueprint.update');
+        Route::get('navigation/{navigation}/tree', 'NavigationTreeController@index')->name('navigation.tree.index');
+        Route::patch('navigation/{navigation}/tree', 'NavigationTreeController@update')->name('navigation.tree.update');
+        Route::post('navigation/{navigation}/pages', 'NavigationPagesController@update')->name('navigation.pages.update');
+        Route::get('navigation/{navigation}/pages/create', 'NavigationPagesController@create')->name('navigation.pages.create');
+        Route::get('navigation/{navigation}/pages/{edit}/edit', 'NavigationPagesController@edit')->name('navigation.pages.edit');
     });
 
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
-        Route::post('collections/{collection}/structure', 'CollectionStructureController@update')->name('collections.structure.update');
         Route::get('collections/{collection}/scaffold', 'ScaffoldCollectionController@index')->name('collections.scaffold');
         Route::post('collections/{collection}/scaffold', 'ScaffoldCollectionController@create')->name('collections.scaffold.create');
         Route::resource('collections.blueprints', 'CollectionBlueprintsController');
         Route::post('collections/{collection}/blueprints/reorder', 'ReorderCollectionBlueprintsController')->name('collections.blueprints.reorder');
+
+        Route::get('collections/{collection}/tree', 'CollectionTreeController@index')->name('collections.tree.index');
+        Route::patch('collections/{collection}/tree', 'CollectionTreeController@update')->name('collections.tree.update');
 
         Route::group(['prefix' => 'collections/{collection}/entries'], function () {
             Route::get('/', 'EntriesController@index')->name('collections.entries.index');
