@@ -13,7 +13,13 @@ class Iterate extends Tags
      */
     public function index()
     {
-        return $this->iterate($this->params->get('array'));
+        $value = $this->params->get('array');
+
+        if (is_string($value)) {
+            $value = $this->context->get($value);
+        }
+
+        return $this->iterate($value);
     }
 
     /**
