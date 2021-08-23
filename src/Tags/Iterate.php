@@ -13,7 +13,7 @@ class Iterate extends Tags
      */
     public function index()
     {
-        return $this->wildcard($this->params->get('array'));
+        return $this->iterate($this->params->get('array'));
     }
 
     /**
@@ -26,11 +26,14 @@ class Iterate extends Tags
      */
     public function wildcard($tag)
     {
+        return $this->iterate($this->context->get($tag));
+    }
+
+    protected function iterate($items)
+    {
         [$keyKey, $valueKey] = $this->getKeyNames();
 
-        $tag = $this->context->get($tag) ?? $tag;
-
-        $items = collect($tag)
+        $items = collect($items)
             ->map(function ($value, $key) use ($keyKey, $valueKey) {
                 return [$keyKey => $key, $valueKey => $value];
             });
