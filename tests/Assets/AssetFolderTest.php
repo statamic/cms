@@ -5,11 +5,16 @@ namespace Tests\Assets;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetFolder as Folder;
 use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetFolderDeleted;
+use Statamic\Events\AssetFolderSaved;
+use Statamic\Events\AssetSaved;
 use Statamic\Facades;
 use Statamic\Filesystem\FlysystemAdapter;
 use Tests\TestCase;
@@ -225,12 +230,9 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function deleting_a_folder_deletes_the_assets_and_directory()
     {
-        Storage::fake('local');
-        $container = Facades\AssetContainer::make('test')->disk('local');
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
-        Facades\AssetContainer::shouldReceive('save')->with($container);
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
 
-        $disk = Storage::disk('local');
         $disk->put('path/to/folder/one.txt', '');
         $disk->put('path/to/sub/folder/two.txt', '');
         $disk->put('path/to/sub/folder/three.txt', '');
@@ -314,6 +316,8 @@ class AssetFolderTest extends TestCase
             ->container($container)
             ->path('move');
 
+        Event::fake();
+
         $folder->move('destination/folder');
 
         $disk->assertMissing('move');
@@ -344,6 +348,34 @@ class AssetFolderTest extends TestCase
             'destination/folder/move/one.txt',
             'destination/folder/move/two.txt',
         ], $container->contents()->cached()->keys()->all());
+
+        // Assert asset folder events.
+        $paths = ['move', 'move/sub', 'move/sub/subsub'];
+        Event::assertDispatchedTimes(AssetFolderDeleted::class, count($paths));
+        Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
+                return $event->folder->path() === $path;
+            });
+
+            Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+                return $event->folder->path() === 'destination/folder/'.$path;
+            });
+        }
+
+        // Assert asset events.
+        $paths = [
+            'destination/folder/move/one.txt',
+            'destination/folder/move/two.txt',
+            'destination/folder/move/sub/three.txt',
+            'destination/folder/move/sub/subsub/four.txt',
+        ];
+        Event::assertDispatchedTimes(AssetSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
+                return $event->asset->path() === $path;
+            });
+        }
     }
 
     /** @test */
@@ -404,6 +436,8 @@ class AssetFolderTest extends TestCase
             ->container($container)
             ->path('before');
 
+        Event::fake();
+
         $folder->rename('after');
 
         $disk->assertMissing('before');
@@ -424,8 +458,43 @@ class AssetFolderTest extends TestCase
             'after/sub',
             'after/sub/foo.txt',
         ], $container->contents()->cached()->keys()->all());
+
+        // Assert asset folder events.
+        $paths = ['before', 'before/sub'];
+        Event::assertDispatchedTimes(AssetFolderDeleted::class, 2);
+        Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) {
+            return $event->folder->path() === 'before';
+        });
+        Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) {
+            return $event->folder->path() === 'before/sub';
+        });
+        Event::assertDispatchedTimes(AssetFolderSaved::class, 2);
+        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+            return $event->folder->path() === 'after';
+        });
+        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+            return $event->folder->path() === 'after/sub';
+        });
+
+        // Assert asset event.
+        Event::assertDispatchedTimes(AssetSaved::class, 1);
+        Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
+            return $event->asset->path() === 'after/sub/foo.txt';
+        });
     }
 
+    /** @test */
+    public function it_updates_asset_references_when_moved()
+    {
+        // TODO
+    }
+    
+    /** @test */
+    public function it_updates_asset_references_when_renamed()
+    {
+        // TODO
+    }
+    
     /** @test */
     public function it_gets_the_parent_folder()
     {
