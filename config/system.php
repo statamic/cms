@@ -112,21 +112,4 @@ return [
     'ajax_timeout' => '600000',
     'pcre_backtrack_limit' => '-1',
 
-    /*
-    |--------------------------------------------------------------------------
-    | Process Environment Variables
-    |--------------------------------------------------------------------------
-    |
-    | External processes (e.g. Composer) may require additional environment
-    | variables to be explicitly made available. Here you may add a list
-    | of vars that you would like to be passed along from Statamic.
-    |
-    */
-
-    'process_environment_variables' => [
-        // 'HOME',
-        // 'COMPOSER_HOME',
-        // 'COMPOSER_AUTH',
-    ],
-
 ];

@@ -53,26 +53,23 @@ class Process
     {
         $this->basePath = str_finish($basePath ?? base_path(), '/');
 
-        $this->constructEnv();
+        $this->env = $this->constructEnv();
     }
 
     /**
      * Construct the environment variables that will be passed to the process.
      *
-     * @return void
+     * @return array
      */
     protected function constructEnv()
     {
-        $keys = array_merge([
-            'HOME',
-            'LARAVEL_SAIL',
-        ], config('statamic.system.process_environment_variables', []));
+        $env = collect(getenv())->only(['HOME', 'LARAVEL_SAIL']);
 
-        $this->env = collect(getenv())->only($keys)->all();
-
-        if ($this->isRunningInSail() && ! isset($this->env['HOME'])) {
-            $this->env['HOME'] = '/home/sail';
+        if (! $env->has('HOME') && $this->isRunningInSail()) {
+            $env['HOME'] = '/home/sail';
         }
+
+        return $env->all();
     }
 
     /**
