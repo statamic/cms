@@ -45,7 +45,7 @@ class FormsController extends CpController
         $columns = $form
             ->blueprint()
             ->columns()
-            ->merge([Column::make('datestamp')])
+            ->prepend(Column::make('datestamp'), 'datestamp')
             ->setPreferred("forms.{$form->handle()}.columns")
             ->rejectUnlisted()
             ->values();
