@@ -494,7 +494,7 @@ final class Installer
     }
 
     /**
-     * Complete starter kit install, expiring license key and/or increment install count.
+     * Complete starter kit install, expiring license key and/or incrementing install count.
      *
      * @return $this
      */
