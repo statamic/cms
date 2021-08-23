@@ -65,21 +65,11 @@ class Process
     {
         $env = collect(getenv())->only(['HOME', 'LARAVEL_SAIL']);
 
-        if (! $env->has('HOME') && $this->isRunningInSail()) {
+        if (! $env->has('HOME') && $env->get('LARAVEL_SAIL') === '1') {
             $env['HOME'] = '/home/sail';
         }
 
         return $env->all();
-    }
-
-    /**
-     * Check to see if Statamic is running in Laravel Sail.
-     *
-     * @return bool
-     */
-    protected function isRunningInSail(): bool
-    {
-        return isset($this->env['LARAVEL_SAIL']) && $this->env['LARAVEL_SAIL'] === '1';
     }
 
     /**
