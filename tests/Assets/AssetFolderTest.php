@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetFolder as Folder;
 use Statamic\Contracts\Assets\AssetContainer;
-use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
 use Statamic\Events\AssetSaved;
@@ -460,7 +459,6 @@ class AssetFolderTest extends TestCase
         ], $container->contents()->cached()->keys()->all());
 
         // Assert asset folder events.
-        $paths = ['before', 'before/sub'];
         Event::assertDispatchedTimes(AssetFolderDeleted::class, 2);
         Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) {
             return $event->folder->path() === 'before';
@@ -469,16 +467,16 @@ class AssetFolderTest extends TestCase
             return $event->folder->path() === 'before/sub';
         });
         Event::assertDispatchedTimes(AssetFolderSaved::class, 2);
-        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) {
             return $event->folder->path() === 'after';
         });
-        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) {
             return $event->folder->path() === 'after/sub';
         });
 
         // Assert asset event.
         Event::assertDispatchedTimes(AssetSaved::class, 1);
-        Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
+        Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) {
             return $event->asset->path() === 'after/sub/foo.txt';
         });
     }
@@ -488,13 +486,13 @@ class AssetFolderTest extends TestCase
     {
         // TODO
     }
-    
+
     /** @test */
     public function it_updates_asset_references_when_renamed()
     {
         // TODO
     }
-    
+
     /** @test */
     public function it_gets_the_parent_folder()
     {
