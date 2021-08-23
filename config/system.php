@@ -114,16 +114,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | System Environment Variables
+    | Process Environment Variables
     |--------------------------------------------------------------------------
     |
-    | Sometimes external processes `Composer` require additional environment variables.
-    | Here you can add any variables from getenv() that you would like to pass from Statamic.
-    | Simply specifiy the environment variable by name, example: 'HOME' will return the value of getenv('HOME')
+    | External processes (e.g. Composer) may require additional environment
+    | variables to be explicitly made available. Here you may add a list
+    | of vars that you would like to be passed along from Statamic.
     |
-    | HOME and LARAVEL_SAIL will automatically attempt to be passed to the process.
     */
-    'system_environment_variables' => [
+
+    'process_environment_variables' => [
         // 'HOME',
         // 'COMPOSER_HOME',
         // 'COMPOSER_AUTH',

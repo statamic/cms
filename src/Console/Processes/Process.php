@@ -63,14 +63,12 @@ class Process
      */
     protected function constructEnv()
     {
-        $filteredEnv = array_merge([
+        $keys = array_merge([
             'HOME',
             'LARAVEL_SAIL',
-        ], config('statamic.system.system_environment_variables', []));
+        ], config('statamic.system.process_environment_variables', []));
 
-        $this->env = collect(getenv())
-            ->only($filteredEnv)
-            ->toArray();
+        $this->env = collect(getenv())->only($keys)->all();
 
         if ($this->isRunningInSail() && ! isset($this->env['HOME'])) {
             $this->env['HOME'] = '/home/sail';
