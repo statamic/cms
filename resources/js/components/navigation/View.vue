@@ -109,7 +109,7 @@
                     :redirect="branch.edit_url" />
                 <dropdown-item
                     v-if="depth < maxDepth"
-                    :text="__('Add child link to URL')"
+                    :text="__('Add child nav item')"
                     @click="linkPage(vm)" />
                 <dropdown-item
                     v-if="depth < maxDepth"
