@@ -142,7 +142,7 @@ final class Installer
             ->removeStarterKit()
             ->removeRepository()
             ->removeComposerJsonBackup()
-            ->expireLicense();
+            ->completeInstall();
     }
 
     /**
@@ -494,15 +494,13 @@ final class Installer
     }
 
     /**
-     * Expire starter kit license on successful installation.
+     * Complete starter kit install, expiring license key and/or incrementing install count.
      *
      * @return $this
      */
-    protected function expireLicense()
+    protected function completeInstall()
     {
-        if ($this->licenseManager->hasValidLicenseKey()) {
-            $this->licenseManager->expireLicense();
-        }
+        $this->licenseManager->completeInstall();
 
         return $this;
     }

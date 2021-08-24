@@ -53,25 +53,11 @@ final class LicenseManager
     }
 
     /**
-     * Check if user has valid starter kit or site license key, for the purpose of expiring after a successful install.
-     *
-     * @return bool
+     * Expire license key and increment install count.
      */
-    public function hasValidLicenseKey()
+    public function completeInstall()
     {
-        return $this->valid && $this->licenseKey;
-    }
-
-    /**
-     * Expire license key.
-     */
-    public function expireLicense()
-    {
-        if (! $this->hasValidLicenseKey()) {
-            return;
-        }
-
-        Http::post(self::OUTPOST_ENDPOINT.'expire', [
+        Http::post(self::OUTPOST_ENDPOINT.'installed', [
             'license' => $this->licenseKey,
             'configured_site_license' => config('statamic.system.license_key'),
             'package' => $this->package,

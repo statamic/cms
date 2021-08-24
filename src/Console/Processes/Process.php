@@ -46,6 +46,11 @@ class Process
     protected $logErrorOutput = true;
 
     /**
+     * @var array
+     */
+    protected $env = [];
+
+    /**
      * Create new process on path.
      *
      * @param string|null $basePath
@@ -53,6 +58,24 @@ class Process
     public function __construct($basePath = null)
     {
         $this->basePath = str_finish($basePath ?? base_path(), '/');
+
+        $this->env = $this->constructEnv();
+    }
+
+    /**
+     * Construct the environment variables that will be passed to the process.
+     *
+     * @return array
+     */
+    protected function constructEnv()
+    {
+        $env = collect(getenv())->only(['HOME', 'LARAVEL_SAIL']);
+
+        if (! $env->has('HOME') && $env->get('LARAVEL_SAIL') === '1') {
+            $env['HOME'] = '/home/sail';
+        }
+
+        return $env->all();
     }
 
     /**
@@ -110,7 +133,7 @@ class Process
         $process->run(function ($type, $buffer) use (&$output, $operateOnOutput) {
             $this->prepareErrorOutput($type, $buffer);
             $this->output .= $operateOnOutput($buffer);
-        });
+        }, $this->env);
 
         $this->logErrorOutput();
 
@@ -161,7 +184,7 @@ class Process
         $process->run(function ($type, $buffer) use (&$output) {
             $this->prepareErrorOutput($type, $buffer);
             $this->output .= $buffer;
-        });
+        }, $this->env);
 
         $this->logErrorOutput();
 
@@ -185,7 +208,7 @@ class Process
         $process->run(function ($type, $buffer) use ($cacheKey) {
             $this->prepareErrorOutput($type, $buffer);
             $this->appendOutputToCache($cacheKey, $buffer);
-        });
+        }, $this->env);
 
         $this->logErrorOutput();
 
@@ -371,8 +394,8 @@ class Process
         }
         // Handle both string and array command formats.
         $process = is_string($command) && method_exists(SymfonyProcess::class, 'fromShellCommandLine')
-            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, ['HOME' => getenv('HOME')])
-            : new SymfonyProcess($command, $path ?? $this->basePath, ['HOME' => getenv('HOME')]);
+            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath, $this->env)
+            : new SymfonyProcess($command, $path ?? $this->basePath, $this->env);
 
         $process->setTimeout(null);
 
