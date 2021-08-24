@@ -23,6 +23,27 @@
 
 
 
+## 3.1.35 (2021-08-24)
+
+### What's new
+- Taxonomy terms may be live previewed. [#4145](https://github.com/statamic/cms/issues/4145)
+- The `foreach` tag supports dynamic variables.  [#4012](https://github.com/statamic/cms/issues/4012)
+- The `video` fieldtype's placeholder may be customized. [#4162](https://github.com/statamic/cms/issues/4162)
+
+### What's fixed
+- Fix missing environment variables when updating through the CP using Laravel Sail.  [#4027](https://github.com/statamic/cms/issues/4027)
+- Fix `crop_focal` usage in Glide presets. [#4041](https://github.com/statamic/cms/issues/4041)
+- Fix `nav` and `nav:breadcrumbs` tags showing incorrectly showing redirected items as current. [#4058](https://github.com/statamic/cms/issues/4058)
+- Fix date column on form submissions table. [#3969](https://github.com/statamic/cms/issues/3969)
+- Make the `as` modifier work with collections. [#4130](https://github.com/statamic/cms/issues/4130)
+- In the `static:warm` command, fix missing requests, and show errors for failed requests. [#4128](https://github.com/statamic/cms/issues/4128)
+- Fix term `title` not taking the supplemented value into account. [#4153](https://github.com/statamic/cms/issues/4153)
+- Fix CP nav items not being marked as active when there's a query string. [#4149](https://github.com/statamic/cms/issues/4149)
+- Fix the `link` fieldtype's perpetual dirty state [#4148](https://github.com/statamic/cms/issues/4148)
+- When creating a blueprint, the title will get slugified to prevent colons and question marks. [#4143](https://github.com/statamic/cms/issues/4143)
+
+
+
 ## 3.1.34 (2021-08-17)
 
 ### What's new
