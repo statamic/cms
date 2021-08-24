@@ -482,18 +482,6 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    public function it_updates_asset_references_when_moved()
-    {
-        // TODO
-    }
-
-    /** @test */
-    public function it_updates_asset_references_when_renamed()
-    {
-        // TODO
-    }
-
-    /** @test */
     public function it_gets_the_parent_folder()
     {
         $container = $this->mock(AssetContainer::class);
