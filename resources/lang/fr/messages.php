@@ -38,7 +38,7 @@ return [
     'collection_next_steps_configure_description' => 'Configurer les URLs et les routes, définissez les Blueprints, les comportements des dates, l’ordonnancement et d’autres options.',
     'collection_next_steps_create_entry_description' => 'Créez votre première entrée ou générez une poignée d’entrées génériques, à vous de jouer.',
     'collection_next_steps_documentation_description' => 'Apprenez-en plus au sujet des collections, comment elles fonctionnent et comment les configurer.',
-    'collection_next_steps_scaffold_description' => 'Générez rapidement des Blueprints vides et des vues pour le frontal basées sur le nom de votre collection.',
+    'collection_next_steps_scaffold_description' => 'Générez rapidement des vues d’index et de détail à partir du nom de votre collection.',
     'collection_scaffold_instructions' => 'Choisissez les vues vides à générer. Les fichiers existants ne seront pas écrasés.',
     'collections_amp_instructions' => 'Activez les Pages Accélérées pour Mobile (AMP). Ajoutez automatiquement des routes et des URLs pour les entrées de cette collection. Apprenez-en plus dans la [documentation](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Les entrées de cette collection peuvent utiliser l’un des Blueprints listés ci-dessous.',
