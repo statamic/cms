@@ -1,4 +1,4 @@
-<template>
+<template> 
 
     <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
         <div v-if="initializing" class="loading">
