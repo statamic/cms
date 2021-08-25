@@ -223,6 +223,9 @@ class CollectionsController extends CpController
         }
 
         if (! $values['structured']) {
+            if ($structure = $collection->structure()) {
+                $structure->trees()->each->delete();
+            }
             $collection->structure(null);
         } else {
             $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites'] ?? null));
@@ -437,6 +440,9 @@ class CollectionsController extends CpController
                         'type' => 'entries',
                         'max_items' => 1,
                         'create' => false,
+                        'collections' => Collection::all()->map->handle()->reject(function ($collectionHandle) use ($collection) {
+                            return $collectionHandle === $collection->handle();
+                        })->values()->all(),
                     ],
                     'amp' => [
                         'display' => __('Enable AMP'),

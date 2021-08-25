@@ -121,6 +121,39 @@ class Lock
     }
 
     /**
+     * Check if package is installed.
+     *
+     * @param string $package
+     * @return bool
+     */
+    public function isPackageInstalled(string $package)
+    {
+        $this->ensureExists();
+
+        $lock = json_decode($this->files->get($this->path), true);
+
+        return collect($lock['packages'] ?? [])
+            ->merge($lock['packages-dev'] ?? [])
+            ->pluck('name')
+            ->contains($package);
+    }
+
+    /**
+     * Check if package is installed as dev dependency.
+     *
+     * @param string $package
+     * @return bool
+     */
+    public function isDevPackageInstalled(string $package)
+    {
+        $this->ensureExists();
+
+        return collect(json_decode($this->files->get($this->path), true)['packages-dev'] ?? [])
+            ->pluck('name')
+            ->contains($package);
+    }
+
+    /**
      * Override package version.
      *
      * @param string $package

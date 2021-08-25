@@ -28,15 +28,6 @@ class TermsFieldtypeTest extends TestCase
     /** @test */
     public function it_gets_multiple_terms()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_terms' => ['tags::foo', 'tags::bar'],
-        ])->create();
-
-        Taxonomy::make('tags')->save();
-        Term::make()->taxonomy('tags')->in('en')->slug('foo')->data(['title' => 'Foo'])->save();
-        Term::make()->taxonomy('tags')->in('en')->slug('bar')->data(['title' => 'Bar'])->save();
-
         $tags = Blueprint::makeFromFields([]);
         $article = Blueprint::makeFromFields([
             'related_terms' => ['type' => 'terms'],
@@ -48,6 +39,15 @@ class TermsFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_terms' => ['tags::foo', 'tags::bar'],
+        ])->create();
+
+        Taxonomy::make('tags')->save();
+        Term::make()->taxonomy('tags')->in('en')->slug('foo')->data(['title' => 'Foo'])->save();
+        Term::make()->taxonomy('tags')->in('en')->slug('bar')->data(['title' => 'Bar'])->save();
 
         $query = <<<'GQL'
 {
@@ -81,13 +81,6 @@ GQL;
     /** @test */
     public function it_gets_single_entry()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_term' => 'tags::foo',
-        ])->create();
-        Taxonomy::make('tags')->save();
-        Term::make()->taxonomy('tags')->in('en')->slug('foo')->data(['title' => 'Foo'])->save();
-
         $tags = Blueprint::makeFromFields([]);
         $article = Blueprint::makeFromFields([
             'related_term' => ['type' => 'terms', 'max_items' => 1],
@@ -99,6 +92,13 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_term' => 'tags::foo',
+        ])->create();
+        Taxonomy::make('tags')->save();
+        Term::make()->taxonomy('tags')->in('en')->slug('foo')->data(['title' => 'Foo'])->save();
 
         $query = <<<'GQL'
 {

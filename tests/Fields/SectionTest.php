@@ -147,6 +147,7 @@ class SectionTest extends TestCase
                     'prepend' => null,
                     'append' => null,
                     'antlers' => false,
+                    'default' => null,
                 ],
                 [
                     'handle' => 'two',
@@ -160,6 +161,7 @@ class SectionTest extends TestCase
                     'component' => 'textarea',
                     'antlers' => false,
                     'placeholder' => null,
+                    'default' => null,
                 ],
             ],
         ], $section->toPublishArray());

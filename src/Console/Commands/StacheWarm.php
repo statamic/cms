@@ -22,6 +22,6 @@ class StacheWarm extends Command
 
         Stache::warm();
 
-        $this->info('You have poured oil over the Stache and polished it until it shines. It is warm and ready.');
+        $this->info('You have poured oil over the Stache and polished it until it shines. It is warm and ready');
     }
 }

@@ -25,8 +25,7 @@
         initial-sort-column="email"
         initial-sort-direction="asc"
         :filters="{{ $filters->toJson() }}"
-        run-action-url="{{ cp_route('users.actions.run') }}"
-        bulk-actions-url="{{ cp_route('users.actions.bulk') }}"
+        action-url="{{ cp_route('users.actions.run') }}"
     ></user-listing>
 
     @include('statamic::partials.docs-callout', [

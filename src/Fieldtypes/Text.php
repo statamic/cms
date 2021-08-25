@@ -7,6 +7,8 @@ use Statamic\Support\Str;
 
 class Text extends Fieldtype
 {
+    protected $selectableInForms = true;
+
     protected function configFieldItems(): array
     {
         return [
@@ -59,6 +61,12 @@ class Text extends Fieldtype
                 'display' => 'Antlers',
                 'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                 'type' => 'toggle',
+                'width' => 50,
+            ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
                 'width' => 50,
             ],
         ];

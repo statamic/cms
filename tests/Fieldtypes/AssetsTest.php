@@ -8,9 +8,8 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Field;
+use Statamic\Fieldtypes\Assets\AssetRule;
 use Statamic\Fieldtypes\Assets\Assets;
-use Statamic\Fieldtypes\Assets\ImageRule;
-use Statamic\Fieldtypes\Assets\MimesRule;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -88,13 +87,25 @@ class AssetsTest extends TestCase
     }
 
     /** @test */
+    public function it_replaces_dimensions_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['dimensions:width=180,height=180']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.dimensions'), $replaced[0]->message());
+    }
+
+    /** @test */
     public function it_replaces_image_rule()
     {
         $replaced = $this->fieldtype(['validate' => ['image']])->fieldRules();
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(ImageRule::class, $replaced[0]);
+        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.image'), $replaced[0]->message());
     }
 
     /** @test */
@@ -104,7 +115,29 @@ class AssetsTest extends TestCase
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(MimesRule::class, $replaced[0]);
+        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.mimes', ['values' => 'jpg, png']), $replaced[0]->message());
+    }
+
+    /** @test */
+    public function it_replaces_mimestypes_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['mimetypes:image/jpg,image/png']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.mimetypes', ['values' => 'image/jpg, image/png']), $replaced[0]->message());
+    }
+
+    /** @test */
+    public function it_doesnt_replace_non_image_related_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['min:3']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertEquals('min:3', $replaced[0]);
     }
 
     public function fieldtype($config = [])

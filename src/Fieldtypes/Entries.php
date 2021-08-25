@@ -3,15 +3,18 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Support\Arr;
 
 class Entries extends Relationship
 {
@@ -50,6 +53,13 @@ class Entries extends Relationship
     protected function configFieldItems(): array
     {
         return array_merge(parent::configFieldItems(), [
+            'create' => [
+                'display' => __('Allow Creating'),
+                'instructions' => __('statamic::fieldtypes.entries.config.create'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'collections' => [
                 'display' => __('Collections'),
                 'type' => 'collections',
@@ -104,7 +114,7 @@ class Entries extends Relationship
             $collections = $this->getConfiguredCollections();
         }
 
-        return Collection::findByHandle($collections[0]);
+        return Collection::findByHandle(Arr::first($collections));
     }
 
     public function getSortColumn($request)
@@ -156,10 +166,16 @@ class Entries extends Relationship
 
         $collections = $this->getConfiguredCollections();
 
-        return collect($collections)->flatMap(function ($collectionHandle) use ($collections) {
+        $user = User::current();
+
+        return collect($collections)->flatMap(function ($collectionHandle) use ($collections, $user) {
             $collection = Collection::findByHandle($collectionHandle);
 
             throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
+
+            if (! $user->can('create', [EntryContract::class, $collection])) {
+                return null;
+            }
 
             $blueprints = $collection->entryBlueprints();
 
@@ -204,12 +220,13 @@ class Entries extends Relationship
         if (! is_object($value)) {
             $value = Entry::find($value);
         }
+
         if ($value != null && $parent = $this->field()->parent()) {
             $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
             $value = $value->in($site);
         }
 
-        return $value;
+        return ($value && $value->status() === 'published') ? $value : null;
     }
 
     protected function shallowAugmentValue($value)

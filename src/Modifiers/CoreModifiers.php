@@ -67,6 +67,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns a string with backslashes added before characters that need to be escaped.
+     *
+     * @param $value
+     * @return string
+     */
+    public function addSlashes($value)
+    {
+        return addslashes($value);
+    }
+
+    /**
      * Creates a sentence list from the given array and the ability to set the glue.
      *
      * @param $value
@@ -94,7 +105,7 @@ class CoreModifiers extends Modifier
      */
     public function alias($value, $params)
     {
-        if (! is_array($value)) {
+        if (! (is_array($value) || $value instanceof Collection)) {
             return;
         }
 
@@ -997,7 +1008,7 @@ class CoreModifiers extends Modifier
      */
     public function isLowercase($value)
     {
-        return Stringy::isLowercase($value);
+        return Stringy::isLowerCase($value);
     }
 
     /**
@@ -1086,6 +1097,18 @@ class CoreModifiers extends Modifier
     public function isYesterday($value)
     {
         return $this->carbon($value)->isYesterday();
+    }
+
+    /**
+     * Converts a string to kebab-case.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function kebab($value, $params)
+    {
+        return Str::kebab($value);
     }
 
     /**
@@ -1714,6 +1737,10 @@ class CoreModifiers extends Modifier
      */
     public function reverse($value)
     {
+        if ($value instanceof Collection) {
+            return $value->reverse();
+        }
+
         if (is_array($value)) {
             return array_reverse($value);
         }
@@ -1947,6 +1974,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a string to snake_case.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function snake($value, $params)
+    {
+        return Str::snake($value);
+    }
+
+    /**
      * Sort an array by key $params[0] and direction $params[1].
      *
      * @param $value
@@ -2031,6 +2070,18 @@ class CoreModifiers extends Modifier
         }
 
         return Str::stripTags($value, (array) $tags);
+    }
+
+    /**
+     * Converts a string to StudlyCase.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function studly($value, $params)
+    {
+        return Str::studly($value);
     }
 
     /**

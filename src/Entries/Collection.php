@@ -345,6 +345,19 @@ class Collection implements Contract, AugmentableContract
             ->args(func_get_args());
     }
 
+    public function createLabel()
+    {
+        $key = "messages.{$this->handle()}_collection_create_entry";
+
+        $translation = __($key);
+
+        if ($translation === $key) {
+            return __('Create Entry');
+        }
+
+        return $translation;
+    }
+
     public function save()
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);

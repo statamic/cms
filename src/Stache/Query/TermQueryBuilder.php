@@ -56,6 +56,10 @@ class TermQueryBuilder extends Builder
             ? Facades\Taxonomy::handles()
             : $this->taxonomies;
 
+        if ($this->collections) {
+            $this->filterUsagesWithinCollections($taxonomies);
+        }
+
         $keys = empty($this->wheres)
             ? $this->getKeysFromTaxonomies($taxonomies)
             : $this->getKeysFromTaxonomiesWithWheres($taxonomies, $this->wheres);
@@ -142,5 +146,17 @@ class TermQueryBuilder extends Builder
         }
 
         return $items;
+    }
+
+    private function filterUsagesWithinCollections($taxonomies)
+    {
+        $this->whereIn('id', collect($taxonomies)->flatMap(function ($taxonomy) {
+            return $this->store->store($taxonomy)
+                ->index('associations')
+                ->items()->whereIn('collection', $this->collections)
+                ->map(function ($item) use ($taxonomy) {
+                    return $taxonomy.'::'.$item['slug'];
+                });
+        })->all());
     }
 }

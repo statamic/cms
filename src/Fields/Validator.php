@@ -4,12 +4,15 @@ namespace Statamic\Fields;
 
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Validator
 {
     protected $fields;
-    protected $data = [];
+    protected $replacements = [];
     protected $extraRules = [];
+    protected $customMessages = [];
 
     public function make()
     {
@@ -30,11 +33,22 @@ class Validator
         return $this;
     }
 
+    public function withMessages($messages)
+    {
+        $this->customMessages = $messages;
+
+        return $this;
+    }
+
     public function rules()
     {
         return $this
             ->merge($this->fieldRules(), $this->extraRules)
-            ->all();
+            ->map(function ($rules) {
+                return collect($rules)->map(function ($rule) {
+                    return $this->parse($rule);
+                })->all();
+            })->all();
     }
 
     private function fieldRules()
@@ -65,12 +79,19 @@ class Validator
         return collect($original);
     }
 
+    public function withReplacements($replacements)
+    {
+        $this->replacements = $replacements;
+
+        return $this;
+    }
+
     public function validate()
     {
         return LaravelValidator::validate(
             $this->fields->preProcessValidatables()->values()->all(),
             $this->rules(),
-            [],
+            $this->customMessages,
             $this->fieldAttributes()
         );
     }
@@ -82,6 +103,17 @@ class Validator
 
             return Lang::has($handle) ? Lang::get($handle) : $field->display();
         })->all();
+    }
+
+    private function parse($rule)
+    {
+        if (! is_string($rule) || ! Str::contains($rule, '{')) {
+            return $rule;
+        }
+
+        return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
+            return Arr::get($this->replacements, $match[1], 'NULL');
+        }, $rule);
     }
 
     public static function explodeRules($rules)

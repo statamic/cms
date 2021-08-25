@@ -15,6 +15,7 @@ class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
     protected $defaultValue = [];
+    protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {
@@ -23,7 +24,7 @@ class Assets extends Fieldtype
                 'display' => __('Mode'),
                 'instructions' => __('statamic::fieldtypes.assets.config.mode'),
                 'type' => 'select',
-                'default' => 'grid',
+                'default' => 'list',
                 'options' => [
                     'grid' => __('Grid'),
                     'list' => __('List'),
@@ -54,6 +55,13 @@ class Assets extends Fieldtype
             'allow_uploads' => [
                 'display' => __('Allow Uploads'),
                 'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'show_filename' => [
+                'display' => __('Show Filename'),
+                'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
                 'type' => 'toggle',
                 'default' => true,
                 'width' => 50,
@@ -172,22 +180,7 @@ class Assets extends Fieldtype
     public function fieldRules()
     {
         return collect(parent::fieldRules())->map(function ($rule) {
-            $name = Str::before($rule, ':');
-            $parameters = explode(',', Str::after($rule, ':'));
-
-            if ($name === 'image') {
-                return new ImageRule();
-            }
-
-            if ($name === 'mimes') {
-                return new MimesRule($parameters);
-            }
-
-            if ($name === 'mimetypes') {
-                return new MimetypesRule($parameters);
-            }
-
-            return $rule;
+            return AssetRule::makeFromRule($rule);
         })->all();
     }
 

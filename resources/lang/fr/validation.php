@@ -90,6 +90,9 @@ return [
     'duplicate_field_handle' => 'Le champ avec l’identifiant :handle ne peut pas être utilisé plus d’une fois.',
     'one_site_without_origin' => 'Au moins un site ne doit pas avoir d’origine.',
     'origin_cannot_be_disabled' => 'Impossible de sélectionner une origine désactivée.',
+    'unique_uri' => 'Cette URI est déjà prise.',
+    'duplicate_uri' => 'URI en doublon :value',
+    'reserved' => 'Ceci est un mot réservé par le système.',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];

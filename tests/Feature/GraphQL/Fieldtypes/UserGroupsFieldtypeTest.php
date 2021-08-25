@@ -34,11 +34,6 @@ class UserGroupsFieldtypeTest extends TestCase
     /** @test */
     public function it_gets_multiple_groups()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_groups' => ['admin', 'editors'],
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'related_groups' => ['type' => 'user_groups'],
         ]);
@@ -46,6 +41,11 @@ class UserGroupsFieldtypeTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_groups' => ['admin', 'editors'],
+        ])->create();
 
         $query = <<<'GQL'
 {
@@ -79,11 +79,6 @@ GQL;
     /** @test */
     public function it_gets_single_collection()
     {
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Main Post',
-            'related_group' => 'admin',
-        ])->create();
-
         $article = Blueprint::makeFromFields([
             'related_group' => ['type' => 'user_groups', 'max_items' => 1],
         ]);
@@ -91,6 +86,11 @@ GQL;
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
         ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'related_group' => 'admin',
+        ])->create();
 
         $query = <<<'GQL'
 {

@@ -68,6 +68,9 @@ class FileUserTest extends TestCase
             'id' => '123',
             'password_hash' => 'hashed-secret',
             'content' => 'Lorem Ipsum',
+            'preferences' => [
+                'locale' => 'en',
+            ],
         ], Arr::removeNullValues($user->fileData()));
     }
 

@@ -38,7 +38,7 @@ return [
     'color.config.theme' => '選擇經典或迷你 (簡化版) 色彩選擇器。',
     'date.config.columns' => '一次以行列顯示多個月',
     'date.config.earliest_date' => '設定可選擇的最早日期。',
-    'date.config.format' => '可選擇使用 [moment.js](https://momentjs.com/docs/#/displaying/format/) 來格式化日期字串。',
+    'date.config.format' => '使用 [PHP日期格式](https://www.php.net/manual/en/datetime.format.php) 如何存儲日期。',
     'date.config.full_width' => '拉伸月曆以使用全寬。',
     'date.config.inline' => '跳過下拉選單輸入欄位並直接顯示月曆。',
     'date.config.mode' => '選擇使用單一或範圍模式 (範圍模式將禁用時間選擇器)。',

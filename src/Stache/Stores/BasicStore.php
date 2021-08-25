@@ -8,14 +8,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 abstract class BasicStore extends Store
 {
-    public function getFileFilter(SplFileInfo $file)
-    {
-        return $file->getExtension() === 'yaml';
-    }
-
     public function getItemFilter(SplFileInfo $file)
     {
-        return $this->getFileFilter($file);
+        return $file->getExtension() === 'yaml';
     }
 
     abstract public function makeItemFromFile($path, $contents);
@@ -37,11 +32,6 @@ abstract class BasicStore extends Store
         $this->cacheItem($item);
 
         return $item;
-    }
-
-    public function getItemByPath($path)
-    {
-        return $this->getItem($this->getKeyFromPath($path));
     }
 
     protected function getCachedItem($key)

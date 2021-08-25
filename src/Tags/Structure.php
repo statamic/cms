@@ -55,8 +55,8 @@ class Structure extends Tags
                 'children'    => $children,
                 'parent'      => $parent,
                 'depth'       => $depth,
-                'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->url(), '/'),
-                'is_parent'   => Site::current()->url() === $page->url() ? false : URL::isAncestorOf(URL::getCurrent(), $page->urlWithoutRedirect()),
+                'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->urlWithoutRedirect(), '/'),
+                'is_parent'   => Site::current()->absoluteUrl() === $page->absoluteUrl() ? false : URL::isAncestorOf(URL::getCurrent(), $page->urlWithoutRedirect()),
                 'is_external' => URL::isExternal($page->absoluteUrl()),
             ]);
         })->filter()->values()->all();

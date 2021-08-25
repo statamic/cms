@@ -4,8 +4,8 @@ namespace Statamic\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Entries\GetSlugFromPath;
 use Statamic\Facades\File;
-use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -26,7 +26,7 @@ class TaxonomyTermsStore extends ChildStore
         'site' => Indexes\Terms\Site::class,
     ];
 
-    public function getFileFilter(SplFileInfo $file)
+    public function getItemFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory(), '/');
         $relative = $file->getPathname();
@@ -51,7 +51,7 @@ class TaxonomyTermsStore extends ChildStore
 
         $term = Term::make()
             ->taxonomy($taxonomy)
-            ->slug(pathinfo(Path::clean($path), PATHINFO_FILENAME))
+            ->slug((new GetSlugFromPath)($path))
             ->initialPath($path)
             ->blueprint($data['blueprint'] ?? null);
 
@@ -60,6 +60,7 @@ class TaxonomyTermsStore extends ChildStore
         }
 
         $term->dataForLocale($term->defaultLocale(), $data);
+        $term->syncOriginal();
 
         return $term;
     }
@@ -80,7 +81,6 @@ class TaxonomyTermsStore extends ChildStore
         [$site, $slug] = explode('::', $key);
 
         if ($path = $this->getPath($key)) {
-            $path = explode('::', $path)[1];
             $item = $this->makeItemFromFile($path, File::get($path))->in($site);
         } else {
             $item = Term::make($slug)
@@ -112,6 +112,7 @@ class TaxonomyTermsStore extends ChildStore
                 'value' => $value,
                 'slug' => $slug,
                 'entry' => $entry->id(),
+                'collection' => $entry->collectionHandle(),
                 'site' => $entry->locale(),
             ]);
         }
@@ -145,27 +146,6 @@ class TaxonomyTermsStore extends ChildStore
         parent::handleFileChanges();
     }
 
-    public function getItemsFromFiles()
-    {
-        if ($this->shouldCacheFileItems && $this->fileItems) {
-            return $this->fileItems;
-        }
-
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
-
-        $items = $files->flatMap(function ($timestamp, $path) {
-            $keys = $this->getKeyFromPath($path);
-
-            return $keys->map(function ($key) {
-                return $this->getItem($key);
-            });
-        })->keyBy(function ($item) {
-            return $this->getItemKey($item);
-        });
-
-        return $this->fileItems = $items;
-    }
-
     public function paths()
     {
         if ($this->paths) {
@@ -184,7 +164,7 @@ class TaxonomyTermsStore extends ChildStore
             return $term->localizations()->flatMap(function ($localization, $locale) use ($path) {
                 $this->cacheItem($localization);
 
-                return [$this->getItemKey($localization) => $locale.'::'.$path];
+                return [$this->getItemKey($localization) => $path];
             })->all();
         });
 
@@ -209,7 +189,7 @@ class TaxonomyTermsStore extends ChildStore
 
             $this->forgetItem($key);
 
-            $this->setPath($key, $item->locale().'::'.$item->path());
+            $this->setPath($key, $item->path());
 
             $this->resolveIndexes()->each->updateItem($item);
 
@@ -217,34 +197,8 @@ class TaxonomyTermsStore extends ChildStore
         }
     }
 
-    protected function adjustModifiedPaths($paths)
+    protected function getItemFromModifiedPath($path)
     {
-        $sites = Taxonomy::find($this->childKey())->sites();
-
-        return $paths->flatMap(function ($timestamp, $path) use ($sites) {
-            return $sites->mapWithKeys(function ($site) use ($timestamp, $path) {
-                return [$site.'::'.$path => $timestamp];
-            });
-        });
-    }
-
-    protected function adjustDeletedPaths($paths)
-    {
-        return $this->adjustModifiedPaths($paths);
-    }
-
-    protected function getItemFromModifiedPath($path, $pathMap)
-    {
-        if ($key = $pathMap->get($path)) {
-            return $this->getItem($key);
-        }
-
-        $site = explode('::', $key)[0];
-
-        $item = $this->makeItemFromFile($path, File::get($path))->in($site);
-
-        $this->cacheItem($item);
-
-        return $item;
+        return parent::getItemFromModifiedPath($path)->localizations()->all();
     }
 }

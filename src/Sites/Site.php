@@ -50,6 +50,16 @@ class Site implements Augmentable
         return Str::removeRight($url, '/');
     }
 
+    public function direction()
+    {
+        return $this->config['direction'] ?? 'ltr';
+    }
+
+    public function attributes()
+    {
+        return $this->config['attributes'] ?? [];
+    }
+
     public function absoluteUrl()
     {
         if (Str::startsWith($url = $this->url(), '/')) {
@@ -85,6 +95,8 @@ class Site implements Augmentable
             'locale' => $this->locale(),
             'short_locale' => $this->shortLocale(),
             'url' => $this->url(),
+            'direction' => $this->direction(),
+            'attributes' => $this->attributes(),
         ];
     }
 

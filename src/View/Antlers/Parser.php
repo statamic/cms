@@ -89,7 +89,7 @@ class Parser
         $this->noparseRegex = '/{{\s*noparse\s*}}(.*?){{\s*\/noparse\s*}}/ms';
 
         // Matches an ignored tag as indicated by a prefixed @ symbol: @{{ }}
-        $this->ignoreRegex = '/@{{[^}]*}}/';
+        $this->ignoreRegex = '/@{{(?:(?!}}).)*}}/s';
 
         // Matches the logic operator tags
         $this->conditionalRegex = '/{{\s*(if|unless|elseif|elseunless)\s+((?:\()?(.*?)(?:\))?)\s*}}/ms';
@@ -452,7 +452,9 @@ class Parser
                 $name = $match[1][0];
 
                 // is this not the content tag, and is the value known?
-                if (Arr::get($data, $name)) {
+                [$exists] = $this->getVariableExistenceAndValue($name, $data);
+
+                if ($exists) {
                     // the value is known. Are there parameters?
                     if (isset($match[2])) {
                         // there are, make a backup of our $data
@@ -478,7 +480,7 @@ class Parser
 
                     // Parameter-style modifier time
                     // Probably should do an extraction here...
-                    $replacement = Arr::get($data, $name);
+                    [, $replacement] = $this->getVariableExistenceAndValue($name, $data);
 
                     foreach ($parameters as $modifier => $parameters) {
                         $replacement = $this->runModifier($modifier, $replacement, explode('|', $parameters), $data);
@@ -583,7 +585,9 @@ class Parser
             if ($name != 'content' && ! $replacement) {
 
                 // is the callback a variable in our data set?
-                if ($values = Arr::get($data, $name)) {
+                [$exists, $values] = $this->getVariableExistenceAndValue($name, $data);
+
+                if ($exists) {
 
                     // is this a tag-pair?
                     if ($this->isLoopable($values)) {

@@ -32,6 +32,13 @@ class Terms extends Relationship
     protected function configFieldItems(): array
     {
         return array_merge(parent::configFieldItems(), [
+            'create' => [
+                'display' => __('Allow Creating'),
+                'instructions' => __('statamic::fieldtypes.terms.config.create'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'taxonomies' => [
                 'display' => __('Taxonomies'),
                 'type' => 'taxonomies',
@@ -287,14 +294,8 @@ class Terms extends Relationship
 
     protected function createTermFromString($string, $taxonomy)
     {
-        // The entered string will be treated as the term's title. If it's the same
-        // as the slug, an actual term object/file won't need to be created.
-        if ($string === ($slug = Str::slug($string))) {
-            return "{$taxonomy}::{$slug}";
-        }
-
         $term = Facades\Term::make()
-            ->slug($slug)
+            ->slug(Str::slug($string))
             ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
             ->set('title', $string);
 

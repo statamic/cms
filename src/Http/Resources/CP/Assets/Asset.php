@@ -16,6 +16,7 @@ class Asset extends JsonResource
             'filename' => $this->filename(),
             'basename' => $this->basename(),
             'url' => $this->url(),
+            'reference' => $this->reference(),
             'permalink' => $this->absoluteUrl(),
             'extension' => $this->extension(),
             'downloadUrl' => cp_route('assets.download', base64_encode($this->id())),
@@ -40,7 +41,7 @@ class Asset extends JsonResource
             $this->merge($this->publishFormData()),
 
             'allowDownloading' => $this->container()->allowDownloading(),
-            'runActionUrl' => cp_route('assets.actions.run'),
+            'actionUrl' => cp_route('assets.actions.run'),
             'actions' => Action::for($this->resource, ['container' => $this->container()->handle()]),
 
             'blueprint' => $this->blueprint()->toPublishArray(),

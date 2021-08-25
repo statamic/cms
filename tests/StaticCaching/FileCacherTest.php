@@ -53,16 +53,33 @@ class FileCacherTest extends TestCase
     {
         $cacher = $this->fileCacher([
             'path' => 'test/path',
+            'max_filename_length' => 16,
         ]);
 
         $this->assertEquals(
-            'test/path/foo/bar_baz=qux&one=two.html',
-            $cacher->getFilePath('http://domain.com/foo/bar?baz=qux&one=two')
+            'test/path/foo/bar/baz/qux_a=b&c=d.html',
+            $cacher->getFilePath('http://domain.com/foo/bar/baz/qux?a=b&c=d')
         );
 
         $this->assertEquals(
             'test/path/foo/bar_.html',
             $cacher->getFilePath('http://domain.com/foo/bar')
+        );
+    }
+
+    /** @test */
+    public function gets_file_path_from_url_and_hashes_long_query_strings()
+    {
+        $cacher = $this->fileCacher([
+            'path' => 'test/path',
+            'max_filename_length' => 30,
+        ]);
+
+        $query = 'baz=qux&one=two&three=four&five=six';
+
+        $this->assertEquals(
+            'test/path/foo/bar_lqs_'.md5($query).'.html',
+            $cacher->getFilePath('http://domain.com/foo/bar?'.$query)
         );
     }
 

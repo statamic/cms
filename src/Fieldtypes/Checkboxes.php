@@ -9,6 +9,8 @@ use Statamic\GraphQL\Types\LabeledValueType;
 
 class Checkboxes extends Fieldtype
 {
+    protected $selectableInForms = true;
+
     protected function configFieldItems(): array
     {
         return [
@@ -24,6 +26,12 @@ class Checkboxes extends Fieldtype
                 'type' => 'array',
                 'key_header' => __('Key (Value)'),
                 'value_header' => __('Label'),
+            ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
             ],
         ];
     }

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="min-h-screen">
+    <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
         <div v-if="initializing" class="loading">
             <loading-graphic  />
         </div>
@@ -22,7 +22,7 @@
                 </div>
 
                 <div class="publish-tabs tabs rounded-none rounded-t -mx-1px shadow-none" v-if="showContainerTabs">
-                    <a v-for="item in containers" :key="item.id"
+                    <button class="tab-button" v-for="item in containers" :key="item.id"
                         v-text="item.title"
                         :class="{
                             active: item.id === container.id,
@@ -44,7 +44,7 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }" :class="modeClass">
-                        <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs }">
+                        <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
                             <div class="relative w-full">
 
                                 <div class="data-list-header">
@@ -73,10 +73,10 @@
 
                                 </div>
 
-                                <breadcrumbs :path="path" @navigated="selectFolder" />
+                                <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
 
                                 <data-list-bulk-actions
-                                    :url="bulkActionsUrl"
+                                    :url="actionUrl"
                                     :context="actionContext"
                                     :show-always="mode === 'grid'"
                                     @started="actionStarted"
@@ -123,12 +123,12 @@
 
                                         <td class="actions-column" :colspan="columns.length">
                                             <dropdown-list v-if="folderActions(folder).length">
-                                                <!-- TODO: Do we want folder edit functionality for launch? -->
+                                                <!-- TODO: Folder edit -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
                                                 <data-list-inline-actions
                                                     :item="folder.path"
-                                                    :url="runFolderActionUrl"
+                                                    :url="folderActionUrl"
                                                     :actions="folderActions(folder)"
                                                     @started="actionStarted"
                                                     @completed="actionCompleted"
@@ -162,7 +162,7 @@
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
-                                            :url="runActionUrl"
+                                            :url="actionUrl"
                                             :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"
@@ -194,8 +194,8 @@
                                         <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="folder.basename" :title="folder.basename" />
                                     </div>
                                     <!-- Assets -->
-                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="asset in assets" :key="asset.id">
-                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('edit-asset', asset)">
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="(asset, index) in assets" :key="asset.id">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
                                             <div class="absolute inset-0 flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
                                                 <asset-thumbnail :asset="asset" class="h-full w-full" />
                                             </div>
@@ -214,7 +214,9 @@
                         <data-list-pagination
                             class="mt-3"
                             :resource-meta="meta"
+                            :per-page="perPage"
                             @page-selected="page = $event"
+                            @per-page-changed="changePerPage"
                         />
 
                     </div>
@@ -248,10 +250,17 @@ import AssetEditor from '../Editor/Editor.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import FolderCreator from '../Folder/Create.vue';
 import FolderEditor from '../Folder/Edit.vue';
+import HasPagination from '../../data-list/HasPagination';
+import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 
 export default {
+
+    mixins: [
+        HasPagination,
+        HasPreferences,
+    ],
 
     components: {
         AssetThumbnail,
@@ -297,14 +306,15 @@ export default {
             creatingFolder: false,
             uploads: [],
             page: 1,
-            perPage: 30, // TODO: Should come from the controller, or a config.
+            preferencesPrefix: null,
             meta: {},
             sortColumn: 'basename',
             sortDirection: 'asc',
             mode: 'table',
-            runActionUrl: null,
-            bulkActionsUrl: null,
-            runFolderActionUrl: null,
+            actionUrl: null,
+            folderActionUrl: null,
+            shifting: false,
+            lastItemClicked: null
         }
     },
 
@@ -333,7 +343,7 @@ export default {
         },
 
         canEdit() {
-            return this.can('assets:'+ this.container.id +':edit')
+            return this.can('edit '+ this.container.id +' assets')
         },
 
         canUpload() {
@@ -399,7 +409,10 @@ export default {
             this.container = this.initialContainer;
         },
 
-        container() {
+        container(container) {
+            this.preferencesPrefix = `assets.${container.id}`;
+            this.mode = this.getPreference('mode') || 'table';
+            this.setInitialPerPage();
             this.loadAssets();
         },
 
@@ -444,7 +457,6 @@ export default {
             this.$axios.get(cp_url('asset-containers')).then(response => {
                 this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
-                this.mode = this.$preferences.get(`assets.${this.container.id}.mode`, this.mode);
             });
         },
 
@@ -466,9 +478,8 @@ export default {
                 } else {
                     this.folder = data.data.folder;
                     this.folders = data.data.folder.folders;
-                    this.runActionUrl = data.links.run_asset_action;
-                    this.bulkActionsUrl = data.links.bulk_asset_actions;
-                    this.runFolderActionUrl = data.links.run_folder_action;
+                    this.actionUrl = data.links.asset_action;
+                    this.folderActionUrl = data.links.folder_action;
                 }
 
                 this.loadingAssets = false;
@@ -498,7 +509,7 @@ export default {
 
         setMode(mode) {
             this.mode = mode;
-            this.$preferences.set(`assets.${this.container.id}.mode`, mode);
+            this.setPreference('mode', mode == 'table' ? null : mode);
         },
 
         edit(id) {
@@ -565,20 +576,47 @@ export default {
             return this.selectedAssets.includes(id);
         },
 
-        toggleSelection(id) {
+        toggleSelection(id, index, $event) {
             const i = this.selectedAssets.indexOf(id);
+            this.$refs.browser.focus()
 
             if (i != -1) {
                 this.selectedAssets.splice(i, 1);
             } else if (! this.reachedSelectionLimit) {
-                this.selectedAssets.push(id);
+                if ($event.shiftKey && this.lastItemClicked !== null) {
+                    this.selectRange(
+                        Math.min(this.lastItemClicked, index),
+                        Math.max(this.lastItemClicked, index)
+                    );
+                } else {
+                    this.selectedAssets.push(id);
+                }
             }
             this.$emit('selections-updated', this.selectedAssets);
+            this.lastItemClicked = index;
         },
 
         folderActions(folder) {
             return folder.actions || this.folder.actions || [];
-        }
+        },
+
+        selectRange(from, to) {
+            for (var i = from; i <= to; i++ ) {
+                let asset = this.assets[i].id;
+                if (! this.selectedAssets.includes(asset) && ! this.reachedSelectionLimit) {
+                    this.selectedAssets.push(asset);
+                }
+                this.$emit('selections-updated', this.selectedAssets);
+            };
+        },
+
+        shiftDown() {
+            this.shifting = true
+        },
+
+        clearShift() {
+            this.shifting = false
+        },
 
     }
 

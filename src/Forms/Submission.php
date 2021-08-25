@@ -212,7 +212,7 @@ class Submission implements SubmissionContract, Augmentable
 
         return $this->form()->fields()->keys()->flip()
             ->reject(function ($field, $key) {
-                return in_array($key, ['id', 'date']);
+                return in_array($key, ['id', 'date', 'form']);
             })
             ->map(function ($field, $key) use ($data) {
                 return $data[$key] ?? null;
@@ -226,7 +226,9 @@ class Submission implements SubmissionContract, Augmentable
 
     public function augmentedArrayData()
     {
-        return $this->toArray();
+        return array_merge($this->toArray(), [
+            'form' => $this->form,
+        ]);
     }
 
     public function blueprint()

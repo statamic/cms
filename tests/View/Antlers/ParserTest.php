@@ -35,6 +35,9 @@ class ParserTest extends TestCase
             'default_key' => 'two',
             'first_key' => 'three',
             'second_key' => 'deep',
+            'good' => true,
+            'bad' => false,
+            'unknown' => null,
             'string' => 'Hello wilderness',
             'simple' => ['one', 'two', 'three'],
             'complex' => [
@@ -389,9 +392,25 @@ EOT;
     {
         $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
 
-        $template = "{{ test variable='{{ true ? 'Hello wilderness' : 'fail' }}' }}";
+        $this->assertEquals('yes', $this->parse(
+            "{{ test variable='{{ good ? 'yes' : 'fail' }}' }}",
+            $this->variables
+        ));
 
-        $this->assertEquals('Hello wilderness', $this->parse($template, $this->variables));
+        $this->assertEquals('fail', $this->parse(
+            "{{ test variable='{{ bad ? 'yes' : 'fail' }}' }}",
+            $this->variables
+        ));
+
+        $this->assertEquals('fail', $this->parse(
+            "{{ test variable='{{ unknown ?? 'fail' }}' }}",
+            $this->variables
+        ));
+
+        $this->assertEquals('yes', $this->parse(
+            "{{ test variable='{{ !unknown ? 'yes' : 'fail' }}' }}",
+            $this->variables
+        ));
     }
 
     public function testNullCoalescence()
@@ -475,11 +494,36 @@ EOT;
         $this->assertEquals('hello wilderness', $this->parse($template, $this->variables));
     }
 
+    public function testChainedStandardStringModifiersFromDynamicArrayRelaxed()
+    {
+        $template = '{{ associative[default_key] | upper | lower }}';
+
+        $this->assertEquals('wilderness', $this->parse($template, $this->variables));
+    }
+
     public function testSingleParameterStringModifier()
     {
         $template = "{{ string upper='true' }}";
 
         $this->assertEquals('HELLO WILDERNESS', $this->parse($template, $this->variables));
+    }
+
+    public function testSingleParameterStringFromArrayModifier()
+    {
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative.two upper='true' }}", $this->variables)
+        );
+
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative['two'] upper='true' }}", $this->variables)
+        );
+
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative[default_key] upper='true' }}", $this->variables)
+        );
     }
 
     public function testChainedParameterStringModifiers()
@@ -797,6 +841,76 @@ EOT;
 
         $parsed = $parser->parse($template);
         $this->assertEquals($expected, trim($parsed));
+    }
+
+    /** @test */
+    public function it_doesnt_parse_tags_prefixed_with_an_at_symbol()
+    {
+        $this->assertEquals('foo {{ bar }} baz', $this->parse('foo @{{ bar }} baz'));
+    }
+
+    /** @test */
+    public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_over_multiple_lines()
+    {
+        $template = <<<'EOT'
+@{{ foo }}
+bar
+{{ baz }}
+EOT;
+
+        $expected = <<<'EOT'
+{{ foo }}
+bar
+BAZ
+EOT;
+
+        $this->assertEquals($expected, $this->parse($template, ['baz' => 'BAZ']));
+    }
+
+    /** @test */
+    public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_over_tags_in_multiple_lines()
+    {
+        $template = <<<'EOT'
+@{{ foo }} {{ qux }}
+bar
+{{ baz }}
+EOT;
+
+        $expected = <<<'EOT'
+{{ foo }} QUX
+bar
+BAZ
+EOT;
+
+        $this->assertEquals($expected, $this->parse($template, ['baz' => 'BAZ', 'qux' => 'QUX']));
+    }
+
+    /** @test */
+    public function it_doesnt_parse_multiline_tags_prefixed_with_an_at_symbol_over_tags_in_multiple_lines()
+    {
+        $template = <<<'EOT'
+@{{ foo
+  bar:baz="qux"
+}} {{ qux }}
+bar
+{{ baz }}
+EOT;
+
+        $expected = <<<'EOT'
+{{ foo
+  bar:baz="qux"
+}} QUX
+bar
+BAZ
+EOT;
+
+        $this->assertEquals($expected, $this->parse($template, ['baz' => 'BAZ', 'qux' => 'QUX']));
+    }
+
+    /** @test */
+    public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_containing_nested_tags()
+    {
+        $this->assertEquals('{{ foo bar="{baz}" }}', $this->parse('@{{ foo bar="{baz}" }}'));
     }
 
     /** @test */
@@ -1705,6 +1819,47 @@ EOT;
         $this->assertEquals('yup', $this->parse($template, ['entries' => Entry::query()]));
         $this->assertEquals('yup', $this->parse($template, ['entries' => Entry::query()->where('collection', 'blog')]));
         $this->assertEquals('nope', $this->parse($template, ['entries' => Entry::query()->where('collection', 'dunno')]));
+    }
+
+    /** @test */
+    public function it_applies_modifier_on_different_array_syntax()
+    {
+        $vars = [
+            'key' => 'entries',
+            'source' => [
+                'entries' => [
+                    ['id' => 0],
+                    ['id' => 1],
+                    ['id' => 2],
+                    ['id' => 3],
+                ],
+            ],
+        ];
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source.entries }}[{{ id }}]{{ /source.entries }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source[key] }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source.entries sort="id" }}[{{ id }}]{{ /source.entries }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source[key] sort="id" }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[3][2][1][0]',
+            $this->parse('{{ source[key] sort="id:desc" }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
     }
 
     /** @test */
