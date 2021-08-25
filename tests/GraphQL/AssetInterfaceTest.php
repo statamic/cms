@@ -38,7 +38,6 @@ class AssetInterfaceTest extends TestCase
 
         AssetInterface::addTypes();
 
-        GraphQL::shouldHaveReceived('addType')->with(AssetInterface::class)->once();
         GraphQL::shouldHaveReceived('addTypes')->withArgs(function ($args) {
             $this->assertEveryItemIsInstanceOf(AssetType::class, $args);
             $this->assertEquals($expected = [

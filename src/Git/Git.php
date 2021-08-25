@@ -130,14 +130,27 @@ class Git
                 return app(Filesystem::class)->exists($path);
             })
             ->filter(function ($path) {
-                return GitProcess::create($path)->isRepo();
+                return $this->gitProcessForPath($path)->isRepo();
             })
             ->filter(function ($path) {
-                return GitProcess::create($path)->status();
+                return $this->gitProcessForPath($path)->status();
             })
             ->groupBy(function ($path) {
-                return GitProcess::create($path)->root();
+                return $this->gitProcessForPath($path)->root();
             });
+    }
+
+    /**
+     * Get git process for content path.
+     *
+     * @param string $path
+     * @return GitProcess
+     */
+    protected function gitProcessForPath($path)
+    {
+        return is_link($path)
+            ? GitProcess::create($path)->fromParent()
+            : GitProcess::create($path);
     }
 
     /**

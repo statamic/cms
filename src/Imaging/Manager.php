@@ -3,6 +3,7 @@
 namespace Statamic\Imaging;
 
 use Statamic\Contracts\Imaging\ImageManipulator;
+use Statamic\Support\Arr;
 
 class Manager
 {
@@ -63,7 +64,11 @@ class Manager
      */
     public function userManipulationPresets()
     {
-        return config('statamic.assets.image_manipulation.presets', []);
+        return collect(config('statamic.assets.image_manipulation.presets', []))
+            ->map(function ($preset) {
+                return $this->normalizePreset($preset);
+            })
+            ->all();
     }
 
     /**
@@ -86,5 +91,23 @@ class Manager
     public function getCpImageManipulationPresets()
     {
         return $this->cpManipulationPresets();
+    }
+
+    /**
+     * Normalize preset.
+     *
+     * @param array $preset
+     * @return array
+     */
+    protected function normalizePreset($preset)
+    {
+        // When explicitly setting `crop_focal` in a preset, it breaks cropping
+        // altogether. Statamic's glide tag will automatically respect focal
+        // points though, so we can remove this parameter from the preset.
+        if (Arr::get($preset, 'fit') === 'crop_focal') {
+            Arr::forget($preset, 'fit');
+        }
+
+        return $preset;
     }
 }

@@ -85,7 +85,7 @@ button {
 
 // Earth isn't flat but these buttons are
 .btn-flat {
-    @apply text-white text-grey-80 bg-grey-30;
+    @apply text-white text-grey-80 bg-grey-30 flex items-center;
     position: inherit;
 
     &:hover:not(:disabled), &:active:not(:disabled), &.active {
