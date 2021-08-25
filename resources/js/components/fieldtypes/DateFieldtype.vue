@@ -51,7 +51,7 @@
                                 </div>
                             </div>
 
-                            <div class="icon icon-arrow-right my-0.5 mx-1 text-grey-60" />
+                            <div class="icon icon-arrow-right my-sm mx-1 text-grey-60" />
 
                             <div class="input-group">
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
