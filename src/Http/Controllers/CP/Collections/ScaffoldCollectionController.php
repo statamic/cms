@@ -30,7 +30,7 @@ class ScaffoldCollectionController extends CpController
             $this->makeTemplate($show);
         }
 
-        session()->flash('success', __('Views created sucessfully'));
+        session()->flash('success', __('Views created successfully'));
 
         return [
             'redirect' => route('statamic.cp.collections.show', $request->collection->handle()),

@@ -9,4 +9,9 @@ class NavType extends StructureType
     protected $attributes = [
         'name' => self::NAME,
     ];
+
+    protected function getTreeBranchType(): string
+    {
+        return NavTreeBranchType::NAME;
+    }
 }

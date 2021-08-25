@@ -58,12 +58,9 @@
 
             <editor-floating-menu :editor="editor">
                 <div
-                    slot-scope="{ commands, isActive, menu }"
+                    slot-scope="{ menu }"
                     class="bard-set-selector"
-                    :class="{
-                        'invisible': !config.always_show_set_button && !menu.isActive,
-                        'visible': menu.isActive
-                    }"
+                    :class="config.sets.length && (config.always_show_set_button || menu.isActive) ? 'visible' : 'invisible'"
                     :style="`top: ${menu.top}px`"
                 >
                     <dropdown-list>

@@ -5,18 +5,14 @@ namespace Statamic\Console\Commands;
 use Exception;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\GeneratorCommand as IlluminateGeneratorCommand;
+use Statamic\Facades\Antlers;
 use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 abstract class GeneratorCommand extends IlluminateGeneratorCommand
 {
-    /**
-     * Should path output be hidden?
-     *
-     * @var bool
-     */
-    public $hiddenPathOutput = false;
+    protected $package;
 
     /**
      * Execute the console command.
@@ -25,17 +21,21 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     public function handle()
     {
+        if ($addon = $this->argument('addon')) {
+            $this->package = Str::startsWith($addon, '/')
+                ? preg_replace('/.*\/([^\/]+\/[^\/]+)$/', '$1', $addon)
+                : $addon;
+        }
+
         if (parent::handle() === false) {
             return false;
         }
 
-        if ($this->hiddenPathOutput) {
-            return;
-        }
-
         $relativePath = $this->getRelativePath($this->getPath($this->qualifyClass($this->getNameInput())));
 
-        $this->comment("Your {$this->typeLower} class awaits at: {$relativePath}");
+        if (! $addon) {
+            $this->line("Your {$this->typeLower} class awaits: <comment>{$relativePath}</comment>");
+        }
     }
 
     /**
@@ -82,7 +82,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         $default = $this->laravel->getNamespace();
 
         if ($addon = $this->argument('addon')) {
-            $composerPath = $this->getAddonPath($addon).'/../composer.json';
+            $composerPath = $this->getAddonPath($addon).'/composer.json';
         } else {
             return $default;
         }
@@ -107,7 +107,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         $basePath = $this->laravel['path'];
 
         if ($addon = $this->argument('addon')) {
-            $basePath = $this->getAddonPath($addon);
+            $basePath = $this->getAddonPath($addon).'/src';
         }
 
         $path = $basePath.'/'.str_replace('\\', '/', $name).'.php';
@@ -126,8 +126,6 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         // If explicitly setting addon path from an external command like `make:addon`,
         // use explicit path and allow external command to handle path output.
         if (starts_with($addon, '/') && $this->files->exists($addon)) {
-            $this->hiddenPathOutput = true;
-
             return $addon;
         }
 
@@ -136,7 +134,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
 
         // Attempt to get addon path via composer.
         try {
-            $path = Composer::installedPath($addon).'/src';
+            $path = Composer::installedPath($addon);
         } catch (Exception $exception) {
             $path = $fallbackPath;
         }
@@ -214,9 +212,33 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     {
         $directory = $this->files->isDirectory($path) ? $path : dirname($path);
 
-        $this->files->makeDirectory($directory, 0777, true, true);
+        if (! $this->files->exists($directory)) {
+            $this->files->makeDirectory($directory, 0777, true, true);
+        }
 
         return $directory;
+    }
+
+    /*
+     * Create a file from stub if it doesn't exist
+     * and use Antlers to customize it
+     *
+     * @param string $stub
+     * @param string $path
+     * @param array $data
+     */
+    protected function createFromStub($stub, $path, $data = [])
+    {
+        if (! $this->option('force') && $this->files->exists($path)) {
+            return;
+        }
+
+        $file = Antlers::parse($this->files->get($this->getStub($stub)), $data);
+        $file = str_replace('&lt;?php', '<?php', $file); // because we don't touch the parser on pain of death.
+
+        $this->makeDirectory($path);
+
+        $this->files->put($path, $file);
     }
 
     /**

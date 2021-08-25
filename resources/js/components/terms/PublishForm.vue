@@ -308,6 +308,9 @@ export default {
             isRoot: this.initialIsRoot,
             permalink: this.initialPermalink,
             preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
+            saveKeyBinding: null,
+            quickSaveKeyBinding: null,
+            quickSave: false
         }
     },
 
@@ -390,7 +393,10 @@ export default {
         },
 
         save() {
-            if (!this.canSave) return;
+            if (! this.canSave) {
+                this.quickSave = false;
+                return;
+            }
 
             this.saving = true;
             this.clearErrors();
@@ -450,13 +456,15 @@ export default {
                         return;
                     }
 
+                    let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
+
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && this.afterSaveOption === 'create_another') {
                         window.location = this.createAnotherUrl;
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && this.afterSaveOption === null) {
+                    else if (!this.isInline && nextAction === null) {
                         window.location = this.listingUrl;
                     }
 
@@ -466,6 +474,8 @@ export default {
                     else {
                         this.$nextTick(() => this.$emit('saved', response));
                     }
+
+                    this.quickSave = false;
                 }).catch(e => {});
         },
 
@@ -592,9 +602,16 @@ export default {
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+return'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
+            this.canPublish ? this.confirmPublish() : this.save();
+        });
+
+        this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], e => {
+            e.preventDefault();
+            if (this.confirmingPublish) return;
+            this.quickSave = true;
             this.canPublish ? this.confirmPublish() : this.save();
         });
 
@@ -603,6 +620,11 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    destroyed() {
+        this.saveKeyBinding.destroy();
+        this.quickSaveKeyBinding.destroy();
     }
 
 }

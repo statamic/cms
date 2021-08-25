@@ -86,13 +86,6 @@
 
     .markdown-cheatsheet-helper {
         @apply py-1 px-2 inline-block;
-        svg {
-            height: 14px;
-            width: 24px;
-            position: relative;
-            bottom: -2px;
-            margin-right: 3px;
-        }
     }
 
     .markdown-asset-helper {
