@@ -18,7 +18,7 @@
     }
 
     .upload-text-button {
-        @apply text-blue underline;
+        @apply text-blue underline whitespace-no-wrap;
         &:hover {
             @apply text-blue-dark;
         }
@@ -36,66 +36,14 @@
 
 
 
-/* Leftover bits for reference
-  ========================================================================== */
-
-// .assets-fieldtype .asset-grid-listing .asset-tile {
-//
-//     &.draggable-source--is-dragging {
-//         visibility: hidden;
-//     }
-//
-//     .asset-thumb-container {
-//         position: relative;
-//     }
-//
-//     .asset-filename {
-//         flex-grow: 1;
-//         text-align: center;
-//         text-overflow: ellipsis;
-//         overflow: hidden;
-//         white-space: nowrap;
-//     }
-//
-//     .asset-filesize {
-//         display: none;
-//     }
-// }
-
-
-
-/* In a Replicator fieldtype
-  ========================================================================== */
-
-// .replicator-fieldtype .assets-fieldtype,
-// .grid-fieldtype .grid-stacked .assets-fieldtype {
-//     .manage-assets {
-//         background: rgba(0,0,0,.03);
-//     }
-// }
-//
-
-
-
 /* In a Grid fieldtype
   ========================================================================== */
 
-// .grid-fieldtype .grid-table .assets-fieldtype {
-//     .manage-assets {
-//         background: #fff;
-//         border: none;
-//         text-align: center;
-//         padding: 0 8px 16px;
-//
-//         p { display: none; }
-//         .btn { margin-top: 16px; }
-//     }
-//     .asset-table-listing {
-//         border: 0;
-//         padding: 0;
-//     }
-// }
-
+.grid-fieldtype .grid-table .assets-fieldtype {
+    .asset-table-listing tbody tr td {
+        padding: 4px;
+    }
+}
 
 
 
@@ -125,10 +73,3 @@
 
 // hide the 'or drag to upload' text when too narrow
 .assets-fieldtype .narrow .assets-fieldtype-picker .drag-drop-text { display: none; }
-
-// center align the text when it gets really narrow
-.assets-fieldtype .really-narrow .assets-fieldtype-picker {
-    @apply flex-col;
-    .upload-asset-control { @apply ml-0 text-center; }
-    p { @apply ml-0 mt-1 text-center }
-}

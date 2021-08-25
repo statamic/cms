@@ -87,7 +87,7 @@ import AddonEditions from './addons/Editions.vue';
             },
 
             description() {
-                return markdown(this.addon.description);
+                return this.addon.description;
             },
 
             priceRange() {

@@ -3,22 +3,29 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
-use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
+use Statamic\Facades\Term;
+use Statamic\Http\Controllers\CP\PreviewController;
 
-class TermPreviewController extends CpController
+class TermPreviewController extends PreviewController
 {
-    public function show()
-    {
-        return view('statamic::terms.preview');
-    }
-
-    public function edit(Request $request, $taxonomy, $term)
-    {
-        // todo
-    }
-
     public function create(Request $request, $taxonomy, $site)
     {
-        // todo
+        $this->authorize('create', [TermContract::class, $taxonomy]);
+
+        $fields = $taxonomy->termBlueprint($request->blueprint)
+            ->fields()
+            ->addValues($preview = $request->preview)
+            ->process();
+
+        $values = array_except($fields->values()->all(), ['slug']);
+
+        $term = Term::make()
+            ->slug($preview['slug'] ?? 'slug')
+            ->taxonomy($taxonomy)
+            ->locale($site->handle())
+            ->data($values);
+
+        return $this->getDataResponse($request, $term)->getContent();
     }
 }

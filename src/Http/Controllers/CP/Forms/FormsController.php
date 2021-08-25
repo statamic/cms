@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -44,6 +45,7 @@ class FormsController extends CpController
         $columns = $form
             ->blueprint()
             ->columns()
+            ->prepend(Column::make('datestamp'), 'datestamp')
             ->setPreferred("forms.{$form->handle()}.columns")
             ->rejectUnlisted()
             ->values();
