@@ -64,16 +64,11 @@ class EntryInterface extends InterfaceType
             ],
         ];
 
-        foreach ($this->extraFields() as $field => $closure) {
+        foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {
             $fields[$field] = $closure();
         }
 
         return $fields;
-    }
-
-    protected function extraFields()
-    {
-        return GraphQL::getExtraTypeFields(static::NAME);
     }
 
     public function resolveType($entry)
@@ -87,8 +82,6 @@ class EntryInterface extends InterfaceType
 
     public static function addTypes()
     {
-        GraphQL::addType(self::class);
-
         $combinations = Collection::all()
             ->flatMap(function ($collection) {
                 return $collection
@@ -99,11 +92,8 @@ class EntryInterface extends InterfaceType
                     });
             });
 
-        GraphQL::addTypes($combinations->flatMap(function ($item) {
-            return [
-                new EntryType($item['collection'], $item['blueprint']),
-                new EntryPageType($item['collection'], $item['blueprint']),
-            ];
+        GraphQL::addTypes($combinations->map(function ($item) {
+            return new EntryType($item['collection'], $item['blueprint']);
         })->all());
     }
 }

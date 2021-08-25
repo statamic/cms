@@ -25,14 +25,14 @@
     }
 }
 
-.grid-table tbody {
+.grid-table > tbody {
     @apply outline-none;
 
-    tr {
+    > tr {
         @apply outline-none;
     }
 
-    td {
+    > tr > td {
         @apply border-b px-1 py-1.5 align-top;
 
         &:first-child.grid-cell {

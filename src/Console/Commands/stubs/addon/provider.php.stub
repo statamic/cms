@@ -1,6 +1,6 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Statamic\Providers\AddonServiceProvider;
 
