@@ -53,6 +53,13 @@ class Entries extends Relationship
     protected function configFieldItems(): array
     {
         return array_merge(parent::configFieldItems(), [
+            'create' => [
+                'display' => __('Allow Creating'),
+                'instructions' => __('statamic::fieldtypes.entries.config.create'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'collections' => [
                 'display' => __('Collections'),
                 'type' => 'collections',

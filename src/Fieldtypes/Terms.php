@@ -32,6 +32,13 @@ class Terms extends Relationship
     protected function configFieldItems(): array
     {
         return array_merge(parent::configFieldItems(), [
+            'create' => [
+                'display' => __('Allow Creating'),
+                'instructions' => __('statamic::fieldtypes.terms.config.create'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'taxonomies' => [
                 'display' => __('Taxonomies'),
                 'type' => 'taxonomies',
