@@ -12,6 +12,7 @@ return [
     'assets.config.max_files' => 'Die maximale Anzahl der auswählbaren Dateien.',
     'assets.config.mode' => 'Bevorzugten Layoutstil auswählen.',
     'assets.config.restrict' => 'Verhindern, dass Benutzer*innen zu anderen Ordnern navigieren können.',
+    'assets.config.show_filename' => 'Dateiname neben dem Vorschaubild anzeigen.',
     'bard.config.allow_source' => 'Ermöglicht beim Schreiben das Anzeigen des HTML-Quellcodes.',
     'bard.config.always_show_set_button' => 'Ermöglicht das ständige Anzeigen des „Set hinzufügen“-Buttons.',
     'bard.config.buttons' => 'Auswählen, welche Buttons in der Symbolleiste angezeigt werden sollen.',

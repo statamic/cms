@@ -26,6 +26,7 @@ class GitTest extends TestCase
         $this->files->copyDirectory($this->basePath('assets'), $this->basePath('temp/assets'));
         $this->createTempRepo(base_path('content'));
         $this->createTempRepo($this->basePath('temp/assets'));
+        $this->files->copyDirectory($this->basePath('assets'), base_path('../assets-external'));
 
         $defaultConfig = include __DIR__.'/../../config/git.php';
 
@@ -42,6 +43,8 @@ class GitTest extends TestCase
     {
         $this->deleteTempDirectory(base_path('content'));
         $this->deleteTempDirectory($this->basePath('temp'));
+        $this->deleteTempDirectory(base_path('../assets-external'));
+        $this->deleteTempDirectory(base_path('content/assets-linked'));
 
         parent::tearDown();
     }
@@ -100,7 +103,6 @@ EOT;
     /** @test */
     public function it_filters_out_external_paths_that_are_not_separate_repos()
     {
-        // If a user symlinks an assets folder for example, this will fail if not a repo itself.
         $notARepoPath = Path::resolve(base_path('../../../../..'));
 
         Config::set('statamic.git.paths', [
@@ -127,6 +129,34 @@ EOT;
         $this->assertEquals(1, $contentStatus->addedCount);
         $this->assertEquals(1, $contentStatus->modifiedCount);
         $this->assertEquals(0, $contentStatus->deletedCount);
+    }
+
+    /** @test */
+    public function it_can_handle_configured_paths_that_are_symlinks()
+    {
+        $externalPath = Path::resolve(base_path('../assets-external'));
+        $symlinkPath = base_path('content/assets-linked');
+
+        @symlink($externalPath, $symlinkPath);
+
+        $this->files->put($externalPath.'/statement.txt', 'Change statement.');
+
+        Config::set('statamic.git.paths', [
+            $symlinkPath,
+        ]);
+
+        $status = Git::statuses()->get(Path::resolve(base_path('content')));
+
+        $expectedStatus = <<<'EOT'
+?? assets-linked
+EOT;
+
+        $this->assertEquals($expectedStatus, $status->status);
+
+        $this->assertEquals(1, $status->totalCount);
+        $this->assertEquals(1, $status->addedCount);
+        $this->assertEquals(0, $status->modifiedCount);
+        $this->assertEquals(0, $status->deletedCount);
     }
 
     /** @test */

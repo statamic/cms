@@ -59,4 +59,11 @@ class AugmentedTerm extends AbstractAugmented
     {
         return $this->data->absoluteUrl();
     }
+
+    public function title()
+    {
+        $title = $this->data->getSupplement('title') ?? $this->data->title();
+
+        return $this->wrapValue($title, 'title');
+    }
 }
