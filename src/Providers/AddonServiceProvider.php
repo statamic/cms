@@ -432,7 +432,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     private function getAddonByServiceProvider()
     {
         return Addon::all()->first(function ($addon) {
-            return Str::startsWith(get_class($this), $addon->namespace());
+            return Str::startsWith(get_class($this), $addon->namespace().'\\');
         });
     }
 

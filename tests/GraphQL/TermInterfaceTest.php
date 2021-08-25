@@ -44,7 +44,6 @@ class TermInterfaceTest extends TestCase
 
         TermInterface::addTypes();
 
-        GraphQL::shouldHaveReceived('addType')->with(TermInterface::class)->once();
         GraphQL::shouldHaveReceived('addTypes')->withArgs(function ($args) {
             $this->assertEveryItemIsInstanceOf(TermType::class, $args);
             $this->assertEquals($expected = [

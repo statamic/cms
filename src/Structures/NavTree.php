@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use Facades\Statamic\Structures\BranchIds;
 use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
@@ -43,5 +44,16 @@ class NavTree extends Tree
     protected function repository()
     {
         return app(NavTreeRepository::class);
+    }
+
+    public function ensureBranchIds()
+    {
+        $this->tree = BranchIds::ensure($oldTree = $this->tree);
+
+        if ($oldTree !== $this->tree) {
+            $this->save();
+        }
+
+        return $this;
     }
 }
