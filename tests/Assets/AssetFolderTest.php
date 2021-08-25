@@ -199,6 +199,7 @@ class AssetFolderTest extends TestCase
 
         $return = $folder->save();
 
+        $this->assertEquals($container->contents()->cached(), $container->contents()->all());
         $this->assertEquals($folder, $return);
         $disk->assertExists($path);
     }
