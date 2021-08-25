@@ -126,7 +126,7 @@ class Dimensions
         if ($svg['width'] && $svg['height']
             && is_numeric((string) $svg['width'])
             && is_numeric((string) $svg['height'])) {
-            return [(int) $svg['width'], (int) $svg['height']];
+            return [(float) $svg['width'], (float) $svg['height']];
         } elseif ($svg['viewBox']) {
             $viewBox = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
 

@@ -376,6 +376,12 @@ class UpdateAssetReferencesTest extends TestCase
                             ],
                         ],
                         [
+                            'type' => 'link',
+                            'attrs' => [
+                                'href' => 'statamic://asset::test_container::hoff.jpg',
+                            ],
+                        ],
+                        [
                             'type' => 'paragraph',
                             'content' => 'unrelated',
                         ],
@@ -391,6 +397,12 @@ class UpdateAssetReferencesTest extends TestCase
                                 'alt' => 'norris',
                             ],
                         ],
+                        [
+                            'type' => 'link',
+                            'attrs' => [
+                                'href' => 'statamic://asset::test_container::norris.jpg',
+                            ],
+                        ],
                     ],
                 ],
                 [
@@ -402,15 +414,19 @@ class UpdateAssetReferencesTest extends TestCase
 
         $this->assertEquals('asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.0.attrs.src'));
         $this->assertEquals('hoff', Arr::get($entry->data(), 'bardo.0.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.1.attrs.href'));
         $this->assertEquals('asset::test_container::norris.jpg', Arr::get($entry->data(), 'bardo.1.content.0.attrs.src'));
         $this->assertEquals('norris', Arr::get($entry->data(), 'bardo.1.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->data(), 'bardo.1.content.1.attrs.href'));
 
         $this->assetHoff->path('content/hoff-new.jpg')->save();
 
         $this->assertEquals('asset::test_container::content/hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.0.attrs.src'));
         $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'bardo.0.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::content/hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.1.attrs.href'));
         $this->assertEquals('asset::test_container::norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.src'));
         $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.1.content.1.attrs.href'));
     }
 
     /** @test */
@@ -436,7 +452,9 @@ class UpdateAssetReferencesTest extends TestCase
 <img src="statamic://asset::test_container::hoff.jpg">
 <img src="statamic://asset::test_container::hoff.jpg" alt="test">
 </p>More text.</p>
+<p><a href="statamic://asset::test_container::hoff.jpg">Link</a></p>
 <img src="statamic://asset::test_container::norris.jpg">
+<p><a href="statamic://asset::test_container::norris.jpg">Link</a></p>
 EOT;
 
         $entry = tap(Facades\Entry::make()->collection($collection)->data(['bardo' => $content]))->save();
@@ -450,7 +468,9 @@ EOT;
 <img src="statamic://asset::test_container::content/hoff-new.jpg">
 <img src="statamic://asset::test_container::content/hoff-new.jpg" alt="test">
 </p>More text.</p>
+<p><a href="statamic://asset::test_container::content/hoff-new.jpg">Link</a></p>
 <img src="statamic://asset::test_container::norris.jpg">
+<p><a href="statamic://asset::test_container::norris.jpg">Link</a></p>
 EOT;
 
         $this->assertEquals($expected, $entry->fresh()->get('bardo'));

@@ -9,11 +9,11 @@
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
-                    v-text="page.title || page.url" />
+                    v-text="title" />
 
                 <button
                     v-if="hasChildren"
-                    class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none"
+                    class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
@@ -94,6 +94,10 @@ export default {
 
         isText() {
             return this.page.title && !this.page.url;
+        },
+
+        title() {
+            return this.page.title || this.page.entry_title || this.page.url;
         }
 
     },

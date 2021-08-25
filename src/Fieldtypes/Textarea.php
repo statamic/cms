@@ -29,6 +29,12 @@ class Textarea extends Fieldtype
                 'type' => 'toggle',
                 'width' => 50,
             ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'textarea',
+                'width' => 100,
+            ],
         ];
     }
 

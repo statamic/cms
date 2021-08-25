@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Routing\UrlBuilder;
+use Statamic\Contracts\Structures\Nav;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Blink;
@@ -29,9 +30,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
     protected $parent;
     protected $children;
     protected $isRoot = false;
+    protected $id;
     protected $url;
     protected $title;
     protected $depth;
+    protected $data = [];
 
     public function setUrl($url)
     {
@@ -81,6 +84,16 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         }
 
         return optional($this->entry())->value('title');
+    }
+
+    public function hasCustomTitle()
+    {
+        return $this->title !== null;
+    }
+
+    public function hasCustomUrl()
+    {
+        return $this->url !== null;
     }
 
     public function setEntry($reference): self
@@ -227,6 +240,66 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return $this;
     }
 
+    public function setPageData(array $data): self
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function pageData()
+    {
+        return collect($this->data);
+    }
+
+    public function data()
+    {
+        $data = $this->pageData();
+
+        if ($entry = $this->entry()) {
+            $data = $entry->data()->merge($data);
+        }
+
+        return $data;
+    }
+
+    public function values()
+    {
+        $data = $this->pageData();
+
+        if ($entry = $this->entry()) {
+            $data = $entry->values()->merge($data);
+        }
+
+        return $data;
+    }
+
+    public function get(string $key, $fallback = null)
+    {
+        if ($value = $this->data[$key] ?? null) {
+            return $value;
+        }
+
+        if ($entry = $this->entry()) {
+            $value = $entry->get($key);
+        }
+
+        return $value ?? $fallback;
+    }
+
+    public function value(string $key)
+    {
+        if ($value = $this->data[$key] ?? null) {
+            return $value;
+        }
+
+        if ($entry = $this->entry()) {
+            $value = $entry->value($key);
+        }
+
+        return $value;
+    }
+
     public function pages()
     {
         $pages = (new Pages)
@@ -258,9 +331,16 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return optional($this->entry())->editUrl();
     }
 
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function id()
     {
-        return optional($this->entry())->id();
+        return $this->id;
     }
 
     public function in($site)
@@ -270,7 +350,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
                 return null;
             }
 
-            return $this->setEntry($entry->id());
+            return $this->structure()->in($site)->findByEntry($entry->id());
         }
 
         return $this;
@@ -316,7 +396,9 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function blueprint()
     {
-        return optional($this->entry())->blueprint();
+        if ($this->structure() instanceof Nav) {
+            return $this->structure()->blueprint();
+        }
     }
 
     public function collection()

@@ -23,8 +23,8 @@
 
         @if ($collection->hasStructure())
         :structured="{{ Statamic\Support\Str::bool($user->can('reorder', $collection)) }}"
-        structure-pages-url="{{ cp_route('structures.pages.index', 'collection::'.$structure->handle()) }}"
-        structure-submit-url="{{ cp_route('collections.structure.update', $collection->handle()) }}"
+        structure-pages-url="{{ cp_route('collections.tree.index', $structure->handle()) }}"
+        structure-submit-url="{{ cp_route('collections.tree.update', $collection->handle()) }}"
         :structure-max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
         :structure-expects-root="{{ Statamic\Support\Str::bool($structure->expectsRoot()) }}"
         @endif
@@ -37,7 +37,7 @@
                 <dropdown-item :text="__('Edit Blueprints')" redirect="{{ cp_route('collections.blueprints.index', $collection) }}"></dropdown-item>
             @endcan
             @can('edit', $collection)
-                <dropdown-item :text="__('Scaffold Resources')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
+                <dropdown-item :text="__('Scaffold Views')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
             @endcan
             @can('delete', $collection)
                 <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">

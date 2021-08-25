@@ -1,40 +1,66 @@
 <template>
 
-    <element-container @resized="containerWidth = $event.width">
+    <element-container @resized="containerWasResized">
     <div>
-
-        <div class="publish-tabs tabs" v-show="mainSections.length > 1">
-            <a v-for="section in mainSections"
-                :key="section.handle"
-                :class="{
-                    'active': section.handle == active,
-                    'has-error': sectionHasError(section.handle)
-                }"
-                @click.prevent="setActive(section.handle)"
-                v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
-            ></a>
+        <div class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
+            <div
+                class="publish-tabs tabs flex-shrink" v-show="mainSections.length > 1"
+                ref="tabs"
+                role="tablist"
+                :aria-label="__('Edit Content')"
+            >
+                <button v-for="(section, index) in mainSections"
+                    class="tab-button"
+                    :ref="section.handle + '-tab'"
+                    :key="section.handle"
+                    :class="{
+                        'active': section.handle == active,
+                        'has-error': sectionHasError(section.handle),
+                        'invisible': isTabHidden(index)
+                    }"
+                    :aria-controls="section.handle + '-tab'"
+                    :aria-selected="section.handle == active ? true : false"
+                    :id="section.handle + '-tab-control'"
+                    @click="setActive(section.handle)"
+                    v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
+                ></button>
+            </div>
+            <dropdown-list class="ml-1 v-cloak" v-if="showHiddenTabsDropdown">
+                <dropdown-item
+                    v-for="(section, index) in mainSections"
+                    v-show="isTabHidden(index)"
+                    :key="section.handle"
+                    :text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
+                    @click.prevent="setActive(section.handle)"
+                />
+            </dropdown-list>
         </div>
 
         <div class="flex justify-between">
-            <div
-                class="publish-section"
-                :class="{ 'rounded-tl-none' : mainSections.length > 1 }"
-                v-for="section in mainSections"
-                :key="section.handle"
-                v-show="section.handle === active"
-            >
-                <publish-fields
-                    :fields="section.fields"
-                    :read-only="readOnly"
-                    :syncable="syncable"
-                    :can-toggle-labels="canToggleLabels"
-                    @updated="(handle, value) => $emit('updated', handle, value)"
-                    @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
-                    @synced="$emit('synced', $event)"
-                    @desynced="$emit('desynced', $event)"
-                    @focus="$emit('focus', $event)"
-                    @blur="$emit('blur', $event)"
-                />
+            <div ref="publishSectionWrapper" class="publish-section-wrapper w-full">
+                <div
+                    role="tabpanel"
+                    class="publish-section w-full"
+                    :aria-labeledby="section.display"
+                    :id="section.handle + '-tab'"
+                    :class="{ 'rounded-tl-none' : mainSections.length > 1 }"
+                    :key="section.handle"
+                    v-for="section in mainSections"
+                    v-show="section.handle === active"
+                >
+                    <publish-fields
+                        :fields="section.fields"
+                        :read-only="readOnly"
+                        :syncable="syncable"
+                        :can-toggle-labels="canToggleLabels"
+                        @updated="(handle, value) => $emit('updated', handle, value)"
+                        @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
+                        @synced="$emit('synced', $event)"
+                        @desynced="$emit('desynced', $event)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
+                    />
+                </div>
             </div>
 
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
@@ -89,7 +115,8 @@ export default {
 
         return {
             active: state.blueprint.sections[0].handle,
-            containerWidth: null
+            containerWidth: null,
+            visibleTabs: []
         }
     },
 
@@ -147,6 +174,10 @@ export default {
 
         actionsPortal() {
             return `publish-actions-${this.storeName}`;
+        },
+
+        showHiddenTabsDropdown() {
+            return this.mainSections.length > this.visibleTabs.length;
         }
 
     },
@@ -160,8 +191,44 @@ export default {
         setActive(tab) {
             this.active = tab;
             this.$events.$emit('tab-switched', tab);
-        }
+        },
 
+        isTabHidden(section) {
+            return false
+        },
+
+        containerWasResized($event) {
+            this.containerWidth = $event.width;
+            this.wangjangleTabVisibility();
+        },
+
+        wangjangleTabVisibility: _.debounce(function () {
+            this.$nextTick(() => {
+                let visibleTabs = []
+
+                // Offset 40px for dropdown list position
+                let maxWidth = this.$refs.publishSectionWrapper.offsetWidth - 40;
+                let tabWidthSum = 0;
+
+                this.$refs.tabs.childNodes.forEach((tab, index) => {
+                    tabWidthSum += tab.offsetWidth;
+
+                    if (tabWidthSum < maxWidth) {
+                        visibleTabs.push(this.mainSections[index].handle);
+                    }
+                })
+
+                this.visibleTabs = visibleTabs;
+            });
+        }, 100),
+
+        isTabVisible(index) {
+            return _.contains(this.visibleTabs, this.mainSections[index].handle);
+        },
+
+        isTabHidden(index) {
+            return ! _.contains(this.visibleTabs, this.mainSections[index].handle);
+        }
     }
 
 }

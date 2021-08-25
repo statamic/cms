@@ -81,7 +81,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             ->each(function ($field) use ($dottedPrefix) {
                 $field->get('save_html') === true
                     ? $this->updateStatamicUrlsInStringValue($field, $dottedPrefix)
-                    : $this->updateStatamicUrlsInBardImage($field, $dottedPrefix);
+                    : $this->updateStatamicUrlsInArrayValue($field, $dottedPrefix);
             });
 
         return $this;
@@ -168,7 +168,19 @@ class AssetReferenceUpdater extends DataReferenceUpdater
      * @param \Statamic\Fields\Field $field
      * @param null|string $dottedPrefix
      */
-    protected function updateStatamicUrlsInBardImage($field, $dottedPrefix)
+    protected function updateStatamicUrlsInArrayValue($field, $dottedPrefix)
+    {
+        $this->updateStatamicUrlsInImageNodes($field, $dottedPrefix);
+        $this->updateStatamicUrlsInLinkNodes($field, $dottedPrefix);
+    }
+
+    /**
+     * Update asset references in bard image nodes.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @param null|string $dottedPrefix
+     */
+    private function updateStatamicUrlsInImageNodes($field, $dottedPrefix)
     {
         $data = $this->item->data()->all();
 
@@ -190,6 +202,50 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             })
             ->map(function ($value) {
                 return "asset::{$this->container}::{$this->newValue}";
+            })
+            ->each(function ($value, $key) use (&$bardPayload) {
+                Arr::set($bardPayload, $key, $value);
+            });
+
+        if ($changed->isEmpty()) {
+            return;
+        }
+
+        Arr::set($data, $dottedKey, $bardPayload);
+
+        $this->item->data($data);
+
+        $this->updated = true;
+    }
+
+    /**
+     * Update asset references in bard link nodes.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @param null|string $dottedPrefix
+     */
+    private function updateStatamicUrlsInLinkNodes($field, $dottedPrefix)
+    {
+        $data = $this->item->data()->all();
+
+        $dottedKey = $dottedPrefix.$field->handle();
+
+        $bardPayload = Arr::get($data, $dottedKey, []);
+
+        $changed = collect(Arr::dot($bardPayload))
+            ->filter(function ($value, $key) {
+                return preg_match('/(.*)\.(type)/', $key) && $value === 'link';
+            })
+            ->mapWithKeys(function ($value, $key) use ($bardPayload) {
+                $key = str_replace('.type', '.attrs.href', $key);
+
+                return [$key => Arr::get($bardPayload, $key)];
+            })
+            ->filter(function ($value) {
+                return $value === "statamic://asset::{$this->container}::{$this->originalValue}";
+            })
+            ->map(function ($value) {
+                return "statamic://asset::{$this->container}::{$this->newValue}";
             })
             ->each(function ($value, $key) use (&$bardPayload) {
                 Arr::set($bardPayload, $key, $value);

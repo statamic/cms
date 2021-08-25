@@ -25,6 +25,7 @@ class EntryQuery extends Query
             'slug' => GraphQL::string(),
             'collection' => GraphQL::string(),
             'uri' => GraphQL::string(),
+            'site' => GraphQL::string(),
         ];
     }
 
@@ -46,6 +47,10 @@ class EntryQuery extends Query
 
         if ($uri = $args['uri'] ?? null) {
             $query->where('uri', $uri);
+        }
+
+        if ($site = $args['site'] ?? null) {
+            $query->where('site', $site);
         }
 
         return $query->limit(1)->get()->first();
