@@ -92,6 +92,7 @@ return [
     'origin_cannot_be_disabled' => 'Impossible de sélectionner une origine désactivée.',
     'unique_uri' => 'Cette URI est déjà prise.',
     'duplicate_uri' => 'URI en doublon :value',
+    'reserved' => 'Ceci est un mot réservé par le système.',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];
