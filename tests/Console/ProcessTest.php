@@ -78,7 +78,7 @@ class ProcessTest extends TestCase
     {
         $process = Process::create();
 
-        Log::shouldReceive('error');
+        Log::shouldReceive('error')->times(1);
 
         $process->run('not-a-command');
 
@@ -98,5 +98,19 @@ class ProcessTest extends TestCase
 
         $this->assertTrue($process->hasErrorOutput());
         $this->assertStringContainsString('not found', $output);
+    }
+
+    /** @test */
+    public function it_can_get_cloned_process_for_running_commands_from_parent_path()
+    {
+        $this->assertEquals(
+            Path::resolve(resource_path()),
+            Process::create(resource_path())->getBasePath()
+        );
+
+        $this->assertEquals(
+            Path::resolve(base_path()),
+            Process::create(resource_path())->fromParent()->getBasePath()
+        );
     }
 }

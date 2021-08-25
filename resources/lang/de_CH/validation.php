@@ -68,8 +68,8 @@ return [
     'present' => 'Muss vorhanden sein.',
     'regex' => 'Das Format ist ungültig.',
     'required' => 'Dieses Feld wird benötigt.',
-    'required_if' => 'Dieses Feld ist erforderlich, wenn :other der Wert :value ist.',
-    'required_unless' => 'Dieses Feld ist erforderlich, es sei denn, :other steht in :values.',
+    'required_if' => 'Dieses Feld ist erforderlich, wenn :other den Wert :value hat.',
+    'required_unless' => 'Dieses Feld ist erforderlich, es sei denn, :other hat den Wert :values.',
     'required_with' => 'Dieses Feld ist erforderlich, wenn :values vorhanden ist.',
     'required_with_all' => 'Dieses Feld ist erforderlich, wenn :values vorhanden ist.',
     'required_without' => 'Dieses Feld ist erforderlich, wenn keiner der :values vorhanden ist.',
@@ -92,6 +92,7 @@ return [
     'origin_cannot_be_disabled' => 'Kann keine deaktivierte Quelle auswählen.',
     'unique_uri' => 'Diese URI ist bereits vergeben.',
     'duplicate_uri' => 'Doppelte URI :value',
+    'reserved' => 'Dies ist ein reserviertes Wort.',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',
     'attributes' => [],
 ];
