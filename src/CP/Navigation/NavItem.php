@@ -80,7 +80,7 @@ class NavItem
                 $cpUrl = url(config('statamic.cp.route')).'/';
 
                 if (! $this->active && Str::startsWith($url, $cpUrl)) {
-                    $this->active = str_replace($cpUrl, '', $url).'(/(.*)?|$)';
+                    $this->active = str_replace($cpUrl, '', Str::before($url, '?')).'(/(.*)?|$)';
                 }
             })
             ->value($url);

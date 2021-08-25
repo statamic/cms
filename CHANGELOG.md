@@ -1,5 +1,62 @@
 # Release Notes
 
+## 3.2.0 (2021-08-24)
+
+### What's new
+- Official 3.2 release! 🎉
+
+### What's fixed
+- References to assets in links in Bard fields will get updated. [#4152](https://github.com/statamic/cms/issues/4152)
+- Adjusted nav item editor instructions. [#4142](https://github.com/statamic/cms/issues/4142)
+- Removed the warning when renaming assets. [#4141](https://github.com/statamic/cms/issues/4141)
+- Changes from 3.1
+
+
+
+## 3.2.0-beta.1 (2021-08-17)
+
+### What's new
+- A brand new Starter Kit experience that's objectively better in every possible way (just you wait and see). [#3755](https://github.com/statamic/cms/issues/3755)
+- Navs can now have their own blueprints. 🎉 [#3941](https://github.com/statamic/cms/issues/3941)
+- Addon/extension `make` commands now do all the boilerplate work for you, including wiring up `webpack` because nobody wants to do that. [#3965](https://github.com/statamic/cms/issues/3965)
+- An entire Pringles can full of UI improvements that definitely doesn't have a fake snake coiled up inside. [#3967](https://github.com/statamic/cms/issues/3967)
+- Added Alpine.js to the Control Panel. [#3903](https://github.com/statamic/cms/issues/3903)
+- You can now select multiple rows in CP tables by clicking one, holding down shift, and clicking another. [#3907](https://github.com/statamic/cms/issues/3907)
+- References get automatically updated throughout content when you move or rename assets and terms. [#3850](https://github.com/statamic/cms/issues/3850) [#3912](https://github.com/statamic/cms/issues/3912)
+- Nav and collection tree items are now are collapsible. [#3899](https://github.com/statamic/cms/issues/3899)
+- Added a pagination size selector to the asset browser. [#3957](https://github.com/statamic/cms/issues/3957)
+
+### What's changing
+- `cmd`+`s` now does a _quick_ save (and `cmd`+`return` does the full thing). [#3910](https://github.com/statamic/cms/issues/3910)
+
+### What's fixed
+- Fixed git error when using symlinks. [#4062](https://github.com/statamic/cms/issues/4062)
+- Prevent an error when users move or rename assets. [#4068](https://github.com/statamic/cms/issues/4068)
+- The `site:clear` command will no longer remove the default filesystem disk configs.
+
+
+
+## 3.1.35 (2021-08-24)
+
+### What's new
+- Taxonomy terms may be live previewed. [#4145](https://github.com/statamic/cms/issues/4145)
+- The `foreach` tag supports dynamic variables.  [#4012](https://github.com/statamic/cms/issues/4012)
+- The `video` fieldtype's placeholder may be customized. [#4162](https://github.com/statamic/cms/issues/4162)
+
+### What's fixed
+- Fix missing environment variables when updating through the CP using Laravel Sail.  [#4027](https://github.com/statamic/cms/issues/4027)
+- Fix `crop_focal` usage in Glide presets. [#4041](https://github.com/statamic/cms/issues/4041)
+- Fix `nav` and `nav:breadcrumbs` tags showing incorrectly showing redirected items as current. [#4058](https://github.com/statamic/cms/issues/4058)
+- Fix date column on form submissions table. [#3969](https://github.com/statamic/cms/issues/3969)
+- Make the `as` modifier work with collections. [#4130](https://github.com/statamic/cms/issues/4130)
+- In the `static:warm` command, fix missing requests, and show errors for failed requests. [#4128](https://github.com/statamic/cms/issues/4128)
+- Fix term `title` not taking the supplemented value into account. [#4153](https://github.com/statamic/cms/issues/4153)
+- Fix CP nav items not being marked as active when there's a query string. [#4149](https://github.com/statamic/cms/issues/4149)
+- Fix the `link` fieldtype's perpetual dirty state [#4148](https://github.com/statamic/cms/issues/4148)
+- When creating a blueprint, the title will get slugified to prevent colons and question marks. [#4143](https://github.com/statamic/cms/issues/4143)
+
+
+
 ## 3.1.34 (2021-08-17)
 
 ### What's new

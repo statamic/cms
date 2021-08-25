@@ -24,7 +24,7 @@ class Assets extends Fieldtype
                 'display' => __('Mode'),
                 'instructions' => __('statamic::fieldtypes.assets.config.mode'),
                 'type' => 'select',
-                'default' => 'grid',
+                'default' => 'list',
                 'options' => [
                     'grid' => __('Grid'),
                     'list' => __('List'),
@@ -55,6 +55,13 @@ class Assets extends Fieldtype
             'allow_uploads' => [
                 'display' => __('Allow Uploads'),
                 'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'show_filename' => [
+                'display' => __('Show Filename'),
+                'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
                 'type' => 'toggle',
                 'default' => true,
                 'width' => 50,
