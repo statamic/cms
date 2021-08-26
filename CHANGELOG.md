@@ -1,5 +1,17 @@
 # Release Notes
 
+## 3.2.1 (2021-08-26)
+
+### What's improved
+- Updated French and German translations. [#4182](https://github.com/statamic/cms/issues/4182) [#4171](https://github.com/statamic/cms/issues/4171) [#4175](https://github.com/statamic/cms/issues/4175) [#4169](https://github.com/statamic/cms/issues/4169)
+
+### What's fixed
+- Fix error using `nav:breadcrumbs` on a taxonomy page. [#4179](https://github.com/statamic/cms/issues/4179)
+- Fix missing `is_current` in `nav:breadcrumbs` tag by allowing `Page`s to have supplemental values. [#4178](https://github.com/statamic/cms/issues/4178)
+- Removed outdated `Blueprint::all()` IDE hint. [#4172](https://github.com/statamic/cms/issues/4172)
+
+
+
 ## 3.2.0 (2021-08-24)
 
 ### What's new
