@@ -60,6 +60,7 @@ return [
     'field_validation_advanced_instructions' => 'Voeg meer geavanceerde validatie toe aan dit veld.',
     'field_validation_required_instructions' => 'Bepaal wanneer dit veld verplicht is.',
     'fields_blueprints_description' => 'Blueprints definieëren de velden voor inhoudsstructuren, zoals collecties, taxonomieën, gebruikers en formulieren.',
+    'fields_default_instructions' => 'Stel de standaardwaarde in',
     'fields_display_instructions' => 'Het label van dit veld zoals getoond in het Control Panel.',
     'fields_fieldsets_description' => 'Fieldsets zijn simpele, flexibele, en optionele grouperingen van velden die het mogelijk maken om velden te organiseren en herbruiken.',
     'fields_handle_instructions' => 'De variabelenaam van dit veld te gebruiken in het template.',
