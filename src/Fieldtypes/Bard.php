@@ -157,7 +157,7 @@ class Bard extends Replicator
     protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
-            return $this->resolveStatamicUrls($value);
+            return is_null($value) ? $value : $this->resolveStatamicUrls($value);
         }
 
         if ($this->isLegacyData($value)) {

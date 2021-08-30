@@ -9,15 +9,11 @@ trait ResolvesStatamicUrls
     /**
      * Resolve `statamic://` URLs in string based markdown and html content.
      *
-     * @param string|null $content
-     * @return string|null
+     * @param string $content
+     * @return string
      */
-    protected function resolveStatamicUrls($content)
+    protected function resolveStatamicUrls(string $content)
     {
-        if (! $content) {
-            return $content;
-        }
-
         return preg_replace_callback('/([("])statamic:\/\/([^()"]*)([)"])/im', function ($matches) {
             $data = Data::find($matches[2]);
             $url = $data ? $data->url() : '';
