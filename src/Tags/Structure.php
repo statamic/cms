@@ -46,7 +46,7 @@ class Structure extends Tags
 
     public function toArray($tree, $parent = null, $depth = 1)
     {
-        return collect($tree)->map(function ($item, $index) use ($parent, $depth) {
+        return collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
             $data = $page->toAugmentedArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
@@ -57,6 +57,8 @@ class Structure extends Tags
                 'depth'       => $depth,
                 'index'       => $index,
                 'count'       => $index + 1,
+                'first'       => $index === 0,
+                'last'        => $index === count($tree) - 1,
                 'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->urlWithoutRedirect(), '/'),
                 'is_parent'   => Site::current()->absoluteUrl() === $page->absoluteUrl() ? false : URL::isAncestorOf(URL::getCurrent(), $page->urlWithoutRedirect()),
                 'is_external' => URL::isExternal($page->absoluteUrl()),
