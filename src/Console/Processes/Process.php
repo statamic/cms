@@ -69,7 +69,7 @@ class Process
      */
     protected function constructEnv()
     {
-        $env = collect(getenv())->only(['HOME', 'LARAVEL_SAIL']);
+        $env = collect(getenv())->only(['HOME', 'LARAVEL_SAIL', 'COMPOSER_HOME', 'APPDATA', 'LOCALAPPDATA']);
 
         if (! $env->has('HOME') && $env->get('LARAVEL_SAIL') === '1') {
             $env['HOME'] = '/home/sail';
