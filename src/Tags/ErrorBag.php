@@ -28,7 +28,10 @@ class ErrorBag extends Tags
             return false;
         }
 
-        return collect($messages)->map(fn ($error) => ['field_error' => $error]);
+        return collect($messages)
+            ->map(function ($error) {
+                return ['field_error' => $error];
+            });
     }
 
     private function getMessageBag(): ?MessageBag
@@ -46,8 +49,9 @@ class ErrorBag extends Tags
     private function formatErrors(array $messages): array
     {
         return collect($messages)
-            ->map(fn ($errors, $field) => ['field' => $field, 'field_errors' => $errors])
-            ->values()
+            ->map(function ($errors, $field) {
+                return ['field' => $field, 'field_errors' => $errors];
+            })->values()
             ->all();
     }
 }
