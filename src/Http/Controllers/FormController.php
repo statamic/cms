@@ -92,7 +92,7 @@ class FormController extends Controller
      */
     private function formSuccess($params, $submission, $silentFailure = false)
     {
-        if (request()->ajax()) {
+        if (request()->ajax() || request()->wantsJson()) {
             return response([
                 'success' => true,
                 'submission_created' => ! $silentFailure,
