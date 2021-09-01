@@ -39,7 +39,7 @@ class SupportZipBlueprint extends Command
 
         $zip = new ZipArchive();
 
-        if (true !== $zip->open($filename, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) {
+        if (true !== $zip->open($filename, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
             $this->error("Unable to create zip file \"$filename\"");
 
             return false;
