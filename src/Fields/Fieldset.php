@@ -30,7 +30,7 @@ class Fieldset
     {
         return Path::tidy(vsprintf('%s/%s.yaml', [
             Facades\Fieldset::directory(),
-            $this->handle(),
+            str_replace('.', '/', $this->handle()),
         ]));
     }
 
