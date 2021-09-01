@@ -1,5 +1,22 @@
 # Release Notes
 
+## 3.2.2 (2021-09-01)
+
+### What's improved
+- Added more loop variables to the `nav` tag. [#4195](https://github.com/statamic/cms/issues/4195)
+- Update Dutch translations. [#4185](https://github.com/statamic/cms/issues/4185)
+
+### What's fixed
+- Fix Starter Kits not being installable on Windows [#4202](https://github.com/statamic/cms/issues/4202)
+- Fix Control Panel updater on Windows.  [#4198](https://github.com/statamic/cms/issues/4198)
+- Fix Live Preview and Visit URL icons. [e67c3fc53](https://github.com/statamic/cms/commit/e67c3fc53)
+- Fix Control Panel side nav height. [statamic/ideas#313](https://github.com/statamic/ideas/issues/313)
+- Fix form submissions responses not being returned as JSON. [#4186](https://github.com/statamic/cms/issues/4186)
+- Prevent error on empty bard fields, when they're configured to save HTML. [#4197](https://github.com/statamic/cms/issues/4197)
+- Fix avatars overlaying incorrectly. [#4196](https://github.com/statamic/cms/issues/4196)
+
+
+
 ## 3.2.1 (2021-08-26)
 
 ### What's improved
