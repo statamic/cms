@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
@@ -327,7 +328,7 @@ final class Installer
      */
     protected function copyFile($fromPath, $toPath)
     {
-        $displayPath = str_replace(base_path().'/', '', $toPath);
+        $displayPath = str_replace(Path::tidy(base_path().'/'), '', $toPath);
 
         $this->console->line("Installing file [{$displayPath}]");
 
@@ -639,6 +640,8 @@ final class Installer
                 return $this->expandConfigExportPaths($path);
             })
             ->mapWithKeys(function ($path) {
+                $path = Path::tidy($path);
+
                 return [$path => str_replace("/vendor/{$this->package}", '', $path)];
             });
     }
