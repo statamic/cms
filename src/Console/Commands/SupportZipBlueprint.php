@@ -19,15 +19,13 @@ class SupportZipBlueprint extends Command
 
     public function handle()
     {
-        $blueprint = $this->getBlueprint();
-        if (! $blueprint) {
+        if (! $blueprint = $this->getBlueprint()) {
             return;
         }
 
         $fieldsets = $this->getFieldsets($blueprint);
 
-        $filename = $this->createZip($blueprint, $fieldsets);
-        if (! $filename) {
+        if (! $filename = $this->createZip($blueprint, $fieldsets)) {
             return;
         }
 
