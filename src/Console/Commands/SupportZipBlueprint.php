@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
-use Statamic\Facades\Path;
 use ZipArchive;
 
 class SupportZipBlueprint extends Command
@@ -58,10 +57,6 @@ class SupportZipBlueprint extends Command
     {
         $handle = $this->argument('blueprint');
 
-        if (Str::endsWith($handle, '.yaml') && ! $handle = $this->getBlueprintHandle($handle)) {
-            return null;
-        }
-
         if (! $blueprint = Blueprint::find($handle)) {
             $this->error("Blueprint \"$handle\" not found");
 
@@ -69,22 +64,6 @@ class SupportZipBlueprint extends Command
         }
 
         return $blueprint;
-    }
-
-    protected function getBlueprintHandle($path)
-    {
-        $fullPath = Path::makeFull(Path::makeRelative($path));
-
-        if (! Str::startsWith($fullPath, Blueprint::directory())) {
-            $this->error("Not a valid blueprint file: \"$path\"");
-            $this->comment('Blueprints can be found in '.Path::makeRelative(Blueprint::directory()));
-
-            return null;
-        }
-
-        $relativePath = ltrim(Str::after($fullPath, Blueprint::directory()), '/');
-
-        return str_replace('/', '.', Str::before($relativePath, '.yaml'));
     }
 
     protected function getFieldsets($blueprint)
