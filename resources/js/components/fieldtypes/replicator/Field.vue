@@ -8,7 +8,10 @@
             <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm" v-text="__('Read Only')" />
         </label>
 
-        <div class="help-block" v-if="instructions && field.instructions_position !== 'below'" v-html="instructions" />
+        <div
+            class="help-block"
+            v-if="instructions && field.instructions_position !== 'below'"
+            v-html="instructions" />
 
         <component
             :is="fieldtypeComponent"
@@ -26,7 +29,10 @@
             @replicator-preview-updated="$emit('replicator-preview-updated', $event)"
         />
 
-        <div class="help-block mt-1" v-if="instructions && field.instructions_position === 'below'" v-html="instructions" />
+        <div
+            class="help-block mt-1"
+            v-if="instructions && field.instructions_position === 'below'"
+            v-html="instructions" />
 
         <div v-if="hasError">
             <small class="help-block text-red mt-1" v-for="(error, i) in errors" :key="i" v-text="error" />
