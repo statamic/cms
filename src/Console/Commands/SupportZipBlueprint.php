@@ -23,9 +23,7 @@ class SupportZipBlueprint extends Command
             return 1;
         }
 
-        $fieldsets = $this->getFieldsets($blueprint);
-
-        if (! $filename = $this->createZip($blueprint, $fieldsets)) {
+        if (! $filename = $this->createZip($blueprint)) {
             return 1;
         }
 
@@ -33,7 +31,7 @@ class SupportZipBlueprint extends Command
         $this->comment("Your zip file awaits: {$filename}");
     }
 
-    protected function createZip($blueprint, $fieldsets)
+    protected function createZip($blueprint)
     {
         $filename = $blueprint->handle().'-blueprint.zip';
 
@@ -47,7 +45,7 @@ class SupportZipBlueprint extends Command
 
         $zip->addFile($path = $blueprint->path(), Path::makeRelative($path));
 
-        $fieldsets->each(function ($fieldset) use ($zip) {
+        $this->getFieldsets($blueprint)->each(function ($fieldset) use ($zip) {
             $zip->addFile($path = $fieldset->path(), Path::makeRelative($path));
         });
 
