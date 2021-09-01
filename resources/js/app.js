@@ -193,6 +193,8 @@ Statamic.app({
         Vue.prototype.$moment.locale(Statamic.$config.get('locale'));
 
         this.fixAutofocus();
+
+        this.showBanner = Statamic.$config.get('hasLicenseBanner');
     },
 
     created() {
