@@ -110,7 +110,7 @@
                                             v-if="permalink"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="external-link" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="external-link" class="w-4 h-4 mr-1" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
