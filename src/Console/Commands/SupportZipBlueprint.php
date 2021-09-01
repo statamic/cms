@@ -13,7 +13,7 @@ class SupportZipBlueprint extends Command
 {
     use RunsInPlease;
 
-    protected $signature = 'statamic:support:zip-blueprint { blueprint : Path or full handle of a blueprint }';
+    protected $signature = 'statamic:support:zip-blueprint { blueprint : The blueprint. (e.g. user or collections/blog/post) }';
     protected $description = 'Creates a zip file containing a blueprint and all the fieldsets it uses.';
 
     public function handle()
