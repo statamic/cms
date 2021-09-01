@@ -43,10 +43,10 @@ class SupportZipBlueprint extends Command
             return false;
         }
 
-        $zip->addFile($path = $blueprint->path(), Path::makeRelative($path));
+        $zip->addFile($path = $blueprint->path(), $this->relativePath($path));
 
         $this->getFieldsets($blueprint)->each(function ($fieldset) use ($zip) {
-            $zip->addFile($path = $fieldset->path(), Path::makeRelative($path));
+            $zip->addFile($path = $fieldset->path(), $this->relativePath($path));
         });
 
         $zip->close();
@@ -103,5 +103,10 @@ class SupportZipBlueprint extends Command
                 return Str::before($field['field'], '.');
             }
         })->filter()->unique()->values();
+    }
+
+    protected function relativePath($path)
+    {
+        return Str::after($path, resource_path());
     }
 }
