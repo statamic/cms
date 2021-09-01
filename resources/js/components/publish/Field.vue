@@ -68,14 +68,14 @@
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
 
-        <div v-if="hasError">
-            <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
-        </div>
-
         <div
             class="help-block mt-1"
             v-if="instructions && config.instructions_position === 'below'"
             v-html="instructions" />
+
+        <div v-if="hasError">
+            <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+        </div>
     </div>
     </publish-field-meta>
 
