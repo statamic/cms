@@ -2,6 +2,8 @@
 
 namespace Statamic\Console\Commands;
 
+use Archetype\Facades\PHPFile;
+use PhpParser\BuilderFactory;
 use Statamic\Console\RunsInPlease;
 
 class MakeAction extends GeneratorCommand
@@ -39,12 +41,34 @@ class MakeAction extends GeneratorCommand
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return bool|null
      */
     public function handle()
     {
         if (parent::handle() === false) {
             return false;
+        }
+
+        if ($this->argument('addon')) {
+            $this->updateServiceProvider();
+        }
+    }
+
+    /**
+     * Update the Service Provider to register the Action component.
+     */
+    protected function updateServiceProvider()
+    {
+        $factory = new BuilderFactory();
+
+        $actionClassValue = $factory->classConstFetch('Actions\\'.$this->getNameInput(), 'class');
+
+        try {
+            PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
+                    ->add()->protected()->property('actions', $actionClassValue)
+                    ->save();
+        } catch (\Exception $e) {
+            $this->comment("Don't forget to register the Action class in your addon's service provider.");
         }
     }
 }

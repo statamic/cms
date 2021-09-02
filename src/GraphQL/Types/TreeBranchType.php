@@ -4,13 +4,12 @@ namespace Statamic\GraphQL\Types;
 
 use Statamic\Facades\GraphQL;
 
-class TreeBranchType extends \Rebing\GraphQL\Support\Type
+abstract class TreeBranchType extends \Rebing\GraphQL\Support\Type
 {
-    const NAME = 'TreeBranch';
-
-    protected $attributes = [
-        'name' => self::NAME,
-    ];
+    public function __construct()
+    {
+        $this->attributes['name'] = static::NAME;
+    }
 
     public function fields(): array
     {
@@ -18,11 +17,8 @@ class TreeBranchType extends \Rebing\GraphQL\Support\Type
             'depth' => [
                 'type' => GraphQL::nonNull(GraphQL::int()),
             ],
-            'page' => [
-                'type' => GraphQL::type(PageInterface::NAME),
-            ],
             'children' => [
-                'type' => GraphQL::listOf(GraphQL::type(self::NAME)),
+                'type' => GraphQL::listOf(GraphQL::type(static::NAME)),
             ],
         ];
     }

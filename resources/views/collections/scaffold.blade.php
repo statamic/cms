@@ -7,7 +7,7 @@
             'url' => cp_route('collections.show', $collection->handle()),
             'title' => $collection->title()
         ])
-        <h1> {{ __('Scaffold Resources') }}</h1>
+        <h1> {{ __('Scaffold Views') }}</h1>
     </header>
 
     <collection-scaffolder

@@ -21,7 +21,7 @@ class Multisite extends Command
     use RunsInPlease, EnhancesCommands;
 
     protected $name = 'statamic:multisite';
-    protected $description = 'Converts from a single to multisite installation.';
+    protected $description = 'Converts from a single to multisite installation';
 
     protected $sites;
     protected $newSiteConfigs;

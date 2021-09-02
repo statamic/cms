@@ -76,10 +76,14 @@ class PackToTheFuture
      * @param string $version
      * @param string|null $path
      */
-    public static function generateComposerLock(string $package, string $version, $path = null)
+    public static function generateComposerLock(string $package, string $version, $path = null, $dev = false)
     {
+        $packagesKey = $dev
+            ? 'packages-dev'
+            : 'packages';
+
         $content = [
-            'packages' => [
+            $packagesKey => [
                 [
                     'name' => $package,
                     'version' => $version,

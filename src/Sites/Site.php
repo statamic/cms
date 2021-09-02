@@ -55,6 +55,11 @@ class Site implements Augmentable
         return $this->config['direction'] ?? 'ltr';
     }
 
+    public function attributes()
+    {
+        return $this->config['attributes'] ?? [];
+    }
+
     public function absoluteUrl()
     {
         if (Str::startsWith($url = $this->url(), '/')) {
@@ -91,6 +96,7 @@ class Site implements Augmentable
             'short_locale' => $this->shortLocale(),
             'url' => $this->url(),
             'direction' => $this->direction(),
+            'attributes' => $this->attributes(),
         ];
     }
 

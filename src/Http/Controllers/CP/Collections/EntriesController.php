@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -15,6 +16,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Support\Arr;
 
 class EntriesController extends CpController
 {
@@ -75,6 +77,10 @@ class EntriesController extends CpController
         $entry = $entry->fromWorkingCopy();
 
         $blueprint = $entry->blueprint();
+
+        if (! $blueprint) {
+            throw new BlueprintNotFoundException($entry->value('blueprint'), 'collections/'.$collection->handle());
+        }
 
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
             $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
@@ -160,7 +166,7 @@ class EntriesController extends CpController
         $data = $request->except('id');
 
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $data['author'] = $entry->value('author');
+            $data['author'] = Arr::wrap($entry->value('author'));
         }
 
         $fields = $entry->blueprint()->fields()->addValues($data);
