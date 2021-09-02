@@ -14,6 +14,7 @@ use Statamic\Support\Str;
 class Replicator extends Fieldtype
 {
     protected $defaultValue = [];
+    protected $rules = ['array'];
 
     protected function configFieldItems(): array
     {
