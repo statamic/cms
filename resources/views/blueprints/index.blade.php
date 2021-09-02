@@ -154,7 +154,6 @@
     @endforeach
 
     @foreach (Statamic\Facades\Blueprint::additionalBlueprints() as $title => $blueprints)
-        @if($blueprints->isNotEmpty())
         <h3 class="little-heading pl-0 mb-1">{{ $title }}</h3>
         <div class="card p-0 mb-2">
             <table class="data-table">
@@ -170,7 +169,6 @@
                 @endforeach
             </table>
         </div>
-        @endif
     @endforeach
 
     <h3 class="little-heading pl-0 mb-1">{{ __('Other') }}</h3>
