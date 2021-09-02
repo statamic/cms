@@ -65,6 +65,7 @@ return [
     'fields_fieldsets_description' => 'Fieldsets zijn simpele, flexibele, en optionele grouperingen van velden die het mogelijk maken om velden te organiseren en herbruiken.',
     'fields_handle_instructions' => 'De variabelenaam van dit veld te gebruiken in het template.',
     'fields_instructions_instructions' => 'Wordt getoond onder het velds weergavelabel, net zoals deze tekst. Markdown is toegestaan.',
+    'fields_instructions_position_instructions' => 'Waar de instructie gepositioneerd moet worden ten opzichte van het veld.',
     'fields_listable_instructions' => 'Bepaal of dit veld getoond moet worden als kolom in overzichtstabellen.',
     'fieldset_import_fieldset_instructions' => 'De fieldset die geïmporteerd moet worden.',
     'fieldset_import_prefix_instructions' => 'Het voorvoegsel dat op ieder veld toegepast moet worden als ze worden geïmporteerd. Bijv: hero_',
