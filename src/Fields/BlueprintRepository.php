@@ -18,8 +18,7 @@ class BlueprintRepository
 
     protected $directory;
     protected $fallbacks = [];
-
-    protected $additionalBlueprints = [];
+    protected $additionalNamespaces = [];
 
     public function setDirectory(string $directory)
     {
@@ -142,16 +141,16 @@ class BlueprintRepository
             ->keyBy->handle();
     }
 
-    public function registerBlueprintGroup(string $namespace, string $title)
+    public function addNamespace(string $namespace, string $title)
     {
-        $this->additionalBlueprints[$namespace] = $title;
+        $this->additionalNamespaces[$namespace] = $title;
 
         return $this;
     }
 
     public function additionalBlueprints()
     {
-        return collect($this->additionalBlueprints)->mapWithKeys(function ($title, $namespace) {
+        return collect($this->additionalNamespaces)->mapWithKeys(function ($title, $namespace) {
             return [$title => $this->in($namespace)];
         })->filter();
     }
