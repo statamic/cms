@@ -228,7 +228,7 @@ class Statamic
         }
 
         $svg = StaticStringy::collapseWhitespace(
-            File::get(base_path("vendor/statamic/cms/resources/dist/svg/{$name}.svg"))
+            File::get(statamic_path("resources/svg/{$name}.svg"))
         );
 
         return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
