@@ -240,8 +240,8 @@ class Git
         return [
             'paths' => collect($paths)->implode(' '),
             'message' => $message,
-            'name' => $this->gitUserName(),
-            'email' => $this->gitUserEmail(),
+            'name' => $this->shellEscape($this->gitUserName()),
+            'email' => $this->shellEscape($this->gitUserEmail()),
         ];
     }
 
@@ -251,5 +251,19 @@ class Git
     protected function push($gitRoot)
     {
         GitProcess::create($gitRoot)->push();
+    }
+
+    /**
+     * Shell escape string for use in git commands.
+     *
+     * @param string $string
+     * @return string
+     */
+    protected function shellEscape(string $string)
+    {
+        $string = str_replace('"', '', $string);
+        $string = str_replace("'", '', $string);
+
+        return escapeshellcmd($string);
     }
 }
