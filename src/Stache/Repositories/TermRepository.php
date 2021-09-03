@@ -57,10 +57,12 @@ class TermRepository implements RepositoryContract
             $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
         }
 
-        $uri = Str::removeLeft($uri, '/');
+        
+        $uri = Str::after($uri, '/');
 
-        [$taxonomy, $slug] = array_pad(explode('/', $uri), 2, null);
-
+        $taxonomy = Str::beforeLast($uri, '/');
+        $slug = Str::afterLast($uri, '/');
+        
         if (! $slug) {
             return null;
         }

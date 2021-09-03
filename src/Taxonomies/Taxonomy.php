@@ -28,6 +28,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
 
     protected $handle;
+    protected $route;
     protected $title;
     protected $blueprints = [];
     protected $sites = [];
@@ -50,6 +51,10 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+    }
+
+    public function route($route = null) {
+        return $this->fluentlyGetOrSet('route')->args(func_get_args());
     }
 
     public function title($title = null)
@@ -180,6 +185,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     {
         $data = [
             'title' => $this->title,
+            'route' => $this->route(),
             'blueprints' => $this->blueprints,
         ];
 
@@ -201,6 +207,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     {
         return [
             'title' => $this->title,
+            'route' => $this->route(),
             'handle' => $this->handle,
             'blueprints' => $this->blueprints,
         ];
@@ -257,7 +264,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
-        return URL::tidy($prefix.str_replace('_', '-', '/'.$this->handle));
+        return URL::tidy($prefix.str_replace('_', '-', '/'.($this->route() ?? $this->handle())));
     }
 
     public function collection($collection = null)

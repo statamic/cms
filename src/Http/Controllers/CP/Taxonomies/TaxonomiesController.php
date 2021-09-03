@@ -128,6 +128,7 @@ class TaxonomiesController extends CpController
             'title' => $taxonomy->title(),
             'blueprints' => $taxonomy->termBlueprints()->map->handle()->all(),
             'collections' => $taxonomy->collections()->map->handle()->all(),
+            'route' => $taxonomy->route(),
             'sites' => $taxonomy->sites()->all(),
         ];
 
@@ -155,6 +156,8 @@ class TaxonomiesController extends CpController
         $values = $fields->process()->values()->all();
 
         $taxonomy->title($values['title']);
+
+        $taxonomy->route($values['route']);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
@@ -230,6 +233,11 @@ class TaxonomiesController extends CpController
                         'instructions' => __('statamic::messages.taxonomies_collections_instructions'),
                         'type' => 'collections',
                         'mode' => 'select',
+                    ],
+                    'route' => [
+                        'display' => __('Route'),
+                        'instructions' => __('statamic::messages.collections_route_instructions'),
+                        'type' => 'collection_routes',
                     ],
                 ],
             ],
