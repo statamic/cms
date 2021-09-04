@@ -264,7 +264,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
-        return URL::tidy($prefix.str_replace('_', '-', '/'.($this->route() ?? $this->handle())));
+        return URL::tidy($prefix.'/'.($this->route() ?? $this->route(str_replace('_', '-', $this->handle()))));
     }
 
     public function collection($collection = null)
