@@ -317,7 +317,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
 
     public function route()
     {
-        $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
+        $route = '/'.$this->taxonomy()->route().'/{slug}';
 
         if ($this->collection()) {
             $collectionUrl = $this->collection()->url() ?? $this->collection()->handle();
