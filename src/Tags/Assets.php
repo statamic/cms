@@ -13,9 +13,7 @@ use Statamic\Support\Arr;
 
 class Assets extends Tags
 {
-    use Concerns\OutputsItems {
-        output as outputPaginated;
-    }
+    use Concerns\OutputsItems;
 
     /**
      * @var AssetCollection
@@ -73,19 +71,19 @@ class Assets extends Tags
             return $this->parseNoResults();
         }
 
-        if ($this->params->get('paginate')) {
-            $limit = $this->params->get('limit');
-
-            $page = Paginator::resolveCurrentPage();
-            $pageAssets = $this->assets->forPage($page, $limit);
-
-            $paginator = new LengthAwarePaginator($pageAssets, $this->assets->count(), $limit, $page);
-            $paginator->setPath(Paginator::resolveCurrentPath());
-
-            return $this->outputPaginated($paginator);
+        if ($this->params->get('paginate') && ($limit = $this->params->get('limit'))) {
+            return $this->outputPaginated($this->paginate($limit));
         }
 
-        return $this->output();
+        return $this->output($this->sortAndLimit());
+    }
+
+    private function sortAndLimit(): AssetCollection
+    {
+        $this->sort();
+        $this->limit();
+
+        return $this->assets;
     }
 
     protected function assetsFromContainer($id, $path)
@@ -196,15 +194,7 @@ class Assets extends Tags
             ];
         });
 
-        return $this->output();
-    }
-
-    private function output()
-    {
-        $this->sort();
-        $this->limit();
-
-        return $this->assets;
+        return $this->output($this->sortAndLimit());
     }
 
     private function sort()
@@ -232,5 +222,32 @@ class Assets extends Tags
     {
         return $value instanceof Value
             && optional($value->fieldtype())->handle() === 'assets';
+    }
+
+    public function paginate(int $perPage = null): LengthAwarePaginator
+    {
+        $page = Paginator::resolveCurrentPage();
+
+        return $this->paginator(
+            $this->assets->forPage($page, $perPage),
+            $this->assets->count(),
+            $perPage ?: 15,
+            $page,
+            [
+                'path' => Paginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
+    }
+
+    protected function paginator($items, $total, $perPage, $currentPage, $options): LengthAwarePaginator
+    {
+        return app()->makeWith(LengthAwarePaginator::class, compact(
+            'items',
+            'total',
+            'perPage',
+            'currentPage',
+            'options'
+        ));
     }
 }
