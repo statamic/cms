@@ -2,7 +2,9 @@
 
 namespace Statamic\Tags;
 
+use Illuminate\Pagination\Paginator;
 use Statamic\Assets\AssetCollection;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
@@ -11,6 +13,10 @@ use Statamic\Support\Arr;
 
 class Assets extends Tags
 {
+    use Concerns\OutputsItems {
+        output as outputPaginated;
+    }
+
     /**
      * @var AssetCollection
      */
@@ -65,6 +71,18 @@ class Assets extends Tags
 
         if ($this->assets->isEmpty()) {
             return $this->parseNoResults();
+        }
+
+        if ($this->params->get('paginate')) {
+            $limit = $this->params->get('limit');
+
+            $page = Paginator::resolveCurrentPage();
+            $pageAssets = $this->assets->forPage($page, $limit);
+
+            $paginator = new LengthAwarePaginator($pageAssets, $this->assets->count(), $limit, $page);
+            $paginator->setPath(Paginator::resolveCurrentPath());
+
+            return $this->outputPaginated($paginator);
         }
 
         return $this->output();
