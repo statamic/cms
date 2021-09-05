@@ -72,18 +72,10 @@ class Assets extends Tags
         }
 
         if ($this->params->get('paginate') && ($limit = $this->params->get('limit'))) {
-            return $this->outputPaginated($this->paginate($limit));
+            return $this->output($this->paginate($limit));
         }
 
-        return $this->output($this->sortAndLimit());
-    }
-
-    private function sortAndLimit(): AssetCollection
-    {
-        $this->sort();
-        $this->limit();
-
-        return $this->assets;
+        return $this->output($this->results());
     }
 
     protected function assetsFromContainer($id, $path)
@@ -194,7 +186,7 @@ class Assets extends Tags
             ];
         });
 
-        return $this->output($this->sortAndLimit());
+        return $this->output($this->results());
     }
 
     private function sort()
@@ -224,7 +216,7 @@ class Assets extends Tags
             && optional($value->fieldtype())->handle() === 'assets';
     }
 
-    public function paginate(int $perPage = null): LengthAwarePaginator
+    protected function paginate(int $perPage = null): LengthAwarePaginator
     {
         $page = Paginator::resolveCurrentPage();
 
@@ -249,5 +241,13 @@ class Assets extends Tags
             'currentPage',
             'options'
         ));
+    }
+
+    protected function results(): AssetCollection
+    {
+        return tap($this->assets, function () {
+            $this->sort();
+            $this->limit();
+        });
     }
 }
