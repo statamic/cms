@@ -56,24 +56,9 @@ class TermRepository implements RepositoryContract
         if ($collection) {
             $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
         }
-
         
-        $uri = Str::after($uri, '/');
-
-        $taxonomy = Str::beforeLast($uri, '/');
-        $slug = Str::afterLast($uri, '/');
-        
-        if (! $slug) {
-            return null;
-        }
-
-        if (! $taxonomy = $this->findTaxonomyHandleByUri($taxonomy)) {
-            return null;
-        }
-
         $term = $this->query()
-            ->where('slug', $slug)
-            ->where('taxonomy', $taxonomy)
+            ->where('uri', $uri)
             ->where('site', $site)
             ->first();
 
