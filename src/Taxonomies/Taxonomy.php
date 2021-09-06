@@ -54,7 +54,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     }
 
     public function route($route = null) {
-        return $this->fluentlyGetOrSet('route')->args(func_get_args());
+        return $this->fluentlyGetOrSet('route')->args(func_get_args()) ?? str_replace('_', '-', $this->handle());
     }
 
     public function title($title = null)
@@ -264,7 +264,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
-        return URL::tidy($prefix.'/'.($this->route() ?? $this->route(str_replace('_', '-', $this->handle()))));
+        return URL::tidy($prefix.'/'.$this->route());
     }
 
     public function collection($collection = null)
