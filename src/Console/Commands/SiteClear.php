@@ -48,6 +48,7 @@ class SiteClear extends Command
         $this
             ->clearCollections()
             ->clearNavigations()
+            ->clearTrees()
             ->clearTaxonomies()
             ->clearAssets()
             ->clearGlobals()
@@ -100,6 +101,20 @@ class SiteClear extends Command
         $this->cleanAndKeep(base_path('content/navigation'));
 
         $this->info('Navigations cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all trees.
+     *
+     * @return $this
+     */
+    protected function clearTrees()
+    {
+        $this->cleanAndKeep(base_path('content/trees'));
+
+        $this->info('Trees cleared successfully.');
 
         return $this;
     }
