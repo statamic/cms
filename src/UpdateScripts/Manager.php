@@ -86,7 +86,7 @@ class Manager
                         $newLockFile->getNormalizedInstalledVersion($script->package()),
                         $oldLockFile->getNormalizedInstalledVersion($script->package())
                     );
-                } catch (ComposerLockFileNotFoundException | ComposerLockPackageNotFoundException $exception) {
+                } catch (ComposerLockFileNotFoundException|ComposerLockPackageNotFoundException $exception) {
                     return false;
                 }
             })
