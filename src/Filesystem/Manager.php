@@ -22,7 +22,7 @@ class Manager
 
         try {
             $root = app("filesystems.paths.$name");
-        } catch (\ReflectionException | BindingResolutionException $e) {
+        } catch (\ReflectionException|BindingResolutionException $e) {
             return new FlysystemAdapter(Storage::disk($name));
         }
 
