@@ -233,9 +233,9 @@ EOT;
 
         $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
 
-        Git::commit();
+        Git::commit('Message"; echo "deleting all your files now"; #');
 
-        $this->assertStringContainsString('Content saved', $commit = $this->showLastCommit(base_path('content')));
+        $this->assertStringContainsString('Message\; echo deleting all your files now\; \#', $commit = $this->showLastCommit(base_path('content')));
         $this->assertStringContainsString('Jimmy\; echo deleting all your files now\; \# <jimmy@haxor.org\; echo deleting all your files now\; \#>', $commit);
     }
 

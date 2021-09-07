@@ -239,7 +239,7 @@ class Git
     {
         return [
             'paths' => collect($paths)->implode(' '),
-            'message' => $message,
+            'message' => $this->shellEscape($message),
             'name' => $this->shellEscape($this->gitUserName()),
             'email' => $this->shellEscape($this->gitUserEmail()),
         ];
