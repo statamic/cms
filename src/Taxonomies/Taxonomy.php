@@ -3,6 +3,7 @@
 namespace Statamic\Taxonomies;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Str;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ContainsCascadingData;
@@ -54,7 +55,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     }
 
     public function route($route = null) {
-        return $this->fluentlyGetOrSet('route')->args(func_get_args()) ?? str_replace('_', '-', $this->handle());
+        return $this->fluentlyGetOrSet('route')->args(func_get_args()) ?? str_replace('_', '-', $this->handle()) . '/{slug}';
     }
 
     public function title($title = null)
@@ -264,7 +265,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
-        return URL::tidy($prefix.'/'.$this->route());
+        return URL::tidy($prefix.'/'.Str::before($this->route(), '/{slug}'));
     }
 
     public function collection($collection = null)
