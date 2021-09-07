@@ -149,6 +149,7 @@ return [
     'tab_sections_instructions' => 'Felterne i hvert afsnit grupperes i faner. Opret nye felter, genbrug eksisterende felter, eller importer hele grupper af felter fra eksisterende feltsæt.',
     'taxonomies_blueprints_instructions' => 'Vilkår i denne taksonomi kan bruge en hvilken som helst af disse blueprints.',
     'taxonomies_collections_instructions' => 'De samlinger, der bruger denne taksonomi.',
+    'taxonomies_route_instructions' => 'Ruten styrer begrepene URL -mønster.',
     'taxonomy_configure_handle_instructions' => 'Bruges til at henvise til denne taksonomi på frontend. Det er besværligt at ændre senere.',
     'taxonomy_configure_intro' => 'En taksonomi er et system til klassificering af data omkring et sæt unikke egenskaber, såsom kategori eller farve.',
     'taxonomy_configure_title_instructions' => 'Vi anbefaler at bruge et flertal navneord, som "Kategorier" eller "Mærker".',

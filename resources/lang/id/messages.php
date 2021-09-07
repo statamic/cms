@@ -148,6 +148,7 @@ return [
     'tab_sections_instructions' => 'Bidang di setiap bagian akan dikelompokkan menjadi beberapa tab. Buat bidang baru, gunakan kembali bidang yang ada, atau impor seluruh grup bidang dari fieldsets yang ada.',
     'taxonomies_blueprints_instructions' => 'Istilah dalam taksonomi ini dapat menggunakan salah satu dari cetak biru ini.',
     'taxonomies_collections_instructions' => 'Koleksi yang menggunakan taksonomi ini.',
+    'taxonomies_route_instructions' => 'Rute mengontrol istilah pola URL.',
     'taxonomy_configure_handle_instructions' => 'Digunakan untuk mereferensikan taksonomi ini di frontend. Tidak sepele untuk berubah nanti.',
     'taxonomy_configure_intro' => 'Taksonomi adalah sistem pengklasifikasian data di sekitar sekumpulan karakteristik unik, seperti kategori atau warna.',
     'taxonomy_configure_title_instructions' => 'Kami merekomendasikan penggunaan kata benda jamak, seperti "Kategori" atau "Tag".',

@@ -148,6 +148,7 @@ return [
     'tab_sections_instructions' => 'I campi in ciascuna sezione saranno raggruppati in schede. Crea nuovi campi, riutilizza campi esistenti o importa interi gruppi di campi da fieldset esistenti.',
     'taxonomies_blueprints_instructions' => 'I termini di questa tassonomia possono utilizzare uno qualsiasi di questi progetti.',
     'taxonomies_collections_instructions' => 'Le raccolte che utilizzano questa tassonomia.',
+    'taxonomies_route_instructions' => 'La route definisce il pattern URL dei termini.',
     'taxonomy_configure_handle_instructions' => 'Utilizzato come riferimento a questa tassonomia sul frontend. Non è semplice modificarlo successivamente.',
     'taxonomy_configure_intro' => 'Una tassonomia è un sistema di classificazione dei dati in base ad un insieme di caratteristiche uniche, come categoria o colore.',
     'taxonomy_configure_title_instructions' => 'Ti consigliamo di utilizzare un sostantivo plurale, come "Categorie" o "Tags".',

@@ -153,6 +153,7 @@ return [
     'tab_sections_instructions' => 'De velden in iedere sectie worden gegroepeerd in tabs. Voeg nieuwe velden toe, herbruik bestaande velden of importeer groepen van velden uit reeds bestaande fieldsets.',
     'taxonomies_blueprints_instructions' => 'Termen in deze taxonomie mogen in al deze blueprints gebruikt worden.',
     'taxonomies_collections_instructions' => 'De collectie die deze taxonomie gebruikt.',
+    'taxonomies_route_instructions' => 'De route definieert de termen URL-patroon.',
     'taxonomy_configure_handle_instructions' => 'Wordt gebruikt om in de frontend aan deze taxonomie te refereren. Het is niet persé eenvoudig om dit nadien te wijzigen.',
     'taxonomy_configure_intro' => 'Een taxonomie is een systeem waarmee je data kunt classificeren op basis van unieke eigenschappen, zoals categorie of kleur.',
     'taxonomy_configure_title_instructions' => 'We adviseren een meervoudig zeflstandig naamwoord, zoals "Categorieën" of "Tags".',

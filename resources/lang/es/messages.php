@@ -150,6 +150,7 @@ return [
     'tab_sections_instructions' => 'Los campos en cada sección se agruparán en pestañas. Crea nuevos campos, reutiliza campos existentes o importa grupos enteros de campos en conjuntos de campos existentes.',
     'taxonomies_blueprints_instructions' => 'Los términos en esta taxonomía pueden ser usados en cualquiera de estos planos.',
     'taxonomies_collections_instructions' => 'Las colecciones que usan esta taxonomía.',
+    'taxonomies_route_instructions' => 'La ruta controla el patrón de URL de los términos.',
     'taxonomy_configure_handle_instructions' => 'Se usa para hacer referencia a esta taxonomía en la interfaz. Es complicado cambiarlo más tarde.',
     'taxonomy_configure_intro' => 'Una taxonomía es un sistema de clasificación de datos en torno a un conjunto de características únicas, como "categoría" o "color".',
     'taxonomy_configure_title_instructions' => 'Recomendamos utilizar un sustantivo plural, como "Categorías" o "Etiquetas".',

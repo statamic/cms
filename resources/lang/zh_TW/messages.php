@@ -150,6 +150,7 @@ return [
     'tab_sections_instructions' => '在各個段落中的欄位都將被分組在一起，放置於同一個頁籤內。建立新欄位、重複使用現有欄位、或是從現有欄位組匯入整組欄位。',
     'taxonomies_blueprints_instructions' => '此分類中的字詞組可用於下列任意藍圖。',
     'taxonomies_collections_instructions' => '使用此分類的條目集。',
+    'taxonomies_route_instructions' => '路由控制術語的 URL 格式。',
     'taxonomy_configure_handle_instructions' => '用於在前端參照到此分類。設定後將難以修改。',
     'taxonomy_configure_intro' => '分類是一個依據一組獨立特色來將資料分門別類的系統，就像類別或色彩。',
     'taxonomy_configure_title_instructions' => '我們建議使用英語複數名詞，如「Categories」或「Tags」。',

@@ -153,6 +153,7 @@ return [
     'tab_sections_instructions' => 'The fields in each section will be grouped together into tabs. Create new fields, reuse existing fields, or import entire groups of fields from existing fieldsets.',
     'taxonomies_blueprints_instructions' => 'Terms in this taxonomy may use any of these blueprints.',
     'taxonomies_collections_instructions' => 'The collections that use this taxonomy.',
+    'taxonomies_route_instructions' => 'The route controls terms URL pattern.',
     'taxonomy_configure_handle_instructions' => 'Used to reference this taxonomy on the frontend. It\'s non-trivial to change later.',
     'taxonomy_configure_intro' => 'A taxonomy is a system of classifying data around a set of unique characteristics, such as category or color.',
     'taxonomy_configure_title_instructions' => 'We recommend using a plural noun, like "Categories" or "Tags".',

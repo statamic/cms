@@ -152,6 +152,7 @@ return [
     'tab_sections_instructions' => 'Die Felder in jedem Abschnitt werden in Tabs gruppiert. Du kannst neue Felder erstellen, vorhandene Felder wieder verwenden oder ganze Feldgruppen aus vorhandenen Fieldsets importieren.',
     'taxonomies_blueprints_instructions' => 'Begriffe in dieser Taxonomie können jedes dieser Blueprints verwenden.',
     'taxonomies_collections_instructions' => 'Die Sammlungen, in denen diese Taxonomie verwendet wird.',
+    'taxonomies_route_instructions' => 'Die Route steuert das URL-Schema der Begriffe.',
     'taxonomy_configure_handle_instructions' => 'Verweist im Frontend auf diese Taxonomie. Es ist nicht unproblematisch, dies nachträglich zu ändern.',
     'taxonomy_configure_intro' => 'Eine Taxonomie ist ein System zum Klassifizieren von Daten anhand einer Reihe eindeutiger Merkmale, wie z.B. Kategorie oder Farbe.',
     'taxonomy_configure_title_instructions' => 'Wir empfehlen ein Substantiv im Plural, wie z.B. Kategorien oder Tags.',

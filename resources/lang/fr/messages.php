@@ -152,6 +152,7 @@ return [
     'tab_sections_instructions' => 'Les champs de chaque section seront regroupés dans des onglets. Créez de nouveaux champs, réutilisez des champs existants ou importez des groupes entiers de champs à partir de jeux de champs existants.',
     'taxonomies_blueprints_instructions' => 'Les termes de cette taxonomie peuvent utiliser n’importe lequel de ces Blueprints.',
     'taxonomies_collections_instructions' => 'Les collections qui utilisent cette taxonomie.',
+    'taxonomies_route_instructions' => 'La route contrôle le modèle d’URL des termes.',
     'taxonomy_configure_handle_instructions' => 'Comment vous allez faire référence à cette taxonomie sur le frontal. Ne peut pas être facilement changé.',
     'taxonomy_configure_intro' => 'Une taxonomie est un système de classification des données autour d’un ensemble de caractéristiques uniques, telles que la catégorie ou la couleur.',
     'taxonomy_configure_title_instructions' => 'Nous recommandons un nom au pluriel, comme "Catégories" ou "Etiquettes".',

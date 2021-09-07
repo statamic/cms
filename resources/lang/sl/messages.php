@@ -148,6 +148,7 @@ return [
     'tab_sections_instructions' => 'Polja v vsakem odseku bodo združena v zavihke. Ustvarite nova polja, znova uporabite obstoječa polja ali uvozite celotne skupine polj iz obstoječih naborov polj.',
     'taxonomies_blueprints_instructions' => 'Izrazi v tej taksonomiji lahko uporabljajo katerega koli od teh načrtov.',
     'taxonomies_collections_instructions' => 'Zbirke, ki uporabljajo to taksonomijo.',
+    'taxonomies_route_instructions' => 'Pot nadzira vzorec URL-ja izraza.',
     'taxonomy_configure_handle_instructions' => 'Uporablja se za sklicevanje na to taksonomijo na sprednji strani. Pozneje se spreminjati ni trivialno.',
     'taxonomy_configure_intro' => 'Taksonomija je sistem razvrščanja podatkov po nizu edinstvenih značilnosti, kot sta kategorija ali barva.',
     'taxonomy_configure_title_instructions' => 'Priporočamo uporabo samostalnika v množini, na primer &quot;Kategorije&quot; ali &quot;Oznake&quot;.',
