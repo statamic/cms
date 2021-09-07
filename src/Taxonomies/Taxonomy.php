@@ -55,7 +55,12 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     }
 
     public function route($route = null) {
-        return $this->fluentlyGetOrSet('route')->args(func_get_args()) ?? str_replace('_', '-', $this->handle()) . '/{slug}';
+        return $this
+            ->fluentlyGetOrSet('route')
+            ->getter(function ($route) {
+                return $route ?? (str_replace('_', '-', $this->handle) . '/{slug}');
+            })
+            ->args(func_get_args());
     }
 
     public function title($title = null)
