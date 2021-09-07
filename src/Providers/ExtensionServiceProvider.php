@@ -71,6 +71,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Taggable::class,
         Fieldtypes\Terms::class,
         Fieldtypes\Taxonomies::class,
+        Fieldtypes\TaxonomyRoutes::class,
         Fieldtypes\Template::class,
         Fieldtypes\Text::class,
         Fieldtypes\Textarea::class,
