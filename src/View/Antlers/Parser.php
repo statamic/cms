@@ -130,7 +130,7 @@ class Parser
 
         try {
             $parsed = $this->parse($text, $data);
-        } catch (\Exception | \Error $e) {
+        } catch (\Exception|\Error $e) {
             throw $this->viewException($e, $data);
         }
 
