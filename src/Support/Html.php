@@ -12,7 +12,7 @@ class Html
     /**
      * Build an HTML attribute string from an array.
      *
-     * @param array $attributes
+     * @param  array  $attributes
      *
      * @return string
      */
@@ -34,8 +34,8 @@ class Html
     /**
      * Build a single attribute element.
      *
-     * @param string $key
-     * @param string $value
+     * @param  string  $key
+     * @param  string  $value
      *
      * @return string
      */
@@ -79,7 +79,7 @@ class Html
     /**
      * Convert entities to HTML characters.
      *
-     * @param string $value
+     * @param  string  $value
      *
      * @return string
      */
@@ -91,7 +91,7 @@ class Html
     /**
      * Convert an HTML string to entities.
      *
-     * @param string $value
+     * @param  string  $value
      *
      * @return string
      */
@@ -103,8 +103,8 @@ class Html
     /**
      * Generate an ordered list of items.
      *
-     * @param array $list
-     * @param array $attributes
+     * @param  array  $list
+     * @param  array  $attributes
      *
      * @return \Illuminate\Support\HtmlString|string
      */
@@ -116,8 +116,8 @@ class Html
     /**
      * Generate an un-ordered list of items.
      *
-     * @param array $list
-     * @param array $attributes
+     * @param  array  $list
+     * @param  array  $attributes
      *
      * @return \Illuminate\Support\HtmlString|string
      */
@@ -129,8 +129,8 @@ class Html
     /**
      * Generate a description list of items.
      *
-     * @param array $list
-     * @param array $attributes
+     * @param  array  $list
+     * @param  array  $attributes
      *
      * @return \Illuminate\Support\HtmlString
      */
@@ -158,9 +158,9 @@ class Html
     /**
      * Create a listing HTML element.
      *
-     * @param string $type
-     * @param array  $list
-     * @param array  $attributes
+     * @param  string  $type
+     * @param  array  $list
+     * @param  array  $attributes
      *
      * @return \Illuminate\Support\HtmlString|string
      */
@@ -187,9 +187,9 @@ class Html
     /**
      * Create the HTML for a listing element.
      *
-     * @param mixed  $key
-     * @param string $type
-     * @param mixed  $value
+     * @param  mixed  $key
+     * @param  string  $type
+     * @param  mixed  $value
      *
      * @return string
      */
@@ -205,7 +205,7 @@ class Html
     /**
      * Obfuscate a string to prevent spam-bots from sniffing it.
      *
-     * @param string $value
+     * @param  string  $value
      *
      * @return string
      */
@@ -239,7 +239,7 @@ class Html
     /**
      * Generate a link to a Favicon file.
      *
-     * @param string $url
+     * @param  string  $url
      *
      * @return \Illuminate\Support\HtmlString
      */
@@ -257,9 +257,9 @@ class Html
     /**
      * Generate a HTML link.
      *
-     * @param string $url
-     * @param string $title
-     * @param array  $attributes
+     * @param  string  $url
+     * @param  string  $title
+     * @param  array  $attributes
      *
      * @return \Illuminate\Support\HtmlString
      */
@@ -277,10 +277,10 @@ class Html
     /**
      * Generate a HTML link to an email address.
      *
-     * @param string $email
-     * @param string $title
-     * @param array  $attributes
-     * @param bool   $escape
+     * @param  string  $email
+     * @param  string  $title
+     * @param  array  $attributes
+     * @param  bool  $escape
      *
      * @return \Illuminate\Support\HtmlString
      */
@@ -302,7 +302,7 @@ class Html
     /**
      * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
      *
-     * @param string $email
+     * @param  string  $email
      *
      * @return string
      */
@@ -324,8 +324,8 @@ class Html
     /**
      * Sanitizes a string.
      *
-     * @param string|array $value  The value to sanitize
-     * @param bool $antlers  Whether Antlers (curly braces) should be escaped.
+     * @param  string|array  $value  The value to sanitize
+     * @param  bool  $antlers  Whether Antlers (curly braces) should be escaped.
      * @return string
      */
     public static function sanitize($value, $antlers = true)

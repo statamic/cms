@@ -38,8 +38,8 @@ class ThumbnailController extends Controller
     protected $mutex;
 
     /**
-     * @param Server         $server
-     * @param ImageGenerator $generator
+     * @param  Server  $server
+     * @param  ImageGenerator  $generator
      */
     public function __construct(Server $server, ImageGenerator $generator)
     {
@@ -50,8 +50,8 @@ class ThumbnailController extends Controller
     /**
      * Display the thumbnail.
      *
-     * @param  string $asset
-     * @param  string $size
+     * @param  string  $asset
+     * @param  string  $size
      * @return \Illuminate\Http\Response
      */
     public function show($asset, $size = null)
@@ -72,7 +72,7 @@ class ThumbnailController extends Controller
     /**
      * Get an asset, or throw a 404 if not found.
      *
-     * @param  string $asset  An encoded asset ID from the URL.
+     * @param  string  $asset  An encoded asset ID from the URL.
      * @return \Statamic\Contracts\Assets\Asset
      */
     private function asset($asset)

@@ -21,8 +21,8 @@ abstract class Widget
     /**
      * Get config for use within widget.
      *
-     * @param string|null $key
-     * @param mixed $default
+     * @param  string|null  $key
+     * @param  mixed  $default
      * @return string|\Illuminate\Support\Collection
      */
     public function config($key = null, $default = null)
@@ -37,7 +37,7 @@ abstract class Widget
     /**
      * Set config when loading widget.
      *
-     * @param array $config
+     * @param  array  $config
      * @return array
      */
     public function setConfig($config)

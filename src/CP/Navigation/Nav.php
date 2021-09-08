@@ -15,7 +15,7 @@ class Nav
     /**
      * Register a nav extension closure.
      *
-     * @param Closure $callback
+     * @param  Closure  $callback
      */
     public function extend(Closure $callback)
     {
@@ -25,7 +25,7 @@ class Nav
     /**
      * Create nav item.
      *
-     * @param string $name
+     * @param  string  $name
      * @return NavItem
      */
     public function create($name)
@@ -40,7 +40,7 @@ class Nav
     /**
      * Create nav item (an alias that reads a little nicer when creating children).
      *
-     * @param mixed $name
+     * @param  mixed  $name
      */
     public function item($name)
     {
@@ -50,8 +50,8 @@ class Nav
     /**
      * Find or create nav item.
      *
-     * @param string $section
-     * @param string $name
+     * @param  string  $section
+     * @param  string  $name
      */
     public function findOrCreate($section, $name)
     {
@@ -66,8 +66,8 @@ class Nav
     /**
      * Remove nav item.
      *
-     * @param string $section
-     * @param string|null $name
+     * @param  string  $section
+     * @param  string|null  $name
      * @return $this
      */
     public function remove($section, $name = null)
@@ -255,7 +255,7 @@ class Nav
     /**
      * Filter authorized nav items.
      *
-     * @param mixed $items
+     * @param  mixed  $items
      * @return \Illuminate\Support\Collection
      */
     protected function filterAuthorizedNavItems($items)
@@ -298,8 +298,8 @@ class Nav
     /**
      * Magically find or create nav items, specifying the section name in sections by method name.
      *
-     * @param string $name
-     * @param array $arguments
+     * @param  string  $name
+     * @param  array  $arguments
      * @return NavItem
      */
     public function __call($name, $arguments)

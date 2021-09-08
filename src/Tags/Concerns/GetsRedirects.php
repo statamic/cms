@@ -41,7 +41,7 @@ trait GetsRedirects
     /**
      * Parse redirect URL.
      *
-     * @param string $redirect
+     * @param  string  $redirect
      * @return string
      */
     protected function parseRedirect($redirect)

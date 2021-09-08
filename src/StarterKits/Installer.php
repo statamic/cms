@@ -29,9 +29,9 @@ final class Installer
     /**
      * Instantiate starter kit installer.
      *
-     * @param string $package
-     * @param LicenseManager $licenseManager
-     * @param mixed $console
+     * @param  string  $package
+     * @param  LicenseManager  $licenseManager
+     * @param  mixed  $console
      */
     public function __construct(string $package, LicenseManager $licenseManager, $console = null)
     {
@@ -45,9 +45,9 @@ final class Installer
     /**
      * Instantiate starter kit installer.
      *
-     * @param string $package
-     * @param LicenseManager $licenseManager
-     * @param mixed $console
+     * @param  string  $package
+     * @param  LicenseManager  $licenseManager
+     * @param  mixed  $console
      * @return static
      */
     public static function package(string $package, LicenseManager $licenseManager, $console = null)
@@ -58,7 +58,7 @@ final class Installer
     /**
      * Install from local repo configured in composer config.json.
      *
-     * @param bool $fromLocalRepo
+     * @param  bool  $fromLocalRepo
      * @return $this
      */
     public function fromLocalRepo($fromLocalRepo = false)
@@ -71,7 +71,7 @@ final class Installer
     /**
      * Install with starter-kit config for local development purposes.
      *
-     * @param bool $withConfig
+     * @param  bool  $withConfig
      * @return $this
      */
     public function withConfig($withConfig = false)
@@ -84,7 +84,7 @@ final class Installer
     /**
      * Install without dependencies.
      *
-     * @param bool $withoutDependencies
+     * @param  bool  $withoutDependencies
      * @return $this
      */
     public function withoutDependencies($withoutDependencies = false)
@@ -97,7 +97,7 @@ final class Installer
     /**
      * Install with super user.
      *
-     * @param bool $withUser
+     * @param  bool  $withUser
      * @return $this
      */
     public function withUser($withUser = false)
@@ -110,7 +110,7 @@ final class Installer
     /**
      * Force install and allow dependency errors.
      *
-     * @param bool $force
+     * @param  bool  $force
      * @return $this
      */
     public function force($force = false)
@@ -323,8 +323,8 @@ final class Installer
     /**
      * Copy starter kit file.
      *
-     * @param mixed $fromPath
-     * @param mixed $toPath
+     * @param  mixed  $fromPath
+     * @param  mixed  $toPath
      */
     protected function copyFile($fromPath, $toPath)
     {
@@ -388,9 +388,9 @@ final class Installer
     /**
      * Ensure compatible dependency by performing a dry-run.
      *
-     * @param string $package
-     * @param string $version
-     * @param bool $dev
+     * @param  string  $package
+     * @param  string  $version
+     * @param  bool  $dev
      */
     protected function ensureCompatibleDependency($package, $version, $dev = false)
     {
@@ -406,9 +406,9 @@ final class Installer
     /**
      * Install starter kit dependency permanently into app.
      *
-     * @param string $package
-     * @param string $version
-     * @param bool $dev
+     * @param  string  $package
+     * @param  string  $version
+     * @param  bool  $dev
      */
     protected function installDependency($package, $version, $dev = false)
     {
@@ -552,8 +552,8 @@ final class Installer
     /**
      * Rollback with error.
      *
-     * @param string $error
-     * @param string|null $output
+     * @param  string  $error
+     * @param  string|null  $output
      * @throws StarterKitException
      */
     protected function rollbackWithError($error, $output = null)
@@ -573,7 +573,7 @@ final class Installer
     /**
      * Remove the `require [--dev] [--dry-run] [--prefer-source]...` stuff from the end of composer error output.
      *
-     * @param string $output
+     * @param  string  $output
      * @return string
      */
     protected function tidyComposerErrorOutput($output)
@@ -596,7 +596,7 @@ final class Installer
      *
      * TODO: Move to trait and reuse in MakeAddon?
      *
-     * @param string $output
+     * @param  string  $output
      * @return string
      */
     private function outputFromSymfonyProcess(string $output)
@@ -649,7 +649,7 @@ final class Installer
     /**
      * Expand export paths.
      *
-     * @param string $path
+     * @param  string  $path
      */
     protected function expandConfigExportPaths($path)
     {
@@ -665,7 +665,7 @@ final class Installer
     /**
      * Prepare path directory.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     protected function preparePath($path)
@@ -700,7 +700,7 @@ final class Installer
     /**
      * Get installable dependencies from appropriate require key in composer.json.
      *
-     * @param string $configKey
+     * @param  string  $configKey
      * @return \Illuminate\Support\Collection
      */
     protected function installableDependencies($configKey)

@@ -17,7 +17,7 @@ class UrlBuilder implements UrlBuilderContract
     protected $merged = [];
 
     /**
-     * @param \Statamic\Contracts\Entries\Entry|\Statamic\Taxonomies\Term $content
+     * @param  \Statamic\Contracts\Entries\Entry|\Statamic\Taxonomies\Term  $content
      * @return $this
      * @throws \Exception
      */

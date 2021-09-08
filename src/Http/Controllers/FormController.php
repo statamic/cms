@@ -85,9 +85,9 @@ class FormController extends Controller
      *
      * Used for actual success and by honeypot.
      *
-     * @param array $params
-     * @param Submission $submission
-     * @param bool $silentFailure
+     * @param  array  $params
+     * @param  Submission  $submission
+     * @param  bool  $silentFailure
      * @return Response
      */
     private function formSuccess($params, $submission, $silentFailure = false)
@@ -114,9 +114,9 @@ class FormController extends Controller
     /**
      * The steps for a failed form submission.
      *
-     * @param array $params
-     * @param array $submission
-     * @param string $form
+     * @param  array  $params
+     * @param  array  $submission
+     * @param  string  $form
      * @return Response|RedirectResponse
      */
     private function formFailure($params, $errors, $form)

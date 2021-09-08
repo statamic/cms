@@ -14,7 +14,7 @@ class UserGroups
     protected $user;
 
     /**
-     * @param User $user
+     * @param  User  $user
      */
     public function __construct(UserContract $user)
     {
@@ -42,7 +42,7 @@ class UserGroups
     /**
      * Sync up the user/group relationship in the pivot table.
      *
-     * @param  array $groups  Array of group IDs the user should belong to.
+     * @param  array  $groups  Array of group IDs the user should belong to.
      * @return void
      */
     public function sync($groups)

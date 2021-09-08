@@ -35,8 +35,8 @@ class GlideController extends Controller
     /**
      * GlideController constructor.
      *
-     * @param \League\Glide\Server     $server
-     * @param \Illuminate\Http\Request $request
+     * @param  \League\Glide\Server  $server
+     * @param  \Illuminate\Http\Request  $request
      */
     public function __construct(Server $server, Request $request)
     {
@@ -48,7 +48,7 @@ class GlideController extends Controller
     /**
      * Generate a manipulated image by a path.
      *
-     * @param string $path
+     * @param  string  $path
      * @return mixed
      */
     public function generateByPath($path)
@@ -69,7 +69,7 @@ class GlideController extends Controller
     /**
      * Generate a manipulated image by a URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return mixed
      */
     public function generateByUrl($url)
@@ -84,7 +84,7 @@ class GlideController extends Controller
     /**
      * Generate a manipulated image by an asset reference.
      *
-     * @param string $ref
+     * @param  string  $ref
      * @return mixed
      * @throws \Exception
      */
@@ -125,7 +125,7 @@ class GlideController extends Controller
     /**
      * Create a response.
      *
-     * @param string $path  Path of the generated image
+     * @param  string  $path  Path of the generated image
      * @return mixed
      */
     private function createResponse($path)

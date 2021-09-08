@@ -14,7 +14,7 @@ class Updater
     /**
      * Instantiate package updater.
      *
-     * @param string $package
+     * @param  string  $package
      */
     public function __construct(string $package)
     {
@@ -24,7 +24,7 @@ class Updater
     /**
      * Instantiate package updater.
      *
-     * @param string $package
+     * @param  string  $package
      * @return static
      */
     public static function package(string $package)
@@ -35,7 +35,7 @@ class Updater
     /**
      * Install explicit version.
      *
-     * @param string $version
+     * @param  string  $version
      */
     public function install(string $version)
     {

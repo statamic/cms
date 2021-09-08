@@ -17,8 +17,8 @@ class PresetGenerator
     private $presets;
 
     /**
-     * @param ImageGenerator $generator
-     * @param array $presets
+     * @param  ImageGenerator  $generator
+     * @param  array  $presets
      */
     public function __construct(ImageGenerator $generator, array $presets)
     {
@@ -29,9 +29,9 @@ class PresetGenerator
     /**
      * Generate presets for an asset.
      *
-     * @param Asset $asset         The asset to use for generating presets
-     * @param string|null $preset  An optional name for generating a specific preset.
-     *                             If left blank, all the presets will be generated.
+     * @param  Asset  $asset  The asset to use for generating presets
+     * @param  string|null  $preset  An optional name for generating a specific preset.
+     *                               If left blank, all the presets will be generated.
      */
     public function generate(Asset $asset, $preset = null)
     {
