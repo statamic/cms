@@ -56,7 +56,7 @@ class TermRepository implements RepositoryContract
         if ($collection) {
             $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
         }
-        
+
         $term = $this->query()
             ->where('uri', $uri)
             ->where('site', $site)
