@@ -24,7 +24,7 @@ interface AssetFolder
     /**
      * Get the assets in the folder.
      *
-     * @param bool $recursive Whether to look for assets recursively
+     * @param  bool  $recursive  Whether to look for assets recursively
      * @return AssetCollection
      */
     public function assets($recursive = false);

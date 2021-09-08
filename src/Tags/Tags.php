@@ -134,7 +134,7 @@ abstract class Tags
     /**
      * Parse the tag pair contents.
      *
-     * @param array $data     Data to be parsed into template
+     * @param  array  $data  Data to be parsed into template
      * @return string
      */
     public function parse($data = [])
@@ -153,8 +153,8 @@ abstract class Tags
     /**
      * Iterate over the data and parse the tag pair contents for each.
      *
-     * @param array|\Statamic\Data\DataCollection $data        Data to iterate over
-     * @param bool                                $supplement  Whether to supplement with contextual values
+     * @param  array|\Statamic\Data\DataCollection  $data  Data to iterate over
+     * @param  bool  $supplement  Whether to supplement with contextual values
      * @return string
      */
     public function parseLoop($data, $supplement = true)
@@ -177,7 +177,7 @@ abstract class Tags
     /**
      * Parse with no results.
      *
-     * @param array $data Extra data to merge
+     * @param  array  $data  Extra data to merge
      * @return string
      */
     public function parseNoResults($data = [])

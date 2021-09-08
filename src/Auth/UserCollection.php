@@ -12,7 +12,7 @@ class UserCollection extends DataCollection
     /**
      * Get the collection as an array.
      *
-     * @param bool $supplement
+     * @param  bool  $supplement
      * @return array
      */
     public function extract($supplement = false)

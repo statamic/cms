@@ -30,8 +30,8 @@ class FileCollection extends Collection
     /**
      * Filter by extension(s).
      *
-     * @param   string|array  $extensions  Extension or array of extensions
-     * @return  static
+     * @param  string|array  $extensions  Extension or array of extensions
+     * @return static
      */
     public function filterByExtension($extensions)
     {
@@ -45,8 +45,8 @@ class FileCollection extends Collection
     /**
      * Reject by extension(s).
      *
-     * @param   string|array  $extensions  Extension or array of extensions
-     * @return  static
+     * @param  string|array  $extensions  Extension or array of extensions
+     * @return static
      */
     public function rejectByExtension($extensions)
     {
@@ -60,8 +60,8 @@ class FileCollection extends Collection
     /**
      * Filter by a regular expression.
      *
-     * @param   string  $regex    The regular expression to match against
-     * @return  static
+     * @param  string  $regex  The regular expression to match against
+     * @return static
      */
     public function filterByRegex($regex)
     {
@@ -73,8 +73,8 @@ class FileCollection extends Collection
     /**
      * Reject by a regular expression.
      *
-     * @param   string  $regex    The regular expression to match against
-     * @return  static
+     * @param  string  $regex  The regular expression to match against
+     * @return static
      */
     public function rejectByRegex($regex)
     {
@@ -110,7 +110,7 @@ class FileCollection extends Collection
      * Accepts a string like "title:desc|foo:asc"
      * The keys are optional. "title:desc|foo" is fine.
      *
-     * @param string $sort
+     * @param  string  $sort
      * @return static
      */
     public function multisort($sort)
@@ -143,9 +143,9 @@ class FileCollection extends Collection
     /**
      * Get the values from two files to be sorted against each other.
      *
-     * @param string  $sort  The field to be searched
-     * @param array   $a     The first file
-     * @param array   $b     The second file
+     * @param  string  $sort  The field to be searched
+     * @param  array  $a  The first file
+     * @param  array  $b  The second file
      * @return array
      */
     protected function getSortableValues($sort, $a, $b)

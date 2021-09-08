@@ -12,7 +12,7 @@ class ResponseCreated extends Event
     public $response;
 
     /**
-     * @param Response $response
+     * @param  Response  $response
      */
     public function __construct(Response $response)
     {

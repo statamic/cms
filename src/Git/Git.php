@@ -24,7 +24,7 @@ class Git
     /**
      * Listen to custom addon event.
      *
-     * @param string $event
+     * @param  string  $event
      */
     public function listen($event)
     {
@@ -143,7 +143,7 @@ class Git
     /**
      * Get git process for content path.
      *
-     * @param string $path
+     * @param  string  $path
      * @return GitProcess
      */
     protected function gitProcessForPath($path)
@@ -156,7 +156,7 @@ class Git
     /**
      * Merge status string with calculated file count stats.
      *
-     * @param string $status
+     * @param  string  $status
      * @return array
      */
     protected function statusWithFileCounts($status)
@@ -183,7 +183,7 @@ class Git
     /**
      * Ensure absolute path.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     protected function ensureAbsolutePath($path)
@@ -198,9 +198,9 @@ class Git
     /**
      * Run configured commands.
      *
-     * @param mixed $gitRoot
-     * @param mixed $paths
-     * @param mixed $message
+     * @param  mixed  $gitRoot
+     * @param  mixed  $paths
+     * @param  mixed  $message
      */
     protected function runConfiguredCommands($gitRoot, $paths, $message)
     {
@@ -216,8 +216,8 @@ class Git
     /**
      * Get parsed commands.
      *
-     * @param mixed $paths
-     * @param mixed $message
+     * @param  mixed  $paths
+     * @param  mixed  $message
      */
     protected function getParsedCommands($paths, $message)
     {
@@ -231,8 +231,8 @@ class Git
     /**
      * Get command context.
      *
-     * @param array $paths
-     * @param string $message
+     * @param  array  $paths
+     * @param  string  $message
      * @return array
      */
     protected function getCommandContext($paths, $message)
@@ -256,7 +256,7 @@ class Git
     /**
      * Shell escape string for use in git commands.
      *
-     * @param string $string
+     * @param  string  $string
      * @return string
      */
     protected function shellEscape(string $string)

@@ -13,7 +13,7 @@ class PackToTheFuture
     /**
      * Set version on default test package.
      *
-     * @param string $version
+     * @param  string  $version
      */
     public static function setVersion(string $version)
     {
@@ -23,8 +23,8 @@ class PackToTheFuture
     /**
      * Set addon package name and version on our test package.
      *
-     * @param string $package
-     * @param string $version
+     * @param  string  $package
+     * @param  string  $version
      */
     public static function setAddon(string $package, string $version)
     {
@@ -51,10 +51,10 @@ class PackToTheFuture
     /**
      * Generate composer.json file for our test package.
      *
-     * @param string $package
-     * @param string $version
-     * @param array $extra
-     * @param string|null $version
+     * @param  string  $package
+     * @param  string  $version
+     * @param  array  $extra
+     * @param  string|null  $version
      */
     public static function generateComposerJson(string $package, string $version, array $extra = [], $path = null)
     {
@@ -72,9 +72,9 @@ class PackToTheFuture
     /**
      * Generate composer.lock file for our test package.
      *
-     * @param string $package
-     * @param string $version
-     * @param string|null $path
+     * @param  string  $package
+     * @param  string  $version
+     * @param  string|null  $path
      */
     public static function generateComposerLock(string $package, string $version, $path = null, $dev = false)
     {
@@ -100,8 +100,8 @@ class PackToTheFuture
     /**
      * Generate composer.lock file for multiple test packages.
      *
-     * @param string $packages
-     * @param string|null $path
+     * @param  string  $packages
+     * @param  string|null  $path
      */
     public static function generateComposerLockForMultiple($packages, $path = null)
     {
@@ -128,7 +128,7 @@ class PackToTheFuture
     /**
      * Prepare path.
      *
-     * @param string $path
+     * @param  string  $path
      * @param string
      */
     private static function preparePath($path)

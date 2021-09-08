@@ -11,7 +11,7 @@ trait HasPreferences
     /**
      * Get or set preferences.
      *
-     * @param null|array $preferences
+     * @param  null|array  $preferences
      * @return $this
      */
     public function preferences($preferences = null)
@@ -35,7 +35,7 @@ trait HasPreferences
     /**
      * Set array of preferences.
      *
-     * @param array $preferences
+     * @param  array  $preferences
      * @return $this
      */
     abstract public function setPreferences($preferences);
@@ -43,7 +43,7 @@ trait HasPreferences
     /**
      * Merge array of preferences.
      *
-     * @param array $preferences
+     * @param  array  $preferences
      * @return $this
      */
     abstract public function mergePreferences($preferences);
@@ -51,8 +51,8 @@ trait HasPreferences
     /**
      * Set preference (dot notation in key supported).
      *
-     * @param string $key
-     * @param mixed $value
+     * @param  string  $key
+     * @param  mixed  $value
      * @return $this
      */
     public function setPreference($key, $value)
@@ -69,9 +69,9 @@ trait HasPreferences
     /**
      * Remove preference (dot notation in key supported).
      *
-     * @param string $key
-     * @param null|mixed $value
-     * @param bool $cleanup
+     * @param  string  $key
+     * @param  null|mixed  $value
+     * @param  bool  $cleanup
      * @return $this
      */
     public function removePreference($key, $value = null, $cleanup = true)
@@ -94,8 +94,8 @@ trait HasPreferences
     /**
      * Remove a specific array value from a preference.
      *
-     * @param string $key
-     * @param mixed $value
+     * @param  string  $key
+     * @param  mixed  $value
      */
     protected function removePreferenceValue($key, $value)
     {
@@ -113,7 +113,7 @@ trait HasPreferences
     /**
      * Get preference (dot notation in key supported).
      *
-     * @param string $key
+     * @param  string  $key
      * @return mixed
      */
     public function getPreference($key)
@@ -124,7 +124,7 @@ trait HasPreferences
     /**
      * Check if preference exists (dot notation in key supported).
      *
-     * @param string $key
+     * @param  string  $key
      * @return bool
      */
     public function hasPreference($key)
@@ -135,8 +135,8 @@ trait HasPreferences
     /**
      * Modify a preference using a callback.
      *
-     * @param string $key
-     * @param Closure $callback
+     * @param  string  $key
+     * @param  Closure  $callback
      * @return $this
      */
     public function modifyPreference($key, Closure $callback)
@@ -155,8 +155,8 @@ trait HasPreferences
     /**
      * Append array of preferences onto an array of preferences.
      *
-     * @param string $key
-     * @param array $array
+     * @param  string  $key
+     * @param  array  $array
      * @return $this
      */
     public function appendPreferences($key, $array)
@@ -171,8 +171,8 @@ trait HasPreferences
     /**
      * Append a value onto an array of preferences (will convert to array if necessary).
      *
-     * @param string $key
-     * @param mixed $value
+     * @param  string  $key
+     * @param  mixed  $value
      * @return $this
      */
     public function appendPreference($key, $value)
@@ -188,7 +188,7 @@ trait HasPreferences
     /**
      * Cleanup preference and it's parents to avoid leaving empty array/object data in yaml.
      *
-     * @param string $key
+     * @param  string  $key
      * @return $this
      */
     public function cleanupPreference($key)

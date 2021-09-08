@@ -53,7 +53,7 @@ class Process
     /**
      * Create new process on path.
      *
-     * @param string|null $basePath
+     * @param  string|null  $basePath
      */
     public function __construct($basePath = null)
     {
@@ -81,7 +81,7 @@ class Process
     /**
      * Create new process on path.
      *
-     * @param string|null $basePath
+     * @param  string|null  $basePath
      * @return static
      */
     public static function create($basePath = null)
@@ -92,8 +92,8 @@ class Process
     /**
      * Run the command.
      *
-     * @param string|array $command
-     * @param string|null $cacheKey
+     * @param  string|array  $command
+     * @param  string|null  $cacheKey
      * @return mixed
      */
     public function run($command, $cacheKey = null)
@@ -120,8 +120,8 @@ class Process
     /**
      * Run and externally operate on ouput.
      *
-     * @param mixed $command
-     * @param mixed $operateOnOutput
+     * @param  mixed  $command
+     * @param  mixed  $operateOnOutput
      * @return string
      */
     public function runAndOperateOnOutput($command, $operateOnOutput)
@@ -157,7 +157,7 @@ class Process
     /**
      * Run callback without logging errors.
      *
-     * @param Closure $callable
+     * @param  Closure  $callable
      * @return mixed
      */
     public function withoutLoggingErrors(Closure $callback)
@@ -174,7 +174,7 @@ class Process
     /**
      * Run and return output when finished.
      *
-     * @param SymfonyProcess $process
+     * @param  SymfonyProcess  $process
      * @return string
      */
     private function runAndReturnOutput($process)
@@ -194,8 +194,8 @@ class Process
     /**
      * Run and append output to cache as it's generated.
      *
-     * @param SymfonyProcess $process
-     * @param string $cacheKey
+     * @param  SymfonyProcess  $process
+     * @param  string  $cacheKey
      */
     private function runAndCacheOutput($process, $cacheKey)
     {
@@ -218,8 +218,8 @@ class Process
     /**
      * Prepare error (stderr) output.
      *
-     * @param string $type
-     * @param string $buffer
+     * @param  string  $type
+     * @param  string  $buffer
      */
     private function prepareErrorOutput($type, $buffer)
     {
@@ -257,8 +257,8 @@ class Process
     /**
      * Append output to cache.
      *
-     * @param string $cacheKey
-     * @param string $output
+     * @param  string  $cacheKey
+     * @param  string  $output
      */
     private function appendOutputToCache($cacheKey, $output)
     {
@@ -271,7 +271,7 @@ class Process
     /**
      * Set completed on cache.
      *
-     * @param string $cacheKey
+     * @param  string  $cacheKey
      */
     private function setCompletedOnCache($cacheKey)
     {
@@ -284,7 +284,7 @@ class Process
     /**
      * Get cached output.
      *
-     * @param string $cacheKey
+     * @param  string  $cacheKey
      * @return array
      */
     public function cachedOutput(string $cacheKey)
@@ -299,7 +299,7 @@ class Process
     /**
      * Get cached output for last completed process.
      *
-     * @param string $cacheKey
+     * @param  string  $cacheKey
      * @return array
      */
     public function lastCompletedCachedOutput(string $cacheKey)
@@ -344,7 +344,7 @@ class Process
     /**
      * Throw exception on process failure.
      *
-     * @param bool $throwOnFailure
+     * @param  bool  $throwOnFailure
      * @return $this
      */
     public function throwOnFailure($throwOnFailure = null)
@@ -359,7 +359,7 @@ class Process
     /**
      * Normalize output.
      *
-     * @param mixed $output
+     * @param  mixed  $output
      * @return mixed
      */
     public function normalizeOutput($output)
@@ -382,8 +382,8 @@ class Process
     /**
      * New symfony process.
      *
-     * @param string $command
-     * @param string|null $path
+     * @param  string  $command
+     * @param  string|null  $path
      * @return SymfonyProcess
      */
     protected function newSymfonyProcess($command, $path = null)
@@ -405,7 +405,7 @@ class Process
     /**
      * Throw exception.
      *
-     * @param string $output
+     * @param  string  $output
      * @throws ProcessException
      */
     protected function throwException(string $output)

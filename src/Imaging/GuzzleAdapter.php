@@ -48,9 +48,9 @@ class GuzzleAdapter implements AdapterInterface
     /**
      * Constructs a GuzzleAdapter object.
      *
-     * @param string                      $base         The base URL.
-     * @param \GuzzleHttp\ClientInterface $client       An optional Guzzle client.
-     * @param bool                        $supportsHead Whether the client supports HEAD requests.
+     * @param  string  $base  The base URL.
+     * @param  \GuzzleHttp\ClientInterface  $client  An optional Guzzle client.
+     * @param  bool  $supportsHead  Whether the client supports HEAD requests.
      */
     public function __construct($base, ClientInterface $client = null, $supportsHead = true)
     {
@@ -252,7 +252,7 @@ class GuzzleAdapter implements AdapterInterface
     /**
      * Performs a GET request.
      *
-     * @param string $path The path to GET.
+     * @param  string  $path  The path to GET.
      *
      * @return \GuzzleHttp\Psr7\Response|false The response or false if failed.
      */
@@ -274,8 +274,8 @@ class GuzzleAdapter implements AdapterInterface
     /**
      * Returns the mimetype of a response.
      *
-     * @param string $path
-     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param  string  $path
+     * @param  \Psr\Http\Message\ResponseInterface  $response
      *
      * @return string
      */
@@ -296,8 +296,8 @@ class GuzzleAdapter implements AdapterInterface
     /**
      * Returns the metadata array for a response.
      *
-     * @param string $path
-     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param  string  $path
+     * @param  \Psr\Http\Message\ResponseInterface  $response
      *
      * @return array
      */
@@ -330,7 +330,7 @@ class GuzzleAdapter implements AdapterInterface
     /**
      * Performs a HEAD request.
      *
-     * @param string $path The path to HEAD.
+     * @param  string  $path  The path to HEAD.
      *
      * @return \GuzzleHttp\Psr7\Response|false The response or false if failed.
      */

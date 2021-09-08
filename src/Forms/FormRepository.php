@@ -13,7 +13,7 @@ class FormRepository implements Contract
     /**
      * Find a form.
      *
-     * @param string $handle
+     * @param  string  $handle
      * @return FormContract
      */
     public function find($handle)
@@ -52,7 +52,7 @@ class FormRepository implements Contract
     /**
      * Make form instance.
      *
-     * @param mixed $handle
+     * @param  mixed  $handle
      * @return FormContract
      */
     public function make($handle = null)

@@ -237,7 +237,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get or set the path to the data.
      *
-     * @param string|null $path Path to set
+     * @param  string|null  $path  Path to set
      * @return mixed
      */
     public function path($path = null)
@@ -297,7 +297,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get either a image URL builder instance, or a URL if passed params.
      *
-     * @param null|array $params Optional manipulation parameters to return a string right away
+     * @param  null|array  $params  Optional manipulation parameters to return a string right away
      * @return \Statamic\Contracts\Imaging\UrlBuilder|string
      * @throws \Exception
      */
@@ -457,7 +457,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get or set the container where this asset is located.
      *
-     * @param string|AssetContainerContract $container  ID of the container
+     * @param  string|AssetContainerContract  $container  ID of the container
      * @return AssetContainerContract
      */
     public function container($container = null)
@@ -493,7 +493,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Rename the asset.
      *
-     * @param string $filename
+     * @param  string  $filename
      * @return void
      */
     public function rename($filename, $unique = false)
@@ -506,8 +506,8 @@ class Asset implements AssetContract, Augmentable
     /**
      * Move the asset to a different location.
      *
-     * @param string      $folder   The folder relative to the container.
-     * @param string|null $filename The new filename, if renaming.
+     * @param  string  $folder  The folder relative to the container.
+     * @param  string|null  $filename  The new filename, if renaming.
      * @return void
      */
     public function move($folder, $filename = null)
@@ -532,7 +532,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get the asset's dimensions.
      *
-     * @return array  An array in the [width, height] format
+     * @return array An array in the [width, height] format
      */
     public function dimensions()
     {
@@ -621,7 +621,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Upload a file.
      *
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
+     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return void
      */
     public function upload(UploadedFile $file)
@@ -675,7 +675,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get the blueprint.
      *
-     * @param string|null $blueprint
+     * @param  string|null  $blueprint
      * @return \Statamic\Fields\Blueprint
      */
     public function blueprint()
@@ -726,9 +726,9 @@ class Asset implements AssetContract, Augmentable
     /**
      * Ensure and return unique filename, incrementing as necessary.
      *
-     * @param string $folder
-     * @param string $filename
-     * @param int $count
+     * @param  string  $folder
+     * @param  string  $filename
+     * @param  int  $count
      * @return string
      */
     protected function ensureUniqueFilename($folder, $filename, $count = 0)

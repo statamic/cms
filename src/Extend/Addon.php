@@ -140,7 +140,7 @@ final class Addon
     protected $editions = [];
 
     /**
-     * @param string $id
+     * @param  string  $id
      */
     public function __construct($id)
     {
@@ -160,7 +160,7 @@ final class Addon
     /**
      * Make an addon instance from package details.
      *
-     * @param array $package
+     * @param  array  $package
      * @return self
      */
     public static function makeFromPackage(array $package)
@@ -227,7 +227,7 @@ final class Addon
     /**
      * The marketplace variant ID of the addon.
      *
-     * @param int $id
+     * @param  int  $id
      * @return int
      */
     public function marketplaceId($id = null)
@@ -240,7 +240,7 @@ final class Addon
     /**
      * The marketplace slug of the addon.
      *
-     * @param string $slug
+     * @param  string  $slug
      * @return string
      */
     public function marketplaceSlug($slug = null)
@@ -267,7 +267,7 @@ final class Addon
      *
      * For referencing in URLs.
      *
-     * @param string $slug
+     * @param  string  $slug
      * @return string
      */
     public function slug($slug = null)
@@ -280,7 +280,7 @@ final class Addon
     /**
      * The name of addon.
      *
-     * @param string $name
+     * @param  string  $name
      * @return string|self
      */
     public function name($name = null)
@@ -297,7 +297,7 @@ final class Addon
     /**
      * Whether a given file exists in the addon's directory.
      *
-     * @param string $path
+     * @param  string  $path
      * @return bool
      */
     public function hasFile($path)
@@ -312,7 +312,7 @@ final class Addon
     /**
      * Get the contents of a given file in the addon's directory.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     public function getFile($path)
@@ -327,8 +327,8 @@ final class Addon
     /**
      * Write the given contents to a file.
      *
-     * @param string $path
-     * @param string $contents
+     * @param  string  $path
+     * @param  string  $contents
      */
     public function putFile($path, $contents)
     {
@@ -380,8 +380,8 @@ final class Addon
      * Handle method calls.
      * Typically will get or set property values.
      *
-     * @param string $method
-     * @param array $args
+     * @param  string  $method
+     * @param  array  $args
      * @return mixed
      */
     public function __call($method, $args)

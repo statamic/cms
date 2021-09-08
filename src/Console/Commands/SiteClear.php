@@ -344,7 +344,7 @@ EOT
     /**
      * Clean directory and add .gitkeep file.
      *
-     * @param string $path
+     * @param  string  $path
      */
     protected function cleanAndKeep($path)
     {
@@ -360,7 +360,7 @@ EOT
     /**
      * Prepare path directory.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     protected function preparePath($path)

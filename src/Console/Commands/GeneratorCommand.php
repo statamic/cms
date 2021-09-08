@@ -41,7 +41,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Get the stub file for the generator.
      *
-     * @param string|null $stub
+     * @param  string|null  $stub
      * @return string
      */
     protected function getStub($stub = null)
@@ -64,7 +64,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param string $rootNamespace
+     * @param  string  $rootNamespace
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)
@@ -97,7 +97,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Get the destination class path.
      *
-     * @param string $name
+     * @param  string  $name
      * @return string
      */
     protected function getPath($name)
@@ -118,7 +118,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Get addon path.
      *
-     * @param string $addon
+     * @param  string  $addon
      * @return string
      */
     protected function getAddonPath($addon)
@@ -159,7 +159,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Get path relative to the project if possible, otherwise return absolute path.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     protected function getRelativePath($path)
@@ -170,7 +170,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Get appropriate JS path for generating vue files, etc.
      *
-     * @param string $file
+     * @param  string  $file
      * @return string
      */
     protected function getJsPath($file)
@@ -205,7 +205,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Build the directory for the path if necessary.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     protected function makeDirectory($path)
@@ -268,7 +268,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Get attribute with special `type` modifier handling.
      *
-     * @param mixed $attribute
+     * @param  mixed  $attribute
      */
     public function __get($attribute)
     {
