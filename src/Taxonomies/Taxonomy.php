@@ -191,7 +191,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     {
         $data = [
             'title' => $this->title,
-            'route' => $this->route(),
+            'route' => $this->route,
             'blueprints' => $this->blueprints,
         ];
 
@@ -213,7 +213,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     {
         return [
             'title' => $this->title,
-            'route' => $this->route(),
+            'route' => $this->route,
             'handle' => $this->handle,
             'blueprints' => $this->blueprints,
         ];

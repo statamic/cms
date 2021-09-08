@@ -250,7 +250,7 @@ class FeatureTest extends TestCase
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/taxonomies/new.yaml',
-            "title: 'New Taxonomy'\nroute: 'new/{slug}'\n"
+            "title: 'New Taxonomy'\n"
         );
         @unlink($path);
     }
