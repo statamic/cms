@@ -218,6 +218,28 @@ EOT;
     }
 
     /** @test */
+    public function it_shell_escapes_git_user_name_and_email()
+    {
+        Config::set('statamic.git.user.name', 'Jimmy"; echo "deleting all your files now"; #');
+        Config::set('statamic.git.user.email', 'jimmy@haxor.org"; echo "deleting all your files now"; #');
+
+        $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
+
+        $expectedContentStatus = <<<'EOT'
+ M collections/pages.yaml
+EOT;
+
+        $this->assertEquals($expectedContentStatus, GitProcess::create(Path::resolve(base_path('content')))->status());
+
+        $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
+
+        Git::commit('Message"; echo "deleting all your files now"; #');
+
+        $this->assertStringContainsString('Message\; echo deleting all your files now\; \#', $commit = $this->showLastCommit(base_path('content')));
+        $this->assertStringContainsString('Jimmy\; echo deleting all your files now\; \# <jimmy@haxor.org\; echo deleting all your files now\; \#>', $commit);
+    }
+
+    /** @test */
     public function it_can_commit_with_custom_commit_message()
     {
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
