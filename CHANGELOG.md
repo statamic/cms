@@ -1,5 +1,25 @@
 # Release Notes
 
+## 3.2.3 (2021-09-09)
+
+### What's new
+- Add `support:zip-blueprint` command. [#3740](https://github.com/statamic/cms/issues/3740)
+- Ability to position instructions below the field. [#4157](https://github.com/statamic/cms/issues/4157)
+
+### What's improved
+- The `collection` widget's title is now a link. [#4215](https://github.com/statamic/cms/issues/4215)
+- Update Dutch translations. [#4207](https://github.com/statamic/cms/issues/4207)
+
+### What's fixed
+- Fix issue where newly created asset folders wouldn't show on reload. [#4176](https://github.com/statamic/cms/issues/4176)
+- Make the `site:clear` command clear trees. [#4231](https://github.com/statamic/cms/issues/4231)
+- Bring back the HTML field on the HTML fieldtype so you can HTML in your HTML field. [a3f7caabb](https://github.com/statamic/cms/commit/a3f7caabb)  
+- Read inline SVGs from Composer vendor directory which improves Vapor support. [#4216](https://github.com/statamic/cms/issues/4216)
+- Escape user input on git commands. [#4220](https://github.com/statamic/cms/issues/4220)
+- Validate replicator as an array. [#4212](https://github.com/statamic/cms/issues/4212)
+
+
+
 ## 3.2.2 (2021-09-01)
 
 ### What's improved
