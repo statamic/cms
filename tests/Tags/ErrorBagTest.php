@@ -22,7 +22,7 @@ class ErrorBagTest extends TestCase
     /** @test */
     public function it_returns_empty_string_with_empty_view_error_bag()
     {
-        session()->put('errors', new ViewErrorBag);
+        view()->share('errors', new ViewErrorBag);
         $this->assertEquals('', $this->tag('{{ error_bag }}{{ fields }}{{ field }}: {{ field_errors }}{{ value }}{{ /field_errors}}{{ /fields }}{{ /error_bag }}'));
     }
 
@@ -32,7 +32,7 @@ class ErrorBagTest extends TestCase
         $messageBag = (new MessageBag())->add('name', 'name is required');
         $errorBag = (new ViewErrorBag())->put('default', $messageBag);
 
-        session()->put('errors', $errorBag);
+        view()->share('errors', $errorBag);
 
         $this->assertEquals(
             'name is required',
@@ -48,7 +48,7 @@ class ErrorBagTest extends TestCase
             ->add('name', 'name should be 10 chars');
         $errorBag = (new ViewErrorBag())->put('default', $messageBag);
 
-        session()->put('errors', $errorBag);
+        view()->share('errors', $errorBag);
 
         $this->assertEquals(
             'name is requiredname should be 10 chars',
@@ -64,7 +64,7 @@ class ErrorBagTest extends TestCase
             ->add('number', 'number should be a number');
         $errorBag = (new ViewErrorBag())->put('default', $messageBag);
 
-        session()->put('errors', $errorBag);
+        view()->share('errors', $errorBag);
 
         $this->assertEquals(
             'name: name is requirednumber: number should be a number',
