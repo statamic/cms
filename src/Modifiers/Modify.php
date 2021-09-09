@@ -81,6 +81,7 @@ class Modify implements \IteratorAggregate
      * Get the value as a string.
      *
      * @return string
+     *
      * @throws \Statamic\Modifiers\ModifierException
      */
     public function __toString()
@@ -98,6 +99,7 @@ class Modify implements \IteratorAggregate
      * Get the value as an array.
      *
      * @return \Traversable
+     *
      * @throws \Statamic\Modifiers\ModifierException
      */
     public function getIterator()
@@ -132,6 +134,7 @@ class Modify implements \IteratorAggregate
      * @param  string  $modifier
      * @param  array  $params
      * @return mixed
+     *
      * @throws \Statamic\Exceptions\ModifierException
      */
     public function modify($modifier, $params = [])
@@ -173,6 +176,7 @@ class Modify implements \IteratorAggregate
      * @param  string  $modifier
      * @param  array  $params
      * @return mixed
+     *
      * @throws \Exception
      */
     protected function runModifier($modifier, $params)

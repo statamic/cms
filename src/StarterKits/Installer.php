@@ -248,6 +248,7 @@ final class Installer
      * Ensure starter kit has config.
      *
      * @return $this
+     *
      * @throws StarterKitException
      */
     protected function ensureConfig()
@@ -263,6 +264,7 @@ final class Installer
      * Ensure export paths exist.
      *
      * @return $this
+     *
      * @throws StarterKitException
      */
     protected function ensureExportPathsExist()
@@ -554,6 +556,7 @@ final class Installer
      *
      * @param  string  $error
      * @param  string|null  $output
+     *
      * @throws StarterKitException
      */
     protected function rollbackWithError($error, $output = null)

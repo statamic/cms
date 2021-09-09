@@ -11,12 +11,14 @@ class ResponseFactory implements ResponseFactoryInterface
 {
     /**
      * Request object to check "is not modified".
+     *
      * @var Request|null
      */
     protected $request;
 
     /**
      * Create SymfonyResponseFactory instance.
+     *
      * @param  Request|null  $request  Request object to check "is not modified".
      */
     public function __construct(Request $request = null)
@@ -26,6 +28,7 @@ class ResponseFactory implements ResponseFactoryInterface
 
     /**
      * Create the response.
+     *
      * @param  FilesystemInterface  $cache  The cache file system.
      * @param  string  $path  The cached file path.
      * @return StreamedResponse The response object.

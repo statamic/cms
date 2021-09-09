@@ -406,6 +406,7 @@ class Process
      * Throw exception.
      *
      * @param  string  $output
+     *
      * @throws ProcessException
      */
     protected function throwException(string $output)

@@ -22,6 +22,7 @@ class Comb
 
     /**
      * Match weights.
+     *
      * @var array
      */
     private $match_weights = [
@@ -38,24 +39,28 @@ class Comb
 
     /**
      * Minimum characters to search over.
+     *
      * @var int
      */
     private $min_characters = 1;
 
     /**
      * Minimum characters per word to include word in search.
+     *
      * @var int
      */
     private $min_word_characters = 2;
 
     /**
      * Score threshold.
+     *
      * @var int
      */
     private $score_threshold = 1;
 
     /**
      * Property weights.
+     *
      * @var array
      */
     private $property_weights = [];
@@ -65,30 +70,35 @@ class Comb
 
     /**
      * Query mode.
+     *
      * @var int
      */
     private $query_mode = self::QUERY_BOOLEAN;
 
     /**
      * Should query be stemmed?
+     *
      * @var bool
      */
     private $use_stemming = false;
 
     /**
      * Should query use alternate character values?
+     *
      * @var bool
      */
     private $use_alternates = false;
 
     /**
      * Should the full query be included in boolean searches?
+     *
      * @var bool
      */
     private $include_full_query = true;
 
     /**
      * A list of words filtered out of search queries.
+     *
      * @var array
      */
     private $stop_words = [];
@@ -98,24 +108,28 @@ class Comb
 
     /**
      * Limit the number of results returned.
+     *
      * @var int
      */
     private $limit = null;
 
     /**
      * Should we throw the too-many-results exception?
+     *
      * @var bool
      */
     private $enable_too_many_results = false;
 
     /**
      * Should we sort results by score?
+     *
      * @var bool
      */
     private $sort_by_score = true;
 
     /**
      * Should we group results by category?
+     *
      * @var bool
      */
     private $group_by_category = false;
@@ -125,18 +139,21 @@ class Comb
 
     /**
      * Haystack of data to look through.
+     *
      * @var array
      */
     private $haystack = [];
 
     /**
      * A list of properties to exclude.
+     *
      * @var array
      */
     private $exclude_properties = [];
 
     /**
      * A list of the only properties to include.
+     *
      * @var array
      */
     private $include_properties = [];
@@ -146,24 +163,28 @@ class Comb
 
     /**
      * Has the data already been prepared?
+     *
      * @var bool
      */
     private $is_data_prepared = false;
 
     /**
      * Is the haystack categorized?
+     *
      * @var bool
      */
     private $is_haystack_categorized = false;
 
     /**
      * The start time of a query (for measuring performance).
+     *
      * @var int
      */
     private $query_start_time = false;
 
     /**
      * The end time of a query (for measuring performance).
+     *
      * @var int
      */
     private $query_end_time = false;
@@ -447,6 +468,7 @@ class Comb
      * @param  array  $params  Parameters for search
      * @param  string  $raw_query  Raw query to search for
      * @return array
+     *
      * @throws CombException
      * @throws NoResultsFound
      */
@@ -776,6 +798,7 @@ class Comb
      *
      * @param  string  $query  Query to test
      * @return bool
+     *
      * @throws NoQuery
      * @throws NotEnoughCharacters
      */

@@ -291,8 +291,9 @@ class Glide extends Tags
      *
      * @see http://image.intervention.io/getting_started/formats
      *
-     * @throws \Exception
      * @return array
+     *
+     * @throws \Exception
      */
     private function allowedFileFormats()
     {

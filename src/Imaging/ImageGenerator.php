@@ -132,6 +132,7 @@ class ImageGenerator
      *
      * @param  string  $image  The filename of the image
      * @return mixed
+     *
      * @throws \Exception
      * @throws \League\Glide\Filesystem\FileNotFoundException
      * @throws \League\Glide\Filesystem\FilesystemException

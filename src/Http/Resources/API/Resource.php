@@ -62,6 +62,7 @@ class Resource
      *
      * @param  string  $bindable
      * @param  string  $class
+     *
      * @throws JsonResourceException
      */
     protected static function validateBinding($bindable, $class)

@@ -25,6 +25,7 @@ class Exporter
      * Export starter kit.
      *
      * @param  string  $absolutePath
+     *
      * @throws StarterKitException
      */
     public function export($absolutePath)
@@ -68,6 +69,7 @@ class Exporter
      * Ensure export path exists.
      *
      * @param  string  $path
+     *
      * @throws StarterKitException
      */
     protected function ensureExportPathExists($path)
@@ -125,6 +127,7 @@ class Exporter
      * Get starter kit export paths from config.
      *
      * @return \Illuminate\Support\Collection
+     *
      * @throws StarterKitException
      */
     protected function exportPaths()

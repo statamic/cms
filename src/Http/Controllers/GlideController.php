@@ -86,6 +86,7 @@ class GlideController extends Controller
      *
      * @param  string  $ref
      * @return mixed
+     *
      * @throws \Exception
      */
     public function generateByAsset($encoded)

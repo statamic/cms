@@ -42,8 +42,9 @@ class Application extends ConsoleApplication
      * Finds a command by name or alias.  If doesn't exist, resolve deferred artisan commands and try again.
      *
      * @param  string  $name
-     * @throws CommandNotFoundException
      * @return \Illuminate\Console\Command
+     *
+     * @throws CommandNotFoundException
      */
     public function find($name)
     {

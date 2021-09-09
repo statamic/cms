@@ -215,6 +215,7 @@ class URL
 
     /**
      * Checks whether a URL is external or not.
+     *
      * @param  string  $url
      * @return bool
      */
@@ -232,6 +233,7 @@ class URL
 
     /**
      * Get the current site url from Apache headers.
+     *
      * @return string
      */
     public function getSiteUrl()

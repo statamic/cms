@@ -29,6 +29,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
      * @param  array  $params
      * @param  string|null  $filename
      * @return string
+     *
      * @throws \Exception
      */
     public function build($item, $params, $filename = null)

@@ -128,6 +128,7 @@ class Engine implements EngineInterface
      * @param  string  $content  If its a tag pair, this is what's between them
      * @param  array  $context  The tag's surrounding context variables
      * @return mixed|string
+     *
      * @throws Exceptions\FatalException
      * @throws \Exception
      */
