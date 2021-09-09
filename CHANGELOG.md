@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.2.4 (2021-09-09)
+
+### What's fixed
+- Fix issue where Bards inside Replicators wouldn't validate. [#4241](https://github.com/statamic/cms/issues/4241)
+
+
+
 ## 3.2.3 (2021-09-09)
 
 ### What's new
