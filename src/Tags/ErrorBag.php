@@ -37,7 +37,7 @@ class ErrorBag extends Tags
     private function getMessageBag(): ?MessageBag
     {
         /** @var \Illuminate\Support\ViewErrorBag */
-        $errorBag = session('errors');
+        $errorBag = view()->shared('errors');
 
         if ($errorBag->count() === 0) {
             return null;
