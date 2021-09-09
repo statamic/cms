@@ -19,11 +19,6 @@ class UserRepository extends BaseRepository
         $this->config = $config;
     }
 
-    public function make(): UserContract
-    {
-        return (new User)->model(new $this->config['model']);
-    }
-
     public function all(): UserCollection
     {
         $users = $this->model('all')->keyBy('id')->map(function ($model) {
@@ -105,5 +100,17 @@ class UserRepository extends BaseRepository
         }
 
         return null;
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            UserContract::class => User::class,
+        ];
+    }
+
+    public function make(): UserContract
+    {
+        return parent::make()->model(new $this->config['model']);
     }
 }

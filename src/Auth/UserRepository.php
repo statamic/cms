@@ -18,6 +18,11 @@ abstract class UserRepository implements RepositoryContract
         return app(UserFactory::class);
     }
 
+    public function make(): User
+    {
+        return app(User::class);
+    }
+
     public function current(): ?User
     {
         if (! $user = auth()->user()) {
