@@ -3,15 +3,15 @@
 namespace Tests\Tags;
 
 use Illuminate\Support\Facades\Storage;
-use Statamic\Assets\Asset;
-use Statamic\Assets\AssetCollection;
 use Statamic\Assets\AssetContainer;
-use Statamic\Facades;
 use Statamic\Facades\Parse;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetsTagTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -33,36 +33,16 @@ class AssetsTagTest extends TestCase
     /** @test */
     public function it_outputs_assets()
     {
-        $container = (new AssetContainer)
-            ->handle('test_container')
-            ->disk('test');
+        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
 
-        $assets = collect([1, 2, 3])
-            ->map(function ($item, $key) use ($container) {
-                return (new Asset)
-                    ->container($container)
-                    ->set('title', $item);
-            })->values();
+        Storage::disk('test')->put('a.txt', '');
+        Storage::disk('test')->put('b.txt', '');
 
-        $ac = AssetCollection::make($assets);
-
-        Facades\AssetContainer::shouldReceive('findByHandle')
-            ->with('test_container')
-            ->andReturn($container);
-
-        Facades\AssetContainer::shouldReceive('find')
-            ->with('test_container')
-            ->andReturn($container);
-
-        $container = $this->mock(AssetContainer::class);
-        $container
-            ->shouldReceive('assets')
-            ->with([null, false])
-            ->andReturn($ac);
+        AssetContainer::make('test')->disk('test')->save();
 
         $this->assertEquals(
             '123',
-            $this->tag('{{ assets container="test_container" }}{{ title }}{{ /assets }}')
+            $this->tag('{{ assets container="test" }}{{ total_results }}{{ /assets }}')
         );
     }
 }
