@@ -160,6 +160,7 @@ class Nav
      * Validate that nav children don't exceed nesting limit.
      *
      * @return $this
+     *
      * @throws Exception
      */
     protected function validateNesting()
@@ -182,6 +183,7 @@ class Nav
      * Validate that nav children don't specify icons.
      *
      * @return $this
+     *
      * @throws Exception
      */
     protected function validateIcons()
@@ -204,6 +206,7 @@ class Nav
      * Validate that nav children don't specify views.
      *
      * @return $this
+     *
      * @throws Exception
      */
     protected function validateViews()

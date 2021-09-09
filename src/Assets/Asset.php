@@ -299,6 +299,7 @@ class Asset implements AssetContract, Augmentable
      *
      * @param  null|array  $params  Optional manipulation parameters to return a string right away
      * @return \Statamic\Contracts\Imaging\UrlBuilder|string
+     *
      * @throws \Exception
      */
     public function manipulate($params = null)

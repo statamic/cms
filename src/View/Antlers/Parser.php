@@ -1264,9 +1264,9 @@ class Parser
      *
      * @param  string  $key
      * @param  array  $context
-     * @throws ArrayKeyNotFoundException
-     *
      * @return string
+     *
+     * @throws ArrayKeyNotFoundException
      */
     protected function replaceDynamicArrayKeys($key, $context)
     {
@@ -1329,6 +1329,7 @@ class Parser
      *
      * @param  string  $text  Text to evaluate
      * @return string
+     *
      * @throws \Statamic\Exceptions\ParsingException
      */
     protected function parsePhp($text)

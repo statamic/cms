@@ -13,7 +13,6 @@ class Html
      * Build an HTML attribute string from an array.
      *
      * @param  array  $attributes
-     *
      * @return string
      */
     public static function attributes($attributes)
@@ -36,7 +35,6 @@ class Html
      *
      * @param  string  $key
      * @param  string  $value
-     *
      * @return string
      */
     protected static function attributeElement($key, $value)
@@ -68,7 +66,6 @@ class Html
      * Transform the string to an Html serializable object.
      *
      * @param $html
-     *
      * @return \Illuminate\Support\HtmlString
      */
     protected static function toHtmlString($html)
@@ -80,7 +77,6 @@ class Html
      * Convert entities to HTML characters.
      *
      * @param  string  $value
-     *
      * @return string
      */
     public static function decode($value)
@@ -92,7 +88,6 @@ class Html
      * Convert an HTML string to entities.
      *
      * @param  string  $value
-     *
      * @return string
      */
     public static function entities($value)
@@ -105,7 +100,6 @@ class Html
      *
      * @param  array  $list
      * @param  array  $attributes
-     *
      * @return \Illuminate\Support\HtmlString|string
      */
     public static function ol($list, $attributes = [])
@@ -118,7 +112,6 @@ class Html
      *
      * @param  array  $list
      * @param  array  $attributes
-     *
      * @return \Illuminate\Support\HtmlString|string
      */
     public static function ul($list, $attributes = [])
@@ -131,7 +124,6 @@ class Html
      *
      * @param  array  $list
      * @param  array  $attributes
-     *
      * @return \Illuminate\Support\HtmlString
      */
     public static function dl(array $list, array $attributes = [])
@@ -161,7 +153,6 @@ class Html
      * @param  string  $type
      * @param  array  $list
      * @param  array  $attributes
-     *
      * @return \Illuminate\Support\HtmlString|string
      */
     protected static function listing($type, $list, $attributes = [])
@@ -190,7 +181,6 @@ class Html
      * @param  mixed  $key
      * @param  string  $type
      * @param  mixed  $value
-     *
      * @return string
      */
     protected static function listingElement($key, $type, $value)
@@ -206,7 +196,6 @@ class Html
      * Obfuscate a string to prevent spam-bots from sniffing it.
      *
      * @param  string  $value
-     *
      * @return string
      */
     public static function obfuscate($value)
@@ -240,7 +229,6 @@ class Html
      * Generate a link to a Favicon file.
      *
      * @param  string  $url
-     *
      * @return \Illuminate\Support\HtmlString
      */
     public static function favicon($url)
@@ -260,7 +248,6 @@ class Html
      * @param  string  $url
      * @param  string  $title
      * @param  array  $attributes
-     *
      * @return \Illuminate\Support\HtmlString
      */
     public static function link($url, $title = null, $attributes = [])
@@ -281,7 +268,6 @@ class Html
      * @param  string  $title
      * @param  array  $attributes
      * @param  bool  $escape
-     *
      * @return \Illuminate\Support\HtmlString
      */
     public static function mailto($email, $title = null, $attributes = [], $escape = true)
@@ -303,7 +289,6 @@ class Html
      * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
      *
      * @param  string  $email
-     *
      * @return string
      */
     public static function email($email)

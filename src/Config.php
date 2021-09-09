@@ -157,6 +157,7 @@ class Config
      * Get the image manipulation presets.
      *
      * @return array
+     *
      * @deprecated Use Statamic\Facades\Image::userManipulationPresets()
      *             or Image::manipulationPresets() to get merged with CP presets.
      */

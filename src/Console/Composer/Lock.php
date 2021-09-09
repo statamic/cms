@@ -78,8 +78,9 @@ class Lock
     /**
      * Ensure this lock file exists.
      *
-     * @throws ComposerLockFileNotFoundException
      * @return $this
+     *
+     * @throws ComposerLockFileNotFoundException
      */
     public function ensureExists()
     {

@@ -201,6 +201,7 @@ class ParametersTest extends TestCase
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/3248
      */
     public function it_gets_nested_values()

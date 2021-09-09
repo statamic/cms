@@ -253,7 +253,6 @@ class GuzzleAdapter implements AdapterInterface
      * Performs a GET request.
      *
      * @param  string  $path  The path to GET.
-     *
      * @return \GuzzleHttp\Psr7\Response|false The response or false if failed.
      */
     protected function get($path)
@@ -276,7 +275,6 @@ class GuzzleAdapter implements AdapterInterface
      *
      * @param  string  $path
      * @param  \Psr\Http\Message\ResponseInterface  $response
-     *
      * @return string
      */
     protected function getMimetypeFromResponse($path, ResponseInterface $response)
@@ -298,7 +296,6 @@ class GuzzleAdapter implements AdapterInterface
      *
      * @param  string  $path
      * @param  \Psr\Http\Message\ResponseInterface  $response
-     *
      * @return array
      */
     protected function getResponseMetadata($path, ResponseInterface $response)
@@ -331,7 +328,6 @@ class GuzzleAdapter implements AdapterInterface
      * Performs a HEAD request.
      *
      * @param  string  $path  The path to HEAD.
-     *
      * @return \GuzzleHttp\Psr7\Response|false The response or false if failed.
      */
     protected function head($path)

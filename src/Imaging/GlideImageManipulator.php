@@ -127,6 +127,7 @@ class GlideImageManipulator implements ImageManipulator
      *
      * @param  string  $param
      * @param  mixed  $value
+     *
      * @throws \Exception
      */
     public function setParam($param, $value)

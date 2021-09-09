@@ -117,6 +117,7 @@ class DataCollection extends IlluminateCollection
      *
      * @param  array  $actions
      * @return \Statamic\Data\DataCollection
+     *
      * @throws \Statamic\Exceptions\MethodNotFoundException
      */
     public function actions($actions)

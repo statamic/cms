@@ -16,18 +16,21 @@ abstract class Tags
 
     /**
      * The content written between the tags (when a tag pair).
+     *
      * @public string
      */
     public $content;
 
     /**
      * The variable context around which this tag is positioned.
+     *
      * @public array
      */
     public $context;
 
     /**
      * The parameters used on this tag.
+     *
      * @public array
      */
     public $params;
@@ -54,24 +57,28 @@ abstract class Tags
 
     /**
      * If is a tag pair.
+     *
      * @var bool
      */
     public $isPair;
 
     /**
      * The parser instance that executed this tag.
+     *
      * @var \Statamic\View\Antlers\Parser
      */
     public $parser;
 
     /**
      * The method that will handle wildcard tags.
+     *
      * @var string
      */
     protected $wildcardMethod = 'wildcard';
 
     /**
      * Whether a wildcard method has already been handled.
+     *
      * @var bool
      */
     protected $wildcardHandled;
