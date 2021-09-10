@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Statamic\Assets\AssetCollection;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Asset;
@@ -232,7 +233,7 @@ class Assets extends Tags
         );
     }
 
-    protected function paginator($items, $total, $perPage, $currentPage, $options): LengthAwarePaginator
+    protected function paginator(Collection $items, int $total, int $perPage, int $currentPage, array $options): LengthAwarePaginator
     {
         return app()->makeWith(LengthAwarePaginator::class, compact(
             'items',
