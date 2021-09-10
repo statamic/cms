@@ -41,8 +41,49 @@ class AssetsTagTest extends TestCase
         AssetContainer::make('test')->disk('test')->save();
 
         $this->assertEquals(
-            '123',
-            $this->tag('{{ assets container="test" }}{{ total_results }}{{ /assets }}')
+            'a.txtb.txt',
+            $this->tag('{{ assets container="test" }}{{ title }}{{ /assets }}')
+        );
+    }
+
+    /** @test */
+    public function it_paginates_assets()
+    {
+        $antlers = <<<ANTLERS
+{{ assets container="test" limit="2" paginate="true" as="pics" }}
+{{ pics }}{{ title }}{{ /pics }}
+{{ paginate }}
+{{ prev_page }} is empty
+{{ current_page }} of {{ total_pages }} pages
+Total items: {{ total_items }}
+{{ next_page }}
+{{ /paginate }}
+{{ /assets }}
+ANTLERS;
+        $expect = <<<EXPECTATION
+a.txtb.txt
+ is empty
+1 of 3 pages
+Total items: 6
+http://localhost?page=2
+
+
+EXPECTATION;
+
+        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+
+        Storage::disk('test')->put('a.txt', '');
+        Storage::disk('test')->put('b.txt', '');
+        Storage::disk('test')->put('c.txt', '');
+        Storage::disk('test')->put('d.txt', '');
+        Storage::disk('test')->put('e.txt', '');
+        Storage::disk('test')->put('f.txt', '');
+
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this->assertEquals(
+            $expect,
+            $this->tag($antlers)
         );
     }
 }

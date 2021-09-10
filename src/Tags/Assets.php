@@ -245,9 +245,9 @@ class Assets extends Tags
 
     protected function results(): AssetCollection
     {
-        return tap($this->assets, function () {
-            $this->sort();
-            $this->limit();
-        });
+        $this->sort();
+        $this->limit();
+
+        return $this->assets;
     }
 }
