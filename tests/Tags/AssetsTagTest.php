@@ -49,7 +49,7 @@ class AssetsTagTest extends TestCase
     /** @test */
     public function it_paginates_assets()
     {
-        $antlers = <<<ANTLERS
+        $antlers = <<<'ANTLERS'
 {{ assets container="test" limit="2" paginate="true" as="pics" }}
 {{ pics }}{{ title }}{{ /pics }}
 {{ paginate }}
@@ -60,7 +60,7 @@ Total items: {{ total_items }}
 {{ /paginate }}
 {{ /assets }}
 ANTLERS;
-        $expect = <<<EXPECTATION
+        $expect = <<<'EXPECTATION'
 a.txtb.txt
  is empty
 1 of 3 pages

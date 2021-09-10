@@ -161,7 +161,7 @@ class Assets extends Tags
     /**
      * Perform the asset lookups.
      *
-     * @param string|array $urls  One URL, or array of URLs.
+     * @param  string|array  $urls  One URL, or array of URLs.
      * @return string
      */
     protected function assets($urls)
