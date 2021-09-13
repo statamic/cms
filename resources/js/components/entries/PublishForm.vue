@@ -23,7 +23,7 @@
 
                 <save-button-options
                     v-if="!readOnly"
-                    :show-options="!revisionsEnabled"
+                    :show-options="!revisionsEnabled && !isInline"
                     :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
@@ -98,7 +98,7 @@
                         >
                             <template #actions="{ shouldShowSidebar }">
 
-                                <div :class="{ 'hi': !shouldShowSidebar }">
+                                <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
                                     <div class="p-2 flex items-center -mx-1">
                                         <button
@@ -121,7 +121,7 @@
 
                                 <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input :value="published" @input="setFieldValue('published', $event)" />
+                                    <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
                                 </div>
 
                                 <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
@@ -156,11 +156,11 @@
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer hover:bg-grey-20"
-                                        :class="{ 'opacity-50': !option.active }"
+                                        class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer"
+                                        :class="option.active ? 'bg-blue-100' : 'hover:bg-grey-20'"
                                         @click="localizationSelected(option)"
                                     >
-                                        <div class="flex-1 flex items-center">
+                                        <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot mr-1" :class="{
                                                 'bg-green': option.published,
                                                 'bg-grey-50': !option.published,
@@ -290,14 +290,17 @@ export default {
         method: String,
         amp: Boolean,
         isCreating: Boolean,
+        isInline: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
         canEditBlueprint: Boolean,
+        canManagePublishState: Boolean,
         createAnotherUrl: String,
         listingUrl: String,
+        collectionHasRoutes: Boolean,
     },
 
     data() {
@@ -336,6 +339,8 @@ export default {
             permalink: this.initialPermalink,
 
             saveKeyBinding: null,
+            quickSaveKeyBinding: null,
+            quickSave: false
         }
     },
 
@@ -431,7 +436,10 @@ export default {
         },
 
         save() {
-            if (!this.canSave) return;
+            if (! this.canSave) {
+                this.quickSave = false;
+                return;
+            }
 
             this.saving = true;
             this.clearErrors();
@@ -491,13 +499,15 @@ export default {
                         return;
                     }
 
+                    let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
+
                     // If the user has opted to create another entry, redirect them to create page.
-                    if (this.afterSaveOption === 'create_another') {
+                    if (!this.isInline && nextAction === 'create_another') {
                         window.location = this.createAnotherUrl;
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (this.afterSaveOption === null) {
+                    else if (!this.isInline && nextAction === null) {
                         window.location = this.listingUrl;
                     }
 
@@ -510,6 +520,8 @@ export default {
                         this.activeLocalization.status = response.data.data.status;
                         this.$nextTick(() => this.$emit('saved', response));
                     }
+
+                    this.quickSave = false;
                 }).catch(e => {});
         },
 
@@ -625,6 +637,9 @@ export default {
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.data.title;
+            this.activeLocalization.title = response.data.data.title;
+            this.activeLocalization.published = response.data.data.published;
+            this.activeLocalization.status = response.data.data.status;
             this.permalink = response.data.data.permalink
             this.$nextTick(() => this.$emit('saved', response));
         },
@@ -656,9 +671,16 @@ export default {
     },
 
     mounted() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s', 'mod+return'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+return'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
+            this.save();
+        });
+
+        this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], e => {
+            e.preventDefault();
+            if (this.confirmingPublish) return;
+            this.quickSave = true;
             this.save();
         });
 
@@ -671,6 +693,7 @@ export default {
 
     destroyed() {
         this.saveKeyBinding.destroy();
+        this.quickSaveKeyBinding.destroy();
     }
 
 }

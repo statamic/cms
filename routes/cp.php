@@ -11,6 +11,8 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
 
     Route::get('password/reset', 'ForgotPasswordController@showLinkRequestForm')->name('password.request');
     Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+    Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
+    Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.action');
 
     Route::get('token', 'CsrfTokenController')->name('token');
     Route::get('extend', 'ExtendSessionController')->name('extend');
@@ -26,23 +28,32 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
-    Route::group(['namespace' => 'Structures'], function () {
+    Route::group(['namespace' => 'Navigation'], function () {
         Route::resource('navigation', 'NavigationController');
-        Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
+
+        Route::get('navigation/{navigation}/blueprint', 'NavigationBlueprintController@edit')->name('navigation.blueprint.edit');
+        Route::patch('navigation/{navigation}/blueprint', 'NavigationBlueprintController@update')->name('navigation.blueprint.update');
+        Route::get('navigation/{navigation}/tree', 'NavigationTreeController@index')->name('navigation.tree.index');
+        Route::patch('navigation/{navigation}/tree', 'NavigationTreeController@update')->name('navigation.tree.update');
+        Route::post('navigation/{navigation}/pages', 'NavigationPagesController@update')->name('navigation.pages.update');
+        Route::get('navigation/{navigation}/pages/create', 'NavigationPagesController@create')->name('navigation.pages.create');
+        Route::get('navigation/{navigation}/pages/{edit}/edit', 'NavigationPagesController@edit')->name('navigation.pages.edit');
     });
 
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
-        Route::post('collections/{collection}/structure', 'CollectionStructureController@update')->name('collections.structure.update');
         Route::get('collections/{collection}/scaffold', 'ScaffoldCollectionController@index')->name('collections.scaffold');
         Route::post('collections/{collection}/scaffold', 'ScaffoldCollectionController@create')->name('collections.scaffold.create');
         Route::resource('collections.blueprints', 'CollectionBlueprintsController');
         Route::post('collections/{collection}/blueprints/reorder', 'ReorderCollectionBlueprintsController')->name('collections.blueprints.reorder');
 
+        Route::get('collections/{collection}/tree', 'CollectionTreeController@index')->name('collections.tree.index');
+        Route::patch('collections/{collection}/tree', 'CollectionTreeController@update')->name('collections.tree.update');
+
         Route::group(['prefix' => 'collections/{collection}/entries'], function () {
             Route::get('/', 'EntriesController@index')->name('collections.entries.index');
             Route::post('actions', 'EntryActionController@run')->name('collections.entries.actions.run');
-            Route::get('actions', 'EntryActionController@bulkActions')->name('collections.entries.actions.bulk');
+            Route::post('actions/list', 'EntryActionController@bulkActions')->name('collections.entries.actions.bulk');
             Route::get('create/{site}', 'EntriesController@create')->name('collections.entries.create');
             Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
@@ -75,7 +86,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
             Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
             Route::post('actions', 'TermActionController@run')->name('taxonomies.terms.actions.run');
-            Route::get('actions', 'TermActionController@bulkActions')->name('taxonomies.terms.actions.bulk');
+            Route::post('actions/list', 'TermActionController@bulkActions')->name('taxonomies.terms.actions.bulk');
             Route::get('create/{site}', 'TermsController@create')->name('taxonomies.terms.create');
             Route::post('create/{site}/preview', 'TermPreviewController@create')->name('taxonomies.terms.preview.create');
             Route::post('{site}', 'TermsController@store')->name('taxonomies.terms.store');
@@ -120,7 +131,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('asset-containers/{asset_container}/blueprint', 'AssetContainerBlueprintController@edit')->name('asset-containers.blueprint.edit');
         Route::patch('asset-containers/{asset_container}/blueprint', 'AssetContainerBlueprintController@update')->name('asset-containers.blueprint.update');
         Route::post('assets/actions', 'ActionController@run')->name('assets.actions.run');
-        Route::get('assets/actions', 'ActionController@bulkActions')->name('assets.actions.bulk');
+        Route::post('assets/actions/list', 'ActionController@bulkActions')->name('assets.actions.bulk');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
         Route::get('assets/browse/search/{asset_container}', 'BrowserController@search');
         Route::post('assets/browse/folders/{asset_container}/actions', 'FolderActionController@run')->name('assets.folders.actions.run');
@@ -155,6 +166,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('updater/{product}/install', 'UpdateProductController@install');
     });
 
+    Route::group(['prefix' => 'duplicates'], function () {
+        Route::get('/', 'DuplicatesController@index')->name('duplicates');
+        Route::post('regenerate', 'DuplicatesController@regenerate')->name('duplicates.regenerate');
+    });
+
     Route::get('addons', 'AddonsController@index')->name('addons.index');
     Route::post('addons/install', 'AddonsController@install');
     Route::post('addons/uninstall', 'AddonsController@uninstall');
@@ -162,7 +178,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::group(['namespace' => 'Forms'], function () {
         Route::post('forms/{form}/submissions/actions', 'SubmissionActionController@run')->name('forms.submissions.actions.run');
-        Route::get('forms/{form}/submissions/actions', 'SubmissionActionController@bulkActions')->name('forms.submissions.actions.bulk');
+        Route::post('forms/{form}/submissions/actions/list', 'SubmissionActionController@bulkActions')->name('forms.submissions.actions.bulk');
         Route::resource('forms', 'FormsController');
         Route::resource('forms.submissions', 'FormSubmissionsController');
         Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
@@ -172,7 +188,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::group(['namespace' => 'Users'], function () {
         Route::post('users/actions', 'UserActionController@run')->name('users.actions.run');
-        Route::get('users/actions', 'UserActionController@bulkActions')->name('users.actions.bulk');
+        Route::post('users/actions/list', 'UserActionController@bulkActions')->name('users.actions.bulk');
         Route::get('users/blueprint', 'UserBlueprintController@edit')->name('users.blueprint.edit');
         Route::patch('users/blueprint', 'UserBlueprintController@update')->name('users.blueprint.update');
         Route::resource('users', 'UsersController');
@@ -191,10 +207,16 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('utilities', 'Utilities\UtilitiesController@index')->name('utilities.index');
     Utility::routes();
 
+    if (config('statamic.graphql.enabled')) {
+        Route::get('graphql', 'GraphQLController@index')->name('graphql.index');
+        Route::get('graphiql', 'GraphQLController@graphiql')->name('graphql.graphiql');
+    }
+
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');
         Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
         Route::get('relationship/filters', 'RelationshipFieldtypeController@filters')->name('relationship.filters');
+        Route::post('markdown', 'MarkdownFieldtypeController@preview')->name('markdown.preview');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.', 'namespace' => 'API'], function () {

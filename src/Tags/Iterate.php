@@ -7,6 +7,22 @@ class Iterate extends Tags
     protected static $aliases = ['foreach'];
 
     /**
+     * Maps to the {{ iterate }} tag.
+     *
+     * @return mixed
+     */
+    public function index()
+    {
+        $value = $this->params->get('array');
+
+        if (is_string($value)) {
+            $value = $this->context->get($value);
+        }
+
+        return $this->iterate($value);
+    }
+
+    /**
      * Maps to the {{ iterate:fieldname }} tag.
      *
      * Also maps to {{ foreach:fieldname }}.
@@ -16,12 +32,23 @@ class Iterate extends Tags
      */
     public function wildcard($tag)
     {
+        return $this->iterate($this->context->get($tag));
+    }
+
+    protected function iterate($items)
+    {
         [$keyKey, $valueKey] = $this->getKeyNames();
 
-        return collect($this->context->get($tag))
+        $items = collect($items)
             ->map(function ($value, $key) use ($keyKey, $valueKey) {
                 return [$keyKey => $key, $valueKey => $value];
-            })->values();
+            });
+
+        if ($limit = $this->params->int('limit')) {
+            $items = $items->take($limit);
+        }
+
+        return $items->values();
     }
 
     /**

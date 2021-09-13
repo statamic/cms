@@ -130,8 +130,14 @@ export default {
                 this.fieldset.fields.splice(e.newIndex, 0, this.fieldset.fields.splice(e.oldIndex, 1)[0]);
             });
         }
+    },
 
-    }
+    created() {
+        this.$keys.bindGlobal(['mod+s'], e => {
+            e.preventDefault();
+            this.save();
+        });
+    },
 
 }
 </script>

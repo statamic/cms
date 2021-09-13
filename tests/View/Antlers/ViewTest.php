@@ -128,11 +128,27 @@ class ViewTest extends TestCase
     }
 
     /** @test */
+    public function gets_first()
+    {
+        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-noparse.antlers.html'));
+
+        $view = View::first(['template', 'not_found']);
+        $this->assertEquals('template', $view->template());
+
+        $view = View::first(['not_found', 'template']);
+        $this->assertEquals('template', $view->template());
+    }
+
+    /** @test */
     public function gets_data()
     {
         $view = (new View)->with(['foo' => 'bar']);
 
         $this->assertEquals(['foo' => 'bar'], $view->data());
+
+        $view->with(['baz' => 'qux']);
+
+        $this->assertEquals(['baz' => 'qux'], $view->data());
     }
 
     /** @test */
@@ -169,6 +185,34 @@ template-bar
 template:
 template-foo
 template-bar
+EOT;
+
+        $this->assertEquals($expected, trim($view->render()));
+    }
+
+    /** @test */
+    public function current_view_data_wins()
+    {
+        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-front-matter.antlers.html')."\n{{ partial:partial }}");
+        $this->viewShouldReturnRaw('partial', file_get_contents(__DIR__.'/fixtures/partial-with-front-matter.antlers.html'));
+        $this->viewShouldReturnRaw('layout', file_get_contents(__DIR__.'/fixtures/layout-with-front-matter.antlers.html'));
+
+        $view = (new View)
+            ->template('template')
+            ->layout('layout');
+
+        $expected = <<<'EOT'
+layout:
+layout-foo
+template-bar
+
+template:
+template-foo
+template-bar
+
+partial:
+partial-foo
+partial-bar
 EOT;
 
         $this->assertEquals($expected, trim($view->render()));

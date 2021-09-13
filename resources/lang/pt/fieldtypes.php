@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'any.config.default' => 'Definir o valor padrão',
+    'any.config.antlers' => 'Se você deseja que este campo seja analisado pelo Antlers.',
     'any.config.cast_booleans' => 'Opções com valores de verdadeiro e falso serão salvas como booleans.',
+    'any.config.default' => 'Definir o valor padrão',
     'array.config.keys' => 'O modo dinâmico dá ao utilizador o controlo dos dados enquanto que o modo com chave não o faz.',
     'array.config.mode' => 'Defina as chaves da matriz (variáveis) e as etiquetas opcionais.',
     'assets.config.allow_uploads' => 'Permitir o carregamento de novos ficheiros.',
@@ -37,7 +38,7 @@ return [
     'color.config.theme' => 'Escolha entre o clássico e o mini-apanhador de cores (mais simples).',
     'date.config.columns' => 'Mostrar vários meses ao mesmo tempo, em filas e colunas',
     'date.config.earliest_date' => 'Fixar a data mais próxima a seleccionar.',
-    'date.config.format' => 'Formatar opcionalmente a sequência de datas utilizando [moment.js](https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Como a data deve ser armazenada, usando o [formato de data PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Esticar o calendário para utilizar em toda a sua largura.',
     'date.config.inline' => 'Saltar o campo de entrada dropdown e mostrar directamente o calendário.',
     'date.config.mode' => 'Escolha entre o modo simples ou intervalo (intervalo desabilita o seletor de tempo).',
@@ -67,6 +68,11 @@ return [
     'range.config.prepend' => 'Adicionar texto ao início (lado esquerdo) da barra deslizante.',
     'range.config.step' => 'A dimensão mínima entre os valores.',
     'relationship.config.mode' => 'Escolha o seu estilo de interface do usuário preferido.',
+    'replicator.config.collapse' => 'O comportamento de colapso do conjunto.',
+    'replicator.config.collapse.accordion' => 'Permitir que apenas um conjunto seja expandido de cada vez',
+    'replicator.config.collapse.disabled' => 'Todos os conjuntos são expandidos por padrão',
+    'replicator.config.collapse.enabled' => 'Todos os conjuntos recolhidos por padrão',
+    'replicator.config.max_sets' => 'O número máximo de conjuntos.',
     'select.config.clearable' => 'Permitir a desmarcação da sua opção.',
     'select.config.multiple' => 'Permitir selecções múltiplas.',
     'select.config.options' => 'Defina as chaves e as suas etiquetas opcionais.',

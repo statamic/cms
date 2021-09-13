@@ -3,8 +3,15 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
+use Statamic\Events\GlobalSetDeleted;
+use Statamic\Events\GlobalSetSaved;
+use Statamic\Events\NavDeleted;
+use Statamic\Events\NavSaved;
+use Statamic\Events\NavTreeDeleted;
+use Statamic\Events\NavTreeSaved;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 
@@ -17,6 +24,14 @@ class Invalidate implements ShouldQueue
         EntryDeleted::class => 'invalidateEntry',
         TermSaved::class => 'invalidateTerm',
         TermDeleted::class => 'invalidateTerm',
+        GlobalSetSaved::class => 'invalidateGlobalSet',
+        GlobalSetDeleted::class => 'invalidateGlobalSet',
+        NavSaved::class => 'invalidateNav',
+        NavDeleted::class => 'invalidateNav',
+        CollectionTreeSaved::class => 'invalidateCollectionByTree',
+        CollectionTreeDeleted::class => 'invalidateCollectionByTree',
+        NavTreeSaved::class => 'invalidateNavByTree',
+        NavTreeDeleted::class => 'invalidateNavByTree',
     ];
 
     public function __construct(Invalidator $invalidator)
@@ -39,5 +54,25 @@ class Invalidate implements ShouldQueue
     public function invalidateTerm($event)
     {
         $this->invalidator->invalidate($event->term);
+    }
+
+    public function invalidateGlobalSet($event)
+    {
+        $this->invalidator->invalidate($event->globals);
+    }
+
+    public function invalidateNav($event)
+    {
+        $this->invalidator->invalidate($event->nav);
+    }
+
+    public function invalidateCollectionByTree($event)
+    {
+        $this->invalidator->invalidate($event->tree->collection());
+    }
+
+    public function invalidateNavByTree($event)
+    {
+        $this->invalidator->invalidate($event->tree->structure());
     }
 }

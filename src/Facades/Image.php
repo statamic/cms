@@ -8,7 +8,9 @@ use Statamic\Imaging\Manager;
 /**
  * @method static string|\Statamic\Contracts\Imaging\ImageManipulator manipulate($item = null, $params = null)
  * @method static \Statamic\Contracts\Imaging\ImageManipulator manipulator()
- * @method static array getCpImageManipulationPresets()
+ * @method static array manipulationPresets()
+ * @method static array userManipulationPresets()
+ * @method static array cpManipulationPresets()
  *
  * @see \Statamic\Imaging\Manager
  */

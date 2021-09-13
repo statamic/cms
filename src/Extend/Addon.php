@@ -3,10 +3,9 @@
 namespace Statamic\Extend;
 
 use Facades\Statamic\Licensing\LicenseManager;
+use ReflectionClass;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
-use Statamic\Facades\URL;
-use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Updater\AddonChangelog;
@@ -15,7 +14,7 @@ final class Addon
 {
     /**
      * The identifier.
-     * Typically a composer package name. eg. statamic/bloodhound.
+     * Typically a composer package name. eg. statamic/trapper-keeper.
      *
      * @var string
      */
@@ -43,14 +42,14 @@ final class Addon
     protected $marketplaceSellerSlug;
 
     /**
-     * The addon's namespace. eg. "Statamic\Addons\Bloodhound".
+     * The addon's namespace. eg. "Statamic\Addons\TrapperKeeper".
      *
      * @var string
      */
     protected $namespace;
 
     /**
-     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound".
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/trapper-keeper".
      *
      * @var string
      */
@@ -64,7 +63,14 @@ final class Addon
     protected $autoload;
 
     /**
-     * The name of the addon. eg. "Bloodhound Search".
+     * The service provider class.
+     *
+     * @var string
+     */
+    protected $provider;
+
+    /**
+     * The name of the addon. eg. "Trapper Keeper".
      *
      * @var string
      */
@@ -162,8 +168,8 @@ final class Addon
         $instance = self::make($package['id']);
 
         $keys = [
-            'id', 'slug', 'editions', 'marketplaceId', 'marketplaceSlug', 'marketplaceSellerSlug', 'name', 'namespace', 'directory',
-            'autoload', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
+            'id', 'slug', 'editions', 'marketplaceId', 'marketplaceSlug', 'marketplaceSellerSlug', 'name', 'namespace',
+            'autoload', 'provider', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
         ];
 
         foreach (Arr::only($package, $keys) as $key => $value) {
@@ -176,7 +182,7 @@ final class Addon
 
     /**
      * The ID (in a vendor/package format)
-     * eg. statamic/bloodhound.
+     * eg. statamic/trapper-keeper.
      *
      * @return string
      */
@@ -187,7 +193,7 @@ final class Addon
 
     /**
      * The composer package string
-     * eg. statamic/bloodhound.
+     * eg. statamic/trapper-keeper.
      *
      * @return string
      */
@@ -198,7 +204,7 @@ final class Addon
 
     /**
      * The composer package name string
-     * eg. in statamic/blodhound, it's bloodhound.
+     * eg. in statamic/trapper-keeper, it's trapper-keeper.
      *
      * @return string
      */
@@ -209,7 +215,7 @@ final class Addon
 
     /**
      * The composer vendor name string
-     * eg. in statamic/blodhound, it's statamic.
+     * eg. in statamic/trapper-keeper, it's statamic.
      *
      * @return string
      */
@@ -275,7 +281,7 @@ final class Addon
      * The name of addon.
      *
      * @param string $name
-     * @return stirng|self
+     * @return string|self
      */
     public function name($name = null)
     {
@@ -297,7 +303,7 @@ final class Addon
     public function hasFile($path)
     {
         if (! $this->directory()) {
-            throw new \Exception('Cannot check files without a directory specified.');
+            throw new \Exception('Cannot check files without a provider specified.');
         }
 
         return File::exists(Path::assemble($this->directory(), $path));
@@ -312,7 +318,7 @@ final class Addon
     public function getFile($path)
     {
         if (! $this->directory()) {
-            throw new \Exception('Cannot get files without a directory specified.');
+            throw new \Exception('Cannot get files without a provider specified.');
         }
 
         return File::get(Path::assemble($this->directory(), $path));
@@ -327,7 +333,7 @@ final class Addon
     public function putFile($path, $contents)
     {
         if (! $this->directory()) {
-            throw new \Exception('Cannot write files without a directory specified.');
+            throw new \Exception('Cannot write files without a provider specified.');
         }
 
         File::put(
@@ -391,6 +397,28 @@ final class Addon
         $this->$method = $args[0];
 
         return $this;
+    }
+
+    /**
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/trapper-keeper/".
+     *
+     * @return string
+     */
+    public function directory()
+    {
+        if (! $this->provider) {
+            return null;
+        }
+
+        if ($this->directory) {
+            return $this->directory;
+        }
+
+        $reflector = new ReflectionClass($this->provider);
+
+        $dir = Str::removeRight(dirname($reflector->getFileName()), rtrim($this->autoload, '/'));
+
+        return $this->directory = Str::ensureRight($dir, '/');
     }
 
     public function existsOnMarketplace()

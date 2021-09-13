@@ -236,6 +236,8 @@ class SiteTest extends TestCase
             'locale' => 'en_US',
             'short_locale' => 'en',
             'url' => 'http://test.com',
+            'direction' => 'ltr',
+            'attributes' => [],
         ], $values->all());
 
         $this->assertEquals(
@@ -255,5 +257,21 @@ class SiteTest extends TestCase
 
         $this->assertSame('test', (string) $site);
         $this->assertEquals('test', Antlers::parse('{{ site }}', ['site' => $site]));
+    }
+
+    /** @test */
+    public function gets_direction()
+    {
+        $site = new Site('ar', ['locale' => 'ar_SA', 'direction' => 'rtl']);
+
+        $this->assertEquals('rtl', $site->direction());
+    }
+
+    /** @test */
+    public function gets_direction_with_fallback()
+    {
+        $site = new Site('en', ['locale' => 'en_US']);
+
+        $this->assertEquals('ltr', $site->direction());
     }
 }

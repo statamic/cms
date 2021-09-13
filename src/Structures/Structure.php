@@ -14,7 +14,7 @@ abstract class Structure implements StructureContract
 
     protected $title;
     protected $handle;
-    protected $trees;
+    protected $trees = [];
     protected $collection;
     protected $maxDepth;
     protected $expectsRoot = false;
@@ -54,38 +54,20 @@ abstract class Structure implements StructureContract
         return collect($this->trees);
     }
 
-    public function makeTree($site)
+    public function makeTree($site, $tree = [])
     {
-        return (new Tree)
+        return $this->newTreeInstance()
+            ->handle($this->handle())
             ->locale($site)
-            ->structure($this);
+            ->tree($tree)
+            ->syncOriginal();
     }
 
-    public function addTree($tree)
-    {
-        $tree->structure($this);
+    abstract public function newTreeInstance();
 
-        $this->trees[$tree->locale()] = $tree;
+    abstract public function existsIn($site);
 
-        return $this;
-    }
-
-    public function removeTree($tree)
-    {
-        unset($this->trees[$tree->locale()]);
-
-        return $this;
-    }
-
-    public function existsIn($site)
-    {
-        return isset($this->trees[$site]);
-    }
-
-    public function in($site)
-    {
-        return $this->trees[$site] ?? null;
-    }
+    abstract public function in($site);
 
     abstract public function collections($collections = null);
 
@@ -102,10 +84,6 @@ abstract class Structure implements StructureContract
     {
         if (! $this->expectsRoot()) {
             return $tree;
-        }
-
-        if (! empty($tree) && ! isset($tree[0]['entry'])) {
-            throw new \Exception('Root page must be an entry');
         }
 
         throw_if(isset($tree[0]['children']), new \Exception('Root page cannot have children'));

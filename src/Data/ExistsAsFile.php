@@ -13,6 +13,11 @@ trait ExistsAsFile
 
     abstract public function path();
 
+    public function buildPath()
+    {
+        return $this->path();
+    }
+
     public function initialPath($path = null)
     {
         if (func_num_args() === 0) {
@@ -37,15 +42,30 @@ trait ExistsAsFile
         // file type used. Right now it's assuming markdown. Maybe you'll want to
         // save JSON, etc. TODO: Make it smarter when the time is right.
 
-        $data = Arr::removeNullValues($this->fileData());
+        $data = $this->fileData();
+
+        if ($this->shouldRemoveNullsFromFileData()) {
+            $data = Arr::removeNullValues($data);
+        }
 
         if ($this->fileExtension() === 'yaml') {
             return YAML::dump($data);
         }
 
-        $content = array_pull($data, 'content');
+        if (! Arr::has($data, 'content')) {
+            return YAML::dumpFrontMatter($data);
+        }
 
-        return YAML::dumpFrontMatter($data, $content);
+        $content = $data['content'];
+
+        return $content === null
+            ? YAML::dump($data)
+            : YAML::dumpFrontMatter(Arr::except($data, 'content'), $content);
+    }
+
+    protected function shouldRemoveNullsFromFileData()
+    {
+        return true;
     }
 
     public function fileLastModified()
@@ -62,9 +82,9 @@ trait ExistsAsFile
         return 'yaml';
     }
 
-    public function writeFile()
+    public function writeFile($path = null)
     {
-        $path = $this->path();
+        $path = $path ?? $this->buildPath();
         $initial = $this->initialPath();
 
         if ($initial && $path !== $initial) {

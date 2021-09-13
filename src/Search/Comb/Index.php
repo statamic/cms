@@ -3,6 +3,7 @@
 namespace Statamic\Search\Comb;
 
 use Statamic\Facades\File;
+use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 use Statamic\Search\Documents;
@@ -18,15 +19,15 @@ class Index extends BaseIndex
 
     public function lookup($query)
     {
-        $data = $this->data()->map(function ($item, $id) {
-            return $item + ['id' => $id];
+        $data = $this->data()->map(function ($item, $reference) {
+            return $item + ['reference' => $reference];
         })->values()->toArray();
 
         $comb = new Comb($data, $this->settings());
 
         try {
             $results = $comb->lookUp($query)['data'];
-        } catch (NoResultsFound | NotEnoughCharacters $e) {
+        } catch (NoResultsFound | NotEnoughCharacters | NoQuery $e) {
             return collect();
         }
 
@@ -91,7 +92,7 @@ class Index extends BaseIndex
             return;
         }
 
-        $data->forget($document->id());
+        $data->forget($document->reference());
 
         $this->save($data);
     }

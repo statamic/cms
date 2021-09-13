@@ -70,7 +70,7 @@ abstract class Index
 
         $this->items = Cache::get($this->cacheKey());
 
-        if (! $this->items) {
+        if ($this->items === null) {
             $this->update();
         }
 
@@ -92,6 +92,11 @@ abstract class Index
         $this->cache();
 
         return $this;
+    }
+
+    public function isCached()
+    {
+        return Cache::has($this->cacheKey());
     }
 
     public function cache()

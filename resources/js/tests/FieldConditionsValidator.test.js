@@ -294,7 +294,9 @@ test('it can call a custom function', () => {
     });
 
     expect(Fields.showField({if: 'reallyLovesAnimals'})).toBe(false);
+    expect(Fields.showField({if: 'custom reallyLovesAnimals'})).toBe(false);
     expect(Fields.showField({unless: 'reallyLovesAnimals'})).toBe(true);
+    expect(Fields.showField({unless: 'custom reallyLovesAnimals'})).toBe(true);
 });
 
 test('it can call a custom function using params against root values', () => {
@@ -346,6 +348,15 @@ test('it can call a custom function on a specific field using params against a r
     expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals'})).toBe(true);
     expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals:2'})).toBe(true);
     expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals:7'})).toBe(false);
+});
+
+test('it fails if the condition lhs is not evaluatable', () => {
+    Fields.setValues({
+        favorite_animals: [],
+    });
+
+    expect(Fields.showField({if: {'favorite_animals': 'not null'}})).toBe(false);
+    expect(Fields.showField({unless: {'favorite_animals': 'not null'}})).toBe(true);
 });
 
 test('it can mix custom and non-custom conditions', () => {

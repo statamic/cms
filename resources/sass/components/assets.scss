@@ -115,25 +115,27 @@
 /* Solo Asset (max_files: 1)
   ========================================================================== */
 
- .asset-solo-container {
+.asset-solo-container {
 
     .asset-tile {
         padding: 0;
         max-width: 300px;
     }
 
-    .asset-tile .asset-thumb img {
-         height: auto;
-         width: auto;
-         max-width: 100%;
-         max-height: 100%;
+    .asset-tile .asset-thumb {
+        img,
+        .svg-img {
+            height: auto;
+            width: 100%;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    }
 
-     }
-
-     .asset-tile .asset-meta {
+    .asset-tile .asset-meta {
          max-width: 100%;
-     }
- }
+    }
+}
 
 
  /* Asset Tile
@@ -145,14 +147,19 @@
     padding: 8px;
 
     .asset-thumb {
-        text-align: center;
+        @apply flex justify-center items-center;
+        overflow: hidden;
 
-        img {
-            @apply shadow block w-auto h-auto;
+        img,
+        .svg-img {
             border: 5px solid #fff;
             max-height: 150px;
             max-width: 150px;
             margin: 0 auto;
+        }
+
+        img {
+            @apply block w-auto h-auto;
         }
     }
 
@@ -188,17 +195,12 @@
         border-radius: 4px;
     }
 
-    &.is-svg {
-        .asset-thumb-container {
-            background: url('../img/trans-bg.gif');
-        }
-    }
-
     .svg-img {
         background-size: contain;
         background-position: 50% 50%;
         background-repeat: no-repeat;
         padding-bottom: 100%;
+        padding-bottom: calc(100% - 10px); // take the border of 5px each into account
         height: 150px;
         width: 150px;
     }
@@ -246,6 +248,7 @@
 
     .editor-preview {
         flex-basis: 64%;
+        flex-grow: 1;
     }
 
     .editor-form {
@@ -296,36 +299,22 @@
 }
 
 .asset-editor .editor-preview {
-	@apply bg-grey-80 flex flex-col justify-between relative;
+	@apply bg-grey-80 flex flex-col justify-between;
 
     .editor-preview-image {
-        flex-grow: 1;
-        padding: 30px 30px 90px; // bottom padding accounts for action button bar.
-        height: 100%;
+        flex: 1;
+        padding: 30px;
         display: flex;
         flex-direction: column;
-    }
-
-    .audio-wrapper,
-    .video-wrapper {
-        align-items: center;
-        display: flex;
-        height: 100%;
-        padding: 30px;
-        audio, video {
-            box-shadow: 0 0 30px rgba(black, .35);
-            text-align: center;
-            width: 100%;
-        }
     }
 
     .image-wrapper {
         flex: 1 1 auto;
         position: relative;
 
-        img {
-			@apply absolute w-auto h-auto max-w-full max-h-full;
-			box-shadow: 0 0 32px rgba(0, 0, 0, .35);
+        > * {
+            @apply absolute w-auto h-auto max-w-full max-h-full;
+            box-shadow: 0 0 32px rgba(0, 0, 0, .35);
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
@@ -333,7 +322,7 @@
     }
 
     .editor-file-actions {
-		@apply absolute bottom-0 inset-x-0 bg-grey-90 p-2 text-center h-16;
+		@apply bg-grey-90 p-2 text-center h-16;
 
         button {
             @apply mx-sm;

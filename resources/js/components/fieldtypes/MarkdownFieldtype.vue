@@ -70,7 +70,7 @@
                             <div class="flex w-full">
                                 <div class="markdown-cheatsheet-helper">
                                     <button class="text-link flex items-center" @click="showCheatsheet = true" :aria-label="__('Show Markdown Cheatsheet')">
-                                        <svg-icon name="markdown-icon" class="w-6 items-start mr-px" />
+                                        <svg-icon name="markdown-icon" class="w-6 h-4 items-start mr-1" />
                                         <span>{{ __('Markdown Cheatsheet') }}</span>
                                     </button>
                                 </div>
@@ -173,6 +173,7 @@ export default {
             uploads: [],
             count: {},
             escBinding: null,
+            markdownPreviewText: null
         };
     },
 
@@ -191,6 +192,10 @@ export default {
                     document.body.style.removeProperty("overflow")
                 }
             }
+        },
+
+        mode(mode) {
+            if (mode === 'preview') this.updateMarkdownPreview();
         }
 
     },
@@ -466,7 +471,7 @@ export default {
             this.$axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
                 _(response.data).each((asset) => {
                     var alt = asset.values.alt || '';
-                    var url = encodeURI(asset.url);
+                    var url = encodeURI('statamic://'+asset.reference);
                     if (asset.isImage) {
                         this[method+'Image'](url, alt);
                     } else {
@@ -540,14 +545,17 @@ export default {
             return this.config.restrict_assets || false;
         },
 
-        markdownPreviewText() {
-            return markdown(this.data);
-        },
-
         replicatorPreview() {
             return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
         },
+
+        updateMarkdownPreview() {
+            this.$axios
+                .post(this.meta.previewUrl, { value: this.data, config: this.config })
+                .then(response => this.markdownPreviewText = response.data)
+                .catch(e => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
+        }
     },
 
     mounted() {
@@ -563,7 +571,10 @@ export default {
             tabindex: 0,
             autoRefresh: true,
             readOnly: self.isReadOnly ? 'nocursor' : false,
-            extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
+            extraKeys: {
+                "Enter": "newlineAndIndentContinueMarkdownList",
+                "Cmd-Left": "goLineLeftSmart"
+            }
         });
 
         self.codemirror.on('change', function (cm) {

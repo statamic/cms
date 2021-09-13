@@ -6,21 +6,6 @@ use Statamic\Facades\Path;
 
 class PathsTest extends TestCase
 {
-    public function testPathCleaning()
-    {
-        $path = Path::clean('/blog/2015-01-12.post.md');
-        $this->assertEquals('/blog/post.md', $path);
-
-        $path = Path::clean('pages/1.about/index.md');
-        $this->assertEquals('pages/about/index.md', $path);
-    }
-
-    public function testPathCleaningWithNumericSlug()
-    {
-        $path = Path::clean('/blog/404.md');
-        $this->assertEquals('/blog/404.md', $path);
-    }
-
     public function testRelativePath()
     {
         $path = Path::makeRelative(base_path().'/content/foo/bar.md');

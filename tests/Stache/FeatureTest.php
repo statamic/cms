@@ -30,6 +30,8 @@ class FeatureTest extends TestCase
             $stache->store('navigation')->directory($dir.'/content/navigation');
             $stache->store('globals')->directory($dir.'/content/globals');
             $stache->store('asset-containers')->directory($dir.'/content/assets');
+            $stache->store('collection-trees')->directory($dir.'/content/structures/collections');
+            $stache->store('nav-trees')->directory($dir.'/content/structures/navigation');
             $stache->store('users')->directory($dir.'/users');
         });
     }
@@ -63,7 +65,10 @@ class FeatureTest extends TestCase
         $this->assertNull(Entry::find('users-john'));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @deprecated
+     **/
     public function it_gets_entry_by_slug()
     {
         $this->assertEquals('Christmas', Entry::findBySlug('christmas', 'blog', 'christmas')->get('title'));
@@ -172,14 +177,28 @@ class FeatureTest extends TestCase
     {
         $structure = Nav::find('footer');
         $this->assertEquals('footer', $structure->handle());
-        // TODO: Some more assertions
+        $this->assertEquals([
+            ['entry' => 'pages-home'],
+            ['entry' => 'pages-about'],
+            ['entry' => 'pages-contact'],
+        ], $structure->in('en')->tree());
     }
 
     /** @test */
     public function it_gets_a_collection_structure()
     {
         $structure = Structure::find('collection::pages');
-        $this->assertEquals('collection::pages', $structure->handle());
+        $this->assertEquals('pages', $structure->handle());
+        $this->assertEquals([
+            ['entry' => 'pages-home'],
+            ['entry' => 'pages-about', 'children' => [
+                ['entry' => 'pages-board', 'children' => [
+                    ['entry' => 'pages-directors'],
+                ]],
+            ]],
+            ['entry' => 'pages-blog'],
+            ['entry' => 'pages-contact'], // not in the actual tree but since the entry exists it gets added.
+        ], $structure->in('en')->tree());
     }
 
     /** @test */

@@ -1,5 +1,5 @@
 .v-select {
-	@apply rounded;
+	@apply rounded min-w-0;
 	position: relative;
 	font-family: inherit
 }
@@ -15,11 +15,15 @@
 }
 
 .vs--disabled .vs__clear,
+.vs--disabled .vs__deselect,
 .vs--disabled .vs__dropdown-toggle,
 .vs--disabled .vs__open-indicator,
 .vs--disabled .vs__search,
 .vs--disabled .vs__selected {
-	cursor: not-allowed;
+	cursor: not-allowed !important;
+}
+
+.vs--disabled .vs__dropdown-toggle {
 	@apply bg-grey-20;
 }
 
@@ -56,6 +60,10 @@
 	}
 }
 
+.vs__selected-options {
+    @apply min-w-0;
+}
+
 .v-select:not(.vs--unsearchable) .vs__selected-options {
 	@apply appearance-none text-grey-80 text-sm;
 	@apply flex flex-wrap flex-1 border border-grey-50 border-r-0 rounded-l relative h-full;
@@ -86,18 +94,18 @@
 	@apply flex items-center;
 }
 
-.vs__actions .vs__open-indicator {
-	@include clickable;
-	@apply flex items-center rounded-r px-1 text-sm flex-shrink-0;
-	height: 2.375rem;
-}
-
 .vs--searchable .vs__dropdown-toggle {
 	cursor: text
 }
 
 .vs--unsearchable .vs__dropdown-toggle {
 	cursor: pointer
+}
+
+.vs__open-indicator {
+	@include clickable;
+	@apply flex items-center rounded-r px-1 text-sm flex-shrink-0;
+	height: 2.375rem;
 }
 
 .vs__open-indicator svg {

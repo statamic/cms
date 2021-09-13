@@ -15,7 +15,7 @@
                 :key="i"
                 :class="{ 'current': page == currentPage }"
             >
-                <span v-if="page === 'separator'">...</span>
+                <span v-if="page === 'separator'" class="unclickable">...</span>
                 <a v-else @click="selectPage(page)">{{ page }}</a>
             </li>
 
@@ -61,6 +61,10 @@ export default {
         resourceMeta: {
             type: Object,
             required: true
+        },
+        scrollToTop: {
+            type: Boolean,
+            default: true,
         }
     },
 
@@ -127,7 +131,7 @@ export default {
 
         perPageOptions() {
             let defaultPaginationSize = Statamic.$config.get('paginationSize');
-            let defaultOptions = [10, 25, 50, 100].filter(size => size !== defaultPaginationSize);
+            let defaultOptions = [10, 25, 50, 100, 500].filter(size => size !== defaultPaginationSize);
             let options = this.normalizeInputOptions(defaultOptions);
 
             options.push({
@@ -153,7 +157,9 @@ export default {
 
             this.$emit('page-selected', page);
 
-            window.scrollTo(0, 0);
+            if (this.scrollToTop) {
+                window.scrollTo(0, 0);
+            }
         },
 
         selectPreviousPage() {

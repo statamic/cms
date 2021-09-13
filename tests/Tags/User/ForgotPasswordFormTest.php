@@ -231,7 +231,8 @@ EOT
 
     protected function simulateSuccessfulPasswordResetEmail()
     {
-        $success = new class {
+        $success = new class
+        {
             public function sendResetLink()
             {
                 return Password::RESET_LINK_SENT;

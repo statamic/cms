@@ -169,7 +169,7 @@ class User extends BaseUser
         return $this->groups = $this->groups
             ?? (new UserGroups($this))->all()->map(function ($row) {
                 return UserGroup::find($row->group_id);
-            });
+            })->keyBy->handle();
     }
 
     protected function setGroups($groups)
@@ -206,7 +206,7 @@ class User extends BaseUser
     public function removeFromGroup($group)
     {
         $groups = collect(array_wrap($group))->map(function ($group) {
-            return is_string($group) ? group::find($group) : $group;
+            return is_string($group) ? UserGroup::find($group) : $group;
         })->filter();
 
         $groups->each(function ($group) {
@@ -255,13 +255,6 @@ class User extends BaseUser
         $this->saveRoles();
 
         $this->saveGroups();
-    }
-
-    public function delete()
-    {
-        $this->model()->delete();
-
-        event(new UserDeleted($this->id(), []));
     }
 
     public function lastModified()
@@ -343,7 +336,13 @@ class User extends BaseUser
 
         $model->last_login = $model->fromDateTime($time);
 
+        $timestamps = $model->timestamps;
+
+        $model->timestamps = false;
+
         $model->save();
+
+        $model->timestamps = $timestamps;
     }
 
     protected function getPreferences()
@@ -363,5 +362,27 @@ class User extends BaseUser
     public function mergePreferences($preferences)
     {
         $this->model()->preferences = array_merge($this->getPreferences(), Arr::wrap($preferences));
+    }
+
+    public function __set($key, $value)
+    {
+        if ($key === 'timestamps') {
+            return $this->model()->timestamps = $value;
+        }
+
+        return $this->$key = $value;
+    }
+
+    public function __get($key)
+    {
+        if ($key === 'timestamps') {
+            return $this->model()->timestamps;
+        }
+
+        if ($key == 'email') {
+            return $this->email();
+        }
+
+        return $this->$key;
     }
 }

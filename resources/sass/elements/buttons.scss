@@ -7,7 +7,7 @@ button {
 }
 
 // Base button styles that shouldn't need overriding
-[class*="btn"] {
+[class^="btn"], [class*=" btn"] {
     @apply cursor-pointer select-none h-auto rounded relative;
     @apply leading-normal inline-block align-middle whitespace-no-wrap;
     @apply text-center text-sm subpixel-antialiased;
@@ -85,7 +85,7 @@ button {
 
 // Earth isn't flat but these buttons are
 .btn-flat {
-    @apply text-white text-grey-80 bg-grey-30;
+    @apply text-white text-grey-80 bg-grey-30 flex items-center;
     position: inherit;
 
     &:hover:not(:disabled), &:active:not(:disabled), &.active {

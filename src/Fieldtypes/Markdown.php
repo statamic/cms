@@ -2,12 +2,15 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 use Statamic\Support\Html;
 
 class Markdown extends Fieldtype
 {
+    use Concerns\ResolvesStatamicUrls;
+
     protected function configFieldItems(): array
     {
         return [
@@ -65,6 +68,18 @@ class Markdown extends Fieldtype
                 'type' => 'text',
                 'width' => 50,
             ],
+            'antlers' => [
+                'display' => 'Antlers',
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'markdown',
+                'width' => 100,
+            ],
         ];
     }
 
@@ -99,6 +114,8 @@ class Markdown extends Fieldtype
             $markdown = $markdown->withSmartPunctuation();
         }
 
+        $value = $this->resolveStatamicUrls($value);
+
         $html = $markdown->parse((string) $value);
 
         return $html;
@@ -107,5 +124,31 @@ class Markdown extends Fieldtype
     public function preProcessIndex($value)
     {
         return $value ? Html::markdown($value) : $value;
+    }
+
+    public function toGqlType()
+    {
+        return [
+            'type' => GraphQL::string(),
+            'args' => [
+                'format' => [
+                    'type' => GraphQL::string(),
+                    'description' => 'How the value should be formatted. Either "markdown" or "html". Defaults to "html".',
+                    'defaultValue' => 'html',
+                ],
+            ],
+            'resolve' => function ($entry, $args, $context, $info) {
+                return $args['format'] == 'html'
+                    ? $entry->resolveGqlValue($info->fieldName)
+                    : $entry->resolveRawGqlValue($info->fieldName);
+            },
+        ];
+    }
+
+    public function preload()
+    {
+        return [
+            'previewUrl' => cp_route('markdown.preview'),
+        ];
     }
 }

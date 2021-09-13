@@ -12,10 +12,10 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Entry;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Tags\Tags;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -35,6 +35,9 @@ class ParserTest extends TestCase
             'default_key' => 'two',
             'first_key' => 'three',
             'second_key' => 'deep',
+            'good' => true,
+            'bad' => false,
+            'unknown' => null,
             'string' => 'Hello wilderness',
             'simple' => ['one', 'two', 'three'],
             'complex' => [
@@ -198,7 +201,8 @@ EOT;
     /** @test */
     public function accessing_string_as_array_which_exists_as_callback_calls_the_callback()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'foo';
 
             public function test()
@@ -388,9 +392,25 @@ EOT;
     {
         $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
 
-        $template = "{{ test variable='{{ true ? 'Hello wilderness' : 'fail' }}' }}";
+        $this->assertEquals('yes', $this->parse(
+            "{{ test variable='{{ good ? 'yes' : 'fail' }}' }}",
+            $this->variables
+        ));
 
-        $this->assertEquals('Hello wilderness', $this->parse($template, $this->variables));
+        $this->assertEquals('fail', $this->parse(
+            "{{ test variable='{{ bad ? 'yes' : 'fail' }}' }}",
+            $this->variables
+        ));
+
+        $this->assertEquals('fail', $this->parse(
+            "{{ test variable='{{ unknown ?? 'fail' }}' }}",
+            $this->variables
+        ));
+
+        $this->assertEquals('yes', $this->parse(
+            "{{ test variable='{{ !unknown ? 'yes' : 'fail' }}' }}",
+            $this->variables
+        ));
     }
 
     public function testNullCoalescence()
@@ -474,11 +494,36 @@ EOT;
         $this->assertEquals('hello wilderness', $this->parse($template, $this->variables));
     }
 
+    public function testChainedStandardStringModifiersFromDynamicArrayRelaxed()
+    {
+        $template = '{{ associative[default_key] | upper | lower }}';
+
+        $this->assertEquals('wilderness', $this->parse($template, $this->variables));
+    }
+
     public function testSingleParameterStringModifier()
     {
         $template = "{{ string upper='true' }}";
 
         $this->assertEquals('HELLO WILDERNESS', $this->parse($template, $this->variables));
+    }
+
+    public function testSingleParameterStringFromArrayModifier()
+    {
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative.two upper='true' }}", $this->variables)
+        );
+
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative['two'] upper='true' }}", $this->variables)
+        );
+
+        $this->assertEquals(
+            'WILDERNESS',
+            $this->parse("{{ associative[default_key] upper='true' }}", $this->variables)
+        );
     }
 
     public function testChainedParameterStringModifiers()
@@ -575,11 +620,11 @@ EOT;
         // the variables are inside RecursiveChildren@index
         $this->app['statamic.tags']['recursive_children'] = \Tests\Fixtures\Addon\Tags\RecursiveChildren::class;
 
-        $template = '<ul>{{ recursive_children }}<li>{{ title }}{{ if children }}<ul>{{ *recursive children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
+        $template = '<ul>{{ recursive_children }}<li>{{ title }}.{{ foo }}{{ if children }}<ul>{{ *recursive children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
 
-        $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
+        $expected = '<ul><li>One.Bar<ul><li>Two.Bar</li><li>Three.Bar<ul><li>Four.Baz</li></ul></li></ul></li></ul>';
 
-        $this->assertEquals($expected, $this->parse($template, []));
+        $this->assertEquals($expected, $this->parse($template, ['foo' => 'Bar']));
     }
 
     public function testRecursiveChildrenWithScope()
@@ -587,11 +632,11 @@ EOT;
         // the variables are inside RecursiveChildren@index
         $this->app['statamic.tags']['recursive_children'] = \Tests\Fixtures\Addon\Tags\RecursiveChildren::class;
 
-        $template = '<ul>{{ recursive_children scope="item" }}<li>{{ item:title }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
+        $template = '<ul>{{ recursive_children scope="item" }}<li>{{ item:title }}.{{ item:foo }}.{{ foo }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
 
-        $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
+        $expected = '<ul><li>One..Bar<ul><li>Two..Bar</li><li>Three..Bar<ul><li>Four.Baz.Baz</li></ul></li></ul></li></ul>';
 
-        $this->assertEquals($expected, $this->parse($template, []));
+        $this->assertEquals($expected, $this->parse($template, ['foo' => 'Bar']));
     }
 
     public function testEmptyValuesAreNotOverriddenByPreviousIteration()
@@ -710,7 +755,8 @@ EOT;
     /** @test */
     public function it_doesnt_parse_noparse_tags_inside_callbacks()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function array()
@@ -751,7 +797,8 @@ EOT;
     {
         $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
 
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function array()
@@ -797,6 +844,76 @@ EOT;
     }
 
     /** @test */
+    public function it_doesnt_parse_tags_prefixed_with_an_at_symbol()
+    {
+        $this->assertEquals('foo {{ bar }} baz', $this->parse('foo @{{ bar }} baz'));
+    }
+
+    /** @test */
+    public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_over_multiple_lines()
+    {
+        $template = <<<'EOT'
+@{{ foo }}
+bar
+{{ baz }}
+EOT;
+
+        $expected = <<<'EOT'
+{{ foo }}
+bar
+BAZ
+EOT;
+
+        $this->assertEquals($expected, $this->parse($template, ['baz' => 'BAZ']));
+    }
+
+    /** @test */
+    public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_over_tags_in_multiple_lines()
+    {
+        $template = <<<'EOT'
+@{{ foo }} {{ qux }}
+bar
+{{ baz }}
+EOT;
+
+        $expected = <<<'EOT'
+{{ foo }} QUX
+bar
+BAZ
+EOT;
+
+        $this->assertEquals($expected, $this->parse($template, ['baz' => 'BAZ', 'qux' => 'QUX']));
+    }
+
+    /** @test */
+    public function it_doesnt_parse_multiline_tags_prefixed_with_an_at_symbol_over_tags_in_multiple_lines()
+    {
+        $template = <<<'EOT'
+@{{ foo
+  bar:baz="qux"
+}} {{ qux }}
+bar
+{{ baz }}
+EOT;
+
+        $expected = <<<'EOT'
+{{ foo
+  bar:baz="qux"
+}} QUX
+bar
+BAZ
+EOT;
+
+        $this->assertEquals($expected, $this->parse($template, ['baz' => 'BAZ', 'qux' => 'QUX']));
+    }
+
+    /** @test */
+    public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_containing_nested_tags()
+    {
+        $this->assertEquals('{{ foo bar="{baz}" }}', $this->parse('@{{ foo bar="{baz}" }}'));
+    }
+
+    /** @test */
     public function it_accepts_an_arrayable_object()
     {
         $this->assertEquals(
@@ -836,7 +953,8 @@ EOT;
     /** @test */
     public function it_gets_augmented_value()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -853,7 +971,8 @@ EOT;
     /** @test */
     public function it_expands_augmented_value_when_used_as_an_array()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($values)
             {
                 return collect($values)->map(function ($value) {
@@ -885,7 +1004,8 @@ EOT;
     /** @test */
     public function it_loops_over_value_object()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($values)
             {
                 return collect($values)->map(function ($value) {
@@ -949,7 +1069,8 @@ EOT;
     /** @test */
     public function it_parses_value_objects_values_when_configured_to_do_so()
     {
-        $fieldtypeOne = new class extends Fieldtype {
+        $fieldtypeOne = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -962,7 +1083,8 @@ EOT;
 
             // fake what's being returned from the field config
         };
-        $fieldtypeTwo = new class extends Fieldtype {
+        $fieldtypeTwo = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -1021,7 +1143,8 @@ EOT;
     /** @test */
     public function it_casts_objects_to_string_when_using_single_tags()
     {
-        $object = new class {
+        $object = new class
+        {
             public function __toString()
             {
                 return 'string';
@@ -1040,7 +1163,8 @@ EOT;
         Log::shouldReceive('debug')->once()
             ->with('Cannot render an object variable as a string: {{ object }}');
 
-        $object = new class {
+        $object = new class
+        {
         };
 
         $this->assertEquals('', $this->parse('{{ object }}', compact('object')));
@@ -1084,7 +1208,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_unparsed_simple_arrays_get_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1110,7 +1235,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_unparsed_simple_arrays_get_parsed_with_scope()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1136,7 +1262,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_unparsed_multidimensional_arrays_get_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1168,7 +1295,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_empty_arrays_get_parsed_with_no_results()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1193,7 +1321,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_collections_get_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1225,12 +1354,14 @@ EOT;
     /** @test */
     public function callback_tags_that_return_value_objects_gets_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
             {
-                $fieldtype = new class extends Fieldtype {
+                $fieldtype = new class extends Fieldtype
+                {
                     public function augment($value)
                     {
                         return 'augmented '.$value;
@@ -1247,12 +1378,14 @@ EOT;
     /** @test */
     public function callback_tags_that_return_value_objects_with_antlers_gets_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
             {
-                $fieldtype = new class extends Fieldtype {
+                $fieldtype = new class extends Fieldtype
+                {
                     public function augment($value)
                     {
                         return 'augmented '.$value;
@@ -1274,12 +1407,14 @@ EOT;
     /** @test */
     public function callback_tags_that_return_value_objects_with_antlers_disabled_does_not_get_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
             {
-                $fieldtype = new class extends Fieldtype {
+                $fieldtype = new class extends Fieldtype
+                {
                     public function augment($value)
                     {
                         return 'augmented '.$value;
@@ -1301,7 +1436,8 @@ EOT;
     /** @test */
     public function value_objects_with_antlers_gets_parsed()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -1324,7 +1460,8 @@ EOT;
     /** @test */
     public function value_objects_with_antlers_disabled_do_not_get_parsed()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return 'augmented '.$value;
@@ -1363,7 +1500,8 @@ EOT;
     /** @test */
     public function it_automatically_augments_augmentable_objects_when_returned_from_a_callback_tag()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1400,7 +1538,8 @@ EOT;
     /** @test */
     public function callback_tag_pair_variables_get_context_merged_in_but_nulls_remain_null()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1496,7 +1635,8 @@ EOT;
 
         $parser = Antlers::parser()->cascade($cascade);
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
         };
         $augmented = new Value(['drink' => 'la croix'], 'augmented', $fieldtype);
 
@@ -1632,7 +1772,8 @@ EOT;
     /** @test */
     public function it_aliases_callback_tag_pair_loop_using_the_as_param()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
@@ -1681,9 +1822,51 @@ EOT;
     }
 
     /** @test */
+    public function it_applies_modifier_on_different_array_syntax()
+    {
+        $vars = [
+            'key' => 'entries',
+            'source' => [
+                'entries' => [
+                    ['id' => 0],
+                    ['id' => 1],
+                    ['id' => 2],
+                    ['id' => 3],
+                ],
+            ],
+        ];
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source.entries }}[{{ id }}]{{ /source.entries }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source[key] }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source.entries sort="id" }}[{{ id }}]{{ /source.entries }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[0][1][2][3]',
+            $this->parse('{{ source[key] sort="id" }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+
+        $this->assertEquals(
+            '[3][2][1][0]',
+            $this->parse('{{ source[key] sort="id:desc" }}[{{ id }}]{{ /source[key] }}', $vars)
+        );
+    }
+
+    /** @test */
     public function modifiers_on_tag_pairs_receive_the_augmented_value()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 $value[1]['type'] = 'yup';
@@ -1707,12 +1890,13 @@ EOT;
     }
 
     /** @test */
-    public function it_outputs_the_value_when_a_LabeledValue_object_is_used_as_string()
+    public function it_outputs_the_value_when_a_ArrayableString_object_is_used_as_string()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
-                return new LabeledValue('world', 'World');
+                return new ArrayableString('world', ['label' => 'World']);
             }
         };
 
@@ -1724,32 +1908,34 @@ EOT;
     }
 
     /** @test */
-    public function it_can_treat_a_LabeledValue_object_as_an_array()
+    public function it_can_treat_a_ArrayableString_object_as_an_array()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
-                return new LabeledValue('world', 'World');
+                return new ArrayableString('world', ['label' => 'World']);
             }
         };
 
         $value = new Value('world', 'hello', $fieldtype);
 
         $this->assertEquals(
-            'world, world, World',
-            $this->parse('{{ hello }}{{ key }}, {{ value }}, {{ label }}{{ /hello }}', [
+            'world, World',
+            $this->parse('{{ hello }}{{ value }}, {{ label }}{{ /hello }}', [
                 'hello' => $value,
             ])
         );
     }
 
     /** @test */
-    public function it_can_access_LabeledValue_properties_by_colon_notation()
+    public function it_can_access_ArrayableString_properties_by_colon_notation()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
-                return new LabeledValue('world', 'World');
+                return new ArrayableString('world', ['label' => 'World']);
             }
         };
 
@@ -1758,19 +1944,19 @@ EOT;
         $vars = ['hello' => $value];
 
         $this->assertEquals('world', $this->parse('{{ hello:value }}', $vars));
-        $this->assertEquals('world', $this->parse('{{ hello:key }}', $vars));
         $this->assertEquals('World', $this->parse('{{ hello:label }}', $vars));
     }
 
     /** @test */
-    public function it_can_use_LabeledValue_objects_in_conditions()
+    public function it_can_use_ArrayableString_objects_in_conditions()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 $label = is_null($value) ? null : strtoupper($value);
 
-                return new LabeledValue($value, $label);
+                return new ArrayableString($value, ['label' => $label]);
             }
         };
 
@@ -1807,6 +1993,37 @@ EOT;
         $this->assertEquals('fallback', $this->parse('{{ string:label ?= "fallback" }}', $vars));
         $this->assertEquals('', $this->parse('{{ nully ?= "fallback" }}', $vars));
         $this->assertEquals('', $this->parse('{{ nully:label ?= "fallback" }}', $vars));
+    }
+
+    /** @test */
+    public function it_can_remove_escaping_characters_from_tenary_output()
+    {
+        $vars = [
+            'seo_title' => "Let's work together",
+            'title' => 'Contact',
+
+            'local_office_link' => '',
+            'head_office_link' => 'https://statamic.com',
+        ];
+
+        $this->assertEquals("Let's work together", $this->parse('{{ seo_title ? seo_title : title }}', $vars));
+        $this->assertEquals('Contact', $this->parse('{{ title ? title : seo_title }}', $vars));
+
+        $this->assertEquals('https://statamic.com', $this->parse('{{ local_office_link ? local_office_link : head_office_link }}', $vars));
+        $this->assertEquals('https://statamic.com', $this->parse('{{ head_office_link ? head_office_link : local_office_link }}', $vars));
+    }
+
+    /** @test */
+    public function it_can_remove_escaping_characters_from_tenary_output_with_truth_coalescence()
+    {
+        $vars = [
+            'truthy' => true,
+            'string' => "Let's work together",
+            'link' => 'https://statamic.com',
+        ];
+
+        $this->assertEquals("Let's work together", $this->parse('{{ truthy ?= string }}', $vars));
+        $this->assertEquals('https://statamic.com', $this->parse('{{ truthy ?= link }}', $vars));
     }
 
     /** @test */
@@ -1878,7 +2095,8 @@ after
 EOT;
 
         $this->assertEquals($expected, $this->parse($template, [
-            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator {
+            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator
+            {
             }),
         ]));
     }
@@ -1895,6 +2113,116 @@ EOT;
             '<FOO!><bar>',
             (string) Antlers::parse('{{ augmentables limit="1" }}<{{ one }}><{{ two }}>{{ /augmentables }}', ['augmentables' => $loop])
         );
+    }
+
+    /** @test */
+    public function it_uses_tags_with_single_part_in_conditions()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'truthy';
+
+            public function index()
+            {
+                return true;
+            }
+        })::register();
+
+        (new class extends Tags
+        {
+            public static $handle = 'falsey';
+
+            public function index()
+            {
+                return false;
+            }
+        })::register();
+
+        $this->assertEquals('yes', $this->parse('{{ if {truthy} }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('yes', $this->parse('{{ if {truthy} == true }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {truthy} == false }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {falsey} }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {falsey} == true }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('yes', $this->parse('{{ if {falsey} == false }}yes{{ else }}no{{ /if }}'));
+    }
+
+    /** @test */
+    public function it_uses_tags_with_multiple_parts_in_conditions()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'truthy';
+
+            public function test()
+            {
+                return true;
+            }
+        })::register();
+
+        (new class extends Tags
+        {
+            public static $handle = 'falsey';
+
+            public function test()
+            {
+                return false;
+            }
+        })::register();
+
+        $this->assertEquals('yes', $this->parse('{{ if {truthy:test} }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('yes', $this->parse('{{ if {truthy:test} == true }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {truthy:test} == false }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {falsey:test} }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {falsey:test} == true }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('yes', $this->parse('{{ if {falsey:test} == false }}yes{{ else }}no{{ /if }}'));
+    }
+
+    /** @test */
+    public function it_does_stuff_in_issue_2537()
+    {
+        $template = '{{ if noindex || segment_1 == "mobile" || get:page > 0 }}yes{{ else }}no{{ /if }}';
+
+        $this->assertEquals('yes', $this->parse($template, ['noindex' => true]));
+    }
+
+    /** @test */
+    public function it_does_stuff_in_issue_2456()
+    {
+        $template = '{{ if publication_venue:publication_venue_types:slug !== "journal" and publication_venue:first_year }}yes{{ else }}no{{ /if }}';
+
+        $this->assertEquals('yes', $this->parse($template, [
+            'publication_venue' => [
+                'first_year' => true,
+                'publication_venue_types' => [
+                    'slug' => 'notjournal',
+                ],
+            ],
+        ]));
+    }
+
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/2936
+     **/
+    public function it_compares_to_a_string_that_looks_like_array_access()
+    {
+        $template = '{{ if test == "price:desc" }}yes{{ else }}no{{ /if }}';
+
+        $this->assertEquals('yes', $this->parse($template, [
+            'test' => 'price:desc',
+        ]));
+    }
+
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/3374
+     **/
+    public function it_parses_single_and_tag_pairs_with_modifiers()
+    {
+        $data = ['items' => ['one', 'two', 'three']];
+
+        $this->assertEquals('<one><two>3', $this->parse('{{ items limit="2" }}<{{ value }}>{{ /items }}{{ items | count }}', $data));
+        $this->assertEquals('3<one><two>', $this->parse('{{ items | count }}{{ items limit="2" }}<{{ value }}>{{ /items }}', $data));
     }
 }
 
@@ -1925,7 +2253,8 @@ class AugmentableObject extends ArrayableObject implements Augmentable
 
     public function blueprint()
     {
-        FieldtypeRepository::shouldReceive('find')->andReturn(new class extends Fieldtype {
+        FieldtypeRepository::shouldReceive('find')->andReturn(new class extends Fieldtype
+        {
             public function augment($data)
             {
                 return strtoupper($data).'!';

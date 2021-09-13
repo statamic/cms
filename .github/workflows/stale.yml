@@ -1,0 +1,22 @@
+name: "Close stale issues"
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "30 1 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v3
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        days-before-stale: 60
+        days-before-close: 7
+        ascending: true
+        only-labels: 'needs more info'
+        stale-issue-label: stale
+        stale-issue-message: >
+          This issue has not had recent activity and has been marked as stale — by me, a robot.
+          Simply reply to keep it open and send me away. If you do nothing, I will close it in
+          a week. I have no feelings, so whatever you do is fine by me.

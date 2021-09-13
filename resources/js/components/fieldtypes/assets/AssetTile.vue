@@ -15,7 +15,7 @@
 
         <div class="asset-thumb-container">
 
-            <div class="asset-thumb">
+            <div class="asset-thumb" :class="{ 'bg-checkerboard': canBeTransparent }">
 
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
@@ -30,12 +30,12 @@
                              class="svg-img"
                              :style="'background-image:url('+asset.url+')'">
                         </div>
-                        <file-icon v-else type="div" :extension="asset.extension"></file-icon>
+                        <file-icon v-else :extension="asset.extension" class="p-2 h-40 w-40" />
                     </template>
 
                 </template>
 
-                <div class="asset-controls">
+                <div class="asset-controls" v-if="!readOnly">
                     <button
                         @click="edit"
                         class="btn btn-icon icon icon-pencil"
@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <div class="asset-meta">
+        <div class="asset-meta" v-if="showFilename">
             <div class="asset-filename" :title="label">{{ label }}</div>
         </div>
     </div>

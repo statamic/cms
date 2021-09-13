@@ -1,6 +1,6 @@
 <template>
 
-    <td class="grid-cell" :class="fieldtypeComponent">
+    <td class="grid-cell" :class="classes" :width="width">
         <div v-show="showInner">
             <component
                 :is="fieldtypeComponent"
@@ -69,6 +69,10 @@ export default {
 
     computed: {
 
+        classes() {
+            return [this.fieldtypeComponent, this.field.classes];
+        },
+
         fieldtypeComponent() {
             return `${this.field.component || this.field.type}-fieldtype`;
         },
@@ -79,6 +83,12 @@ export default {
 
         hasError() {
             return this.errors.length > 0;
+        },
+
+        width() {
+            if (this.field.width) {
+                return this.field.width + '%';
+            }
         }
 
     }

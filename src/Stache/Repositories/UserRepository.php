@@ -8,7 +8,6 @@ use Statamic\Auth\File\UserGroupRepository;
 use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
 use Statamic\Contracts\Auth\User;
-use Statamic\OAuth\Provider;
 use Statamic\Stache\Query\UserQueryBuilder;
 use Statamic\Stache\Stache;
 
@@ -64,13 +63,6 @@ class UserRepository extends BaseRepository
     public function delete(User $user)
     {
         $this->store->delete($user);
-    }
-
-    public function findByOAuthId(string $provider, string $id): ?User
-    {
-        return $this->find(
-            (new Provider($provider))->getUserId($id)
-        );
     }
 
     public function fromUser($user): ?User

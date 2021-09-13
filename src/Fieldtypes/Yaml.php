@@ -2,10 +2,23 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
 class Yaml extends Fieldtype
 {
+    protected function configFieldItems(): array
+    {
+        return [
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'yaml',
+                'width' => 100,
+            ],
+        ];
+    }
+
     // Turn the YAML back into a string
     public function preProcess($data)
     {
@@ -27,5 +40,17 @@ class Yaml extends Fieldtype
         }
 
         return $data;
+    }
+
+    public function toGqlType()
+    {
+        return [
+            'type' => GraphQL::string(),
+            'resolve' => function ($entry, $args, $context, $info) {
+                if ($value = $entry->resolveRawGqlValue($info->fieldName)) {
+                    return \Statamic\Facades\YAML::dump($value);
+                }
+            },
+        ];
     }
 }

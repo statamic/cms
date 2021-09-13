@@ -10,7 +10,12 @@ use Statamic\Tags\Tags as BaseTags;
 class Tags extends BaseTags
 {
     use Concerns\OutputsItems,
-        Concerns\QueriesConditions;
+        Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\QueriesOrderBys;
+    use Concerns\GetsQueryResults {
+        results as getQueryResults;
+    }
 
     protected static $handle = 'search';
 
@@ -20,36 +25,58 @@ class Tags extends BaseTags
             return $this->parseNoResults();
         }
 
+        $supplementData = $this->params->get('supplement_data', true);
+
         $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($this->params->get('supplement_data', true))
+            ->withData($supplementData)
             ->limit($this->params->get('limit'))
             ->offset($this->params->get('offset'));
 
         $this->querySite($builder);
         $this->queryStatus($builder);
         $this->queryConditions($builder);
+        $this->queryScopes($builder);
+        $this->queryOrderBys($builder);
 
-        $results = $this->addResultTypes($builder->get());
+        $results = $this->getQueryResults($builder);
 
-        return $this->output($results);
+        // Backwards compatibility. This can be removed in 3.2.
+        if (! $this->params->get('as')) {
+            return $this->output($this->addResultTypes($results));
+        }
+
+        $results = $this->output($results);
+
+        return $this->addResultTypesToOutput($results);
+    }
+
+    protected function addResultTypesToOutput($output)
+    {
+        if (! $this->params->get('paginate') && ! $this->params->get('as')) {
+            return $this->addResultTypes($output);
+        }
+
+        $as = $this->getPaginationResultsKey();
+
+        $output[$as] = $this->addResultTypes($output[$as]);
+
+        return $output;
     }
 
     protected function addResultTypes($results)
     {
         return $results->map(function ($result) {
-            $type = null;
+            $reference = is_array($result) ? $result['reference'] : $result->reference();
 
-            if ($result instanceof \Statamic\Contracts\Entries\Entry) {
-                $type = 'entry';
-            } elseif ($result instanceof \Statamic\Contracts\Taxonomies\Term) {
-                $type = 'term';
-            } elseif ($result instanceof \Statamic\Contracts\Assets\Asset) {
-                $type = 'asset';
+            [$type, $id] = explode('::', $reference, 2);
+
+            if (is_array($result)) {
+                $result['result_type'] = $type;
+            } else {
+                $result->setSupplement('result_type', $type);
             }
-
-            $result->set('result_type', $type);
 
             return $result;
         });

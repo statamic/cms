@@ -2,11 +2,24 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
 class Lists extends Fieldtype
 {
     protected static $handle = 'list';
+
+    protected function configFieldItems(): array
+    {
+        return [
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'list',
+                'width' => 50,
+            ],
+        ];
+    }
 
     public function preProcess($data)
     {
@@ -26,5 +39,10 @@ class Lists extends Fieldtype
         return collect($data)->reject(function ($item) {
             return in_array($item, [null, ''], true);
         })->values()->all();
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::listOf(GraphQL::string());
     }
 }

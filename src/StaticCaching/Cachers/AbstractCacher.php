@@ -5,7 +5,7 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Statamic\Facades\Config;
+use Illuminate\Support\Facades\Request as RequestFacade;
 use Statamic\StaticCaching\Cacher;
 use Statamic\Support\Str;
 
@@ -49,7 +49,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function getBaseUrl()
     {
-        return $this->config('base_url');
+        return $this->config('base_url') ?? RequestFacade::root();
     }
 
     /**
@@ -57,7 +57,8 @@ abstract class AbstractCacher implements Cacher
      */
     public function getDefaultExpiration()
     {
-        return $this->config('default_cache_length');
+        return $this->config('expiry')
+            ?? $this->config('default_cache_length'); // deprecated
     }
 
     /**
@@ -273,5 +274,10 @@ abstract class AbstractCacher implements Cacher
         $domain = $domain ?: $this->getBaseUrl();
 
         return $this->normalizeKey($this->makeHash($domain).'.urls');
+    }
+
+    public function hasCachedPage(Request $request)
+    {
+        return $this->getCachedPage($request) !== null;
     }
 }

@@ -134,6 +134,7 @@ class SectionTest extends TestCase
             'fields' => [
                 [
                     'handle' => 'one',
+                    'prefix' => null,
                     'type' => 'text',
                     'display' => 'One',
                     'instructions' => 'One instructions',
@@ -145,9 +146,12 @@ class SectionTest extends TestCase
                     'character_limit' => 0,
                     'prepend' => null,
                     'append' => null,
+                    'antlers' => false,
+                    'default' => null,
                 ],
                 [
                     'handle' => 'two',
+                    'prefix' => null,
                     'type' => 'textarea',
                     'display' => 'Two',
                     'instructions' => 'Two instructions',
@@ -155,6 +159,9 @@ class SectionTest extends TestCase
                     'validate' => 'min:2',
                     'character_limit' => null,
                     'component' => 'textarea',
+                    'antlers' => false,
+                    'placeholder' => null,
+                    'default' => null,
                 ],
             ],
         ], $section->toPublishArray());

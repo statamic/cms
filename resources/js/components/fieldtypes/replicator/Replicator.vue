@@ -2,7 +2,7 @@
 
     <div class="replicator-fieldtype-container">
 
-        <div class="absolute top-0 right-0 p-3 text-2xs" v-if="values.length > 0">
+        <div class="absolute top-0 right-0 p-3 text-2xs" v-if="config.collapse !== 'accordion' && values.length > 0">
             <button @click="collapseAll" class="text-blue hover:text-black mr-1" v-text="__('Collapse All')" />
             <button @click="expandAll" class="text-blue hover:text-black" v-text="__('Expand All')" />
         </div>
@@ -12,6 +12,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            constrain-dimensions
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
@@ -29,6 +30,7 @@
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
                     :error-key-prefix="errorKeyPrefix || handle"
+                    :previews="previews[set._id]"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
                     @updated="updated"
@@ -36,8 +38,9 @@
                     @removed="removed(set, index)"
                     @focus="focused = true"
                     @blur="blurred"
+                    @previews-updated="previews[set._id] = $event"
                 >
-                    <template v-slot:picker v-if="!isReadOnly && index !== values.length-1">
+                    <template v-slot:picker v-if="index !== values.length-1 && canAddSet">
                         <set-picker
                             class="replicator-set-picker-between"
                             :sets="setConfigs"
@@ -48,7 +51,7 @@
             </div>
         </sortable-list>
 
-        <set-picker v-if="!isReadOnly"
+        <set-picker v-if="canAddSet"
             :last="true"
             :sets="setConfigs"
             :index="values.length"
@@ -80,10 +83,16 @@ export default {
             values: this.value,
             focused: false,
             collapsed: this.meta.collapsed,
+            previews: this.meta.previews,
         }
     },
 
     computed: {
+        canAddSet() {
+            if (this.isReadOnly) return false;
+
+            return !this.config.max_sets || this.values.length < this.config.max_sets;
+        },
 
         setConfigs() {
             return this.config.sets;
@@ -128,9 +137,15 @@ export default {
                 enabled: true,
             });
 
+            let previews = {};
+            Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
+            this.previews = Object.assign({}, this.previews, { [set._id]: previews });
+
             this.updateSetMeta(set._id, this.meta.new[handle]);
 
             this.values.splice(index, 0, set);
+
+            this.expandSet(set._id);
         },
 
         collapseSet(id) {
@@ -140,6 +155,11 @@ export default {
         },
 
         expandSet(id) {
+            if (this.config.collapse === 'accordion') {
+                this.collapsed = this.value.map(v => v._id).filter(v => v !== id);
+                return;
+            }
+
             if (this.collapsed.includes(id)) {
                 var index = this.collapsed.indexOf(id);
                 this.collapsed.splice(index, 1);
@@ -161,7 +181,10 @@ export default {
                 }
             }, 1);
         },
+    },
 
+    mounted() {
+        if (this.config.collapse) this.collapseAll();
     },
 
     watch: {
@@ -192,6 +215,12 @@ export default {
         collapsed(value) {
             const meta = this.meta;
             meta.collapsed = value;
+            this.updateMeta(meta);
+        },
+
+        previews(previews) {
+            let meta = this.meta;
+            meta.previews = previews;
             this.updateMeta(meta);
         }
 

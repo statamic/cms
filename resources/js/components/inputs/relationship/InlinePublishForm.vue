@@ -18,6 +18,7 @@
             v-bind="componentPropValues"
             :method="method"
             :is-creating="creating"
+            :is-inline="true"
             :publish-container="publishContainer"
             @saved="saved"
         >

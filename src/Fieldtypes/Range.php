@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
 class Range extends Fieldtype
@@ -53,6 +54,17 @@ class Range extends Fieldtype
                 'type' => 'text',
                 'width' => 50,
             ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
+            ],
         ];
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::int();
     }
 }

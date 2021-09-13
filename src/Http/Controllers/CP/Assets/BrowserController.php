@@ -71,9 +71,13 @@ class BrowserController extends CpController
 
         $folder = $container->assetFolder($path);
 
-        $assets = $folder->queryAssets()
-            ->orderBy($request->sort ?? 'basename', $request->order ?? 'asc')
-            ->paginate(30);
+        $query = $folder->queryAssets();
+
+        if ($request->sort) {
+            $query->orderBy($request->sort, $request->order ?? 'asc');
+        }
+
+        $assets = $query->paginate(request('perPage'));
 
         return (new FolderAssetsCollection($assets))->folder($folder);
     }
@@ -86,7 +90,7 @@ class BrowserController extends CpController
             ? $container->searchIndex()->ensureExists()->search($request->search)
             : $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
 
-        $assets = $query->paginate(30);
+        $assets = $query->paginate(request('perPage'));
 
         return new SearchedAssetsCollection($assets);
     }

@@ -4,9 +4,12 @@ namespace Statamic\Http\Resources\CP\Submissions;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
+use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
 class Submissions extends ResourceCollection
 {
+    use HasRequestedColumns;
+
     public $collects = ListedSubmission::class;
     protected $blueprint;
     protected $columns;
@@ -46,11 +49,11 @@ class Submissions extends ResourceCollection
             'data' => $this->collection->each(function ($collection) {
                 $collection
                     ->blueprint($this->blueprint)
-                    ->columns($this->columns);
+                    ->columns($this->requestedColumns());
             }),
 
             'meta' => [
-                'columns' => $this->columns,
+                'columns' => $this->visibleColumns(),
             ],
         ];
     }

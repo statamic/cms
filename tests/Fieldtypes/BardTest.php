@@ -2,12 +2,19 @@
 
 namespace Tests\Fieldtypes;
 
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Bard;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class BardTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     public function it_augments_prosemirror_structure_to_a_template_friendly_array()
     {
@@ -173,7 +180,7 @@ class BardTest extends TestCase
     /** @test */
     public function it_converts_plain_html_into_prosemirror_structure()
     {
-        $data = '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>';
+        $data = '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second <a href="statamic://entry::foo">paragraph</a>. <img src="statamic://asset::assets::lagoa.jpg"></p>';
 
         $expected = [
             [
@@ -187,7 +194,16 @@ class BardTest extends TestCase
             [
                 'type' => 'paragraph',
                 'content' => [
-                    ['type' => 'text', 'text' => 'Second paragraph.'],
+                    ['type' => 'text', 'text' => 'Second '],
+                    ['type' => 'text', 'text' => 'paragraph', 'marks' => [
+                        ['type' => 'link', 'attrs' => ['href' => 'entry::foo']],
+                    ]],
+                    ['type' => 'text', 'text' => '. '],
+                    ['type' => 'image', 'attrs' => [
+                        'alt' => null,
+                        'src' => 'asset::assets::lagoa.jpg',
+                        'title' => null,
+                    ]],
                 ],
             ],
         ];
@@ -343,6 +359,146 @@ class BardTest extends TestCase
 
         // When it is actually null (eg. when it was not in the front matter to begin with, and was never touched), it's an empty array.
         $this->assertNull($bard->process('[]'));
+    }
+
+    /** @test */
+    public function it_preloads_preprocessed_default_values()
+    {
+        $field = (new Field('test', [
+            'type' => 'bard',
+            'sets' => [
+                'main' => [
+                    'fields' => [
+                        ['handle' => 'things', 'field' => ['type' => 'array']],
+                    ],
+                ],
+            ],
+        ]));
+
+        $expected = [
+            'things' => [],
+        ];
+
+        $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']);
+    }
+
+    /** @test */
+    public function it_preloads_new_meta_with_preprocessed_values()
+    {
+        // For this test, use a grid field with min_rows.
+        // It doesn't have to be, but it's a fieldtype that would
+        // require preprocessed values to be provided down the line.
+        // https://github.com/statamic/cms/issues/3481
+
+        $field = (new Field('test', [
+            'type' => 'bard',
+            'sets' => [
+                'main' => [
+                    'fields' => [
+                        [
+                            'handle' => 'things',
+                            'field' => [
+                                'type' => 'grid',
+                                'min_rows' => 2,
+                                'fields' => [
+                                    ['handle' => 'one', 'field' => ['type' => 'text']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]));
+
+        $expected = [
+            '_' => '_',
+            'things' => [ // this array is the preloaded meta for the grid field
+                'defaults' => [
+                    'one' => null, // default value for the text field
+                ],
+                'new' => [
+                    'one' => null, // meta for the text field
+                ],
+                'existing' => [
+                    'row-0' => ['one' => null],
+                    'row-1' => ['one' => null],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $field->fieldtype()->preload()['new']['main']);
+    }
+
+    /** @test */
+    public function it_gets_link_data()
+    {
+        tap(Facades\Collection::make('pages')->routes('/{slug}'))->save();
+        EntryFactory::collection('pages')->id('1')->slug('about')->data(['title' => 'About'])->create();
+        EntryFactory::collection('pages')->id('2')->slug('articles')->data(['title' => 'Articles'])->create();
+        EntryFactory::collection('pages')->id('3')->slug('contact')->data(['title' => 'Contact'])->create();
+        EntryFactory::collection('pages')->id('4')->slug('unused')->data(['title' => 'Unused'])->create();
+
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
+
+        $html = <<<'EOT'
+<p>
+    Paragraph
+    <a href="http://google.com">External Link</a>
+    <a href="statamic://entry::1">Internal Link One</a>
+    <a href="statamic://entry::2">Internal Link Two</a>
+    <strong>
+        <a href="statamic://entry::3">Internal Link Three inside another element</a>
+        <a href="statamic://entry::1">Internal Link Four thats a repeat</a>
+    </strong>
+</p>
+EOT;
+
+        $prosemirror = (new \HtmlToProseMirror\Renderer)->render($html)['content'];
+
+        $this->assertEquals([
+            'entry::1' => ['title' => 'About', 'permalink' => 'http://localhost/about'],
+            'entry::2' => ['title' => 'Articles', 'permalink' => 'http://localhost/articles'],
+            'entry::3' => ['title' => 'Contact', 'permalink' => 'http://localhost/contact'],
+        ], $bard->getLinkData($prosemirror));
+    }
+
+    /** @test */
+    public function it_converts_statamic_asset_urls_when_stored_as_html()
+    {
+        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+
+        tap(Facades\AssetContainer::make()->handle('test_container')->disk('test'))->save();
+        tap(Facades\Asset::make()->container('test_container')->path('foo/hoff.jpg'))->save();
+
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
+
+        $html = <<<'EOT'
+<p>
+    Actual asset...
+    <img src="statamic://asset::test_container::foo/hoff.jpg" alt="Asset" />
+    <a href="statamic://asset::test_container::foo/hoff.jpg">Asset Link</a>
+
+    Non-existent asset...
+    <a href="statamic://asset::test_container::nope.jpg">Asset Link</a>
+    <img src="statamic://asset::test_container::nope.jpg" alt="Asset" />
+</p>
+EOT;
+
+        $expected = <<<'EOT'
+<p>
+    Actual asset...
+    <img src="/assets/foo/hoff.jpg" alt="Asset" />
+    <a href="/assets/foo/hoff.jpg">Asset Link</a>
+
+    Non-existent asset...
+    <a href="">Asset Link</a>
+    <img src="" alt="Asset" />
+</p>
+EOT;
+
+        $this->assertEquals($expected, $bard->augment($html));
     }
 
     private function bard($config = [])

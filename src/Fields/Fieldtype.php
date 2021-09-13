@@ -2,10 +2,12 @@
 
 namespace Statamic\Fields;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -23,6 +25,7 @@ abstract class Fieldtype implements Arrayable
     protected $validatable = true;
     protected $defaultable = true;
     protected $selectable = true;
+    protected $selectableInForms = false;
     protected $categories = ['text'];
     protected $rules = [];
     protected $extraRules = [];
@@ -77,6 +80,16 @@ abstract class Fieldtype implements Arrayable
         return $this->selectable;
     }
 
+    public function selectableInForms(): bool
+    {
+        return $this->selectableInForms ?: FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+    }
+
+    public static function makeSelectableInForms()
+    {
+        FieldtypeRepository::makeSelectableInForms(self::handle());
+    }
+
     public function categories(): array
     {
         return $this->categories;
@@ -90,6 +103,11 @@ abstract class Fieldtype implements Arrayable
     public function rules(): array
     {
         return Validator::explodeRules($this->rules);
+    }
+
+    public function fieldRules()
+    {
+        return $this->config('validate');
     }
 
     public function extraRules(): array
@@ -125,7 +143,6 @@ abstract class Fieldtype implements Arrayable
             'localizable' => $this->localizable(),
             'validatable' => $this->validatable(),
             'defaultable' => $this->defaultable(),
-            'selectable'  => $this->selectable(),
             'categories' => $this->categories(),
             'icon' => $this->icon(),
             'config' => $this->configFields()->toPublishArray(),
@@ -211,5 +228,15 @@ abstract class Fieldtype implements Arrayable
     public static function docsUrl()
     {
         return Statamic::docsUrl('fieldtypes/'.static::handle());
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::string();
+    }
+
+    public function addGqlTypes()
+    {
+        //
     }
 }

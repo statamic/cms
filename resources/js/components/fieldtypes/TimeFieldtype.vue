@@ -6,7 +6,7 @@
             </div>
             <div class="input-text flex items-center px-sm w-auto" :class="{ 'read-only': isReadOnly }">
                 <input class="input-time input-hour"
-                    type="text" pattern="[0-5][0-9]" min="00" max="23" v-model="hour" ref="hour"
+                    type="text" min="00" max="23" v-model="hour" ref="hour"
                     placeholder="00"
                     @keydown.up.prevent="incrementHour(1)"
                     @keydown.down.prevent="incrementHour(-1)"
@@ -21,7 +21,7 @@
                 />
                 <span class="colon">:</span>
                 <input class="input-time input-minute"
-                    type="text" pattern="[0-5][0-9]" min="00" max="59" v-model="minute" ref="minute"
+                    type="text" min="00" max="59" v-model="minute" ref="minute"
                     placeholder="00"
                     @keydown.up.prevent="incrementMinute(1)"
                     @keydown.down.prevent="incrementMinute(-1)"
@@ -33,7 +33,7 @@
                 />
             </div>
         </div>
-        <button class="btn-close ml-sm" tabindex="0"
+        <button class="text-xl text-grey-60 hover:text-grey-80 h-4 w-4 p-1 flex items-center outline-none" tabindex="0"
               v-if="! required && ! isReadOnly"
               @click="clear" @keyup.enter.space="clear">
               &times;
@@ -76,12 +76,17 @@ export default {
                 var time = this.data.split(':');
                 var hour = parseInt(val);
 
+                hour = isNaN(hour) ? 0 : hour;
+
                 // ensure you cant go beyond the range
                 hour = (hour > 23) ? 23 : hour;
                 hour = (hour < 0) ? 0 : hour;
 
                 time[0] = this.pad(hour);
                 this.data = time.join(':');
+
+                // ensure the input value is updated
+                this.$forceUpdate();
             },
             get: function() {
                 return (this.hasTime) ? this.pad(this.data.split(':')[0]) : '';
@@ -94,12 +99,17 @@ export default {
                 var time = this.data.split(':');
                 var minute = parseInt(val);
 
+                minute = isNaN(minute) ? 0 : minute;
+
                 // ensure you cant go beyond the range
                 minute = (minute > 59) ? 59 : minute;
                 minute = (minute < 0) ? 0 : minute;
 
                 time[1] = this.pad(minute);
                 this.data = time.join(':');
+
+                // ensure the input value is updated
+                this.$forceUpdate();
             },
             get: function() {
                 return (this.hasTime) ? this.pad(this.data.split(':')[1]) : '';

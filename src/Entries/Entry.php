@@ -7,8 +7,10 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -16,27 +18,32 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract
 {
     use Routable {
         uri as routableUri;
     }
 
     use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -49,6 +56,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $locale;
     protected $localizations;
     protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -77,6 +85,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function site()
     {
         return Site::get($this->locale());
+    }
+
+    public function authors()
+    {
+        return collect($this->value('author'));
     }
 
     public function collection($collection = null)
@@ -118,7 +131,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->collection;
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedEntry($this);
     }
@@ -155,8 +168,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                         $tree->move($child->id(), optional($parent)->id());
                     });
                     $tree->remove($this);
-                });
-            })->save();
+                })->save();
+            });
         }
 
         Facades\Entry::delete($this);
@@ -247,7 +260,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function apiUrl()
     {
-        return Statamic::apiRoute('collections.entries.show', [$this->collectionHandle(), $this->id()]);
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return Statamic::apiRoute('collections.entries.show', [$this->collectionHandle(), $id]);
     }
 
     public function reference()
@@ -262,20 +279,34 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        $result = $this->save();
+
+        $this->withEvents = true;
+
+        return $result;
+    }
+
     public function save()
     {
+        $isNew = is_null(Facades\Entry::find($this->id()));
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
-
-        if (EntrySaving::dispatch($this) === false) {
-            return false;
+        if ($this->withEvents) {
+            if (EntrySaving::dispatch($this) === false) {
+                return false;
+            }
         }
 
         Facades\Entry::save($this);
 
         if ($this->id()) {
-            Blink::store('structure-page-entries')->forget($this->id());
             Blink::store('structure-uris')->forget($this->id());
+            Blink::store('structure-entries')->forget($this->id());
         }
 
         $this->taxonomize();
@@ -286,7 +317,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        EntrySaved::dispatch($this);
+        if ($this->withEvents) {
+            if ($isNew) {
+                EntryCreated::dispatch($this);
+            }
+
+            EntrySaved::dispatch($this);
+        }
 
         return true;
     }
@@ -297,6 +334,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     }
 
     public function path()
+    {
+        return $this->initialPath ?? $this->buildPath();
+    }
+
+    public function buildPath()
     {
         $prefix = '';
 
@@ -400,17 +442,25 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function fileData()
     {
-        $array = $this->data()->merge([
+        $array = Arr::removeNullValues([
             'id' => $this->id(),
-            'origin' => optional($this->origin)->id(),
+            'origin' => optional($this->origin())->id(),
             'published' => $this->published === false ? false : null,
+            'blueprint' => $this->blueprint()->handle(),
         ]);
 
-        if ($this->blueprint && $this->collection()->entryBlueprints()->count() > 1) {
-            $array['blueprint'] = $this->blueprint;
+        $data = $this->data()->all();
+
+        if ($this->isRoot()) {
+            $data = Arr::removeNullValues($data);
         }
 
-        return $array->all();
+        return array_merge($array, $data);
+    }
+
+    protected function shouldRemoveNullsFromFileData()
+    {
+        return false;
     }
 
     public function ampable()
@@ -433,6 +483,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
+            'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
             'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
@@ -447,10 +498,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $attrs = $revision->attributes();
 
-        return $entry
+        $entry
             ->published($attrs['published'])
             ->data($attrs['data'])
             ->slug($attrs['slug']);
+
+        if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
+            $entry->date(Carbon::createFromTimestamp($date));
+        }
+
+        return $entry;
     }
 
     public function status()
@@ -615,6 +672,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function uri()
     {
+        if (! $this->route()) {
+            return null;
+        }
+
         if ($structure = $this->structure()) {
             return $structure->entryUri($this);
         }
@@ -665,5 +726,18 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function getProtectionScheme()
     {
         return $this->value('protect');
+    }
+
+    public function resolveGqlValue($field)
+    {
+        if ($field === 'site') {
+            return $this->site();
+        }
+
+        if ($field === 'parent') {
+            return optional($this->parent())->entry();
+        }
+
+        return $this->traitResolveGqlValue($field);
     }
 }

@@ -14,6 +14,7 @@ interface TermRepository
 
     public function findByUri(string $uri);
 
+    /** @deprecated */
     public function findBySlug(string $slug, string $collection);
 
     public function make(string $slug = null);

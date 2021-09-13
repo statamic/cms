@@ -8,31 +8,35 @@
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
             <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
-                <span :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle, 'cursor-pointer': canToggleLabel }" v-text="labelText" />
+                <span
+                    :class="{ 'text-grey-60': syncable && isSynced }"
+                    v-text="labelText"
+                    v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
+                />
                 <i class="required ml-sm" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
+                <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-sm">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
 
                 <button
-                    v-if="!isReadOnly"
+                    v-if="!isReadOnly && !isSection"
                     v-show="syncable && isSynced"
                     class="outline-none"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="hyperlink" class="h-4 ml-sm w-4 text-grey-60"
+                    <svg-icon name="hyperlink" class="h-4 w-4 ml-.5 mt-sm text-grey-60"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
                 <button
-                    v-if="!isReadOnly"
+                    v-if="!isReadOnly && !isSection"
                     v-show="syncable && !isSynced"
                     class="outline-none"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 ml-sm w-4 text-grey-60"
+                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-.5 mt-sm text-grey-60"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>
@@ -125,9 +129,18 @@ export default {
             return this.isLocked || this.readOnly || this.config.read_only || false;
         },
 
+        isLocalizable() {
+            return this.$config.get('sites').length > 1 && this.config.localizable;
+        },
+
+        isSection() {
+            return this.config.type === 'section';
+        },
+
         classes() {
             return [
                 'form-group publish-field',
+                `publish-field__` + this.config.handle,
                 `${this.config.component || this.config.type}-fieldtype`,
                 `field-${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',

@@ -13,6 +13,12 @@ use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 class Yaml
 {
     protected $file;
+    protected $yaml;
+
+    public function __construct(SymfonyYaml $yaml)
+    {
+        $this->yaml = $yaml;
+    }
 
     public function file($file)
     {
@@ -37,6 +43,8 @@ class Yaml
         }
 
         if (empty($str)) {
+            $this->file = null;
+
             return [];
         }
 
@@ -45,17 +53,21 @@ class Yaml
         if (Pattern::startsWith($str, '---')) {
             $split = preg_split("/\n---/", $str, 2, PREG_SPLIT_NO_EMPTY);
             $str = $split[0];
-            $content = ltrim(array_get($split, 1, ''));
+            if (empty($content = ltrim(array_get($split, 1, '')))) {
+                $content = null;
+            }
         }
 
         try {
-            $yaml = SymfonyYaml::parse($str);
+            $yaml = $this->yaml->parse($str);
         } catch (\Exception $e) {
             throw $this->viewException($e, $str);
         }
 
         $this->validateString($yaml, $str);
         $this->validateDocumentContent($yaml, $content, $originalStr);
+
+        $this->file = null;
 
         return isset($content)
             ? $yaml + ['content' => $content]
@@ -79,7 +91,7 @@ class Yaml
             $data['content'] = $content;
         }
 
-        return SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+        return $this->yaml->dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
     }
 
     /**
@@ -96,12 +108,16 @@ class Yaml
             $content = '';
         }
 
-        return '---'.PHP_EOL.$this->dump($data).'---'.PHP_EOL.$content;
+        return '---'.PHP_EOL.rtrim($this->dump($data)).PHP_EOL.'---'.PHP_EOL.$content;
     }
 
     protected function viewException($e, $str, $line = null)
     {
-        $path = $this->file ?? $this->createTemporaryExceptionFile($str);
+        if ($this->file && File::exists($this->file)) {
+            $path = $this->file;
+        } else {
+            $path = $this->createTemporaryExceptionFile($str, $this->file);
+        }
 
         $args = [
             $e->getMessage(), 0, 1, $path,
@@ -125,9 +141,9 @@ class Yaml
         return $exception;
     }
 
-    protected function createTemporaryExceptionFile($string)
+    protected function createTemporaryExceptionFile($string, $path = null)
     {
-        $path = storage_path('statamic/tmp/yaml-'.md5($string));
+        $path = storage_path('statamic/tmp/yaml/'.($path ?? md5($string)));
 
         File::put($path, $string);
 

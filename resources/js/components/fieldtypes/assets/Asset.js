@@ -8,7 +8,12 @@ export default {
     },
 
     props: {
-        asset: Object
+        asset: Object,
+        readOnly: Boolean,
+        showFilename: {
+            type: Boolean,
+            default: true
+        }
     },
 
     data() {
@@ -28,12 +33,12 @@ export default {
             return this.asset.extension === 'svg' && ! this.asset.url.includes('::');
         },
 
-        thumbnail() {
-            return this.asset.thumbnail;
+        canBeTransparent() {
+            return ['png', 'svg'].includes(this.asset.extension)
         },
 
-        toenail() {
-            return this.asset.toenail;
+        thumbnail() {
+            return this.asset.thumbnail;
         },
 
         label() {
@@ -45,10 +50,14 @@ export default {
     methods: {
 
         edit() {
+            if (this.readOnly) return;
+
             this.editing = true;
         },
 
         remove() {
+            if (this.readOnly) return;
+
             this.$emit('removed', this.asset);
         },
 

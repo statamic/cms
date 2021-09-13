@@ -3,7 +3,7 @@
 namespace Statamic\Tags;
 
 use Illuminate\Support\Collection;
-use Statamic\Facades\Entry;
+use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
 
@@ -24,6 +24,14 @@ class Locales extends Tags
         }
 
         return $this->getLocales();
+    }
+
+    /**
+     * The {{ locales:count }} tag.
+     */
+    public function count()
+    {
+        return $this->getLocales()->count();
     }
 
     /**
@@ -135,7 +143,7 @@ class Locales extends Tags
 
         $id = $this->params->get('id', $this->context->get('id'));
 
-        return $this->data = Entry::find($id);
+        return $this->data = Data::find($id);
     }
 
     /**

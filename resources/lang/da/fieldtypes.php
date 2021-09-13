@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'any.config.default' => 'Indstil standardværdien.',
+    'any.config.antlers' => 'Uanset om du vil have, at dette felt skal tages af Antlers.',
     'any.config.cast_booleans' => 'Valgmuligheder med værdierne sandt og falsk gemmes som booleanske.',
+    'any.config.default' => 'Indstil standardværdien.',
     'array.config.keys' => 'Indstil matrixnøgler (variabler) og valgfri etiketter.',
     'array.config.mode' => 'Dynamisk tilstand giver brugeren kontrol over dataene, mens tastetilstand ikke gør det.',
     'assets.config.allow_uploads' => 'Tillad nye filoverførsler.',
@@ -37,7 +38,7 @@ return [
     'color.config.theme' => 'Vælg mellem den klassiske og mini (enklere) farvevælger.',
     'date.config.columns' => 'Vis flere måneder ad gangen i rækker og kolonner',
     'date.config.earliest_date' => 'Indstil den tidligst valgte dato.',
-    'date.config.format' => 'Du kan eventuelt formatere datostrengen ved hjælp af [moment.js] (https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Hvordan datoen skal gemmes ved hjælp af [PHP-datoformat](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Stræk kalenderen for at bruge den fulde bredde.',
     'date.config.inline' => 'Spring over dropdown-indtastningsfeltet og vis kalenderen direkte.',
     'date.config.mode' => 'Vælg mellem enkelt- eller områdetilstand (rækkevidde deaktiverer tidsvælger).',
@@ -67,6 +68,11 @@ return [
     'range.config.prepend' => 'Føj tekst til begyndelsen (venstre side) af skyderen.',
     'range.config.step' => 'Minimumsstørrelsen mellem værdierne.',
     'relationship.config.mode' => 'Vælg din foretrukne UI-stil.',
+    'replicator.config.collapse' => 'Sættets kollapsende adfærd.',
+    'replicator.config.collapse.accordion' => 'Tillad kun, at ét sæt udvides ad gangen',
+    'replicator.config.collapse.disabled' => 'Alle sæt udvides som standard',
+    'replicator.config.collapse.enabled' => 'Alle sæt er som standard skjult',
+    'replicator.config.max_sets' => 'Det maksimale antal sæt.',
     'select.config.clearable' => 'Aktiver for at tillade fravælgelse af din indstilling.',
     'select.config.multiple' => 'Tillad flere valg.',
     'select.config.options' => 'Indstil tasterne og deres valgfri etiketter.',

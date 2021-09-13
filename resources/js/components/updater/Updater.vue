@@ -36,6 +36,7 @@
                 v-for="release in unlicensedReleases"
                 :key="release.version"
                 :release="release"
+                :package-name="name"
                 :show-actions="showActions"
                 @install="installExplicitVersion(release.version)"
             />
@@ -45,6 +46,7 @@
             v-for="release in licensedReleases"
             :key="release.version"
             :release="release"
+            :package-name="name"
             :show-actions="showActions"
             @install="installExplicitVersion(release.version)"
         />
@@ -160,7 +162,10 @@
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
-                    status: 'Installing ' + this.package + ' version ' + version,
+                    status: __('Installing :package version :version', {
+                        package: this.package,
+                        version: version
+                    }),
                     package: this.package,
                 });
 
@@ -172,7 +177,7 @@
 
                 this.$store.commit('statamic/composer', {
                     processing: false,
-                    status: 'Installation complete!',
+                    status: __('Installation complete!'),
                     package: this.package,
                 });
 

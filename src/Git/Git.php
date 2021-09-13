@@ -4,7 +4,6 @@ namespace Statamic\Git;
 
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Processes\Git as GitProcess;
-use Statamic\Events\Event;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;
@@ -75,7 +74,9 @@ class Git
             $message = null;
         }
 
-        CommitJob::dispatch($message)->delay($delayInMinutes ?? null);
+        CommitJob::dispatch($message)
+            ->onConnection(config('statamic.git.queue_connection'))
+            ->delay($delayInMinutes ?? null);
     }
 
     /**
@@ -129,11 +130,27 @@ class Git
                 return app(Filesystem::class)->exists($path);
             })
             ->filter(function ($path) {
-                return GitProcess::create($path)->status();
+                return $this->gitProcessForPath($path)->isRepo();
+            })
+            ->filter(function ($path) {
+                return $this->gitProcessForPath($path)->status();
             })
             ->groupBy(function ($path) {
-                return GitProcess::create($path)->root();
+                return $this->gitProcessForPath($path)->root();
             });
+    }
+
+    /**
+     * Get git process for content path.
+     *
+     * @param string $path
+     * @return GitProcess
+     */
+    protected function gitProcessForPath($path)
+    {
+        return is_link($path)
+            ? GitProcess::create($path)->fromParent()
+            : GitProcess::create($path);
     }
 
     /**

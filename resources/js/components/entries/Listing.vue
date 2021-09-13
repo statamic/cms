@@ -12,6 +12,7 @@
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
+            @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
@@ -46,7 +47,7 @@
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
 
                     <data-list-bulk-actions
-                        :url="bulkActionsUrl"
+                        :url="actionUrl"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -79,7 +80,7 @@
                                 <div class="divider" v-if="entry.actions.length" />
                                 <data-list-inline-actions
                                     :item="entry.id"
-                                    :url="runActionUrl"
+                                    :url="actionUrl"
                                     :actions="entry.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"

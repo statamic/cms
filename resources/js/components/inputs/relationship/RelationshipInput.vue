@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relationship-input">
+    <div class="relationship-input" :class="{ 'relationship-input-empty': items.length == 0 }">
 
         <relationship-select-field
             v-if="!initializing && usesSelectField"
@@ -11,6 +11,7 @@
             :taggable="taggable"
             :read-only="readOnly"
             :url="selectionsUrl"
+            :site="site"
             @input="selectFieldSelected"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
@@ -19,7 +20,7 @@
         <loading-graphic v-if="initializing" :inline="true" />
 
         <template v-if="!initializing && !usesSelectField">
-            <div ref="items" class="relationship-input-items outline-none">
+            <div ref="items" class="relationship-input-items space-y-1 outline-none">
                 <component
                     :is="itemComponent"
                     v-for="(item, i) in items"
@@ -41,11 +42,11 @@
                 <span>{{ __('Maximum items selected:')}}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
-            <div v-if="canSelectOrCreate" class="relative" :class="{ 'mt-2': items.length > 0 }" >
+            <div v-if="canSelectOrCreate" class="relationship-input-buttons relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
                         <create-button
-                            v-if="canCreate"
+                            v-if="canCreate && creatables.length"
                             :creatables="creatables"
                             :site="site"
                             :component="formComponent"
@@ -174,12 +175,17 @@ export default {
         });
     },
 
+    beforeDestroy() {
+        this.setLoadingProgress(false);
+    },
+
     watch: {
 
         loading: {
             immediate: true,
             handler(loading) {
-                this.$progress.loading(`relationship-fieldtype-${this._uid}`, loading);
+                this.$emit('loading', loading);
+                this.setLoadingProgress(loading);
             }
         },
 
@@ -261,6 +267,10 @@ export default {
         selectFieldSelected(selectedItemData) {
             this.$emit('item-data-updated', selectedItemData.map(item => ({ id: item.id, title: item.title })));
             this.update(selectedItemData.map(item => item.id));
+        },
+
+        setLoadingProgress(state) {
+            this.$progress.loading(`relationship-fieldtype-${this._uid}`, state);
         }
 
     }

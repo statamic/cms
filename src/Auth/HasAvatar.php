@@ -14,7 +14,11 @@ trait HasAvatar
      */
     public function avatar($size = 64)
     {
-        return $this->hasAvatarField() ? $this->avatarFieldUrl() : $this->gravatarUrl($size);
+        if ($this->hasAvatarField() && ($url = $this->avatarFieldUrl())) {
+            return $url;
+        }
+
+        return $this->gravatarUrl($size);
     }
 
     /**
@@ -22,7 +26,7 @@ trait HasAvatar
      */
     public function hasAvatarField()
     {
-        return $this->has('avatar') && $this->blueprint()->hasField('avatar');
+        return $this->get('avatar') && $this->blueprint()->hasField('avatar');
     }
 
     /**
@@ -43,7 +47,7 @@ trait HasAvatar
      */
     public function avatarFieldUrl()
     {
-        return $this->avatarFieldValue()->value()->url();
+        return optional($this->avatarFieldValue()->value())->url();
     }
 
     /**

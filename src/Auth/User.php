@@ -6,19 +6,21 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
 use Statamic\Facades;
-use Statamic\Facades\Blueprint;
-use Statamic\Fields\Value;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Statamic;
@@ -29,9 +31,11 @@ abstract class User implements
     Authenticatable,
     CanResetPasswordContract,
     Augmentable,
-    AuthorizableContract
+    AuthorizableContract,
+    ResolvesValuesContract,
+    HasLocalePreference
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar, ResolvesValues;
 
     abstract public function get($key, $fallback = null);
 
@@ -96,7 +100,7 @@ abstract class User implements
         return Statamic::apiRoute('users.show', $this->id());
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedUser($this);
     }
@@ -107,6 +111,11 @@ abstract class User implements
     }
 
     public function getAuthIdentifier()
+    {
+        return $this->id();
+    }
+
+    public function getKey()
     {
         return $this->id();
     }
@@ -219,5 +228,15 @@ abstract class User implements
     protected function shallowAugmentedArrayKeys()
     {
         return ['id', 'name', 'email', 'api_url'];
+    }
+
+    public function preferredLocale()
+    {
+        return $this->getPreference('locale') ?? config('app.locale');
+    }
+
+    public function setPreferredLocale($locale)
+    {
+        return $this->setPreference('locale', $locale);
     }
 }

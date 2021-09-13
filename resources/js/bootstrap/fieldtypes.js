@@ -30,6 +30,7 @@ Vue.component('color-fieldtype', require('../components/fieldtypes/ColorFieldtyp
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue').default);
 Vue.component('fieldset-fieldtype', FieldsetFieldtype);
 Vue.component('fields-fieldtype', require('../components/fieldtypes/grid/FieldsFieldtype.vue').default);
+Vue.component('float-fieldtype', require('../components/fieldtypes/FloatFieldtype.vue').default);
 Vue.component('global_set_sites-fieldtype', require('../components/globals/Sites.vue').default);
 Vue.component('grid-fieldtype', require('../components/fieldtypes/grid/Grid.vue').default);
 Vue.component('grid-fieldtype-index', require('../components/fieldtypes/grid/GridIndex.vue').default);

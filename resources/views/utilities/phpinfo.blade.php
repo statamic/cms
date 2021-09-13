@@ -27,7 +27,7 @@
                 @foreach ($items as $name => $value)
                 <tr>
                     <th class="pl-2 py-1 w-1/4">{{ $name }}</th>
-                    <td>{{ is_array($value) ? join(', ', $value) : $value }}</td>
+                    <td class="break-all">{{ is_array($value) ? join(', ', $value) : $value }}</td>
                 </tr>
                 @endforeach
             </table>

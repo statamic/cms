@@ -4,20 +4,20 @@ namespace Statamic\Assets;
 
 use Facades\Statamic\Assets\Dimensions;
 use Illuminate\Support\Carbon;
-use League\Flysystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
-use Statamic\Data\Data;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\SyncsOriginalState;
+use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
-use Statamic\Facades\Blueprint;
-use Statamic\Facades\File;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -28,10 +28,11 @@ use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements AssetContract, Augmentable
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, SyncsOriginalState, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -41,6 +42,7 @@ class Asset implements AssetContract, Augmentable
     protected $container;
     protected $path;
     protected $meta;
+    protected $syncOriginalProperties = ['path'];
 
     public function __construct()
     {
@@ -88,10 +90,6 @@ class Asset implements AssetContract, Augmentable
 
     public function hydrate()
     {
-        if ($this->meta) {
-            return $this;
-        }
-
         $this->meta = $this->meta();
 
         $this->data = collect($this->meta['data']);
@@ -115,11 +113,15 @@ class Asset implements AssetContract, Augmentable
             return false;
         }
 
-        return $this->disk()->exists($path);
+        return $this->container()->files()->contains($path);
     }
 
-    public function meta()
+    public function meta($key = null)
     {
+        if (func_num_args() === 1) {
+            return $this->metaValue($key);
+        }
+
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
         }
@@ -128,13 +130,30 @@ class Asset implements AssetContract, Augmentable
             return array_merge($this->meta, ['data' => $this->data->all()]);
         }
 
-        if ($this->disk()->exists($path = $this->metaPath())) {
-            return YAML::parse($this->disk()->get($path));
+        return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
+            if ($contents = $this->disk()->get($path = $this->metaPath())) {
+                return YAML::file($path)->parse($contents);
+            }
+
+            $this->writeMeta($meta = $this->generateMeta());
+
+            return $meta;
+        });
+    }
+
+    private function metaValue($key)
+    {
+        $value = Arr::get($this->meta(), $key);
+
+        if (! is_null($value)) {
+            return $value;
         }
 
-        $this->writeMeta($this->meta = $this->generateMeta());
+        Cache::forget($this->metaCacheKey());
 
-        return $this->meta;
+        $this->writeMeta($meta = $this->generateMeta());
+
+        return Arr::get($meta, $key);
     }
 
     public function generateMeta()
@@ -149,6 +168,7 @@ class Asset implements AssetContract, Augmentable
                 'last_modified' => $this->disk()->lastModified($this->path()),
                 'width' => $dimensions[0],
                 'height' => $dimensions[1],
+                'mime_type' => $this->disk()->mimeType($this->path()),
             ]);
         }
 
@@ -169,6 +189,11 @@ class Asset implements AssetContract, Augmentable
         $contents = YAML::dump($meta);
 
         $this->disk()->put($this->metaPath(), $contents);
+    }
+
+    public function metaCacheKey()
+    {
+        return 'asset-meta-'.$this->id();
     }
 
     /**
@@ -204,7 +229,9 @@ class Asset implements AssetContract, Augmentable
      */
     public function folder()
     {
-        return pathinfo($this->path())['dirname'];
+        $dirname = pathinfo($this->path())['dirname'];
+
+        return $dirname === '.' ? '/' : $dirname;
     }
 
     /**
@@ -338,7 +365,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function isVideo()
     {
-        return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm']);
+        return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
     }
 
     /**
@@ -352,13 +379,33 @@ class Asset implements AssetContract, Augmentable
     }
 
     /**
+     * Get the extension based on the mime type.
+     *
+     * @return string|null The guessed extension or null if it cannot be guessed
+     */
+    public function guessedExtension()
+    {
+        return MimeTypes::getDefault()->getExtensions($this->mimeType())[0] ?? null;
+    }
+
+    /**
+     * Get the mime type.
+     *
+     * @return string
+     */
+    public function mimeType()
+    {
+        return $this->meta('mime_type');
+    }
+
+    /**
      * Get the last modified time of the asset.
      *
      * @return \Carbon\Carbon
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta()['last_modified']);
+        return Carbon::createFromTimestamp($this->meta('last_modified'));
     }
 
     /**
@@ -370,7 +417,11 @@ class Asset implements AssetContract, Augmentable
     {
         Facades\Asset::save($this);
 
+        $this->clearCaches();
+
         AssetSaved::dispatch($this);
+
+        $this->syncOriginal();
 
         return true;
     }
@@ -385,9 +436,22 @@ class Asset implements AssetContract, Augmentable
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 
+        Facades\Asset::delete($this);
+
+        $this->clearCaches();
+
         AssetDeleted::dispatch($this);
 
         return $this;
+    }
+
+    /**
+     * Clear meta and filesystem listing caches.
+     */
+    private function clearCaches()
+    {
+        $this->meta = null;
+        Cache::forget($this->metaCacheKey());
     }
 
     /**
@@ -472,7 +536,11 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        return [$this->meta()['width'], $this->meta()['height']];
+        if (! $this->isImage() && ! $this->isSvg()) {
+            return [null, null];
+        }
+
+        return [$this->meta('width'), $this->meta('height')];
     }
 
     /**
@@ -520,7 +588,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function ratio()
     {
-        if (! $this->isImage()) {
+        if (! $this->isImage() && ! $this->isSvg()) {
             return null;
         }
 
@@ -534,7 +602,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function size()
     {
-        return $this->meta()['size'];
+        return $this->meta('size');
     }
 
     /**
@@ -579,7 +647,7 @@ class Asset implements AssetContract, Augmentable
             fclose($stream);
         }
 
-        $this->path($path);
+        $this->path($path)->syncOriginal();
 
         $this->save();
 
@@ -595,7 +663,7 @@ class Asset implements AssetContract, Augmentable
             '#' => '-',
         ];
 
-        $str = Stringy::create($string)->toAscii();
+        $str = Stringy::create(urldecode($string))->toAscii();
 
         foreach ($replacements as $from => $to) {
             $str = $str->replace($from, $to);
@@ -640,6 +708,16 @@ class Asset implements AssetContract, Augmentable
         return in_array(strtolower($this->extension()), $filetypes);
     }
 
+    /**
+     * Check if asset's guessed file extension is one of a given list.
+     *
+     * @return string
+     */
+    public function guessedExtensionIsOneOf($filetypes = [])
+    {
+        return in_array(strtolower($this->guessedExtension()), $filetypes);
+    }
+
     public function __toString()
     {
         return $this->url() ?? $this->id();
@@ -671,9 +749,14 @@ class Asset implements AssetContract, Augmentable
         return Facades\Asset::{$method}(...$parameters);
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedAsset($this);
+    }
+
+    public function defaultAugmentedArrayKeys()
+    {
+        return $this->selectedQueryColumns;
     }
 
     protected function shallowAugmentedArrayKeys()

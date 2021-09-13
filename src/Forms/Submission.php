@@ -45,7 +45,7 @@ class Submission implements SubmissionContract, Augmentable
     {
         return $this->fluentlyGetOrSet('id')
             ->getter(function ($id) {
-                return $id ?: microtime(true);
+                return $this->id = $id ?: str_replace(',', '.', microtime(true));
             })
             ->args(func_get_args());
     }
@@ -212,7 +212,7 @@ class Submission implements SubmissionContract, Augmentable
 
         return $this->form()->fields()->keys()->flip()
             ->reject(function ($field, $key) {
-                return in_array($key, ['id', 'date']);
+                return in_array($key, ['id', 'date', 'form']);
             })
             ->map(function ($field, $key) use ($data) {
                 return $data[$key] ?? null;
@@ -222,6 +222,13 @@ class Submission implements SubmissionContract, Augmentable
                 'date' => $this->date(),
             ])
             ->all();
+    }
+
+    public function augmentedArrayData()
+    {
+        return array_merge($this->toArray(), [
+            'form' => $this->form,
+        ]);
     }
 
     public function blueprint()

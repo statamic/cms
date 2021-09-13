@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\View\Composers;
 
-use Illuminate\View\View;
+use Illuminate\Support\Arr;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Statamic;
@@ -16,11 +16,10 @@ class FieldComposer
 
     protected $fieldsetFields;
 
-    public function compose(View $view)
+    public function compose()
     {
         Statamic::provideToScript([
             'fieldsets' => $this->fieldsets(),
-            'fieldsetFields' => FieldTransformer::fieldsetFields(),
         ]);
     }
 
@@ -30,7 +29,10 @@ class FieldComposer
             return [$fieldset->handle() => [
                 'handle' => $fieldset->handle(),
                 'title' => $fieldset->title(),
+                'fields' => collect(Arr::get($fieldset->contents(), 'fields'))->map(function ($field) {
+                    return FieldTransformer::toVue($field);
+                })->sortBy('config.display')->values()->all(),
             ]];
-        });
+        })->sortBy('title');
     }
 }

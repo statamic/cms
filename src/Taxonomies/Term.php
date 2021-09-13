@@ -4,13 +4,12 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\SyncsOriginalState;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -18,13 +17,14 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Term implements TermContract
 {
-    use ExistsAsFile, FluentlyGetsAndSets;
+    use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
 
     protected $taxonomy;
     protected $slug;
     protected $blueprint;
     protected $collection;
     protected $data;
+    protected $syncOriginalProperties = ['slug'];
 
     public function __construct()
     {
@@ -144,6 +144,13 @@ class Term implements TermContract
         return $this->queryEntries()->get();
     }
 
+    public function entriesCount()
+    {
+        return Blink::once('term-entries-count-'.$this->id(), function () {
+            return Facades\Term::entriesCount($this);
+        });
+    }
+
     public function queryEntries()
     {
         $entries = $this->collection
@@ -163,6 +170,8 @@ class Term implements TermContract
         Facades\Term::save($this);
 
         TermSaved::dispatch($this);
+
+        $this->syncOriginal();
 
         return true;
     }

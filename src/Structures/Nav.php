@@ -3,10 +3,13 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Structures\Nav as Contract;
+use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Events\NavBlueprintFound;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -45,18 +48,12 @@ class Nav extends Structure implements Contract
 
     public function fileData()
     {
-        $data = [
+        return [
             'title' => $this->title,
             'collections' => $this->collections,
             'max_depth' => $this->maxDepth,
             'root' => $this->expectsRoot ?: null,
         ];
-
-        if (! Site::hasMultiple()) {
-            $data = array_merge($data, $this->in(Site::default()->handle())->fileData());
-        }
-
-        return $data;
     }
 
     public function collections($collections = null)
@@ -86,5 +83,37 @@ class Nav extends Structure implements Contract
     public function deleteUrl()
     {
         return cp_route('navigation.destroy', $this->handle());
+    }
+
+    public function newTreeInstance()
+    {
+        return new NavTree;
+    }
+
+    public function in($site)
+    {
+        return app(NavTreeRepository::class)->find($this->handle(), $site);
+    }
+
+    public function trees()
+    {
+        return Site::all()->map(function ($site) {
+            return $this->in($site);
+        })->filter();
+    }
+
+    public function existsIn($site)
+    {
+        return $this->trees()->has($site);
+    }
+
+    public function blueprint()
+    {
+        $blueprint = Blueprint::find('navigation.'.$this->handle())
+            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('navigation');
+
+        NavBlueprintFound::dispatch($blueprint, $this);
+
+        return $blueprint;
     }
 }

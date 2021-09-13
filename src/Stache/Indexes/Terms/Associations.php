@@ -23,11 +23,19 @@ class Associations extends Index
                                     'value' => $value,
                                     'slug' => Str::slug($value),
                                     'entry' => $entry->id(),
+                                    'collection' => $entry->collectionHandle(),
                                     'site' => $entry->locale(),
                                 ];
                             });
                     })->all();
             })->all();
+    }
+
+    public function forgetEntry($id)
+    {
+        $this->items = $this->items()->reject(function ($association) use ($id) {
+            return $association['entry'] === $id;
+        })->all();
     }
 
     public function updateItem($item)

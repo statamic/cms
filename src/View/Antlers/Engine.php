@@ -17,6 +17,12 @@ use Statamic\Tags\TagNotFoundException;
 
 class Engine implements EngineInterface
 {
+    const EXTENSIONS = [
+        'antlers.html',
+        'antlers.php',
+        'antlers.xml',
+    ];
+
     /**
      * The Antlers Parser.
      *

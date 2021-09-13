@@ -1,6 +1,11 @@
 <template>
 
-    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
+    <div 
+        class="bard-fieldtype-wrapper"
+        :class="{'bard-fullscreen': fullScreenMode }"
+        @dragstart.stop="ignorePageHeader(true)"
+        @dragend="ignorePageHeader(false)"
+    >
 
         <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar" v-if="showFixedToolbar">
@@ -53,12 +58,9 @@
 
             <editor-floating-menu :editor="editor">
                 <div
-                    slot-scope="{ commands, isActive, menu }"
+                    slot-scope="{ menu }"
                     class="bard-set-selector"
-                    :class="{
-                        'invisible': !config.always_show_set_button && !menu.isActive,
-                        'visible': menu.isActive
-                    }"
+                    :class="config.sets.length && (config.always_show_set_button || menu.isActive) ? 'visible' : 'invisible'"
                     :style="`top: ${menu.top}px`"
                 >
                     <dropdown-list>
@@ -76,7 +78,7 @@
             </editor-floating-menu>
 
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
-            <bard-source :html="html" v-if="showSource" />
+            <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
         <div class="bard-footer-toolbar" v-if="config.reading_time">
             {{ readingTime }} {{ __('Reading Time') }}
@@ -93,6 +95,7 @@ import {
     CodeBlock,
     HardBreak,
     Heading,
+    HorizontalRule,
     OrderedList,
     BulletList,
     ListItem,
@@ -125,6 +128,7 @@ import css from 'highlight.js/lib/languages/css'
 import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
 import mark from './Mark';
+import node from './Node';
 
 export default {
 
@@ -157,7 +161,9 @@ export default {
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
+            previews: this.meta.previews,
             mounted: false,
+            pageHeader: null,
         }
     },
 
@@ -210,6 +216,24 @@ export default {
             });
 
             return indexes;
+        },
+
+        site() {
+            if (! this.storeName) return this.$config.get('selectedSite');
+
+            return this.$store.state.publish[this.storeName].site;
+        },
+
+        htmlWithReplacedLinks() {
+            return this.html.replaceAll(/\"statamic:\/\/(.*?)\"/g, (match, ref) => {
+                const linkData = this.meta.linkData[ref];
+                if (! linkData) {
+                    this.$toast.error(`${__('No link data found for')} ${ref}`);
+                    return '""';
+                }
+
+                return `"${linkData.permalink}"`;
+            });
         }
 
     },
@@ -221,6 +245,8 @@ export default {
             extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
+            disableInputRules: ! this.config.enable_input_rules,
+            disablePasteRules: ! this.config.enable_paste_rules,
             onFocus: () => this.$emit('focus'),
             onBlur: () => {
                 // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
@@ -242,6 +268,8 @@ export default {
         this.$keys.bind('esc', this.closeFullscreen)
 
         this.$nextTick(() => this.mounted = true);
+
+        this.pageHeader = document.querySelector('.global-header');
     },
 
     beforeDestroy() {
@@ -276,6 +304,18 @@ export default {
             const meta = this.meta;
             meta.collapsed = value;
             this.updateMeta(meta);
+        },
+
+        previews: {
+            deep: true,
+            handler(value) {
+                if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
+                    return
+                }
+                const meta = this.meta;
+                meta.previews = value;
+                this.updateMeta(meta);
+            }
         }
 
     },
@@ -285,6 +325,11 @@ export default {
         addSet(handle) {
             const id = `set-${uniqid()}`;
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
+
+            let previews = {};
+            Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
             this.updateSetMeta(id, this.meta.new[handle]);
 
             // Perform this in nextTick because the meta data won't be ready until then.
@@ -430,6 +475,7 @@ export default {
 
             let btns = this.buttons.map(button => button.name);
 
+            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('quote')) exts.push(new Blockquote());
             if (btns.includes('bold')) exts.push(new Bold());
             if (btns.includes('italic')) exts.push(new Italic());
@@ -437,9 +483,9 @@ export default {
             if (btns.includes('underline')) exts.push(new Underline());
             if (btns.includes('subscript')) exts.push(new Subscript());
             if (btns.includes('superscript')) exts.push(new Superscript());
-            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('removeformat')) exts.push(new RemoveFormat());
             if (btns.includes('image')) exts.push(new Image({ bard: this }));
+            if (btns.includes('horizontalrule')) exts.push(new HorizontalRule());
 
             if (btns.includes('orderedlist') || btns.includes('unorderedlist')) {
                 if (btns.includes('orderedlist')) exts.push(new OrderedList());
@@ -480,14 +526,25 @@ export default {
             }
 
             this.$bard.extensionCallbacks.forEach(callback => {
-                let returned = callback({ bard: this, mark });
+                let returned = callback({ bard: this, mark, node });
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
             });
 
             return exts;
+        },
+
+        updateSetPreviews(set, previews) {
+            this.previews[set] = previews;
+        },
+
+        ignorePageHeader(ignore) {
+            if (this.pageHeader) {
+                this.pageHeader.style['pointer-events'] = ignore ? 'none' : 'all';
+            }
         }
+
     }
 }
 </script>

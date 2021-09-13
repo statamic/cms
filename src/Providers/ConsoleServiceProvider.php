@@ -11,6 +11,7 @@ class ConsoleServiceProvider extends ServiceProvider
     protected $commands = [
         Commands\ListCommand::class,
         Commands\AddonsDiscover::class,
+        Commands\AssetsGeneratePresets::class,
         Commands\AssetsMeta::class,
         Commands\GlideClear::class,
         Commands\Install::class,
@@ -28,12 +29,16 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StacheRefresh::class,
         Commands\StacheWarm::class,
         Commands\StacheDoctor::class,
+        Commands\StarterKitExport::class,
+        Commands\StarterKitInstall::class,
         Commands\StaticClear::class,
+        Commands\StaticWarm::class,
         // Commands\MakeUserMigration::class,
         Commands\SupportDetails::class,
         Commands\AuthMigration::class,
         Commands\Multisite::class,
         Commands\SiteClear::class,
+        Commands\UpdatesRun::class,
     ];
 
     public function boot()

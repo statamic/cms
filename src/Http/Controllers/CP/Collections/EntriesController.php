@@ -3,8 +3,10 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -14,6 +16,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Support\Arr;
 
 class EntriesController extends CpController
 {
@@ -75,6 +78,14 @@ class EntriesController extends CpController
 
         $blueprint = $entry->blueprint();
 
+        if (! $blueprint) {
+            throw new BlueprintNotFoundException($entry->value('blueprint'), 'collections/'.$collection->handle());
+        }
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+        }
+
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         if ($hasOrigin = $entry->hasOrigin()) {
@@ -97,6 +108,7 @@ class EntriesController extends CpController
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
             'collection' => $collection->handle(),
+            'collectionHasRoutes' => ! is_null($collection->route($entry->locale())),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
@@ -127,6 +139,7 @@ class EntriesController extends CpController
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
+            'canManagePublishState' => User::current()->can('publish', $entry),
         ];
 
         if ($request->wantsJson()) {
@@ -148,9 +161,24 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
-        $fields = $entry->blueprint()->fields()->addValues($request->except('id'));
+        $blueprint = $entry->blueprint();
 
-        $fields->validate(Entry::updateRules($collection, $entry));
+        $data = $request->except('id');
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $data['author'] = Arr::wrap($entry->value('author'));
+        }
+
+        $fields = $entry->blueprint()->fields()->addValues($data);
+
+        $fields
+            ->validator()
+            ->withRules(Entry::updateRules($collection, $entry))
+            ->withReplacements([
+                'id' => $entry->id(),
+                'collection' => $collection->handle(),
+                'site' => $entry->locale(),
+            ])->validate();
 
         $values = $fields->process()->values();
 
@@ -175,13 +203,20 @@ class EntriesController extends CpController
         }
 
         if ($collection->structure() && ! $collection->orderable()) {
-            $entry->afterSave(function ($entry) use ($parent) {
-                $entry->structure()
-                    ->in($entry->locale())
+            $tree = $entry->structure()->in($entry->locale());
+
+            $entry->afterSave(function ($entry) use ($parent, $tree) {
+                if ($parent && optional($tree->page($parent))->isRoot()) {
+                    $parent = null;
+                }
+
+                $tree
                     ->move($entry->id(), $parent)
                     ->save();
             });
         }
+
+        $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
@@ -189,7 +224,7 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
         } else {
-            if (! $entry->revisionsEnabled()) {
+            if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
             }
 
@@ -209,6 +244,10 @@ class EntriesController extends CpController
             throw new \Exception(__('A valid blueprint is required.'));
         }
 
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+        }
+
         $values = [];
 
         if ($collection->hasStructure() && $request->parent) {
@@ -220,24 +259,26 @@ class EntriesController extends CpController
             ->addValues($values)
             ->preProcess();
 
-        $values = $fields->values()->merge([
+        $values = collect([
             'title' => null,
             'slug' => null,
             'published' => $collection->defaultPublishState(),
-        ]);
+        ])->merge($fields->values());
 
         if ($collection->dated()) {
             $values['date'] = substr(now()->toDateTimeString(), 0, 10);
         }
 
         $viewData = [
-            'title' => __('Create Entry'),
+            'title' => $collection->createLabel(),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
             ],
             'values' => $values->all(),
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
+            'collectionCreateLabel' => $collection->createLabel(),
+            'collectionHasRoutes' => ! is_null($collection->route($site->handle())),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
@@ -254,6 +295,7 @@ class EntriesController extends CpController
             })->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
+            'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
         ];
 
         if ($request->wantsJson()) {
@@ -269,9 +311,21 @@ class EntriesController extends CpController
 
         $blueprint = $collection->entryBlueprint($request->_blueprint);
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $data = $request->all();
 
-        $fields->validate(Entry::createRules($collection, $site));
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $data['author'] = [User::current()->id()];
+        }
+
+        $fields = $blueprint->fields()->addValues($data);
+
+        $fields
+            ->validator()
+            ->withRules(Entry::createRules($collection, $site))
+            ->withReplacements([
+                'collection' => $collection->handle(),
+                'site' => $site->handle(),
+            ])->validate();
 
         $values = $fields->process()->values()->except(['slug', 'date', 'blueprint']);
 
@@ -294,6 +348,8 @@ class EntriesController extends CpController
                 $tree->appendTo($parent, $entry)->save();
             });
         }
+
+        $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled()) {
             $entry->store([
@@ -336,6 +392,12 @@ class EntriesController extends CpController
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
         }
 
+        if ($entry->collection()->dated()) {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
         $fields = $blueprint
             ->fields()
             ->addValues($values)
@@ -346,12 +408,6 @@ class EntriesController extends CpController
             'slug' => $entry->slug(),
             'published' => $entry->published(),
         ]);
-
-        if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
-            $values['date'] = $datetime;
-        }
 
         return [$values->all(), $fields->meta()];
     }
@@ -385,6 +441,44 @@ class EntriesController extends CpController
         }
 
         return $date;
+    }
+
+    private function validateUniqueUri($entry, $tree, $parent)
+    {
+        if (! $uri = $this->entryUri($entry, $tree, $parent)) {
+            return;
+        }
+
+        $existing = Entry::findByUri($uri, $entry->locale());
+
+        if (! $existing || $existing->id() === $entry->id()) {
+            return;
+        }
+
+        throw ValidationException::withMessages(['slug' => __('statamic::validation.unique_uri')]);
+    }
+
+    private function entryUri($entry, $tree, $parent)
+    {
+        if (! $entry->route()) {
+            return null;
+        }
+
+        if (! $tree) {
+            return $entry->uri();
+        }
+
+        $parent = $parent ? $tree->page($parent) : null;
+
+        return app(\Statamic\Contracts\Routing\UrlBuilder::class)
+            ->content($entry)
+            ->merge([
+                'parent_uri' => $parent ? $parent->uri() : null,
+                'slug' => $entry->slug(),
+                // 'depth' => '', // todo
+                'is_root' => false,
+            ])
+            ->build($entry->route());
     }
 
     protected function breadcrumbs($collection)

@@ -5,10 +5,10 @@
             class="flex-1"
             :name="name"
             :clearable="config.clearable"
-            :disabled="config.disabled || isReadOnly || limitReached"
+            :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
             :options="options"
             :placeholder="config.placeholder"
-            :searchable="config.searchable"
+            :searchable="config.searchable || config.taggable"
             :taggable="config.taggable"
             :push-tags="config.push_tags"
             :multiple="config.multiple"
@@ -36,8 +36,11 @@
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-1">
                             {{ option.label }}
-                            <button @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
+                            <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
+                            </button>
+                            <button v-else type="button" class="vs__deselect">
+                                <span class="opacity-50">×</span>
                             </button>
                         </span>
                     </div>
@@ -71,6 +74,10 @@ export default {
             return this.normalizeInputOptions(this.config.options);
         },
 
+        replicatorPreview() {
+            return this.selectedOptions.map(option => option.label).join(', ');
+        },
+
         resetOnOptionsChange() {
             // Reset logic should only happen when the config value is true.
             // Nothing should be reset when it's false or undefined.
@@ -89,12 +96,28 @@ export default {
             return this.currentLength >= this.config.max_items;
         },
 
+        limitExceeded() {
+            if (! this.config.max_items) return false;
+
+            return this.currentLength > this.config.max_items;
+        },
+
         currentLength() {
-            return (this.value) ? this.value.length : 0
+            if (this.value) {
+                return (typeof this.value == 'string') ? 1 : this.value.length;
+            }
+
+            return 0;
         },
 
         limitIndicatorColor() {
-            return this.limitReached ? 'text-red' : 'text-grey'
+            if (this.limitExceeded) {
+                return 'text-red';
+            } else if (this.limitReached) {
+                return 'text-green';
+            }
+
+            return 'text-grey';
         }
     },
 

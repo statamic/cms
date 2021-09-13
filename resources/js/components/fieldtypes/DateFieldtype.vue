@@ -2,7 +2,7 @@
     <element-container @resized="containerWidth = $event.width">
     <div class="datetime">
 
-        <button type="button" class="btn flex mb-1 md:mb-0 items-center pl-1.5" v-if="config.inline === false && !hasDate" @click="addDate" tabindex="0">
+        <button type="button" class="btn flex mb-1 md:mb-0 items-center pl-1.5" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
             <svg-icon name="calendar" class="w-4 h-4 mr-1"></svg-icon>
     		{{ __('Add Date') }}
     	</button>
@@ -16,15 +16,15 @@
                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
                     <svg-icon name="calendar" class="w-4 h-4" />
                 </div>
-                <input type="text" class="input-text" readonly :value="$moment(value).format('L')" v-if="isReadOnly">
+                <input type="text" class="input-text" readonly :value="$moment(value).format(displayFormat)" v-if="isReadOnly">
                 <v-date-picker
                     v-else
                     v-model="date"
                     :popover="{ visibility: 'click' }"
                     :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
-                    :locale="$config.get('locale')"
-                    :formats="formats"
+                    :locale="$config.get('locale').replace('_', '-')"
+                    :masks="{ input: [displayFormat] }"
                     :mode="config.mode"
                     :input="value"
                     :is-required="config.required"
@@ -63,13 +63,6 @@ export default {
         return {
             date: null,
             time: null,
-            formats: {
-                title: 'MMMM YYYY',
-                weekdays: 'W',
-                navMonths: 'MMM',
-                input: ['L', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD'],
-                dayPopover: 'L',
-            },
             attrs: [
                 {
                     key: 'today',
@@ -103,6 +96,10 @@ export default {
 
         format() {
             return (this.time) ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD';
+        },
+
+        displayFormat() {
+            return this.meta.displayFormat;
         }
     },
 
@@ -129,9 +126,15 @@ export default {
 
     methods: {
         handleUpdate(value) {
-            let date = this.config.mode === "single"
-                ? Vue.moment(this.dateTime).format(this.format)
-                : this.date;
+            let date;
+            if (this.config.mode === "range") {
+                date = value ? {
+                    start: Vue.moment(value.start).format(this.format),
+                    end: Vue.moment(value.end).format(this.format)
+                } : null;
+            } else {
+                date = Vue.moment(this.dateTime).format(this.format);
+            }
 
             if (date == 'Invalid date') {
                 date = null;
@@ -174,7 +177,7 @@ export default {
         },
 
         parseTime(value) {
-            if (value && this.config.time_enabled) {
+            if (this.config.time_enabled && value && value.length > 10) {
                 return Vue.moment(value).format('HH:mm');
             } else if (this.config.time_required) {
                 return Vue.moment().format('HH:mm');

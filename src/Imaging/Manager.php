@@ -3,6 +3,7 @@
 namespace Statamic\Imaging;
 
 use Statamic\Contracts\Imaging\ImageManipulator;
+use Statamic\Support\Arr;
 
 class Manager
 {
@@ -41,18 +42,72 @@ class Manager
     }
 
     /**
+     * Get the image manipulation presets.
+     *
+     * @return array
+     */
+    public function manipulationPresets()
+    {
+        $presets = $this->userManipulationPresets();
+
+        if (config('statamic.cp.enabled')) {
+            $presets = array_merge($presets, $this->cpManipulationPresets());
+        }
+
+        return $presets;
+    }
+
+    /**
+     * Get the user defined image manipulation presets.
+     *
+     * @return array
+     */
+    public function userManipulationPresets()
+    {
+        return collect(config('statamic.assets.image_manipulation.presets', []))
+            ->map(function ($preset) {
+                return $this->normalizePreset($preset);
+            })
+            ->all();
+    }
+
+    /**
      * Get the image manipulation presets required by the control panel.
      *
      * @return array
      */
-    public function getCpImageManipulationPresets()
+    public function cpManipulationPresets()
     {
         return [
-            'cp_thumbnail_small' => ['w' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_portrait' => ['h' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_square' => ['w' => '300', 'h' => '300'],
-            'cp_thumbnail_large' => ['w' => '1000', 'h' => '1000'],
         ];
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getCpImageManipulationPresets()
+    {
+        return $this->cpManipulationPresets();
+    }
+
+    /**
+     * Normalize preset.
+     *
+     * @param array $preset
+     * @return array
+     */
+    protected function normalizePreset($preset)
+    {
+        // When explicitly setting `crop_focal` in a preset, it breaks cropping
+        // altogether. Statamic's glide tag will automatically respect focal
+        // points though, so we can remove this parameter from the preset.
+        if (Arr::get($preset, 'fit') === 'crop_focal') {
+            Arr::forget($preset, 'fit');
+        }
+
+        return $preset;
     }
 }

@@ -2,12 +2,16 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\LabeledValue;
+use Statamic\GraphQL\Types\LabeledValueType;
 use Statamic\Support\Arr;
 
 class Select extends Fieldtype
 {
+    protected $selectableInForms = true;
+
     protected function configFieldItems(): array
     {
         return [
@@ -75,6 +79,12 @@ class Select extends Fieldtype
                 'default' => false,
                 'width' => 50,
             ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
+            ],
         ];
     }
 
@@ -123,6 +133,11 @@ class Select extends Fieldtype
         return $value;
     }
 
+    public function preProcessConfig($value)
+    {
+        return $value;
+    }
+
     public function process($value)
     {
         if ($this->config('cast_booleans')) {
@@ -134,5 +149,42 @@ class Select extends Fieldtype
         }
 
         return $value;
+    }
+
+    public function toGqlType()
+    {
+        return $this->config('multiple')
+            ? $this->multiSelectGqlType()
+            : $this->singleSelectGqlType();
+    }
+
+    private function singleSelectGqlType()
+    {
+        return [
+            'type' => GraphQL::type(LabeledValueType::NAME),
+            'resolve' => function ($item, $args, $context, $info) {
+                $resolved = $item->resolveGqlValue($info->fieldName);
+
+                return $resolved->value() ? $resolved : null;
+            },
+        ];
+    }
+
+    private function multiSelectGqlType()
+    {
+        return [
+            'type' => GraphQL::listOf(GraphQL::type(LabeledValueType::NAME)),
+            'resolve' => function ($item, $args, $context, $info) {
+                $resolved = $item->resolveGqlValue($info->fieldName);
+
+                if (empty($resolved)) {
+                    return null;
+                }
+
+                return collect($resolved)->map(function ($item) {
+                    return new LabeledValue($item['value'], $item['label']);
+                })->all();
+            },
+        ];
     }
 }

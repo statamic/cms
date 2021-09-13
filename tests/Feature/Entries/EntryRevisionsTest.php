@@ -5,13 +5,11 @@ namespace Tests\Feature\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
-use Mockery;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Folder;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
-use Statamic\Fields\Fields;
 use Statamic\Revisions\Revision;
 use Statamic\Revisions\WorkingCopy;
 use Tests\FakesRoles;
@@ -29,7 +27,7 @@ class EntryRevisionsTest extends TestCase
         $this->dir = __DIR__.'/tmp';
         config(['statamic.revisions.enabled' => true]);
         config(['statamic.revisions.path' => $this->dir]);
-        $this->collection = Collection::make('blog')->revisionsEnabled(true)->save();
+        $this->collection = tap(Collection::make('blog')->revisionsEnabled(true)->dated(true))->save();
     }
 
     public function tearDown(): void
@@ -51,6 +49,7 @@ class EntryRevisionsTest extends TestCase
             ->slug('test')
             ->collection('blog')
             ->published(false)
+            ->date('2010-12-25')
             ->data([
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -60,6 +59,7 @@ class EntryRevisionsTest extends TestCase
         tap($entry->makeWorkingCopy(), function ($copy) {
             $attrs = $copy->attributes();
             $attrs['data']['foo'] = 'foo modified in working copy';
+            $attrs['date'] = 1482624000; // 2016-12-25
             $copy->attributes($attrs);
         })->save();
 
@@ -81,11 +81,13 @@ class EntryRevisionsTest extends TestCase
         ], $entry->data()->all());
         $this->assertTrue($entry->published());
         $this->assertCount(1, $entry->revisions());
+        $this->assertEquals('2016-12-25', $entry->date()->format('Y-m-d'));
         $revision = $entry->latestRevision();
         $this->assertEquals([
             'published' => true,
             'slug' => 'test',
             'id' => '1',
+            'date' => 1482624000,
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -111,6 +113,7 @@ class EntryRevisionsTest extends TestCase
             ->slug('test')
             ->collection('blog')
             ->published(true)
+            ->date('2010-12-25')
             ->data([
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -140,6 +143,7 @@ class EntryRevisionsTest extends TestCase
             'published' => false,
             'slug' => 'test',
             'id' => '1',
+            'date' => 1293235200, // 2010-12-25
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -162,6 +166,7 @@ class EntryRevisionsTest extends TestCase
             ->slug('test')
             ->collection('blog')
             ->published(false)
+            ->date('2010-12-25')
             ->data([
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -195,6 +200,7 @@ class EntryRevisionsTest extends TestCase
             'published' => false,
             'slug' => 'test',
             'id' => '1',
+            'date' => 1293235200, // 2010-12-25
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -220,6 +226,7 @@ class EntryRevisionsTest extends TestCase
             ->attributes([
                 'published' => false,
                 'slug' => 'existing-slug',
+                'date' => 1246665600, // 2009-07-04
                 'data' => ['foo' => 'existing foo'],
             ]))->save();
 
@@ -229,6 +236,7 @@ class EntryRevisionsTest extends TestCase
             ->slug('test')
             ->collection('blog')
             ->published(true)
+            ->date('2010-12-25')
             ->data([
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -238,6 +246,7 @@ class EntryRevisionsTest extends TestCase
         $workingCopy = tap($entry->makeWorkingCopy(), function ($copy) {
             $attrs = $copy->attributes();
             $attrs['data']['foo'] = 'foo modified in working copy';
+            $attrs['date'] = 1482624000; // 2016-12-25
             $copy->attributes($attrs);
         });
         $workingCopy->save();
@@ -246,6 +255,8 @@ class EntryRevisionsTest extends TestCase
         $this->assertCount(1, $entry->revisions());
         $this->assertEquals('bar', $entry->get('foo'));
         $this->assertEquals('foo modified in working copy', $entry->fromWorkingCopy()->get('foo'));
+        $this->assertEquals('2010-12-25', $entry->date()->format('Y-m-d'));
+        $this->assertEquals('2016-12-25', $entry->fromWorkingCopy()->date()->format('Y-m-d'));
 
         $this
             ->actingAs($user)
@@ -257,6 +268,8 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals('test', $entry->slug());
         $this->assertEquals('bar', $entry->get('foo'));
         $this->assertEquals('existing foo', $entry->fromWorkingCopy()->get('foo'));
+        $this->assertEquals('2010-12-25', $entry->date()->format('Y-m-d'));
+        $this->assertEquals('2009-07-04', $entry->fromWorkingCopy()->date()->format('Y-m-d'));
         $this->assertTrue($entry->published());
         $this->assertTrue($entry->hasWorkingCopy());
         $this->assertCount(1, $entry->revisions());
@@ -324,16 +337,9 @@ class EntryRevisionsTest extends TestCase
 
     private function setTestBlueprint($handle, $fields)
     {
-        $fields = collect($fields)->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        })->all();
-
-        $blueprint = Mockery::mock(Blueprint::class);
-        $blueprint->shouldReceive('fields')->andReturn(new Fields($fields));
-
-        $blueprint->shouldReceive('ensureField')->andReturnSelf();
-        $blueprint->shouldReceive('ensureFieldPrepended')->andReturnSelf();
+        $blueprint = Blueprint::makeFromFields($fields)->setHandle($handle);
 
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect(['test' => $blueprint]));
     }
 }

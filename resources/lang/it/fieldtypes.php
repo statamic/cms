@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'any.config.default' => 'Imposta il valore predefinito.',
+    'any.config.antlers' => 'Se desideri che questo campo venga analizzato da Antlers.',
     'any.config.cast_booleans' => 'Le opzioni con valori "true" e "false" verranno salvate come booleani.',
+    'any.config.default' => 'Imposta il valore predefinito.',
     'array.config.keys' => 'Imposta le chiavi dell\'array (variabili) e le etichette opzionali.',
     'array.config.mode' => 'La modalità dinamica consente all\'utente di controllare i dati a differenza della modalità fissa.',
     'assets.config.allow_uploads' => 'Consenti nuovi caricamenti di file.',
@@ -37,7 +38,7 @@ return [
     'color.config.theme' => 'Scegli tra il selettore di colori classico e mini (più semplice).',
     'date.config.columns' => 'Mostra più mesi contemporaneamente, in righe e colonne',
     'date.config.earliest_date' => 'Imposta la prima data selezionabile.',
-    'date.config.format' => 'Formatta la stringa della data usando [moment.js](https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.format' => 'Come deve essere memorizzata la data, utilizzando il [formato data PHP](https://www.php.net/manual/en/datetime.format.php).',
     'date.config.full_width' => 'Forza il calendario ad utilizzare l\'intera larghezza.',
     'date.config.inline' => 'Ignora il menu a discesa e mostra direttamente il calendario.',
     'date.config.mode' => 'Scegli tra singola o intervallo (l\'intervallo disabilita il selettore dell\'ora).',
@@ -67,6 +68,11 @@ return [
     'range.config.prepend' => 'Aggiungi testo all\'inizio (lato sinistro) dello slider.',
     'range.config.step' => 'Lo step tra i valori.',
     'relationship.config.mode' => 'Scegli il tuo stile di layout preferito.',
+    'replicator.config.collapse' => 'Il comportamento di collasso dell\'insieme.',
+    'replicator.config.collapse.accordion' => 'Consentire l\'espansione di un solo set alla volta',
+    'replicator.config.collapse.disabled' => 'Tutti i set sono espansi per impostazione predefinita',
+    'replicator.config.collapse.enabled' => 'Tutti i set sono compressi per impostazione predefinita',
+    'replicator.config.max_sets' => 'Il numero massimo di set.',
     'select.config.clearable' => 'Abilita per consentire la deselezione dell\'opzione.',
     'select.config.multiple' => 'Consenti la selezione multipla delle opzioni.',
     'select.config.options' => 'Imposta le chiavi e le loro etichette opzionali.',

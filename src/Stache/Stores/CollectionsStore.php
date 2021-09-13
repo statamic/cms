@@ -21,7 +21,7 @@ class CollectionsStore extends BasicStore
         return $item->handle();
     }
 
-    public function getFileFilter(SplFileInfo $file)
+    public function getItemFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory, '/');
         $relative = str_after(Path::tidy($file->getPathname()), $dir);
@@ -74,11 +74,19 @@ class CollectionsStore extends BasicStore
         return $value === 'published';
     }
 
-    public function updateEntryUris($collection)
+    public function updateEntryUris($collection, $ids = null)
     {
         Stache::store('entries')
             ->store($collection->handle())
             ->index('uri')
+            ->update();
+    }
+
+    public function updateEntryOrder($collection, $ids = null)
+    {
+        Stache::store('entries')
+            ->store($collection->handle())
+            ->index('order')
             ->update();
     }
 

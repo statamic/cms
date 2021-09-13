@@ -3,9 +3,9 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class ActionController extends CpController
 {
@@ -33,7 +33,7 @@ abstract class ActionController extends CpController
 
         abort_unless($unauthorized->isEmpty(), 403, __('You are not authorized to run this action.'));
 
-        $action->run($items, $values = $request->all());
+        $response = $action->run($items, $values = $request->all());
 
         if ($redirect = $action->redirect($items, $values)) {
             return ['redirect' => $redirect];
@@ -41,7 +41,11 @@ abstract class ActionController extends CpController
             return $download instanceof Response ? $download : response()->download($download);
         }
 
-        return [];
+        if (is_string($response)) {
+            return ['message' => $response];
+        }
+
+        return $response ?: [];
     }
 
     public function bulkActions(Request $request)

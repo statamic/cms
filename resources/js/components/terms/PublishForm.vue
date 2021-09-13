@@ -160,11 +160,11 @@
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer hover:bg-grey-20"
-                                        :class="{ 'opacity-50': !option.active }"
+                                        class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer"
+                                        :class="option.active ? 'bg-blue-100' : 'hover:bg-grey-20'"
                                         @click="localizationSelected(option)"
                                     >
-                                        <div class="flex-1 flex items-center">
+                                        <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot mr-1" :class="{
                                                 'bg-green': option.published,
                                                 'bg-grey-50': !option.published,
@@ -307,6 +307,9 @@ export default {
             isRoot: this.initialIsRoot,
             permalink: this.initialPermalink,
             preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
+            saveKeyBinding: null,
+            quickSaveKeyBinding: null,
+            quickSave: false
         }
     },
 
@@ -389,11 +392,32 @@ export default {
         },
 
         save() {
-            if (!this.canSave) return;
+            if (! this.canSave) {
+                this.quickSave = false;
+                return;
+            }
 
             this.saving = true;
             this.clearErrors();
 
+            this.runBeforeSaveHook();
+        },
+
+        runBeforeSaveHook() {
+            Statamic.$hooks.run('term.saving', {
+                taxonomy: this.taxonomyHandle,
+                values: this.values,
+                container: this.$refs.container,
+                storeName: this.publishContainer,
+            })
+            .then(this.performSaveRequest)
+            .catch(error => {
+                this.saving = false;
+                this.$toast.error(error || 'Something went wrong');
+            });
+        },
+
+        performSaveRequest() {
             const payload = { ...this.values, ...{
                 _blueprint: this.fieldset.handle,
                 published: this.published,
@@ -407,7 +431,7 @@ export default {
                 this.isWorkingCopy = true;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
-                this.handleSuccess(response);
+                this.runAfterSaveHook(response);
             }).catch(e => this.handleAxiosError(e));
         },
 
@@ -417,21 +441,34 @@ export default {
             }
         },
 
-        handleSuccess(response) {
-            // If the user has opted to create another entry, redirect them to create page.
-            if (! this.revisionsEnabled && this.afterSaveOption === 'create_another') {
-                window.location = this.createAnotherUrl;
-            }
+        runAfterSaveHook(response) {
+            Statamic.$hooks
+                .run('term.saved', {
+                    taxonomy: this.taxonomyHandle,
+                    reference: this.initialReference,
+                    response
+                })
+                .then(() => {
 
-            // If the user has opted to go to listing (default/null option), redirect them there.
-            else if (! this.revisionsEnabled && this.afterSaveOption === null) {
-                window.location = this.listingUrl;
-            }
+                    let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
 
-            // Otherwise, leave them on the edit form and emit an event.
-            else {
-                this.$nextTick(() => this.$emit('saved', response));
-            }
+                    // If the user has opted to create another entry, redirect them to create page.
+                    if (! this.revisionsEnabled && this.afterSaveOption === 'create_another') {
+                        window.location = this.createAnotherUrl;
+                    }
+
+                    // If the user has opted to go to listing (default/null option), redirect them there.
+                    else if (! this.revisionsEnabled && nextAction === null) {
+                        window.location = this.listingUrl;
+                    }
+
+                    // Otherwise, leave them on the edit form and emit an event.
+                    else {
+                        this.$nextTick(() => this.$emit('saved', response));
+                    }
+
+                    this.quickSave = false;
+                }).catch(e => {});
         },
 
         handleAxiosError(e) {
@@ -557,9 +594,16 @@ export default {
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+return'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
+            this.canPublish ? this.confirmPublish() : this.save();
+        });
+
+        this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], e => {
+            e.preventDefault();
+            if (this.confirmingPublish) return;
+            this.quickSave = true;
             this.canPublish ? this.confirmPublish() : this.save();
         });
 
@@ -568,6 +612,11 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    destroyed() {
+        this.saveKeyBinding.destroy();
+        this.quickSaveKeyBinding.destroy();
     }
 
 }

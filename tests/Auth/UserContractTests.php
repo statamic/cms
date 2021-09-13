@@ -21,6 +21,7 @@ trait UserContractTests
                 'foo' => 'bar',
                 'content' => 'Lorem Ipsum',
             ])
+            ->setPreferredLocale('en')
             ->setSupplement('supplemented', 'qux')
             ->assignRole($this->createRole('role_one'))
             ->assignRole($this->createRole('role_two'))
@@ -32,6 +33,12 @@ trait UserContractTests
     public function it_gets_email()
     {
         $this->assertEquals('john@example.com', $this->user()->email());
+    }
+
+    /** @test */
+    public function it_gets_email_as_property()
+    {
+        $this->assertEquals('john@example.com', $this->user()->email);
     }
 
     /** @test */
@@ -110,6 +117,12 @@ trait UserContractTests
         config(['statamic.users.avatars' => 'initials']);
 
         $this->assertNull($this->user()->avatar());
+    }
+
+    /** @test */
+    public function it_gets_preferred_locale()
+    {
+        $this->assertEquals('en', $this->user()->preferredLocale());
     }
 
     /** @test */
@@ -193,6 +206,7 @@ trait UserContractTests
             'edit_url' => 'http://localhost/cp/users/123/edit',
             'last_login' => null,
             'api_url' => 'http://localhost/api/users/123',
+            'preferred_locale' => 'en',
         ], $this->additionalToArrayValues()), $arr);
     }
 
@@ -203,7 +217,8 @@ trait UserContractTests
 
     private function createRole($handle)
     {
-        $class = new class($handle) extends Role {
+        $class = new class($handle) extends Role
+        {
             public function __construct($handle)
             {
                 $this->handle = $handle;
@@ -219,7 +234,8 @@ trait UserContractTests
 
     private function createGroup($handle)
     {
-        $class = new class($handle) extends UserGroup {
+        $class = new class($handle) extends UserGroup
+        {
             public function __construct($handle)
             {
                 $this->handle = $handle;

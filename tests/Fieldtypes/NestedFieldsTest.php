@@ -17,7 +17,8 @@ class NestedFieldsTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('assets')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 protected $component = 'assets';
                 protected $configFields = [
                     'max_files' => ['type' => 'integer'],
@@ -27,7 +28,8 @@ class NestedFieldsTest extends TestCase
 
         FieldtypeRepository::shouldReceive('find')
             ->with('plain')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcess($data)
                 {
                     return $data;
@@ -36,7 +38,8 @@ class NestedFieldsTest extends TestCase
 
         FieldtypeRepository::shouldReceive('find')
             ->with('integer')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function preProcess($data)
                 {
                     return (int) $data;
@@ -77,6 +80,7 @@ class NestedFieldsTest extends TestCase
                 'validate' => 'required',
                 'component' => 'assets',
                 'handle' => 'image',
+                'prefix' => null,
                 'required' => true,
             ],
         ], $actual);
@@ -139,6 +143,8 @@ class NestedFieldsTest extends TestCase
                     'character_limit' => 0,
                     'prepend' => null,
                     'append' => null,
+                    'antlers' => false,
+                    'default' => null,
                     'component' => 'text',
                     'width' => 50,
                     'display' => 'Second Field',

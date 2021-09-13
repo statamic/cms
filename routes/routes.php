@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\API\Middleware\Cache;
 use Statamic\Http\Middleware\API\SwapExceptionHandler as SwapAPIExceptionHandler;
 use Statamic\Http\Middleware\CP\SwapExceptionHandler as SwapCpExceptionHandler;
 use Statamic\Http\Middleware\RequireStatamicPro;
@@ -9,6 +10,7 @@ if (config('statamic.api.enabled')) {
     Route::middleware([
         SwapApiExceptionHandler::class,
         RequireStatamicPro::class,
+        Cache::class,
     ])->group(function () {
         Route::middleware(config('statamic.api.middleware'))
             ->name('statamic.api.')
@@ -28,8 +30,6 @@ if (config('statamic.cp.enabled')) {
     });
 }
 
-if (config('statamic.routes.enabled')) {
-    Route::middleware(config('statamic.routes.middleware', 'web'))
-        ->namespace('Statamic\Http\Controllers')
-        ->group(__DIR__.'/web.php');
-}
+Route::middleware(config('statamic.routes.middleware', 'web'))
+    ->namespace('Statamic\Http\Controllers')
+    ->group(__DIR__.'/web.php');

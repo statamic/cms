@@ -510,7 +510,8 @@ class QueriesConditionsTest extends TestCase
             ->collection(Facades\Collection::make('test'))
             ->set('somefield', 'somevalue');
 
-        $class = new class($value) {
+        $class = new class($value)
+        {
             use QueriesConditions;
             protected $parameters;
 
@@ -526,7 +527,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('where')->with('somefield', 'somevalue');
+        $query->shouldReceive('where')->with('somefield', 'somevalue')->once();
 
         $class->query($query);
     }
@@ -542,13 +543,14 @@ class QueriesConditionsTest extends TestCase
 
         $values = [$value];
 
-        $class = new class($values) {
+        $class = new class($values)
+        {
             use QueriesConditions;
             protected $parameters;
 
             public function __construct($values)
             {
-                $this->params = new Parameters(['somefield:is_in' => $values]);
+                $this->params = new Parameters(['somefield:in' => $values]);
             }
 
             public function query($query)
@@ -558,7 +560,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('whereIn')->with('somefield', ['somevalue']);
+        $query->shouldReceive('whereIn')->with('somefield', ['somevalue'])->once();
 
         $class->query($query);
     }
@@ -574,13 +576,14 @@ class QueriesConditionsTest extends TestCase
 
         $values = collect([$value]);
 
-        $class = new class($values) {
+        $class = new class($values)
+        {
             use QueriesConditions;
             protected $parameters;
 
             public function __construct($values)
             {
-                $this->params = new Parameters(['somefield:is_in' => $values]);
+                $this->params = new Parameters(['somefield:in' => $values]);
             }
 
             public function query($query)
@@ -590,7 +593,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('whereIn')->with('somefield', ['somevalue']);
+        $query->shouldReceive('whereIn')->with('somefield', ['somevalue'])->once();
 
         $class->query($query);
     }
@@ -600,7 +603,8 @@ class QueriesConditionsTest extends TestCase
     {
         $value = new LabeledValue('foo', 'The Foo Label');
 
-        $class = new class($value) {
+        $class = new class($value)
+        {
             use QueriesConditions;
             protected $parameters;
 
@@ -616,7 +620,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('where')->with('somefield', 'foo');
+        $query->shouldReceive('where')->with('somefield', 'foo')->once();
 
         $class->query($query);
     }
@@ -628,7 +632,8 @@ class QueriesConditionsTest extends TestCase
 
         $value = new SomeArbitraryTestObject;
 
-        $class = new class($value) {
+        $class = new class($value)
+        {
             use QueriesConditions;
             protected $parameters;
 
@@ -644,7 +649,7 @@ class QueriesConditionsTest extends TestCase
         };
 
         $query = $this->mock(Builder::class);
-        $query->shouldReceive('where')->with('somefield', 'somevalue');
+        $query->shouldReceive('where')->never();
 
         $class->query($query);
     }

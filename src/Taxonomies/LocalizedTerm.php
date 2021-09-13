@@ -7,21 +7,26 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades;
 use Statamic\Facades\Site;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
 
-class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
+class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified, ContainsSupplementalData, ResolvesValues;
 
     protected $locale;
     protected $term;
@@ -30,6 +35,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
     {
         $this->term = $term;
         $this->locale = $locale;
+        $this->supplements = collect();
     }
 
     public function get($key, $fallback = null)
@@ -100,7 +106,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
         if (func_num_args() === 1) {
             if ($this->isDefaultLocale()) {
                 $this->term->slug($slug);
-            } elseif ($this->term->slug() !== $slug) {
+            } else {
                 $this->set('slug', $slug);
             }
 
@@ -191,6 +197,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
     public function entries()
     {
         return $this->term->entries();
+    }
+
+    public function entriesCount()
+    {
+        return $this->term->entriesCount();
     }
 
     protected function revisionKey()
@@ -324,6 +335,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
         ])->all();
     }
 
+    public function status()
+    {
+        return 'published';
+    }
+
     public function toResponse($request)
     {
         if (! view()->exists($this->template())) {
@@ -364,7 +380,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
         return $this->set('layout', $layout);
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedTerm($this);
     }
@@ -423,5 +439,15 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
     public function getProtectionScheme()
     {
         return $this->value('protect');
+    }
+
+    public function term()
+    {
+        return $this->term;
+    }
+
+    public function fresh()
+    {
+        return Facades\Term::find($this->id())->in($this->locale);
     }
 }

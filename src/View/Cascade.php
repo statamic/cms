@@ -4,6 +4,7 @@ namespace Statamic\View;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Facades;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
@@ -15,12 +16,14 @@ class Cascade
     protected $site;
     protected $data;
     protected $content;
+    protected $sections;
 
     public function __construct(Request $request, Site $site, array $data = [])
     {
         $this->request = $request;
         $this->site = $site;
         $this->data($data);
+        $this->sections = collect();
     }
 
     public function instance()
@@ -76,6 +79,9 @@ class Cascade
 
     public function hydrate()
     {
+        $this->data([]);
+        $this->sections = collect();
+
         return $this
             ->hydrateVariables()
             ->hydrateSegments()
@@ -180,6 +186,7 @@ class Cascade
             'old' => Arr::sanitize(old(null, [])),
 
             'site' => $this->site,
+            'sites' => Facades\Site::all()->values(),
             'homepage' => $this->site->url(),
             'cp_url' => cp_route('index'),
         ];
@@ -193,5 +200,23 @@ class Cascade
         }
 
         return $this;
+    }
+
+    public function getViewData($view)
+    {
+        $all = $this->get('views') ?? [];
+
+        return collect($all)
+            ->reverse()
+            ->reduce(function ($carry, $data) {
+                return $carry->merge($data);
+            }, collect())
+            ->merge($all[$view])
+            ->all();
+    }
+
+    public function sections()
+    {
+        return $this->sections;
     }
 }

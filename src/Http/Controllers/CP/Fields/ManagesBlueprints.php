@@ -37,10 +37,12 @@ trait ManagesBlueprints
             ]];
         })->all();
 
-        $blueprint->setContents(array_filter([
-            'title' => $request->title,
-            'sections' => $sections,
-        ]));
+        $blueprint
+            ->setHidden($request->hidden)
+            ->setContents(array_filter([
+                'title' => $request->title,
+                'sections' => $sections,
+            ]));
 
         return $blueprint;
     }
@@ -77,6 +79,7 @@ trait ManagesBlueprints
         return [
             'title' => $blueprint->title(),
             'handle' => $blueprint->handle(),
+            'hidden' => $blueprint->hidden(),
             'sections' => $blueprint->sections()->map(function ($section, $i) {
                 return array_merge($this->sectionToVue($section), ['_id' => $i]);
             })->values()->all(),
@@ -96,10 +99,10 @@ trait ManagesBlueprints
 
     private function storeBlueprint(Request $request, string $namespace)
     {
-        $handle = Str::snake($request->title);
+        $handle = Str::slug($request->title, '_');
 
-        if (Facades\Blueprint::find($handle)) {
-            throw ValidationException::withMessages([__('A blueprint with that name already exists.')]);
+        if (Facades\Blueprint::in($namespace)->has($handle)) {
+            throw ValidationException::withMessages(['title' => __('A blueprint with that name already exists.')]);
         }
 
         $blueprint = (new Blueprint)

@@ -7,10 +7,6 @@
 </template>
 
 <script>
-/**
- * Register this component with:
- * Vue.component('dummy_name-fieldtype', require('./path/to/DummyName.vue'))
- */
 export default {
 
     mixins: [Fieldtype],

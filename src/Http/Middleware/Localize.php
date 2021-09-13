@@ -2,8 +2,10 @@
 
 namespace Statamic\Http\Middleware;
 
+use Carbon\Carbon;
 use Closure;
 use Statamic\Facades\Site;
+use Statamic\Statamic;
 
 class Localize
 {
@@ -18,6 +20,8 @@ class Localize
         // The short locale is used for your translations. (eg. if you set your site's locale
         // to "fr_FR", the translator will look for "fr" files rather than "fr_FR" files.)
         app()->setLocale($site->shortLocale());
+
+        Carbon::setToStringFormat(Statamic::dateFormat());
 
         return $next($request);
     }

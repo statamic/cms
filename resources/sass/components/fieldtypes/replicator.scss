@@ -8,6 +8,10 @@
 
 .replicator-set {
     @apply mb-5 shadow-set rounded bg-white outline-none relative;
+
+    &:first-child {
+        @apply mt-3;
+    }
 }
 
 .replicator-set-header {

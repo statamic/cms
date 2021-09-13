@@ -34,13 +34,19 @@ trait OutputsItems
 
     protected function paginatedOutput($paginator)
     {
-        $as = $this->params->get('as', $this->defaultAsKey ?? 'results');
+        $paginator->withQueryString();
+        $as = $this->getPaginationResultsKey();
         $items = $paginator->getCollection()->supplement('total_results', $paginator->total());
 
         return array_merge([
             $as => $items,
             'paginate' => $this->getPaginationData($paginator),
         ], $this->extraOutput($items));
+    }
+
+    protected function getPaginationResultsKey()
+    {
+        return $this->params->get('as', $this->defaultAsKey ?? 'results');
     }
 
     protected function getPaginationData($paginator)

@@ -3,9 +3,12 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Support\Str;
 
 class Text extends Fieldtype
 {
+    protected $selectableInForms = true;
+
     protected function configFieldItems(): array
     {
         return [
@@ -23,7 +26,9 @@ class Text extends Fieldtype
                 'width' => 50,
                 'options' => [
                     'color',
+                    'date',
                     'email',
+                    'hidden',
                     'month',
                     'number',
                     'password',
@@ -52,7 +57,28 @@ class Text extends Fieldtype
                 'type' => 'text',
                 'width' => 50,
             ],
+            'antlers' => [
+                'display' => 'Antlers',
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
+            ],
         ];
+    }
+
+    public function process($data)
+    {
+        if ($data !== null && $this->config('input_type') === 'number') {
+            return Str::contains($data, '.') ? (float) $data : (int) $data;
+        }
+
+        return $data;
     }
 
     public function preProcessIndex($value)

@@ -59,6 +59,7 @@ class Tags extends BaseTags
 
         $data = $this->getFormSession($sessionHandle);
         $data['fields'] = $this->getFields($sessionHandle);
+        $data['honeypot'] = $form->honeypot();
 
         $this->addToDebugBar($data, $formHandle);
 
@@ -68,7 +69,10 @@ class Tags extends BaseTags
 
         $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect', 'files']);
 
-        $html = $this->formOpen(route('statamic.forms.submit', $formHandle), 'POST', $knownParams);
+        $action = $this->params->get('action', route('statamic.forms.submit', $formHandle));
+        $method = $this->params->get('method', 'POST');
+
+        $html = $this->formOpen($action, $method, $knownParams);
 
         $params = [];
 

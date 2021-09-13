@@ -51,19 +51,30 @@ class CollectionsController extends CpController
     {
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
-        $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
-            return [
-                'handle' => $blueprint->handle(),
-                'title' => $blueprint->title(),
-            ];
-        });
+        $blueprints = $collection
+            ->entryBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
 
         $site = $request->site ? Site::get($request->site) : Site::selected();
+
+        $columns = $collection
+            ->entryBlueprint()
+            ->columns()
+            ->setPreferred("collections.{$collection->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
 
         $viewData = [
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => $site->handle(),
+            'columns' => $columns,
             'filters' => Scope::filters('entries', [
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
@@ -129,7 +140,9 @@ class CollectionsController extends CpController
             'layout' => $collection->layout(),
             'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
-            'routes' => $collection->routes()->all(),
+            'routes' => $collection->routes()->unique()->count() === 1
+                ? $collection->routes()->first()
+                : $collection->routes()->all(),
             'mount' => optional($collection->mount())->id(),
         ];
 
@@ -210,6 +223,9 @@ class CollectionsController extends CpController
         }
 
         if (! $values['structured']) {
+            if ($structure = $collection->structure()) {
+                $structure->trees()->each->delete();
+            }
             $collection->structure(null);
         } else {
             $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites'] ?? null));
@@ -255,7 +271,7 @@ class CollectionsController extends CpController
     protected function makeStructure($collection, $maxDepth, $expectsRoot, $sites)
     {
         if (! $structure = $collection->structure()) {
-            $structure = (new CollectionStructure)->collection($collection);
+            $structure = new CollectionStructure;
         }
 
         return $structure
@@ -424,6 +440,9 @@ class CollectionsController extends CpController
                         'type' => 'entries',
                         'max_items' => 1,
                         'create' => false,
+                        'collections' => Collection::all()->map->handle()->reject(function ($collectionHandle) use ($collection) {
+                            return $collectionHandle === $collection->handle();
+                        })->values()->all(),
                     ],
                     'amp' => [
                         'display' => __('Enable AMP'),

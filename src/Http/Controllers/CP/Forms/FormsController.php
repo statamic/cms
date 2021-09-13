@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -41,7 +42,15 @@ class FormsController extends CpController
     {
         $this->authorize('view', $form);
 
-        return view('statamic::forms.show', compact('form'));
+        $columns = $form
+            ->blueprint()
+            ->columns()
+            ->prepend(Column::make('datestamp'), 'datestamp')
+            ->setPreferred("forms.{$form->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
+
+        return view('statamic::forms.show', compact('form', 'columns'));
     }
 
     /**
@@ -209,7 +218,7 @@ class FormsController extends CpController
                                 'handle' => 'to',
                                 'field' => [
                                     'type' => 'text',
-                                    'display' => __('Recipient (To)'),
+                                    'display' => __('Recipient'),
                                     'validate' => [
                                         'required',
                                     ],
@@ -220,7 +229,7 @@ class FormsController extends CpController
                                 'handle' => 'from',
                                 'field' => [
                                     'type' => 'text',
-                                    'display' => __('Sender (From)'),
+                                    'display' => __('Sender'),
                                     'instructions' => __('statamic::messages.form_configure_email_from_instructions').' ('.config('mail.from.address').').',
                                 ],
                             ],
@@ -236,6 +245,7 @@ class FormsController extends CpController
                                 'handle' => 'subject',
                                 'field' => [
                                     'type' => 'text',
+                                    'display' => __('Subject'),
                                     'instructions' => __('statamic::messages.form_configure_email_subject_instructions'),
                                 ],
                             ],
@@ -253,6 +263,14 @@ class FormsController extends CpController
                                     'type' => 'template',
                                     'display' => __('Text view'),
                                     'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'markdown',
+                                'field' => [
+                                    'type' => 'toggle',
+                                    'display' => __('Markdown'),
+                                    'instructions' => __('statamic::messages.form_configure_email_markdown_instructions'),
                                 ],
                             ],
                         ],

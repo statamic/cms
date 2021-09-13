@@ -153,6 +153,11 @@ class SiteClear extends Command
             return;
         }
 
+        // Don't remove any of the default disks.
+        if (in_array($disk, ['local', 'public', 's3', 'assets'])) {
+            return;
+        }
+
         // TODO: Maybe we can eventually bring in and extract this to statamic/migrator's Configurator class...
         $filesystemsPath = config_path('filesystems.php');
         $config = $this->files->get($filesystemsPath);
@@ -216,7 +221,7 @@ class SiteClear extends Command
      */
     protected function clearGroups()
     {
-        $this->files->put(resource_path('users/groups.yaml'), <<<EOT
+        $this->files->put($this->preparePath(resource_path('users/groups.yaml')), <<<EOT
 # admin:
 #   title: Administrators
 #   roles:
@@ -236,7 +241,7 @@ EOT
      */
     protected function clearRoles()
     {
-        $this->files->put(resource_path('users/roles.yaml'), <<<EOT
+        $this->files->put($this->preparePath(resource_path('users/roles.yaml')), <<<EOT
 # admin:
 #   title: Administrator
 #   permissions:
@@ -335,5 +340,22 @@ EOT
         $this->files->cleanDirectory($path);
 
         $this->files->put("{$path}/.gitkeep", '');
+    }
+
+    /**
+     * Prepare path directory.
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function preparePath($path)
+    {
+        $folder = preg_replace('/(.*)\/[^\/]+\.[^\/]+/', '$1', $path);
+
+        if (! $this->files->exists($folder)) {
+            $this->files->makeDirectory($folder, 0755, true);
+        }
+
+        return $path;
     }
 }

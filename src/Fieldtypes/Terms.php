@@ -2,12 +2,16 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\CP\Column;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
 use Statamic\Facades;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
+use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
@@ -28,6 +32,13 @@ class Terms extends Relationship
     protected function configFieldItems(): array
     {
         return array_merge(parent::configFieldItems(), [
+            'create' => [
+                'display' => __('Allow Creating'),
+                'instructions' => __('statamic::fieldtypes.terms.config.create'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'taxonomies' => [
                 'display' => __('Taxonomies'),
                 'type' => 'taxonomies',
@@ -86,13 +97,13 @@ class Terms extends Relationship
                 // entry, but could also be something else, like another taxonomy term.
                 $parent = $this->field->parent();
 
-                if ($parent && $this->field->handle() === $taxonomy->handle()) {
+                if ($parent && $parent instanceof Entry && $this->field->handle() === $taxonomy->handle()) {
                     $term->collection($parent->collection());
                 }
 
-                $locale = $parent
+                $locale = $parent && $parent instanceof Localization
                     ? $parent->locale()
-                    : Site::current()->handle();
+                    : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
 
                 return $term->in($locale);
             });
@@ -146,7 +157,7 @@ class Terms extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $query->paginate();
+        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
     }
 
     public function getResourceCollection($request, $items)
@@ -207,6 +218,16 @@ class Terms extends Relationship
             return $this->invalidItemArray($id);
         }
 
+        // The parent is the item this terms fieldtype exists on. Most commonly an
+        // entry, but could also be something else, like another taxonomy term.
+        $parent = $this->field->parent();
+
+        $locale = $parent && $parent instanceof Localization
+            ? $parent->locale()
+            : Site::default()->handle();
+
+        $term = $term->in($locale);
+
         return [
             'id' => $id,
             'title' => $term->value('title'),
@@ -239,9 +260,9 @@ class Terms extends Relationship
             $query->where('title', 'like', '%'.$search.'%');
         }
 
-        // if ($site = $request->site) {
-        //     $query->where('site', $site);
-        // }
+        if ($site = $request->site) {
+            $query->where('site', $site);
+        }
 
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
@@ -273,19 +294,24 @@ class Terms extends Relationship
 
     protected function createTermFromString($string, $taxonomy)
     {
-        // The entered string will be treated as the term's title. If it's the same
-        // as the slug, an actual term object/file won't need to be created.
-        if ($string === ($slug = Str::slug($string))) {
-            return "{$taxonomy}::{$slug}";
-        }
-
         $term = Facades\Term::make()
-            ->slug($slug)
+            ->slug(Str::slug($string))
             ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
             ->set('title', $string);
 
         $term->save();
 
         return $term->id();
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(TermInterface::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

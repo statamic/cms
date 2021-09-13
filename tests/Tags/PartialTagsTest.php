@@ -51,6 +51,14 @@ class PartialTagsTest extends TestCase
     }
 
     /** @test */
+    public function gets_partials_with_underscore_prefix_from_partials_directory()
+    {
+        $this->viewShouldReturnRaw('partials.sub._mypartial', 'the partial content');
+
+        $this->assertEquals('the partial content', $this->partialTag('sub.mypartial'));
+    }
+
+    /** @test */
     public function partials_can_contain_front_matter()
     {
         $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ view:foo }}");
