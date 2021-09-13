@@ -319,8 +319,6 @@ class ScopeDumper
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
                 continue;
-            } else {
-                dd('doh!', $k, $v);
             }
         }
 
