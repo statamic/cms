@@ -6,6 +6,7 @@ use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\View\Engine as EngineInterface;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Exceptions;
 use Statamic\Facades\Parse;
@@ -26,7 +27,7 @@ class Engine implements EngineInterface
     /**
      * The Antlers Parser.
      *
-     * @return Parser
+     * @return ParserContract
      */
     private $parser;
 
@@ -48,9 +49,9 @@ class Engine implements EngineInterface
      * Create a new AntlersEngine instance.
      *
      * @param  Filesystem  $filesystem
-     * @param  Parser  $parser
+     * @param  ParserContract  $parser
      */
-    public function __construct(Filesystem $filesystem, Parser $parser)
+    public function __construct(Filesystem $filesystem, ParserContract $parser)
     {
         $this->filesystem = $filesystem;
         $this->parser = $parser;
@@ -132,7 +133,7 @@ class Engine implements EngineInterface
      * @throws Exceptions\FatalException
      * @throws \Exception
      */
-    public static function renderTag(Parser $parser, $name, $parameters = [], $content = '', $context = [])
+    public static function renderTag(ParserContract $parser, $name, $parameters = [], $content = '', $context = [])
     {
         $tag_measure = 'tag_'.$name.microtime();
         debugbar()->startMeasure($tag_measure, 'Tag: '.$name);

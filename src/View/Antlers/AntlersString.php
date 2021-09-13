@@ -2,13 +2,15 @@
 
 namespace Statamic\View\Antlers;
 
+use Statamic\Contracts\Antlers\ParserContract;
+
 class AntlersString
 {
     protected $string;
     protected $parser;
     protected $injectExtractions = true;
 
-    public function __construct(string $string, Parser $parser)
+    public function __construct(string $string, ParserContract $parser)
     {
         $this->string = $string;
         $this->parser = $parser;

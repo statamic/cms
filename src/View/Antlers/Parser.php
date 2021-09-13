@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
+use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Fields\ArrayableString;
@@ -22,7 +23,7 @@ use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class Parser
+class Parser implements ParserContract
 {
     // Instance state
     protected $cascade;
@@ -1059,6 +1060,11 @@ class Parser
         } else {
             return var_export($value, true);
         }
+    }
+
+    public function valueWithNoParse($text)
+    {
+        return $this->extractNoparse(str_replace('{{', '@{{', $text));
     }
 
     /**

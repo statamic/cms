@@ -1,0 +1,1464 @@
+<?php
+
+namespace Statamic\View\Antlers\Language\Runtime\Sandbox;
+
+use ArrayAccess;
+use Carbon\Carbon;
+use DateTime;
+use Exception;
+use Illuminate\Support\Arr;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
+use Statamic\Contracts\Antlers\ParserContract;
+use Statamic\Contracts\Entries\QueryBuilder;
+use Statamic\Fields\ArrayableString;
+use Statamic\Support\Str;
+use Statamic\View\Cascade;
+use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
+use Statamic\View\Antlers\Language\Errors\ErrorFactory;
+use Statamic\View\Antlers\Language\Errors\LineRetriever;
+use Statamic\View\Antlers\Language\Errors\TypeLabeler;
+use Statamic\View\Antlers\Language\Exceptions\LibraryCallException;
+use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
+use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
+use Statamic\View\Antlers\Language\Exceptions\VariableAccessException;
+use Statamic\View\Antlers\Language\Nodes\AbstractNode;
+use Statamic\View\Antlers\Language\Nodes\ArgumentGroup;
+use Statamic\View\Antlers\Language\Nodes\ArithmeticNodeContract;
+use Statamic\View\Antlers\Language\Nodes\Constants\FalseConstant;
+use Statamic\View\Antlers\Language\Nodes\Constants\NullConstant;
+use Statamic\View\Antlers\Language\Nodes\Constants\TrueConstant;
+use Statamic\View\Antlers\Language\Nodes\LibraryInvocationConstruct;
+use Statamic\View\Antlers\Language\Nodes\MethodInvocationNode;
+use Statamic\View\Antlers\Language\Nodes\Modifiers\ModifierChainNode;
+use Statamic\View\Antlers\Language\Nodes\ModifierValueNode;
+use Statamic\View\Antlers\Language\Nodes\NamedArgumentNode;
+use Statamic\View\Antlers\Language\Nodes\NumberNode;
+use Statamic\View\Antlers\Language\Nodes\OperatorNodeContract;
+use Statamic\View\Antlers\Language\Nodes\Operators\Arithmetic\AdditionOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Arithmetic\DivisionOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Arithmetic\ExponentiationOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Arithmetic\FactorialOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Arithmetic\ModulusOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Arithmetic\MultiplicationOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Arithmetic\SubtractionOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\AdditionAssignmentOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\DivisionAssignmentOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\LeftAssignmentOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\ModulusAssignmentOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\MultiplicationAssignmentOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\SubtractionAssignmentOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\EqualCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\GreaterThanCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\GreaterThanEqualCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\LessThanCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\LessThanEqualCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\NotEqualCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\NotStrictEqualCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\SpaceshipCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\StrictEqualCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\ConditionalVariableFallbackOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LanguageOperatorConstruct;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalAndOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalNegationOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalOrOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalXorOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\StringConcatenationOperator;
+use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
+use Statamic\View\Antlers\Language\Nodes\StringValueNode;
+use Statamic\View\Antlers\Language\Nodes\Structures\ArrayNode;
+use Statamic\View\Antlers\Language\Nodes\Structures\DirectionGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\ListValueNode;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupEnd;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\NullCoalescenceGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\TernaryCondition;
+use Statamic\View\Antlers\Language\Nodes\VariableNode;
+use Statamic\View\Antlers\Language\Parser\PathParser;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\Libraries\LibraryManager;
+use Statamic\View\Antlers\Language\Runtime\ModifierManager;
+use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
+use Statamic\View\Antlers\Language\Runtime\PathDataManager;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\ArrayBoxObject;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\BoolBoxObject;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\DateTimeBoxObject;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\NumericBoxObject;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\StringBoxObject;
+
+class Environment
+{
+    protected $dataRetriever = null;
+    protected $pathParser = null;
+    protected $isEvaluatingTruthValue = false;
+    protected $interpolationReplacements = [];
+    protected $interpolationKeys = [];
+    protected $assignments = [];
+    protected $referenceVars = [];
+
+    /**
+     * @var LanguageOperatorManager|null
+     */
+    protected $operatorManager = null;
+
+    /**
+     * @var ParserContract|null;
+     */
+    protected $antlersParser = null;
+
+    protected $data = [];
+
+    /**
+     * @var Cascade|null
+     */
+    private $cascade = null;
+
+    /**
+     * @var AbstractNode|null
+     */
+    private $lastNode = null;
+
+    /**
+     * The internal LibraryManager.
+     *
+     * @var LibraryManager|null
+     */
+    protected $libraryManager = null;
+
+    /**
+     * @var NodeProcessor|null
+     */
+    protected $nodeProcessor = null;
+
+    public function __construct(LibraryManager $libraryManager)
+    {
+        $this->libraryManager = $libraryManager;
+        $this->pathParser = new PathParser();
+        $this->dataRetriever = new PathDataManager();
+        $this->dataRetriever->setIsPaired(false);
+        $this->operatorManager = new LanguageOperatorManager();
+
+        $this->operatorManager->setEnvironment($this)->setLibraryManager($this->libraryManager);
+    }
+
+    /**
+     * Returns all triggered assignments from the environment session.
+     *
+     * @return array
+     */
+    public function getAssignments()
+    {
+        return $this->assignments;
+    }
+
+    /**
+     * Returns a list of all referenced values.
+     *
+     * @return array
+     */
+    public function getReferenceValues()
+    {
+        return $this->referenceVars;
+    }
+
+    /**
+     * Sets whether the final return value is collapsed to a string, augmented, etc.
+     *
+     * @param  bool  $reduceFinal  Whether to reduce.
+     */
+    public function setReduceFinal($reduceFinal)
+    {
+        $this->dataRetriever->setReduceFinal($reduceFinal);
+    }
+
+    /**
+     * Sets the internal NodeProcessors instance.
+     *
+     * @param  NodeProcessor  $processor  The instance.
+     * @return $this
+     */
+    public function setProcessor(NodeProcessor $processor)
+    {
+        $this->nodeProcessor = $processor;
+
+        $this->operatorManager->setNodeProcessor($this->nodeProcessor);
+
+        return $this;
+    }
+
+    /***
+     * Clears the internal NodeProcessor instance.
+     *
+     * @return $this
+     */
+    public function resetNodeProcessor()
+    {
+        $this->operatorManager->resetNodeProcessor();
+
+        $this->nodeProcessor = null;
+
+        return $this;
+    }
+
+    /**
+     * Sets the Cascade instance.
+     *
+     * @param  Cascade|null  $cascade  The Cascade instance.
+     * @return $this
+     */
+    public function cascade($cascade)
+    {
+        $this->cascade = $cascade;
+
+        $this->dataRetriever->cascade($this->cascade);
+
+        return $this;
+    }
+
+    /**
+     * Sets the interpolation replacements.
+     *
+     * @param  array  $replacements  The replacements.
+     */
+    public function setInterpolationReplacements($replacements)
+    {
+        $this->interpolationReplacements = $replacements;
+        $this->interpolationKeys = array_keys($this->interpolationReplacements);
+    }
+
+    /**
+     * Returns the current data within the Environment.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Sets the internal Parser instance.
+     *
+     * @param  ParserContract  $parser  The parser instance.
+     */
+    public function setParserInstance(ParserContract $parser)
+    {
+        $this->antlersParser = $parser;
+        $this->dataRetriever->setAntlersParser($this->antlersParser);
+    }
+
+    /**
+     * Resets the internal parser instance.
+     */
+    public function resetParser()
+    {
+        $this->antlersParser = null;
+        $this->dataRetriever->resetParser();
+    }
+
+    /**
+     * Sets the internal data instance.
+     *
+     * @param  array|mixed  $data  The data to set.
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        if (is_array($this->data) && count($this->data) == 1 && Arr::isAssoc($this->data) == false) {
+            $this->data = $this->data[0];
+        }
+    }
+
+    /**
+     * @param  SemanticGroup[]  $statements
+     * @return null
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    public function processStatements($statements)
+    {
+        $lastStackVal = null;
+
+        foreach ($statements as $statement) {
+            if (count($statement->nodes) == 0) {
+                continue;
+            }
+
+            $lastStackVal = $this->process($statement->nodes);
+        }
+
+        return $lastStackVal;
+    }
+
+    /**
+     * Evaluates the provided runtime nodes.
+     *
+     * @param  AbstractNode[]  $nodes  The runtime nodes.
+     * @return mixed
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    public function evaluate($nodes)
+    {
+        if (count($nodes) == 0) {
+            return null;
+        }
+
+        if ($nodes[0] instanceof SemanticGroup) {
+            return $this->processStatements($nodes);
+        }
+
+        return $this->process($nodes);
+    }
+
+    /**
+     * Evaluates the provided nodes as a boolean expression.
+     *
+     * @param  AbstractNode[]|AbstractNode  $nodes  The runtime nodes.
+     * @return bool|mixed|null
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    public function evaluateBool($nodes)
+    {
+        $this->isEvaluatingTruthValue = true;
+        $result = $this->getValue($this->evaluate($nodes));
+        $this->isEvaluatingTruthValue = false;
+
+        if (is_object($result)) {
+            if ($result instanceof ArrayableString) {
+                return $this->getTruthValue($result->value());
+            } elseif ($result instanceof QueryBuilder) {
+                $builderResults = $result->count();
+
+                return $builderResults > 0;
+            }
+
+            return true;
+        }
+
+        if (is_bool($result)) {
+            return $result;
+        }
+
+        if (is_numeric($result)) {
+            return $result >= 1;
+        }
+
+        return null;
+    }
+
+    /**
+     * Evaluates the provided value and returns a boolean equivalent.
+     *
+     * @param  mixed  $value  The value to evaluate.
+     * @return bool|mixed
+     */
+    private function getTruthValue($value)
+    {
+        if ($value == null) {
+            return false;
+        }
+
+        if (is_string($value) && mb_strlen($value) > 0) {
+            return true;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Tests if the provided value is numeric.
+     *
+     * @param  mixed  $value  The value to test.
+     *
+     * @throws RuntimeException
+     */
+    private function assertNumericValue($value)
+    {
+        if (! is_numeric($value)) {
+            throw ErrorFactory::makeRuntimeError(
+                AntlersErrorCodes::TYPE_RUNTIME_TYPE_MISMATCH,
+                $this->lastNode,
+                'Expected numeric type; got ['.TypeLabeler::getPrettyRuntimeTypeName($value).'] near "'.LineRetriever::getNearText($this->lastNode).'".'
+            );
+        }
+    }
+
+    /**
+     * Tests the provided value is a safe divisor.
+     *
+     * @param  mixed  $value  The value to test.
+     *
+     * @throws RuntimeException
+     */
+    private function assertNonZeroForDivisor($value)
+    {
+        if ($value == 0) {
+            throw ErrorFactory::makeRuntimeError(
+                AntlersErrorCodes::TYPE_RUNTIME_DIVIDE_BY_ZERO,
+                $this->lastNode,
+                'Cannot divide by zero; encountered near "'.LineRetriever::getNearText($this->lastNode).'".'
+            );
+        }
+    }
+
+    /**
+     * Evaluates the provided nodes and returns the result.
+     *
+     * @param  AbstractNode[]  $nodes  The runtime nodes.
+     * @return mixed
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws LibraryCallException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    public function process($nodes)
+    {
+        if (count($nodes) == 1 && $nodes[0] instanceof LogicGroup) {
+            $tmpNodes = $nodes[0]->nodes;
+
+            // We will move the modifier chain to the unwrapped node.
+            if ($nodes[0]->modifierChain != null && ! empty($nodes[0]->modifierChain->modifierChain)) {
+                if (count($tmpNodes) === 1) {
+                    $tmpNodes[0]->modifierChain = $nodes[0]->modifierChain;
+                    $nodes = $tmpNodes;
+                }
+            }
+        }
+
+        $stack = [];
+
+        for ($i = 0; $i < count($nodes); $i++) {
+            $currentNode = $nodes[$i];
+            $this->lastNode = $currentNode;
+
+            if ($currentNode instanceof AdditionOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $leftVal = $this->getValue($left);
+                $rightVal = $this->getValue($right);
+
+                if (is_string($leftVal) || is_string($rightVal)) {
+                    $stack[] = $leftVal.$rightVal;
+                } else {
+                    $this->assertNumericValue($leftVal);
+                    $this->assertNumericValue($rightVal);
+                    $stack[] = ($leftVal + $rightVal);
+                }
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof StringConcatenationOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $leftVal = $this->getValue($left);
+                $rightVal = $this->getValue($right);
+
+                $stack[] = (string) $leftVal.(string) $rightVal;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof FactorialOperator) {
+                $left = array_pop($stack);
+                $leftValue = TypeCoercion::coerceType($this->getValue($left));
+
+                $this->assertNumericValue($leftValue);
+
+                if ($currentNode->repeat > 1) {
+                    $stack[] = RuntimeHelpers::iterativeFactorial($leftValue, $currentNode->repeat);
+                } else {
+                    $stack[] = RuntimeHelpers::factorial($leftValue);
+                }
+
+                continue;
+            } elseif ($currentNode instanceof DivisionOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $leftValue = TypeCoercion::coerceType($this->getValue($left));
+                $rightValue = TypeCoercion::coerceType($this->getValue($right));
+
+                $this->assertNumericValue($leftValue);
+                $this->assertNumericValue($rightValue);
+                $this->assertNonZeroForDivisor($rightValue);
+
+                $stack[] = ($leftValue / $rightValue);
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof ExponentiationOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $leftValue = TypeCoercion::coerceType($this->getValue($left));
+                $rightValue = TypeCoercion::coerceType($this->getValue($right));
+
+                $this->assertNumericValue($leftValue);
+                $this->assertNumericValue($rightValue);
+
+                $stack[] = pow($leftValue, $rightValue);
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof ModulusOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $leftValue = TypeCoercion::coerceType($this->getValue($left));
+                $rightValue = TypeCoercion::coerceType($this->getValue($right));
+
+                $this->assertNumericValue($leftValue);
+                $this->assertNumericValue($rightValue);
+
+                $stack[] = ($leftValue % $rightValue);
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof MultiplicationOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $leftValue = TypeCoercion::coerceType($this->getValue($left));
+                $rightValue = TypeCoercion::coerceType($this->getValue($right));
+
+                $this->assertNumericValue($leftValue);
+                $this->assertNumericValue($rightValue);
+
+                $stack[] = ($leftValue * $rightValue);
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof SubtractionOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $leftValue = TypeCoercion::coerceType($this->getValue($left));
+                $rightValue = TypeCoercion::coerceType($this->getValue($right));
+
+                $this->assertNumericValue($leftValue);
+                $this->assertNumericValue($rightValue);
+
+                $stack[] = ($leftValue - $rightValue);
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof EqualCompOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $left = $this->getValue($left);
+                $right = $this->getValue($right);
+                $this->isEvaluatingTruthValue = $restore;
+
+                $stack[] = $left == $right;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof GreaterThanCompOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $left = $this->getValue($left);
+                $right = $this->getValue($right);
+                $this->isEvaluatingTruthValue = $restore;
+
+                $stack[] = $left > $right;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof GreaterThanEqualCompOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $left = $this->getValue($left);
+                $right = $this->getValue($right);
+                $this->isEvaluatingTruthValue = $restore;
+
+                $stack[] = $left >= $right;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof LessThanCompOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $left = $this->getValue($left);
+                $right = $this->getValue($right);
+                $this->isEvaluatingTruthValue = $restore;
+
+                $stack[] = $left < $right;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof LessThanEqualCompOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $left = $this->getValue($left);
+                $right = $this->getValue($right);
+                $this->isEvaluatingTruthValue = $restore;
+
+                $stack[] = $left <= $right;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof NotEqualCompOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $left = $this->getValue($left);
+                $right = $this->getValue($right);
+                $this->isEvaluatingTruthValue = $restore;
+
+                $stack[] = $left != $right;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof NotStrictEqualCompOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $left = $this->getValue($left);
+                $right = $this->getValue($right);
+                $this->isEvaluatingTruthValue = $restore;
+
+                $stack[] = $left !== $right;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof SpaceshipCompOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $left = $this->getValue($left);
+                $right = $this->getValue($right);
+                $this->isEvaluatingTruthValue = $restore;
+
+                $stack[] = $left <=> $right;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof StrictEqualCompOperator) {
+                $left = array_pop($stack);
+                $right = $nodes[$i + 1];
+
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $left = $this->getValue($left);
+                $right = $this->getValue($right);
+                $this->isEvaluatingTruthValue = $restore;
+
+                $stack[] = $left === $right;
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof LogicalOrOperator) {
+                $left = $this->getValue(array_pop($stack));
+                $right = $this->getValue($nodes[$i + 1]);
+
+                if ($left instanceof ArrayableString) {
+                    $left = $left->value();
+                }
+
+                if ($this->isEvaluatingTruthValue) {
+                    $stack[] = ($left || $right);
+                } else {
+                    if ($left) {
+                        $stack[] = $left;
+                    } else {
+                        $stack[] = $right;
+                    }
+                }
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof LogicalAndOperator) {
+                $left = $this->getValue(array_pop($stack));
+                $right = $this->getValue($nodes[$i + 1]);
+
+                $stack[] = ($left && $right);
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof LogicalXorOperator) {
+                $left = $this->getValue(array_pop($stack));
+                $right = $this->getValue($nodes[$i + 1]);
+
+                $stack[] = ($left xor $right);
+
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof LogicGroup) {
+                $restore = $this->isEvaluatingTruthValue;
+                $this->isEvaluatingTruthValue = false;
+                $stack[] = $this->adjustValue($this->getValue($currentNode), $currentNode);
+                $this->isEvaluatingTruthValue = $restore;
+                continue;
+            } elseif ($currentNode instanceof NullCoalescenceGroup) {
+                $stack[] = $this->adjustValue($this->evaluateNullCoalescence($currentNode), $currentNode);
+                continue;
+            } elseif ($currentNode instanceof TernaryCondition) {
+                $stack[] = $this->adjustValue($this->evaluateTernaryGroup($currentNode), $currentNode);
+
+                continue;
+            } elseif ($currentNode instanceof LogicalNegationOperator) {
+                $right = $this->getTruthValue($this->getValue($nodes[$i + 1]));
+
+                $stack[] = $right == false;
+
+                // Need to skip over the value node.
+                $i += 1;
+                continue;
+            } elseif ($currentNode instanceof LanguageOperatorConstruct) {
+                if (! array_key_exists($currentNode->content, LanguageOperatorRegistry::$operators)) {
+                    throw ErrorFactory::makeRuntimeError(
+                        AntlersErrorCodes::TYPE_RUNTIME_UNKNOWN_LANG_OPERATOR,
+                        $currentNode,
+                        'Illegal language operator "'.$currentNode->content.'"'
+                    );
+                }
+
+                if (array_key_exists($currentNode->content, LanguageOperatorRegistry::$getsArgsFromRight)) {
+                    $right = $nodes[$i + 1];
+
+                    $restore = $this->isEvaluatingTruthValue;
+                    $this->isEvaluatingTruthValue = false;
+                    $right = $this->getValue($right);
+                    $this->isEvaluatingTruthValue = $restore;
+
+                    $seekLeft = $i - 1;
+
+                    if ($i == 0) {
+                        $seekLeft = $i;
+                    }
+                    $stack[] = $this->operatorManager->evaluateOperator(
+                        $currentNode->content, $right, null,
+                        $nodes[$seekLeft], $nodes[$i + 1], $this->data);
+                } else {
+                    $leftNode = array_pop($stack);
+                    $right = $nodes[$i + 1];
+
+                    $restore = $this->isEvaluatingTruthValue;
+                    $this->isEvaluatingTruthValue = false;
+                    $left = $this->getValue($leftNode);
+                    $right = $this->getValue($right);
+                    $this->isEvaluatingTruthValue = $restore;
+
+                    $seekLeft = $i - 1;
+
+                    if ($i == 0) {
+                        $seekLeft = $i;
+                    }
+
+                    $result = $this->operatorManager->evaluateOperator(
+                        $currentNode->content,
+                        $left, $right,
+                        $nodes[$seekLeft],
+                        $nodes[$i + 1], $this->data);
+
+                    $stack[] = $result;
+                }
+
+                $i += 3;
+                continue;
+            } elseif ($currentNode instanceof LibraryInvocationConstruct) {
+                $stack[] = $this->evaluateLibraryMethodCall($currentNode);
+                continue;
+            } elseif ($currentNode instanceof MethodInvocationNode) {
+                $leftNode = array_pop($stack);
+
+                if ($leftNode == null) {
+                    $stack[] = null;
+                    continue;
+                }
+                $leftVal = $this->getValue($leftNode);
+
+                if ($leftVal == null) {
+                    $stack[] = null;
+                    continue;
+                }
+
+                if (is_string($leftVal)) {
+                    $leftVal = new StringBoxObject($leftVal);
+                } elseif (is_array($leftVal)) {
+                    $leftVal = new ArrayBoxObject($leftVal);
+                } elseif (is_numeric($leftVal)) {
+                    $leftVal = new NumericBoxObject($leftVal);
+                } elseif (is_bool($leftVal)) {
+                    $leftVal = new BoolBoxObject($leftVal);
+                } elseif ($leftVal instanceof Carbon) {
+                    $leftVal = new DateTimeBoxObject($leftVal);
+                } elseif ($leftVal instanceof DateTime) {
+                    $leftVal = new DateTimeBoxObject(new Carbon($leftVal));
+                }
+
+                try {
+                    $args = $this->evaluateArgumentGroup($currentNode->args);
+                    $args = $args['a'];
+
+                    $callRes = call_user_func([$leftVal, $currentNode->method->name], ...$args);
+
+                    $stack[] = $callRes;
+                } catch (Exception $exception) {
+                    throw ErrorFactory::makeRuntimeError(
+                        AntlersErrorCodes::TYPE_RUNTIME_BAD_METHOD_CALL,
+                        $currentNode,
+                        $exception->getMessage()
+                    );
+                }
+                continue;
+            }
+
+            $stack[] = $currentNode;
+        }
+
+        if (count($stack) == 1) {
+            return $this->getValue($stack[0]);
+        }
+
+        if (count($stack) == 3) {
+            $left = $stack[0];
+            $rightNode = $stack[2];
+            $right = $this->getValue($rightNode);
+            $operand = $stack[1];
+
+            if ($operand instanceof LeftAssignmentOperator) {
+                $varName = $this->nameOf($left);
+
+                $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
+                $this->assignments[$this->dataRetriever->lastPath()] = $right;
+
+                return null;
+            } elseif ($operand instanceof AdditionAssignmentOperator) {
+                $varName = $this->nameOf($left);
+                $curVal = $this->numericScopeValue($varName);
+                $right = floatval($right);
+
+                $this->assertNumericValue($curVal);
+                $this->assertNumericValue($right);
+
+                $newVal = $curVal + $right;
+
+                $this->dataRetriever->setRuntimeValue(
+                    $varName,
+                    $this->data,
+                    $newVal
+                );
+                $this->assignments[$this->dataRetriever->lastPath()] = $newVal;
+
+                return null;
+            } elseif ($operand instanceof DivisionAssignmentOperator) {
+                $varName = $this->nameOf($left);
+                $curVal = $this->numericScopeValue($varName);
+
+                $this->assertNumericValue($curVal);
+                $this->assertNumericValue($right);
+                $this->assertNonZeroForDivisor($right);
+
+                $assignValue = $curVal / $right;
+
+                $this->dataRetriever->setRuntimeValue(
+                    $varName,
+                    $this->data,
+                    $assignValue
+                );
+                $this->assignments[$this->dataRetriever->lastPath()] = $assignValue;
+
+                return null;
+            } elseif ($operand instanceof ModulusAssignmentOperator) {
+                $varName = $this->nameOf($left);
+                $curVal = $this->numericScopeValue($varName);
+
+                $this->assertNumericValue($curVal);
+                $this->assertNumericValue($right);
+
+                $assignValue = $curVal % $right;
+
+                $this->dataRetriever->setRuntimeValue(
+                    $varName,
+                    $this->data,
+                    $assignValue
+                );
+                $this->assignments[$this->dataRetriever->lastPath()] = $assignValue;
+
+                return null;
+            } elseif ($operand instanceof MultiplicationAssignmentOperator) {
+                $varName = $this->nameOf($left);
+                $curVal = $this->numericScopeValue($varName);
+
+                $this->assertNumericValue($curVal);
+                $this->assertNumericValue($right);
+
+                $assignValue = $curVal * $right;
+
+                $this->dataRetriever->setRuntimeValue(
+                    $varName,
+                    $this->data,
+                    $assignValue
+                );
+                $this->assignments[$this->dataRetriever->lastPath()] = $assignValue;
+
+                return null;
+            } elseif ($operand instanceof SubtractionAssignmentOperator) {
+                $varName = $this->nameOf($left);
+                $curVal = $this->numericScopeValue($varName);
+
+                $this->assertNumericValue($curVal);
+                $this->assertNumericValue($right);
+
+                $assignValue = $curVal - $right;
+
+                $this->dataRetriever->setRuntimeValue(
+                    $varName,
+                    $this->data,
+                    $assignValue
+                );
+                $this->assignments[$this->dataRetriever->lastPath()] = $assignValue;
+
+                return null;
+            } elseif ($operand instanceof ConditionalVariableFallbackOperator) {
+                $leftValue = $this->getFallbackComparisonValue($left);
+
+                if ($leftValue instanceof ArrayableString) {
+                    $leftValue = $leftValue->value();
+                }
+
+                if ($leftValue != false) {
+                    return $this->getValue($right);
+                } else {
+                    return null;
+                }
+            }
+        } else {
+            throw ErrorFactory::makeRuntimeError(
+                AntlersErrorCodes::TYPE_RUNTIME_UNEXPECTED_STACK_CONDITION,
+                $this->lastNode,
+                'Unexpected stack condition encountered.'
+            );
+        }
+
+        return $stack;
+    }
+
+    /**
+     * Evaluates the provided null coalescence group.
+     *
+     * @param  NullCoalescenceGroup  $group  The group.
+     * @return mixed|DirectionGroup|ListValueNode|string
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    private function evaluateNullCoalescence(NullCoalescenceGroup $group)
+    {
+        $leftVal = $this->getValue($group->left);
+        $rightVal = $this->getValue($group->right);
+
+        if ($leftVal instanceof ArrayableString) {
+            $leftVal = $leftVal->value();
+        }
+
+        if ($leftVal != null) {
+            return $leftVal;
+        }
+
+        return $rightVal;
+    }
+
+    /**
+     * Evaluates the provided ternary condition group.
+     *
+     * @param  TernaryCondition  $condition  The ternary expression.
+     * @return mixed
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    private function evaluateTernaryGroup(TernaryCondition $condition)
+    {
+        $env = new Environment($this->libraryManager);
+        $env->setProcessor($this->nodeProcessor);
+        $env->setData($this->data);
+        $headValue = $env->evaluateBool($condition->head);
+
+        if ($headValue == true) {
+            return $this->getValue($condition->truthBranch);
+        }
+
+        return $this->getValue($condition->falseBranch);
+    }
+
+    /**
+     * Returns the numeric value associated with the provided variable name.
+     *
+     * @param  string|VariableReference  $name  The variable name.
+     * @return array|ArrayAccess|int|mixed|string
+     *
+     * @throws RuntimeException
+     */
+    private function numericScopeValue($name)
+    {
+        $value = $this->scopeValue($name);
+
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        if ($value == null) {
+            if ($name instanceof VariableReference) {
+                return 0;
+            }
+
+            $this->data[$name] = 0;
+
+            return 0;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Returns the current value associated with the provided variable name.
+     *
+     * @param  string|VariableReference  $name  The variable name.
+     * @return array|ArrayAccess|mixed|string|null
+     *
+     * @throws RuntimeException
+     */
+    private function scopeValue($name)
+    {
+        if ($name instanceof VariableReference) {
+            return $this->dataRetriever->getData($name, $this->data);
+        }
+
+        return Arr::get($this->data, $name);
+    }
+
+    /**
+     * Returns the variable name associated with the provided reference.
+     *
+     * @param  AbstractNode  $node  The variable node.
+     * @return mixed|VariableReference|string|null
+     *
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     */
+    private function nameOf($node)
+    {
+        if ($node instanceof VariableNode) {
+            if ($node->variableReference == null) {
+                $node->variableReference = $this->pathParser->parse($node->name);
+            }
+
+            if ($node->variableReference != null) {
+                return $node->variableReference;
+            }
+
+            return $node->name;
+        }
+
+        throw ErrorFactory::makeRuntimeError(
+            AntlersErrorCodes::TYPE_RUNTIME_ASSIGNMENT_TO_NON_VAR,
+            $node,
+            'Cannot assign value to type ['.TypeLabeler::getPrettyTypeName($node).'].'
+        );
+    }
+
+    /**
+     * Resolves the value appropriately for a variable fallback expression.
+     *
+     * @param  AbstractNode|mixed  $val  The value to resolve.
+     * @return bool|float|int|mixed|DirectionGroup|ListValueNode|string|null
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    private function getFallbackComparisonValue($val)
+    {
+        $checkVal = $val;
+
+        if ($checkVal === false) {
+            return null;
+        }
+
+        return $this->getValue($checkVal);
+    }
+
+    /**
+     * Applies a modifier chain to a value.
+     *
+     * @param  AbstractNode|VariableReference|mixed  $value  The variable.
+     * @param  ModifierChainNode  $modifierChain  The modifier chain.
+     * @return mixed
+     */
+    private function applyModifiers($value, ModifierChainNode $modifierChain)
+    {
+        return ModifierManager::evaluate($value, $this, $modifierChain, $this->data);
+    }
+
+    /**
+     * Adjusts the value based on the current environment state.
+     *
+     * @param  mixed  $value  The value to adjust.
+     * @param  AbstractNode  $originalNode  The original node.
+     * @return mixed|string
+     */
+    private function adjustValue($value, $originalNode)
+    {
+        if ($originalNode instanceof AbstractNode && $originalNode->modifierChain != null) {
+            if (! empty($originalNode->modifierChain->modifierChain)) {
+                return $this->applyModifiers($value, $originalNode->modifierChain);
+            }
+        }
+
+        if (! empty($this->interpolationReplacements)) {
+            if (Str::contains($value, $this->interpolationKeys)) {
+                $value = strtr($value, $this->interpolationReplacements);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Tests if the provided node represents an ascending direction instruction.
+     *
+     * @param  AbstractNode  $node  The node to evaluate.
+     * @return bool
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    private function getIsAscendingDirection($node)
+    {
+        if ($node instanceof StringValueNode) {
+            return $node->value == 'asc';
+        } elseif ($node instanceof TrueConstant) {
+            return true;
+        } elseif ($node instanceof FalseConstant) {
+            return false;
+        } elseif ($node instanceof NullConstant) {
+            return false;
+        } elseif ($node instanceof NumberNode) {
+            return $node->value >= 1;
+        }
+
+        $env = new Environment($this->libraryManager);
+        $env->setProcessor($this->nodeProcessor);
+        $env->setData($this->data);
+        $envResult = $env->evaluate([$node]);
+
+        if (is_string($envResult)) {
+            if ($envResult == 'asc') {
+                return true;
+            }
+
+            return false;
+        } elseif (is_bool($envResult)) {
+            return $envResult;
+        }
+
+        throw ErrorFactory::makeRuntimeError(
+            AntlersErrorCodes::TYPE_UNEXPECTED_RUNTIME_RESULT_FOR_ORDER_BY_CLAUSE,
+            $node,
+            'Unexpected return value ['.TypeLabeler::getPrettyRuntimeTypeName($envResult).'] when evaluating order by direction.'
+        );
+    }
+
+    /**
+     * Evaluates the provided direction group.
+     *
+     * @param  DirectionGroup  $group  The group.
+     * @return array
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    public function evaluateDirectionGroup(DirectionGroup $group)
+    {
+        $orders = [];
+
+        foreach ($group->orderClauses as $clause) {
+            $orders[] = [
+                'var' => $clause->name,
+                'asc' => $this->getIsAscendingDirection($clause->directionNode),
+            ];
+        }
+
+        return $orders;
+    }
+
+    /**
+     * Pushes the assignments to the environment's referenced variable stack.
+     *
+     * @param  array  $referencedAssignments  The assignments.
+     *
+     * @throws RuntimeException
+     * @throws VariableAccessException
+     */
+    public function pushReferenceAssignments($referencedAssignments)
+    {
+        foreach ($referencedAssignments as $assignment) {
+            /** @var VariableNode $varName */
+            $varName = $assignment[0];
+            $value = $assignment[1];
+
+            $this->dataRetriever->setRuntimeValue($varName->variableReference, $this->data, $value);
+        }
+
+        $this->referenceVars = array_merge($this->referenceVars, $referencedAssignments);
+    }
+
+    /**
+     * Evaluates the provided argument group's inner values.
+     *
+     * @param  ArgumentGroup  $argumentGroup  The argument group.
+     * @return array
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    public function evaluateArgumentGroup(ArgumentGroup $argumentGroup)
+    {
+        $env = new Environment($this->libraryManager);
+        $env->setProcessor($this->nodeProcessor);
+        $env->setData($this->data);
+
+        $normalArgs = [];
+        $namedArgs = [];
+
+        foreach ($argumentGroup->args as $arg) {
+            if ($arg instanceof NamedArgumentNode) {
+                if ($arg->name instanceof VariableNode) {
+                    $namedArgs[$arg->name->name] = $env->evaluate([$arg->value]);
+                }
+            } else {
+                $normalArgs[] = $env->evaluate([$arg]);
+            }
+        }
+
+        return [
+            LibraryManager::ARG_NORMAL => $normalArgs,
+            LibraryManager::ARG_NAMED => $namedArgs,
+        ];
+    }
+
+    /**
+     * Evaluates the provided library method call, and returns the result.
+     *
+     * @param  LibraryInvocationConstruct  $invocation  The library call.
+     * @return mixed|null
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     */
+    private function evaluateLibraryMethodCall(LibraryInvocationConstruct $invocation)
+    {
+        if ($this->libraryManager->hasLibrary($invocation->libraryName)) {
+            try {
+                return $this->libraryManager->tryExecute($invocation, $this);
+            } catch (LibraryCallException $libraryCallException) {
+                $libraryCallException->node = $invocation;
+
+                throw $libraryCallException;
+            } catch (Exception $e) {
+                throw ErrorFactory::makeRuntimeError(
+                    AntlersErrorCodes::TYPE_RUNTIME_LIBRARY_BAD_METHOD_CALL,
+                    $invocation,
+                    'Bad method call to "'.$invocation->content.'". System failed with: '.$e->getMessage()
+                );
+            }
+        } else {
+            throw ErrorFactory::makeRuntimeError(
+                AntlersErrorCodes::TYPE_RUNTIME_UNKNOWN_LIBRARY,
+                $invocation,
+                'Unknown runtime library "'.$invocation->libraryName.'".'
+            );
+        }
+    }
+
+    /**
+     * Converts an array node to its actual values.
+     *
+     * @param  ArrayNode  $array  The array representation.
+     * @return array|bool[]|mixed|string[]
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    private function resolveArrayValue(ArrayNode $array)
+    {
+        $runtimeArray = [];
+
+        foreach ($array->nodes as $node) {
+            if ($node instanceof ArrayNode) {
+                $runtimeArray[] = $this->resolveArrayValue($node);
+            } else {
+                if ($node->name == null) {
+                    $runtimeArray[] = $this->getValue($node->value);
+                } else {
+                    $key = $this->getValue($node->name);
+                    $value = $this->getValue($node->value);
+
+                    $runtimeArray = $runtimeArray + [$key => $value];
+                }
+            }
+        }
+
+        return $runtimeArray;
+    }
+
+    /**
+     * Retrieves the runtime value for the provided value.
+     *
+     * @param  mixed  $val  The value.
+     * @return array|bool|float|int|mixed|DirectionGroup|ListValueNode|string
+     *
+     * @throws LibraryCallException
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws VariableAccessException
+     */
+    public function getValue($val)
+    {
+        if ($val instanceof DirectionGroup || $val instanceof ListValueNode) {
+            return $val;
+        }
+
+        if ($val instanceof SwitchGroup) {
+            return $val;
+        }
+
+        if ($val instanceof OperatorNodeContract ||
+            $val instanceof LogicalNegationOperator || $val instanceof LogicalGroupEnd) {
+            throw ErrorFactory::makeRuntimeError(
+                AntlersErrorCodes::TYPE_RUNTIME_PARSE_VALUE_VIOLATION,
+                $this->lastNode,
+                'Unexpected parser type ['.get_class($val).'] encountered.'
+            );
+        }
+
+        $returnVal = $val;
+
+        if ($val instanceof NumberNode) {
+            $returnVal = $val->value;
+        } elseif ($val instanceof LogicGroup) {
+            $returnVal = $this->process($val->nodes);
+        } elseif ($val instanceof SemanticGroup) {
+            $returnVal = $this->process($val->nodes);
+        } elseif ($val instanceof VariableNode) {
+            $varName = $this->nameOf($val);
+
+            if ($val->isInterpolationReference) {
+                $interpolationValue = $this->adjustValue($this->nodeProcessor->reduceInterpolatedVariable($val), $val);
+
+                // If the currently active node is an instance of ArithmeticNodeContract,
+                // we will ask the runtime type coercion to convert whatever value
+                // comes from the interpolation result into its most likely
+                // data type; as values from interpolation are strings.
+                if ($this->lastNode instanceof ArithmeticNodeContract) {
+                    $interpolationValue = TypeCoercion::coerceType($interpolationValue);
+                }
+
+                return $interpolationValue;
+            }
+
+            return $this->adjustValue($this->scopeValue($varName), $val);
+        } elseif ($val instanceof TrueConstant) {
+            $returnVal = true;
+        } elseif ($val instanceof FalseConstant) {
+            $returnVal = false;
+        } elseif ($val instanceof NullConstant) {
+            $returnVal = null;
+        } elseif ($val instanceof StringValueNode) {
+            $returnVal = $val->value;
+        } elseif ($val instanceof NullCoalescenceGroup) {
+            $returnVal = $this->evaluateNullCoalescence($val);
+        } elseif ($val instanceof TernaryCondition) {
+            $returnVal = $this->evaluateTernaryGroup($val);
+        } elseif ($val instanceof ModifierValueNode) {
+            if (is_string($val->value) && in_array(trim($val->value), GlobalRuntimeState::$interpolatedVariables)) {
+                return $this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value));
+            }
+
+            $returnVal = $val->value;
+        } elseif ($val instanceof LibraryInvocationConstruct) {
+            $returnVal = $this->evaluateLibraryMethodCall($val);
+        } elseif ($val instanceof ArrayNode) {
+            $returnVal = $this->resolveArrayValue($val);
+        }
+
+        if ($val instanceof ViewErrorBag) {
+            if ($this->isEvaluatingTruthValue) {
+                return (bool) $val->getBags();
+            } else {
+                return $val->toArray();
+            }
+        }
+
+        if ($val instanceof MessageBag) {
+            if ($this->isEvaluatingTruthValue) {
+                return $val->count() > 0;
+            } else {
+                $val->toArray();
+            }
+        }
+
+        if (is_array($val) && $this->isEvaluatingTruthValue) {
+            return ! empty($val);
+        }
+
+        if (is_string($val) && $this->isEvaluatingTruthValue) {
+            return mb_strlen($val) > 0;
+        }
+
+        if ($returnVal instanceof AbstractNode) {
+            return $this->getValue($returnVal);
+        }
+
+        return $this->adjustValue($returnVal, $val);
+    }
+}
