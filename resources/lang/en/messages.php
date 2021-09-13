@@ -114,6 +114,7 @@ return [
     'licensing_error_outside_license_range' => 'License valid for versions :start and :end',
     'licensing_error_unknown_site' => 'Unknown site',
     'licensing_error_unlicensed' => 'Unlicensed',
+    'licensing_config_cached_warning' => 'Any changes you make to your .env or config files will not be detected until you clear the cache. If you are seeing unexpected licensing results here, it may be because of this. You can use the <code>php artisan config:cache</code> command to regenerate the cache.',
     'licensing_production_alert' => 'Please purchase or enter a valid license key for this site to comply with the License Agreement.',
     'licensing_sync_instructions' => 'Data from statamic.com is synced once per hour. Force a sync to see any changes you\'ve made.',
     'licensing_trial_mode_alert' => 'You are enjoying paid features or addons that need to be licensed before deploying this site. Have fun!',

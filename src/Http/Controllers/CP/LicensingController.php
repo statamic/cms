@@ -14,6 +14,7 @@ class LicensingController extends CpController
             'statamic' => $licenses->statamic(),
             'addons' => $licenses->addons()->filter->existsOnMarketplace(),
             'unlistedAddons' => $licenses->addons()->reject->existsOnMarketplace(),
+            'configCached' => app()->configurationIsCached(),
         ]);
     }
 

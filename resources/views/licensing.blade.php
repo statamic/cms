@@ -31,6 +31,13 @@
             <h1 class="flex-1">{{ __('Licensing') }}</h1>
         </div>
 
+        @if ($configCached)
+            <div class="text-xs border border-yellow-dark rounded p-2 bg-yellow">
+                <div class="font-bold mb-1">{{ __('Configuration is cached') }}</div>
+                <p>{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
+           </div>
+        @endif
+
         <h6 class="mt-4">Site</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
