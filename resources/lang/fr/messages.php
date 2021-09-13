@@ -65,6 +65,7 @@ return [
     'fields_fieldsets_description' => 'Les jeux de champs sont des groupements simples, flexibles et totalement facultatifs de champs qui aident à organiser des champs réutilisables et préconfigurés.',
     'fields_handle_instructions' => 'La variable de modèle du champ.',
     'fields_instructions_instructions' => 'Texte affiché sous l’étiquette du champ (comme celui-ci). Markdown est pris en compte.',
+    'fields_instructions_position_instructions' => 'Défini le positionnement des instructions par rapport au champ.',
     'fields_listable_instructions' => 'Contrôle la visibilité de ce champ dans les colonnes.',
     'fieldset_import_fieldset_instructions' => 'Le jeu de champs à importer.',
     'fieldset_import_prefix_instructions' => 'Le préfixe à appliquer à chaque champ lors de leur importation. Ex. hero_',
