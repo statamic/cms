@@ -11,7 +11,6 @@ use Statamic\Support\Str;
 use Statamic\Tags\TagNotFoundException;
 use Statamic\View\Antlers\AntlersString;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
-use Statamic\View\Cascade;
 use Statamic\View\Antlers\Language\Errors\LineRetriever;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
@@ -22,6 +21,7 @@ use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Cascade;
 use Throwable;
 
 class RuntimeParser implements ParserContract

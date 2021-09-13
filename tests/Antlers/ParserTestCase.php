@@ -2,8 +2,8 @@
 
 namespace Tests\Antlers;
 
-use Orchestra\Testbench\TestCase;
 use Facade\Ignition\Exceptions\ViewException;
+use Orchestra\Testbench\TestCase;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
@@ -12,9 +12,8 @@ use Statamic\Fields\Value;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Statamic\Tags\Loader;
-use Statamic\View\Antlers\Language\LanguageServiceProvider;
-use Statamic\View\Cascade;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
+use Statamic\View\Antlers\Language\LanguageServiceProvider;
 use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
@@ -32,6 +31,7 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Cascade;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class ParserTestCase extends TestCase

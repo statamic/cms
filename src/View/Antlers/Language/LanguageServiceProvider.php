@@ -3,7 +3,6 @@
 namespace Statamic\View\Antlers\Language;
 
 use Illuminate\Support\ServiceProvider;
-
 use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
@@ -19,7 +18,6 @@ use Statamic\View\Cascade;
 
 class LanguageServiceProvider extends ServiceProvider
 {
-
     public function register()
     {
         GlobalRuntimeState::$environmentId = StringUtilities::uuidv4();
@@ -117,5 +115,4 @@ class LanguageServiceProvider extends ServiceProvider
             return $parser;
         });
     }
-
 }

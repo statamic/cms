@@ -97,7 +97,6 @@ class GlobalDebugManager
         }
     }
 
-
     /**
      * Produces a list of stack frames from the runtime template stack.
      *

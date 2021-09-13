@@ -9,7 +9,6 @@ use JsonSerializable;
 use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Support\Str;
-use Statamic\View\Antlers\Parser;
 
 class Value implements IteratorAggregate, JsonSerializable
 {

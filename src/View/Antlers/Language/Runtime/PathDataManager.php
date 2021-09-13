@@ -12,7 +12,6 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\AntlersString;
-use Statamic\View\Cascade;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
@@ -22,6 +21,7 @@ use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Cascade;
 
 class PathDataManager
 {

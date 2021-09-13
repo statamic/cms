@@ -4,8 +4,8 @@ namespace Tests\Antlers\Runtime;
 
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Markdown;
-use Tests\Antlers\ParserTestCase;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Tests\Antlers\ParserTestCase;
 
 class MarkdownContentTest extends ParserTestCase
 {

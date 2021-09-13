@@ -7,8 +7,8 @@ use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
-use Tests\Antlers\ParserTestCase;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Tests\Antlers\ParserTestCase;
 
 class PreparserTest extends ParserTestCase
 {

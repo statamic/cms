@@ -20,8 +20,6 @@ use Statamic\Tags\Loader;
 use Statamic\Tags\TagNotFoundException;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\AntlersString;
-use Statamic\View\Antlers\SyntaxError;
-use Statamic\View\Cascade;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
@@ -50,6 +48,8 @@ use Statamic\View\Antlers\Language\Runtime\Libraries\LibraryManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Antlers\SyntaxError;
+use Statamic\View\Cascade;
 use Throwable;
 
 class NodeProcessor

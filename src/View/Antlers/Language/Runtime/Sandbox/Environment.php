@@ -13,7 +13,6 @@ use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Fields\ArrayableString;
 use Statamic\Support\Str;
-use Statamic\View\Cascade;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Errors\LineRetriever;
@@ -87,6 +86,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\BoolBoxObject;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\DateTimeBoxObject;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\NumericBoxObject;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\StringBoxObject;
+use Statamic\View\Cascade;
 
 class Environment
 {

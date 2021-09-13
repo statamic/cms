@@ -2,8 +2,8 @@
 
 namespace Tests\Antlers\Runtime\Libraries;
 
-use Tests\Antlers\ParserTestCase;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Tests\Antlers\ParserTestCase;
 
 class FileLibraryTest extends ParserTestCase
 {

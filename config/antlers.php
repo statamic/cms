@@ -26,7 +26,7 @@ return [
     */
 
     'guardedVariables' => [
-        'config.app.key'
+        'config.app.key',
     ],
 
     /*
