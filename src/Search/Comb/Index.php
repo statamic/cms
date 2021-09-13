@@ -115,6 +115,6 @@ class Index extends BaseIndex
 
     protected function save($documents)
     {
-        File::put($this->path(), $documents->toJson());
+        File::put($this->path(), $documents->toJson(JSON_UNESCAPED_UNICODE));
     }
 }
