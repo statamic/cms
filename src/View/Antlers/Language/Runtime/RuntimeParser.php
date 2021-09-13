@@ -283,6 +283,10 @@ class RuntimeParser implements ParserContract
             $bufferContent = $this->nodeProcessor->render($renderNodes);
             $this->nodeProcessor->triggerRenderComplete();
         } catch (AntlersException $antlersException) {
+            if (! class_exists(ViewException::class)) {
+                throw $antlersException;
+            }
+
             if ($antlersException->node == null && GlobalRuntimeState::$lastNode != null) {
                 $antlersException->node = GlobalRuntimeState::$lastNode;
             } elseif ($antlersException->node == null && GlobalRuntimeState::$lastNode == null) {
@@ -299,6 +303,7 @@ class RuntimeParser implements ParserContract
             }
 
             $newMessage = $typeText.$antlersException->getMessage().' '.LineRetriever::getErrorLineAndCharText($antlersException->node);
+
             $ignitionException = new ViewException($newMessage);
             $traceProperty = new ReflectionProperty('Exception', 'trace');
             $traceProperty->setAccessible(true);

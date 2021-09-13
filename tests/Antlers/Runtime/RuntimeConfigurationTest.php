@@ -1,8 +1,9 @@
 <?php
 
-namespace Statamic\View\Antlers\Language\Runtime;
+namespace Tests\Antlers\Runtime;
 
-use Facade\Ignition\Exceptions\ViewException;
+use Statamic\View\Antlers\Language\Exceptions\AntlersException;
+use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Tests\Antlers\ParserTestCase;
 
 class RuntimeConfigurationTest extends ParserTestCase
@@ -14,7 +15,7 @@ class RuntimeConfigurationTest extends ParserTestCase
 
         $vars = ['test' => ['one', 'two', 'three']];
 
-        $this->expectException(ViewException::class);
+        $this->expectException(AntlersException::class);
         $this->renderStringWithConfiguration('{{ test }}', $config, $vars);
     }
 }

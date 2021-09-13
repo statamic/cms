@@ -1,9 +1,9 @@
 <?php
 
-namespace Statamic\View\Antlers\Language\Runtime;
+namespace Tests\Antlers\Runtime;
 
-use Facade\Ignition\Exceptions\ViewException;
 use Statamic\Tags\Tags;
+use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Tests\Antlers\ParserTestCase;
 
 class ConditionLogicTest extends ParserTestCase
@@ -112,7 +112,7 @@ EOT;
 
     public function test_switch_invalid_default_position_throws_exception()
     {
-        $this->expectException(ViewException::class);
+        $this->expectException(AntlersException::class);
         $template = <<<'EOT'
 {{ switch (
     () => {"Default"},
@@ -126,7 +126,7 @@ EOT;
 
     public function test_missing_arg_separator_after_first_case_statement_throws_exception()
     {
-        $this->expectException(ViewException::class);
+        $this->expectException(AntlersException::class);
         $template = <<<'EOT'
 {{ switch (
     () => {"Default"}
@@ -140,7 +140,7 @@ EOT;
 
     public function test_missing_arg_separator_after_other_case_statement_throws_exception()
     {
-        $this->expectException(ViewException::class);
+        $this->expectException(AntlersException::class);
         $template = <<<'EOT'
 {{ switch (
     () => {"Default"},

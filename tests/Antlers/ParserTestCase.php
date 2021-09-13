@@ -2,7 +2,6 @@
 
 namespace Tests\Antlers;
 
-use Facade\Ignition\Exceptions\ViewException;
 use Orchestra\Testbench\TestCase;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
@@ -13,6 +12,7 @@ use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Statamic\Tags\Loader;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
+use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Statamic\View\Antlers\Language\LanguageServiceProvider;
 use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
@@ -40,7 +40,7 @@ class ParserTestCase extends TestCase
 
     protected function assertThrowsParserError($string)
     {
-        $this->expectException(ViewException::class);
+        $this->expectException(AntlersException::class);
         $this->renderString($string);
     }
 

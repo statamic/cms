@@ -2,17 +2,17 @@
 
 namespace Tests\Antlers\Runtime\Libraries;
 
-use Facade\Ignition\Exceptions\ViewException;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Tests\Antlers\ParserTestCase;
 
 class RestrictedRuntimeAccessTest extends ParserTestCase
 {
     public function test_fields_attempting_to_call_protected_libraries_throws_exception()
     {
-        $this->expectException(ViewException::class);
+        $this->expectException(AntlersException::class);
         $fieldtype = new class extends Fieldtype
         {
             public function augment($value)

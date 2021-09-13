@@ -2,7 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
-use Facade\Ignition\Exceptions\ViewException;
+use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Tests\Antlers\ParserTestCase;
 
 class WhereOperatorTest extends ParserTestCase
@@ -121,7 +121,7 @@ EOT;
 
     public function test_complex_expressions_with_attempted_loop_throws_exception()
     {
-        $this->expectException(ViewException::class);
+        $this->expectException(AntlersException::class);
         $template = <<<'EOT'
 {{ filtered_products = products where (id >= 3 || name == 'Lamp'); shouldError = true }}{{ id }}{{ /filtered_products }}
 EOT;
