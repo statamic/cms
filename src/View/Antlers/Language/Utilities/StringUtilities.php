@@ -49,7 +49,7 @@ class StringUtilities
             return str_split($text);
         }
 
-        return mb_str_split($text);
+        return \mb_str_split($text);
     }
 
     /**

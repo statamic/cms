@@ -93,7 +93,7 @@ class LanguageOperatorTest extends ParserTestCase
 
     public function test_str_word_count()
     {
-        $this->assertSame(Str::wordCount('test value for word count'), $this->evaluateRaw('str_word_count "testtest value for word count"'));
+        $this->assertSame(\str_word_count('test value for word count'), $this->evaluateRaw('str_word_count "testtest value for word count"'));
     }
 
     public function test_str_studly()

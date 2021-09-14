@@ -97,7 +97,6 @@ class StringLibrary extends RuntimeLibrary
                 $this->strOrArrayVar('pattern'),
                 $this->stringVar('value'),
             ],
-            'isAscii' => [$this->stringVar('value')],
             'isUuid' => [$this->stringVar('value')],
             'kebab' => [$this->stringVar('kebab')],
             'length' => [
@@ -114,10 +113,6 @@ class StringLibrary extends RuntimeLibrary
                 $this->stringVar('limit'),
                 $this->numericVarWithDefault('limit', 100),
                 $this->stringVarWithDefault('end', '...'),
-            ],
-            'markdown' => [
-                $this->stringVar('string'),
-                $this->arrayVarWithDefault('options', []),
             ],
             'match' => [
                 $this->stringVar('pattern'),
@@ -191,7 +186,6 @@ class StringLibrary extends RuntimeLibrary
             ],
             'ucfirst' => [$this->stringVar('string')],
             'uuid' => 1,
-            'orderedUuid' => 1,
             'wordCount' => [$this->stringVar('string')],
             'substrCount' => [
                 $this->stringVar('haystack'),
@@ -211,17 +205,17 @@ class StringLibrary extends RuntimeLibrary
 
     public function substrCount($haystack, $needle, $offset = 0, $length = null)
     {
-        return Str::substrCount($haystack, $needle, $offset, $length);
+        // From: https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/Str.php#L801-L808
+        if (! is_null($length)) {
+            return substr_count($haystack, $needle, $offset, $length);
+        } else {
+            return substr_count($haystack, $needle, $offset);
+        }
     }
 
     public function wordCount($string)
     {
-        return Str::wordCount($string);
-    }
-
-    public function orderedUuid()
-    {
-        return (string) Str::orderedUuid();
+        return \str_word_count($string);
     }
 
     public function uuid()
@@ -276,7 +270,10 @@ class StringLibrary extends RuntimeLibrary
 
     public function remove($search, $subject, $case_sensitive = true)
     {
-        return Str::remove($search, $subject, $case_sensitive);
+        // From: https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/Str.php#L633-L640
+        return $case_sensitive
+            ? str_replace($search, '', $subject)
+            : str_ireplace($search, '', $subject);
     }
 
     public function replaceLast($search, $replace, $subject)
@@ -336,17 +333,26 @@ class StringLibrary extends RuntimeLibrary
 
     public function matchAll($pattern, $subject)
     {
-        return Str::matchAll($pattern, $subject)->all();
+        // From: https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/Str.php#L422-L431
+        preg_match_all($pattern, $subject, $matches);
+
+        if (empty($matches[0])) {
+            return [];
+        }
+
+        return $matches[1] ?? $matches[0];
     }
 
     public function match($pattern, $subject)
     {
-        return Str::match($pattern, $subject);
-    }
+        // From: https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/Str.php#L404-L413
+        preg_match($pattern, $subject, $matches);
 
-    public function markdown($string, $options = [])
-    {
-        return Str::markdown($string, $options);
+        if (! $matches) {
+            return '';
+        }
+
+        return $matches[1] ?? $matches[0];
     }
 
     public function words($value, $limit = 100, $end = '...')
@@ -377,11 +383,6 @@ class StringLibrary extends RuntimeLibrary
     public function isUuid($value)
     {
         return Str::isUuid($value);
-    }
-
-    public function isAscii($value)
-    {
-        return Str::isAscii($value);
     }
 
     public function is($pattern, $value)

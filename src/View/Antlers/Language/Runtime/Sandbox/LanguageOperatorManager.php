@@ -200,7 +200,7 @@ class LanguageOperatorManager
         } elseif ($operator == LanguageOperatorRegistry::STR_UCFIRST) {
             $value = Str::ucfirst($a);
         } elseif ($operator == LanguageOperatorRegistry::STR_WORD_COUNT) {
-            $value = Str::wordCount($a);
+            $value = \str_word_count($a);
         } elseif ($operator == LanguageOperatorRegistry::ARR_PLUCK_INTO) {
             $value = $this->executePluckInto($a, $rawB, $rawA, $context);
         } elseif ($operator == LanguageOperatorRegistry::QUERY_WHERE) {

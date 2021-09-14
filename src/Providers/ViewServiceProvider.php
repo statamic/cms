@@ -35,6 +35,14 @@ class ViewServiceProvider extends ServiceProvider
             $this->registerRegexAntlers();
         }
 
+        // Ensures all classes currently requiring a Parser instance
+        // continues to receive the same behavior they used to.
+        $this->app->bind(Parser::class, function ($app) {
+            return (new Parser)
+                ->callback([Engine::class, 'renderTag'])
+                ->cascade($app[Cascade::class]);
+        });
+
         $this->app->singleton(Engine::class, function ($app) {
             return new Engine($app['files'], $app[ParserContract::class]);
         });

@@ -53,15 +53,10 @@ EOT;
     public function test_str_word_count()
     {
         foreach ($this->singleParamValues as $param) {
-            $this->assertSame(Str::wordCount($param), $this->evaluateRaw('str.wordCount(arg_param)', [
+            $this->assertSame(\str_word_count($param), $this->evaluateRaw('str.wordCount(arg_param)', [
                 'arg_param' => $param,
             ]));
         }
-    }
-
-    public function test_str_ordered_uuid()
-    {
-        $this->assertTrue($this->evaluateRaw('str.isUuid(str.orderedUuid())'));
     }
 
     public function test_str_uuid()
@@ -233,15 +228,6 @@ EOT;
         $this->assertSame('bar', $this->evaluateRaw('str.match("/foo (.*)/", "foo bar")'));
     }
 
-    public function test_str_markdown()
-    {
-        foreach ($this->singleParamValues as $param) {
-            $this->assertSame(Str::markdown($param), $this->evaluateRaw('str.markdown(arg_param)', [
-                'arg_param' => $param,
-            ]));
-        }
-    }
-
     public function test_str_words()
     {
         foreach ($this->singleParamValues as $param) {
@@ -296,15 +282,6 @@ EOT;
     {
         foreach ($this->singleParamValues as $param) {
             $this->assertSame(Str::isUuid($param), $this->evaluateRaw('str.isUuid(arg_param)', [
-                'arg_param' => $param,
-            ]));
-        }
-    }
-
-    public function test_str_is_ascii()
-    {
-        foreach ($this->singleParamValues as $param) {
-            $this->assertSame(Str::isAscii($param), $this->evaluateRaw('str.isAscii(arg_param)', [
                 'arg_param' => $param,
             ]));
         }
