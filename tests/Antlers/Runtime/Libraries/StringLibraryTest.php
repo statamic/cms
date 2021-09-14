@@ -278,15 +278,6 @@ EOT;
         }
     }
 
-    public function test_str_is_uuid()
-    {
-        foreach ($this->singleParamValues as $param) {
-            $this->assertSame(Str::isUuid($param), $this->evaluateRaw('str.isUuid(arg_param)', [
-                'arg_param' => $param,
-            ]));
-        }
-    }
-
     public function test_str_is()
     {
         $this->assertTrue($this->evaluateRaw('str.is("/", "/")'));

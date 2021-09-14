@@ -7,9 +7,7 @@ class LanguageOperatorRegistry
     const STR_STARTS_WITH = 'startswith';
     const STR_ENDS_WITH = 'endswith';
     const STR_IS = 'str_is';
-    const STR_IS_ASCII = 'is_ascii';
     const STR_ASCII = 'str_ascii';
-    const STR_IS_UUID = 'is_uuid';
     const STR_IS_URL = 'is_url';
     const STR_FINISH = 'str_finish';
     const STR_CONTAINS = 'str_contains';
@@ -59,8 +57,6 @@ class LanguageOperatorRegistry
         self::STR_STARTS_WITH => 1,
         self::STR_ENDS_WITH => 1,
         self::STR_IS => 1,
-        self::STR_IS_ASCII => 1,
-        self::STR_IS_UUID => 1,
         self::STR_IS_URL => 1,
         self::STR_CAMEL => 1,
         self::STR_CONTAINS => 1,
@@ -109,9 +105,7 @@ class LanguageOperatorRegistry
     ];
 
     public static $getsArgsFromRight = [
-        self::STR_IS_ASCII => 1,
         self::STR_ASCII => 1,
-        self::STR_IS_UUID => 1,
         self::STR_IS_URL => 1,
         self::ARR_SORT => 1,
         self::ARR_RECURSIVE_SORT => 1,

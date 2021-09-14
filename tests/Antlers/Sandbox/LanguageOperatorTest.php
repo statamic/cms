@@ -21,12 +21,6 @@ class LanguageOperatorTest extends ParserTestCase
         $this->assertSame('u', $this->evaluateRaw('str_ascii "ü"'));
     }
 
-    public function test_str_is_uuid()
-    {
-        $this->assertFalse($this->evaluateRaw('is_uuid "nope"'));
-        $this->assertTrue($this->evaluateRaw('is_uuid "976bb061-d11e-449e-a846-fe47cee3a87f"'));
-    }
-
     public function test_str_is_url()
     {
         $this->assertFalse($this->evaluateRaw('is_url "test"'));

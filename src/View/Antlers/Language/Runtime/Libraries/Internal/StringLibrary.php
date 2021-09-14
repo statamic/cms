@@ -97,7 +97,6 @@ class StringLibrary extends RuntimeLibrary
                 $this->strOrArrayVar('pattern'),
                 $this->stringVar('value'),
             ],
-            'isUuid' => [$this->stringVar('value')],
             'kebab' => [$this->stringVar('kebab')],
             'length' => [
                 $this->stringVar('value'),
@@ -378,11 +377,6 @@ class StringLibrary extends RuntimeLibrary
     public function kebab($value)
     {
         return Str::kebab($value);
-    }
-
-    public function isUuid($value)
-    {
-        return Str::isUuid($value);
     }
 
     public function is($pattern, $value)

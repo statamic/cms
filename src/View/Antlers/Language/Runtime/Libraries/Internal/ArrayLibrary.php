@@ -494,7 +494,29 @@ class ArrayLibrary extends RuntimeLibrary
 
     public function hasAny($array, $keys)
     {
-        return Arr::hasAny($array, $keys);
+        // From: https://github.com/laravel/framework/blob/8.x/src/Illuminate/Collections/Arr.php#L356-L379
+
+        if (is_null($keys)) {
+            return false;
+        }
+
+        $keys = (array) $keys;
+
+        if (! $array) {
+            return false;
+        }
+
+        if ($keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (static::has($array, $key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function assoc($array)

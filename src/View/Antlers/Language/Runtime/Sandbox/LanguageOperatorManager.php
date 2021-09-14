@@ -122,10 +122,6 @@ class LanguageOperatorManager
             $value = Str::endsWith($a, $b);
         } elseif ($operator == LanguageOperatorRegistry::STR_IS) {
             $value = Str::is($b, $a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_IS_ASCII) {
-            $value = Str::isAscii($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_IS_UUID) {
-            $value = Str::isUuid($a);
         } elseif ($operator == LanguageOperatorRegistry::STR_IS_URL) {
             $value = Str::isUrl($a);
         } elseif ($operator == LanguageOperatorRegistry::STR_CONTAINS) {
