@@ -59,11 +59,6 @@ EOT;
         }
     }
 
-    public function test_str_uuid()
-    {
-        $this->assertTrue($this->evaluateRaw('str.isUuid(str.uuid())'));
-    }
-
     public function test_str_ucfirst()
     {
         foreach ($this->singleParamValues as $param) {
