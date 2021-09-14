@@ -33,14 +33,14 @@ class StringUtilities
     public static function substr($string, $start = null, $length = null)
     {
         if (self::getMethod($string)) {
-            return \mb_substr($string, $start, $length);
+            return mb_substr($string, $start, $length);
         }
 
         if ($length === null) {
-            return \substr($string, $start);
+            return substr($string, $start);
         }
 
-        return \substr($string, $start, $length);
+        return substr($string, $start, $length);
     }
 
     public static function split($text)
@@ -49,7 +49,7 @@ class StringUtilities
             return str_split($text);
         }
 
-        return \mb_str_split($text);
+        return mb_str_split($text);
     }
 
     /**
