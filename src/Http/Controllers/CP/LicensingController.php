@@ -10,11 +10,12 @@ class LicensingController extends CpController
     {
         return view('statamic::licensing', [
             'requestError' => $licenses->requestFailed(),
-            'site' => $licenses->site(),
-            'statamic' => $licenses->statamic(),
-            'addons' => $licenses->addons()->filter->existsOnMarketplace(),
+            'site' => $site = $licenses->site(),
+            'statamic' => $statamic = $licenses->statamic(),
+            'addons' => $addons = $licenses->addons()->filter->existsOnMarketplace(),
             'unlistedAddons' => $licenses->addons()->reject->existsOnMarketplace(),
             'configCached' => app()->configurationIsCached(),
+            'addToCartUrl' => $this->addToCartUrl($site, $statamic, $addons),
         ]);
     }
 
@@ -25,5 +26,16 @@ class LicensingController extends CpController
         return redirect()
             ->cpRoute('utilities.licensing')
             ->with('success', __('Data updated'));
+    }
+
+    public function addToCartUrl($site, $statamic, $addons)
+    {
+        return 'https://statamic.test/cart/bulk-add?'.http_build_query([
+            'site' => $site->key(),
+            'statamic' => !$statamic->valid(),
+            'products' => $addons->reject(function ($addon) {
+                return $addon->valid();
+            })->map->addon()->map->marketplaceId()->implode(',')
+        ]);
     }
 }
