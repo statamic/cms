@@ -81,7 +81,7 @@
                     <tr>
                         <td class="w-64 mr-1">
                             <span class="little-dot {{ $addon->valid() ? 'bg-green' : 'bg-red' }} mr-1"></span>
-                            <span class="font-bold">{{ $addon->name() }}</span>
+                            <span class="font-bold"><a href="{{ $addon->addon()->marketplaceUrl() }}" class="text-grey hover:text-blue">{{ $addon->name() }}</a></span>
                             @if ($addon->edition())<span class="badge uppercase font-bold text-grey-60">{{ $addon->edition() ?? '' }}</span>@endif
                         </td>
                         <td>{{ $addon->version() }}</td>
