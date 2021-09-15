@@ -40,4 +40,18 @@ return [
 
     'middleware' => 'web',
 
+    /**
+    |--------------------------------------------------------------------------
+    | Single-page application
+    |--------------------------------------------------------------------------
+    |
+    | Define the application will be running as a single-page application "SPA"
+    | and will use the view default to render your SPA.
+    |
+    */
+    'spa' => [
+        'enabled' => false,
+        'view' => 'layout'
+    ]
+
 ];

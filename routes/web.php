@@ -8,6 +8,16 @@ use Statamic\Statamic;
 
 Route::name('statamic.')->group(function () {
     /**
+     * Front-end
+     * All front-end website requests go through a single-page application view
+     */
+    if (config('statamic.routes.spa.enabled')) {
+        Route::get('/{any}', function () {
+            return view(config('statamic.routes.spa.view'));
+        })->where('any', '.*');
+    }
+
+    /**
      * Glide
      * On-the-fly URL-based image transforms.
      */
