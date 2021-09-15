@@ -56,10 +56,6 @@ class CoreNav
                 ->icon('charts');
         }
 
-        // Nav::topLevel('Playground')
-        //     ->route('playground')
-        //     ->icon('playground');
-
         return $this;
     }
 
