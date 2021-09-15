@@ -75,12 +75,12 @@ class LicenseManager
 
     public function onlyStatamicIsInvalid()
     {
-        return $this->addonsValid() && !$this->statamicValid();
+        return $this->addonsValid() && ! $this->statamicValid();
     }
 
     public function onlyAddonsAreInvalid()
     {
-        return $this->statamicValid() && !$this->addonsValid();
+        return $this->statamicValid() && ! $this->addonsValid();
     }
 
     public function response($key = null, $default = null)
