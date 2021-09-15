@@ -50,13 +50,11 @@ class CoreNav
      */
     protected function makeTopLevel()
     {
-        Nav::topLevel('Dashboard')
-            ->route('dashboard')
-            ->icon('charts');
-
-        // Nav::topLevel('Playground')
-        //     ->route('playground')
-        //     ->icon('playground');
+        if (count(config('statamic.cp.widgets')) > 0 || config('statamic.cp.start_page') === 'dashboard') {
+            Nav::topLevel('Dashboard')
+                ->route('dashboard')
+                ->icon('charts');
+        }
 
         return $this;
     }
