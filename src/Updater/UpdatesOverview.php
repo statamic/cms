@@ -18,7 +18,7 @@ class UpdatesOverview
     /**
      * Get updates count.
      *
-     * @param bool $clearCache
+     * @param  bool  $clearCache
      * @return int
      */
     public function count($clearCache = false)
@@ -29,7 +29,7 @@ class UpdatesOverview
     /**
      * Check if statamic update is available.
      *
-     * @param bool $clearCache
+     * @param  bool  $clearCache
      * @return bool
      */
     public function hasStatamicUpdate($clearCache = false)
@@ -40,7 +40,7 @@ class UpdatesOverview
     /**
      * List updatable addons.
      *
-     * @param bool $clearCache
+     * @param  bool  $clearCache
      * @return array
      */
     public function updatableAddons($clearCache = false)
@@ -51,8 +51,8 @@ class UpdatesOverview
     /**
      * Get value from cache.
      *
-     * @param string $key
-     * @param bool $clearCache
+     * @param  string  $key
+     * @param  bool  $clearCache
      * @return mixed
      */
     public function getCached($key, $clearCache = false)

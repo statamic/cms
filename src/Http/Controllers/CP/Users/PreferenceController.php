@@ -12,7 +12,7 @@ class PreferenceController extends CpController
     /**
      * Store a user preference.
      *
-     * @param Request $request
+     * @param  Request  $request
      */
     public function store(Request $request)
     {
@@ -36,7 +36,7 @@ class PreferenceController extends CpController
     /**
      * Destroy a user preference.
      *
-     * @param string $key
+     * @param  string  $key
      */
     public function destroy($key, Request $request)
     {

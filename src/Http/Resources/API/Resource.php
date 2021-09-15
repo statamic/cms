@@ -25,7 +25,7 @@ class Resource
     /**
      * Map resource implementations.
      *
-     * @param array $resources
+     * @param  array  $resources
      */
     public static function map($resources)
     {
@@ -60,8 +60,9 @@ class Resource
     /**
      * Validate binding.
      *
-     * @param string $bindable
-     * @param string $class
+     * @param  string  $bindable
+     * @param  string  $class
+     *
      * @throws JsonResourceException
      */
     protected static function validateBinding($bindable, $class)

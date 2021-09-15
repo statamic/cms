@@ -41,7 +41,7 @@ class User extends BaseUser
     /**
      * Get or set all the data for the current locale.
      *
-     * @param array|null $data
+     * @param  array|null  $data
      * @return $this|array
      */
     public function data($data = null)

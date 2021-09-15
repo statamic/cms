@@ -197,7 +197,7 @@ class Tags extends BaseTags
     /**
      * Get fields with extra data for looping over and rendering.
      *
-     * @param string $sessionHandle
+     * @param  string  $sessionHandle
      * @return array
      */
     protected function getFields($sessionHandle)
@@ -217,7 +217,7 @@ class Tags extends BaseTags
      * by its name. We'll use blink to keep track of the data as
      * we go and just update the collector.
      *
-     * @param array $data
+     * @param  array  $data
      */
     protected function addToDebugBar($data, $formHandle)
     {

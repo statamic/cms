@@ -56,7 +56,7 @@ class FormsController extends CpController
     /**
      * Get the metrics array ready to be injected into a Grid field.
      *
-     * @param  Form $form
+     * @param  Form  $form
      * @return array
      */
     private function preProcessMetrics($form)

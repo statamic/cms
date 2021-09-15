@@ -7,7 +7,7 @@ interface User
     /**
      * Get or set a user's email address.
      *
-     * @param string|null $email
+     * @param  string|null  $email
      * @return mixed
      */
     public function email($email = null);
@@ -15,7 +15,7 @@ interface User
     /**
      * Get or set a user's password.
      *
-     * @param string|null $password
+     * @param  string|null  $password
      * @return string
      */
     public function password($password = null);

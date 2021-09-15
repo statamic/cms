@@ -14,7 +14,7 @@ abstract class AbstractExporter implements Exporter
     /**
      * Get or set the form.
      *
-     * @param  Statamic\Contracts\Forms\Form|null $form
+     * @param  Statamic\Contracts\Forms\Form|null  $form
      * @return Statamic\Contracts\Forms\Form
      */
     public function form($form = null)

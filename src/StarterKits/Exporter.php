@@ -24,7 +24,8 @@ class Exporter
     /**
      * Export starter kit.
      *
-     * @param string $absolutePath
+     * @param  string  $absolutePath
+     *
      * @throws StarterKitException
      */
     public function export($absolutePath)
@@ -67,7 +68,8 @@ class Exporter
     /**
      * Ensure export path exists.
      *
-     * @param string $path
+     * @param  string  $path
+     *
      * @throws StarterKitException
      */
     protected function ensureExportPathExists($path)
@@ -80,7 +82,7 @@ class Exporter
     /**
      * Copy path to new export path location.
      *
-     * @param string $fromPath
+     * @param  string  $fromPath
      */
     protected function copyPath($fromPath)
     {
@@ -97,8 +99,8 @@ class Exporter
     /**
      * Prepare path directory.
      *
-     * @param string $fromPath
-     * @param string $toPath
+     * @param  string  $fromPath
+     * @param  string  $toPath
      */
     protected function preparePath($fromPath, $toPath)
     {
@@ -125,6 +127,7 @@ class Exporter
      * Get starter kit export paths from config.
      *
      * @return \Illuminate\Support\Collection
+     *
      * @throws StarterKitException
      */
     protected function exportPaths()
@@ -161,7 +164,7 @@ class Exporter
     /**
      * Export dependencies from composer.json.
      *
-     * @param \Illuminate\Support\Collection $config
+     * @param  \Illuminate\Support\Collection  $config
      * @return \Illuminate\Support\Collection
      */
     protected function exportDependenciesFromComposerJson($config)
@@ -186,7 +189,7 @@ class Exporter
     /**
      * Get exportable dependencies without versions from config.
      *
-     * @param \Illuminate\Support\Collection $config
+     * @param  \Illuminate\Support\Collection  $config
      * @return \Illuminate\Support\Collection
      */
     protected function getExportableDependenciesFromConfig($config)
@@ -204,7 +207,7 @@ class Exporter
     /**
      * Check if config has dependencies without versions.
      *
-     * @param \Illuminate\Support\Collection $config
+     * @param  \Illuminate\Support\Collection  $config
      * @return bool
      */
     protected function hasDependenciesWithoutVersions($config)
@@ -219,8 +222,8 @@ class Exporter
     /**
      * Export dependencies from composer.json using specific require key.
      *
-     * @param string $requireKey
-     * @param \Illuminate\Support\Collection $exportableDependencies
+     * @param  string  $requireKey
+     * @param  \Illuminate\Support\Collection  $exportableDependencies
      * @return \Illuminate\Support\Collection
      */
     protected function exportDependenciesFromComposerRequire($requireKey, $exportableDependencies)
