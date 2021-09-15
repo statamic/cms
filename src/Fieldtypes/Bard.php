@@ -24,6 +24,7 @@ class Bard extends Replicator
 
     public $category = ['text', 'structured'];
     protected $defaultValue = '[]';
+    protected $rules = [];
 
     protected function configFieldItems(): array
     {

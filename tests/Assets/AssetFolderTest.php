@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
+use Statamic\Assets\AssetContainerContents;
 use Statamic\Assets\AssetFolder as Folder;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Facades;
@@ -185,8 +186,10 @@ class AssetFolderTest extends TestCase
         Storage::fake('local');
 
         $container = $this->mock(AssetContainer::class);
-        $container->shouldReceive('disk')->andReturn($disk = Storage::disk('local'));
+        $container->shouldReceive('contents')->andReturn(new AssetContainerContents($container));
+        $container->shouldReceive('disk')->andReturn(new FlysystemAdapter($disk = Storage::disk('local')));
         $container->shouldReceive('foldersCacheKey')->andReturn('irrelevant for test');
+        $container->shouldReceive('handle')->andReturn('local');
 
         $folder = (new Folder)
             ->container($container)
@@ -196,6 +199,7 @@ class AssetFolderTest extends TestCase
 
         $return = $folder->save();
 
+        $this->assertEquals($container->contents()->cached(), $container->contents()->all());
         $this->assertEquals($folder, $return);
         $disk->assertExists($path);
     }
