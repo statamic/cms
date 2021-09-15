@@ -438,7 +438,7 @@ class Environment
                     $tmpNodes[0]->modifierChain = $nodes[0]->modifierChain;
                     $nodes = $tmpNodes;
                 }
-            } else if ($nodes[0]->modifierChain === null) {
+            } elseif ($nodes[0]->modifierChain === null) {
                 $nodes = $tmpNodes;
             }
         }

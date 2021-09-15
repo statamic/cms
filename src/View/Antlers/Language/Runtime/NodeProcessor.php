@@ -352,7 +352,7 @@ class NodeProcessor
      * Updates the current scope with any new variable assignments.
      *
      * @param  array  $assignments  The assignments.
-     * @param array $lockData
+     * @param  array  $lockData
      */
     private function processAssignments($assignments, &$lockData = null)
     {
@@ -1159,7 +1159,7 @@ class NodeProcessor
                             continue;
                         } elseif ($node->name->name == 'section') {
                             // We need to reach into the cascade to get the rendered content.
-                            if (!array_key_exists($node->name->methodPart, GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId])) {
+                            if (! array_key_exists($node->name->methodPart, GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId])) {
                                 GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$node->name->methodPart] = [];
                             }
 
@@ -1465,7 +1465,7 @@ class NodeProcessor
                                 $val = $this->addLoopIterationVariables($val);
                             }
 
-                            if (!$this->shouldProcessAsTag($node)) {
+                            if (! $this->shouldProcessAsTag($node)) {
                                 foreach ($node->parameters as $param) {
                                     if (ModifierManager::isModifier($param)) {
                                         $activeData = $this->getActiveData();
