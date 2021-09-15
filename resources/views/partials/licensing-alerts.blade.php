@@ -27,11 +27,11 @@
                         <span>
                             <b class="mr-1">{{ __('Trial Mode') }}:</b>
                             @if ($licenses->onlyAddonsAreInvalid())
-                                This site is using commercial addons. Make sure to buy licenses before launching. Thanks!
+                                {{ __('statamic::messages.licensing_trial_mode_alert_addons') }}
                             @elseif ($licenses->onlyStatamicIsInvalid())
-                                This site is using Statamic Pro. Make sure to buy a license before launching. Thanks!
+                                {{ __('statamic::messages.licensing_trial_mode_alert_statamic') }}
                             @else
-                                This site is using Statamic Pro and commercial addons. Make sure to buy licenses before launching. Thanks!
+                                {{ __('statamic::messages.licensing_trial_mode_alert') }}
                             @endif
                         </span>
                         <div class="flex">
@@ -46,11 +46,11 @@
                 @else
                     <div class="flex items-center justify-between">
                         @if ($licenses->onlyAddonsAreInvalid())
-                            This site is using commercial addons. Please purchase appropriate licenses.
+                            {{ __('statamic::messages.licensing_production_alert_addons') }}
                         @elseif ($licenses->onlyStatamicIsInvalid())
-                            This site is using Statamic Pro. Please purchase a license.
+                            {{ __('statamic::messages.licensing_production_alert_statamic') }}
                         @else
-                            This site is using Statamic Pro and commercial addons. Please purchase appropriate licenses.
+                            {{ __('statamic::messages.licensing_production_alert') }}
                         @endif
                         <div class="flex">
                             <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
