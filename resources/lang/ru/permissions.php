@@ -24,9 +24,9 @@ return [
     'publish_{collection}_entries_desc' => 'Возможность перехода от черновика к публикации и наоборот',
     'reorder_{collection}_entries' => 'Изменение порядка записей',
     'reorder_{collection}_entries_desc' => 'Обеспечивает возможность перетаскивания и переупорядочивания',
-    'edit_other_authors_{collection}_entries' => "Редактирование записей других авторов",
-    'publish_other_authors_{collection}_entries' => "Управление состоянием публикации записей других авторов",
-    'delete_other_authors_{collection}_entries' => "Удаление записей других авторов",
+    'edit_other_authors_{collection}_entries' => 'Редактирование записей других авторов',
+    'publish_other_authors_{collection}_entries' => 'Управление состоянием публикации записей других авторов',
+    'delete_other_authors_{collection}_entries' => 'Удаление записей других авторов',
 
     'group_taxonomies' => 'Таксономии',
     'configure_taxonomies' => 'Настройка таксономий',
