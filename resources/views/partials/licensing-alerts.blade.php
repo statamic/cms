@@ -26,7 +26,13 @@
                     <div class="flex items-center justify-between">
                         <span>
                             <b class="mr-1">{{ __('Trial Mode') }}:</b>
-                            {{ __('statamic::messages.licensing_trial_mode_alert') }}
+                            @if ($licenses->onlyAddonsAreInvalid())
+                                This site is using commercial addons. Make sure to buy licenses before launching. Thanks!
+                            @elseif ($licenses->onlyStatamicIsInvalid())
+                                This site is using Statamic Pro. Make sure to buy a license before launching. Thanks!
+                            @else
+                                This site is using Statamic Pro and commercial addons. Make sure to buy licenses before launching. Thanks!
+                            @endif
                         </span>
                         <div class="flex">
                             <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
@@ -39,7 +45,13 @@
                     </div>
                 @else
                     <div class="flex items-center justify-between">
-                        {{ __('statamic::messages.licensing_production_alert') }}
+                        @if ($licenses->onlyAddonsAreInvalid())
+                            This site is using commercial addons. Please purchase appropriate licenses.
+                        @elseif ($licenses->onlyStatamicIsInvalid())
+                            This site is using Statamic Pro. Please purchase a license.
+                        @else
+                            This site is using Statamic Pro and commercial addons. Please purchase appropriate licenses.
+                        @endif
                         <div class="flex">
                             <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
