@@ -31,8 +31,8 @@
                         <div class="flex">
                             <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
-                            <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to Your License Settings') }}">
-                                {{ __('Go to Your License Settings') }} &rarr;
+                            <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to License Settings') }}">
+                                {{ __('Go to License Settings') }} &rarr;
                             </a>
                             @endcan
                         </div>
@@ -43,8 +43,8 @@
                         <div class="flex">
                             <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
-                                <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to Your License Settings') }}">
-                                    {{ __('Go to Your License Settings') }} &rarr;
+                                <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to License Settings') }}">
+                                    {{ __('Go to License Settings') }} &rarr;
                                 </a>
                             @endcan
                         </div>
