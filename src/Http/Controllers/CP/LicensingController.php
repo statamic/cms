@@ -30,7 +30,7 @@ class LicensingController extends CpController
 
     public function addToCartUrl($site, $statamic, $addons)
     {
-        return 'https://statamic.test/cart/bulk-add?'.http_build_query([
+        return 'https://statamic.com/cart/bulk-add?'.http_build_query([
             'site' => $site->key(),
             'statamic' => ! $statamic->valid(),
             'products' => $addons->reject(function ($addon) {
