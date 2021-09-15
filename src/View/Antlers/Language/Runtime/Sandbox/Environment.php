@@ -438,6 +438,8 @@ class Environment
                     $tmpNodes[0]->modifierChain = $nodes[0]->modifierChain;
                     $nodes = $tmpNodes;
                 }
+            } else if ($nodes[0]->modifierChain === null) {
+                $nodes = $tmpNodes;
             }
         }
 
@@ -560,11 +562,25 @@ class Environment
                 $right = $nodes[$i + 1];
 
                 $restore = $this->isEvaluatingTruthValue;
+                if ($restore) {
+                    $restoreRf = $this->dataRetriever->getReduceFinal();
+                    $this->dataRetriever->setReduceFinal(false);
+                    $this->isEvaluatingTruthValue = false;
+                    $left = $this->getValue($left);
+                    $this->isEvaluatingTruthValue = true;
+
+                    $this->dataRetriever->setReduceFinal($restoreRf);
+                } else {
+                    $right = $this->getValue($right);
+                    $left = $this->getValue($left);
+                }
+
                 $this->isEvaluatingTruthValue = false;
-                $left = $this->getValue($left);
+
                 $right = $this->getValue($right);
                 $this->isEvaluatingTruthValue = $restore;
 
+                //var_dump($left, $right);
                 $stack[] = $left == $right;
 
                 $i += 1;

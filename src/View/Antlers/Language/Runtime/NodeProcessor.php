@@ -352,18 +352,30 @@ class NodeProcessor
      * Updates the current scope with any new variable assignments.
      *
      * @param  array  $assignments  The assignments.
+     * @param array $lockData
      */
-    private function processAssignments($assignments)
+    private function processAssignments($assignments, &$lockData = null)
     {
         foreach ($assignments as $path => $value) {
             if (array_key_exists($path, $this->previousAssignments) == false) {
                 $this->previousAssignments[$path] = count($this->data) - 1;
                 Arr::set($this->data[count($this->data) - 1], $path, $value);
+
+                if ($lockData != null) {
+                    $this->previousAssignments[$path] = count($lockData) - 1;
+                    Arr::set($lockData[count($lockData) - 1], $path, $value);
+                }
             } else {
                 $start = $this->previousAssignments[$path];
 
                 for ($i = $start; $i < count($this->data); $i++) {
                     Arr::set($this->data[$i], $path, $value);
+                }
+
+                if ($lockData != null) {
+                    for ($i = $start; $i < count($lockData); $i++) {
+                        Arr::set($lockData[$i], $path, $value);
+                    }
                 }
             }
         }
@@ -466,7 +478,7 @@ class NodeProcessor
 
         $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $activeData);
 
-        if ($managerResults[0] === true) {
+        if ($managerResults[0] === true && $managerResults[1] !== null) {
             return false;
         }
 
@@ -1147,6 +1159,10 @@ class NodeProcessor
                             continue;
                         } elseif ($node->name->name == 'section') {
                             // We need to reach into the cascade to get the rendered content.
+                            if (!array_key_exists($node->name->methodPart, GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId])) {
+                                GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$node->name->methodPart] = [];
+                            }
+
                             $activeYield = array_pop(GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$node->name->methodPart]);
 
                             // If we receive a NULL, override this with a one to ensure "override" behavior.
@@ -1449,43 +1465,45 @@ class NodeProcessor
                                 $val = $this->addLoopIterationVariables($val);
                             }
 
-                            foreach ($node->parameters as $param) {
-                                if (ModifierManager::isModifier($param)) {
-                                    $activeData = $this->getActiveData();
+                            if (!$this->shouldProcessAsTag($node)) {
+                                foreach ($node->parameters as $param) {
+                                    if (ModifierManager::isModifier($param)) {
+                                        $activeData = $this->getActiveData();
 
-                                    $tempValues = $node->getModifierParameterValuesForParameter($param, $activeData);
-                                    $paramValues = [];
+                                        $tempValues = $node->getModifierParameterValuesForParameter($param, $activeData);
+                                        $paramValues = [];
 
-                                    foreach ($tempValues as $paramName => $value) {
-                                        $containedInterpolation = false;
+                                        foreach ($tempValues as $paramName => $value) {
+                                            $containedInterpolation = false;
 
-                                        foreach ($node->interpolationRegions as $regionName => $region) {
-                                            if (Str::contains($value, $regionName)) {
-                                                $containedInterpolation = true;
-                                                if (array_key_exists($regionName, $this->canHandleInterpolations) == false) {
-                                                    $this->canHandleInterpolations[$regionName] = $node->processedInterpolationRegions[$regionName];
+                                            foreach ($node->interpolationRegions as $regionName => $region) {
+                                                if (Str::contains($value, $regionName)) {
+                                                    $containedInterpolation = true;
+                                                    if (array_key_exists($regionName, $this->canHandleInterpolations) == false) {
+                                                        $this->canHandleInterpolations[$regionName] = $node->processedInterpolationRegions[$regionName];
+                                                    }
+
+                                                    $interpolationResult = $this->evaluateDeferredInterpolation($regionName);
+
+                                                    $resolvedValue = null;
+
+                                                    if ($value == $regionName) {
+                                                        $resolvedValue = $interpolationResult;
+                                                    } else {
+                                                        $resolvedValue = str_replace($regionName, (string) $interpolationResult, $val);
+                                                    }
+
+                                                    $paramValues[$paramName] = $resolvedValue;
                                                 }
+                                            }
 
-                                                $interpolationResult = $this->evaluateDeferredInterpolation($regionName);
-
-                                                $resolvedValue = null;
-
-                                                if ($value == $regionName) {
-                                                    $resolvedValue = $interpolationResult;
-                                                } else {
-                                                    $resolvedValue = str_replace($regionName, (string) $interpolationResult, $val);
-                                                }
-
-                                                $paramValues[$paramName] = $resolvedValue;
+                                            if (! $containedInterpolation) {
+                                                $paramValues[$paramName] = $value;
                                             }
                                         }
 
-                                        if (! $containedInterpolation) {
-                                            $paramValues[$paramName] = $value;
-                                        }
+                                        $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
                                     }
-
-                                    $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
                                 }
                             }
                             $executedParamModifiers = true;
@@ -1503,6 +1521,8 @@ class NodeProcessor
                             if ($node->hasRecursiveNode) {
                                 RecursiveNodeManager::incrementDepth($node->recursiveReference);
                             }
+                            $lockData = $this->data;
+
                             if ($this->isLoopable($val)) {
                                 if (! empty($val)) {
                                     if (is_array($val) && Arr::isAssoc($val)) {
@@ -1574,7 +1594,7 @@ class NodeProcessor
                                                     }
                                                 }
 
-                                                $this->processAssignments($runtimeAssignmentsToProcess);
+                                                $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
                                                 $runtimeData = $runtimeAssignments + $runtimeData;
                                             }
 
@@ -1591,6 +1611,7 @@ class NodeProcessor
                                     $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                                 }
 
+                                $this->data = $lockData;
                                 continue;
                             }
                         }
@@ -1614,6 +1635,8 @@ class NodeProcessor
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
+                        $this->data = $lockData;
+
                         continue;
                     }
                 }

@@ -144,6 +144,11 @@ class PathDataManager
         return $this;
     }
 
+    public function getReduceFinal()
+    {
+        return $this->reduceFinal;
+    }
+
     /**
      * Attempts to locate a value within the provided data.
      *
