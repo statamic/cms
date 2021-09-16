@@ -40,6 +40,7 @@ class LicensingController extends CpController
                 if ($edition = $addon->edition()) {
                     $product .= ':'.$edition;
                 }
+
                 return $product;
             })->implode(','),
         ]);
