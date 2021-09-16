@@ -608,7 +608,7 @@ class CoreModifiers extends Modifier
      */
     public function format($value, $params)
     {
-        return $this->carbon($value)->format(Arr::get($params, 0));
+        return $this->carbon($value)->translatedFormat(Arr::get($params, 0));
     }
 
     /**
