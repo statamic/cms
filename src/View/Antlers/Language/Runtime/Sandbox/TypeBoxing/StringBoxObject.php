@@ -135,7 +135,7 @@ class StringBoxObject
         return Str::remove($search, $this->value, $case_sensitive);
     }
 
-    public function replaceLast($search, $replace, $subject)
+    public function replaceLast($search, $replace)
     {
         return Str::replaceLast($search, $replace, $this->value);
     }
@@ -327,6 +327,10 @@ class StringBoxObject
 
     public function split($delimiter, $limit = null)
     {
+        if ($limit == null) {
+            return explode($delimiter, $this->value);
+        }
+
         return explode($delimiter, $this->value, $limit);
     }
 }
