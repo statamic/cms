@@ -580,7 +580,6 @@ class Environment
                 $right = $this->getValue($right);
                 $this->isEvaluatingTruthValue = $restore;
 
-                //var_dump($left, $right);
                 $stack[] = $left == $right;
 
                 $i += 1;
