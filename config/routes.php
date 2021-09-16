@@ -52,6 +52,6 @@ return [
     'spa' => [
         'enabled' => false,
         'view' => 'layout'
-    ]
+    ],
 
 ];

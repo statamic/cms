@@ -9,7 +9,7 @@ use Statamic\Statamic;
 Route::name('statamic.')->group(function () {
     /**
      * Front-end
-     * All front-end website requests go through a single-page application view
+     * All front-end website requests go through a single-page application view layout.
      */
     if (config('statamic.routes.spa.enabled')) {
         Route::get('/{any}', function () {
