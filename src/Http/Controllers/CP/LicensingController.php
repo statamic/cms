@@ -35,7 +35,13 @@ class LicensingController extends CpController
             'statamic' => ! $statamic->valid(),
             'products' => $addons->reject(function ($addon) {
                 return $addon->valid();
-            })->map->addon()->map->marketplaceId()->implode(','),
+            })->map->addon()->map(function ($addon) {
+                $product = $addon->marketplaceId();
+                if ($edition = $addon->edition()) {
+                    $product .= ':'.$edition;
+                }
+                return $product;
+            })->implode(','),
         ]);
     }
 }
