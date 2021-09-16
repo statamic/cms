@@ -64,6 +64,25 @@ class SelectTest extends TestCase
     }
 
     /** @test */
+    public function it_augments_to_a_LabeledValue_object_with_a_false_value()
+    {
+        $field = (new Select)->setField(new Field('test', [
+            'type' => 'select',
+            'options' => [
+                'au' => 'Australia',
+                'ca' => 'Canada',
+                'us' => 'USA',
+            ],
+            'cast_booleans' => true,
+        ]));
+
+        $augmented = $field->augment(false);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertFalse($augmented->value());
+        $this->assertEquals('false', $augmented->label());
+    }
+
+    /** @test */
     public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents()
     {
         $field = (new Select)->setField(new Field('test', [
@@ -80,5 +99,25 @@ class SelectTest extends TestCase
             ['key' => 'au', 'value' => 'au', 'label' => 'Australia'],
             ['key' => 'us', 'value' => 'us', 'label' => 'USA'],
         ], $field->augment(['au', 'us']));
+    }
+
+    /** @test */
+    public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_casting()
+    {
+        $field = (new Select)->setField(new Field('test', [
+            'type' => 'select',
+            'multiple' => true,
+            'options' => [
+                'null' => 'Null',
+                'false' => 'False',
+                'true' => 'True',
+            ],
+            'cast_booleans' => true,
+        ]));
+
+        $this->assertEquals([
+            ['key' => false, 'value' => false, 'label' => 'False'],
+            ['key' => true, 'value' => true, 'label' => 'True'],
+        ], $field->augment([false, true]));
     }
 }

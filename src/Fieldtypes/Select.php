@@ -105,17 +105,23 @@ class Select extends Fieldtype
     {
         if ($this->config('multiple')) {
             return collect($value)->map(function ($value) {
+                $value = $this->preProcess($value);
+                $label = is_null($value) ? null : array_get($this->config('options'), $value, $value);
+                $value = $this->process($value);
+
                 return [
                     'key' => $value,
                     'value' => $value,
-                    'label' => array_get($this->config('options'), $value, $value),
+                    'label' => $label,
                 ];
             })->all();
         }
 
         throw_if(is_array($value), new MultipleValuesEncounteredException($this));
 
+        $value = $this->preProcess($value);
         $label = is_null($value) ? null : array_get($this->config('options'), $value, $value);
+        $value = $this->process($value);
 
         return new LabeledValue($value, $label);
     }
