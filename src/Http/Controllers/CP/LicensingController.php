@@ -33,9 +33,7 @@ class LicensingController extends CpController
         return 'https://statamic.com/cart/bulk-add?'.http_build_query([
             'site' => $site->key(),
             'statamic' => ! $statamic->valid(),
-            'products' => $addons->reject(function ($addon) {
-                return $addon->valid();
-            })->map->addon()->map(function ($addon) {
+            'products' => $addons->reject->valid()->map->addon()->map(function ($addon) {
                 $product = $addon->marketplaceId();
                 if ($edition = $addon->edition()) {
                     $product .= ':'.$edition;
