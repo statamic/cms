@@ -111,7 +111,7 @@
 
         <div class="mt-5 py-2 border-t flex items-center">
             <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary mr-2">{{ __('Edit Site') }}</a>
-            @if ($addToCartUrl) <a href="{{ $addToCartUrl }}" target="_blank" class="btn mr-2">Buy Licenses</a> @endif
+            @if ($addToCartUrl) <a href="{{ $addToCartUrl }}" target="_blank" class="btn mr-2">{{ __('Buy Licenses') }}</a> @endif
             <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn">{{ __('Sync') }}</a>
             <p class="ml-2 text-2xs text-grey">{{ __('statamic::messages.licensing_sync_instructions') }}</p>
         </div>
