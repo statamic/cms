@@ -20,7 +20,7 @@ class AddSiteColumnToBlueprint
         $event->blueprint->ensureField('site', [
             'type' => 'sites',
             'max_items' => 1,
-            'listable' => true
+            'listable' => true,
         ]);
     }
 

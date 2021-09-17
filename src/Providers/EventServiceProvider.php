@@ -20,7 +20,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \Statamic\Events\EntryBlueprintFound::class => [
             \Statamic\Entries\AddSiteColumnToBlueprint::class,
-        ]
+        ],
     ];
 
     protected $subscribe = [
