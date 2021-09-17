@@ -308,10 +308,6 @@ class Collection implements Contract, AugmentableContract
             ], 'sidebar');
         }
 
-        if (Site::hasMultiple()) {
-            $blueprint->ensureField('site', ['type' => 'sites', 'max_items' => 1, 'show_on_form' => false]);
-        }
-
         return $blueprint;
     }
 
