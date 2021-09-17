@@ -1,5 +1,15 @@
 # Release Notes
 
+## 3.2.5 (2021-09-17)
+
+### What's improved
+- A number of licensing UX improvements. [#4262](https://github.com/statamic/cms/issues/4262)
+- Added Russian translations. [#4263](https://github.com/statamic/cms/issues/4263)
+- Updated French translations. [#4255](https://github.com/statamic/cms/issues/4255)
+- The Dashboard item is removed from the nav when there are no widgets. [#4266](https://github.com/statamic/cms/issues/4266)
+
+
+
 ## 3.2.4 (2021-09-09)
 
 ### What's fixed
