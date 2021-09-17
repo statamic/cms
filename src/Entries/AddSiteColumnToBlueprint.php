@@ -9,11 +9,7 @@ class AddSiteColumnToBlueprint
 {
     public function handle(EntryBlueprintFound $event)
     {
-        if (! Site::hasMultiple()) {
-            return;
-        }
-
-        if (! in_array(request()->route()->getName(), $this->allowedRoutes())) {
+        if (! Site::hasMultiple() || ! $this->isOnAllowedRoute()) {
             return;
         }
 
@@ -24,12 +20,16 @@ class AddSiteColumnToBlueprint
         ]);
     }
 
-    private function allowedRoutes()
+    private function isOnAllowedRoute()
     {
-        return [
+        if (! $route = optional(request()->route())->getName()) {
+            return false;
+        }
+
+        return in_array($route, [
             'statamic.cp.collections.show',
             'statamic.cp.collections.entries.index',
             'statamic.cp.relationship.index',
-        ];
+        ]);
     }
 }
