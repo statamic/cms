@@ -6,7 +6,7 @@ use Statamic\Facades\Site;
 
 class Sites extends Relationship
 {
-    protected $indexComponent = 'sites';
+    protected $indexComponent = 'text';
 
     public function toItemArray($id)
     {
@@ -45,11 +45,6 @@ class Sites extends Relationship
             $items = collect([$items]);
         }
 
-        return $items->map(function ($item) {
-            return [
-                'id' => $item->handle(),
-                'title' => $item->name(),
-            ];
-        });
+        return $items->map->name()->join(', ');
     }
 }

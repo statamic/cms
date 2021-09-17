@@ -50,7 +50,6 @@ Vue.component('revealer-fieldtype', RevealerFieldtype);
 Vue.component('section-fieldtype', require('../components/fieldtypes/SectionFieldtype.vue').default);
 Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldtype.vue').default);
 Vue.component('sets-fieldtype', require('../components/fieldtypes/replicator/SetsFieldtype.vue').default);
-Vue.component('sites-fieldtype-index', require('../components/fieldtypes/SitesIndexFieldtype.vue').default);
 Vue.component('status-fieldtype', StatusFieldtype);
 Vue.component('table-fieldtype', require('../components/fieldtypes/TableFieldtype.vue').default);
 Vue.component('tags-fieldtype', require('../components/fieldtypes/TagsFieldtype.vue').default);
