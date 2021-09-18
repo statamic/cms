@@ -428,6 +428,34 @@ class DocumentParser
 
                                 break;
                             } else {
+                                // Account for literals between a skipped region. If the span length
+                                // is greater than zero, we just left a region where we skipped
+                                // a few Antlers-like nodes, but will encounter literal content
+                                // before we hit the start of the next Antlers start candidate.
+                                $nextStart = $this->antlersStartIndex[$skipIndex];
+                                $spanLen = $nextStart - $this->lastAntlersNode->endPosition->offset - 1;
+
+                                if ($spanLen > 0) {
+                                    $spanStart = $this->lastAntlersNode->endPosition->offset;
+                                    $spanEnd = $nextStart - 1;
+
+                                    $spanStart += 1;
+                                    $spanEnd -= 1;
+
+                                    $content = StringUtilities::substr($this->content, $spanStart, $spanLen);
+
+                                    if (strlen($content) > 0) {
+                                        $node = new LiteralNode();
+                                        $node->content = $content;
+
+                                        $node->startPosition = $this->positionFromOffset($spanStart, $spanStart);
+                                        $node->endPosition = $this->positionFromOffset($spanEnd, $spanEnd);
+                                        $this->nodes[] = $node;
+                                    }
+
+                                    continue;
+                                }
+
                                 $i = $skipIndex - 1;
                                 continue;
                             }

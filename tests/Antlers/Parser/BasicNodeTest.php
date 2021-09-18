@@ -9,6 +9,7 @@ use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 
 class BasicNodeTest extends ParserTestCase
@@ -187,5 +188,29 @@ class BasicNodeTest extends ParserTestCase
 
         $this->assertSame(' test comment {{ var }} ', $nodes[0]->getContent());
         $this->assertSame('<p>I am a literal.</p>', $nodes[1]->content);
+    }
+
+    public function test_neighboring_comments_dont_confuse_things()
+    {
+        $template = <<<'EOT'
+{{# A comment #}}
+{{# another comment {{ width }} #}}
+<div class="max-w-2xl mx-auto mb-32">
+<p>test</p> {{ subtitle }}
+</div>
+EOT;
+
+        $expected = <<<'EOT'
+
+
+<div class="max-w-2xl mx-auto mb-32">
+<p>test</p> test
+</div>
+EOT;
+
+
+        $result = $this->renderString($template, ['subtitle' => 'test']);
+
+        $this->assertSame(StringUtilities::normalizeLineEndings($expected), $result);
     }
 }
