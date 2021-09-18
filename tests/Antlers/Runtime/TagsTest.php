@@ -7,7 +7,6 @@ use Tests\Antlers\ParserTestCase;
 
 class TagsTest extends ParserTestCase
 {
-
     public function test_nested_double_braces_can_be_used_to_supply_parameter_values()
     {
         (new class extends Tags
@@ -16,22 +15,20 @@ class TagsTest extends ParserTestCase
 
             public function index()
             {
-                return 'Test: ' . $this->params->get('test');
+                return 'Test: '.$this->params->get('test');
             }
-
         })::register();
 
         $result = $this->renderString('{{# comment {{ test }} {{ value }} #}}{{ test_receives_arguments test="{{ value }}" }}{{# value #}}{{ value }}{{# value #}} - {{ value | upper }}', [
-            'value' => 'test value'
+            'value' => 'test value',
         ], true);
 
         $this->assertSame('Test: test valuetest value - TEST VALUE', $result);
 
         $result = $this->renderString('{{# comment {{ test }} {{ value }} #}}{{ test_receives_arguments test="{{ value }}" }}{{# value #}}{{ value }}{{# value #}} - ', [
-            'value' => 'test value'
+            'value' => 'test value',
         ], true);
 
         $this->assertSame('Test: test valuetest value - ', $result);
     }
-
 }

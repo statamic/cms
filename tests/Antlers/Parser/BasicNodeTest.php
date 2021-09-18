@@ -208,7 +208,6 @@ EOT;
 </div>
 EOT;
 
-
         $result = $this->renderString($template, ['subtitle' => 'test']);
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), $result);
