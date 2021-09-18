@@ -174,4 +174,18 @@ class BasicNodeTest extends ParserTestCase
         $this->assertSame('path', $subNestedPart1->name);
         $this->assertSame('path1', $subNestedPart2->name);
     }
+
+    public function test_comments_with_things_that_look_like_antlers_dont_skip_literal_nodes()
+    {
+        $input = '{{# test comment {{ var }} #}}<p>I am a literal.</p>';
+        $nodes = $this->parseNodes($input);
+
+        $this->assertCount(2, $nodes);
+
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[1]);
+
+        $this->assertSame(' test comment {{ var }} ', $nodes[0]->getContent());
+        $this->assertSame('<p>I am a literal.</p>', $nodes[1]->content);
+    }
 }

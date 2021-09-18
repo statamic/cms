@@ -69,6 +69,13 @@ class DocumentParser
     private $chars = [];
     private $charLen = 0;
 
+    /**
+     * Maintains a reference to the last produced AntlersNode to reduce lookups.
+     *
+     * @var AntlersNode|null
+     */
+    private $lastAntlersNode = null;
+
     private $content = '';
     private $currentIndex = 0;
     private $currentContent = [];
@@ -206,7 +213,9 @@ class DocumentParser
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfAntlersCommentRegion();
+
                     $this->isDoubleBrace = false;
+
                     break;
                 }
 
@@ -369,9 +378,12 @@ class DocumentParser
                     // Create a literal node representing the start of the document.
                     $node = new LiteralNode();
                     $node->content = $this->prepareLiteralContent(StringUtilities::substr($this->content, 0, $offset));
-                    $node->startPosition = $this->positionFromOffset(0, 0);
-                    $node->endPosition = $this->positionFromOffset($offset, $offset);
-                    $this->nodes[] = $node;
+
+                    if (!strlen($node->content) == 0) {
+                        $node->startPosition = $this->positionFromOffset(0, 0);
+                        $node->endPosition = $this->positionFromOffset($offset, $offset);
+                        $this->nodes[] = $node;
+                    }
                 }
 
                 if ($offset < $this->lastAntlersEndIndex) {
@@ -382,6 +394,47 @@ class DocumentParser
                 $this->resetIntermediateState();
                 $this->parseIntermediateText();
 
+                if ($this->lastAntlersNode != null && $this->lastAntlersNode instanceof PhpExecutionNode == false && $this->lastAntlersNode->isComment) {
+                    if ($i + 1 < $indexCount) {
+                        $nextAntlersStart = $this->antlersStartIndex[$i + 1];
+
+                        if ($nextAntlersStart < $this->lastAntlersNode->endPosition->offset) {
+                            // We want to skip over any potential candidates
+                            // now to avoid having to process them later.
+
+                            $skipIndex = null;
+
+                            for ($j = $i + 1; $j < $indexCount; $j++) {
+                                if ($this->antlersStartIndex[$j] > $this->lastAntlersNode->endPosition->offset) {
+                                    $skipIndex = $j;
+                                    break;
+                                }
+                            }
+
+                            // Drop a literal node, and break.
+                            if ($skipIndex == null) {
+                                $content = $this->prepareLiteralContent(StringUtilities::substr($this->content, $this->lastAntlersNode->endPosition->offset + 1));
+
+                                if (strlen($content) > 0) {
+                                    $node = new LiteralNode();
+                                    $node->content = $content;
+
+                                    $literalStartOffset = $this->lastAntlersNode->endPosition->offset + 1;
+
+                                    $node->startPosition = $this->positionFromOffset($literalStartOffset, $literalStartOffset);
+                                    $node->endPosition = $this->positionFromOffset($this->inputLen, $this->inputLen);
+                                    $this->nodes[] = $node;
+                                }
+
+                                break;
+                            } else {
+                                $i = $skipIndex - 1;
+                                continue;
+                            }
+                        }
+                    }
+                }
+
                 $shouldProduceLiteralNode = false;
 
                 if (! array_key_exists($this->currentChunkOffset, $this->antlersStartPositionIndex)) {
@@ -390,43 +443,103 @@ class DocumentParser
                     $shouldProduceLiteralNode = true;
                 }
 
+
                 if ($shouldProduceLiteralNode) {
+                    if ($i !== $lastIndex && $this->lastAntlersNode != null) {
+                        $startCandidate = $this->positionFromOffset($offset, $offset);
+
+                        // Skip processing potential nodes that are inside the last node.
+                        if ($startCandidate->isBefore($this->lastAntlersNode->endPosition)) {
+                            if ($i + 1 < $indexCount) {
+                                $nextAntlersStart = $this->antlersStartIndex[$i + 1];
+
+                                if ($nextAntlersStart < $this->lastAntlersNode->endPosition->offset) {
+                                    continue;
+                                }
+                            } else {
+                                if ($i + 1 != $lastIndex) {
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+
                     if ($i + 1 < $indexCount) {
                         $nextAntlersStart = $this->antlersStartIndex[$i + 1];
                         $literalStartIndex = $this->lastAntlersEndIndex + 1;
 
                         if ($nextAntlersStart < $literalStartIndex) {
-                            continue;
+                            if ($this->lastAntlersEndIndex > $nextAntlersStart) {
+                                if ($i + 2 < $indexCount) {
+                                    $nextAntlersStart = $this->antlersStartIndex[$i + 2];
+                                }
+                            } else {
+                                continue;
+                            }
                         }
 
-                        $literalLength = $nextAntlersStart - $this->lastAntlersEndIndex - 1;
 
-                        $thisOffset = $this->currentChunkOffset;
-                        $content = StringUtilities::substr($this->content, $literalStartIndex, $literalLength);
+                        if ($i + 1 == $lastIndex && ($nextAntlersStart <= $this->lastAntlersEndIndex)) {
+                            // In this scenario, we will create the last trailing literal node and break.
+                            $thisOffset = $this->currentChunkOffset;
+                            $content = StringUtilities::substr($this->content, $literalStartIndex);
 
-                        $node = new LiteralNode();
+                            $node = new LiteralNode();
 
-                        $node->content = $this->prepareLiteralContent($content);
-                        $node->startPosition = $this->positionFromOffset($thisOffset, $thisOffset);
-                        $node->endPosition = $this->positionFromOffset($nextAntlersStart, $thisOffset);
-                        $this->nodes[] = $node;
+                            $node->content = $this->prepareLiteralContent($content);
+
+                            if (!strlen($node->content) == 0) {
+                                $node->startPosition = $this->positionFromOffset($thisOffset, $thisOffset);
+                                $node->endPosition = $this->positionFromOffset($nextAntlersStart, $thisOffset);
+                                $this->nodes[] = $node;
+                            }
+
+
+                            break;
+                        } else {
+
+                            $literalLength = $nextAntlersStart - $this->lastAntlersEndIndex - 1;
+
+                            if ($literalLength == 0) {
+                                continue;
+                            }
+
+                            $thisOffset = $this->currentChunkOffset;
+                            $content = StringUtilities::substr($this->content, $literalStartIndex, $literalLength);
+
+                            $node = new LiteralNode();
+
+                            $node->content = $this->prepareLiteralContent($content);
+
+                            if (!strlen($node->content) == 0) {
+                                $node->startPosition = $this->positionFromOffset($thisOffset, $thisOffset);
+                                $node->endPosition = $this->positionFromOffset($nextAntlersStart, $thisOffset);
+                                $this->nodes[] = $node;
+                            }
+                        }
+
                         continue;
                     }
-                }
 
-                if ($i == $lastIndex) {
-                    $literalStart = $this->currentIndex + $offset;
+                    if ($i == $lastIndex) {
+                        $literalStart = $this->currentIndex + $offset;
 
-                    if ($literalStart < $this->inputLen) {
-                        $node = new LiteralNode();
+                        if ($literalStart < $this->inputLen) {
+                            $node = new LiteralNode();
 
-                        $node->content = $this->prepareLiteralContent(StringUtilities::substr($this->content, $literalStart));
-                        $node->startPosition = $this->positionFromOffset($literalStart, $literalStart);
-                        $node->endPosition = $this->positionFromOffset($this->inputLen - 1, $literalStart);
-                        $this->nodes[] = $node;
-                        break;
+                            $node->content = $this->prepareLiteralContent(StringUtilities::substr($this->content, $literalStart));
+
+                            if (!strlen($node->content) == 0) {
+                                $node->startPosition = $this->positionFromOffset($literalStart, $literalStart);
+                                $node->endPosition = $this->positionFromOffset($this->inputLen - 1, $literalStart);
+                                $this->nodes[] = $node;
+                            }
+                            break;
+                        }
                     }
                 }
+
+
             }
         }
 
@@ -530,6 +643,9 @@ class DocumentParser
                     // Indicate our next "start".
                     $this->startIndex = $this->currentIndex;
                     $this->nodes[] = $node;
+
+                    $this->lastAntlersNode = $node;
+
                     break;
                 }
             }
@@ -558,13 +674,16 @@ class DocumentParser
                     $node = $this->makeAntlersTagNode($this->currentIndex, true);
                     $this->currentContent = [];
 
-                    // Advance over the  }}.
-                    $this->currentIndex += 2;
+                    // Advance over the  #}}.
+                    $this->currentIndex += 3;
 
                     // Indicate our next "start".
                     $this->startIndex = $this->currentIndex;
 
                     $this->nodes[] = $node;
+
+                    $this->lastAntlersNode = $node;
+
                     break;
                 }
             }
@@ -682,6 +801,9 @@ class DocumentParser
                 $node = $this->makeAntlersTagNode($this->currentIndex, false);
                 $this->currentIndex += 2;
                 $this->nodes[] = $node;
+
+                $this->lastAntlersNode = $node;
+
                 break;
             }
 

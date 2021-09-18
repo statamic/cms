@@ -143,10 +143,9 @@ EOT;
 EOT;
 
         $nodes = $this->parseNodes($template);
-        $this->assertCount(3, $nodes);
+        $this->assertCount(2, $nodes);
         $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
-        $this->assertInstanceOf(LiteralNode::class, $nodes[1]);
-        $this->assertInstanceOf(AntlersNode::class, $nodes[2]);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[1]);
 
         /** @var AntlersNode $firstNode */
         $firstNode = $nodes[0];
