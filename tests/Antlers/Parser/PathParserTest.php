@@ -86,9 +86,9 @@ class PathParserTest extends ParserTestCase
             'values' => [
                 'one' => 'Value One',
                 'two' => 'Value Two',
-                'three' => 'Value Three'
+                'three' => 'Value Three',
             ],
-            'value' => 'two'
+            'value' => 'two',
         ];
         $result = $this->renderString('{{ values[value] }}', $data);
 
@@ -98,11 +98,11 @@ class PathParserTest extends ParserTestCase
             'values' => [
                 'one' => 'Value One',
                 'two' => 'Value Two',
-                'three' => 'Value Three'
-            ]
+                'three' => 'Value Three',
+            ],
         ];
         $result = $this->renderString('{{ values[value] }}', $data);
 
-        $this->assertSame("", $result);
+        $this->assertSame('', $result);
     }
 }

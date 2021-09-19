@@ -447,6 +447,7 @@ class PathDataManager
     {
         if ($path === null) {
             $this->reducedVar = null;
+
             return;
         }
 
