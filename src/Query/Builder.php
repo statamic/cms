@@ -209,7 +209,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLike($item, $like)
     {
-        $pattern = '/^'.str_replace(['%', '_'], ['.*', '.'], preg_quote($like, '/')).'$/im';
+        $pattern = '/^'.str_replace(['%', '_'], ['.*', '.'], preg_quote($like, '/')).'$/ium';
 
         if (is_array($item)) {
             $item = json_encode($item);
@@ -225,7 +225,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/im", $item);
+        return preg_match("/{$pattern}/ium", $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)
