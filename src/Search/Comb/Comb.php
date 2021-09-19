@@ -452,14 +452,14 @@ class Comb
         $output = '';
 
         if (! is_array($item)) {
-            return preg_replace('#\s+#ism', ' ', $item);
+            return preg_replace('#\s+#isum', ' ', $item);
         }
 
         foreach ($item as $part) {
             $output .= (is_array($part)) ? $this->flattenArray($part, $glue) : $glue.$part;
         }
 
-        return preg_replace('#\s+#ism', ' ', $output);
+        return preg_replace('#\s+#isum', ' ', $output);
     }
 
     /**
@@ -515,9 +515,9 @@ class Comb
             foreach ($params['chunks'] as $chunk) {
                 $escaped_chunk = str_replace('#', '\#', $chunk);
                 $regex = [
-                    'whole' => '#^'.$escaped_chunk.'$#i',
-                    'partial' => '#'.$escaped_chunk.'#i',
-                    'partial_from_start' => '#^'.$escaped_chunk.'#i',
+                    'whole' => '#^'.$escaped_chunk.'$#iu',
+                    'partial' => '#'.$escaped_chunk.'#iu',
+                    'partial_from_start' => '#^'.$escaped_chunk.'#iu',
                 ];
 
                 // loop over each data property
@@ -528,7 +528,7 @@ class Comb
                         continue;
                     }
 
-                    $words = preg_split("#\s#i", $property);
+                    $words = preg_split("#\s#iu", $property);
                     $strength = (! isset($this->property_weights[$name])) ? 1 : $this->property_weights[$name];
 
                     // reset iterator
@@ -681,8 +681,8 @@ class Comb
      */
     private function removeDisallowedMatches($params)
     {
-        $disallowed = '#'.implode('|', $params['disallowed']).'#i';
-        $required = '#(?=.*'.implode(')(?=.*', $params['required']).')#i';
+        $disallowed = '#'.implode('|', $params['disallowed']).'#iu';
+        $required = '#(?=.*'.implode(')(?=.*', $params['required']).')#iu';
         $new_data = [];
 
         // this only applies to boolean mode
@@ -779,7 +779,7 @@ class Comb
     private function standardizeArray($array)
     {
         // make words lowercase
-        $array = array_map('strtolower', $array);
+        $array = array_map('mb_strtolower', $array);
 
         // sort items (mainly so plural forms come after singular forms)
         sort($array);
@@ -835,7 +835,7 @@ class Comb
 
         // look for each word
         if ($this->query_mode === self::QUERY_WORDS) {
-            $parts['chunks'] = preg_split("/\s+/i", $query);
+            $parts['chunks'] = preg_split("/\s+/iu", $query);
 
             if ($this->use_alternates) {
                 $parts['chunks'] = array_merge($parts['chunks'], $this->getAlternateWords($parts['chunks']));
@@ -852,7 +852,7 @@ class Comb
 
             // perform a boolean search -- require words, disallow words
         } elseif ($this->query_mode === self::QUERY_BOOLEAN) {
-            $words = preg_split("/\s+/i", $query);
+            $words = preg_split("/\s+/iu", $query);
 
             if ($this->use_alternates) {
                 $parts['chunks'] = array_merge($parts['chunks'], $this->getAlternateWords($words));
