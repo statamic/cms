@@ -445,6 +445,11 @@ class PathDataManager
      */
     private function reduceVar($path)
     {
+        if ($path === null) {
+            $this->reducedVar = null;
+            return;
+        }
+
         if (is_string($path)) {
             $varPath = $path;
             $doCompact = true;

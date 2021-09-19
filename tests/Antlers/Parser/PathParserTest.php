@@ -79,4 +79,30 @@ class PathParserTest extends ParserTestCase
         $this->assertSame('path', $subNestedPart1->name);
         $this->assertSame('path1', $subNestedPart2->name);
     }
+
+    public function test_it_parses_trailing_array_accessors()
+    {
+        $data = [
+            'values' => [
+                'one' => 'Value One',
+                'two' => 'Value Two',
+                'three' => 'Value Three'
+            ],
+            'value' => 'two'
+        ];
+        $result = $this->renderString('{{ values[value] }}', $data);
+
+        $this->assertSame('Value Two', $result);
+
+        $data = [
+            'values' => [
+                'one' => 'Value One',
+                'two' => 'Value Two',
+                'three' => 'Value Three'
+            ]
+        ];
+        $result = $this->renderString('{{ values[value] }}', $data);
+
+        $this->assertSame("", $result);
+    }
 }
