@@ -5,6 +5,7 @@ namespace Tests\Feature\Globals;
 use Facades\Tests\Factories\GlobalFactory;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -31,10 +32,12 @@ class ViewGlobalsListingTest extends TestCase
         $this->actingAs($user)
             ->get(cp_route('globals.index'))
             ->assertOk()
-            ->assertViewHas('globals.0.handle', 'test_one')
-            ->assertViewHas('globals.0.edit_url', url('/cp/globals/test_one'))
-            ->assertViewHas('globals.1.handle', 'test_three')
-            ->assertViewHas('globals.1.edit_url', url('/cp/globals/test_three'));
+            ->assertViewHas('globals', function ($globals) {
+                return Arr::get($globals, '0.handle', 'test_one')
+                    && Arr::get($globals, '0.edit_url', url('/cp/globals/test_one'))
+                    && Arr::get($globals, '1.handle', 'test_three')
+                    && Arr::get($globals, '1.edit_url', url('/cp/globals/test_three'));
+            });
     }
 
     /** @test */
@@ -59,10 +62,12 @@ class ViewGlobalsListingTest extends TestCase
         $this->actingAs($user)
             ->get(cp_route('globals.index'))
             ->assertOk()
-            ->assertViewHas('globals.0.handle', 'test_one')
-            ->assertViewHas('globals.0.edit_url', url('/cp/globals/test_one?site=fr'))
-            ->assertViewHas('globals.1.handle', 'test_two')
-            ->assertViewHas('globals.1.edit_url', url('/cp/globals/test_two/edit'));
+            ->assertViewHas('globals', function ($globals) {
+                return Arr::get($globals, '0.handle', 'test_one')
+                    && Arr::get($globals, '0.edit_url', url('/cp/globals/test_one?site=fr'))
+                    && Arr::get($globals, '1.handle', 'test_two')
+                    && Arr::get($globals, '1.edit_url', url('/cp/globals/test_two/edit'));
+            });
     }
 
     /** @test */
@@ -92,7 +97,9 @@ class ViewGlobalsListingTest extends TestCase
             ->assertViewHas('globals', function ($globals) {
                 return $globals->count() === 1;
             })
-            ->assertViewHas('globals.0.handle', 'test_one')
-            ->assertViewHas('globals.0.edit_url', url('/cp/globals/test_one?site=fr'));
+            ->assertViewHas('globals', function ($globals) {
+                return Arr::get($globals, '0.handle', 'test_one')
+                    && Arr::get($globals, '0.edit_url', url('/cp/globals/test_one?site=fr'));
+            });
     }
 }
