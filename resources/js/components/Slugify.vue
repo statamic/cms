@@ -55,6 +55,14 @@ export default {
 
     render() {
         return this.$scopedSlots.default({});
+    },
+
+    methods: {
+
+        reset() {
+            if (this.enabled) this.shouldSlugify = true;
+        }
+
     }
 
 }

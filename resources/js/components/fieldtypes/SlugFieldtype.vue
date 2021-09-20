@@ -1,6 +1,7 @@
 <template>
 
     <slugify
+        ref="slugify"
         :enabled="generate"
         :from="source"
         :separator="separator"
@@ -71,6 +72,22 @@ export default {
 
         slug(slug) {
             this.update(slug);
+        }
+
+    },
+
+    created() {
+        this.$events.$on('localization.created', this.reset);
+    },
+
+    destroyed() {
+        this.$events.$off('localization.created', this.reset);
+    },
+
+    methods: {
+
+        reset() {
+            this.$refs.slugify.reset();
         }
 
     }
