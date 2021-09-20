@@ -19,6 +19,7 @@ use Statamic\Facades\Role as RoleAPI;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
 use Statamic\Statamic;
@@ -120,12 +121,16 @@ class CoreNav
             ->can('index', GlobalSet::class)
             ->children(function () {
                 return GlobalSetAPI::all()->sortBy->title()->map(function ($globalSet) {
-                    $globalSet = $globalSet->in(Site::selected()->handle());
+                    $localized = $globalSet->inSelectedSite();
+
+                    if (! $localized && User::current()->cant('edit', $globalSet)) {
+                        return null;
+                    }
 
                     return Nav::item($globalSet->title())
-                              ->url($globalSet->editUrl())
+                              ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
                               ->can('view', $globalSet);
-                });
+                })->filter();
             });
 
         return $this;
