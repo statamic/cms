@@ -21,7 +21,7 @@ class ViewGlobalsListingTest extends TestCase
         $this->setTestRoles(['test' => [
             'access cp',
             'edit test_one globals',
-            'edit test_three globals'
+            'edit test_three globals',
         ]]);
         $user = User::make()->assignRole('test')->save();
         GlobalFactory::handle('test_one')->create();
@@ -76,7 +76,7 @@ class ViewGlobalsListingTest extends TestCase
         $this->setTestRoles(['test' => [
             'access cp',
             'edit test_one globals',
-            'edit test_three globals'
+            'edit test_three globals',
         ]]);
         $user = User::make()->assignRole('test')->save();
         $one = GlobalFactory::handle('test_one')->create();
