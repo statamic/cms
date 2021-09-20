@@ -17,9 +17,9 @@
                         v-tooltip="__('Localizable')"
                         @click="localizable = !localizable"
                     >
-                        <svg-icon name="earth" />
+                        <svg-icon name="earth" class="h-4 w-4" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100 flex items-center"><svg-icon name="trash" /></button>
+                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100 flex items-center"><svg-icon name="trash" class="h-4 w-4" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
