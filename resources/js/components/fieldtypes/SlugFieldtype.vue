@@ -77,17 +77,21 @@ export default {
     },
 
     created() {
-        this.$events.$on('localization.created', this.reset);
+        this.$events.$on('localization.created', this.handleLocalizationCreated);
     },
 
     destroyed() {
-        this.$events.$off('localization.created', this.reset);
+        this.$events.$off('localization.created', this.handleLocalizationCreated);
     },
 
     methods: {
 
-        reset() {
-            this.$refs.slugify.reset();
+        handleLocalizationCreated({ store }) {
+            // Only reset for the "slug" field in the matching store.
+            // Other slug fields that aren't named "slug" should be left alone.
+            if (this.handle === 'slug' && store === this.store) {
+                this.$refs.slugify.reset();
+            }
         }
 
     }
