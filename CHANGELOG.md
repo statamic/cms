@@ -1,5 +1,22 @@
 # Release Notes
 
+## 3.2.6 (2021-09-21)
+
+### What's new
+- When creating a localization of an entry, the slug becomes reactive to the title field again. [#4292](https://github.com/statamic/cms/issues/4292)
+- Add a Site column to entry listings when using multisite. [#4279](https://github.com/statamic/cms/issues/4279)
+
+### What's improved
+- German translations. [#4283](https://github.com/statamic/cms/issues/4283)
+
+### What's fixed
+- Fix Replicator set picker popover going the wrong direction. [#2966](https://github.com/statamic/cms/issues/2966)
+- Fix Globals nav and listing causing errors when using multisite. [#4289](https://github.com/statamic/cms/issues/4289)
+- Fixed responsiveness of SVG icons. [#4285](https://github.com/statamic/cms/issues/4285)
+- Added missing translation. [#4282](https://github.com/statamic/cms/issues/4282)
+
+
+
 ## 3.2.5 (2021-09-17)
 
 ### What's improved
