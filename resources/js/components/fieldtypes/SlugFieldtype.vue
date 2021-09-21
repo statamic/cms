@@ -1,6 +1,7 @@
 <template>
 
     <slugify
+        ref="slugify"
         :enabled="generate"
         :from="source"
         :separator="separator"
@@ -71,6 +72,26 @@ export default {
 
         slug(slug) {
             this.update(slug);
+        }
+
+    },
+
+    created() {
+        this.$events.$on('localization.created', this.handleLocalizationCreated);
+    },
+
+    destroyed() {
+        this.$events.$off('localization.created', this.handleLocalizationCreated);
+    },
+
+    methods: {
+
+        handleLocalizationCreated({ store }) {
+            // Only reset for the "slug" field in the matching store.
+            // Other slug fields that aren't named "slug" should be left alone.
+            if (this.handle === 'slug' && store === this.store) {
+                this.$refs.slugify.reset();
+            }
         }
 
     }

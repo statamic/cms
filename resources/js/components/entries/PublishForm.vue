@@ -570,7 +570,7 @@ export default {
         },
 
         editLocalization(localization) {
-            this.$axios.get(localization.url).then(response => {
+            return this.$axios.get(localization.url).then(response => {
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
@@ -600,7 +600,8 @@ export default {
 
             const url = this.activeLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
-                this.editLocalization(response.data);
+                this.editLocalization(response.data)
+                    .then(() => this.$events.$emit('localization.created', {store: this.publishContainer}));
             });
         },
 
