@@ -6,6 +6,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Stringy\StaticStringy as Stringy;
 
 class ParentTags extends Tags
@@ -72,7 +73,7 @@ class ParentTags extends Tags
      */
     private function getParent()
     {
-        $segments = explode('/', URL::tidy(URL::removeSiteUrl(URL::getCurrent())));
+        $segments = explode('/', Str::after(URL::getCurrent(), Site::current()->url()));
         $segment_count = count($segments);
         $segments[0] = '/';
 
