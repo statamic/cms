@@ -138,6 +138,7 @@ class NestedFieldsTest extends TestCase
                 'type' => 'reference',
                 'field_reference' => 'test.bar',
                 'config' => [
+                    'type' => 'text',
                     'width' => 50,
                     'display' => 'Second Field',
                     'localizable' => false,

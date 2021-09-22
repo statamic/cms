@@ -180,6 +180,9 @@ class Field implements Arrayable
         ]);
     }
 
+    /**
+     * @deprecated
+     */
     public function toBlueprintArray()
     {
         return [
