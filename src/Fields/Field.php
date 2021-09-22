@@ -187,7 +187,7 @@ class Field implements Arrayable
             'type' => $this->type(),
             'display' => $this->display(),
             'instructions' => $this->instructions(),
-            'config' => array_except($this->preProcessedConfig(), 'type'),
+            'config' => array_except($this->config(), 'type'),
         ];
     }
 
