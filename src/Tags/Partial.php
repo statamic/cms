@@ -52,16 +52,12 @@ class Partial extends Tags
      * The {{ partial:exists }} tag.
      *
      * Returns true if the partial exists, false otherwise.
-     * Requires the partial be provided as the 'src' parameter.
-     *
-     * @return bool
-     *
-     * @throws \Exception
+     * If the src parameter is omitted, it acts like the user is trying to use a partial named "exists".
      */
     public function exists()
     {
-        if (! $partial = $this->params->get('src', false)) {
-            throw new \Exception('partial:exists requires a src parameter');
+        if (! $partial = $this->params->get('src')) {
+            return $this->wildcard('exists');
         }
 
         return view()->exists($this->viewName($partial));
