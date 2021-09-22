@@ -10,6 +10,11 @@ class Partial extends Tags
         // an argument, but fall back to the studly version just in case.
         $partial = $this->params->get('src', $tag);
 
+        return $this->render($partial);
+    }
+
+    protected function render($partial)
+    {
         $variables = array_merge($this->context->all(), $this->params->all(), [
             '__frontmatter' => $this->params->all(),
             'slot' => $this->isPair ? trim($this->parse()) : null,
@@ -61,5 +66,22 @@ class Partial extends Tags
         }
 
         return view()->exists($this->viewName($partial));
+    }
+
+    /**
+     * The {{ partial:if_exists }} tag.
+     *
+     * Returns true if the partial exists, false otherwise.
+     * If the src parameter is omitted, it acts like the user is trying to use a partial named "if_exists".
+     */
+    public function ifExists()
+    {
+        if (! $partial = $this->params->get('src')) {
+            return $this->wildcard('if_exists');
+        }
+
+        if (view()->exists($this->viewName($partial))) {
+            return $this->render($partial);
+        }
     }
 }
