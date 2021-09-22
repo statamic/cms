@@ -47,4 +47,22 @@ class Partial extends Tags
 
         return $bits->implode('.').'._'.$last;
     }
+    
+    /**
+     * The {{ partial:exists }} tag.
+     *
+     * Returns true if the partial exists, false otherwise.
+     * Requires the partial be provided as the 'src' parameter.
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function exists()
+    {
+        if (!$partial = $this->params->get('src', false)) {
+            throw new \Exception('partial:exists requires a src parameter');
+        }
+
+        return view()->exists($this->viewName($partial));
+    }
 }
