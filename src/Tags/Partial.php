@@ -47,6 +47,7 @@ class Partial extends Tags
 
         return $bits->implode('.').'._'.$last;
     }
+
     
     /**
      * The {{ partial:exists }} tag.
