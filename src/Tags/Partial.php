@@ -55,11 +55,12 @@ class Partial extends Tags
      * Requires the partial be provided as the 'src' parameter.
      *
      * @return bool
+     *
      * @throws \Exception
      */
     public function exists()
     {
-        if (!$partial = $this->params->get('src', false)) {
+        if (! $partial = $this->params->get('src', false)) {
             throw new \Exception('partial:exists requires a src parameter');
         }
 
