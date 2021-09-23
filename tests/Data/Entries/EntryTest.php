@@ -73,7 +73,8 @@ class EntryTest extends TestCase
     /** @test */
     public function it_sets_gets_and_removes_data_values()
     {
-        $entry = new Entry;
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection('test');
         $this->assertNull($entry->get('foo'));
 
         $return = $entry->set('foo', 'bar');
@@ -176,6 +177,44 @@ class EntryTest extends TestCase
             'two' => 'two in origin',
             'three' => 'three in entry',
         ], $entry->values()->all());
+
+        $this->assertEquals('one in collection', $entry->value('one'));
+        $this->assertEquals('two in origin', $entry->value('two'));
+        $this->assertEquals('three in entry', $entry->value('three'));
+    }
+
+    /** @test */
+    public function if_the_value_is_explicitly_set_to_null_then_it_should_not_fall_back()
+    {
+        tap(Collection::make('test')->cascade([
+            'one' => 'one in collection',
+            'two' => 'two in collection',
+            'three' => 'three in collection',
+            'four' => 'four in collection',
+        ]))->save();
+
+        $origin = (new Entry)->collection('test')->data([
+            'two' => null,
+            'three' => 'three in origin',
+            'four' => 'four in origin',
+        ]);
+
+        $entry = (new Entry)->origin($origin)->collection('test')->data([
+            'three' => null,
+            'four' => 'four in entry',
+        ]);
+
+        $this->assertEquals([
+            'one' => 'one in collection', // falls all the way back
+            'two' => null, // falls back from entry, stops at origin
+            'three' => null, // stops at entry
+            'four' => 'four in entry', // set in entry
+        ], $entry->values()->all());
+
+        $this->assertEquals('one in collection', $entry->value('one'));
+        $this->assertEquals(null, $entry->value('two'));
+        $this->assertEquals(null, $entry->value('three'));
+        $this->assertEquals('four in entry', $entry->value('four'));
     }
 
     /** @test */
@@ -837,7 +876,7 @@ class EntryTest extends TestCase
         $originEntry->shouldReceive('id')->andReturn('123');
 
         Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
-        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('test');
+        $originEntry->shouldReceive('values')->andReturn(collect(['blueprint' => 'test']));
 
         $entry = (new Entry)
             ->collection('test')
@@ -914,7 +953,7 @@ class EntryTest extends TestCase
         $originEntry->shouldReceive('id')->andReturn('123');
 
         Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
-        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('another');
+        $originEntry->shouldReceive('values')->andReturn(collect(['blueprint' => 'another']));
 
         $entry = (new Entry)
             ->collection('test')
