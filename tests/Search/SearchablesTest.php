@@ -2,6 +2,7 @@
 
 namespace Tests\Search;
 
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
 use Statamic\Assets\AssetCollection;
 use Statamic\Auth\UserCollection;
@@ -13,7 +14,6 @@ use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Search\Searchables;
 use Statamic\Taxonomies\TermCollection;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
