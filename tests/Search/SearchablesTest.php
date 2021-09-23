@@ -13,6 +13,7 @@ use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Search\Searchables;
 use Statamic\Taxonomies\TermCollection;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -289,7 +290,7 @@ class SearchablesTest extends TestCase
             'config' => config('statamic.search.indexes.default'),
         ]);
 
-        $searchable = Entry::make()->data(['title' => 'Hello']);
+        $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
         $searchables = new Searchables($index);
 
         $this->assertEquals([
@@ -319,7 +320,7 @@ class SearchablesTest extends TestCase
             'config' => config('statamic.search.indexes.default'),
         ]);
 
-        $searchable = Entry::make()->data(['title' => 'Hello']);
+        $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
         $searchables = new Searchables($index);
 
         $this->assertEquals([
