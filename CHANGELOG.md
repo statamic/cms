@@ -1,5 +1,16 @@
 # Release Notes
 
+## 3.2.7 (2021-09-23)
+
+### What's new
+- Add `partial:exists` and `partial:if_exists` tags. [#4296](https://github.com/statamic/cms/issues/4296)
+
+### What's fixed
+- Localize the `parent` tag. [#4294](https://github.com/statamic/cms/issues/4294)
+- Fix responsiveness of more SVG icons. [#4295](https://github.com/statamic/cms/issues/4295) [6773a7f7b](https://github.com/statamic/cms/commit/6773a7f7b) [ee498c02d](https://github.com/statamic/cms/commit/ee498c02d)
+
+
+
 ## 3.2.6 (2021-09-21)
 
 ### What's new
