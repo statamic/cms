@@ -2046,7 +2046,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Break an array into a given number of groups
+     * Break an array into a given number of groups.
      *
      * @param $value
      * @param $params
@@ -2063,8 +2063,8 @@ class CoreModifiers extends Modifier
             ->map(function ($collection) use ($group_name, $items_name) {
                 return [
                     $group_name => [
-                        $items_name => $collection->all()
-                    ]
+                        $items_name => $collection->all(),
+                    ],
                 ];
             })->all();
     }
