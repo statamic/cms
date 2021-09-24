@@ -1,5 +1,19 @@
 # Release Notes
 
+## 3.2.8 (2020-09-24)
+
+### What's new
+- Add a `format_translated` modifier to get translated Carbon dates. [#4272](https://github.com/statamic/cms/issues/4272)
+
+### What's fixed
+- Localized entries with explicit `null` values will no longer inherit their origin's values. [#4301](https://github.com/statamic/cms/issues/4301)
+- Fix slow stack selector listing in the `entries` fieldtype. [#4302](https://github.com/statamic/cms/issues/4302)
+- Fix error when editing certain imported fields in the blueprint editor. [#4298](https://github.com/statamic/cms/issues/4298)
+- Fix overzealous field blink cache that causes data to remain across entries when using the SSG. [#4303](https://github.com/statamic/cms/issues/4303)
+- Fix another giant SVG icon. [488c8aca5](https://github.com/statamic/cms/commit/488c8aca5)
+
+
+
 ## 3.2.7 (2021-09-23)
 
 ### What's new
