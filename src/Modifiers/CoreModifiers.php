@@ -2063,8 +2063,8 @@ class CoreModifiers extends Modifier
             ->map(function ($collection) use ($groups_name, $items_name) {
                 return [
                     $groups_name => [
-                        $items_name => $collection->all()
-                    ]
+                        $items_name => $collection->all(),
+                    ],
                 ];
             })->all();
     }
