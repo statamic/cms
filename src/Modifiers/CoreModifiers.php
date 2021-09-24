@@ -2055,16 +2055,16 @@ class CoreModifiers extends Modifier
     public function split($value, $params)
     {
         $size = Arr::get($params, 0, 1);
-        $group_name = Arr::get($params, 1, 'group');
+        $groups_name = Arr::get($params, 1, 'groups');
         $items_name = Arr::get($params, 2, 'items');
 
         return collect($value)
             ->split($size)
-            ->map(function ($collection) use ($group_name, $items_name) {
+            ->map(function ($collection) use ($groups_name, $items_name) {
                 return [
-                    $group_name => [
-                        $items_name => $collection->all(),
-                    ],
+                    $groups_name => [
+                        $items_name => $collection->all()
+                    ]
                 ];
             })->all();
     }
