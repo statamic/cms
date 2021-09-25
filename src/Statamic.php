@@ -150,7 +150,12 @@ class Statamic
             return false;
         }
 
-        return starts_with(request()->path(), config('statamic.cp.route'));
+        // The route needs to start with the configured CP route,
+        // e.g. 'cp/' including trailing slash. See #4213.
+        return starts_with(
+            request()->path(),
+            str_finish(config('statamic.cp.route'), '/')
+        );
     }
 
     public static function cpRoute($route, $params = [])
