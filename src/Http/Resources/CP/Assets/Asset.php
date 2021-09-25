@@ -57,7 +57,8 @@ class Asset extends JsonResource
 
     protected function publishFormData()
     {
-        $fields = $this->blueprint()->fields()
+        $fields = $this->blueprint()->setParent($this->resource)
+            ->fields()
             ->addValues($this->data()->all())
             ->preProcess();
 
