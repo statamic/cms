@@ -2,7 +2,7 @@
 
 return [
     'cheatsheet' => '
-    <p>Markdown ist ein Text-zu-HTML Auszeichnungssyntax für Webautoren. Markdown ermöglicht es dir in einem einfachen, reinen Textformat zu schreiben, welches leicht zu lesen ist und in korrektes HTML konvertiert wird.</p>
+    <p>Markdown ist eine Text-zu-HTML-Auszeichnungssyntax für Webautoren. Mit Markdown kannst du in einem einfachen, reinen Textformat schreiben, welches leicht zu lesen ist und in korrektes HTML konvertiert wird.</p>
     <h3>Überschriften</h3>
     <pre class="language-markdown"><code># Dies ist eine H1
     ## Dies ist eine H2
@@ -20,13 +20,13 @@ return [
     <p>Umschließe deinen Code mit drei Backticks (<code>```</code>) auf der Zeile davor und danach.</p>
 
     <pre class="language-markdown"><code>```
-    dies: ist etwas YAML
+    dies: \'ist etwas YAML\'
     ```</code></pre>
 
     <p>Du kannst auch Code inline hinzufügen, indem du den Inhalt mit je einem einfachen Backtick (<code>`</code>) umschließt.</p>
 
     <h3>Zitate</h3>
-    <p>Erstelle ein Zitat indem du den Text mit <code>>&nbsp;</code> beginnst.</p>
+    <p>Erstelle ein Zitat, indem du den Text mit <code>>&nbsp;</code> beginnst.</p>
     <pre class="language-markdown"><code>> Dies wird ein Zitat.</code></pre>
 
     <h3>Bilder</h3>
