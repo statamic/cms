@@ -3,8 +3,10 @@
 namespace Statamic\Tags;
 
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Stringy\StaticStringy as Stringy;
 
 class ParentTags extends Tags
@@ -71,9 +73,7 @@ class ParentTags extends Tags
      */
     private function getParent()
     {
-        $crumbs = [];
-
-        $segments = explode('/', URL::getCurrent());
+        $segments = explode('/', Str::after(URL::getCurrent(), Site::current()->url()));
         $segment_count = count($segments);
         $segments[0] = '/';
 
@@ -92,7 +92,7 @@ class ParentTags extends Tags
 
         // Find the parent by stripping away URL segments
         foreach ($segment_urls as $segment_url) {
-            if ($content = Entry::findByUri($segment_url)) {
+            if ($content = Entry::findByUri($segment_url, Site::current())) {
                 return $content->toAugmentedArray();
             }
         }

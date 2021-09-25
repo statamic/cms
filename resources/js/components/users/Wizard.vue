@@ -22,11 +22,11 @@
                 <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
 
                 <div class="text-2xs text-red mt-1 flex items-center" v-if="userExists">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                     {{ __('This user already exists.') }}
                 </div>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center" v-else>
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_email_instructions') }}
                 </div>
             </div>
@@ -36,7 +36,7 @@
                 <label class="font-bold text-base mb-sm" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" autofocus tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_name_instructions') }}
                 </div>
             </div>
@@ -56,7 +56,7 @@
                     <label class="font-bold ml-1">{{ __('Super Admin') }}</label>
                 </div>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_super_admin_instructions') }}
                 </div>
             </div>
