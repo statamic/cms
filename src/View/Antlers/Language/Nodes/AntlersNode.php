@@ -359,11 +359,12 @@ class AntlersNode extends AbstractNode
     /**
      * Processes any nested interpolations that may be within the parameter content.
      *
-     * @param ParameterNode $param The parameter to analyze.
-     * @param NodeProcessor $processor The node processor.
-     * @param string $mutateVar The value to apply interpolations to.
-     * @param array $data The context data.
+     * @param  ParameterNode  $param  The parameter to analyze.
+     * @param  NodeProcessor  $processor  The node processor.
+     * @param  string  $mutateVar  The value to apply interpolations to.
+     * @param  array  $data  The context data.
      * @return array|string|string[]
+     *
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws TagNotFoundException
