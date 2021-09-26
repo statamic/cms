@@ -89,7 +89,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble } from 'tiptap';
+import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble, Paragraph } from 'tiptap';
 import {
     Blockquote,
     CodeBlock,
@@ -469,11 +469,15 @@ export default {
             let exts = [
                 new Doc(),
                 new Set({ bard: this }),
+                new Paragraph(),
                 new HardBreak(),
                 new History()
             ];
 
             let btns = this.buttons.map(button => button.name);
+            
+            let languages = { javascript, css };
+            let levels = [];
 
             if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('quote')) exts.push(new Blockquote());
@@ -496,7 +500,7 @@ export default {
             if (btns.includes('codeblock') || btns.includes('code')) {
                 if (btns.includes('code')) exts.push(new Code());
                 if (btns.includes('codeblock')) exts.push(new CodeBlock());
-                exts.push(new CodeBlockHighlight({ languages: { javascript, css }}));
+                exts.push(new CodeBlockHighlight({ languages }));
             }
 
             if (btns.includes('table')) {
@@ -515,7 +519,6 @@ export default {
                 btns.includes('h5') ||
                 btns.includes('h6')
             ) {
-                let levels = [];
                 if (btns.includes('h1')) levels.push(1);
                 if (btns.includes('h2')) levels.push(2);
                 if (btns.includes('h3')) levels.push(3);
@@ -525,6 +528,17 @@ export default {
                 exts.push(new Heading({ levels }));
             }
 
+            this.$bard.extensionReplacementCallbacks.forEach(callback => {
+                let returned = callback({ bard: this, mark, node, languages, levels });
+                let replaceExts = Array.isArray(returned[0]) ? returned : [returned];
+                replaceExts.forEach(([searchExt, replaceExt]) => {
+                    const index = exts.findIndex(ext => ext instanceof searchExt);
+                    if (index !== -1) {
+                        exts[index] = replaceExt;
+                    }
+                });
+            });
+            
             this.$bard.extensionCallbacks.forEach(callback => {
                 let returned = callback({ bard: this, mark, node });
                 exts = exts.concat(
