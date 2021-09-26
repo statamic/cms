@@ -527,23 +527,23 @@ export default {
                 if (btns.includes('h6')) levels.push(6);
                 exts.push(new Heading({ levels }));
             }
-
-            this.$bard.extensionReplacementCallbacks.forEach(callback => {
-                let returned = callback({ bard: this, mark, node, languages, levels });
-                let replaceExts = Array.isArray(returned[0]) ? returned : [returned];
-                replaceExts.forEach(([searchExt, replaceExt]) => {
-                    const index = exts.findIndex(ext => ext instanceof searchExt);
-                    if (index !== -1) {
-                        exts[index] = replaceExt;
-                    }
-                });
-            });
             
             this.$bard.extensionCallbacks.forEach(callback => {
                 let returned = callback({ bard: this, mark, node });
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
+            });
+
+            this.$bard.extensionReplacementCallbacks.forEach(callback => {
+                let returned = callback({ bard: this, mark, node, languages, levels });
+                let replaceExts = Array.isArray(returned[0] || []) ? returned : [returned];
+                replaceExts.forEach(([searchExt, replaceExt]) => {
+                    const index = exts.findIndex(ext => ext instanceof searchExt);
+                    if (index !== -1) {
+                        exts[index] = replaceExt;
+                    }
+                });
             });
 
             return exts;
