@@ -342,29 +342,50 @@ class AntlersNode extends AbstractNode
                 $pathParser = new PathParser();
                 $retriever = new PathDataManager();
 
+                $pathToParse = $this->reduceParameterInterpolations($param, $processor, $param->value, $data);
+
                 $retriever->setIsPaired(false)->setReduceFinal(false);
-
-                $value = $retriever->getData($pathParser->parse($value), $data);
+                $value = $retriever->getData($pathParser->parse($pathToParse), $data);
             } else {
-                if ($param->parent != null && ! empty($param->interpolations)) {
-                    foreach ($param->interpolations as $interpolationVar) {
-                        if (array_key_exists($interpolationVar, $param->parent->processedInterpolationRegions)) {
-                            $interpolationResult = $processor->cloneProcessor()
-                                ->setData($data)
-                                ->setIsInterpolationProcessor(true)
-                                ->setIsProvidingParameterContent(true)
-                                ->render($param->parent->processedInterpolationRegions[$interpolationVar]);
-
-                            $value = str_replace($interpolationVar, $interpolationResult, $value);
-                        }
-                    }
-                }
+                $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
             }
 
             $values[$param->name] = $value;
         }
 
         return $values;
+    }
+
+    /**
+     * Processes any nested interpolations that may be within the parameter content.
+     *
+     * @param ParameterNode $param The parameter to analyze.
+     * @param NodeProcessor $processor The node processor.
+     * @param string $mutateVar The value to apply interpolations to.
+     * @param array $data The context data.
+     * @return array|string|string[]
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws TagNotFoundException
+     * @throws Throwable
+     */
+    private function reduceParameterInterpolations(ParameterNode $param, NodeProcessor $processor, $mutateVar, $data)
+    {
+        if ($param->parent != null && ! empty($param->interpolations)) {
+            foreach ($param->interpolations as $interpolationVar) {
+                if (array_key_exists($interpolationVar, $param->parent->processedInterpolationRegions)) {
+                    $interpolationResult = $processor->cloneProcessor()
+                        ->setData($data)
+                        ->setIsInterpolationProcessor(true)
+                        ->setIsProvidingParameterContent(true)
+                        ->render($param->parent->processedInterpolationRegions[$interpolationVar]);
+
+                    $mutateVar = str_replace($interpolationVar, $interpolationResult, $mutateVar);
+                }
+            }
+        }
+
+        return $mutateVar;
     }
 
     public function getModifierParameterValuesForParameter(ParameterNode $param, $data = [])
