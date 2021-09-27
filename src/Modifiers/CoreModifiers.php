@@ -739,23 +739,55 @@ class CoreModifiers extends Modifier
         $params = explode('|', $params);
         $groupBy = $params[0];
 
-        $grouped = collect($value)->groupBy(function ($item) use ($groupBy) {
-            if (is_array($item)) {
-                return $item[$groupBy];
-            }
+        $groupLabels = [];
 
-            // Make the array just from the params, so it only augments the values that might be needed.
-            $keys = explode(':', $groupBy);
-            $context = $item->toAugmentedArray($keys);
+        $grouped = collect($value)->groupBy(function ($item) use ($groupBy, $params, &$groupLabels) {
+            $value = $this->getGroupByValue($item, $groupBy);
 
-            return Antlers::parser()->getVariable($groupBy, $context);
+            return $this->handleGroupByDateValue($value, $params, $groupLabels);
         });
 
-        $iterable = $grouped->map(function ($items, $key) {
-            return ['group' => $key, 'items' => $items];
+        $iterable = $grouped->map(function ($items, $key) use ($groupLabels) {
+            return [
+                'key' => $key,
+                'group' => $groupLabels[$key] ?? $key,
+                'items' => $items,
+            ];
         })->values();
 
         return collect($grouped)->merge(['groups' => $iterable]);
+    }
+
+    private function getGroupByValue($item, $groupBy)
+    {
+        if (is_array($item)) {
+            return $item[$groupBy];
+        }
+
+        // Make the array just from the params, so it only augments the values that might be needed.
+        $keys = explode(':', $groupBy);
+        $context = $item->toAugmentedArray($keys);
+
+        return Antlers::parser()->getVariable($groupBy, $context);
+    }
+
+    private function handleGroupByDateValue($value, $params, &$groupLabels)
+    {
+        if (! $value instanceof Carbon) {
+            return $value;
+        }
+
+        $date = $value;
+        $dateFormat = $params[1] ?? 'Y-m-d';
+        $dateGroupFormat = $params[2] ?? $dateFormat;
+
+        $value = $date->format($dateFormat);
+
+        if ($dateFormat !== $dateGroupFormat) {
+            $groupLabels[$value] = $date->format($dateGroupFormat);
+        }
+
+        return $value;
     }
 
     /**

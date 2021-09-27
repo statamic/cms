@@ -3,6 +3,7 @@
 namespace Tests\Modifiers;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Carbon;
 use Statamic\Facades\Collection;
 use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -31,6 +32,7 @@ class GroupByTest extends TestCase
             ]),
             'groups' => collect([
                 [
+                    'key' => 'basketball',
                     'group' => 'basketball',
                     'items' => collect([
                         ['sport' => 'basketball', 'team' => 'jazz'],
@@ -38,6 +40,7 @@ class GroupByTest extends TestCase
                     ]),
                 ],
                 [
+                    'key' => 'baseball',
                     'group' => 'baseball',
                     'items' => collect([
                         ['sport' => 'baseball', 'team' => 'yankees'],
@@ -62,8 +65,8 @@ class GroupByTest extends TestCase
             'basketball' => collect([$jazz, $bulls]),
             'baseball' => collect([$yankees]),
             'groups' => collect([
-                ['group' => 'basketball', 'items' => collect([$jazz, $bulls])],
-                ['group' => 'baseball', 'items' => collect([$yankees])],
+                ['key' => 'basketball', 'group' => 'basketball', 'items' => collect([$jazz, $bulls])],
+                ['key' => 'baseball', 'group' => 'baseball', 'items' => collect([$yankees])],
             ]),
         ]);
 
@@ -86,12 +89,100 @@ class GroupByTest extends TestCase
             'Basketball' => collect([$jazz, $bulls]),
             'Baseball' => collect([$yankees]),
             'groups' => collect([
-                ['group' => 'Basketball', 'items' => collect([$jazz, $bulls])],
-                ['group' => 'Baseball', 'items' => collect([$yankees])],
+                ['key' => 'Basketball', 'group' => 'Basketball', 'items' => collect([$jazz, $bulls])],
+                ['key' => 'Baseball', 'group' => 'Baseball', 'items' => collect([$yankees])],
             ]),
         ]);
 
         $this->assertEquals($expected, $this->modify($items, 'collection:title'));
+    }
+
+    /** @test */
+    public function it_groups_by_date()
+    {
+        Carbon::setTestNow(now()->startOfDay());
+
+        $items = [
+            ['when' => now()->setHour(14), 'title' => '2pm'],
+            ['when' => now()->setHour(3), 'title' => '3am'],
+            ['when' => now()->setHour(10), 'title' => '10am'],
+            ['when' => now()->setHour(23), 'title' => '11pm'],
+        ];
+
+        $expected = collect([
+            'pm' => collect([
+                ['when' => now()->setHour(14), 'title' => '2pm'],
+                ['when' => now()->setHour(23), 'title' => '11pm'],
+            ]),
+            'am' => collect([
+                ['when' => now()->setHour(3), 'title' => '3am'],
+                ['when' => now()->setHour(10), 'title' => '10am'],
+            ]),
+            'groups' => collect([
+                [
+                    'key' => 'pm',
+                    'group' => 'pm',
+                    'items' => collect([
+                        ['when' => now()->setHour(14), 'title' => '2pm'],
+                        ['when' => now()->setHour(23), 'title' => '11pm'],
+                    ]),
+                ],
+                [
+                    'key' => 'am',
+                    'group' => 'am',
+                    'items' => collect([
+                        ['when' => now()->setHour(3), 'title' => '3am'],
+                        ['when' => now()->setHour(10), 'title' => '10am'],
+                    ]),
+                ],
+            ]),
+        ]);
+
+        $this->assertEquals($expected, $this->modify($items, 'when|a'));
+    }
+
+    /** @test */
+    public function it_groups_by_date_with_custom_group_format()
+    {
+        Carbon::setTestNow(now()->setMonth(9)->startOfDay());
+
+        $items = [
+            ['when' => now()->setHour(14), 'title' => '2pm'],
+            ['when' => now()->setHour(3), 'title' => '3am'],
+            ['when' => now()->setHour(10), 'title' => '10am'],
+            ['when' => now()->setHour(23), 'title' => '11pm'],
+        ];
+
+        $expected = collect([
+            'pm' => collect([
+                ['when' => now()->setHour(14), 'title' => '2pm'],
+                ['when' => now()->setHour(23), 'title' => '11pm'],
+            ]),
+            'am' => collect([
+                ['when' => now()->setHour(3), 'title' => '3am'],
+                ['when' => now()->setHour(10), 'title' => '10am'],
+            ]),
+            'groups' => collect([
+                [
+                    'key' => 'pm',
+                    'group' => 'September PM',
+                    'items' => collect([
+                        ['when' => now()->setHour(14), 'title' => '2pm'],
+                        ['when' => now()->setHour(23), 'title' => '11pm'],
+                    ]),
+                ],
+                [
+                    'key' => 'am',
+                    'group' => 'September AM',
+                    'items' => collect([
+                        ['when' => now()->setHour(3), 'title' => '3am'],
+                        ['when' => now()->setHour(10), 'title' => '10am'],
+                    ]),
+                ],
+            ]),
+        ]);
+
+        $this->assertEquals($expected, $this->modify($items, 'when|a|F A'));
     }
 
     public function modify($items, $value)
