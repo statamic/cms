@@ -1,12 +1,6 @@
 {{ foreach:options as="value|label" }}
     <label>
-        <input
-            type="radio"
-            name="{{ handle }}"
-            value="{{ value }}"
-            {{ old === value ?= " checked" }}
-            {{ ! old && default === value ?= "checked" }}
-            {{ validate|contains:required ?= "required">
+        <input type="radio" name="{{ handle }}" value="{{ value }}"{{ old === value ?= " checked" }}{{ ! old && value === default ?= " checked" }}{{ if validate|contains:required }} required{{ /if }}>
         {{ label }}
     </label>
     {{ unless inline }}
