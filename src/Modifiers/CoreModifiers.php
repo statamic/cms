@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
@@ -732,15 +733,24 @@ class CoreModifiers extends Modifier
      */
     public function groupBy($value, $params)
     {
-        $groupBy = $params[0];
+        $groupBy = implode(':', $params);
 
-        $grouped = collect($value)->groupBy($groupBy);
+        $grouped = collect($value)->groupBy(function ($item) use ($groupBy, $params) {
+            if (is_array($item)) {
+                return $item[$groupBy];
+            }
+
+            // Make the array just from the params, so it only augments the values that might be needed.
+            $context = $item->toAugmentedArray($params);
+
+            return Antlers::parser()->getVariable($groupBy, $context);
+        });
 
         $iterable = $grouped->map(function ($items, $key) {
-            return collect(['group' => $key, 'items' => $items]);
+            return ['group' => $key, 'items' => $items];
         })->values();
 
-        return collect($grouped)->merge(['groups' => $iterable])->toArray();
+        return collect($grouped)->merge(['groups' => $iterable]);
     }
 
     /**
