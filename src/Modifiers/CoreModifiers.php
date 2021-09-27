@@ -2060,9 +2060,7 @@ class CoreModifiers extends Modifier
             ->split($size)
             ->map(function ($collection) {
                 return [
-                    'groups' => [
-                        'items' => $collection->all(),
-                    ],
+                    'items' => $collection->all(),
                 ];
             })->all();
     }
