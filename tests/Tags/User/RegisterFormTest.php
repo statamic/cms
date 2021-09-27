@@ -66,10 +66,10 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input type="email" name="email">',
-            '<label>Password</label><input type="password" name="password">',
-            '<label>Password Confirmation</label><input type="password" name="password_confirmation">',
-            '<label>Name</label><input type="text" name="name">',
+            '<label>Email Address</label><input type="email" name="email" value="">',
+            '<label>Password</label><input type="password" name="password" value="">',
+            '<label>Password Confirmation</label><input type="password" name="password_confirmation" value="">',
+            '<label>Name</label><input type="text" name="name" value="">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -92,12 +92,12 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input type="email" name="email">',
-            '<label>Password</label><input type="password" name="password">',
-            '<label>Password Confirmation</label><input type="password" name="password_confirmation">',
-            '<label>Full Name</label><input type="text" name="name">',
-            '<label>Phone Number</label><input type="text" name="phone">',
-            '<label>Over 18 years of age?</label><input type="text" name="age" required>',
+            '<label>Email Address</label><input type="email" name="email" value="">',
+            '<label>Password</label><input type="password" name="password" value="">',
+            '<label>Password Confirmation</label><input type="password" name="password_confirmation" value="">',
+            '<label>Full Name</label><input type="text" name="name" value="">',
+            '<label>Phone Number</label><input type="text" name="phone" value="">',
+            '<label>Over 18 years of age?</label><input type="text" name="age" value="" required>',
         ];
 
         $this->assertEquals($expected, $actual[0]);
