@@ -473,11 +473,11 @@ export default {
                 new HardBreak(),
                 new History()
             ];
-
-            let btns = this.buttons.map(button => button.name);
             
             let languages = { javascript, css };
             let levels = [];
+
+            let btns = this.buttons.map(button => button.name);
 
             if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('quote')) exts.push(new Blockquote());
