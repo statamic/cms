@@ -733,15 +733,20 @@ class CoreModifiers extends Modifier
      */
     public function groupBy($value, $params)
     {
-        $groupBy = implode(':', $params);
+        // Workaround for https://github.com/statamic/cms/issues/3614
+        // At the moment this modifier only works properly when using the param syntax.
+        $params = implode(':', $params);
+        $params = explode('|', $params);
+        $groupBy = $params[0];
 
-        $grouped = collect($value)->groupBy(function ($item) use ($groupBy, $params) {
+        $grouped = collect($value)->groupBy(function ($item) use ($groupBy) {
             if (is_array($item)) {
                 return $item[$groupBy];
             }
 
             // Make the array just from the params, so it only augments the values that might be needed.
-            $context = $item->toAugmentedArray($params);
+            $keys = explode(':', $groupBy);
+            $context = $item->toAugmentedArray($keys);
 
             return Antlers::parser()->getVariable($groupBy, $context);
         });

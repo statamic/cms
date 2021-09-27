@@ -46,7 +46,7 @@ class GroupByTest extends TestCase
             ]),
         ]);
 
-        $this->assertEquals($expected, $this->modify($items, ['sport']));
+        $this->assertEquals($expected, $this->modify($items, 'sport'));
     }
 
     /** @test */
@@ -67,7 +67,7 @@ class GroupByTest extends TestCase
             ]),
         ]);
 
-        $this->assertEquals($expected, $this->modify($items, ['sport']));
+        $this->assertEquals($expected, $this->modify($items, 'sport'));
     }
 
     /** @test */
@@ -91,11 +91,10 @@ class GroupByTest extends TestCase
             ]),
         ]);
 
-        // passing an array like ['collection', 'title'] translates to group_by="collection:title"
-        $this->assertEquals($expected, $this->modify($items, ['collection', 'title']));
+        $this->assertEquals($expected, $this->modify($items, 'collection:title'));
     }
 
-    public function modify($items, array $value)
+    public function modify($items, $value)
     {
         return Modify::value($items)->groupBy($value)->fetch();
     }
