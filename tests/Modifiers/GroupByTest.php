@@ -24,6 +24,15 @@ class GroupByTest extends TestCase
             'baseball' => [
                 ['sport' => 'baseball', 'team' => 'yankees'],
             ],
+            'groups' => [
+                ['group' => 'basketball', 'items' => [
+                    ['sport' => 'basketball', 'team' => 'jazz'],
+                    ['sport' => 'basketball', 'team' => 'bulls'],
+                ]],
+                ['group' => 'baseball', 'items' => [
+                    ['sport' => 'baseball', 'team' => 'yankees'],
+                ]],
+            ],
         ];
 
         $this->assertEquals($expected, $this->modify($items, 'sport'));

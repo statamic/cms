@@ -732,7 +732,15 @@ class CoreModifiers extends Modifier
      */
     public function groupBy($value, $params)
     {
-        return collect($value)->groupBy($params[0])->toArray();
+        $groupBy = $params[0];
+
+        $grouped = collect($value)->groupBy($groupBy);
+
+        $iterable = $grouped->map(function ($items, $key) {
+            return collect(['group' => $key, 'items' => $items]);
+        })->values();
+
+        return collect($grouped)->merge(['groups' => $iterable])->toArray();
     }
 
     /**
