@@ -5,6 +5,7 @@ namespace Tests\Modifiers;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Collection;
+use Statamic\Fields\Value;
 use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -20,6 +21,47 @@ class GroupByTest extends TestCase
             ['sport' => 'basketball', 'team' => 'jazz'],
             ['sport' => 'baseball', 'team' => 'yankees'],
             ['sport' => 'basketball', 'team' => 'bulls'],
+        ];
+
+        $expected = collect([
+            'basketball' => collect([
+                ['sport' => 'basketball', 'team' => 'jazz'],
+                ['sport' => 'basketball', 'team' => 'bulls'],
+            ]),
+            'baseball' => collect([
+                ['sport' => 'baseball', 'team' => 'yankees'],
+            ]),
+            'groups' => collect([
+                [
+                    'key' => 'basketball',
+                    'group' => 'basketball',
+                    'items' => collect([
+                        ['sport' => 'basketball', 'team' => 'jazz'],
+                        ['sport' => 'basketball', 'team' => 'bulls'],
+                    ]),
+                ],
+                [
+                    'key' => 'baseball',
+                    'group' => 'baseball',
+                    'items' => collect([
+                        ['sport' => 'baseball', 'team' => 'yankees'],
+                    ]),
+                ],
+            ]),
+        ]);
+
+        $this->assertEquals($expected, $this->modify($items, 'sport'));
+    }
+
+    /** @test */
+    public function it_groups_an_array_with_value_objects()
+    {
+        // eg. replicator sets
+
+        $items = [
+            ['sport' => new Value('basketball', 'sport'), 'team' => new Value('jazz', 'team')],
+            ['sport' => new Value('baseball', 'sport'), 'team' => new Value('yankees', 'team')],
+            ['sport' => new Value('basketball', 'sport'), 'team' => new Value('bulls', 'team')],
         ];
 
         $expected = collect([

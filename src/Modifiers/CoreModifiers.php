@@ -760,10 +760,19 @@ class CoreModifiers extends Modifier
 
     private function getGroupByValue($item, $groupBy)
     {
-        if (is_array($item)) {
-            return $item[$groupBy];
+        $value = is_object($item)
+            ? $this->getGroupByValueFromObject($item, $groupBy)
+            : $item[$groupBy];
+
+        if ($value instanceof Value) {
+            $value = $value->value();
         }
 
+        return $value;
+    }
+
+    private function getGroupByValueFromObject($item, $groupBy)
+    {
         // Make the array just from the params, so it only augments the values that might be needed.
         $keys = explode(':', $groupBy);
         $context = $item->toAugmentedArray($keys);
