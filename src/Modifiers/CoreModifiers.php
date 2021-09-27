@@ -2110,6 +2110,26 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Break an array into a given number of groups.
+     *
+     * @param $value
+     * @param $params
+     * @return array
+     */
+    public function split($value, $params)
+    {
+        $size = Arr::get($params, 0, 1);
+
+        return collect($value)
+            ->split($size)
+            ->map(function ($collection) {
+                return [
+                    'items' => $collection->all(),
+                ];
+            })->all();
+    }
+
+    /**
      * Returns true if the string starts with a given substring ($params[0]), false otherwise.
      * The comparison is case-insensitive.
      *
