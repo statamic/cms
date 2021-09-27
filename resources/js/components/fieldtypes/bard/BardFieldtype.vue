@@ -527,7 +527,7 @@ export default {
                 if (btns.includes('h6')) levels.push(6);
                 exts.push(new Heading({ levels }));
             }
-            
+
             this.$bard.extensionCallbacks.forEach(callback => {
                 let returned = callback({ bard: this, mark, node });
                 exts = exts.concat(
