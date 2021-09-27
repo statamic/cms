@@ -35,7 +35,7 @@ return [
 <pre class="language-markdown"><code>> Это будет блочная цитата.</code></pre>
 
 <h3>Изображения</h3>
-<pre class="language-markdown"><code>![текст alt](http://example.com/image.jpg)</code></pre>
+<pre class="language-markdown"><code>![текст alt](https://picsum.photos/seed/'.time().'/200/300)</code></pre>
 
 <h3>Неупорядоченный список</h3>
 <pre class="language-markdown"><code>- Бекон
