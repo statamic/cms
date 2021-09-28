@@ -2,12 +2,24 @@
 
 namespace Tests\Auth;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /** @group user-repo */
 class EloquentUserRepositoryTest extends TestCase
 {
     use UserRepositoryTests;
+
+    public function setUp(): void
+    {
+        parent::setup();
+
+        $testbench = (new \Statamic\Console\Processes\Composer(__DIR__.'/../../'))->installedVersion('orchestra/testbench-core');
+
+        if (version_compare($testbench, '6.7.0', '<')) {
+            $this->markTestSkipped('Need defineDatabaseMigrations method only introduced in 6.7.0');
+        }
+    }
 
     protected function getEnvironmentSetUp($app)
     {
