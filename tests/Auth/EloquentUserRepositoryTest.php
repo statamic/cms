@@ -9,6 +9,16 @@ class EloquentUserRepositoryTest extends TestCase
 {
     use UserRepositoryTests;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        if (version_compare($this->app->version(), '7.0', '<')) {
+            // honestly just a pain to support this in earlier versions of laravel/testbench
+            $this->markTestSkipped('Needs newer testbench');
+        }
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
