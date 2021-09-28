@@ -1,5 +1,25 @@
 # Release Notes
 
+## 3.2.9 (2020-09-28)
+
+### What's new
+- The `group_by` modifier can now be looped over, use nested values, and handles dates. [#4322](https://github.com/statamic/cms/issues/4322)
+- Added a `split` modifier. [#4305](https://github.com/statamic/cms/issues/4305)
+
+### What's improved
+- Updated French, German, Swiss, and Russian translations. [#4332](https://github.com/statamic/cms/issues/4332) [#4311](https://github.com/statamic/cms/issues/4311) [#4306](https://github.com/statamic/cms/issues/4306)
+- Return queries from `QueriesConditions` trait. [#4312](https://github.com/statamic/cms/issues/4312)
+- Improve IDE completion of `GraphQL` facade. [#4307](https://github.com/statamic/cms/issues/4307)
+
+### What's fixed
+- Fixed `User` class not being overridable. [#4243](https://github.com/statamic/cms/issues/4243)
+- Fixed `users` fieldtype outputting too much data. [#4243](https://github.com/statamic/cms/issues/4243)
+- Don't show "toggle all" checkbox in the asset selector if only one file is selectable. [#4309](https://github.com/statamic/cms/issues/4309)
+- Fix pages that start with the CP route, but not actually within the CP, being considered a CP route. (e.g. `/cpa`) [#4324](https://github.com/statamic/cms/issues/4324)
+- Support default values on all applicable form inputs. [#4323](https://github.com/statamic/cms/issues/4323)
+
+
+
 ## 3.2.8 (2020-09-24)
 
 ### What's new
