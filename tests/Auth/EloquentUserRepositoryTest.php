@@ -2,7 +2,6 @@
 
 namespace Tests\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /** @group user-repo */
