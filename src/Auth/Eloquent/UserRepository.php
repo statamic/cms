@@ -22,7 +22,7 @@ class UserRepository extends BaseRepository
     public function all(): UserCollection
     {
         $users = $this->model('all')->keyBy('id')->map(function ($model) {
-            return $this->makeUser($model);
+            return $this->make()->model($model);
         });
 
         return UserCollection::make($users);
@@ -32,7 +32,7 @@ class UserRepository extends BaseRepository
     {
         return Blink::once("eloquent-user-find-{$id}", function () use ($id) {
             if ($model = $this->model('find', $id)) {
-                return $this->makeUser($model);
+                return $this->make()->model($model);
             }
 
             return null;
@@ -45,7 +45,7 @@ class UserRepository extends BaseRepository
             return null;
         }
 
-        return $this->makeUser($model);
+        return $this->make()->model($model);
     }
 
     public function model($method, ...$args)
@@ -53,17 +53,6 @@ class UserRepository extends BaseRepository
         $model = $this->config['model'];
 
         return call_user_func_array([$model, $method], $args);
-    }
-
-    /**
-     * Convert an Eloquent User model to a Statamic User instance.
-     *
-     * @param  Model  $model
-     * @return User
-     */
-    private function makeUser(Model $model)
-    {
-        return User::fromModel($model);
     }
 
     public function query()
