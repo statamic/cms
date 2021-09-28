@@ -78,9 +78,8 @@ class PackToTheFuture
      */
     public static function generateComposerLock(string $package, string $version, $path = null, $dev = false)
     {
-        $packagesKey = $dev
-            ? 'packages-dev'
-            : 'packages';
+        $packagesKey = $dev ? 'packages-dev' : 'packages';
+        $nonFavouritePackagesKey = $dev ? 'packages' : 'packages-dev';
 
         $content = [
             $packagesKey => [
@@ -89,6 +88,7 @@ class PackToTheFuture
                     'version' => $version,
                 ],
             ],
+            $nonFavouritePackagesKey => [],
         ];
 
         file_put_contents(
@@ -117,6 +117,7 @@ class PackToTheFuture
 
         $content = [
             'packages' => $packages,
+            'packages-dev' => [],
         ];
 
         file_put_contents(
