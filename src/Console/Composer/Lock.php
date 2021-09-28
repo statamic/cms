@@ -99,7 +99,10 @@ class Lock
     {
         $this->ensureExists();
 
-        $installed = collect(json_decode($this->files->get($this->path))->packages)
+        $lock = json_decode($this->files->get($this->path));
+
+        $installed = collect($lock->packages)
+            ->merge($lock->{'packages-dev'})
             ->keyBy('name')
             ->get($package);
 
