@@ -1,5 +1,15 @@
 # Release Notes
 
+## 3.2.10 (2020-09-30)
+
+### What's new
+- Add `ensureFieldsInSection` method to add multiple fields at the same time. [#4333](https://github.com/statamic/cms/issues/4333)
+
+### What's fixed
+- Fix taxonomy terms not returning accurate entries or counts when using certain combinations of collections and multisite. [#4335](https://github.com/statamic/cms/issues/4335)
+
+
+
 ## 3.2.9 (2020-09-28)
 
 ### What's new
