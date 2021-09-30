@@ -25,8 +25,8 @@ class LengthAwarePaginator extends BasePaginator
     /**
      * Make dynamic calls into the collection.
      *
-     * @param string $method
-     * @param array $parameters
+     * @param  string  $method
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

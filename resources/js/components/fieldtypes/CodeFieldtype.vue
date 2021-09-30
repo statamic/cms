@@ -89,11 +89,13 @@ export default {
         this.codemirror.on('focus', () => this.$emit('focus'));
         this.codemirror.on('blur', () => this.$emit('blur'));
 
-        // Refresh to ensure proper size
-        // Most applicable when loaded by another field like Bard, etc
-        this.$nextTick(function() {
-            this.codemirror.refresh();
-        })
+
+        // Refresh to ensure CodeMirror visible and the proper size
+        // Most applicable when loaded by another field like Bard
+        this.refresh();
+
+        // CodeMirror also needs to be manually refreshed when made visible in the DOM
+        this.$events.$on('tab-switched', this.refresh);
     },
 
     watch: {
@@ -101,7 +103,6 @@ export default {
             if (value == this.codemirror.doc.getValue()) return;
             this.codemirror.doc.setValue(value);
         },
-
         readOnlyOption(val) {
             this.codemirror.setOption('readOnly', val);
         }
@@ -110,8 +111,12 @@ export default {
     methods: {
         focus() {
             this.codemirror.focus();
+        },
+        refresh() {
+            this.$nextTick(function() {
+                this.codemirror.refresh();
+            })
         }
     }
-
 };
 </script>

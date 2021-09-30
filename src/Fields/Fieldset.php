@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Facades;
+use Statamic\Facades\Path;
 use Statamic\Support\Str;
 
 class Fieldset
@@ -23,6 +24,14 @@ class Fieldset
     public function handle(): ?string
     {
         return $this->handle;
+    }
+
+    public function path()
+    {
+        return Path::tidy(vsprintf('%s/%s.yaml', [
+            Facades\Fieldset::directory(),
+            str_replace('.', '/', $this->handle()),
+        ]));
     }
 
     public function setContents(array $contents)

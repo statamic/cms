@@ -9,7 +9,7 @@ interface Form extends Arrayable
     /**
      * Get or set the handle.
      *
-     * @param  string|null $name
+     * @param  string|null  $name
      * @return string
      */
     public function handle($handle = null);
@@ -17,7 +17,7 @@ interface Form extends Arrayable
     /**
      * Get or set the title.
      *
-     * @param  string|null $title
+     * @param  string|null  $title
      * @return string
      */
     public function title($title = null);
@@ -39,7 +39,7 @@ interface Form extends Arrayable
     /**
      * Get a submission.
      *
-     * @param  string $id
+     * @param  string  $id
      * @return Submission
      */
     public function submission($id);
@@ -54,7 +54,7 @@ interface Form extends Arrayable
     /**
      * Get or set the honeypot field.
      *
-     * @param  string|null $honeypot
+     * @param  string|null  $honeypot
      * @return string
      */
     public function honeypot($honeypot = null);
@@ -62,7 +62,7 @@ interface Form extends Arrayable
     /**
      * Get all the metrics.
      *
-     * @param array|null $metrics
+     * @param  array|null  $metrics
      * @return array
      */
     public function metrics($metrics = null);
@@ -70,7 +70,7 @@ interface Form extends Arrayable
     /**
      * Get or set the email config.
      *
-     * @param  array|null $email
+     * @param  array|null  $email
      * @return array
      */
     public function email($email = null);

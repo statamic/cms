@@ -53,6 +53,13 @@ class Entries extends Relationship
     protected function configFieldItems(): array
     {
         return array_merge(parent::configFieldItems(), [
+            'create' => [
+                'display' => __('Allow Creating'),
+                'instructions' => __('statamic::fieldtypes.entries.config.create'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'collections' => [
                 'display' => __('Collections'),
                 'type' => 'collections',
@@ -77,9 +84,7 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        $items = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
-
-        return $items->preProcessForIndex();
+        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
     }
 
     public function getResourceCollection($request, $items)
@@ -92,7 +97,7 @@ class Entries extends Relationship
             ]]);
     }
 
-    protected function getBlueprint($request)
+    protected function getBlueprint($request = null)
     {
         return $this->getFirstCollectionFromRequest($request)->entryBlueprint();
     }
@@ -253,5 +258,10 @@ class Entries extends Relationship
         }
 
         return $type;
+    }
+
+    public function getColumns()
+    {
+        return $this->getBlueprint()->columns()->values()->all();
     }
 }

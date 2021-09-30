@@ -35,6 +35,9 @@ class ParserTest extends TestCase
             'default_key' => 'two',
             'first_key' => 'three',
             'second_key' => 'deep',
+            'good' => true,
+            'bad' => false,
+            'unknown' => null,
             'string' => 'Hello wilderness',
             'simple' => ['one', 'two', 'three'],
             'complex' => [
@@ -389,9 +392,25 @@ EOT;
     {
         $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
 
-        $template = "{{ test variable='{{ true ? 'Hello wilderness' : 'fail' }}' }}";
+        $this->assertEquals('yes', $this->parse(
+            "{{ test variable='{{ good ? 'yes' : 'fail' }}' }}",
+            $this->variables
+        ));
 
-        $this->assertEquals('Hello wilderness', $this->parse($template, $this->variables));
+        $this->assertEquals('fail', $this->parse(
+            "{{ test variable='{{ bad ? 'yes' : 'fail' }}' }}",
+            $this->variables
+        ));
+
+        $this->assertEquals('fail', $this->parse(
+            "{{ test variable='{{ unknown ?? 'fail' }}' }}",
+            $this->variables
+        ));
+
+        $this->assertEquals('yes', $this->parse(
+            "{{ test variable='{{ !unknown ? 'yes' : 'fail' }}' }}",
+            $this->variables
+        ));
     }
 
     public function testNullCoalescence()
@@ -2183,6 +2202,7 @@ EOT;
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/2936
      **/
     public function it_compares_to_a_string_that_looks_like_array_access()
@@ -2196,6 +2216,7 @@ EOT;
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/3374
      **/
     public function it_parses_single_and_tag_pairs_with_modifiers()

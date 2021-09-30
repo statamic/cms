@@ -31,7 +31,7 @@ class DefaultCacher extends AbstractCacher
     /**
      * Handle event based API cache invalidation.
      *
-     * @param Event $event
+     * @param  Event  $event
      * @return void
      */
     public function handleInvalidationEvent(Event $event)
@@ -46,7 +46,7 @@ class DefaultCacher extends AbstractCacher
     /**
      * Track endpoint and return new cache key.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return string
      */
     protected function trackEndpoint($request)
@@ -88,7 +88,7 @@ class DefaultCacher extends AbstractCacher
     /**
      * Get cache key for endpoint.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return string
      */
     protected function getCacheKey(Request $request)

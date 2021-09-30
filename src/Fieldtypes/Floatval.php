@@ -11,10 +11,22 @@ class Floatval extends Fieldtype
     protected static $title = 'Float';
     protected static $handle = 'float';
 
+    protected function configFieldItems(): array
+    {
+        return [
+            'default' => [
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+        ];
+    }
+
     /**
      * Pre-process the data before it gets sent to the publish page.
      *
-     * @param mixed $data
+     * @param  mixed  $data
      * @return array|mixed
      */
     public function preProcess($data)

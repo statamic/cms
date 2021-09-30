@@ -48,6 +48,7 @@ class SiteClear extends Command
         $this
             ->clearCollections()
             ->clearNavigations()
+            ->clearTrees()
             ->clearTaxonomies()
             ->clearAssets()
             ->clearGlobals()
@@ -105,6 +106,20 @@ class SiteClear extends Command
     }
 
     /**
+     * Clear all trees.
+     *
+     * @return $this
+     */
+    protected function clearTrees()
+    {
+        $this->cleanAndKeep(base_path('content/trees'));
+
+        $this->info('Trees cleared successfully.');
+
+        return $this;
+    }
+
+    /**
      * Clear all taxonomies.
      *
      * @return $this
@@ -150,6 +165,11 @@ class SiteClear extends Command
         }
 
         if (! $disk = YAML::parse($container->getContents())['disk'] ?? false) {
+            return;
+        }
+
+        // Don't remove any of the default disks.
+        if (in_array($disk, ['local', 'public', 's3', 'assets'])) {
             return;
         }
 
@@ -216,7 +236,7 @@ class SiteClear extends Command
      */
     protected function clearGroups()
     {
-        $this->files->put(resource_path('users/groups.yaml'), <<<EOT
+        $this->files->put($this->preparePath(resource_path('users/groups.yaml')), <<<EOT
 # admin:
 #   title: Administrators
 #   roles:
@@ -236,7 +256,7 @@ EOT
      */
     protected function clearRoles()
     {
-        $this->files->put(resource_path('users/roles.yaml'), <<<EOT
+        $this->files->put($this->preparePath(resource_path('users/roles.yaml')), <<<EOT
 # admin:
 #   title: Administrator
 #   permissions:
@@ -324,7 +344,7 @@ EOT
     /**
      * Clean directory and add .gitkeep file.
      *
-     * @param string $path
+     * @param  string  $path
      */
     protected function cleanAndKeep($path)
     {
@@ -335,5 +355,22 @@ EOT
         $this->files->cleanDirectory($path);
 
         $this->files->put("{$path}/.gitkeep", '');
+    }
+
+    /**
+     * Prepare path directory.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    protected function preparePath($path)
+    {
+        $folder = preg_replace('/(.*)\/[^\/]+\.[^\/]+/', '$1', $path);
+
+        if (! $this->files->exists($folder)) {
+            $this->files->makeDirectory($folder, 0755, true);
+        }
+
+        return $path;
     }
 }

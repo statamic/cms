@@ -20,8 +20,11 @@ use Statamic\Support\Str;
 
 class Bard extends Replicator
 {
+    use Concerns\ResolvesStatamicUrls;
+
     public $category = ['text', 'structured'];
     protected $defaultValue = '[]';
+    protected $rules = [];
 
     protected function configFieldItems(): array
     {
@@ -155,7 +158,7 @@ class Bard extends Replicator
     protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
-            return $value;
+            return is_null($value) ? $value : $this->resolveStatamicUrls($value);
         }
 
         if ($this->isLegacyData($value)) {
@@ -178,7 +181,7 @@ class Bard extends Replicator
         })->all();
 
         if ($this->shouldSaveHtml()) {
-            return (new Augmentor($this))->convertToHtml($structure);
+            return (new Augmentor($this))->withStatamicImageUrls()->convertToHtml($structure);
         }
 
         if ($structure === [['type' => 'paragraph']]) {
@@ -223,6 +226,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
+            $value = str_replace('statamic://', '', $value);
             $doc = (new \HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {

@@ -13,8 +13,8 @@ class Config
     /**
      * Get a config variable.
      *
-     * @param string      $key      The name of the key
-     * @param mixed|bool  $default  The fallback value
+     * @param  string  $key  The name of the key
+     * @param  mixed|bool  $default  The fallback value
      * @return mixed
      */
     public function get($key, $default = false)
@@ -25,8 +25,8 @@ class Config
     /**
      * Set a config variable.
      *
-     * @param string $key  The name of the key
-     * @param mixed $value The value to set
+     * @param  string  $key  The name of the key
+     * @param  mixed  $value  The value to set
      */
     public function set($key, $value)
     {
@@ -77,7 +77,7 @@ class Config
     /**
      * Get the current locale's full code for date string translations.
      *
-     * @param string|null $locale
+     * @param  string|null  $locale
      * @return string
      */
     public function getFullLocale($locale = null)
@@ -88,7 +88,7 @@ class Config
     /**
      * Get the current locale's short code.
      *
-     * @param string|null $locale
+     * @param  string|null  $locale
      * @return string
      */
     public function getShortLocale($locale = null)
@@ -99,7 +99,7 @@ class Config
     /**
      * Get the current locale's name.
      *
-     * @param string|null $locale
+     * @param  string|null  $locale
      * @return string
      */
     public function getLocaleName($locale = null)
@@ -130,7 +130,7 @@ class Config
     /**
      * Get the locales that aren't the current (or specified) one.
      *
-     * @param string|null $locale The locale to treat as the current one
+     * @param  string|null  $locale  The locale to treat as the current one
      * @return array
      */
     public function getOtherLocales($locale = null)
@@ -145,7 +145,7 @@ class Config
     /**
      * Get the site URL.
      *
-     * @param string|null $locale Optionally get the site url for a locale
+     * @param  string|null  $locale  Optionally get the site url for a locale
      * @return mixed
      */
     public function getSiteUrl($locale = null)
@@ -157,6 +157,7 @@ class Config
      * Get the image manipulation presets.
      *
      * @return array
+     *
      * @deprecated Use Statamic\Facades\Image::userManipulationPresets()
      *             or Image::manipulationPresets() to get merged with CP presets.
      */

@@ -9,11 +9,14 @@ class Html extends Fieldtype
     protected static $title = 'HTML';
     protected $icon = 'html';
 
-    protected $configFields = [
-        'html' => [
-            'display' => 'HTML',
-            'type' => 'code',
-            'mode' => 'htmlmixed',
-        ],
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            'html' => [
+                'display' => 'HTML',
+                'type' => 'code',
+                'mode' => 'htmlmixed',
+            ],
+        ];
+    }
 }

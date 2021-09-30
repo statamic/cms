@@ -15,8 +15,7 @@ trait HasOrigin
 
     public function value($key)
     {
-        return $this->get($key)
-            ?? ($this->hasOrigin() ? $this->origin()->value($key) : null);
+        return $this->values()->get($key);
     }
 
     public function origin($origin = null)

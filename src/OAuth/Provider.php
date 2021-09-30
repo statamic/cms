@@ -24,8 +24,8 @@ class Provider
     /**
      * Get a Statamic user ID from an OAuth user ID.
      *
-     * @param string $id  User ID from an OAuth provider
-     * @return string|null  A Statamic user ID
+     * @param  string  $id  User ID from an OAuth provider
+     * @return string|null A Statamic user ID
      */
     public function getUserId(string $id): ?string
     {
@@ -44,7 +44,7 @@ class Provider
     /**
      * Create a Statamic user from a Socialite user.
      *
-     * @param SocialiteUser $socialite
+     * @param  SocialiteUser  $socialite
      * @return StatamicUser
      */
     public function createUser($socialite): StatamicUser

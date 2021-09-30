@@ -95,7 +95,10 @@
     width: fit-content;
 }
 
-[v-cloak] { display: none }
+[v-cloak],
+[x-cloak] {
+    display: none
+}
 
 .loading-blocker {
     @apply absolute inset-0 z-10;
@@ -143,5 +146,5 @@
 }
 
 .bg-checkerboard {
-    background: url('../img/trans-bg.gif');
+    background: url('../img/checkerboard.png');
 }

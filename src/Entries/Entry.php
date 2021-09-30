@@ -703,11 +703,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return Facades\Entry::find($origin);
     }
 
-    public function value($key)
-    {
-        return $this->originValue($key) ?? $this->collection()->cascade($key);
-    }
-
     public function values()
     {
         return $this->collection()->cascade()->merge($this->originValues());
@@ -732,6 +727,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         if ($field === 'site') {
             return $this->site();
+        }
+
+        if ($field === 'parent') {
+            return optional($this->parent())->entry();
         }
 
         return $this->traitResolveGqlValue($field);
