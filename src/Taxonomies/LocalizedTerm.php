@@ -17,6 +17,7 @@ use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
@@ -196,12 +197,20 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
 
     public function entries()
     {
-        return $this->term->entries();
+        return $this->queryEntries()->where('site', $this->locale())->get();
     }
 
     public function entriesCount()
     {
-        return $this->term->entriesCount();
+        $key = vsprintf('term-entries-count-%s-%s-%s', [
+            $this->locale(),
+            $this->id(),
+            optional($this->collection())->handle(),
+        ]);
+
+        return Blink::once($key, function () {
+            return Facades\Term::entriesCount($this);
+        });
     }
 
     protected function revisionKey()
