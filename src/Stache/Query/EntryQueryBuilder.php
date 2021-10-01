@@ -85,7 +85,6 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
                     });
             });
 
-
             // Perform the filtering, and get the keys (the references, we don't care about the values).
             $method = 'filterWhere'.$where['type'];
             $keys = $this->{$method}($items, $where)->keys();
