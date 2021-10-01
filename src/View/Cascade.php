@@ -105,8 +105,6 @@ class Cascade
             $callback($this);
         }
 
-        $this->hydratedCallbacks = [];
-
         return $this;
     }
 
