@@ -11,7 +11,7 @@ class TermQueryBuilder extends Builder
     protected $taxonomies;
     protected $collections;
 
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null, $boolean = null)
     {
         if ($column === 'taxonomy') {
             $this->taxonomies[] = $operator;
@@ -25,7 +25,12 @@ class TermQueryBuilder extends Builder
             return $this;
         }
 
-        return parent::where($column, $operator, $value);
+        return parent::where($column, $operator, $value, $boolean);
+    }
+
+    public function orWhere($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'or');
     }
 
     public function whereIn($column, $values)
@@ -43,6 +48,11 @@ class TermQueryBuilder extends Builder
         }
 
         return parent::whereIn($column, $values);
+    }
+
+    public function orWhereIn($column, $values)
+    {
+        return $this->whereIn($column, $values, 'or');
     }
 
     protected function collect($items = [])

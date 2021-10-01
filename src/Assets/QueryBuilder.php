@@ -93,7 +93,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
             : Facades\AssetContainer::find($this->container);
     }
 
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null, $boolean = null)
     {
         if ($column === 'container') {
             throw_if($this->container, new Exception('Only one asset container may be queried.'));
@@ -102,7 +102,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
             return $this;
         }
 
-        return parent::where($column, $operator, $value);
+        return parent::where($column, $operator, $value, $boolean);
     }
 
     protected function collect($items = [])

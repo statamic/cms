@@ -12,7 +12,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     protected $collections;
 
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null, $boolean = null)
     {
         if ($column === 'collection') {
             $this->collections[] = $operator;
@@ -20,10 +20,15 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             return $this;
         }
 
-        return parent::where($column, $operator, $value);
+        return parent::where($column, $operator, $value, $boolean);
     }
 
-    public function whereIn($column, $values)
+    public function orWhere($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'or');
+    }
+
+    public function whereIn($column, $values, $boolean = null)
     {
         if (in_array($column, ['collection', 'collections'])) {
             $this->collections = array_merge($this->collections ?? [], $values);
@@ -31,7 +36,12 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             return $this;
         }
 
-        return parent::whereIn($column, $values);
+        return parent::whereIn($column, $values, $boolean);
+    }
+
+    public function orWhereIn($column, $values)
+    {
+        return $this->whereIn($column, $values, 'or');
     }
 
     protected function collect($items = [])
@@ -75,9 +85,13 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
                     });
             });
 
+
             // Perform the filtering, and get the keys (the references, we don't care about the values).
             $method = 'filterWhere'.$where['type'];
             $keys = $this->{$method}($items, $where)->keys();
+
+            if ($where['boolean'] == 'or')
+                return $ids ? $ids->concat($keys)->values() : $keys;
 
             // Continue intersecting the keys across the where clauses.
             // If a key exists in the reduced array but not in the current iteration, it should be removed.
