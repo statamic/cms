@@ -73,7 +73,7 @@ class ParentTags extends Tags
      */
     private function getParent()
     {
-        $segments = explode('/', Str::start(Str::after(URL::getCurrent(), Site::current()->url()), '/'));
+        $segments = explode('/', Str::after(URL::getCurrent(), Site::current()->url().'/'));
         $segment_count = count($segments);
         $segments[0] = '/';
 
