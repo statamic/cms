@@ -33,7 +33,7 @@ class TermQueryBuilder extends Builder
         return $this->where($column, $operator, $value, 'or');
     }
 
-    public function whereIn($column, $values)
+    public function whereIn($column, $values, $boolean = null)
     {
         if (in_array($column, ['taxonomy', 'taxonomies'])) {
             $this->taxonomies = array_merge($this->taxonomies ?? [], $values);
@@ -105,6 +105,9 @@ class TermQueryBuilder extends Builder
             // Perform the filtering, and get the keys (the references, we don't care about the values).
             $method = 'filterWhere'.$where['type'];
             $keys = $this->{$method}($items, $where)->keys();
+
+            if ($where['boolean'] == 'or')
+                return $ids ? $ids->concat($keys)->values() : $keys;
 
             // Continue intersecting the keys across the where clauses.
             // If a key exists in the reduced array but not in the current iteration, it should be removed.
