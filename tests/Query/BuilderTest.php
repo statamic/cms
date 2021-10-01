@@ -42,4 +42,12 @@ class BuilderTest extends TestCase
         $this->assertSame($searchedEntry, $retrievedEntry);
         $this->assertSame($retrievedEntry->selectedQueryColumns(), $columns);
     }
+
+    /** @test **/
+    public function entries_are_found_using_or_where()
+    {
+        $this->createDummyCollectionAndEntries();
+        $entries = Entry::query()->where('title', 'Post 1')->orWhere('title', 'Post 3')->get();
+        $this->assertCount(2, $entries->count());
+    }
 }

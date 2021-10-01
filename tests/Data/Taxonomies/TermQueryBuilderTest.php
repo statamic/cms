@@ -41,6 +41,18 @@ class TermQueryBuilderTest extends TestCase
     }
 
     /** @test */
+    public function it_filters_using_or_wheres()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'foo'])->save();
+
+        $terms = Term::query()->where('test', 'foo')->orWhere('test', 'bar')->get();
+        $this->assertEquals(['a', 'b', 'c'], $terms->map->slug()->sort()->values()->all());
+    }
+
+    /** @test */
     public function it_filters_by_taxonomy()
     {
         Taxonomy::make('tags')->save();
