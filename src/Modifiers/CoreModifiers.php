@@ -1588,7 +1588,13 @@ class CoreModifiers extends Modifier
         }
 
         $items = $value->map(function ($item) use ($key) {
-            return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+            if (is_object($item)) {
+                return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+            } 
+
+            if (is_array($item)) {
+                return Arr::get($item, $key);
+            }
         });
 
         return $wasArray ? $items->all() : $items;

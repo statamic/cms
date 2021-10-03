@@ -1,3 +1,4 @@
+
 <?php
 
 namespace Tests\Modifiers;
@@ -67,6 +68,34 @@ class PluckTest extends TestCase
         $this->assertEquals(['food', 'food', 'drink', 'drink'], $modified->all());
     }
 
+    /** @test */
+    public function it_plucks_values_from_array_of_items_of_type_array()
+    {
+        $items = $this->itemsOfTypeArray();
+
+        $modified = $this->modify($items, 'title');
+        $this->assertIsArray($modified);
+        $this->assertEquals(['Bread', 'Coffee'], $modified);
+
+        $modified = $this->modify($items, 'type');
+        $this->assertIsArray($modified);
+        $this->assertEquals(['food', 'drink'], $modified);
+    }
+
+    /** @test */
+    public function it_plucks_values_from_collections_of_items_of_type_array()
+    {
+        $items = $items = EntryCollection::make($this->itemsOfTypeArray());
+
+        $modified = $this->modify($items, 'title');
+        $this->assertInstanceOf(EntryCollection::class, $modified);
+        $this->assertEquals(['Bread', 'Coffee'], $modified->all());
+
+        $modified = $this->modify($items, 'type');
+        $this->assertInstanceOf(EntryCollection::class, $modified);
+        $this->assertEquals(['food', 'drink'], $modified->all());
+    }
+
     private function items()
     {
         return [
@@ -82,6 +111,14 @@ class PluckTest extends TestCase
             $breadEs = new ItemWithOrigin(['title' => 'Pan'], $breadEn),
             $coffeeEn = new ItemWithOrigin(['title' => 'Coffee', 'type' => 'drink']),
             $coffeeEs = new ItemWithOrigin(['title' => 'Cafe'], $coffeeEn),
+        ];
+    }
+
+    private function itemsOfTypeArray()
+    {
+        return [
+            ['title' => 'Bread', 'type' => 'food'],
+            ['title' => 'Coffee', 'type' => 'drink'],
         ];
     }
 
