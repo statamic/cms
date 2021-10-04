@@ -61,6 +61,14 @@ export default {
             this.$emit('removed', this.asset);
         },
 
+        open() {
+            window.open(this.asset.url, '_blank');
+        },
+
+        download() {
+            window.open(this.asset.downloadUrl);
+        },
+
         makeZoomable() {
             const el = $(this.$el).find('a.zoom')[0];
 

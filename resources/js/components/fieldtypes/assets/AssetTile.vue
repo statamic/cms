@@ -46,6 +46,19 @@
                         class="btn btn-icon icon icon-trash"
                         :alt="__('Remove')"></button>
                 </div>
+
+                <div class="asset-controls" v-if="readOnly">
+                    <button
+                        @click="open"
+                        class="btn btn-icon icon icon-link"
+                        :alt="__('Open in a new window')"></button>
+
+                    <button
+                        v-if="asset.allowDownloading"
+                        @click="download"
+                        class="btn btn-icon icon icon-download"
+                        :alt="__('Download file')"></button>
+                </div>
             </div>
         </div>
 
