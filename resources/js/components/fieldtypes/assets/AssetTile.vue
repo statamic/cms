@@ -49,6 +49,7 @@
 
                 <div class="asset-controls" v-if="readOnly">
                     <button
+                        v-if="asset.url"
                         @click="open"
                         class="btn btn-icon icon icon-link"
                         :alt="__('Open in a new window')"></button>
