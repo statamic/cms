@@ -17,7 +17,7 @@ return [
     'asset_container_rename_instructions' => 'Ist diese Option aktiviert, können Benutzer*innen Dateien in diesem Container umbenennen.',
     'asset_container_title_instructions' => 'Gewöhnlich ein Substantiv im Plural, wie z.B. Bilder oder Dokumente.',
     'asset_folders_directory_instructions' => 'Wir empfehlen Leer- und Sonderzeichen zu vermeiden, damit die URLs korrekt bleiben.',
-    'blueprints_hidden_instructions' => 'Blendet das Blueprint bei den „Erstellen“-Buttons im CP aus.',
+    'blueprints_hidden_instructions' => 'Blendet den Blueprint bei den „Erstellen“-Buttons im CP aus.',
     'blueprints_intro' => 'Blueprints definieren und organisieren Felder, mit denen die Inhaltsmodelle von Sammlungen, Formularen und anderen Datentypen erstellt werden.',
     'blueprints_title_instructions' => 'Gewöhnlich ein einzelnes Substantiv, wie z.B. Artikel oder Produkt.',
     'cache_utility_application_cache_description' => 'Laravels gemeinsamer Cache, der von Statamic, Addons und Composer-Paketen verwendet wird.',
