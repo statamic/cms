@@ -57,6 +57,12 @@ class ParserTest extends TestCase
         ];
     }
 
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+        $app['config']->set('statamic.antlers.version', 'regex');
+    }
+
     private function parse($template, $data = [])
     {
         return (string) Antlers::parse($template, $data);
