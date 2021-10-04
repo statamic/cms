@@ -1,5 +1,19 @@
 # Release Notes
 
+## 3.2.11 (2020-10-04)
+
+### What's improved
+- Updated German translations. [#4373](https://github.com/statamic/cms/issues/4373)
+
+### What's fixed
+- Added `Cascade::hydrated()` callback method so you can manipulate its data after being hydrated. [#4359](https://github.com/statamic/cms/issues/4359)
+- Fix extra live preview data not being in view. [#4359](https://github.com/statamic/cms/issues/4103)
+- Make `pluck` modifier work with arrays. [#4374](https://github.com/statamic/cms/issues/4374)
+- Fix `parent` tag not finding the parent in some cases. [#4345](https://github.com/statamic/cms/issues/4345)
+- `Search::indexExists()` returns `false` rather than throwing an exception. [#4244](https://github.com/statamic/cms/issues/4244)
+
+
+
 ## 3.2.10 (2020-09-30)
 
 ### What's new
