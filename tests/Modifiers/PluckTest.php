@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use Illuminate\Support\Collection;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasOrigin;
 use Statamic\Entries\EntryCollection;
@@ -28,14 +29,14 @@ class PluckTest extends TestCase
     /** @test */
     public function it_plucks_values_from_collections_of_items()
     {
-        $items = EntryCollection::make($this->items());
+        $items = Collection::make($this->items());
 
         $modified = $this->modify($items, 'title');
-        $this->assertInstanceOf(EntryCollection::class, $modified);
+        $this->assertInstanceOf(Collection::class, $modified);
         $this->assertEquals(['Bread', 'Coffee'], $modified->all());
 
         $modified = $this->modify($items, 'type');
-        $this->assertInstanceOf(EntryCollection::class, $modified);
+        $this->assertInstanceOf(Collection::class, $modified);
         $this->assertEquals(['food', 'drink'], $modified->all());
     }
 
