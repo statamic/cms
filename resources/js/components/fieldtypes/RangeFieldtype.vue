@@ -52,7 +52,7 @@ export default {
 
     watch: {
         val(value) {
-            this.update(value);
+            this.updateDebounced(value);
         }
     }
 

@@ -101,7 +101,7 @@ export default {
         data: {
             deep: true,
             handler (data) {
-                this.update(this.sortableToArray(data));
+                this.updateDebounced(this.sortableToArray(data));
             }
         },
 
