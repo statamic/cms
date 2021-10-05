@@ -282,7 +282,7 @@ export default {
             if (!this.mounted) return;
 
             // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
-            this.update(JSON.stringify(json));
+            this.updateDebounced(JSON.stringify(json));
         },
 
         value(value, oldValue) {

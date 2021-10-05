@@ -71,7 +71,7 @@ export default {
         },
 
         slug(slug) {
-            this.update(slug);
+            this.updateDebounced(slug);
         }
 
     },

@@ -68,7 +68,7 @@ export default {
             if (option === null) {
                 this.update(null);
             } else if (option === 'url') {
-                this.update(this.urlValue);
+                this.updateDebounced(this.urlValue);
             } else if (option === 'first-child') {
                 this.update('@child');
             } else if (option === 'entry') {
