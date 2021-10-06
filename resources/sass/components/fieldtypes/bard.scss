@@ -134,7 +134,7 @@
         margin-left: -3px
     }
 
-    button {
+    .bard-toolbar-button {
         @apply text-grey-20 h-10 w-10 text-center bg-black rounded-lg flex items-center justify-center;
         font-size: 16px;
         transition: all .1s ease-in-out;
@@ -143,19 +143,19 @@
         }
     }
 
-    button:hover {
+    .bard-toolbar-button:hover {
         @apply .text-white;
     }
 
-    button.active {
+    .bard-toolbar-button.active {
         @apply .text-blue;
     }
 
-    button:focus {
+    .bard-toolbar-button:focus {
         outline: none;
     }
 
-    button:disabled {
+    .bard-toolbar-button:disabled {
         @apply .opacity-50;
         &:hover {
             @apply .text-grey-20;
