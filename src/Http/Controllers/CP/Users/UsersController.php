@@ -92,6 +92,7 @@ class UsersController extends CpController
                 'save' => cp_route('users.store'),
             ],
             'expiry' => $expiry,
+            'separateNameFields' => $blueprint->hasField('first_name'),
         ];
 
         if ($request->wantsJson()) {
@@ -108,7 +109,7 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->only(['email', 'name'])->addValues($request->all());
+        $fields = $blueprint->fields()->only(['email', 'name', 'first_name', 'last_name'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
