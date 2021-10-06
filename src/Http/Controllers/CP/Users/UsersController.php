@@ -54,10 +54,12 @@ class UsersController extends CpController
             ->paginate(request('perPage'));
 
         return (new Users($users))
-            ->blueprint(User::blueprint())
+            ->blueprint($blueprint = User::blueprint())
             ->columns(collect([
                 Column::make('email')->label(__('Email')),
-                Column::make('name')->label(__('Name')),
+                $blueprint->hasField('name') ? Column::make('name')->label(__('Name')) : null,
+                $blueprint->hasField('first_name') ? Column::make('first_name')->label(__('First Name')) : null,
+                $blueprint->hasField('last_name') ? Column::make('last_name')->label(__('Last Name')) : null,
                 Statamic::pro() ? Column::make('roles')->label(__('Roles'))->fieldtype('relationship')->sortable(false) : null,
                 Column::make('last_login')->label(__('Last Login'))->sortable(false),
             ])->filter()->values()->all())
