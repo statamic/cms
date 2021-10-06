@@ -1,5 +1,20 @@
 # Release Notes
 
+## 3.2.12 (2020-10-06)
+
+### What's improved
+- Added debouncing to a number of fieldtypes to prevent slowdowns in some situations. [#4393](https://github.com/statamic/cms/issues/4393)
+- Updated French translations [#4382](https://github.com/statamic/cms/issues/4382)
+
+### What's fixed
+- Fixed Bard's floating toolbar button styles leaking outside of the toolbar. [#4383](https://github.com/statamic/cms/issues/4383)
+- Use separate first/last name fields in the user listing and wizard when applicable. [#4408](https://github.com/statamic/cms/issues/4408) [#4399](https://github.com/statamic/cms/issues/4399)
+- Fix issue where enabling a site on a taxonomy would not show the terms until the cache is cleared. [#4400](https://github.com/statamic/cms/issues/4400)
+- Add missing dimensions icon dimensions. [#4396](https://github.com/statamic/cms/issues/4396)
+- Bump `composer/composer` in test suite. [#4401](https://github.com/statamic/cms/issues/4401)
+
+
+
 ## 3.2.11 (2020-10-04)
 
 ### What's improved
