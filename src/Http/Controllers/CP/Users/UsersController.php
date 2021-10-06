@@ -92,7 +92,7 @@ class UsersController extends CpController
                 'save' => cp_route('users.store'),
             ],
             'expiry' => $expiry,
-            'separate_name_fields' => $blueprint->hasField('first_name'),
+            'separateNameFields' => $blueprint->hasField('first_name'),
         ];
 
         if ($request->wantsJson()) {
