@@ -271,9 +271,7 @@ class ParserTestCase extends TestCase
         $processor = new NodeProcessor($loader, $envDetails, $this->getLibraryManager());
         $processor->setData($data);
 
-        $runtimeParser = new RuntimeParser($documentParser, $processor);
-
-        return $runtimeParser;
+        return new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
     }
 
     protected function renderLibraryMethod($text, $data = [], $withCoreTagsAndModifiers = false)
@@ -304,7 +302,7 @@ class ParserTestCase extends TestCase
         $processor->setRuntimeConfiguration($config);
         $processor->setData($data);
 
-        $runtimeParser = new RuntimeParser($documentParser, $processor);
+        $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
 
         if ($withCoreTagsAndModifiers) {
             $runtimeParser->cascade(app(Cascade::class));
@@ -333,7 +331,7 @@ class ParserTestCase extends TestCase
         $processor = new NodeProcessor($loader, $envDetails, $this->getLibraryManager());
         $processor->setData($data);
 
-        $runtimeParser = new RuntimeParser($documentParser, $processor);
+        $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
 
         if ($withCoreTagsAndModifiers) {
             $runtimeParser->cascade(app(Cascade::class));

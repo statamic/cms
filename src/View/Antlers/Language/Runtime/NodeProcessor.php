@@ -372,6 +372,12 @@ class NodeProcessor
                     Arr::set($this->data[$i], $path, $value);
                 }
 
+                if ($start >= count($this->data)) {
+                    $targetIndex = count($this->data) - 1;
+                    Arr::set($this->data[$targetIndex], $path, $value);
+                    $this->previousAssignments[$path] = $targetIndex;
+                }
+
                 if ($lockData != null) {
                     for ($i = $start; $i < count($lockData); $i++) {
                         Arr::set($lockData[$i], $path, $value);
@@ -782,6 +788,15 @@ class NodeProcessor
         return $environment->evaluate([$group]);
     }
 
+    public function evaluateDeferredVariable(AbstractNode $deferredNode)
+    {
+        $environment = new Environment($this->libraryManager);
+        $environment->setProcessor($this);
+        $environment->cascade($this->cascade)->setData(($this->getActiveData()));
+
+        return $environment->evaluate([$deferredNode]);
+    }
+
     /**
      * Consults the runtime configuration to check
      * if the tag path should be evaluated.
@@ -1151,6 +1166,7 @@ class NodeProcessor
                             GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$node->name->methodPart][] = GlobalRuntimeState::$yieldCount;
 
                             $buffer .= $bufferOverride;
+                            $this->data = $lockData;
 
                             if ($this->isTracingEnabled()) {
                                 $this->runtimeConfiguration->traceManager->traceOnExit($node, $bufferOverride);
@@ -1181,6 +1197,8 @@ class NodeProcessor
                                 $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                             }
 
+                            $this->data = $lockData;
+
                             continue;
                         }
 
@@ -1198,6 +1216,8 @@ class NodeProcessor
                                 $this->runtimeConfiguration->traceManager->traceOnExit($node, $buffer);
                             }
 
+                            $this->data = $lockData;
+
                             continue;
                         }
 
@@ -1214,6 +1234,10 @@ class NodeProcessor
 
                                 GlobalRuntimeState::$activeTracerCount -= 1;
 
+                                $this->data = $lockData;
+                                $this->processAssignments(GlobalRuntimeState::$tracedRuntimeAssignments);
+                                $lockData = $this->data;
+
                                 if (GlobalRuntimeState::$activeTracerCount == 0) {
                                     GlobalRuntimeState::$traceTagAssignments = false;
                                     GlobalRuntimeState::$tracedRuntimeAssignments = [];
@@ -1223,6 +1247,9 @@ class NodeProcessor
                         array_pop(GlobalRuntimeState::$globalTagEnterStack);
 
                         $buffer .= $this->measureBufferAppend($node, $output);
+
+                        $this->data = $lockData;
+                        continue;
                     } else {
                         if ($node->name->name == 'once') {
                             $node->isNodeAbandoned = true;
@@ -1287,6 +1314,15 @@ class NodeProcessor
                             }
 
                             $restoreData = $this->data;
+
+                            if ($node->isPaired()) {
+                                $environment->setReduceFinal(false);
+                            } else {
+                                $environment->setReduceFinal(true);
+                            }
+
+                            $environment->setIsPaired($node->isPaired());
+
                             $runtimeResult = $environment->evaluate($node->parsedRuntimeNodes);
                             $this->data = $restoreData;
 

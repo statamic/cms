@@ -553,6 +553,10 @@ class AntlersNode extends AbstractNode
             $index = $offset;
         }
 
+        if ($this->parser == null) {
+            return $offset;
+        }
+
         return $this->parser->positionFromOffset($this->startPosition->offset + $offset + mb_strlen($this->rawStart), $index);
     }
 

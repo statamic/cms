@@ -15,9 +15,13 @@ use Statamic\View\Antlers\Language\Errors\LineRetriever;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
+use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
+use Statamic\View\Antlers\Language\Nodes\Position;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
+use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
+use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -80,10 +84,26 @@ class RuntimeParser implements ParserContract
      */
     private $tempFileCreated = null;
 
-    public function __construct(DocumentParser $documentParser, NodeProcessor $nodeProcessor)
+    /**
+     * The Antlers Lexer instance.
+     *
+     * @var AntlersLexer
+     */
+    private $antlersLexer = null;
+
+    /**
+     * The Antlers Parser instance.
+     *
+     * @var LanguageParser
+     */
+    private $antlersParser = null;
+
+    public function __construct(DocumentParser $documentParser, NodeProcessor $nodeProcessor, AntlersLexer $lexer, LanguageParser $antlersParser)
     {
         $this->documentParser = $documentParser;
         $this->nodeProcessor = $nodeProcessor;
+        $this->antlersLexer = $lexer;
+        $this->antlersParser = $antlersParser;
     }
 
     /**
@@ -498,6 +518,56 @@ class RuntimeParser implements ParserContract
     }
 
     /**
+     * Constructs a "virtual" node from the provided text.
+     *
+     * @param string $text The node content.
+     * @return AntlersNode
+     */
+    private function wrapText($text)
+    {
+        $node = new AntlersNode();
+
+        $mockPosition = new Position();
+        $mockPosition->offset = 0;
+        $mockPosition->line = 0;
+        $mockPosition->char = 0;
+
+        $node->startPosition = $mockPosition;
+        $node->endPosition = $mockPosition;
+
+        $node->content = $text;
+
+        return $node;
+    }
+
+    /**
+     * Tests if the full Antlers Lexer & Parser should be used to parse the provided text.
+     *
+     * @param string $text The input to test.
+     * @return bool
+     */
+    private function shouldUseFullParserForVariable($text)
+    {
+        return Str::contains($text, [
+            DocumentParser::Punctuation_Pipe,
+            DocumentParser::LeftBracket,
+            DocumentParser::RightBracket,
+            DocumentParser::LeftBrace,
+            DocumentParser::RightBrace,
+            DocumentParser::LeftParen,
+            DocumentParser::RightParent,
+            DocumentParser::Punctuation_Exclamation,
+            DocumentParser::Punctuation_Question,
+            DocumentParser::Punctuation_Ampersand,
+            DocumentParser::Punctuation_Equals,
+            LanguageKeywords::LogicalXor,
+            LanguageKeywords::LogicalOr,
+            LanguageKeywords::LogicalNot,
+            LanguageKeywords::LogicalAnd
+        ]);
+    }
+
+    /**
      * Takes a scope-notated key and finds the value for it in the given
      * array or object.
      *
@@ -511,6 +581,29 @@ class RuntimeParser implements ParserContract
      */
     public function getVariable($key, $context, $default = null)
     {
+        // If the incoming key has the | character, we will assume that
+        // it contains modifiers. To handle this case, we will hand
+        // the incoming string off to the Antlers lexer, parser
+        // and finally, through the runtime processor & env.
+        if ($this->shouldUseFullParserForVariable($key)) {
+            // 1: Create a wrapper node to contain the text.
+            $wrappedNode =  $this->wrapText($key);
+            $tokens = $this->antlersLexer->tokenize($wrappedNode, $key);
+            $antlersNodes = $this->antlersParser->parse($tokens);
+            //                           SG        LG
+            $variableNode = $antlersNodes[0]->nodes[0];
+
+            // We don't want to share the previous processor instance and
+            // accidentally mess up it's internal state while handling
+            // any variables that are being resolved for parameters.
+            /** @var NodeProcessor $processor */
+            $processor = app(NodeProcessor::class);
+            $processor->cascade($this->cascade)->setData($context);
+
+            // Evaluate the variable, and return the results.
+            return $processor->evaluateDeferredVariable($variableNode);
+        }
+
         $pathParser = new PathParser();
 
         $path = $pathParser->parse($key);

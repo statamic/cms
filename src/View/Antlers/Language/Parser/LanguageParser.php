@@ -48,7 +48,10 @@ use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\NotStrictEqualComp
 use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\SpaceshipCompOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\StrictEqualCompOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\LanguageOperatorConstruct;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalAndOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\LogicalNegationOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalOrOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalXorOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\NullCoalesceOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\ScopeAssignmentOperator;
 use Statamic\View\Antlers\Language\Nodes\StringValueNode;
@@ -2152,7 +2155,11 @@ class LanguageParser
 
             if ($subToken instanceof ModifierSeparator ||
                 $subToken instanceof LogicalGroupEnd ||
-                $subToken instanceof LogicalGroupBegin) {
+                $subToken instanceof LogicalGroupBegin ||
+                $subToken instanceof LogicalOrOperator ||
+                $subToken instanceof LogicalAndOperator ||
+                $subToken instanceof LogicalNegationOperator ||
+                $subToken instanceof LogicalXorOperator) {
                 break;
             } else {
                 $subTokens[] = $subToken;

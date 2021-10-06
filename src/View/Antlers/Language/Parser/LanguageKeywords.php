@@ -15,4 +15,14 @@ class LanguageKeywords
     const ArrList = 'list';
 
     const ScopeAs = 'as';
+
+    public static function isLanguageLogicalKeyword($value)
+    {
+        if ($value == self::LogicalAnd || $value == self::LogicalNot || $value == self::LogicalOr || $value == self::LogicalXor) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

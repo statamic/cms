@@ -501,7 +501,14 @@ class CollectionTest extends TestCase
         $this->assertEquals('test', Antlers::parse('{{ collection:handle }}', ['collection' => $collection]));
 
         try {
-            Antlers::parse('{{ collection from="somewhere" }}{{ title }}{{ /collection }}', ['collection' => $collection]);
+            // Updated to use the syntax to force the tag execution since there is a variable
+            // with the same name. Runtime currently gives variables the highest priority.
+            //
+            // When confronted with ambiguous situations, variables are given priority:
+            //   - collection will resolve to the variable if it exists, then look for a tag.
+            //   - ^collection will hint to the runtime to always execute the tag.
+            //   - $collection will hint to the runtime to always treat it as a variable (default).
+            Antlers::parse('{{ ^collection from="somewhere" }}{{ title }}{{ /collection }}', ['collection' => $collection]);
             $this->fail('Exception not thrown');
         } catch (CollectionNotFoundException $e) {
             $this->assertEquals('Collection [somewhere] not found', $e->getMessage());

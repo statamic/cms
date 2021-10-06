@@ -331,7 +331,11 @@ class PathDataManager
                         $didScanSourceData = true;
 
                         if ($pathItem->isFinal == false || $this->reduceFinal) {
-                            $this->compact();
+                            if (! $pathItem->isFinal) {
+                                $this->compact(false);
+                            } else {
+                                $this->compact(true);
+                            }
                         }
 
                         if (count($path->pathParts) > 1 && $this->isPair == false) {
@@ -353,7 +357,7 @@ class PathDataManager
                                 $didScanSourceData = true;
 
                                 if ($pathItem->isFinal == false || $this->reduceFinal) {
-                                    $this->compact();
+                                    $this->compact(false);
                                 }
 
                                 if (count($path->pathParts) > 1 && $this->isPair == false) {
@@ -394,7 +398,7 @@ class PathDataManager
                     }
 
                     if ($pathItem->isFinal == false || $this->reduceFinal) {
-                        $this->compact();
+                        $this->compact(false);
                     }
 
                     continue;
@@ -412,7 +416,7 @@ class PathDataManager
         }
 
         if ($this->isPair && ! $this->reduceFinal) {
-            $this->compact();
+            $this->compact(true);
         }
 
         $this->namedSlotsInScope = false;
@@ -464,7 +468,7 @@ class PathDataManager
             $this->resolvedPath[] = '{method:'.$varPath.'}';
 
             if ($doCompact) {
-                $this->compact();
+                $this->compact($path->isFinal);
             }
         } elseif (is_array($this->reducedVar)) {
             if (array_key_exists($varPath, $this->reducedVar)) {
@@ -472,7 +476,11 @@ class PathDataManager
                 $this->reducedVar = $this->reducedVar[$varPath];
 
                 if ($doCompact) {
-                    $this->compact();
+                    if ($path != null && is_object($path)) {
+                        $this->compact($path->isFinal);
+                    } else {
+                        $this->compact(false);
+                    }
                 }
             } else {
                 $this->reducedVar = null;
@@ -488,13 +496,21 @@ class PathDataManager
 
     /**
      * Compacts the last resolved variable.
+     *
+     * @param bool $isFinal Indicates if the current value is the final value in a path.
      */
-    private function compact()
+    private function compact($isFinal)
     {
         if ($this->antlersParser == null) {
             $this->reducedVar = self::reduce($this->reducedVar, $this->isPair);
         } else {
-            $this->reducedVar = self::reduceForAntlers($this->reducedVar, $this->antlersParser, $this->data, $this->isPair);
+            $isActualPair = $this->isPair;
+
+            if (! $isFinal) {
+                $isActualPair = true;
+            }
+
+            $this->reducedVar = self::reduceForAntlers($this->reducedVar, $this->antlersParser, $this->data, $isActualPair);
         }
     }
 
@@ -589,7 +605,17 @@ class PathDataManager
 
             GlobalRuntimeState::$isEvaluatingUserData = false;
         } else {
-            $returnValue = self::reduce($value);
+            if (! $isPair) {
+                if (is_array($value)) {
+                    $returnValue = $value;
+                } elseif (is_object($value) && method_exists($value, '__toString')) {
+                    $returnValue = (string)$value;
+                } else {
+                    $returnValue = self::reduce($value);
+                }
+            } else {
+                $returnValue = self::reduce($value);
+            }
         }
 
         GlobalRuntimeState::$isEvaluatingUserData = false;

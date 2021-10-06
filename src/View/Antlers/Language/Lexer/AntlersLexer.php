@@ -158,11 +158,11 @@ class AntlersLexer
         return $this->referenceParser->bordersInterpolationRegion($relative);
     }
 
-    private function scanForwardTo($char)
+    private function scanForwardTo($char, $skip = 0)
     {
         $returnChars = [];
 
-        for ($i = $this->currentIndex + 1; $i < $this->inputLen; $i++) {
+        for ($i = $this->currentIndex + 1 + $skip; $i < $this->inputLen; $i++) {
             $cur = $this->chars[$i];
 
             if ($cur == $char) {
@@ -196,13 +196,25 @@ class AntlersLexer
             $this->checkCurrentOffsets();
 
             if ($this->isInModifierParameterValue) {
+                $breakForKeyword = false;
+
+                if (! $this->isParsingString && ctype_space($this->next)) {
+                    $nextWord = strtolower(trim(implode($this->scanForwardTo(' ', 1))));
+
+                    if (strlen($nextWord) > 0 && LanguageKeywords::isLanguageLogicalKeyword($nextWord)) {
+                        $breakForKeyword = true;
+                    }
+                }
+
                 if ($this->next == DocumentParser::String_Terminator_SingleQuote ||
-                    $this->next == DocumentParser::String_Terminator_DoubleQuote || $this->next == null) {
+                    $this->next == DocumentParser::String_Terminator_DoubleQuote ||
+                    $this->next == null ||
+                    $breakForKeyword) {
                     $implodedCurrentContent = implode($this->currentContent);
 
                     if (mb_strlen(trim($implodedCurrentContent)) > 0) {
                         $this->currentContent[] = $this->cur;
-                        $parsedValue = $implodedCurrentContent;
+                        $parsedValue = implode($this->currentContent);
                         $this->currentContent = [];
 
                         $modifierValueNode = new ModifierValueNode();

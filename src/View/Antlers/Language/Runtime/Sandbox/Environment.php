@@ -143,6 +143,18 @@ class Environment
         $this->operatorManager->setEnvironment($this)->setLibraryManager($this->libraryManager);
     }
 
+    public function setIsPaired($paired)
+    {
+        $this->dataRetriever->setIsPaired($paired);
+
+        return $this;
+    }
+
+    public function getIsPaired()
+    {
+        return $this->dataRetriever->getIsPaired();
+    }
+
     /**
      * Returns all triggered assignments from the environment session.
      *

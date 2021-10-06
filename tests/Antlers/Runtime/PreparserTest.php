@@ -3,7 +3,9 @@
 namespace Tests\Antlers\Runtime;
 
 use Statamic\Tags\Loader;
+use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
+use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
@@ -30,7 +32,7 @@ EOT;
         $processor = new NodeProcessor($loader, $envDetails, $this->getLibraryManager());
         $processor->setData($data);
 
-        $runtimeParser = new RuntimeParser($documentParser, $processor);
+        $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
         $runtimeParser->preparse(function ($text) {
             return str_replace('{{ title }}', '{{ subtitle | upper }}', $text);
         });
