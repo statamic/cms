@@ -562,6 +562,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
@@ -580,6 +581,7 @@ class AssetTest extends TestCase
         $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('new/asset.txt');
         $disk->assertExists('new/.meta/asset.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('new/.meta/asset.txt.yaml'));
         $this->assertEquals([
             'new/asset.txt',
         ], $container->files()->all());
@@ -607,6 +609,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
@@ -622,6 +625,7 @@ class AssetTest extends TestCase
         $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('new/newfilename.txt');
         $disk->assertExists('new/.meta/newfilename.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('new/.meta/newfilename.txt.yaml'));
         $this->assertEquals([
             'new/newfilename.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
@@ -645,6 +649,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
@@ -663,6 +668,7 @@ class AssetTest extends TestCase
         $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/newfilename.txt');
         $disk->assertExists('old/.meta/newfilename.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('old/.meta/newfilename.txt.yaml'));
         $this->assertEquals([
             'old/newfilename.txt',
         ], $container->files()->all());
