@@ -520,7 +520,7 @@ class RuntimeParser implements ParserContract
     /**
      * Constructs a "virtual" node from the provided text.
      *
-     * @param string $text The node content.
+     * @param  string  $text  The node content.
      * @return AntlersNode
      */
     private function wrapText($text)
@@ -543,7 +543,7 @@ class RuntimeParser implements ParserContract
     /**
      * Tests if the full Antlers Lexer & Parser should be used to parse the provided text.
      *
-     * @param string $text The input to test.
+     * @param  string  $text  The input to test.
      * @return bool
      */
     private function shouldUseFullParserForVariable($text)
@@ -563,7 +563,7 @@ class RuntimeParser implements ParserContract
             LanguageKeywords::LogicalXor,
             LanguageKeywords::LogicalOr,
             LanguageKeywords::LogicalNot,
-            LanguageKeywords::LogicalAnd
+            LanguageKeywords::LogicalAnd,
         ]);
     }
 
@@ -587,7 +587,7 @@ class RuntimeParser implements ParserContract
         // and finally, through the runtime processor & env.
         if ($this->shouldUseFullParserForVariable($key)) {
             // 1: Create a wrapper node to contain the text.
-            $wrappedNode =  $this->wrapText($key);
+            $wrappedNode = $this->wrapText($key);
             $tokens = $this->antlersLexer->tokenize($wrappedNode, $key);
             $antlersNodes = $this->antlersParser->parse($tokens);
             //                           SG        LG

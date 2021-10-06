@@ -497,7 +497,7 @@ class PathDataManager
     /**
      * Compacts the last resolved variable.
      *
-     * @param bool $isFinal Indicates if the current value is the final value in a path.
+     * @param  bool  $isFinal  Indicates if the current value is the final value in a path.
      */
     private function compact($isFinal)
     {
@@ -609,7 +609,7 @@ class PathDataManager
                 if (is_array($value)) {
                     $returnValue = $value;
                 } elseif (is_object($value) && method_exists($value, '__toString')) {
-                    $returnValue = (string)$value;
+                    $returnValue = (string) $value;
                 } else {
                     $returnValue = self::reduce($value);
                 }
