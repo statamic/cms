@@ -1,5 +1,16 @@
 # Release Notes
 
+## 3.2.13 (2020-10-07)
+
+### What's improved
+- Update Dutch translations. [#4413](https://github.com/statamic/cms/issues/4413) by @robdekort 
+- Update French translations. [#4411](https://github.com/statamic/cms/issues/4411) by @ebeauchamps
+
+### What's fixed
+- Fix lost asset meta on move / rename. [#4412](https://github.com/statamic/cms/issues/4412) by @jesseleite
+
+
+
 ## 3.2.12 (2020-10-06)
 
 ### What's improved
