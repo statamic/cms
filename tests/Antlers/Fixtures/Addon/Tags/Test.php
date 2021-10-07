@@ -6,9 +6,13 @@ use Statamic\Tags\Tags;
 
 class Test extends Tags
 {
+    public static $lastValue = null;
+
     public function index()
     {
-        return $this->params->get('variable');
+        self::$lastValue = $this->params->get('variable');
+
+        return self::$lastValue;
     }
 
     /**

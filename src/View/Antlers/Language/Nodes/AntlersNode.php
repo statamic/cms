@@ -3,6 +3,7 @@
 namespace Statamic\View\Antlers\Language\Nodes;
 
 use Illuminate\Support\Str;
+use Statamic\Facades\Antlers;
 use Statamic\Tags\TagNotFoundException;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
@@ -339,21 +340,68 @@ class AntlersNode extends AbstractNode
             $value = $param->value;
 
             if ($param->isVariableReference) {
-                $pathParser = new PathParser();
-                $retriever = new PathDataManager();
-
                 $pathToParse = $this->reduceParameterInterpolations($param, $processor, $param->value, $data);
 
+                /* $pathParser = new PathParser();
+                $retriever = new PathDataManager();
                 $retriever->setIsPaired(false)->setReduceFinal(false);
-                $value = $retriever->getData($pathParser->parse($pathToParse), $data);
+                $value = $retriever->getData($pathParser->parse($pathToParse), $data);*/
+                $value = Antlers::parser()->getVariable($pathToParse, $data, null);
             } else {
-                $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
+                // If we have a situation where an interpolation is the ONLY content here
+                // we will hand it off to the "bigger, better, stronger" parsing logic.
+                if ($param->parent != null && array_key_exists($param->value, $param->parent->processedInterpolationRegions)) {
+                    $interpolationReference = $param->parent->processedInterpolationRegions[$param->value];
+
+                    if (count($interpolationReference) > 0 &&
+                        $interpolationReference[0] instanceof AntlersNode &&
+                        // If our interpolation region itself also contains interpolations, we need to
+                        // skip this and proceed with the string collapsing logic to preserve the
+                        // behavior you would expect when using previous versions of Antlers.
+                        $this->canSafelyUseFullParserContext($interpolationReference[0])) {
+                        $value = Antlers::parser()->getVariable($interpolationReference[0]->content, $data);
+                    } else {
+                        // Collapse to string.
+                        $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
+                    }
+                } else {
+                    // Try and collapse to string.
+                    $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
+                }
             }
 
             $values[$param->name] = $value;
         }
 
         return $values;
+    }
+
+    /**
+     * Tests if parameter resolution can safely utilize a full parser context.
+     *
+     * This method effectively checks if a parameter's looks like this:
+     *    {{ tag param="{{ variable }}" }}
+     * If it does, we need to return false to fall back to string collapsing behavior.
+     *
+     * @param AntlersNode $node The node to test.
+     * @return bool
+     */
+    private function canSafelyUseFullParserContext(AntlersNode $node)
+    {
+        if (empty($node->processedInterpolationRegions)) {
+            return true;
+        }
+
+        $checkContent = trim($node->content);
+
+        if (! array_key_exists($checkContent, $node->processedInterpolationRegions)) {
+            return false;
+        }
+
+        /** @var AntlersNode $innerRegion */
+        $innerRegion = $node->processedInterpolationRegions[$checkContent];
+
+        return !empty($innerRegion->processedInterpolationRegions);
     }
 
     /**
@@ -554,7 +602,11 @@ class AntlersNode extends AbstractNode
         }
 
         if ($this->parser == null) {
-            return $offset;
+            $position = new Position();
+            $position->index = $offset;
+            $position->offset = $offset;
+
+            return $position;
         }
 
         return $this->parser->positionFromOffset($this->startPosition->offset + $offset + mb_strlen($this->rawStart), $index);
