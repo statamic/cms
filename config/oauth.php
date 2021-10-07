@@ -13,4 +13,7 @@ return [
         'callback' => 'oauth/{provider}/callback',
     ],
 
+    // Set "remember me" cookie when logging in via Oauth.
+    'remember_me' => true,
+
 ];
