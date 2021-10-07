@@ -383,7 +383,7 @@ class AntlersNode extends AbstractNode
      *    {{ tag param="{{ variable }}" }}
      * If it does, we need to return false to fall back to string collapsing behavior.
      *
-     * @param AntlersNode $node The node to test.
+     * @param  AntlersNode  $node  The node to test.
      * @return bool
      */
     private function canSafelyUseFullParserContext(AntlersNode $node)
@@ -401,7 +401,7 @@ class AntlersNode extends AbstractNode
         /** @var AntlersNode $innerRegion */
         $innerRegion = $node->processedInterpolationRegions[$checkContent];
 
-        return !empty($innerRegion->processedInterpolationRegions);
+        return ! empty($innerRegion->processedInterpolationRegions);
     }
 
     /**

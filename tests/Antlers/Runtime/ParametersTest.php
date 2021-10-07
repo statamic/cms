@@ -3,7 +3,6 @@
 namespace Tests\Antlers\Runtime;
 
 use Tests\Antlers\Fixtures\Addon\Tags\Test;
-use Tests\Antlers\Fixtures\MethodClasses\ClassOne;
 use Tests\Antlers\Fixtures\MethodClasses\ClassTwo;
 use Tests\Antlers\ParserTestCase;
 
@@ -40,7 +39,7 @@ EOT;
         Test::register();
 
         $data = [
-            'name' => 'hello'
+            'name' => 'hello',
         ];
 
         $template = <<<'EOT'
@@ -55,7 +54,7 @@ EOT;
         Test::register();
 
         $data = [
-            'name' => 'hello'
+            'name' => 'hello',
         ];
 
         $template = <<<'EOT'
@@ -82,7 +81,7 @@ EOT;
         Test::register();
         $instance = new ClassTwo('Test');
         $data = [
-            'form' => $instance
+            'form' => $instance,
         ];
 
         // Note to source divers: This horrible whitespace was intentional to stress the parsers.
