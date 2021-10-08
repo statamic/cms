@@ -151,7 +151,9 @@ export default {
 
         items() {
             return this.value.map(selection => {
-                const data = _.findWhere(this.data, { id: selection });
+                const data = _.find(this.data, (item) => {
+                    return item.id == selection
+                });
 
                 if (! data) return { id: selection, title: selection };
 
