@@ -232,7 +232,7 @@ class AntlersLexer
                 }
             }
 
-            if ($this->isInModifierParameterValue && !$this->isParsingString) {
+            if ($this->isInModifierParameterValue && ! $this->isParsingString) {
                 $breakForKeyword = false;
 
                 if (! $this->isParsingString && ctype_space($this->next)) {

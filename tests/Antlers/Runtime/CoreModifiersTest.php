@@ -290,12 +290,11 @@ EOT;
 {{ "\"\n\t|||||hello:::::||:||\\'\\" | remove_right: "\"\n\t|||||hello:::::||:||\\'\\" }}
 EOT;
 
-        $this->assertSame("", $this->renderString($modifierTemplate));
+        $this->assertSame('', $this->renderString($modifierTemplate));
 
         $modifierTemplateTwo = <<<'EOT'
 {{ "\"\n\t|||||hello:::::||:||\\'\\" | remove_right: "\"\n\t|||||hello!:::::||:||\\'\\" }}
 EOT;
         $this->assertSame("\"\n\t|||||hello:::::||:||\\'\\", $this->renderString($modifierTemplateTwo));
     }
-
 }
