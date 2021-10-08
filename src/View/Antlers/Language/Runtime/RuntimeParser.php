@@ -288,7 +288,10 @@ class RuntimeParser implements ParserContract
                 if (! empty(GlobalRuntimeState::$globalTagEnterStack)) {
                     /** @var AntlersNode $lastTagNode */
                     $lastTagNode = GlobalRuntimeState::$globalTagEnterStack[count(GlobalRuntimeState::$globalTagEnterStack) - 1];
-                    $this->documentParser->setStartLineSeed($lastTagNode->endPosition->line);
+
+                    if ($lastTagNode->name->name != 'partial') {
+                        $this->documentParser->setStartLineSeed($lastTagNode->endPosition->line);
+                    }
                 }
 
                 self::$standardRenderNodeCache[$cacheSlug] = $this->documentParser->parse($parseText);

@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Parser;
 
 use Statamic\View\Antlers\Language\Errors\TypeLabeler;
+use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
 use Tests\Antlers\ParserTestCase;
 
 class ParserErrorsTest extends ParserTestCase
@@ -180,5 +181,52 @@ EOT
         $this->assertSame('null', TypeLabeler::getPrettyRuntimeTypeName(null));
         $this->assertSame('bool', TypeLabeler::getPrettyRuntimeTypeName(true));
         $this->assertSame('bool', TypeLabeler::getPrettyRuntimeTypeName(false));
+    }
+
+    public function test_neighboring_strings_throws_parser_error_in_modifiers()
+    {
+        $this->assertThrowsParserError(<<<'EOT'
+{{ some_value | modifier: "string" "string" }}
+EOT
+);
+    }
+
+    public function test_neighboring_numeric_throws_parser_error_in_modifiers()
+    {
+        $this->assertThrowsParserError(<<<'EOT'
+{{ some_value | modifier: "string" 123 }}
+EOT
+        );
+    }
+
+    public function test_line_offsets_are_respected()
+    {
+        $template = <<<'EOT'
+---
+test: 'hello'
+hello: 'world'
+hello1: 'world'
+hello2: 'world'
+hello3: 'world'
+---
+line
+line
+line
+
+{{ partial:withfrontmatter }}
+EOT;
+
+        try {
+            $this->renderString($template, [], true);
+            $this->fail('No exception thrown.');
+        } catch (SyntaxErrorException $exception) {
+            if ($exception->node == null) {
+                $this->fail('Node is null');
+            }
+
+            // The error should be produced on line 20 of __fixtures__/views/partials/_anotherpartial.antlers.html
+            // This partial is parsed after it is included from __fixtures__/views/partials/_withfrontmatter.antlers.html
+            $this->assertSame(20, $exception->node->startPosition->line);
+        }
     }
 }

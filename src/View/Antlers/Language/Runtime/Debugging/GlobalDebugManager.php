@@ -29,6 +29,8 @@ class GlobalDebugManager
     protected static $hasRegisteredBreakpoints = false;
     public static $activeSessionLocator = null;
     protected static $activeLockFile = null;
+    protected static $exceptionWriteLock = [];
+
     /**
      * @var TimingsTracer|null
      */
@@ -85,9 +87,14 @@ class GlobalDebugManager
         if (GlobalRuntimeState::$currentExecutionFile != null) {
             $exceptionData = [];
 
+            if (array_key_exists(GlobalRuntimeState::$currentExecutionFile, self::$exceptionWriteLock)) {
+                return;
+            }
+
+            self::$exceptionWriteLock[GlobalRuntimeState::$currentExecutionFile] = 1;
             $exceptionData['msg'] = $exception->getMessage();
             $exceptionData['type'] = $exception->type;
-            $exceptionData['file'] = substr(GlobalRuntimeState::$currentExecutionFile, strlen(self::$baseResourcePath));
+            $exceptionData['file'] = str_replace('//', '/', substr(GlobalRuntimeState::$currentExecutionFile, strlen(self::$baseResourcePath)));
             $exceptionData['rl'] = $exception->node->startPosition->line;
             $exceptionData['rc'] = $exception->node->startPosition->char;
             $exceptionData['ll'] = GlobalRuntimeState::$lastNode->startPosition->line;
@@ -186,7 +193,11 @@ class GlobalDebugManager
             return;
         }
 
-        self::$activeSessionLocator = md5(substr($viewPath, strlen(self::$baseResourcePath)));
+        // Remove any doubled up forward slashes if they happen.
+        $locatorPath = substr($viewPath, strlen(self::$baseResourcePath));
+        $locatorPath = str_replace('//', '/', $locatorPath);
+
+        self::$activeSessionLocator = md5($locatorPath);
     }
 
     public static function loadDebugConfiguration($debugPath, $baseResourcePath)
