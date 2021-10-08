@@ -22,4 +22,13 @@ EOT;
             StringUtilities::normalizeLineEndings($expected),
             StringUtilities::normalizeLineEndings($this->renderString($template)));
     }
+
+    public function test_strings_ending_with_literal_backslash_dont_incorrectly_attempt_to_escape_end_delimiter()
+    {
+        $template = <<<'EOT'
+{{ "\\" }}
+EOT;
+
+        $this->assertSame('\\', $this->renderString($template));
+    }
 }

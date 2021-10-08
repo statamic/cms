@@ -264,4 +264,38 @@ EOT;
     {
         $this->assertSame('yep', $this->result('{{ if "123456"|is_numeric }}yep{{ /if}}'));
     }
+
+    public function test_shorthand_syntax_accepts_space_inside_strings()
+    {
+        $this->assertSame('test', $this->result('{{ phrase | explode:" " | first }}'));
+        $this->assertSame('test', $this->result('{{ phrase | explode: " " | first }}'));
+        $this->assertSame('test', $this->result("{{ phrase | explode: ' ' | first }}"));
+        $this->assertSame('test', $this->result("{{ phrase | explode:' ' | first }}"));
+    }
+
+    public function test_shorthand_syntax_accepts_strings_with_leading_whitespace()
+    {
+        $this->assertSame('test', $this->result('{{ phrase | explode:                   " " | first }}'));
+        $this->assertSame('test', $this->result("{{ phrase | explode:                   ' ' | first }}"));
+    }
+
+    public function test_shorthand_syntax_can_handle_string_escape_sequences()
+    {
+        $template = <<<'EOT'
+{{ "\"\n\t|||||:::::||:||\\'\\" }}
+EOT;
+        $this->assertSame("\"\n\t|||||:::::||:||\\'\\", $this->renderString($template));
+
+        $modifierTemplate = <<<'EOT'
+{{ "\"\n\t|||||hello:::::||:||\\'\\" | remove_right: "\"\n\t|||||hello:::::||:||\\'\\" }}
+EOT;
+
+        $this->assertSame("", $this->renderString($modifierTemplate));
+
+        $modifierTemplateTwo = <<<'EOT'
+{{ "\"\n\t|||||hello:::::||:||\\'\\" | remove_right: "\"\n\t|||||hello!:::::||:||\\'\\" }}
+EOT;
+        $this->assertSame("\"\n\t|||||hello:::::||:||\\'\\", $this->renderString($modifierTemplateTwo));
+    }
+
 }

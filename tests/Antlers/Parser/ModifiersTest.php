@@ -177,4 +177,30 @@ class ModifiersTest extends ParserTestCase
         $this->assertInstanceOf(StringValueNode::class, $valueThree);
         $this->assertSame('hello :|', $valueThree->value);
     }
+
+    public function test_shorthand_modifiers_can_accept_complex_strings()
+    {
+        $nodes = $this->getParsedRuntimeNodes('{{ title | modifier:"hello \"\\ world" }}');
+        $this->assertInstanceOf(SemanticGroup::class, $nodes[0]);
+
+        /** @var SemanticGroup $semanticGroup */
+        $semanticGroup = $nodes[0];
+        $this->assertCount(1, $semanticGroup->nodes);
+
+        /** @var VariableNode $varNode */
+        $varNode = $semanticGroup->nodes[0];
+        $this->assertInstanceOf(VariableNode::class, $varNode);
+        $this->assertSame('title', $varNode->name);
+
+        $this->assertNotNull($varNode->modifierChain);
+
+        $chain = $varNode->modifierChain;
+
+        $this->assertCount(1, $chain->modifierChain);
+
+        $modifierOne = $chain->modifierChain[0];
+
+        $this->assertModifierName('modifier', $modifierOne);
+        $this->assertSame('hello "\\ world', $modifierOne->valueNodes[0]->value);
+    }
 }

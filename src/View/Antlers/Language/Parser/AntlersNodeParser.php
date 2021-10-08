@@ -373,6 +373,7 @@ class AntlersNodeParser
         $name = '';
         $nameStart = 0;
         $startAt = 0;
+        $ignorePrevious = false;
 
         $terminator = null;
 
@@ -387,8 +388,13 @@ class AntlersNodeParser
                 $next = $chars[$i + 1];
             }
 
-            if ($i > 0) {
-                $prev = $chars[$i - 1];
+            if (! $ignorePrevious) {
+                if ($i > 0) {
+                    $prev = $chars[$i - 1];
+                }
+            } else {
+                $prev = '';
+                $ignorePrevious = false;
             }
 
             if ($hasFoundName == false && ctype_space($current)) {
@@ -459,6 +465,7 @@ class AntlersNodeParser
                 if ($peek == DocumentParser::String_EscapeCharacter) {
                     $currentChars[] = DocumentParser::String_EscapeCharacter;
                     $i += 1;
+                    $ignorePrevious = true;
                     continue;
                 }
 

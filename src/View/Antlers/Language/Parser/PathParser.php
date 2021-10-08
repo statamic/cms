@@ -114,6 +114,7 @@ class PathParser
 
         $activeDelimiter = self::ColonSeparator;
         $this->isParsingString = false;
+        $ignorePrevious = false;
         $terminator = null;
         $isStringVar = false;
         $addCur = true;
@@ -123,8 +124,13 @@ class PathParser
 
             $this->next = null;
 
-            if ($this->currentIndex > 0) {
-                $this->prev = $this->chars[$this->currentIndex - 1];
+            if (! $ignorePrevious) {
+                if ($this->currentIndex > 0) {
+                    $this->prev = $this->chars[$this->currentIndex - 1];
+                }
+            } else {
+                $ignorePrevious = false;
+                $this->prev = '';
             }
 
             if ($this->currentIndex + 1 < $this->inputLength) {
@@ -178,6 +184,7 @@ class PathParser
                     if ($this->next == DocumentParser::String_EscapeCharacter) {
                         $currentChars[] = DocumentParser::String_EscapeCharacter;
                         $this->currentIndex += 1;
+                        $ignorePrevious = true;
                         continue;
                     } elseif ($this->next == 'n') {
                         $currentChars[] = "\n";

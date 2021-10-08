@@ -71,6 +71,7 @@ class AntlersLexer
     private $isParsingModifierName = false;
     private $isInModifierParameterValue = false;
     private $runtimeNodes = [];
+    private $ignorePrevious = false;
 
     /**
      * @var DocumentParser|null
@@ -86,6 +87,7 @@ class AntlersLexer
 
     private function reset()
     {
+        $this->ignorePrevious = false;
         $this->runtimeNodes = [];
         $this->chars = [];
         $this->inputLen = 0;
@@ -108,8 +110,13 @@ class AntlersLexer
         $this->prev = null;
         $this->next = null;
 
-        if ($this->currentIndex > 0) {
-            $this->prev = $this->chars[$this->currentIndex - 1];
+        if (! $this->ignorePrevious) {
+            if ($this->currentIndex > 0) {
+                $this->prev = $this->chars[$this->currentIndex - 1];
+            }
+        } else {
+            $this->prev = '';
+            $this->ignorePrevious = false;
         }
 
         if (($this->currentIndex + 1) < $this->inputLen) {
@@ -176,6 +183,19 @@ class AntlersLexer
         return $returnChars;
     }
 
+    private function nextNonWhitespace()
+    {
+        for ($i = $this->currentIndex + 1; $i < $this->inputLen; $i++) {
+            $cur = $this->chars[$i];
+
+            if (! ctype_space($cur)) {
+                return $cur;
+            }
+        }
+
+        return null;
+    }
+
     public function tokenize(AntlersNode $node, $input)
     {
         $this->reset();
@@ -195,7 +215,24 @@ class AntlersLexer
         for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
             $this->checkCurrentOffsets();
 
-            if ($this->isInModifierParameterValue) {
+            if ($this->isParsingString == false) {
+                if ($this->cur == DocumentParser::String_Terminator_DoubleQuote || $this->cur == DocumentParser::String_Terminator_SingleQuote) {
+                    if ($this->prev == DocumentParser::String_EscapeCharacter) {
+                        throw ErrorFactory::makeSyntaxError(
+                            AntlersErrorCodes::TYPE_ILLEGAL_STRING_ESCAPE_SEQUENCE,
+                            $node,
+                            'Illegal string escape sequence outside string parsing.'
+                        );
+                    }
+
+                    $terminator = $this->cur;
+                    $this->isParsingString = true;
+                    $stringStartedOn = $this->currentIndex;
+                    continue;
+                }
+            }
+
+            if ($this->isInModifierParameterValue && !$this->isParsingString) {
                 $breakForKeyword = false;
 
                 if (! $this->isParsingString && ctype_space($this->next)) {
@@ -212,16 +249,29 @@ class AntlersLexer
                     $breakForKeyword) {
                     $implodedCurrentContent = implode($this->currentContent);
 
-                    if (mb_strlen(trim($implodedCurrentContent)) > 0) {
+                    if (mb_strlen($implodedCurrentContent) > 0) {
                         $this->currentContent[] = $this->cur;
                         $parsedValue = implode($this->currentContent);
                         $this->currentContent = [];
+
+                        // If we just received a lot of whitespace, and the next character
+                        // looks like it may be a string, let's discard what we've got.
+                        if (strlen(rtrim($parsedValue)) === 0) {
+                            $nextNonWhitespace = $this->nextNonWhitespace();
+
+                            if ($nextNonWhitespace === DocumentParser::String_Terminator_SingleQuote ||
+                                $nextNonWhitespace === DocumentParser::String_Terminator_DoubleQuote) {
+                                $this->currentContent = [];
+                                continue;
+                            }
+                        }
 
                         $modifierValueNode = new ModifierValueNode();
                         $modifierValueNode->name = $parsedValue;
                         $modifierValueNode->value = rtrim($parsedValue);
                         $modifierValueNode->startPosition = $node->relativeOffset($this->currentIndex - mb_strlen($parsedValue));
                         $modifierValueNode->endPosition = $node->relativeOffset($this->currentIndex);
+
                         $this->runtimeNodes[] = $modifierValueNode;
                     }
 
@@ -273,27 +323,27 @@ class AntlersLexer
                 continue;
             }
 
-            if ($this->isParsingString == false) {
-                if ($this->cur == DocumentParser::String_Terminator_DoubleQuote || $this->cur == DocumentParser::String_Terminator_SingleQuote) {
-                    if ($this->prev == DocumentParser::String_EscapeCharacter) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_ILLEGAL_STRING_ESCAPE_SEQUENCE,
-                            $node,
-                            'Illegal string escape sequence outside string parsing.'
-                        );
-                    }
-
-                    $terminator = $this->cur;
-                    $this->isParsingString = true;
-                    $stringStartedOn = $this->currentIndex;
-                    continue;
-                }
-            }
-
             if ($this->isParsingString && $this->cur == $terminator) {
                 if ($this->prev == DocumentParser::String_EscapeCharacter) {
                     $this->currentContent[] = $terminator;
                 } else {
+                    if ($this->isInModifierParameterValue) {
+                        $parsedValue = implode($this->currentContent);
+
+                        $modifierValueNode = new ModifierValueNode();
+                        $modifierValueNode->name = $parsedValue;
+                        $modifierValueNode->value = $parsedValue;
+                        $modifierValueNode->startPosition = $node->relativeOffset($stringStartedOn);
+                        $modifierValueNode->endPosition = $node->relativeOffset($this->currentIndex);
+
+                        $this->runtimeNodes[] = $modifierValueNode;
+
+                        $this->currentContent = [];
+                        $this->isParsingString = false;
+                        $this->isInModifierParameterValue = false;
+                        continue;
+                    }
+
                     $stringNode = new StringValueNode();
                     $stringNode->startPosition = $node->relativeOffset($stringStartedOn);
                     $stringNode->endPosition = $node->relativeOffset($this->currentIndex);
@@ -311,6 +361,7 @@ class AntlersLexer
             if ($this->isParsingString && $this->cur == DocumentParser::String_EscapeCharacter) {
                 if ($this->next == DocumentParser::String_EscapeCharacter) {
                     $this->currentContent[] = DocumentParser::String_EscapeCharacter;
+                    $this->ignorePrevious = true;
                     $this->currentIndex += 1;
                     continue;
                 } elseif ($this->next == DocumentParser::String_Terminator_SingleQuote) {
