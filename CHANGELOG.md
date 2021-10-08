@@ -3,12 +3,12 @@
 ## 3.2.14 (2020-10-08)
 
 ### What's improved
-- Updated German translations. [#4429](https://github.com/statamic/cms/issues/4429)
+- Updated German translations. [#4429](https://github.com/statamic/cms/issues/4429) by @helloDanuk
 
 ### What's fixed
-- Fieldtype titles are translated separately to prevent conflicts with common words. [#4423](https://github.com/statamic/cms/issues/4423)
-- Collection entry counts are site specific. [#4424](https://github.com/statamic/cms/issues/4424)
-- Fixed issue where IDs are shown instead of titles in relationship fieldtypes when using Eloquent.  [#4422](https://github.com/statamic/cms/issues/4422)
+- Fieldtype titles are translated separately to prevent conflicts with common words. [#4423](https://github.com/statamic/cms/issues/4423) by @jasonvarga
+- Collection entry counts are site specific. [#4424](https://github.com/statamic/cms/issues/4424) by @jasonvarga
+- Fixed issue where IDs are shown instead of titles in relationship fieldtypes when using Eloquent.  [#4422](https://github.com/statamic/cms/issues/4422) by @tobiasholst
 
 
 
