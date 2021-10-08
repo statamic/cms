@@ -310,47 +310,7 @@ class RuntimeParser implements ParserContract
                 throw $antlersException;
             }
 
-            if ($antlersException->node == null && GlobalRuntimeState::$lastNode != null) {
-                $antlersException->node = GlobalRuntimeState::$lastNode;
-            } elseif ($antlersException->node == null && GlobalRuntimeState::$lastNode == null) {
-                throw $antlersException;
-            }
-
-            $rebuiltTrace = $this->buildStackTrace($antlersException->node, $text);
-
-            // Build up a new Ignition exception.
-            $typeText = '';
-
-            if ($antlersException->type != '') {
-                $typeText = '['.$antlersException->type.']: ';
-            }
-
-            $newMessage = $typeText.$antlersException->getMessage().' '.LineRetriever::getErrorLineAndCharText($antlersException->node);
-
-            $ignitionException = new ViewException($newMessage);
-            $traceProperty = new ReflectionProperty('Exception', 'trace');
-            $traceProperty->setAccessible(true);
-            $traceProperty->setValue($ignitionException, $rebuiltTrace);
-
-            $ignitionException->setViewData($data);
-
-            // Automatically clean up the temporary file.
-            // If we wrap this in app()->terminating,
-            // the file exists long enough for the
-            // Ignition renderer to display it.
-            if ($this->tempFileCreated != null) {
-                $tmpFile = $this->tempFileCreated;
-                app()->terminating(function () use ($tmpFile) {
-                    @unlink($tmpFile);
-                });
-                $this->tempFileCreated = null;
-            }
-
-            if (GlobalDebugManager::isDebugSessionActive()) {
-                GlobalDebugManager::writeException($antlersException);
-            }
-
-            throw $ignitionException;
+            throw $this->buildAntlersExceptionError($antlersException, $text, $data);
         } catch (ModifierNotFoundException $exception) {
             if (GlobalRuntimeState::$lastNode != null && GlobalDebugManager::isDebugSessionActive()) {
                 $wrapper = new AntlersException($exception->getMessage());
@@ -360,7 +320,7 @@ class RuntimeParser implements ParserContract
                 GlobalDebugManager::writeException($wrapper);
             }
 
-            throw $exception;
+            throw $this->addAntlersErrorDetails($exception, $text, $data);
         } catch (Exception $exception) {
             if (GlobalRuntimeState::$lastNode != null && GlobalDebugManager::isDebugSessionActive()) {
                 $wrapper = new AntlersException($exception->getMessage());
@@ -370,7 +330,7 @@ class RuntimeParser implements ParserContract
                 GlobalDebugManager::writeException($wrapper);
             }
 
-            throw $exception;
+            throw $this->addAntlersErrorDetails($exception, $text, $data);
         } catch (Throwable $throwable) {
             if (GlobalRuntimeState::$lastNode != null && GlobalDebugManager::isDebugSessionActive()) {
                 $wrapper = new AntlersException($throwable->getMessage());
@@ -380,7 +340,7 @@ class RuntimeParser implements ParserContract
                 GlobalDebugManager::writeException($wrapper);
             }
 
-            throw $throwable;
+            throw $this->addAntlersErrorDetails($throwable, $text, $data);
         }
 
         if ($newLineStyle != "\n") {
@@ -393,6 +353,74 @@ class RuntimeParser implements ParserContract
         $bufferContent = StackReplacementManager::processReplacements($bufferContent);
 
         return new AntlersString($bufferContent, $this);
+    }
+
+    private function cleanUpTempFiles()
+    {
+        // Automatically clean up the temporary file.
+        // If we wrap this in app()->terminating,
+        // the file exists long enough for the
+        // Ignition renderer to display it.
+        if ($this->tempFileCreated != null) {
+            $tmpFile = $this->tempFileCreated;
+            app()->terminating(function () use ($tmpFile) {
+                @unlink($tmpFile);
+            });
+            $this->tempFileCreated = null;
+        }
+    }
+
+    private function addAntlersErrorDetails($exception, $text, $data)
+    {
+        // This is important to not completely bomb out the tests.
+        if (! class_exists(ViewException::class)) {
+            return $exception;
+        }
+
+        $rebuiltTrace = $this->buildStackTrace(GlobalRuntimeState::$lastNode, $text);
+
+        $traceProperty = new ReflectionProperty('Exception', 'trace');
+        $traceProperty->setAccessible(true);
+        $traceProperty->setValue($exception, $rebuiltTrace);
+
+        $this->cleanUpTempFiles();
+
+        return $exception;
+    }
+
+    private function buildAntlersExceptionError(AntlersException $antlersException, $text, $data)
+    {
+        if ($antlersException->node == null && GlobalRuntimeState::$lastNode != null) {
+            $antlersException->node = GlobalRuntimeState::$lastNode;
+        } elseif ($antlersException->node == null && GlobalRuntimeState::$lastNode == null) {
+            throw $antlersException;
+        }
+
+        $rebuiltTrace = $this->buildStackTrace($antlersException->node, $text);
+
+        // Build up a new Ignition exception.
+        $typeText = '';
+
+        if ($antlersException->type != '') {
+            $typeText = '['.$antlersException->type.']: ';
+        }
+
+        $newMessage = $typeText.$antlersException->getMessage().' '.LineRetriever::getErrorLineAndCharText($antlersException->node);
+
+        $ignitionException = new ViewException($newMessage);
+        $traceProperty = new ReflectionProperty('Exception', 'trace');
+        $traceProperty->setAccessible(true);
+        $traceProperty->setValue($ignitionException, $rebuiltTrace);
+
+        $ignitionException->setViewData($data);
+
+        $this->cleanUpTempFiles();
+
+        if (GlobalDebugManager::isDebugSessionActive()) {
+            GlobalDebugManager::writeException($antlersException);
+        }
+
+        return $ignitionException;
     }
 
     private function buildStackTrace(AbstractNode $activeNode, $documentText)

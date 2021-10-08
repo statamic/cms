@@ -13,6 +13,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\ModifierException;
+use Statamic\Modifiers\ModifierNotFoundException;
 use Statamic\Modifiers\Modify;
 use Statamic\Query\Builder;
 use Statamic\Support\Arr;
@@ -1539,6 +1540,9 @@ class NodeProcessor
                                         }
 
                                         $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
+                                    } else {
+                                        // Throw an exception here to maintain consistent behavior with the regex parser.
+                                        throw new ModifierNotFoundException($param->name);
                                     }
                                 }
                             }
