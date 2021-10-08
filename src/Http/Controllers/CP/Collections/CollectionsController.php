@@ -26,7 +26,7 @@ class CollectionsController extends CpController
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries' => \Statamic\Facades\Entry::query()->where('collection', $collection->handle())->count(),
+                'entries' => $collection->queryEntries()->where('site', Site::selected())->count(),
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
