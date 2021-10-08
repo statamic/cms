@@ -1065,11 +1065,11 @@ class DocumentParser
 
         if (! empty(GlobalRuntimeState::$globalTagEnterStack)) {
             /** @var AntlersNode $lastTagNode */
-           $lastTagNode = GlobalRuntimeState::$globalTagEnterStack[count(GlobalRuntimeState::$globalTagEnterStack) - 1];
+            $lastTagNode = GlobalRuntimeState::$globalTagEnterStack[count(GlobalRuntimeState::$globalTagEnterStack) - 1];
 
-           if ($lastTagNode->name->name != 'partial') {
-               $this->setStartLineSeed($lastTagNode->endPosition->line);
-           }
+            if ($lastTagNode->name->name != 'partial') {
+                $this->setStartLineSeed($lastTagNode->endPosition->line);
+            }
         }
 
         $this->seedOffset = 0;
