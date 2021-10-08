@@ -85,7 +85,7 @@ EOT;
         ];
 
         // Note to source divers: This horrible whitespace was intentional to stress the parsers.
-        // Please do not this, and please do not write variable bindings like this :)
+        // Please do not do this, and please do not write variable bindings like this :)
         $template = <<<'EOT'
 {{# Because someone will try and set fire to everything. #}}
   {{ test :variable="null or (null or (null or

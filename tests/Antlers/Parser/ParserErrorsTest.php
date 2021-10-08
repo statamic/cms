@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Parser;
 
+use Statamic\View\Antlers\Language\Errors\TypeLabeler;
 use Tests\Antlers\ParserTestCase;
 
 class ParserErrorsTest extends ParserTestCase
@@ -168,5 +169,16 @@ EOT
 }}
 EOT
         );
+    }
+
+    public function test_runtime_type_labeler()
+    {
+        $this->assertSame('string', TypeLabeler::getPrettyRuntimeTypeName('hello'));
+        $this->assertSame('string', TypeLabeler::getPrettyRuntimeTypeName('1234'));
+        $this->assertSame('numeric', TypeLabeler::getPrettyRuntimeTypeName(1234));
+        $this->assertSame('numeric', TypeLabeler::getPrettyRuntimeTypeName(1234.0));
+        $this->assertSame('null', TypeLabeler::getPrettyRuntimeTypeName(null));
+        $this->assertSame('bool', TypeLabeler::getPrettyRuntimeTypeName(true));
+        $this->assertSame('bool', TypeLabeler::getPrettyRuntimeTypeName(false));
     }
 }

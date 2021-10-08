@@ -293,7 +293,7 @@ class TypeLabeler
             return 'string';
         } elseif (is_numeric($value)) {
             return 'numeric';
-        } elseif ($value == null) {
+        } elseif ($value === null) {
             return 'null';
         } elseif ($value == false) {
             return 'bool';
