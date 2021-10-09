@@ -62,7 +62,13 @@ class PathParser
 
     public function parse($content)
     {
+        // Note: this second call to clone is not an accident.
+        if (isset(self::$pathCache[$content])) {
+            return clone self::$pathCache[$content];
+        }
+
         StringUtilities::prepareSplit($content);
+
         $originalContent = $content;
 
         $isStrictVariableReference = false;
@@ -89,10 +95,6 @@ class PathParser
                 $isExplicitVariableReference = true;
                 $content = StringUtilities::substr($content, 1);
             }
-        }
-
-        if (array_key_exists($originalContent, self::$pathCache)) {
-            return unserialize(self::$pathCache[$originalContent]);
         }
 
         $this->chars = [];
@@ -267,14 +269,6 @@ class PathParser
                         );
                     }
 
-                    /*if ($this->cur == self::DotPathSeparator) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_ILLEGAL_DOTVARPATH_RIGHT,
-                            null,
-                            'Variable paths cannot end with the "." character.'
-                        );
-                    }*/
-
                     if ($this->cur == self::LeftBracket) {
                         throw ErrorFactory::makeSyntaxError(
                             AntlersErrorCodes::TYPE_ILLEGAL_VARPATH_SUBPATH_START,
@@ -327,7 +321,7 @@ class PathParser
         $variableReference->isVariableVariable = $isVariableVariable;
         $variableReference->normalizedReference = str_replace(':', '.', $content);
 
-        self::$pathCache[$originalContent] = serialize($variableReference);
+        self::$pathCache[$originalContent] = clone $variableReference;
 
         return $variableReference;
     }
