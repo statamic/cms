@@ -123,7 +123,7 @@ EOT;
 EOT;
 
         $this->assertSame('hello_world', $this->renderString($template, [
-            'var_name' => 'hello_world'
+            'var_name' => 'hello_world',
         ], true));
     }
 }
