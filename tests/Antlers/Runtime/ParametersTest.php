@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Tests\Antlers\Fixtures\Addon\Tags\EchoMethod;
 use Tests\Antlers\Fixtures\Addon\Tags\Test;
 use Tests\Antlers\Fixtures\MethodClasses\ClassTwo;
 use Tests\Antlers\ParserTestCase;
@@ -111,5 +112,18 @@ EOT;
 
         $this->renderString($template, $data, true);
         $this->assertSame($instance, Test::$lastValue);
+    }
+
+    public function test_interpolations_can_be_used_as_part_of_a_tag_method()
+    {
+        EchoMethod::register();
+
+        $template = <<<'EOT'
+{{ echo_method:{{ var_name }} }}
+EOT;
+
+        $this->assertSame('hello_world', $this->renderString($template, [
+            'var_name' => 'hello_world'
+        ], true));
     }
 }

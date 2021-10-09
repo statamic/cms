@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use ParseError;
 use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Facades\Antlers;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\ModifierException;
@@ -1107,6 +1108,17 @@ class NodeProcessor
                         $tagName = $node->name->getCompoundTagName();
                         $tagMethod = $node->name->getMethodName();
 
+                        if (array_key_exists($tagMethod, $node->processedInterpolationRegions)) {
+                            if (! empty($node->processedInterpolationRegions)) {
+                                foreach ($node->processedInterpolationRegions as $region => $regionNodes) {
+                                    $this->canHandleInterpolations[$region] = $regionNodes;
+                                }
+                            }
+
+                            $tagMethod = $this->evaluateDeferredInterpolation($tagMethod);
+                            $tagName = $node->name->name.':'.$tagMethod;
+                        }
+
                         $guardCheck = $tagName.':'.$tagMethod;
 
                         if (! $this->guardRuntimeTag($guardCheck)) {
@@ -1153,18 +1165,18 @@ class NodeProcessor
                         if ($node->name->name == 'yield') {
                             GlobalRuntimeState::$yieldCount += 1;
                             // Wrap it in a partial thing.
-                            $wrapName = 'section:'.$node->name->methodPart.'__yield'.GlobalRuntimeState::$yieldCount;
+                            $wrapName = 'section:'.$tagMethod.'__yield'.GlobalRuntimeState::$yieldCount;
                             $bufferOverride = LiteralReplacementManager::registerRegion($wrapName, $output);
 
                             if (! array_key_exists(GlobalRuntimeState::$environmentId, GlobalRuntimeState::$yieldStacks)) {
                                 GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId] = [];
                             }
 
-                            if (! array_key_exists($node->name->methodPart, GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId])) {
-                                GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$node->name->methodPart] = [];
+                            if (! array_key_exists($tagMethod, GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId])) {
+                                GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$tagMethod] = [];
                             }
 
-                            GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$node->name->methodPart][] = GlobalRuntimeState::$yieldCount;
+                            GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$tagMethod][] = GlobalRuntimeState::$yieldCount;
 
                             $buffer .= $bufferOverride;
                             $this->data = $lockData;
@@ -1176,22 +1188,26 @@ class NodeProcessor
                             continue;
                         } elseif ($node->name->name == 'section') {
                             // We need to reach into the cascade to get the rendered content.
-                            if (! array_key_exists($node->name->methodPart, GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId])) {
-                                GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$node->name->methodPart] = [];
+                            if (! array_key_exists(GlobalRuntimeState::$environmentId, GlobalRuntimeState::$yieldStacks)) {
+                                GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId] = [];
                             }
 
-                            $activeYield = array_pop(GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$node->name->methodPart]);
+                            if (! array_key_exists($tagMethod, GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId])) {
+                                GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$tagMethod] = [];
+                            }
+
+                            $activeYield = array_pop(GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId][$tagMethod]);
 
                             // If we receive a NULL, override this with a one to ensure "override" behavior.
                             if ($activeYield === null) {
                                 $activeYield = 1;
                             }
 
-                            $sectionName = 'section:'.$node->name->methodPart.'__yield'.$activeYield;
+                            $sectionName = 'section:'.$tagMethod.'__yield'.$activeYield;
 
                             LiteralReplacementManager::registerRegionReplacement(
                                 $sectionName,
-                                $this->cascade->sections()->get($node->name->methodPart)
+                                $this->cascade->sections()->get($tagMethod)
                             );
 
                             if ($this->isTracingEnabled()) {
