@@ -33,7 +33,7 @@ class ConditionalFallbackTest extends ParserTestCase
             'is_parent' => false,
         ]));
         $this->assertSame('text-green-800', $this->evaluateRaw("type == 'success' ?= 'text-green-800'", [
-            'type' => 'success'
+            'type' => 'success',
         ]));
     }
 }
