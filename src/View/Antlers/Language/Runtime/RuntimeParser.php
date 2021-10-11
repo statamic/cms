@@ -3,6 +3,9 @@
 namespace Statamic\View\Antlers\Language\Runtime;
 
 use Facade\Ignition\Exceptions\ViewException;
+use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
+use Facade\IgnitionContracts\ProvidesSolution;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use ReflectionProperty;
 use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Modifiers\ModifierNotFoundException;
@@ -26,6 +29,7 @@ use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
 class RuntimeParser implements ParserContract
@@ -377,15 +381,41 @@ class RuntimeParser implements ParserContract
             return $exception;
         }
 
+        if ($exception instanceof ViewException || $exception instanceof ViewExceptionWithSolution) {
+            return $exception;
+        }
+
+        if ($exception instanceof HttpException || $exception instanceof HttpResponseException) {
+            return $exception;
+        }
+
+        $exceptionClass = ViewException::class;
+
+        if (in_array(ProvidesSolution::class, class_implements($exception))) {
+            $exceptionClass = ViewExceptionWithSolution::class;
+        }
+
+        $line = null;
+
+        if (GlobalRuntimeState::$lastNode != null) {
+            $line = GlobalRuntimeState::$lastNode->startPosition->line;
+        }
+
+        $newException = new $exceptionClass($exception->getMessage(), 0, 1, $this->view, $line, $exception);
+
+        if ($exceptionClass === ViewExceptionWithSolution::class) {
+            $newException->setSolution($exception->getSolution());
+        }
+
         $rebuiltTrace = $this->buildStackTrace(GlobalRuntimeState::$lastNode, $text);
 
         $traceProperty = new ReflectionProperty('Exception', 'trace');
         $traceProperty->setAccessible(true);
-        $traceProperty->setValue($exception, $rebuiltTrace);
+        $traceProperty->setValue($newException, $rebuiltTrace);
 
         $this->cleanUpTempFiles();
 
-        return $exception;
+        return $newException;
     }
 
     private function buildAntlersExceptionError(AntlersException $antlersException, $text, $data)
@@ -407,7 +437,7 @@ class RuntimeParser implements ParserContract
 
         $newMessage = $typeText.$antlersException->getMessage().' '.LineRetriever::getErrorLineAndCharText($antlersException->node);
 
-        $ignitionException = new ViewException($newMessage);
+        $ignitionException = new ViewException($newMessage,  0, 1, $this->view, $antlersException->node->startPosition->line, null);
         $traceProperty = new ReflectionProperty('Exception', 'trace');
         $traceProperty->setAccessible(true);
         $traceProperty->setValue($ignitionException, $rebuiltTrace);
