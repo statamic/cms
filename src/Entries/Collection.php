@@ -453,7 +453,7 @@ class Collection implements Contract, AugmentableContract
         ]));
 
         if (! Site::hasMultiple()) {
-            unset($array['sites']);
+            unset($array['sites'], $array['propagate']);
         }
 
         if ($array['date_behavior'] == ['past' => 'public', 'future' => 'public']) {
@@ -464,10 +464,6 @@ class Collection implements Contract, AugmentableContract
 
         if ($this->hasStructure()) {
             $array['structure'] = $this->structureContents();
-        }
-
-        if ($this->propagate()) {
-            $array['propagate'] = $this->propagate();
         }
 
         return $array;
