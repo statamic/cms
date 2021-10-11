@@ -11,7 +11,7 @@
                     :class="{ 'text-sm font-medium': isTopLevel }"
                     v-text="title" />
 
-                <span v-if="page.show_slug" class="ml-1 font-mono text-2xs">
+                <span v-if="showSlugs" class="ml-1 font-mono text-2xs">
                     {{ page.slug }}
                 </span>
 
@@ -66,6 +66,7 @@ export default {
         hasCollection: Boolean,
         isOpen: Boolean,
         hasChildren: Boolean,
+        showSlugs: Boolean
     },
 
     data() {

@@ -66,7 +66,6 @@ class TreeBuilder
                 'page' => $page->selectedQueryColumns($fields),
                 'depth' => $depth,
                 'children' => $this->toTree($page->pages()->all(), $params, $depth + 1),
-                'show_slug' => $params['structure']->showSlugs() ?? false
             ];
         })->filter()->values()->all();
     }
@@ -93,7 +92,6 @@ class TreeBuilder
                 'edit_url'    => $page->editUrl(),
                 'can_delete'  => $page->referenceExists() ? User::current()->can('delete', $page->entry()) : true,
                 'slug'        => $page->slug(),
-                'show_slug'   => $item['show_slug'] ?? false,
                 'status'      => $page->referenceExists() ? $page->status() : null,
                 'redirect'    => $page->referenceExists() ? $page->entry()->get('redirect') : null,
                 'collection'  => ! $collection ? null : [
