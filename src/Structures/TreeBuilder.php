@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Structures\Nav;
+use Statamic\Facades\Action;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Structure;
 use Statamic\Facades\User;
@@ -63,6 +64,7 @@ class TreeBuilder
             }
 
             return [
+                'entry' => $page->entry(),
                 'page' => $page->selectedQueryColumns($fields),
                 'depth' => $depth,
                 'children' => $this->toTree($page->pages()->all(), $params, $depth + 1),
@@ -73,13 +75,15 @@ class TreeBuilder
     public function buildForController($params)
     {
         $tree = $this->build($params);
-
         return $this->transformTreeForController($tree);
     }
 
     protected function transformTreeForController($tree)
     {
         return collect($tree)->map(function ($item) {
+            /**
+             * @var Page $page
+             */
             $page = $item['page'];
             $collection = $page->collection();
 
@@ -100,6 +104,7 @@ class TreeBuilder
                     'edit_url' => $collection->showUrl(),
                     'create_url' => $collection->createEntryUrl(),
                 ],
+                'actions' => Action::for($page->entry(), ['collection' => $collection]),
                 'children'    => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : [],
             ];
         })->values()->all();

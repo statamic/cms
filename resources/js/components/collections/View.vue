@@ -1,7 +1,6 @@
 <template>
 
     <div>
-
         <header class="mb-3">
 
             <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
@@ -134,13 +133,6 @@
                         :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
                         v-text="blueprints.length > 1 ? blueprint.title : __('Create Child Entry')" />
-                </template>
-                <template v-if="branch.can_delete">
-                    <li class="divider"></li>
-                    <dropdown-item
-                        :text="__('Delete')"
-                        class="warning"
-                        @click="deleteTreeBranch(branch, removeBranch, orphanChildren)" />
                 </template>
             </template>
         </page-tree>

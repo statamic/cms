@@ -53,6 +53,14 @@
 
                     <template #branch-options="props">
                         <slot name="branch-options" v-bind="{ ...props, vm }" />
+                        <div class="divider" v-if="props.branch.actions.length" />
+                        <data-list-inline-actions
+                            :item="props.branch.id"
+                            :url="actionUrl"
+                            :actions="props.branch.actions"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
                     </template>
                 </tree-branch>
             </draggable-tree>
@@ -71,8 +79,11 @@
 import * as th from 'tree-helper';
 import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
+import Listing from '../Listing.vue';
 
 export default {
+
+    mixins: [Listing],
 
     components: {
         DraggableTree,
