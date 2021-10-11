@@ -581,7 +581,7 @@ class Collection implements Contract, AugmentableContract
         return (new CollectionStructure)
             ->handle($this->handle())
             ->expectsRoot($this->structureContents['root'] ?? false)
-            ->showSlugs($this->structureContents['show_slugs'] ?? false)
+            ->showSlugs($this->structureContents['slugs'] ?? false)
             ->maxDepth($this->structureContents['max_depth'] ?? null);
     }
 
