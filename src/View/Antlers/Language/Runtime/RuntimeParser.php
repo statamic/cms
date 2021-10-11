@@ -437,7 +437,7 @@ class RuntimeParser implements ParserContract
 
         $newMessage = $typeText.$antlersException->getMessage().' '.LineRetriever::getErrorLineAndCharText($antlersException->node);
 
-        $ignitionException = new ViewException($newMessage,  0, 1, $this->view, $antlersException->node->startPosition->line, null);
+        $ignitionException = new ViewException($newMessage, 0, 1, $this->view, $antlersException->node->startPosition->line, null);
         $traceProperty = new ReflectionProperty('Exception', 'trace');
         $traceProperty->setAccessible(true);
         $traceProperty->setValue($ignitionException, $rebuiltTrace);
