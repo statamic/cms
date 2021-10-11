@@ -329,7 +329,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $this->collection()->sites()
                 ->reject($this->site()->handle())
                 ->each(function ($siteHandle) {
-                    $this->makeLocalization($siteHandle)->saveQuietly();
+                    $this->makeLocalization($siteHandle)->save();
                 });
         }
 
