@@ -735,6 +735,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return optional($this->parent())->entry();
         }
 
+        if ($field === 'blueprint') {
+            return $this->blueprint();
+        }
+
         return $this->traitResolveGqlValue($field);
     }
 }

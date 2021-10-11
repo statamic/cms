@@ -59,6 +59,7 @@ class EntryTest extends TestCase
         status
         date
         last_modified
+        blueprint
         collection {
             title
             handle
@@ -90,6 +91,7 @@ GQL;
                     'status' => 'published',
                     'date' => 'November 3rd, 2017',
                     'last_modified' => 'December 25th, 2017',
+                    'blueprint' => 'event',
                     'collection' => [
                         'title' => 'Events',
                         'handle' => 'events',
