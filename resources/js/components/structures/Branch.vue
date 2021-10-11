@@ -11,8 +11,8 @@
                     :class="{ 'text-sm font-medium': isTopLevel }"
                     v-text="title" />
 
-                    {{ page.slug }}
                 <span v-if="showSlugs" class="ml-1 font-mono text-grey-70 text-2xs pt-px">
+                    {{ isRoot ? '/' : page.slug }}
                 </span>
 
                 <button
