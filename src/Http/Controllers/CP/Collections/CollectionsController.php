@@ -133,6 +133,7 @@ class CollectionsController extends CpController
             'sort_direction' => $collection->sortDirection(),
             'max_depth' => optional($collection->structure())->maxDepth(),
             'expects_root' => optional($collection->structure())->expectsRoot(),
+            'show_slugs' => optional($collection->structure())->showSlugs(),
             'links' => $collection->entryBlueprints()->map->handle()->contains('link'),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
             'default_publish_state' => $collection->defaultPublishState(),
@@ -228,7 +229,7 @@ class CollectionsController extends CpController
             }
             $collection->structure(null);
         } else {
-            $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites'] ?? null));
+            $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['show_slugs']));
         }
 
         $collection->save();
@@ -268,7 +269,7 @@ class CollectionsController extends CpController
             ->save();
     }
 
-    protected function makeStructure($collection, $maxDepth, $expectsRoot, $sites)
+    protected function makeStructure($collection, $maxDepth, $expectsRoot, $showSlugs)
     {
         if (! $structure = $collection->structure()) {
             $structure = new CollectionStructure;
@@ -276,7 +277,8 @@ class CollectionsController extends CpController
 
         return $structure
             ->maxDepth($maxDepth)
-            ->expectsRoot($expectsRoot);
+            ->expectsRoot($expectsRoot)
+            ->showSlugs($showSlugs);
     }
 
     public function destroy($collection)
@@ -363,6 +365,12 @@ class CollectionsController extends CpController
                     'expects_root' => [
                         'display' => __('Expect a root page'),
                         'instructions' => __('statamic::messages.expect_root_instructions'),
+                        'type' => 'toggle',
+                        'if' => ['structured' => true],
+                    ],
+                    'show_slugs' => [
+                        'display' => __('Slugs'),
+                        'instructions' => __('statamic::messages.show_slugs_instructions'),
                         'type' => 'toggle',
                         'if' => ['structured' => true],
                     ],
