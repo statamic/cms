@@ -18,7 +18,6 @@ abstract class Structure implements StructureContract
     protected $collection;
     protected $maxDepth;
     protected $expectsRoot = false;
-    protected $showSlugs = false;
 
     public function id()
     {
@@ -48,11 +47,6 @@ abstract class Structure implements StructureContract
     public function expectsRoot($expectsRoot = null)
     {
         return $this->fluentlyGetOrSet('expectsRoot')->args(func_get_args());
-    }
-
-    public function showSlugs($showSlugs = null)
-    {
-        return $this->fluentlyGetOrSet('showSlugs')->args(func_get_args());
     }
 
     public function trees()
