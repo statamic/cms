@@ -14,7 +14,7 @@ class TreeResource extends JsonResource
     /**
      * Set selected fields.
      *
-     * @param array|null $fields
+     * @param  array|null  $fields
      * @return $this
      */
     public function fields($fields = null)
@@ -27,7 +27,7 @@ class TreeResource extends JsonResource
     /**
      * Set max depth.
      *
-     * @param int|null $depth
+     * @param  int|null  $depth
      * @return $this
      */
     public function maxDepth($depth = null)

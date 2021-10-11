@@ -71,7 +71,7 @@ class Locales extends Tags
     /**
      * Get a single locale array representation.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return array
      */
     private function getLocale($key)
@@ -90,7 +90,7 @@ class Locales extends Tags
     /**
      * Add data to the locale collection.
      *
-     * @param Collection $locales
+     * @param  Collection  $locales
      */
     private function addData($locales)
     {
@@ -110,7 +110,7 @@ class Locales extends Tags
     /**
      * Get the localized version of the data object as an array.
      *
-     * @param  string $locale
+     * @param  string  $locale
      * @return array
      */
     private function getLocalizedData($locale)
@@ -149,7 +149,7 @@ class Locales extends Tags
     /**
      * Sort the locale collection.
      *
-     * @param  Collection $locales
+     * @param  Collection  $locales
      * @return Collection
      */
     private function sort($locales)
@@ -169,7 +169,7 @@ class Locales extends Tags
     /**
      * Get the sort and direction values from a parameter string.
      *
-     * @param  string $sort
+     * @param  string  $sort
      * @return array
      */
     private function getSort($sort)
@@ -187,7 +187,7 @@ class Locales extends Tags
     /**
      * Move the current site locale to the front of the collection.
      *
-     * @param  Collection $locales
+     * @param  Collection  $locales
      * @return Collection
      */
     private function moveCurrentLocaleToFront($locales)

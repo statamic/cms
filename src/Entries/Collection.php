@@ -587,6 +587,7 @@ class Collection implements Contract, AugmentableContract
                 return Arr::removeNullValues([
                     'root' => $structure->expectsRoot(),
                     'max_depth' => $structure->maxDepth(),
+                    'slugs' => $structure->showSlugs() ?: null,
                 ]);
             })
             ->args(func_get_args());
@@ -597,6 +598,7 @@ class Collection implements Contract, AugmentableContract
         return (new CollectionStructure)
             ->handle($this->handle())
             ->expectsRoot($this->structureContents['root'] ?? false)
+            ->showSlugs($this->structureContents['slugs'] ?? false)
             ->maxDepth($this->structureContents['max_depth'] ?? null);
     }
 

@@ -9,7 +9,6 @@ use Statamic\Fields\BlueprintRepository;
  * @method static self setDirectory(string $directory)
  * @method static self setFallbackDirectory(string $directory)
  * @method static null|\Statamic\Fields\Blueprint find($handle)
- * @method static \Illuminate\Support\Collection all()
  * @method static void save(Blueprint $blueprint)
  * @method static void delete(Blueprint $blueprint)
  * @method static \Statamic\Fields\Blueprint make($handle = null)

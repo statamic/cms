@@ -43,7 +43,7 @@ class ImageGenerator
     /**
      * GlideController constructor.
      *
-     * @param \League\Glide\Server     $server
+     * @param  \League\Glide\Server  $server
      */
     public function __construct(Server $server)
     {
@@ -53,8 +53,8 @@ class ImageGenerator
     /**
      * Generate a manipulated image by a path.
      *
-     * @param string $path
-     * @param array  $params
+     * @param  string  $path
+     * @param  array  $params
      * @return mixed
      */
     public function generateByPath($path, array $params)
@@ -72,8 +72,8 @@ class ImageGenerator
     /**
      * Generate a manipulated image by a URL.
      *
-     * @param string $url
-     * @param array  $params
+     * @param  string  $url
+     * @param  array  $params
      * @return mixed
      */
     public function generateByUrl($url, array $params)
@@ -97,8 +97,8 @@ class ImageGenerator
     /**
      * Generate a manipulated image by an asset.
      *
-     * @param \Statamic\Contracts\Assets\Asset $asset
-     * @param array                            $params
+     * @param  \Statamic\Contracts\Assets\Asset  $asset
+     * @param  array  $params
      * @return mixed
      */
     public function generateByAsset($asset, array $params)
@@ -130,8 +130,9 @@ class ImageGenerator
     /**
      * Generate the image.
      *
-     * @param string $image The filename of the image
+     * @param  string  $image  The filename of the image
      * @return mixed
+     *
      * @throws \Exception
      * @throws \League\Glide\Filesystem\FileNotFoundException
      * @throws \League\Glide\Filesystem\FilesystemException

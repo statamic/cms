@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Responses;
 
-use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Str;
 use Statamic\Auth\Protect\Protection;
@@ -159,11 +158,6 @@ class DataResponse implements Responsable
         }
 
         return $contents;
-    }
-
-    protected function cascade()
-    {
-        return Cascade::instance()->withContent($this->data)->hydrate();
     }
 
     protected function adjustResponseType()

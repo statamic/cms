@@ -67,6 +67,7 @@
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
                     :site="site"
+                    :initial-columns="columns"
                     initial-sort-column="title"
                     initial-sort-direction="asc"
                     :initial-selections="value"
@@ -122,6 +123,10 @@ export default {
             default: 'default',
         },
         taggable: Boolean,
+        columns: {
+            type: Array,
+            default: () => []
+        }
     },
 
     components: {
@@ -146,7 +151,7 @@ export default {
 
         items() {
             return this.value.map(selection => {
-                const data = _.findWhere(this.data, { id: selection });
+                const data = _.find(this.data, (item) => item.id == selection);
 
                 if (! data) return { id: selection, title: selection };
 

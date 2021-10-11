@@ -23,7 +23,7 @@ interface Asset
     /**
      * Get or set the container.
      *
-     * @param AssetContainer|string $container  An asset container instance, or the handle of one.
+     * @param  AssetContainer|string  $container  An asset container instance, or the handle of one.
      * @return AssetContainer
      */
     public function container($container = null);
@@ -38,7 +38,7 @@ interface Asset
     /**
      * Get either a image URL builder instance, or a URL if passed params.
      *
-     * @param null|array $params Optional manipulation parameters to return a string right away
+     * @param  null|array  $params  Optional manipulation parameters to return a string right away
      * @return \Statamic\Contracts\Imaging\UrlBuilder|string
      */
     public function manipulate($params = null);
@@ -67,7 +67,7 @@ interface Asset
     /**
      * Upload a file.
      *
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
+     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return mixed
      */
     public function upload(UploadedFile $file);

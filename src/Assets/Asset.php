@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
@@ -31,7 +32,7 @@ use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements AssetContract, Augmentable
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, SyncsOriginalState, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -41,7 +42,7 @@ class Asset implements AssetContract, Augmentable
     protected $container;
     protected $path;
     protected $meta;
-    protected $original;
+    protected $syncOriginalProperties = ['path'];
 
     public function __construct()
     {
@@ -236,7 +237,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get or set the path to the data.
      *
-     * @param string|null $path Path to set
+     * @param  string|null  $path  Path to set
      * @return mixed
      */
     public function path($path = null)
@@ -296,8 +297,9 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get either a image URL builder instance, or a URL if passed params.
      *
-     * @param null|array $params Optional manipulation parameters to return a string right away
+     * @param  null|array  $params  Optional manipulation parameters to return a string right away
      * @return \Statamic\Contracts\Imaging\UrlBuilder|string
+     *
      * @throws \Exception
      */
     public function manipulate($params = null)
@@ -420,6 +422,8 @@ class Asset implements AssetContract, Augmentable
 
         AssetSaved::dispatch($this);
 
+        $this->syncOriginal();
+
         return true;
     }
 
@@ -454,7 +458,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get or set the container where this asset is located.
      *
-     * @param string|AssetContainerContract $container  ID of the container
+     * @param  string|AssetContainerContract  $container  ID of the container
      * @return AssetContainerContract
      */
     public function container($container = null)
@@ -490,7 +494,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Rename the asset.
      *
-     * @param string $filename
+     * @param  string  $filename
      * @return void
      */
     public function rename($filename, $unique = false)
@@ -503,8 +507,8 @@ class Asset implements AssetContract, Augmentable
     /**
      * Move the asset to a different location.
      *
-     * @param string      $folder   The folder relative to the container.
-     * @param string|null $filename The new filename, if renaming.
+     * @param  string  $folder  The folder relative to the container.
+     * @param  string|null  $filename  The new filename, if renaming.
      * @return void
      */
     public function move($folder, $filename = null)
@@ -529,7 +533,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get the asset's dimensions.
      *
-     * @return array  An array in the [width, height] format
+     * @return array An array in the [width, height] format
      */
     public function dimensions()
     {
@@ -618,7 +622,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Upload a file.
      *
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
+     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return void
      */
     public function upload(UploadedFile $file)
@@ -644,7 +648,7 @@ class Asset implements AssetContract, Augmentable
             fclose($stream);
         }
 
-        $this->path($path);
+        $this->path($path)->syncOriginal();
 
         $this->save();
 
@@ -672,7 +676,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get the blueprint.
      *
-     * @param string|null $blueprint
+     * @param  string|null  $blueprint
      * @return \Statamic\Fields\Blueprint
      */
     public function blueprint()
@@ -723,9 +727,9 @@ class Asset implements AssetContract, Augmentable
     /**
      * Ensure and return unique filename, incrementing as necessary.
      *
-     * @param string $folder
-     * @param string $filename
-     * @param int $count
+     * @param  string  $folder
+     * @param  string  $filename
+     * @param  int  $count
      * @return string
      */
     protected function ensureUniqueFilename($folder, $filename, $count = 0)
@@ -759,19 +763,5 @@ class Asset implements AssetContract, Augmentable
     protected function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
-    }
-
-    public function syncOriginal()
-    {
-        $this->original = [
-            'path' => $this->path,
-        ];
-
-        return $this;
-    }
-
-    public function getOriginal($key = null, $fallback = null)
-    {
-        return Arr::get($this->original, $key, $fallback);
     }
 }
