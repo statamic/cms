@@ -53,7 +53,7 @@ class CollectionsStore extends BasicStore
             ->sortField(array_get($data, 'sort_by'))
             ->sortDirection(array_get($data, 'sort_dir'))
             ->taxonomies(array_get($data, 'taxonomies'))
-            ->autoPublish(array_get($data, 'autopublish'));
+            ->propagate(array_get($data, 'propagate'));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection

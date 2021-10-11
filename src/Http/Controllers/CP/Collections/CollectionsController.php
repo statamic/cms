@@ -141,7 +141,7 @@ class CollectionsController extends CpController
             'layout' => $collection->layout(),
             'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
-            'autopublish' => $collection->autoPublish(),
+            'propagate' => $collection->propagate(),
             'routes' => $collection->routes()->unique()->count() === 1
                 ? $collection->routes()->first()
                 : $collection->routes()->all(),
@@ -219,7 +219,7 @@ class CollectionsController extends CpController
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
             ->mount(array_get($values, 'mount'))
-            ->autoPublish(array_get($values, 'autopublish'));
+            ->propagate(array_get($values, 'propagate'));
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -431,10 +431,10 @@ class CollectionsController extends CpController
                         'mode' => 'select',
                         'required' => true,
                     ],
-                    'autopublish' => [
+                    'propagate' => [
                         'type' => 'toggle',
-                        'display' => __('Auto Publish'),
-                        'instructions' => __('statamic::messages.collection_configure_autopublish_instructions'),
+                        'display' => __('Propagate'),
+                        'instructions' => __('statamic::messages.collection_configure_propagate_instructions'),
                     ],
                 ],
             ];

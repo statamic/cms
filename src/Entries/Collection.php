@@ -36,7 +36,7 @@ class Collection implements Contract, AugmentableContract
     protected $template;
     protected $layout;
     protected $sites;
-    protected $autoPublish;
+    protected $propagate = false;
     protected $blueprints = [];
     protected $searchIndex;
     protected $dated = false;
@@ -326,12 +326,12 @@ class Collection implements Contract, AugmentableContract
             ->args(func_get_args());
     }
 
-    public function autoPublish($autoPublish = null)
+    public function propagate($propagate = null)
     {
         return $this
-            ->fluentlyGetOrSet('autoPublish')
-            ->getter(function ($autoPublish) {
-                return $autoPublish ?? false;
+            ->fluentlyGetOrSet('propagate')
+            ->getter(function ($propagate) {
+                return $propagate ?? false;
             })
             ->args(func_get_args());
     }
@@ -466,8 +466,8 @@ class Collection implements Contract, AugmentableContract
             $array['structure'] = $this->structureContents();
         }
 
-        if ($this->autoPublish()) {
-            $array['autopublish'] = $this->autoPublish();
+        if ($this->propagate()) {
+            $array['propagate'] = $this->propagate();
         }
 
         return $array;
@@ -505,7 +505,7 @@ class Collection implements Contract, AugmentableContract
             'default_publish_state' => $this->defaultPublishState,
             'amp' => $this->ampable,
             'sites' => $this->sites,
-            'autopublish' => $this->autoPublish,
+            'propagate' => $this->propagate(),
             'template' => $this->template,
             'layout' => $this->layout,
             'cascade' => $this->cascade->all(),

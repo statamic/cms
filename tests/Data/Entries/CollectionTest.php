@@ -179,24 +179,16 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_auto_publish_configuration_from_collection()
-    {
-        $collection = new Collection;
-        $collection->autoPublish(true);
-
-        $return = $collection->autoPublish();
-
-        $this->assertTrue($return);
-    }
-
-    /** @test */
-    public function it_gets_default_auto_publish_configuration()
+    public function it_gets_and_sets_propagation_setting()
     {
         $collection = new Collection;
 
-        $return = $collection->autoPublish();
+        $this->assertFalse($collection->propagate());
 
-        $this->assertFalse($return);
+        $return = $collection->propagate(true);
+
+        $this->assertEquals($collection, $return);
+        $this->assertTrue($collection->propagate());
     }
 
     /** @test */

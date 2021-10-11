@@ -325,7 +325,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             EntrySaved::dispatch($this);
         }
 
-        if ($isNew && ! $this->hasOrigin() && $this->collection()->autoPublish()) {
+        if ($isNew && ! $this->hasOrigin() && $this->collection()->propagate()) {
             $this->collection()->sites()
                 ->reject($this->site()->handle())
                 ->each(function ($siteHandle) {

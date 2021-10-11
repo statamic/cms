@@ -824,7 +824,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    public function it_auto_publishes_entry_if_configured()
+    public function it_propagates_entry_if_configured()
     {
         Event::fake();
 
@@ -839,7 +839,7 @@ class EntryTest extends TestCase
 
         $collection = (new Collection)
             ->handle('pages')
-            ->autoPublish(true)
+            ->propagate(true)
             ->sites(['en', 'fr', 'de'])
             ->save();
 
@@ -855,7 +855,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_auto_publish_if_not_configured()
+    public function it_does_not_propagate_if_not_configured()
     {
         Event::fake();
 
@@ -885,7 +885,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_auto_publish_in_site_not_configured_for_collection()
+    public function it_does_not_propagate_in_site_not_configured_for_collection()
     {
         Event::fake();
 
@@ -900,7 +900,7 @@ class EntryTest extends TestCase
 
         $collection = (new Collection)
             ->handle('pages')
-            ->autoPublish(true)
+            ->propagate(true)
             ->sites(['en', 'fr'])
             ->save();
 
