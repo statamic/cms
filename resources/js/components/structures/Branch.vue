@@ -11,6 +11,10 @@
                     :class="{ 'text-sm font-medium': isTopLevel }"
                     v-text="title" />
 
+                <span v-if="showSlugs" class="ml-1 font-mono text-grey-70 text-2xs pt-px">
+                    {{ isRoot ? '/' : page.slug }}
+                </span>
+
                 <button
                     v-if="hasChildren"
                     class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
@@ -62,6 +66,7 @@ export default {
         hasCollection: Boolean,
         isOpen: Boolean,
         hasChildren: Boolean,
+        showSlugs: Boolean
     },
 
     data() {
