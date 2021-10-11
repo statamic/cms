@@ -11,6 +11,10 @@
                     :class="{ 'text-sm font-medium': isTopLevel }"
                     v-text="title" />
 
+                <span v-if="page.show_slug" class="ml-1 font-mono text-2xs">
+                    {{ page.slug }}
+                </span>
+
                 <button
                     v-if="hasChildren"
                     class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
