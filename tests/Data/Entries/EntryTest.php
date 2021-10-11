@@ -833,6 +833,7 @@ class EntryTest extends TestCase
             'sites' => [
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
                 'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
                 'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
             ],
         ]);
@@ -852,6 +853,7 @@ class EntryTest extends TestCase
 
         $this->assertIsObject($entry->descendants()->get('fr'));
         $this->assertIsObject($entry->descendants()->get('de'));
+        $this->assertNull($entry->descendants()->get('es')); // collection not configured for this site
     }
 
     /** @test */
@@ -912,37 +914,6 @@ class EntryTest extends TestCase
         $return = $entry->save();
 
         $this->assertNull($entry->descendants()->get('fr'));
-        $this->assertNull($entry->descendants()->get('de'));
-    }
-
-    /** @test */
-    public function it_does_not_propagate_in_site_not_configured_for_collection()
-    {
-        Event::fake();
-
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
-        ]);
-
-        $collection = (new Collection)
-            ->handle('pages')
-            ->propagate(true)
-            ->sites(['en', 'fr'])
-            ->save();
-
-        $entry = (new Entry)
-            ->id('a')
-            ->locale('en')
-            ->collection($collection);
-
-        $return = $entry->save();
-
-        $this->assertIsObject($entry->descendants()->get('fr'));
         $this->assertNull($entry->descendants()->get('de'));
     }
 
