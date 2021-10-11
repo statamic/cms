@@ -1,6 +1,6 @@
 <template>
 
-    <div 
+    <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
         @dragstart.stop="ignorePageHeader(true)"
@@ -292,6 +292,7 @@ export default {
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.clearContent()
                 this.editor.setContent(content, true);
             }
         },
