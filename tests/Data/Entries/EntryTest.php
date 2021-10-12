@@ -677,6 +677,21 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_blueprint_when_defined_in_an_origin_property()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        Collection::make('blog')->save();
+        $origin = (new Entry)->collection('blog')->blueprint('second');
+        $entry = (new Entry)->collection('blog')->origin($origin);
+
+        $this->assertSame($second, $entry->blueprint());
+        $this->assertNotSame($first, $second);
+    }
+
+    /** @test */
     public function it_gets_the_default_collection_blueprint_when_undefined()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -1045,7 +1060,10 @@ class EntryTest extends TestCase
         $originEntry->shouldReceive('id')->andReturn('123');
 
         Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
-        $originEntry->shouldReceive('values')->andReturn(collect(['blueprint' => 'test']));
+        $originEntry->shouldReceive('values')->andReturn(collect([]));
+        $originEntry->shouldReceive('blueprint')->andReturn(
+            $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('test')->getMock()
+        );
 
         $entry = (new Entry)
             ->collection('test')
@@ -1074,7 +1092,6 @@ class EntryTest extends TestCase
             'origin' => '123',
             'published' => false,
             'content' => 'The content',
-            'blueprint' => 'test',
         ], $entry->fileData());
     }
 
@@ -1109,7 +1126,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    public function the_inherited_blueprint_is_added_to_the_localized_file_contents()
+    public function the_blueprint_is_not_added_to_the_localized_file_contents()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
             'default' => (new Blueprint)->setHandle('default'),
@@ -1122,13 +1139,43 @@ class EntryTest extends TestCase
         $originEntry->shouldReceive('id')->andReturn('123');
 
         Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
-        $originEntry->shouldReceive('values')->andReturn(collect(['blueprint' => 'another']));
+        $originEntry->shouldReceive('values')->andReturn(collect([]));
+        $originEntry->shouldReceive('blueprint')->andReturn(
+            $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
+        );
 
         $entry = (new Entry)
             ->collection('test')
             ->origin('123'); // do not set blueprint.
 
-        $this->assertEquals('another', $entry->fileData()['blueprint']);
+        $this->assertArrayNotHasKey('blueprint', $entry->fileData());
+    }
+
+    /** @test */
+    public function the_blueprint_is_added_to_the_localized_file_contents_if_explicitly_different_from_the_origin()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $originEntry = $this->mock(Entry::class);
+        $originEntry->shouldReceive('id')->andReturn('123');
+
+        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $originEntry->shouldReceive('values')->andReturn(collect([]));
+        $originEntry->shouldReceive('blueprint')->andReturn(
+            $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
+        );
+
+        $entry = (new Entry)
+            ->collection('test')
+            ->origin('123')
+            ->blueprint('default');
+
+        $this->assertEquals('default', $entry->fileData()['blueprint']);
     }
 
     /** @test */
