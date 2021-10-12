@@ -35,6 +35,7 @@ return [
     'collection_configure_layout_instructions' => 'Set this collection\'s default layout. Entries can override this setting with a `template` field named `layout`. It is unusual to change this setting.',
     'collection_configure_template_instructions' => 'Set this collection\'s default template. Entries can override this setting with a `template` field.',
     'collection_configure_title_instructions' => 'We recommend a plural noun, like "Articles" or "Products".',
+    'collection_configure_propagate_instructions' => 'Automatically propagate new entries to all configured sites.',
     'collection_next_steps_configure_description' => 'Configure URLs and routes, define blueprints, date behaviors, ordering and other options.',
     'collection_next_steps_create_entry_description' => 'Create the first entry or stub out a handful of placeholder entries, it\'s up to you.',
     'collection_next_steps_documentation_description' => 'Learn more about collections, how they work, and how to configure them.',

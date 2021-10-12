@@ -712,7 +712,9 @@ class EntryTest extends TestCase
     public function it_saves_through_the_api()
     {
         Event::fake();
-        $entry = (new Entry)->id('a')->collection(new Collection);
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
@@ -736,7 +738,8 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        $entry = (new Entry)->id('1')->collection(new Collection);
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('1')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('1')->times(3)->andReturn(null, $entry, $entry);
@@ -753,7 +756,9 @@ class EntryTest extends TestCase
     public function it_saves_quietly()
     {
         Event::fake();
-        $entry = (new Entry)->id('a')->collection(new Collection);
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
@@ -788,7 +793,9 @@ class EntryTest extends TestCase
     public function it_performs_callbacks_after_saving_but_before_the_saved_event_and_only_once()
     {
         Event::fake();
-        $entry = (new Entry)->id('a')->collection(new Collection);
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->times(2)->andReturn(null, $entry);
@@ -814,6 +821,168 @@ class EntryTest extends TestCase
         $this->assertEquals(1, $callbackTwoRan);
 
         // TODO: How to test that the callbacks are run *before* the EntrySaved event?
+    }
+
+    /** @test */
+    public function it_propagates_entry_if_configured()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->propagate(true)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertIsObject($fr = $entry->descendants()->get('fr'));
+        $this->assertIsObject($de = $entry->descendants()->get('de'));
+        $this->assertNull($entry->descendants()->get('es')); // collection not configured for this site
+
+        Event::assertDispatchedTimes(EntrySaving::class, 3);
+        Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+        Event::assertDispatched(EntrySaving::class, function ($event) use ($fr) {
+            return $event->entry === $fr;
+        });
+        Event::assertDispatched(EntrySaving::class, function ($event) use ($de) {
+            return $event->entry === $de;
+        });
+
+        Event::assertDispatchedTimes(EntryCreated::class, 3);
+        Event::assertDispatched(EntryCreated::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+        Event::assertDispatched(EntryCreated::class, function ($event) use ($fr) {
+            return $event->entry === $fr;
+        });
+        Event::assertDispatched(EntryCreated::class, function ($event) use ($de) {
+            return $event->entry === $de;
+        });
+
+        Event::assertDispatchedTimes(EntrySaved::class, 3);
+        Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+        Event::assertDispatched(EntrySaved::class, function ($event) use ($fr) {
+            return $event->entry === $fr;
+        });
+        Event::assertDispatched(EntrySaved::class, function ($event) use ($de) {
+            return $event->entry === $de;
+        });
+    }
+
+    /** @test */
+    public function it_propagates_entry_from_non_default_site_if_configured()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->propagate(true)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('fr')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertIsObject($entry->descendants()->get('en'));
+        $this->assertIsObject($entry->descendants()->get('de'));
+    }
+
+    /** @test */
+    public function it_does_not_propagate_if_not_configured()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertNull($entry->descendants()->get('fr'));
+        $this->assertNull($entry->descendants()->get('de'));
+    }
+
+    /** @test */
+    public function it_does_not_propagate_existing_entries()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->propagate(false)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $entry->save();
+        $this->assertCount(1, Entry::all());
+
+        $collection->propagate(true)->save();
+
+        $entry->save();
+        $this->assertCount(1, Entry::all());
     }
 
     /** @test */

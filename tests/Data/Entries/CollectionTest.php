@@ -179,6 +179,19 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_propagation_setting()
+    {
+        $collection = new Collection;
+
+        $this->assertFalse($collection->propagate());
+
+        $return = $collection->propagate(true);
+
+        $this->assertEquals($collection, $return);
+        $this->assertTrue($collection->propagate());
+    }
+
+    /** @test */
     public function it_stores_cascading_data_in_a_collection()
     {
         $collection = new Collection;
