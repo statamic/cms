@@ -6,6 +6,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Statamic\CP\Toasts\ToastsHolder;
 use Statamic\CP\Utilities\CoreUtilities;
 use Statamic\CP\Utilities\UtilityRepository;
 use Statamic\Extensions\Translation\Loader;
@@ -62,6 +63,8 @@ class CpServiceProvider extends ServiceProvider
         $this->app->singleton(LicenseManager::class, function ($app) {
             return new LicenseManager($app[Outpost::class]);
         });
+
+        $this->app->singleton(ToastsHolder::class);
     }
 
     protected function registerMiddlewareGroups()
