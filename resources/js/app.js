@@ -200,7 +200,7 @@ Statamic.app({
             const toasts = response?.data?._toasts ?? []
 
             toasts.forEach(toast => {
-                this.$toast.success(toast.message)
+                this.$toast[toast.type](toast.message)
             })
 
             return response;
