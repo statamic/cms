@@ -24,8 +24,8 @@ class Checkboxes extends Fieldtype
                 'display' => __('Options'),
                 'instructions' => __('statamic::fieldtypes.checkboxes.config.options'),
                 'type' => 'array',
-                'key_header' => __('Key (Value)'),
-                'value_header' => __('Label'),
+                'key_header' => __('Key'),
+                'value_header' => __('Label').' ('.__('Optional').')',
             ],
             'default' => [
                 'display' => __('Default Value'),
