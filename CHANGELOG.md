@@ -1,5 +1,21 @@
 # Release Notes
 
+## 3.2.15 (2020-10-12)
+
+### What's new
+- Entries may be propagated to other sites automatically on creation. [#3304](https://github.com/statamic/cms/issues/3304) by @duncanmcclean
+- Slugs may be shown on a collection's tree view. [#4444](https://github.com/statamic/cms/issues/4444) by @tobiasholst
+- You can query entries' `blueprint` fields in GraphQL. [#4416](https://github.com/statamic/cms/issues/4416) by @dmgawel
+
+### What's improved
+- When creating a new localized entry, the published toggle will now match the origin entry's status. [#4432](https://github.com/statamic/cms/issues/4432) by @jesseleite
+
+### What's fixed
+- Fix incompatibility with latest version of Laravel. [#4456](https://github.com/statamic/cms/issues/4456) by @jasonvarga
+- Fix Bard reactivity issue [#4438](https://github.com/statamic/cms/issues/4438) by @tobiasholst
+
+
+
 ## 3.2.14 (2020-10-08)
 
 ### What's improved
