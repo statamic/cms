@@ -195,6 +195,16 @@ Statamic.app({
         this.fixAutofocus();
 
         this.showBanner = Statamic.$config.get('hasLicenseBanner');
+
+        axios.interceptors.response.use((response) => {
+            const toasts = response?.data?._toasts ?? []
+
+            toasts.forEach(toast => {
+                this.$toast.success(toast.message)
+            })
+
+            return response;
+        });
     },
 
     created() {
