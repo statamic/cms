@@ -27,7 +27,7 @@ class Select extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.select.config.options'),
                 'type' => 'array',
                 'key_header' => __('Key'),
-                'value_header' => __('Label'),
+                'value_header' => __('Label').' ('.__('Optional').')',
                 'add_button' => __('Add Option'),
             ],
             'multiple' => [

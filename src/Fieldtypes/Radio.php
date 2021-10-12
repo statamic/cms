@@ -18,7 +18,7 @@ class Radio extends Fieldtype
                 'display' => __('Options'),
                 'instructions' => __('statamic::fieldtypes.radio.config.options'),
                 'type' => 'array',
-                'value_header' => __('Label'),
+                'value_header' => __('Label').' ('.__('Optional').')',
             ],
             'inline' => [
                 'display' => __('Inline'),
