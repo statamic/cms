@@ -677,6 +677,21 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_blueprint_when_defined_in_an_origin_property()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        Collection::make('blog')->save();
+        $origin = (new Entry)->collection('blog')->blueprint('second');
+        $entry = (new Entry)->collection('blog')->origin($origin);
+
+        $this->assertSame($second, $entry->blueprint());
+        $this->assertNotSame($first, $second);
+    }
+
+    /** @test */
     public function it_gets_the_default_collection_blueprint_when_undefined()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
