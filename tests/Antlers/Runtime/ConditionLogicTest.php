@@ -313,7 +313,7 @@ EOT;
 
         $data = [
             'global' => [
-                'notification' => '<p></p>'
+                'notification' => '<p></p>',
             ],
         ];
 
@@ -321,8 +321,8 @@ EOT;
 
         $data = [
             'global' => [
-                'notification' => '<p>Hello, world.</p>'
-            ]
+                'notification' => '<p>Hello, world.</p>',
+            ],
         ];
 
         $this->assertSame('Not Empty', $this->renderString($template, $data, true));
