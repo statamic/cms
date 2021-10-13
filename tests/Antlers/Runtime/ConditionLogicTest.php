@@ -304,4 +304,27 @@ EOT;
         $this->assertSame('Page 1Page 2Page 3', $this->renderString($template, ['use_pages' => true], true));
         $this->assertSame('Article 1Article 2Article 3', $this->renderString($template, ['use_pages' => false], true));
     }
+
+    public function test_modifier_chains_break_on_equality_comparison_operator()
+    {
+        $template = <<<'EOT'
+{{ if global:notification && global:notification|strip_tags|is_empty == false }}Not Empty{{ else}}Empty{{ /if }}
+EOT;
+
+        $data = [
+            'global' => [
+                'notification' => '<p></p>'
+            ],
+        ];
+
+        $this->assertSame('Empty', $this->renderString($template, $data, true));
+
+        $data = [
+            'global' => [
+                'notification' => '<p>Hello, world.</p>'
+            ]
+        ];
+
+        $this->assertSame('Not Empty', $this->renderString($template, $data, true));
+    }
 }

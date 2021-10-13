@@ -2156,10 +2156,11 @@ class LanguageParser
             if ($subToken instanceof ModifierSeparator ||
                 $subToken instanceof LogicalGroupEnd ||
                 $subToken instanceof LogicalGroupBegin ||
-                $subToken instanceof LogicalOrOperator ||
-                $subToken instanceof LogicalAndOperator ||
-                $subToken instanceof LogicalNegationOperator ||
-                $subToken instanceof LogicalXorOperator) {
+                $this->isOperatorType($subToken) ||
+                $subToken instanceof LanguageOperatorConstruct ||
+                $subToken instanceof LibraryInvocationConstruct ||
+                $subToken instanceof MethodInvocationNode ||
+                $subToken instanceof LogicalNegationOperator) {
                 break;
             } else {
                 $subTokens[] = $subToken;
