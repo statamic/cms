@@ -25,6 +25,21 @@ class SelectTest extends TestCase
         $this->assertInstanceOf(LabeledValue::class, $augmented);
         $this->assertEquals('au', $augmented->value());
         $this->assertEquals('Australia', $augmented->label());
+
+        $augmented = $field->augment(null);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertNull($augmented->value());
+        $this->assertNull($augmented->label());
+
+        $augmented = $field->augment(false);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertFalse($augmented->value());
+        $this->assertFalse($augmented->label());
+
+        $augmented = $field->augment('missing');
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertEquals('missing', $augmented->value());
+        $this->assertEquals('missing', $augmented->label());
     }
 
     /** @test */
@@ -43,6 +58,21 @@ class SelectTest extends TestCase
         $this->assertInstanceOf(LabeledValue::class, $augmented);
         $this->assertEquals('Australia', $augmented->value());
         $this->assertEquals('Australia', $augmented->label());
+
+        $augmented = $field->augment(null);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertNull($augmented->value());
+        $this->assertNull($augmented->label());
+
+        $augmented = $field->augment(false);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertFalse($augmented->value());
+        $this->assertFalse($augmented->label());
+
+        $augmented = $field->augment('missing');
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertEquals('missing', $augmented->value());
+        $this->assertEquals('missing', $augmented->label());
     }
 
     /** @test */
@@ -61,6 +91,21 @@ class SelectTest extends TestCase
         $this->assertInstanceOf(LabeledValue::class, $augmented);
         $this->assertNull($augmented->value());
         $this->assertNull($augmented->label());
+
+        $augmented = $field->augment(null);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertNull($augmented->value());
+        $this->assertNull($augmented->label());
+
+        $augmented = $field->augment(false);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertFalse($augmented->value());
+        $this->assertFalse($augmented->label());
+
+        $augmented = $field->augment('missing');
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertEquals('missing', $augmented->value());
+        $this->assertEquals('missing', $augmented->label());
     }
 
     /** @test */
@@ -79,6 +124,9 @@ class SelectTest extends TestCase
         $this->assertEquals([
             ['key' => 'au', 'value' => 'au', 'label' => 'Australia'],
             ['key' => 'us', 'value' => 'us', 'label' => 'USA'],
-        ], $field->augment(['au', 'us']));
+            ['key' => null, 'value' => null, 'label' => null],
+            ['key' => false, 'value' => false, 'label' => false],
+            ['key' => 'missing', 'value' => 'missing', 'label' => 'missing'],
+        ], $field->augment(['au', 'us', null, false, 'missing']));
     }
 }
