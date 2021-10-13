@@ -424,6 +424,10 @@
         top: -1px;
     }
 
+    pre {
+        margin-bottom: .85em;
+    }
+
     pre code {
         @apply font-mono bg-grey-40 text-xs p-2 block w-full rounded;
         line-height: 1.8;
