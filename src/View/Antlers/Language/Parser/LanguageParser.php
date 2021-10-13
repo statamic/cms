@@ -48,9 +48,13 @@ use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\NotStrictEqualComp
 use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\SpaceshipCompOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\StrictEqualCompOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\LanguageOperatorConstruct;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalAndOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\LogicalNegationOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalOrOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalXorOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\NullCoalesceOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\ScopeAssignmentOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\StringConcatenationOperator;
 use Statamic\View\Antlers\Language\Nodes\StringValueNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\AliasedScopeLogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArgSeparator;
@@ -2153,7 +2157,23 @@ class LanguageParser
             if ($subToken instanceof ModifierSeparator ||
                 $subToken instanceof LogicalGroupEnd ||
                 $subToken instanceof LogicalGroupBegin ||
-                $this->isOperatorType($subToken) ||
+
+                $subToken instanceof EqualCompOperator ||
+                $subToken instanceof GreaterThanCompOperator ||
+                $subToken instanceof GreaterThanEqualCompOperator ||
+                $subToken instanceof LessThanCompOperator ||
+                $subToken instanceof LessThanEqualCompOperator ||
+                $subToken instanceof NotEqualCompOperator ||
+                $subToken instanceof NotStrictEqualCompOperator ||
+                $subToken instanceof SpaceshipCompOperator ||
+                $subToken instanceof StrictEqualCompOperator ||
+
+                $subToken instanceof LogicalAndOperator ||
+                $subToken instanceof LogicalOrOperator ||
+                $subToken instanceof LogicalXorOperator ||
+                $subToken instanceof NullCoalesceOperator ||
+                $subToken instanceof StringConcatenationOperator ||
+
                 $subToken instanceof LanguageOperatorConstruct ||
                 $subToken instanceof LibraryInvocationConstruct ||
                 $subToken instanceof MethodInvocationNode ||
