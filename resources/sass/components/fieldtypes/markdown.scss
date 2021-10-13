@@ -229,6 +229,10 @@
 
     .markdown-preview {
         @apply max-w-xl bg-transparent mx-auto relative p-4 text-lg;
+        
+        ul, li {
+            @apply list-auto;   
+        }
     }
 
     .helpers {
