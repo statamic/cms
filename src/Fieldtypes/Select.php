@@ -223,7 +223,7 @@ class Select extends Fieldtype
     private function isOption($value)
     {
         return Arr::isAssoc($options = $this->config('options'))
-            ? array_key_exists($value, $options)
+            ? in_array($value, array_keys($options), true)
             : in_array($value, $options, true);
     }
 }
