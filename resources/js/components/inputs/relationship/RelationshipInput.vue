@@ -236,13 +236,12 @@ export default {
 
         getDataForSelections(selections) {
             this.loading = true;
-            const params = { site: this.site, selections };
 
-            return this.$axios.get(this.itemDataUrl, { params }).then(response => {
-                    this.$emit('item-data-updated', response.data.data);
-                }).finally(() => {
-                    this.loading = false;
-                });
+            return this.$axios.post(this.itemDataUrl, { site: this.site, selections }).then(response => {
+                this.$emit('item-data-updated', response.data.data);
+            }).finally(() => {
+                this.loading = false;
+            });
         },
 
         makeSortable() {
