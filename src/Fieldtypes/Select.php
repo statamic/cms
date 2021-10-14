@@ -108,29 +108,26 @@ class Select extends Fieldtype
                 return [
                     'key' => $value,
                     'value' => $value,
-                    'label' => $value ? array_get($this->config('options'), $value, $value) : $value,
+                    'label' => $this->getLabel($value),
                 ];
             })->all();
         }
 
         throw_if(is_array($value), new MultipleValuesEncounteredException($this));
 
-        $label = $value ? array_get($this->config('options'), $value, $value) : $value;
-
-        return new LabeledValue($value, $label);
+        return new LabeledValue($value, $this->getLabel($value));
     }
 
     public function preProcess($value)
     {
-        if ($this->config('cast_booleans')) {
-            if ($value === true) {
-                return 'true';
-            } elseif ($value === false) {
-                return 'false';
-            }
-        }
+        // Cannot use Arr::wrap() here because it will convert null to an empty array.
+        $value = is_array($value) ? $value : [$value];
 
-        return $value;
+        $values = collect($value)->map(function ($value) {
+            return $this->config('cast_booleans') ? $this->castFromBoolean($value) : $value;
+        });
+
+        return $this->config('multiple') ? $values->all() : $values->first();
     }
 
     public function preProcessConfig($value)
@@ -140,15 +137,11 @@ class Select extends Fieldtype
 
     public function process($value)
     {
-        if ($this->config('cast_booleans')) {
-            if ($value === 'true') {
-                return true;
-            } elseif ($value === 'false') {
-                return false;
-            }
-        }
+        $values = collect(Arr::wrap($value))->map(function ($value) {
+            return $this->config('cast_booleans') ? $this->castToBoolean($value) : $value;
+        });
 
-        return $value;
+        return $this->config('multiple') ? $values->all() : $values->first();
     }
 
     public function toGqlType()
@@ -165,7 +158,7 @@ class Select extends Fieldtype
             'resolve' => function ($item, $args, $context, $info) {
                 $resolved = $item->resolveGqlValue($info->fieldName);
 
-                return $resolved->value() ? $resolved : null;
+                return is_null($resolved->value()) ? null : $resolved;
             },
         ];
     }
@@ -186,5 +179,51 @@ class Select extends Fieldtype
                 })->all();
             },
         ];
+    }
+
+    private function getLabel($actualValue)
+    {
+        $value = $actualValue;
+
+        if ($this->config('cast_booleans')) {
+            $value = $this->castFromBoolean($value);
+        }
+
+        return $this->isOption($value)
+            ? Arr::get($this->config('options'), $value, $value)
+            : $actualValue;
+    }
+
+    private function castToBoolean($value)
+    {
+        if ($value === 'true') {
+            return true;
+        } elseif ($value === 'false') {
+            return false;
+        } elseif ($value === 'null') {
+            return null;
+        }
+
+        return $value;
+    }
+
+    private function castFromBoolean($value)
+    {
+        if ($value === true) {
+            return 'true';
+        } elseif ($value === false) {
+            return 'false';
+        } elseif ($value === null) {
+            return 'null';
+        }
+
+        return $value;
+    }
+
+    private function isOption($value)
+    {
+        return Arr::isAssoc($options = $this->config('options'))
+            ? array_key_exists($value, $options)
+            : in_array($value, $options, true);
     }
 }
