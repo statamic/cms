@@ -194,8 +194,17 @@
 
 .markdown-preview {
     @apply mx-auto;
+
     padding: 16px 20px;
     min-height: 167px; // @TODO Refactor to avoid a magic number.
+
+    ol {
+        @apply list-decimal;
+    }
+
+    ul {
+        @apply list-disc;
+    }
 }
 
 .markdown-fieldtype-wrapper.markdown-fullscreen {
@@ -229,10 +238,6 @@
 
     .markdown-preview {
         @apply max-w-xl bg-transparent mx-auto relative p-4 text-lg;
-        
-        ul, li {
-            @apply list-auto;   
-        }
     }
 
     .helpers {
