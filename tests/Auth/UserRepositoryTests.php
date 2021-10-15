@@ -3,7 +3,6 @@
 namespace Tests\Auth;
 
 use Statamic\Facades\User;
-use Statamic\Contracts\Auth\User as UserContract;
 
 trait UserRepositoryTests
 {
