@@ -16,12 +16,12 @@ trait HasSelectOptions
 
     public function preProcessIndex($value)
     {
-        if (! $value) {
-            return [];
-        }
+        $values = $this->preProcess($value);
 
-        return collect(Arr::wrap($value))->map(function ($value) {
-            return array_get($this->field->get('options'), $value, $value);
+        $values = collect(is_array($values) ? $values : [$values]);
+
+        return $values->map(function ($value) {
+            return $this->getLabel($value);
         })->all();
     }
 

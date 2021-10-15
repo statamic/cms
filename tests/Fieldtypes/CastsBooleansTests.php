@@ -27,6 +27,11 @@ trait CastsBooleansTests
         $this->assertEquals('false', $field->preProcess(false));
         $this->assertEquals('null', $field->preProcess(null));
         $this->assertEquals('foo', $field->preProcess('foo'));
+
+        $this->assertEquals(['Yup'], $field->preProcessIndex(true));
+        $this->assertEquals(['Nope'], $field->preProcessIndex(false));
+        $this->assertEquals(['Dunno'], $field->preProcessIndex(null));
+        $this->assertEquals(['Bar'], $field->preProcessIndex('foo'));
     }
 
     /** @test */
@@ -52,5 +57,10 @@ trait CastsBooleansTests
         $this->assertEquals(false, $field->preProcess(false));
         $this->assertEquals(null, $field->preProcess(null));
         $this->assertEquals('foo', $field->preProcess('foo'));
+
+        $this->assertEquals([true], $field->preProcessIndex(true));
+        $this->assertEquals([false], $field->preProcessIndex(false));
+        $this->assertEquals([null], $field->preProcessIndex(null));
+        $this->assertEquals(['Bar'], $field->preProcessIndex('foo'));
     }
 }

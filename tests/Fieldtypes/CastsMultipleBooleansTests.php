@@ -31,6 +31,11 @@ trait CastsMultipleBooleansTests
 
         $this->assertEquals([], $field->preProcess(null));
         $this->assertEquals(['null'], $field->preProcess([null]));
+
+        $this->assertEquals(
+            ['Yup', 'Nope', 'Dunno', 'Bar'],
+            $field->preProcessIndex([true, false, null, 'foo'])
+        );
     }
 
     /** @test */
@@ -56,6 +61,11 @@ trait CastsMultipleBooleansTests
         $this->assertEquals(
             [true, false, null, 'foo'],
             $field->preProcess([true, false, null, 'foo'])
+        );
+
+        $this->assertEquals(
+            [true, false, null, 'Bar'],
+            $field->preProcessIndex([true, false, null, 'foo'])
         );
     }
 }
