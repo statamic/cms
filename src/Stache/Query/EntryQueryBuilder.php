@@ -12,7 +12,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     protected $collections;
 
-    public function where($column, $operator = null, $value = null, $boolean = null)
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column === 'collection') {
             $this->collections[] = $operator;
@@ -28,7 +28,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return $this->where($column, $operator, $value, 'or');
     }
 
-    public function whereIn($column, $values, $boolean = null)
+    public function whereIn($column, $values, $boolean = 'and')
     {
         if (in_array($column, ['collection', 'collections'])) {
             $this->collections = array_merge($this->collections ?? [], $values);

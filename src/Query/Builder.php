@@ -62,7 +62,7 @@ abstract class Builder implements Contract
 
     abstract public function inRandomOrder();
 
-    public function where($column, $operator = null, $value = null, $boolean = null)
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
@@ -115,7 +115,7 @@ abstract class Builder implements Contract
         return ! in_array(strtolower($operator), array_keys($this->operators), true);
     }
 
-    public function whereIn($column, $values, $boolean = null)
+    public function whereIn($column, $values, $boolean = 'and')
     {
         $this->wheres[] = [
             'type' => 'In',
@@ -139,7 +139,7 @@ abstract class Builder implements Contract
         return $this;
     }
 
-    public function whereNotIn($column, $values, $boolean = null)
+    public function whereNotIn($column, $values, $boolean = 'and')
     {
         $this->wheres[] = [
             'type' => 'NotIn',
