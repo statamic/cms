@@ -79,10 +79,6 @@ abstract class Builder implements Contract
         }
 
         $type = 'Basic';
-        if (is_null($boolean)) {
-            $boolean = 'and';
-        }
-
         $this->wheres[] = compact('type', 'column', 'value', 'operator', 'boolean');
 
         return $this;
