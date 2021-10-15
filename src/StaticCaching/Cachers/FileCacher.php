@@ -2,12 +2,13 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Statamic\Facades\File;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\Site;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Cache\Repository;
 
 class FileCacher extends AbstractCacher
 {
@@ -154,7 +155,11 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        return $this->getCachePath().'/'.$urlParts['host'].$pathParts['dirname'].'/'.$basename;
+        if (Site::hasMultipleDomains()) {
+            return $this->getCachePath().'/'.$urlParts['host'].$pathParts['dirname'].'/'.$basename;
+        }
+
+        return $this->getCachePath().$pathParts['dirname'].'/'.$basename;
     }
 
     private function isBasenameTooLong($basename)
