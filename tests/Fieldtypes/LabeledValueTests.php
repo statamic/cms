@@ -120,7 +120,6 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->label());
     }
 
-
     /** @test */
     public function it_augments_to_a_LabeledValue_object_with_boolean_casting()
     {
@@ -187,5 +186,4 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->value());
         $this->assertEquals('missing', $augmented->label());
     }
-
 }

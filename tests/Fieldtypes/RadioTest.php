@@ -4,8 +4,6 @@ namespace Tests\Fieldtypes;
 
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Radio;
-use Tests\Fieldtypes\CastsBooleansTests;
-use Tests\Fieldtypes\LabeledValueTests;
 use Tests\TestCase;
 
 class RadioTest extends TestCase
