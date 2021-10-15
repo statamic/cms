@@ -93,6 +93,38 @@ class SitesTest extends TestCase
     }
 
     /** @test */
+    public function checks_whether_there_are_multiple_domains()
+    {
+        $this->sites->setConfig([
+            'default' => 'foo',
+            'sites' => [
+                'foo' => [
+                    'url' => 'http://domain1.com'
+                ],
+                'bar' => [
+                    'url' => 'http://domain2.com'
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($this->sites->hasMultipleDomains());
+
+        $this->sites->setConfig([
+            'default' => 'foo',
+            'sites' => [
+                'foo' => [
+                    'url' => 'http://domain.com'
+                ],
+                'bar' => [
+                    'url' => 'http://domain.com'
+                ],
+            ],
+        ]);
+
+        $this->assertFalse($this->sites->hasMultipleDomains());
+    }
+
+    /** @test */
     public function gets_site_by_handle()
     {
         tap($this->sites->get('en'), function ($site) {

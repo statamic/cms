@@ -89,6 +89,14 @@ class SiteTest extends TestCase
     }
 
     /** @test */
+    public function gets_domain_from_url()
+    {
+        $site = new Site('en', ['url' => 'http://test.com/123']);
+
+        $this->assertEquals('http://test.com', $site->domain());
+    }
+
+    /** @test */
     public function gets_absolute_url()
     {
         $this->assertEquals(
