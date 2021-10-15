@@ -2,15 +2,14 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\LabeledValue;
-use Statamic\GraphQL\Types\LabeledValueType;
-use Statamic\Support\Arr;
 
 class Select extends Fieldtype
 {
+    use HasSelectOptions;
+
     protected $selectableInForms = true;
+    protected $indexComponent = 'tags';
 
     protected function configFieldItems(): array
     {
@@ -86,144 +85,5 @@ class Select extends Fieldtype
                 'width' => 50,
             ],
         ];
-    }
-
-    protected $indexComponent = 'tags';
-
-    public function preProcessIndex($value)
-    {
-        if (! $value) {
-            return [];
-        }
-
-        return collect(Arr::wrap($value))->map(function ($value) {
-            return array_get($this->field->get('options'), $value, $value);
-        })->all();
-    }
-
-    public function augment($value)
-    {
-        if ($this->config('multiple')) {
-            return collect($value)->map(function ($value) {
-                return [
-                    'key' => $value,
-                    'value' => $value,
-                    'label' => $this->getLabel($value),
-                ];
-            })->all();
-        }
-
-        throw_if(is_array($value), new MultipleValuesEncounteredException($this));
-
-        return new LabeledValue($value, $this->getLabel($value));
-    }
-
-    public function preProcess($value)
-    {
-        // Cannot use Arr::wrap() here because it will convert null to an empty array.
-        $value = is_array($value) ? $value : [$value];
-
-        $values = collect($value)->map(function ($value) {
-            return $this->config('cast_booleans') ? $this->castFromBoolean($value) : $value;
-        });
-
-        return $this->config('multiple') ? $values->all() : $values->first();
-    }
-
-    public function preProcessConfig($value)
-    {
-        return $value;
-    }
-
-    public function process($value)
-    {
-        $values = collect(Arr::wrap($value))->map(function ($value) {
-            return $this->config('cast_booleans') ? $this->castToBoolean($value) : $value;
-        });
-
-        return $this->config('multiple') ? $values->all() : $values->first();
-    }
-
-    public function toGqlType()
-    {
-        return $this->config('multiple')
-            ? $this->multiSelectGqlType()
-            : $this->singleSelectGqlType();
-    }
-
-    private function singleSelectGqlType()
-    {
-        return [
-            'type' => GraphQL::type(LabeledValueType::NAME),
-            'resolve' => function ($item, $args, $context, $info) {
-                $resolved = $item->resolveGqlValue($info->fieldName);
-
-                return is_null($resolved->value()) ? null : $resolved;
-            },
-        ];
-    }
-
-    private function multiSelectGqlType()
-    {
-        return [
-            'type' => GraphQL::listOf(GraphQL::type(LabeledValueType::NAME)),
-            'resolve' => function ($item, $args, $context, $info) {
-                $resolved = $item->resolveGqlValue($info->fieldName);
-
-                if (empty($resolved)) {
-                    return null;
-                }
-
-                return collect($resolved)->map(function ($item) {
-                    return new LabeledValue($item['value'], $item['label']);
-                })->all();
-            },
-        ];
-    }
-
-    private function getLabel($actualValue)
-    {
-        $value = $actualValue;
-
-        if ($this->config('cast_booleans')) {
-            $value = $this->castFromBoolean($value);
-        }
-
-        return $this->isOption($value)
-            ? Arr::get($this->config('options'), $value, $value)
-            : $actualValue;
-    }
-
-    private function castToBoolean($value)
-    {
-        if ($value === 'true') {
-            return true;
-        } elseif ($value === 'false') {
-            return false;
-        } elseif ($value === 'null') {
-            return null;
-        }
-
-        return $value;
-    }
-
-    private function castFromBoolean($value)
-    {
-        if ($value === true) {
-            return 'true';
-        } elseif ($value === false) {
-            return 'false';
-        } elseif ($value === null) {
-            return 'null';
-        }
-
-        return $value;
-    }
-
-    private function isOption($value)
-    {
-        return Arr::isAssoc($options = $this->config('options'))
-            ? in_array($value, array_keys($options), true)
-            : in_array($value, $options, true);
     }
 }
