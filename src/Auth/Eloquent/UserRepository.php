@@ -89,7 +89,7 @@ class UserRepository extends BaseRepository
         }
 
         if ($user instanceof Model) {
-            return User::fromModel($user);
+            return User::make()->model($user);
         }
 
         return null;
