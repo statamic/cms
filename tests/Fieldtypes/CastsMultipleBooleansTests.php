@@ -28,6 +28,9 @@ trait CastsMultipleBooleansTests
             ['true', 'false', 'null', 'foo'],
             $field->preProcess([true, false, null, 'foo'])
         );
+
+        $this->assertEquals([], $field->preProcess(null));
+        $this->assertEquals(['null'], $field->preProcess([null]));
     }
 
     /** @test */

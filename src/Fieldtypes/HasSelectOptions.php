@@ -27,14 +27,19 @@ trait HasSelectOptions
 
     public function preProcess($value)
     {
-        // Cannot use Arr::wrap() here because it will convert null to an empty array.
+        $multiple = $this->multiple();
+
+        if ($value === null && $multiple) {
+            return [];
+        }
+
         $value = is_array($value) ? $value : [$value];
 
         $values = collect($value)->map(function ($value) {
             return $this->config('cast_booleans') ? $this->castFromBoolean($value) : $value;
         });
 
-        return $this->multiple() ? $values->all() : $values->first();
+        return $multiple ? $values->all() : $values->first();
     }
 
     public function preProcessConfig($value)
