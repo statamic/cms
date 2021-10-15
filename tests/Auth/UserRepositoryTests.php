@@ -3,6 +3,7 @@
 namespace Tests\Auth;
 
 use Statamic\Facades\User;
+use Statamic\Contracts\Auth\User as UserContract;
 
 trait UserRepositoryTests
 {
@@ -71,5 +72,20 @@ trait UserRepositoryTests
 
         User::make()->email('foo@bar.com')->data(['name' => 'foo', 'password' => 'foo'])->save();
         $this->assertInstanceOf($this->fakeUserClass(), User::findByEmail('foo@bar.com'));
+    }
+
+    /** @test */
+    public function it_normalizes_statamic_user()
+    {
+        $user = User::make()->email('foo@bar.com')->data(['name' => 'foo', 'password' => 'foo']);
+        $user->save();
+
+        $this->assertInstanceOf($this->userClass(), User::fromUser($user));
+    }
+
+    /** @test */
+    public function it_successfully_returns_null_when_trying_to_normalize_user_from_null()
+    {
+        $this->assertNull(User::fromUser(null));
     }
 }
