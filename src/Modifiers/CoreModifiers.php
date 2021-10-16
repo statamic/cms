@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
@@ -612,6 +613,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns a converted string in a Carbon translated format.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function formatTranslated($value, $params)
+    {
+        return $this->carbon($value)->translatedFormat(Arr::get($params, 0));
+    }
+
+    /**
      * Converts a string to a Carbon instance and formats it according to the whim of the Overlord.
      *
      * @param $value
@@ -720,7 +733,70 @@ class CoreModifiers extends Modifier
      */
     public function groupBy($value, $params)
     {
-        return collect($value)->groupBy($params[0])->toArray();
+        // Workaround for https://github.com/statamic/cms/issues/3614
+        // At the moment this modifier only works properly when using the param syntax.
+        $params = implode(':', $params);
+        $params = explode('|', $params);
+        $groupBy = $params[0];
+
+        $groupLabels = [];
+
+        $grouped = collect($value)->groupBy(function ($item) use ($groupBy, $params, &$groupLabels) {
+            $value = $this->getGroupByValue($item, $groupBy);
+
+            return $this->handleGroupByDateValue($value, $params, $groupLabels);
+        });
+
+        $iterable = $grouped->map(function ($items, $key) use ($groupLabels) {
+            return [
+                'key' => $key,
+                'group' => $groupLabels[$key] ?? $key,
+                'items' => $items,
+            ];
+        })->values();
+
+        return collect($grouped)->merge(['groups' => $iterable]);
+    }
+
+    private function getGroupByValue($item, $groupBy)
+    {
+        $value = is_object($item)
+            ? $this->getGroupByValueFromObject($item, $groupBy)
+            : $item[$groupBy];
+
+        if ($value instanceof Value) {
+            $value = $value->value();
+        }
+
+        return $value;
+    }
+
+    private function getGroupByValueFromObject($item, $groupBy)
+    {
+        // Make the array just from the params, so it only augments the values that might be needed.
+        $keys = explode(':', $groupBy);
+        $context = $item->toAugmentedArray($keys);
+
+        return Antlers::parser()->getVariable($groupBy, $context);
+    }
+
+    private function handleGroupByDateValue($value, $params, &$groupLabels)
+    {
+        if (! $value instanceof Carbon) {
+            return $value;
+        }
+
+        $date = $value;
+        $dateFormat = $params[1] ?? 'Y-m-d';
+        $dateGroupFormat = $params[2] ?? $dateFormat;
+
+        $value = $date->format($dateFormat);
+
+        if ($dateFormat !== $dateGroupFormat) {
+            $groupLabels[$value] = $date->format($dateGroupFormat);
+        }
+
+        return $value;
     }
 
     /**
@@ -1512,6 +1588,10 @@ class CoreModifiers extends Modifier
         }
 
         $items = $value->map(function ($item) use ($key) {
+            if (is_array($item)) {
+                return Arr::get($item, $key);
+            }
+
             return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
         });
 
@@ -2031,6 +2111,26 @@ class CoreModifiers extends Modifier
         $nospaces = preg_replace('/\s+/', ' ', $nolb);
 
         return preg_replace('/>\s+</', '><', $nospaces);
+    }
+
+    /**
+     * Break an array into a given number of groups.
+     *
+     * @param $value
+     * @param $params
+     * @return array
+     */
+    public function split($value, $params)
+    {
+        $size = Arr::get($params, 0, 1);
+
+        return collect($value)
+            ->split($size)
+            ->map(function ($collection) {
+                return [
+                    'items' => $collection->all(),
+                ];
+            })->all();
     }
 
     /**

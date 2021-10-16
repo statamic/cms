@@ -1,5 +1,170 @@
 # Release Notes
 
+## 3.2.16 (2020-10-14)
+
+### What's improved
+- Improve IDE Autocompletion of `Blink` facade. [#4466](https://github.com/statamic/cms/issues/4466) by @duncanmcclean
+
+### What's fixed
+- Fix relationship fieldtype request query length limit. [#4484](https://github.com/statamic/cms/issues/4484) by @jesseleite
+- Fix issue with Glide signature and Laravel Octane. [#4473](https://github.com/statamic/cms/issues/4473) by @riasvdv
+- Fix multisite entry blueprint logic. [#4465](https://github.com/statamic/cms/issues/4465) by @jasonvarga
+- Fix fieldtype key and label translations. [#4458](https://github.com/statamic/cms/issues/4458) by @ebeauchamps
+- Fix styles of lists in Markdown Preview. [#4480](https://github.com/statamic/cms/issues/4480) by @duncanmcclean
+- Fix Bard codeblock margin. [#4482](https://github.com/statamic/cms/issues/4482) by @stvnthomas
+
+
+
+## 3.2.15 (2020-10-12)
+
+### What's new
+- Entries may be propagated to other sites automatically on creation. [#3304](https://github.com/statamic/cms/issues/3304) by @duncanmcclean
+- Slugs may be shown on a collection's tree view. [#4444](https://github.com/statamic/cms/issues/4444) by @tobiasholst
+- You can query entries' `blueprint` fields in GraphQL. [#4416](https://github.com/statamic/cms/issues/4416) by @dmgawel
+
+### What's improved
+- When creating a new localized entry, the published toggle will now match the origin entry's status. [#4432](https://github.com/statamic/cms/issues/4432) by @jesseleite
+
+### What's fixed
+- Fix incompatibility with latest version of Laravel. [#4456](https://github.com/statamic/cms/issues/4456) by @jasonvarga
+- Fix Bard reactivity issue [#4438](https://github.com/statamic/cms/issues/4438) by @tobiasholst
+
+
+
+## 3.2.14 (2020-10-08)
+
+### What's improved
+- Updated German translations. [#4429](https://github.com/statamic/cms/issues/4429) by @helloDanuk
+
+### What's fixed
+- Fieldtype titles are translated separately to prevent conflicts with common words. [#4423](https://github.com/statamic/cms/issues/4423) by @jasonvarga
+- Collection entry counts are site specific. [#4424](https://github.com/statamic/cms/issues/4424) by @jasonvarga
+- Fixed issue where IDs are shown instead of titles in relationship fieldtypes when using Eloquent.  [#4422](https://github.com/statamic/cms/issues/4422) by @tobiasholst
+
+
+
+## 3.2.13 (2020-10-07)
+
+### What's improved
+- Update Dutch translations. [#4413](https://github.com/statamic/cms/issues/4413) by @robdekort 
+- Update French translations. [#4411](https://github.com/statamic/cms/issues/4411) by @ebeauchamps
+
+### What's fixed
+- Fix lost asset meta on move / rename. [#4412](https://github.com/statamic/cms/issues/4412) by @jesseleite
+
+
+
+## 3.2.12 (2020-10-06)
+
+### What's improved
+- Added debouncing to a number of fieldtypes to prevent slowdowns in some situations. [#4393](https://github.com/statamic/cms/issues/4393)
+- Updated French translations [#4382](https://github.com/statamic/cms/issues/4382)
+
+### What's fixed
+- Fixed Bard's floating toolbar button styles leaking outside of the toolbar. [#4383](https://github.com/statamic/cms/issues/4383)
+- Use separate first/last name fields in the user listing and wizard when applicable. [#4408](https://github.com/statamic/cms/issues/4408) [#4399](https://github.com/statamic/cms/issues/4399)
+- Fix issue where enabling a site on a taxonomy would not show the terms until the cache is cleared. [#4400](https://github.com/statamic/cms/issues/4400)
+- Add missing dimensions icon dimensions. [#4396](https://github.com/statamic/cms/issues/4396)
+- Bump `composer/composer` in test suite. [#4401](https://github.com/statamic/cms/issues/4401)
+
+
+
+## 3.2.11 (2020-10-04)
+
+### What's improved
+- Updated German translations. [#4373](https://github.com/statamic/cms/issues/4373)
+
+### What's fixed
+- Added `Cascade::hydrated()` callback method so you can manipulate its data after being hydrated. [#4359](https://github.com/statamic/cms/issues/4359)
+- Fix extra live preview data not being in view. [#4359](https://github.com/statamic/cms/issues/4103)
+- Make `pluck` modifier work with arrays. [#4374](https://github.com/statamic/cms/issues/4374)
+- Fix `parent` tag not finding the parent in some cases. [#4345](https://github.com/statamic/cms/issues/4345)
+- `Search::indexExists()` returns `false` rather than throwing an exception. [#4244](https://github.com/statamic/cms/issues/4244)
+
+
+
+## 3.2.10 (2020-09-30)
+
+### What's new
+- Add `ensureFieldsInSection` method to add multiple fields at the same time. [#4333](https://github.com/statamic/cms/issues/4333)
+
+### What's fixed
+- Fix taxonomy terms not returning accurate entries or counts when using certain combinations of collections and multisite. [#4335](https://github.com/statamic/cms/issues/4335)
+
+
+
+## 3.2.9 (2020-09-28)
+
+### What's new
+- The `group_by` modifier can now be looped over, use nested values, and handles dates. [#4322](https://github.com/statamic/cms/issues/4322)
+- Added a `split` modifier. [#4305](https://github.com/statamic/cms/issues/4305)
+
+### What's improved
+- Updated French, German, Swiss, and Russian translations. [#4332](https://github.com/statamic/cms/issues/4332) [#4311](https://github.com/statamic/cms/issues/4311) [#4306](https://github.com/statamic/cms/issues/4306)
+- Return queries from `QueriesConditions` trait. [#4312](https://github.com/statamic/cms/issues/4312)
+- Improve IDE completion of `GraphQL` facade. [#4307](https://github.com/statamic/cms/issues/4307)
+
+### What's fixed
+- Fixed `User` class not being overridable. [#4243](https://github.com/statamic/cms/issues/4243)
+- Fixed `users` fieldtype outputting too much data. [#4243](https://github.com/statamic/cms/issues/4243)
+- Don't show "toggle all" checkbox in the asset selector if only one file is selectable. [#4309](https://github.com/statamic/cms/issues/4309)
+- Fix pages that start with the CP route, but not actually within the CP, being considered a CP route. (e.g. `/cpa`) [#4324](https://github.com/statamic/cms/issues/4324)
+- Support default values on all applicable form inputs. [#4323](https://github.com/statamic/cms/issues/4323)
+
+
+
+## 3.2.8 (2020-09-24)
+
+### What's new
+- Add a `format_translated` modifier to get translated Carbon dates. [#4272](https://github.com/statamic/cms/issues/4272)
+
+### What's fixed
+- Localized entries with explicit `null` values will no longer inherit their origin's values. [#4301](https://github.com/statamic/cms/issues/4301)
+- Fix slow stack selector listing in the `entries` fieldtype. [#4302](https://github.com/statamic/cms/issues/4302)
+- Fix error when editing certain imported fields in the blueprint editor. [#4298](https://github.com/statamic/cms/issues/4298)
+- Fix overzealous field blink cache that causes data to remain across entries when using the SSG. [#4303](https://github.com/statamic/cms/issues/4303)
+- Fix another giant SVG icon. [488c8aca5](https://github.com/statamic/cms/commit/488c8aca5)
+
+
+
+## 3.2.7 (2021-09-23)
+
+### What's new
+- Add `partial:exists` and `partial:if_exists` tags. [#4296](https://github.com/statamic/cms/issues/4296)
+
+### What's fixed
+- Localize the `parent` tag. [#4294](https://github.com/statamic/cms/issues/4294)
+- Fix responsiveness of more SVG icons. [#4295](https://github.com/statamic/cms/issues/4295) [6773a7f7b](https://github.com/statamic/cms/commit/6773a7f7b) [ee498c02d](https://github.com/statamic/cms/commit/ee498c02d)
+
+
+
+## 3.2.6 (2021-09-21)
+
+### What's new
+- When creating a localization of an entry, the slug becomes reactive to the title field again. [#4292](https://github.com/statamic/cms/issues/4292)
+- Add a Site column to entry listings when using multisite. [#4279](https://github.com/statamic/cms/issues/4279)
+
+### What's improved
+- German translations. [#4283](https://github.com/statamic/cms/issues/4283)
+
+### What's fixed
+- Fix Replicator set picker popover going the wrong direction. [#2966](https://github.com/statamic/cms/issues/2966)
+- Fix Globals nav and listing causing errors when using multisite. [#4289](https://github.com/statamic/cms/issues/4289)
+- Fixed responsiveness of SVG icons. [#4285](https://github.com/statamic/cms/issues/4285)
+- Added missing translation. [#4282](https://github.com/statamic/cms/issues/4282)
+
+
+
+## 3.2.5 (2021-09-17)
+
+### What's improved
+- A number of licensing UX improvements. [#4262](https://github.com/statamic/cms/issues/4262)
+- Added Russian translations. [#4263](https://github.com/statamic/cms/issues/4263)
+- Updated French translations. [#4255](https://github.com/statamic/cms/issues/4255)
+- The Dashboard item is removed from the nav when there are no widgets. [#4266](https://github.com/statamic/cms/issues/4266)
+
+
+
 ## 3.2.4 (2021-09-09)
 
 ### What's fixed

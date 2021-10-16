@@ -7,8 +7,10 @@
     transition: all .3s;
     z-index: 9998;
 
+    h6 { @apply mt-3; }
+
     ul {
-        @apply list-none p-0 mt-0 mb-3;
+        @apply list-none p-0 mt-0;
     }
 
     li {
@@ -55,8 +57,8 @@
         left: -110%;
     }
 
-    ul.section-top-level {
-        @apply font-medium text-grey-90;
+    .nav-section-top-level {
+        @apply mt-2;
     }
 }
 
@@ -72,7 +74,7 @@
 }
 
 .nav-main-inner {
-    @apply pl-3 pr-2 pt-2;
+    @apply pl-3 pr-2 pt-1;
 }
 
 .nav-toggle {

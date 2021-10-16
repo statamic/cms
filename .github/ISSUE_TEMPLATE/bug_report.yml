@@ -1,0 +1,45 @@
+name: Bug report
+description: Fill out a bug report to help us improve Statamic.
+body:
+  - type: textarea
+    attributes:
+      label: Bug description
+      description: What happened? What did you expect to happen? Feel free to drop any screenshots in here.
+      placeholder: I did this thing over here, and saw this error...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: How to reproduce
+      description: List the steps so we're able to recreate this bug. Bonus points if you can provide an example GitHub repo with this bug reproduced.
+      placeholder: Go here, Type this, Click that, Look over there.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Logs
+      description: You can paste any relevant logs here, they'll be automatically rendered in code blocks. You can find your logs in `storage/logs`.
+      render: shell
+  - type: textarea
+    attributes:
+      label: Versions
+      description: |
+        The versions of Statamic, PHP, Laravel, and any addons that are installed.
+        (Go ahead and just paste the output of the `php please support:details` command.)
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Installation
+      description: How did you install Statamic?
+      options:
+        - Fresh statamic/statamic site via CLI
+        - Starter Kit using via CLI
+        - Existing Laravel app
+        - Other (please explain)
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional details
+      description: Fancy setup? Anything else you need to share?

@@ -9,6 +9,7 @@
     "hot": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
     "prod": "npm run production",
     "production": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "svgo": "svgo -f ./resources/svg/  -r",
     "test": "cross-env NODE_ENV=test jest",
     "test-watch": "npm run test -- --watch --notify"
   },
@@ -48,6 +49,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "speakingurl": "^14.0.1",
     "striptags": "^3.2.0",
+    "svgo": "^2.6.1",
     "sweetalert": "~1.0.1",
     "tiptap-extensions": "^1.28.6",
     "underscore": "~1.9.2",

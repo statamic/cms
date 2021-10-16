@@ -27,6 +27,7 @@
         structure-submit-url="{{ cp_route('collections.tree.update', $collection->handle()) }}"
         :structure-max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
         :structure-expects-root="{{ Statamic\Support\Str::bool($structure->expectsRoot()) }}"
+        :structure-show-slugs="{{ Statamic\Support\Str::bool($structure->showSlugs()) }}"
         @endif
     >
         <template #twirldown>

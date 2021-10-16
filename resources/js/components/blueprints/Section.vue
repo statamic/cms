@@ -20,10 +20,10 @@
                 </div>
                 <div class="flex items-center px-1.5">
                     <button @click.prevent="toggleEditing" class="flex items-center text-grey-60 hover:text-grey-100 mr-1">
-                        <svg-icon :name="isEditing ? 'shrink' : 'expand'" />
+                        <svg-icon class="h-4 w-4" :name="isEditing ? 'shrink' : 'expand'" />
                     </button>
                     <button @click.prevent="$emit('deleted')" class="flex items-center text-grey-60 hover:text-grey-100" v-if="deletable">
-                        <svg-icon name="trash" />
+                        <svg-icon class="h-4 w-4" name="trash" />
                     </button>
                 </div>
             </div>

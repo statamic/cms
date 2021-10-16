@@ -73,7 +73,8 @@ class EntryTest extends TestCase
     /** @test */
     public function it_sets_gets_and_removes_data_values()
     {
-        $entry = new Entry;
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection('test');
         $this->assertNull($entry->get('foo'));
 
         $return = $entry->set('foo', 'bar');
@@ -176,6 +177,44 @@ class EntryTest extends TestCase
             'two' => 'two in origin',
             'three' => 'three in entry',
         ], $entry->values()->all());
+
+        $this->assertEquals('one in collection', $entry->value('one'));
+        $this->assertEquals('two in origin', $entry->value('two'));
+        $this->assertEquals('three in entry', $entry->value('three'));
+    }
+
+    /** @test */
+    public function if_the_value_is_explicitly_set_to_null_then_it_should_not_fall_back()
+    {
+        tap(Collection::make('test')->cascade([
+            'one' => 'one in collection',
+            'two' => 'two in collection',
+            'three' => 'three in collection',
+            'four' => 'four in collection',
+        ]))->save();
+
+        $origin = (new Entry)->collection('test')->data([
+            'two' => null,
+            'three' => 'three in origin',
+            'four' => 'four in origin',
+        ]);
+
+        $entry = (new Entry)->origin($origin)->collection('test')->data([
+            'three' => null,
+            'four' => 'four in entry',
+        ]);
+
+        $this->assertEquals([
+            'one' => 'one in collection', // falls all the way back
+            'two' => null, // falls back from entry, stops at origin
+            'three' => null, // stops at entry
+            'four' => 'four in entry', // set in entry
+        ], $entry->values()->all());
+
+        $this->assertEquals('one in collection', $entry->value('one'));
+        $this->assertEquals(null, $entry->value('two'));
+        $this->assertEquals(null, $entry->value('three'));
+        $this->assertEquals('four in entry', $entry->value('four'));
     }
 
     /** @test */
@@ -638,6 +677,21 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_blueprint_when_defined_in_an_origin_property()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        Collection::make('blog')->save();
+        $origin = (new Entry)->collection('blog')->blueprint('second');
+        $entry = (new Entry)->collection('blog')->origin($origin);
+
+        $this->assertSame($second, $entry->blueprint());
+        $this->assertNotSame($first, $second);
+    }
+
+    /** @test */
     public function it_gets_the_default_collection_blueprint_when_undefined()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -673,7 +727,9 @@ class EntryTest extends TestCase
     public function it_saves_through_the_api()
     {
         Event::fake();
-        $entry = (new Entry)->id('a')->collection(new Collection);
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
@@ -697,7 +753,8 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        $entry = (new Entry)->id('1')->collection(new Collection);
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('1')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('1')->times(3)->andReturn(null, $entry, $entry);
@@ -714,7 +771,9 @@ class EntryTest extends TestCase
     public function it_saves_quietly()
     {
         Event::fake();
-        $entry = (new Entry)->id('a')->collection(new Collection);
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
@@ -749,7 +808,9 @@ class EntryTest extends TestCase
     public function it_performs_callbacks_after_saving_but_before_the_saved_event_and_only_once()
     {
         Event::fake();
-        $entry = (new Entry)->id('a')->collection(new Collection);
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->times(2)->andReturn(null, $entry);
@@ -775,6 +836,168 @@ class EntryTest extends TestCase
         $this->assertEquals(1, $callbackTwoRan);
 
         // TODO: How to test that the callbacks are run *before* the EntrySaved event?
+    }
+
+    /** @test */
+    public function it_propagates_entry_if_configured()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->propagate(true)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertIsObject($fr = $entry->descendants()->get('fr'));
+        $this->assertIsObject($de = $entry->descendants()->get('de'));
+        $this->assertNull($entry->descendants()->get('es')); // collection not configured for this site
+
+        Event::assertDispatchedTimes(EntrySaving::class, 3);
+        Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+        Event::assertDispatched(EntrySaving::class, function ($event) use ($fr) {
+            return $event->entry === $fr;
+        });
+        Event::assertDispatched(EntrySaving::class, function ($event) use ($de) {
+            return $event->entry === $de;
+        });
+
+        Event::assertDispatchedTimes(EntryCreated::class, 3);
+        Event::assertDispatched(EntryCreated::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+        Event::assertDispatched(EntryCreated::class, function ($event) use ($fr) {
+            return $event->entry === $fr;
+        });
+        Event::assertDispatched(EntryCreated::class, function ($event) use ($de) {
+            return $event->entry === $de;
+        });
+
+        Event::assertDispatchedTimes(EntrySaved::class, 3);
+        Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+        Event::assertDispatched(EntrySaved::class, function ($event) use ($fr) {
+            return $event->entry === $fr;
+        });
+        Event::assertDispatched(EntrySaved::class, function ($event) use ($de) {
+            return $event->entry === $de;
+        });
+    }
+
+    /** @test */
+    public function it_propagates_entry_from_non_default_site_if_configured()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->propagate(true)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('fr')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertIsObject($entry->descendants()->get('en'));
+        $this->assertIsObject($entry->descendants()->get('de'));
+    }
+
+    /** @test */
+    public function it_does_not_propagate_if_not_configured()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertNull($entry->descendants()->get('fr'));
+        $this->assertNull($entry->descendants()->get('de'));
+    }
+
+    /** @test */
+    public function it_does_not_propagate_existing_entries()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->propagate(false)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $entry->save();
+        $this->assertCount(1, Entry::all());
+
+        $collection->propagate(true)->save();
+
+        $entry->save();
+        $this->assertCount(1, Entry::all());
     }
 
     /** @test */
@@ -837,7 +1060,10 @@ class EntryTest extends TestCase
         $originEntry->shouldReceive('id')->andReturn('123');
 
         Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
-        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('test');
+        $originEntry->shouldReceive('values')->andReturn(collect([]));
+        $originEntry->shouldReceive('blueprint')->andReturn(
+            $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('test')->getMock()
+        );
 
         $entry = (new Entry)
             ->collection('test')
@@ -866,7 +1092,6 @@ class EntryTest extends TestCase
             'origin' => '123',
             'published' => false,
             'content' => 'The content',
-            'blueprint' => 'test',
         ], $entry->fileData());
     }
 
@@ -901,7 +1126,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    public function the_inherited_blueprint_is_added_to_the_localized_file_contents()
+    public function the_blueprint_is_not_added_to_the_localized_file_contents()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
             'default' => (new Blueprint)->setHandle('default'),
@@ -914,13 +1139,43 @@ class EntryTest extends TestCase
         $originEntry->shouldReceive('id')->andReturn('123');
 
         Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
-        $originEntry->shouldReceive('value')->with('blueprint')->andReturn('another');
+        $originEntry->shouldReceive('values')->andReturn(collect([]));
+        $originEntry->shouldReceive('blueprint')->andReturn(
+            $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
+        );
 
         $entry = (new Entry)
             ->collection('test')
             ->origin('123'); // do not set blueprint.
 
-        $this->assertEquals('another', $entry->fileData()['blueprint']);
+        $this->assertArrayNotHasKey('blueprint', $entry->fileData());
+    }
+
+    /** @test */
+    public function the_blueprint_is_added_to_the_localized_file_contents_if_explicitly_different_from_the_origin()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertEquals('default', $collection->entryBlueprint()->handle());
+
+        $originEntry = $this->mock(Entry::class);
+        $originEntry->shouldReceive('id')->andReturn('123');
+
+        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $originEntry->shouldReceive('values')->andReturn(collect([]));
+        $originEntry->shouldReceive('blueprint')->andReturn(
+            $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
+        );
+
+        $entry = (new Entry)
+            ->collection('test')
+            ->origin('123')
+            ->blueprint('default');
+
+        $this->assertEquals('default', $entry->fileData()['blueprint']);
     }
 
     /** @test */
