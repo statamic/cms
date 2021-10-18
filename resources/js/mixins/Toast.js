@@ -28,12 +28,12 @@ export default {
     },
 
     mounted() {
-        this.flashExistingMessages();
+        this.flashMessages(this.flash);
     },
 
     methods: {
-        flashExistingMessages() {
-            this.flash.forEach(
+        flashMessages(messages) {
+            messages.forEach(
                 ({ type, message }) => {
                     switch(type) {
                         case 'error':
