@@ -1,6 +1,6 @@
 <template>
 
-    <div 
+    <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
         @dragstart.stop="ignorePageHeader(true)"
@@ -282,7 +282,7 @@ export default {
             if (!this.mounted) return;
 
             // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
-            this.update(JSON.stringify(json));
+            this.updateDebounced(JSON.stringify(json));
         },
 
         value(value, oldValue) {
@@ -292,6 +292,7 @@ export default {
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.clearContent()
                 this.editor.setContent(content, true);
             }
         },

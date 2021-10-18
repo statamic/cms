@@ -385,6 +385,24 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
+    public function the_cascade_can_be_manipulated_after_hydration()
+    {
+        $cascade = $this->cascade();
+
+        $cascade->hydrated(function ($cascade) {
+            $cascade->set('foo', 'bar');
+            $cascade->set('xml_header', 'not the xml header');
+        });
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertEquals('bar', $cascade['foo']);
+
+            // a var that would normally be there to show the callbacks are run at the end
+            $this->assertEquals('not the xml header', $cascade['xml_header']);
+        });
+    }
+
+    /** @test */
     public function page_data_overrides_globals()
     {
         $this->withoutEvents(); // prevents taxonomy term tracker from kicking in.

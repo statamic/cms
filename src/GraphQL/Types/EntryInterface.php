@@ -51,6 +51,9 @@ class EntryInterface extends InterfaceType
             'collection' => [
                 'type' => GraphQL::nonNull(GraphQL::type(CollectionType::NAME)),
             ],
+            'blueprint' => [
+                'type' => GraphQL::string(),
+            ],
             'date' => new DateField,
             'last_modified' => new DateField,
             'locale' => [

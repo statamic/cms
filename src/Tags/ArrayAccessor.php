@@ -12,7 +12,7 @@ class ArrayAccessor extends Collection
         return Arr::getFirst($this->items, Arr::wrap($key), $default);
     }
 
-    public function hasAny(array $keys)
+    public function hasAny($keys)
     {
         foreach ($keys as $key) {
             if ($this->has($key)) {

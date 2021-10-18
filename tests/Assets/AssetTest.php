@@ -562,6 +562,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
@@ -580,6 +581,7 @@ class AssetTest extends TestCase
         $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('new/asset.txt');
         $disk->assertExists('new/.meta/asset.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('new/.meta/asset.txt.yaml'));
         $this->assertEquals([
             'new/asset.txt',
         ], $container->files()->all());
@@ -607,6 +609,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
@@ -622,6 +625,7 @@ class AssetTest extends TestCase
         $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('new/newfilename.txt');
         $disk->assertExists('new/.meta/newfilename.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('new/.meta/newfilename.txt.yaml'));
         $this->assertEquals([
             'new/newfilename.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
@@ -645,6 +649,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
@@ -663,6 +668,7 @@ class AssetTest extends TestCase
         $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/newfilename.txt');
         $disk->assertExists('old/.meta/newfilename.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('old/.meta/newfilename.txt.yaml'));
         $this->assertEquals([
             'old/newfilename.txt',
         ], $container->files()->all());
@@ -846,25 +852,38 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_can_upload_a_file()
+    public function it_can_upload_a_file_without_an_existing_cache()
+    {
+        $this->uploadFileTest();
+    }
+
+    /** @test */
+    public function it_can_upload_a_file_with_an_existing_cache()
+    {
+        Cache::put('asset-list-contents-test_container', collect());
+        $this->uploadFileTest();
+    }
+
+    private function uploadFileTest()
     {
         Event::fake();
-        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
-        $this->assertEquals([
-        ], $this->container->files()->all());
-        $this->assertEquals([
-        ], $this->container->assets('/', true)->keyBy->path()->map(function ($item) {
-            return $item->data()->all();
-        })->all());
-
-        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg'));
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
 
         $this->assertEquals($asset, $return);
         Storage::disk('test')->assertExists('path/to/asset.jpg');
         $this->assertEquals('path/to/asset.jpg', $asset->path());
+
+        $meta = $asset->meta();
+        $this->assertEquals(13, $meta['width']);
+        $this->assertEquals(15, $meta['height']);
+        $this->assertEquals('image/jpeg', $meta['mime_type']);
+        $this->assertArrayHasKey('size', $meta);
+        $this->assertArrayHasKey('last_modified', $meta);
         $this->assertEquals([
             'path/to/asset.jpg',
         ], $this->container->files()->all());

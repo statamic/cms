@@ -52,7 +52,8 @@ class CollectionsStore extends BasicStore
             ->structureContents(array_get($data, 'structure'))
             ->sortField(array_get($data, 'sort_by'))
             ->sortDirection(array_get($data, 'sort_dir'))
-            ->taxonomies(array_get($data, 'taxonomies'));
+            ->taxonomies(array_get($data, 'taxonomies'))
+            ->propagate(array_get($data, 'propagate'));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection

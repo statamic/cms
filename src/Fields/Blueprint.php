@@ -383,6 +383,17 @@ class Blueprint implements Augmentable
         return $this;
     }
 
+    public function ensureFieldsInSection($fields, $section, $prepend = false)
+    {
+        foreach ($fields as $handle => $config) {
+            $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'config');
+        }
+
+        $this->resetFieldsCache();
+
+        return $this;
+    }
+
     public function ensureFieldPrepended($handle, $field, $section = null)
     {
         return $this->ensureField($handle, $field, $section, true);
