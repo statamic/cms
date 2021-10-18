@@ -282,6 +282,10 @@ class Statamic
             $messages[] = ['type' => 'error', 'message' => $error];
         }
 
+        if ($info = session('info')) {
+            $messages[] = ['type' => 'info', 'message' => $info];
+        }
+
         return $messages ?? [];
     }
 
