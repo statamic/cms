@@ -24,7 +24,22 @@ class AddToasts
     {
         $response = $next($request);
 
-        return $this->addToastsTo($response);
+        if ($this->isRedirect($response)) {
+            return $response;
+        } else {
+            return $this->addToastsTo($response);
+        }
+    }
+
+    private function isRedirect(Response $response): bool
+    {
+        $parsedContent = $this->unwrapAndParseContentAsArray($response);
+
+        if ($parsedContent == null) {
+            return false;
+        } else {
+            return array_has($parsedContent, 'redirect');
+        }
     }
 
     private function addToastsTo(Response $response): Response
