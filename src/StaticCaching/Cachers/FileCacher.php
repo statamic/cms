@@ -2,13 +2,13 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
-use Statamic\Support\Arr;
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\Site;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Contracts\Cache\Repository;
+use Statamic\Facades\File;
+use Statamic\Facades\Site;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FileCacher extends AbstractCacher
 {
@@ -155,7 +155,7 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        if (Site::hasMultipleDomains()) {
+        if (Site::hasMultipleHosts()) {
             return $this->getCachePath().'/'.$urlParts['host'].$pathParts['dirname'].'/'.$basename;
         }
 
