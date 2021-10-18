@@ -4,6 +4,7 @@ namespace Statamic\Http\View\Composers;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\View\View;
+use Statamic\Facades\CP\Toasts;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -29,6 +30,7 @@ class JavascriptComposer
             'resourceUrl' => Statamic::cpAssetUrl(),
             'locales' => config('statamic.system.locales'),
             'flash' => Statamic::flash(),
+            '_toasts' => Toasts::all(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
