@@ -17,10 +17,12 @@ export default {
     data: {
         toast: null,
         flash: null,
+        initialToasts: null,
     },
 
     created() {
         this.flash = Statamic.$config.get('flash');
+        this.initialToasts = Statamic.$config.get('_toasts');
 
         this.$events.$on('toast.success', this.setFlashSuccess);
         this.$events.$on('toast.error', this.setFlashError);
@@ -29,6 +31,7 @@ export default {
 
     mounted() {
         this.flashMessages(this.flash);
+        this.flashMessages(this.initialToasts);
     },
 
     methods: {
