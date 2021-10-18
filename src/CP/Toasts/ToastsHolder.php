@@ -2,16 +2,30 @@
 
 namespace Statamic\CP\Toasts;
 
+use Illuminate\Session\Store;
+
 class ToastsHolder
 {
+    private static $TOASTS_SESSION_KEY = '_toasts';
+
     /**
-     * @var Toast[]
+     * @var Store
      */
-    private $toasts = [];
+    private $sessionStore;
+
+    public function __construct(
+        Store $sessionStore
+    ) {
+        $this->sessionStore = $sessionStore;
+    }
 
     public function push(Toast $toast)
     {
-        array_push($this->toasts, $toast);
+        $toasts = $this->getFromSession();
+
+        array_push($toasts, $toast);
+
+        $this->storeToSession($toasts);
     }
 
     /**
@@ -19,6 +33,22 @@ class ToastsHolder
      */
     public function all(): array
     {
-        return $this->toasts;
+        return $this->getFromSession();
+    }
+
+    /**
+     * @return Toast[]
+     */
+    private function getFromSession(): array
+    {
+        return $this->sessionStore->get(self::$TOASTS_SESSION_KEY, []);
+    }
+
+    /**
+     * @param  Toast[]  $toasts
+     */
+    private function storeToSession(array $toasts)
+    {
+        $this->sessionStore->flash(self::$TOASTS_SESSION_KEY, $toasts);
     }
 }
