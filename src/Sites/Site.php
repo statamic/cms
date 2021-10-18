@@ -50,11 +50,11 @@ class Site implements Augmentable
         return Str::removeRight($url, '/');
     }
 
-    public function domain()
+    public function host()
     {
         $urlParts = parse_url($this->config['url']);
 
-        return $urlParts['scheme'] . '://' . $urlParts['host'];
+        return $urlParts['host'] ?? request()->getHost();
     }
 
     public function direction()

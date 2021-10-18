@@ -30,14 +30,14 @@ class Sites
         return $this->sites->count() > 1;
     }
 
-    public function hasMultipleDomains()
+    public function hasMultipleHosts()
     {
         if (! $this->hasMultiple()) {
             return false;
         }
 
         return $this->sites->map(function ($site) {
-            return $site->domain();
+            return $site->host();
         })->unique()->count() > 1;
     }
 

@@ -89,11 +89,12 @@ class SiteTest extends TestCase
     }
 
     /** @test */
-    public function gets_domain_from_url()
+    public function gets_host_from_url()
     {
-        $site = new Site('en', ['url' => 'http://test.com/123']);
-
-        $this->assertEquals('http://test.com', $site->domain());
+        $this->assertEquals('test.com', (new Site('en', ['url' => 'http://test.com/123']))->host());
+        $this->assertEquals('www.test.com', (new Site('en', ['url' => 'http://www.test.com/123']))->host());
+        $this->assertEquals('subdomain.test.com', (new Site('en', ['url' => 'http://subdomain.test.com/123']))->host());
+        $this->assertEquals('absolute-url-resolved-from-request.com', (new Site('en', ['url' => '/123']))->host());
     }
 
     /** @test */

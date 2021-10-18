@@ -93,35 +93,35 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    public function checks_whether_there_are_multiple_domains()
+    public function checks_whether_there_are_multiple_hosts()
     {
         $this->sites->setConfig([
             'default' => 'foo',
             'sites' => [
                 'foo' => [
-                    'url' => 'http://domain1.com'
+                    'url' => 'http://domain1.com',
                 ],
                 'bar' => [
-                    'url' => 'http://domain2.com'
+                    'url' => 'http://domain2.com',
                 ],
             ],
         ]);
 
-        $this->assertTrue($this->sites->hasMultipleDomains());
+        $this->assertTrue($this->sites->hasMultipleHosts());
 
         $this->sites->setConfig([
             'default' => 'foo',
             'sites' => [
                 'foo' => [
-                    'url' => 'http://domain.com'
+                    'url' => 'http://domain.com',
                 ],
                 'bar' => [
-                    'url' => 'http://domain.com'
+                    'url' => 'http://domain.com',
                 ],
             ],
         ]);
 
-        $this->assertFalse($this->sites->hasMultipleDomains());
+        $this->assertFalse($this->sites->hasMultipleHosts());
     }
 
     /** @test */
