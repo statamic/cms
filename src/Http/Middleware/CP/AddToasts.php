@@ -24,42 +24,42 @@ class AddToasts
     {
         $response = $next($request);
 
-        if ($this->isRedirect($response)) {
+        if ($this->hasNoToasts()) {
             return $response;
         } else {
-            return $this->addToastsTo($response);
+            return $this->addToastsToResponseIfPossible($response);
         }
     }
 
-    private function isRedirect(Response $response): bool
+    private function addToastsToResponseIfPossible(Response $response): Response
     {
-        $parsedContent = $this->unwrapAndParseContentAsArray($response);
+        $content = $this->unwrapAndParseContentAsArray($response);
 
-        if ($parsedContent == null) {
-            return false;
+        if (is_null($content)) {
+            return $response;
+        }
+
+        if ($this->isRedirect($content)) {
+            return $response;
         } else {
-            return array_has($parsedContent, 'redirect');
+            $contentWithToasts = $this->addToastsToContent($content);
+
+            return $this->setContentFor($response, $contentWithToasts);
         }
     }
 
-    private function addToastsTo(Response $response): Response
+    private function isRedirect(array $content): bool
+    {
+        return array_has($content, 'redirect');
+    }
+
+    private function addToastsToContent(array $content): array
     {
         $toasts = $this->getToastsAsArray();
 
-        if (empty($toasts)) {
-            return $response;
-        }
+        $content['_toasts'] = $toasts;
 
-        $parsedContent = $this->unwrapAndParseContentAsArray($response);
-
-        if ($parsedContent == null) {
-            return $response;
-        }
-
-        $parsedContent['_toasts'] = $toasts;
-        $newContent = json_encode($parsedContent);
-
-        return $response->setContent($newContent);
+        return $content;
     }
 
     private function unwrapAndParseContentAsArray(Response $response): ?array
@@ -83,6 +83,13 @@ class AddToasts
         return $parsedContent;
     }
 
+    private function setContentFor(Response $response, array $newContent): Response
+    {
+        $json = json_encode($newContent);
+
+        return $response->setContent($json);
+    }
+
     private function getToastsAsArray(): array
     {
         $toasts = $this->toastsHolder->all();
@@ -90,5 +97,12 @@ class AddToasts
         return array_map(function (Toast $toast) {
             return $toast->toArray();
         }, $toasts);
+    }
+
+    private function hasNoToasts(): bool
+    {
+        $toasts = $this->toastsHolder->all();
+
+        return empty($toasts);
     }
 }
