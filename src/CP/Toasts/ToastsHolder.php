@@ -4,6 +4,13 @@ namespace Statamic\CP\Toasts;
 
 use Illuminate\Session\Store;
 
+/**
+ * Stores toasts in session until they are sent to the client.
+ * Toasts are either sent along with the next JSON response or in the next view.
+ *
+ * @see \Statamic\Http\Middleware\CP\AddToasts
+ * @see \Statamic\Http\View\Composers\JavascriptComposer
+ */
 class ToastsHolder
 {
     private static $TOASTS_SESSION_KEY = '_toasts';
