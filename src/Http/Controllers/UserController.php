@@ -69,6 +69,10 @@ class UserController extends Controller
         if ($roles = config('statamic.users.new_user_roles')) {
             $user->roles($roles);
         }
+        
+        if ($groups = config('statamic.users.new_user_groups')) {
+            $user->groups($groups);
+        }
 
         try {
             throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
