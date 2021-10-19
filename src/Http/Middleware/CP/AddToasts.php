@@ -43,6 +43,7 @@ class AddToasts
             return $response;
         } else {
             $contentWithToasts = $this->addToastsToContent($content);
+            $this->toastsHolder->clear();
 
             return $this->setContentFor($response, $contentWithToasts);
         }

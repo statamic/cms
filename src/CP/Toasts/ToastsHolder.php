@@ -36,6 +36,11 @@ class ToastsHolder
         return $this->getFromSession();
     }
 
+    public function clear()
+    {
+        $this->storeToSession([]);
+    }
+
     /**
      * @return Toast[]
      */
