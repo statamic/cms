@@ -25,4 +25,22 @@ class ScratchTest extends TestCase
 
         $this->assertEquals($expected, $parsed);
     }
+
+    /** @test */
+    public function if_with_extra_leading_spaces_should_work()
+    {
+        $parsed = (string) Antlers::parse('{{  if yup }}you bet{{ else }}nope{{ /if }}', ['yup' => true]);
+
+        $this->assertEquals('you bet', $parsed);
+    }
+
+    /** @test */
+    public function interpolated_parameter_with_extra_space_should_work()
+    {
+        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
+
+        $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{bar }" }}', ['bar' => 'baz']));
+        $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{ bar}" }}', ['bar' => 'baz']));
+        $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{ bar }" }}', ['bar' => 'baz']));
+    }
 }
