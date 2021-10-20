@@ -46,10 +46,12 @@ class TermQueryBuilderTest extends TestCase
         Taxonomy::make('tags')->save();
         Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
         Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
-        Term::make('c')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
 
         $terms = Term::query()->where('test', 'foo')->orWhere('test', 'bar')->get();
-        $this->assertEquals(['a', 'b', 'c'], $terms->map->slug()->sort()->values()->all());
+        $this->assertEquals(['a', 'b', 'd'], $terms->map->slug()->sort()->values()->all());
     }
 
     /** @test */
