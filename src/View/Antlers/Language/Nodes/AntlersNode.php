@@ -359,7 +359,7 @@ class AntlersNode extends AbstractNode
                         // skip this and proceed with the string collapsing logic to preserve the
                         // behavior you would expect when using previous versions of Antlers.
                         $this->canSafelyUseFullParserContext($interpolationReference[0])) {
-                        $value = Antlers::parser()->getVariable($interpolationReference[0]->content, $data);
+                        $value = Antlers::parser()->getVariable(trim($interpolationReference[0]->content), $data);
                     } else {
                         // Collapse to string.
                         $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
@@ -546,6 +546,7 @@ class AntlersNode extends AbstractNode
 
                     if ($this->name->name == 'if' || $this->name->name == 'elseif' ||
                         $this->name->name == 'unless' || $this->name->name == 'elseunless') {
+                        $contentToAnalyze = ' '.ltrim($contentToAnalyze);
                         $this->cachedContent = StringUtilities::substr($contentToAnalyze, $leadNameLen + 1);
                     } else {
                         $this->cachedContent = $contentToAnalyze;
