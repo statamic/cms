@@ -486,7 +486,7 @@ class NodeProcessor
 
         $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $activeData);
 
-        if ($managerResults[0] === true && $managerResults[1] !== null) {
+        if ($managerResults[0] === true && is_string($managerResults[1])) {
             return false;
         }
 
