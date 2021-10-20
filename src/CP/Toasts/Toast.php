@@ -3,11 +3,12 @@
 namespace Statamic\CP\Toasts;
 
 use Exception;
+use Illuminate\Contracts\Support\Arrayable;
 
 /**
  * Holds information about a toast message to show to the user.
  */
-class Toast
+class Toast implements Arrayable
 {
     private static $VALID_TYPES = ['error', 'success', 'info'];
 
