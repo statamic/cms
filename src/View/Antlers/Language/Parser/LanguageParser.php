@@ -63,8 +63,8 @@ use Statamic\View\Antlers\Language\Nodes\Structures\DirectionGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineBranchSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineTernarySeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\ListValueNode;
-use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupBegin;
-use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupEnd;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupBegin;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupEnd;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ModifierSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\ModifierValueSeparator;
@@ -1584,7 +1584,7 @@ class LanguageParser
     private function validateNoDanglingLogicGroupEnds($tokens)
     {
         foreach ($tokens as $token) {
-            if ($token instanceof LogicalGroupEnd) {
+            if ($token instanceof LogicGroupEnd) {
                 throw ErrorFactory::makeSyntaxError(
                     AntlersErrorCodes::TYPE_LOGIC_GROUP_NO_START,
                     $token,
@@ -2155,8 +2155,8 @@ class LanguageParser
             }
 
             if ($subToken instanceof ModifierSeparator ||
-                $subToken instanceof LogicalGroupEnd ||
-                $subToken instanceof LogicalGroupBegin ||
+                $subToken instanceof LogicGroupEnd ||
+                $subToken instanceof LogicGroupBegin ||
 
                 $subToken instanceof EqualCompOperator ||
                 $subToken instanceof GreaterThanCompOperator ||
@@ -2445,7 +2445,7 @@ class LanguageParser
                 if ($i > 0 && ! empty($negatedGroupedTokens)) {
                     $prev = $negatedGroupedTokens[count($negatedGroupedTokens) - 1];
 
-                    if ($prev instanceof NumberNode || $prev instanceof LogicalGroupEnd || $prev instanceof LogicGroup) {
+                    if ($prev instanceof NumberNode || $prev instanceof LogicGroupEnd || $prev instanceof LogicGroup) {
                         if ($prev instanceof LogicGroup) {
                             if ($prev->start instanceof LogicalNegationOperator) {
                                 throw ErrorFactory::makeSyntaxError(
@@ -2483,7 +2483,7 @@ class LanguageParser
                 // We want to peek to the one after the last negation operator.
                 $peek = $tokens[$i + $negationCount];
 
-                if ($peek instanceof LogicalGroupBegin) {
+                if ($peek instanceof LogicGroupBegin) {
                     // Scan right to count the negations.
 
                     $targetSliceOffset = $i + $negationCount + 1;
@@ -2531,7 +2531,7 @@ class LanguageParser
         for ($i = 0; $i < $negatedTokenCount; $i++) {
             $token = $negatedGroupedTokens[$i];
 
-            if ($token instanceof LogicalGroupBegin) {
+            if ($token instanceof LogicGroupBegin) {
                 if ($i + 1 >= $negatedTokenCount) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_LOGIC_GROUP_END_DUE_TO_NEGATION,
@@ -2587,7 +2587,7 @@ class LanguageParser
     }
 
     /**
-     * @param  LogicalGroupBegin  $root
+     * @param  LogicGroupBegin  $root
      * @param  AbstractNode[]  $nodes
      * @return array
      */
@@ -2602,10 +2602,10 @@ class LanguageParser
             $node = $nodes[$i];
             $skipCount += 1;
 
-            if ($node instanceof LogicalGroupEnd) {
+            if ($node instanceof LogicGroupEnd) {
                 $end = $node;
                 break;
-            } elseif ($node instanceof LogicalGroupBegin) {
+            } elseif ($node instanceof LogicGroupBegin) {
                 if ($i + 1 >= $nodeCount) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_LOGIC_GROUP_END,

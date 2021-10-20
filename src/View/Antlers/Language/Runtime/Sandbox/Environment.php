@@ -68,7 +68,7 @@ use Statamic\View\Antlers\Language\Nodes\StringValueNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArrayNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\DirectionGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ListValueNode;
-use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupEnd;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupEnd;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\NullCoalescenceGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
@@ -1400,7 +1400,7 @@ class Environment
         }
 
         if ($val instanceof OperatorNodeContract ||
-            $val instanceof LogicalNegationOperator || $val instanceof LogicalGroupEnd) {
+            $val instanceof LogicalNegationOperator || $val instanceof LogicGroupEnd) {
             throw ErrorFactory::makeRuntimeError(
                 AntlersErrorCodes::TYPE_RUNTIME_PARSE_VALUE_VIOLATION,
                 $this->lastNode,

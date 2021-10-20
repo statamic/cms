@@ -428,7 +428,7 @@ class RuntimeParser implements ParserContract
         }
 
         $rebuiltTrace = $this->buildStackTrace($antlersException->node, $text);
-        
+
         // Build up a new Ignition exception.
         $typeText = '';
 

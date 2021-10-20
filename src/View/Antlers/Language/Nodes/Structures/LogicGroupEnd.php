@@ -4,6 +4,6 @@ namespace Statamic\View\Antlers\Language\Nodes\Structures;
 
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 
-class LogicalGroupBegin extends AbstractNode
+class LogicGroupEnd extends AbstractNode
 {
 }

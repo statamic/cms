@@ -54,8 +54,8 @@ use Statamic\View\Antlers\Language\Nodes\Structures\ConditionalFallbackGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\DirectionGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineBranchSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineTernarySeparator;
-use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupBegin;
-use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupEnd;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupBegin;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupEnd;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ModifierSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\ModifierValueSeparator;
@@ -216,9 +216,9 @@ class TypeLabeler
             return self::TOKEN_BRANCH_SEPARATOR;
         } elseif ($token instanceof InlineTernarySeparator) {
             return self::TOKEN_TERNARY_SEPARATOR;
-        } elseif ($token instanceof LogicalGroupBegin) {
+        } elseif ($token instanceof LogicGroupBegin) {
             return self::TOKEN_GROUP_BEGIN;
-        } elseif ($token instanceof LogicalGroupEnd) {
+        } elseif ($token instanceof LogicGroupEnd) {
             return self::TOKEN_GROUP_END;
         } elseif ($token instanceof ModifierSeparator) {
             return self::TOKEN_MODIFIER_SEPARATOR;

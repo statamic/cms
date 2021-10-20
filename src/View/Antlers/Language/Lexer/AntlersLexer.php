@@ -47,8 +47,8 @@ use Statamic\View\Antlers\Language\Nodes\StringValueNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArgSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineBranchSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineTernarySeparator;
-use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupBegin;
-use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupEnd;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupBegin;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupEnd;
 use Statamic\View\Antlers\Language\Nodes\Structures\ModifierSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\ModifierValueSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\StatementSeparatorNode;
@@ -1030,7 +1030,7 @@ class AntlersLexer
                 }
 
                 if ($this->cur == DocumentParser::LeftParen) {
-                    $logicalGroupBegin = new LogicalGroupBegin();
+                    $logicalGroupBegin = new LogicGroupBegin();
                     $logicalGroupBegin->content = '(';
                     $logicalGroupBegin->startPosition = $node->relativeOffset($this->currentIndex);
                     $logicalGroupBegin->endPosition = $node->relativeOffset($this->currentIndex + 1);
@@ -1041,7 +1041,7 @@ class AntlersLexer
                 }
 
                 if ($this->cur == DocumentParser::RightParent) {
-                    $logicalGroupEnd = new LogicalGroupEnd();
+                    $logicalGroupEnd = new LogicGroupEnd();
                     $logicalGroupEnd->content = ')';
                     $logicalGroupEnd->startPosition = $node->relativeOffset($this->currentIndex);
                     $logicalGroupEnd->endPosition = $node->relativeOffset($this->currentIndex + 1);

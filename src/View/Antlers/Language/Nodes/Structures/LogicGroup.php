@@ -7,12 +7,12 @@ use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 class LogicGroup extends AbstractNode
 {
     /**
-     * @var LogicalGroupBegin|null
+     * @var LogicGroupBegin|null
      */
     public $start = null;
 
     /**
-     * @var LogicalGroupEnd|null
+     * @var LogicGroupEnd|null
      */
     public $end = null;
 

@@ -48,8 +48,8 @@ use Statamic\View\Antlers\Language\Nodes\StringValueNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArgSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineBranchSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineTernarySeparator;
-use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupBegin;
-use Statamic\View\Antlers\Language\Nodes\Structures\LogicalGroupEnd;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupBegin;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupEnd;
 use Statamic\View\Antlers\Language\Nodes\Structures\ModifierSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\ModifierValueSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\StatementSeparatorNode;
@@ -135,8 +135,8 @@ class LineRetriever
             $node instanceof LeftAssignmentOperator || $node instanceof StrictEqualCompOperator || $node instanceof EqualCompOperator ||
             $node instanceof LogicalAndOperator || $node instanceof ModifierSeparator || $node instanceof LogicalOrOperator ||
             $node instanceof NotStrictEqualCompOperator || $node instanceof NotEqualCompOperator || $node instanceof ConditionalVariableFallbackOperator ||
-            $node instanceof NullCoalesceOperator || $node instanceof InlineTernarySeparator || $node instanceof LogicalGroupBegin ||
-            $node instanceof LogicalGroupEnd || $node instanceof ModifierValueSeparator || $node instanceof InlineBranchSeparator ||
+            $node instanceof NullCoalesceOperator || $node instanceof InlineTernarySeparator || $node instanceof LogicGroupBegin ||
+            $node instanceof LogicGroupEnd || $node instanceof ModifierValueSeparator || $node instanceof InlineBranchSeparator ||
             $node instanceof FactorialOperator || $node instanceof ScopeAssignmentOperator || $node instanceof StringConcatenationOperator ||
             $node instanceof MethodInvocationNode) {
             return $node->content;
