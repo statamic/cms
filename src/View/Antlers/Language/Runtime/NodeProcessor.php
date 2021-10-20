@@ -1281,7 +1281,6 @@ class NodeProcessor
                             continue;
                         }
 
-
                         $val = null;
                         $runtimeResolveLoopVar = false;
                         $runtimeResolveModifiedValue = false;

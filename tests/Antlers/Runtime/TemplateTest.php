@@ -18,9 +18,9 @@ use Statamic\Fields\Value;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
-use Tests\Factories\EntryFactory;
 use Tests\Antlers\Fixtures\Addon\Tags\RecursiveChildren;
 use Tests\Antlers\ParserTestCase;
+use Tests\Factories\EntryFactory;
 
 class TemplateTest extends ParserTestCase
 {

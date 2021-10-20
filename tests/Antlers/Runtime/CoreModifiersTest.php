@@ -305,28 +305,28 @@ EOT;
                 [
                     'title' => 'Test',
                     'collection' => [
-                        'title' => 'a'
-                    ]
+                        'title' => 'a',
+                    ],
                 ],
                 [
                     'title' => 'Test 2',
                     'collection' => [
-                        'title' => 'a'
-                    ]
+                        'title' => 'a',
+                    ],
                 ],
                 [
                     'title' => 'Test 3',
                     'collection' => [
-                        'title' => 'b'
-                    ]
+                        'title' => 'b',
+                    ],
                 ],
                 [
                     'title' => 'Test 4',
                     'collection' => [
-                        'title' => 'a'
-                    ]
-                ]
-            ]
+                        'title' => 'a',
+                    ],
+                ],
+            ],
         ];
 
         $template = <<<'EOT'

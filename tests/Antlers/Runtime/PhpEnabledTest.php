@@ -6,8 +6,8 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
-use Tests\Factories\EntryFactory;
 use Tests\Antlers\ParserTestCase;
+use Tests\Factories\EntryFactory;
 
 class PhpEnabledTest extends ParserTestCase
 {
