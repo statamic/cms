@@ -22,7 +22,7 @@ export default {
 
     created() {
         this.flash = Statamic.$config.get('flash');
-        this.initialToasts = Statamic.$config.get('_toasts');
+        this.initialToasts = Statamic.$config.get('toasts');
 
         this.$events.$on('toast.success', this.setFlashSuccess);
         this.$events.$on('toast.error', this.setFlashError);

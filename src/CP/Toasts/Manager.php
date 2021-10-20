@@ -13,17 +13,16 @@ use Illuminate\Session\Store;
  */
 class Manager
 {
-    private static $TOASTS_SESSION_KEY = '_toasts';
+    private const SESSION_KEY = '_toasts';
 
     /**
      * @var Store
      */
-    private $sessionStore;
+    private $session;
 
-    public function __construct(
-        Store $sessionStore
-    ) {
-        $this->sessionStore = $sessionStore;
+    public function __construct(Store $session)
+    {
+        $this->session = $session;
     }
 
     public function push(Toast $toast)
@@ -53,7 +52,7 @@ class Manager
      */
     private function getFromSession(): array
     {
-        return $this->sessionStore->get(self::$TOASTS_SESSION_KEY, []);
+        return $this->session->get(self::SESSION_KEY, []);
     }
 
     /**
@@ -61,6 +60,6 @@ class Manager
      */
     private function storeToSession(array $toasts)
     {
-        $this->sessionStore->flash(self::$TOASTS_SESSION_KEY, $toasts);
+        $this->session->flash(self::SESSION_KEY, $toasts);
     }
 }
