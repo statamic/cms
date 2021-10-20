@@ -196,15 +196,7 @@ Statamic.app({
 
         this.showBanner = Statamic.$config.get('hasLicenseBanner');
 
-        axios.interceptors.response.use((response) => {
-            const toasts = response?.data?._toasts ?? []
-
-            toasts.forEach(toast => {
-                this.$toast[toast.type](toast.message)
-            })
-
-            return response;
-        });
+        this.$toast.intercept();
     },
 
     created() {
