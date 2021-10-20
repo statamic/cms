@@ -61,7 +61,7 @@ export default {
                     return el;
                 },
             ...opts};
-            this.$toasted.show(message, this.normalizeOptions(opts))
+            this.$toasted.show(message, this.normalizeToastOptions(opts))
         },
 
         setFlashSuccess(message, opts) {
@@ -72,7 +72,7 @@ export default {
                     return el;
                 },
             ...opts};
-            this.$toasted.success(message, this.normalizeOptions(opts))
+            this.$toasted.success(message, this.normalizeToastOptions(opts))
         },
 
         setFlashError(message, opts) {
@@ -84,10 +84,10 @@ export default {
                 },
                 ...opts
             };
-            this.$toasted.error(message, this.normalizeOptions(opts))
+            this.$toasted.error(message, this.normalizeToastOptions(opts))
         },
 
-        normalizeOptions(opts) {
+        normalizeToastOptions(opts) {
             if (! opts.duration) delete opts.duration;
 
             return opts;
