@@ -36,6 +36,7 @@ class Collection implements Contract, AugmentableContract
     protected $template;
     protected $layout;
     protected $sites;
+    protected $propagate = false;
     protected $blueprints = [];
     protected $searchIndex;
     protected $dated = false;
@@ -325,6 +326,16 @@ class Collection implements Contract, AugmentableContract
             ->args(func_get_args());
     }
 
+    public function propagate($propagate = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('propagate')
+            ->getter(function ($propagate) {
+                return $propagate ?? false;
+            })
+            ->args(func_get_args());
+    }
+
     public function template($template = null)
     {
         return $this
@@ -442,7 +453,7 @@ class Collection implements Contract, AugmentableContract
         ]));
 
         if (! Site::hasMultiple()) {
-            unset($array['sites']);
+            unset($array['sites'], $array['propagate']);
         }
 
         if ($array['date_behavior'] == ['past' => 'public', 'future' => 'public']) {
@@ -490,6 +501,7 @@ class Collection implements Contract, AugmentableContract
             'default_publish_state' => $this->defaultPublishState,
             'amp' => $this->ampable,
             'sites' => $this->sites,
+            'propagate' => $this->propagate(),
             'template' => $this->template,
             'layout' => $this->layout,
             'cascade' => $this->cascade->all(),

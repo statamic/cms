@@ -141,6 +141,7 @@ class CollectionsController extends CpController
             'layout' => $collection->layout(),
             'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
+            'propagate' => $collection->propagate(),
             'routes' => $collection->routes()->unique()->count() === 1
                 ? $collection->routes()->first()
                 : $collection->routes()->all(),
@@ -217,7 +218,8 @@ class CollectionsController extends CpController
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
-            ->mount(array_get($values, 'mount'));
+            ->mount(array_get($values, 'mount'))
+            ->propagate(array_get($values, 'propagate'));
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -428,6 +430,11 @@ class CollectionsController extends CpController
                         'type' => 'sites',
                         'mode' => 'select',
                         'required' => true,
+                    ],
+                    'propagate' => [
+                        'type' => 'toggle',
+                        'display' => __('Propagate'),
+                        'instructions' => __('statamic::messages.collection_configure_propagate_instructions'),
                     ],
                 ],
             ];
