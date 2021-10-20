@@ -408,6 +408,7 @@ class RuntimeParser implements ParserContract
         }
 
         $rebuiltTrace = $this->buildStackTrace(GlobalRuntimeState::$lastNode, $text);
+        $rebuiltTrace = array_merge($rebuiltTrace, $exception->getTrace());
 
         $traceProperty = new ReflectionProperty('Exception', 'trace');
         $traceProperty->setAccessible(true);
@@ -427,7 +428,7 @@ class RuntimeParser implements ParserContract
         }
 
         $rebuiltTrace = $this->buildStackTrace($antlersException->node, $text);
-
+        
         // Build up a new Ignition exception.
         $typeText = '';
 
