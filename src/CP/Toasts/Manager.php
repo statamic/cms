@@ -35,6 +35,27 @@ class Manager
         $this->storeToSession($toasts);
     }
 
+    public function info(string $message): Toast
+    {
+        return tap(new Toast($message, 'info'), function ($toast) {
+            $this->push($toast);
+        });
+    }
+
+    public function error(string $message): Toast
+    {
+        return tap(new Toast($message, 'error'), function ($toast) {
+            $this->push($toast);
+        });
+    }
+
+    public function success(string $message): Toast
+    {
+        return tap(new Toast($message, 'success'), function ($toast) {
+            $this->push($toast);
+        });
+    }
+
     /**
      * @return Toast[]
      */
