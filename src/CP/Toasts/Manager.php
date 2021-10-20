@@ -3,6 +3,7 @@
 namespace Statamic\CP\Toasts;
 
 use Illuminate\Session\Store;
+use Illuminate\Support\Collection;
 
 /**
  * Stores toasts in session until they are sent to the client.
@@ -40,6 +41,16 @@ class Manager
     public function all(): array
     {
         return $this->getFromSession();
+    }
+
+    public function collect(): Collection
+    {
+        return collect($this->all());
+    }
+
+    public function toArray(): array
+    {
+        return $this->collect()->toArray();
     }
 
     public function clear()
