@@ -212,7 +212,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');
-        Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
+        Route::post('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
         Route::get('relationship/filters', 'RelationshipFieldtypeController@filters')->name('relationship.filters');
         Route::post('markdown', 'MarkdownFieldtypeController@preview')->name('markdown.preview');
     });

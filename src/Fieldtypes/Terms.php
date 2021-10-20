@@ -24,11 +24,6 @@ class Terms extends Relationship
     protected $taggable = true;
     protected $icon = 'taxonomy';
 
-    public static function title()
-    {
-        return __('Taxonomy Terms');
-    }
-
     protected function configFieldItems(): array
     {
         return array_merge(parent::configFieldItems(), [

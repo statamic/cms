@@ -111,6 +111,7 @@
             :submit-parameters="{ deletedEntries, deleteLocalizationBehavior }"
             :max-depth="structureMaxDepth"
             :expects-root="structureExpectsRoot"
+            :show-slugs="structureShowSlugs"
             :site="site"
             :preferences-prefix="preferencesPrefix"
             @edit-page="editPage"
@@ -198,6 +199,7 @@ export default {
         structureSubmitUrl: { type: String },
         structureMaxDepth: { type: Number, default: Infinity },
         structureExpectsRoot: { type: Boolean },
+        structureShowSlugs: { type: Boolean },
     },
 
     data() {

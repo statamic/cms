@@ -76,6 +76,10 @@ class UserRepository extends BaseRepository
 
     public function fromUser($user): ?UserContract
     {
+        if (is_null($user)) {
+            return null;
+        }
+
         if ($user instanceof UserContract) {
             return $user;
         }
@@ -85,7 +89,7 @@ class UserRepository extends BaseRepository
         }
 
         if ($user instanceof Model) {
-            return User::fromModel($user);
+            return User::make()->model($user);
         }
 
         return null;

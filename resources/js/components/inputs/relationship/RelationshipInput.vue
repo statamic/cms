@@ -151,7 +151,7 @@ export default {
 
         items() {
             return this.value.map(selection => {
-                const data = _.findWhere(this.data, { id: selection });
+                const data = _.find(this.data, (item) => item.id == selection);
 
                 if (! data) return { id: selection, title: selection };
 
@@ -236,13 +236,12 @@ export default {
 
         getDataForSelections(selections) {
             this.loading = true;
-            const params = { site: this.site, selections };
 
-            return this.$axios.get(this.itemDataUrl, { params }).then(response => {
-                    this.$emit('item-data-updated', response.data.data);
-                }).finally(() => {
-                    this.loading = false;
-                });
+            return this.$axios.post(this.itemDataUrl, { site: this.site, selections }).then(response => {
+                this.$emit('item-data-updated', response.data.data);
+            }).finally(() => {
+                this.loading = false;
+            });
         },
 
         makeSortable() {
