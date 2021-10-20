@@ -762,7 +762,7 @@ class CoreModifiers extends Modifier
     {
         $value = is_object($item)
             ? $this->getGroupByValueFromObject($item, $groupBy)
-            : $item[$groupBy];
+            : $this->getGroupByValueFromArray($item, $groupBy);
 
         if ($value instanceof Value) {
             $value = $value->value();
@@ -778,6 +778,13 @@ class CoreModifiers extends Modifier
         $context = $item->toAugmentedArray($keys);
 
         return Antlers::parser()->getVariable($groupBy, $context);
+    }
+
+    private function getGroupByValueFromArray($item, $groupBy)
+    {
+        $groupBy = str_replace(':', '.', $groupBy);
+
+        return Arr::get($item, $groupBy);
     }
 
     private function handleGroupByDateValue($value, $params, &$groupLabels)

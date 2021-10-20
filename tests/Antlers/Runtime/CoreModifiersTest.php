@@ -297,4 +297,64 @@ EOT;
 EOT;
         $this->assertSame("\"\n\t|||||hello:::::||:||\\'\\", $this->renderString($modifierTemplateTwo));
     }
+
+    public function test_group_by_modifier()
+    {
+        $data = [
+            'field' => [
+                [
+                    'title' => 'Test',
+                    'collection' => [
+                        'title' => 'a'
+                    ]
+                ],
+                [
+                    'title' => 'Test 2',
+                    'collection' => [
+                        'title' => 'a'
+                    ]
+                ],
+                [
+                    'title' => 'Test 3',
+                    'collection' => [
+                        'title' => 'b'
+                    ]
+                ],
+                [
+                    'title' => 'Test 4',
+                    'collection' => [
+                        'title' => 'a'
+                    ]
+                ]
+            ]
+        ];
+
+        $template = <<<'EOT'
+{{ field group_by="collection:title" }}
+{{ groups }}
+{{ group }}-
+{{ items }}
+{{ title }}--
+{{ /items }}
+{{ /groups }}
+{{ /field }}
+EOT;
+
+        $expected = <<<'EOT'
+a-
+
+Test--
+
+Test 2--
+
+Test 4--
+
+
+b-
+
+Test 3--
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, $data, true)));
+    }
 }

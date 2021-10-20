@@ -1281,6 +1281,7 @@ class NodeProcessor
                             continue;
                         }
 
+
                         $val = null;
                         $runtimeResolveLoopVar = false;
                         $runtimeResolveModifiedValue = false;
@@ -1560,6 +1561,10 @@ class NodeProcessor
                                         // Throw an exception here to maintain consistent behavior with the regex parser.
                                         throw new ModifierNotFoundException($param->name);
                                     }
+                                }
+
+                                if ($val instanceof Collection) {
+                                    $val = $val->toArray();
                                 }
                             }
                             $executedParamModifiers = true;
