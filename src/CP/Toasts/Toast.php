@@ -10,22 +10,21 @@ use Illuminate\Contracts\Support\Arrayable;
  */
 class Toast implements Arrayable
 {
-    private static $VALID_TYPES = ['error', 'success', 'info'];
+    private const TYPES = ['error', 'success', 'info'];
     private $message;
     private $type;
     private $duration;
 
     /**
      * @param  string  $message  The message to display when showing the toast.
-     * @param  string  $type  The type of toast. See Toast::$VALID_TYPES for valid values.
+     * @param  string  $type  The type of toast. See Toast::TYPES for valid values.
      *
      * @throws Exception if the specified toast type is invalid.
      */
     public function __construct(string $message, string $type = 'info')
     {
         $this->message = $message;
-        $this->validateType($type);
-        $this->type = $type;
+        $this->type = $this->validateType($type);
     }
 
     public function duration(int $duration): self
@@ -47,11 +46,13 @@ class Toast implements Arrayable
     /**
      * @throws Exception
      */
-    private function validateType(string $type)
+    private function validateType(string $type): string
     {
-        if (! in_array($type, self::$VALID_TYPES)) {
-            $validTypesString = implode(', ', self::$VALID_TYPES);
+        if (! in_array($type, self::TYPES)) {
+            $validTypesString = implode(', ', self::TYPES);
             throw new Exception("Invalid toast type. Must be one of: $validTypesString");
         }
+
+        return $type;
     }
 }
