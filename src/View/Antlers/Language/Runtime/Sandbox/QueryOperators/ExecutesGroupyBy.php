@@ -101,6 +101,7 @@ trait ExecutesGroupyBy
             $keyValues = [];
             $returnValues = [];
 
+
             $multiGrouped = collect($data)->groupBy(function ($item) use ($groupProps, &$keyValues, $env, $context) {
                 if (! is_array($item)) {
                     $item = PathDataManager::reduce($item);
@@ -118,7 +119,7 @@ trait ExecutesGroupyBy
                     $expression = [];
                     $scopeName = null;
 
-                    if ($prop instanceof VariableNode && $prop->variableReference != null && count($prop->variableReference->pathParts) == 1) {
+                    if ($prop instanceof VariableNode && $prop->variableReference != null) {
                         $propName = $prop->name;
                         $expression = [$prop];
                     } elseif ($prop instanceof AliasedScopeLogicGroup) {
