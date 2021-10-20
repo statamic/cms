@@ -55,9 +55,13 @@ class GetContent extends Tags
         $usingUris = Str::startsWith($first, '/');
 
         $query = Entry::query()
-            ->where('site', $this->params->get(['site', 'locale'], Site::current()->handle()))
             ->whereIn($usingUris ? 'uri' : 'id', $items);
 
-        return $this->output($query->get());
+        $items = $query->get();
+        $localized = $items->map(function ($item) {
+            return $item->in(Site::current()->handle()) ?? $item;
+        });
+
+        return $this->output($localized);
     }
 }
