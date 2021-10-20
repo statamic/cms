@@ -5,17 +5,17 @@ namespace Statamic\Http\Middleware\CP;
 use Closure;
 use Illuminate\Http\Request;
 use Statamic\CP\Toasts\Toast;
-use Statamic\CP\Toasts\ToastsHolder;
+use Statamic\CP\Toasts\Manager;
 use Symfony\Component\HttpFoundation\Response;
 
 class AddToasts
 {
     /**
-     * @var ToastsHolder
+     * @var Manager
      */
     protected $toastsHolder;
 
-    public function __construct(ToastsHolder $toastsHolder)
+    public function __construct(Manager $toastsHolder)
     {
         $this->toastsHolder = $toastsHolder;
     }

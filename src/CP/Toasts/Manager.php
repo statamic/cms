@@ -11,7 +11,7 @@ use Illuminate\Session\Store;
  * @see \Statamic\Http\Middleware\CP\AddToasts
  * @see \Statamic\Http\View\Composers\JavascriptComposer
  */
-class ToastsHolder
+class Manager
 {
     private static $TOASTS_SESSION_KEY = '_toasts';
 
