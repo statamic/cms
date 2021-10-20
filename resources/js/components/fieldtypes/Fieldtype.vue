@@ -32,7 +32,7 @@ export default {
 
         updateDebounced: _.debounce(function (value) {
             this.update(value);
-        }, 300),
+        }, 150),
 
         updateMeta(value) {
             this.$emit('meta-updated', value);
