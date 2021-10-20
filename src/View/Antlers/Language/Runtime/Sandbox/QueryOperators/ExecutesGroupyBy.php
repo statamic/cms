@@ -101,7 +101,6 @@ trait ExecutesGroupyBy
             $keyValues = [];
             $returnValues = [];
 
-
             $multiGrouped = collect($data)->groupBy(function ($item) use ($groupProps, &$keyValues, $env, $context) {
                 if (! is_array($item)) {
                     $item = PathDataManager::reduce($item);
