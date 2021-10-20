@@ -590,18 +590,6 @@ class AntlersLexer
                     continue;
                 }
 
-                // _
-                if ($this->cur == DocumentParser::Punctuation_Underscore && $this->next == DocumentParser::LeftParen) {
-                    $tupleListStart = new TupleListStart();
-                    $tupleListStart->content = DocumentParser::Punctuation_Underscore;
-                    $tupleListStart->startPosition = $node->relativeOffset($this->currentIndex);
-                    $tupleListStart->endPosition = $node->relativeOffset($this->currentIndex + 1);
-
-                    $this->runtimeNodes[] = $tupleListStart;
-                    $this->lastNode = $tupleListStart;
-                    continue;
-                }
-
                 // ,
                 if ($this->cur == DocumentParser::Punctuation_Comma) {
                     $argSeparator = new ArgSeparator();

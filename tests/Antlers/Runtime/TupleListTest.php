@@ -45,7 +45,7 @@ EOT;
         $template = <<<'EOT'
 {{
 
-items = _(
+items = list(
     name,    color, type;
     'Apple', 'red', 'fruit';
     'Hammer', 'brown', 'tool';
