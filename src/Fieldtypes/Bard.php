@@ -64,6 +64,7 @@ class Bard extends Replicator
                 'display' => __('Container'),
                 'instructions' => __('statamic::fieldtypes.bard.config.container'),
                 'type' => 'asset_container',
+                'mode' => 'select',
                 'max_items' => 1,
                 'if' => [
                     'buttons' => 'contains_any anchor, image',
