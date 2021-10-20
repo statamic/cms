@@ -11,7 +11,7 @@ use Statamic\CP\Toasts\Manager;
  *
  * @see \Statamic\CP\Toasts\Manager
  */
-class Toasts extends Facade
+class Toast extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
