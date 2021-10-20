@@ -11,15 +11,9 @@ use Illuminate\Contracts\Support\Arrayable;
 class Toast implements Arrayable
 {
     private static $VALID_TYPES = ['error', 'success', 'info'];
-
-    /**
-     * @var string
-     */
-    public $message;
-    /**
-     * @var string
-     */
-    public $type;
+    private $message;
+    private $type;
+    private $duration;
 
     /**
      * @param  string  $message  The message to display when showing the toast.
@@ -34,11 +28,19 @@ class Toast implements Arrayable
         $this->type = $type;
     }
 
+    public function duration(int $duration): self
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
             'message' => $this->message,
             'type' => $this->type,
+            'duration' => $this->duration,
         ];
     }
 

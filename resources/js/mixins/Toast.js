@@ -37,16 +37,17 @@ export default {
     methods: {
         flashMessages(messages) {
             messages.forEach(
-                ({ type, message }) => {
+                ({ type, message, duration }) => {
+                    const options = { duration };
                     switch(type) {
                         case 'error':
-                            this.setFlashError(message, { type: type })
+                            this.$toast.error(message, options);
                             break;
                         case 'success':
-                            this.setFlashSuccess(message, { type: type })
+                            this.$toast.success(message, options);
                             break;
                         default:
-                            this.setFlashInfo(message, { type: 'default' })
+                            this.$toast.info(message, options);
                     }
                 }
             );
@@ -60,7 +61,7 @@ export default {
                     return el;
                 },
             ...opts};
-            this.$toasted.show(message, opts)
+            this.$toasted.show(message, this.normalizeOptions(opts))
         },
 
         setFlashSuccess(message, opts) {
@@ -71,7 +72,7 @@ export default {
                     return el;
                 },
             ...opts};
-            this.$toasted.success(message, opts)
+            this.$toasted.success(message, this.normalizeOptions(opts))
         },
 
         setFlashError(message, opts) {
@@ -83,7 +84,13 @@ export default {
                 },
                 ...opts
             };
-            this.$toasted.error(message, opts)
+            this.$toasted.error(message, this.normalizeOptions(opts))
+        },
+
+        normalizeOptions(opts) {
+            if (! opts.duration) delete opts.duration;
+
+            return opts;
         }
     }
 }
