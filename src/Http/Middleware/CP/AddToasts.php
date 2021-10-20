@@ -4,8 +4,8 @@ namespace Statamic\Http\Middleware\CP;
 
 use Closure;
 use Illuminate\Http\Request;
-use Statamic\CP\Toasts\Toast;
 use Statamic\CP\Toasts\Manager;
+use Statamic\CP\Toasts\Toast;
 use Symfony\Component\HttpFoundation\Response;
 
 class AddToasts
@@ -13,11 +13,11 @@ class AddToasts
     /**
      * @var Manager
      */
-    protected $toastsHolder;
+    protected $toasts;
 
-    public function __construct(Manager $toastsHolder)
+    public function __construct(Manager $toasts)
     {
-        $this->toastsHolder = $toastsHolder;
+        $this->toasts = $toasts;
     }
 
     public function handle(Request $request, Closure $next)
@@ -43,7 +43,7 @@ class AddToasts
             return $response;
         } else {
             $contentWithToasts = $this->addToastsToContent($content);
-            $this->toastsHolder->clear();
+            $this->toasts->clear();
 
             return $this->setContentFor($response, $contentWithToasts);
         }
@@ -93,7 +93,7 @@ class AddToasts
 
     private function getToastsAsArray(): array
     {
-        $toasts = $this->toastsHolder->all();
+        $toasts = $this->toasts->all();
 
         return array_map(function (Toast $toast) {
             return $toast->toArray();
@@ -102,7 +102,7 @@ class AddToasts
 
     private function hasNoToasts(): bool
     {
-        $toasts = $this->toastsHolder->all();
+        $toasts = $this->toasts->all();
 
         return empty($toasts);
     }
