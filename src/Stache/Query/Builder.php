@@ -92,6 +92,21 @@ abstract class Builder extends BaseBuilder
         return $items->keys();
     }
 
+    protected function intersectKeysFromWhereClause($keys, $newKeys, $boolean)
+    {
+        // On the first iteration, there's nothing to intersect;
+        // Just use the new keys as a starting point.
+        if (! $keys) {
+            return $newKeys;
+        }
+
+        // If it's an `orWhere`, concatenate the `$newKeys`;
+        // Otherwise, intersect to ensure each where is respected.
+        return $boolean === 'or'
+            ? $keys->concat($newKeys)->values()
+            : $keys->intersect($newKeys)->values();
+    }
+
     abstract protected function getOrderKeyValuesByIndex();
 
     protected function getCountForPagination()

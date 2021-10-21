@@ -106,14 +106,8 @@ class TermQueryBuilder extends Builder
             $method = 'filterWhere'.$where['type'];
             $keys = $this->{$method}($items, $where)->keys();
 
-            if ($where['boolean'] == 'or') {
-                return $ids ? $ids->concat($keys)->values() : $keys;
-            }
-
             // Continue intersecting the keys across the where clauses.
-            // If a key exists in the reduced array but not in the current iteration, it should be removed.
-            // On the first iteration, there's nothing to intersect, so just use the result as a starting point.
-            return $ids ? $ids->intersect($keys)->values() : $keys;
+            return $this->intersectKeysFromWhereClause($ids, $keys, $where['boolean']);
         });
     }
 
