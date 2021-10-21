@@ -33,6 +33,7 @@ return [
     'collection_configure_handle_instructions' => 'Comment vous allez faire référence à cette collection sur le frontal. Ne peut pas être facilement changé.',
     'collection_configure_intro' => 'Une collection est un groupe d’entrées liées qui partagent comportement, attributs et paramètres.',
     'collection_configure_layout_instructions' => 'Définissez la disposition par défaut de cette collection. Les entrées peuvent outrepasser ce paramètre avec un champ `template` nommé `layout`. La modification de ce paramètre est inhabituelle.',
+    'collection_configure_propagate_instructions' => 'Propager automatiquement les nouvelles entrées vers tous les sites configurés.',
     'collection_configure_template_instructions' => 'Définissez le modèle par défaut de cette collection. Les entrées peuvent outrepasser ce paramètre avec un champ `template`.',
     'collection_configure_title_instructions' => 'Nous recommandons un nom au pluriel, comme "Articles" ou "Produits".',
     'collection_next_steps_configure_description' => 'Configurer les URLs et les routes, définissez les Blueprints, les comportements des dates, l’ordonnancement et d’autres options.',
