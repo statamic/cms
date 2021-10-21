@@ -4,7 +4,6 @@ namespace Tests\Data\Assets;
 
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
