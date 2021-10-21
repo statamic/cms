@@ -27,7 +27,7 @@ class UserQueryBuilder extends Builder
             $keys = $this->{$method}($items, $where)->keys();
 
             // Continue intersecting the keys across the where clauses.
-            return $this->intersectKeysFromWhereClause($ids, $keys, $where['boolean']);
+            return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
     }
 
