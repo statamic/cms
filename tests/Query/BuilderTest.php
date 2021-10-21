@@ -47,7 +47,25 @@ class BuilderTest extends TestCase
     public function entries_are_found_using_or_where()
     {
         $this->createDummyCollectionAndEntries();
+
         $entries = Entry::query()->where('title', 'Post 1')->orWhere('title', 'Post 3')->get();
+
         $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_or_where_in()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+
+        $entries = Entry::query()->whereIn('title', ['Post 1', 'Post 2'])->orWhereIn('title', ['Post 4', 'Post 5'])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 4', 'Post 5'], $entries->map->title->all());
     }
 }
