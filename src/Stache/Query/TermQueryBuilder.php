@@ -47,7 +47,7 @@ class TermQueryBuilder extends Builder
             return $this;
         }
 
-        return parent::whereIn($column, $values);
+        return parent::whereIn($column, $values, $boolean);
     }
 
     public function orWhereIn($column, $values)
