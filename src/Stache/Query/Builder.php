@@ -92,7 +92,7 @@ abstract class Builder extends BaseBuilder
         return $items->keys();
     }
 
-    protected function intersectKeysFromWhereClause($keys, $newKeys, $boolean)
+    protected function intersectKeysFromWhereClause($keys, $newKeys, $where)
     {
         // On the first iteration, there's nothing to intersect;
         // Just use the new keys as a starting point.
@@ -100,9 +100,9 @@ abstract class Builder extends BaseBuilder
             return $newKeys;
         }
 
-        // If it's an `orWhere`, concatenate the `$newKeys`;
+        // If it's a `orWhere` or `orWhereIn`, concatenate the `$newKeys`;
         // Otherwise, intersect to ensure each where is respected.
-        return $boolean === 'or'
+        return $where['boolean'] === 'or' && $where['type'] !== 'NotIn'
             ? $keys->concat($newKeys)->unique()->values()
             : $keys->intersect($newKeys)->values();
     }
