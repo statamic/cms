@@ -103,7 +103,7 @@ abstract class Builder extends BaseBuilder
         // If it's an `orWhere`, concatenate the `$newKeys`;
         // Otherwise, intersect to ensure each where is respected.
         return $boolean === 'or'
-            ? $keys->concat($newKeys)->values()
+            ? $keys->concat($newKeys)->unique()->values()
             : $keys->intersect($newKeys)->values();
     }
 
