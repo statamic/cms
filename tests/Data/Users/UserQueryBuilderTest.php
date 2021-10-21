@@ -37,4 +37,20 @@ class UserQueryBuilderTest extends TestCase
         $this->assertCount(4, $users);
         $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Tommy'], $users->map->name->all());
     }
+
+    /** @test **/
+    public function users_are_found_using_or_where_not_in()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
+        User::make()->email('aragorn@precious.com')->data(['name' => 'Aragorn'])->save();
+        User::make()->email('bombadil@precious.com')->data(['name' => 'Tommy'])->save();
+        User::make()->email('sauron@precious.com')->data(['name' => 'Sauron'])->save();
+
+        $users = User::query()->whereNotIn('name', ['Gandalf', 'Frodo'])->orWhereNotIn('name', ['Gandalf', 'Sauron'])->get();
+
+        $this->assertCount(3, $users);
+        $this->assertEquals(['Smeagol', 'Aragorn', 'Tommy'], $users->map->name->all());
+    }
 }
