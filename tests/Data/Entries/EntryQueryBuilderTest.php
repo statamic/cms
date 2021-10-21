@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Query;
+namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
@@ -8,7 +8,7 @@ use Statamic\Facades\Entry;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class BuilderTest extends TestCase
+class EntryQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
