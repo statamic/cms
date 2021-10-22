@@ -14,7 +14,7 @@ class ConvertLibrary extends RuntimeLibrary
         'toBool' => 1,
         'toString' => 1,
         'typeOf' => 1,
-        'className' => 1
+        'className' => 1,
     ];
 
     public function toFloat($value)

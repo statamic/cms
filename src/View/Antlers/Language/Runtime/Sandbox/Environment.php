@@ -1091,7 +1091,7 @@ class Environment
     private function scopeValue($name)
     {
         if ($name instanceof VariableReference) {
-            if (!$this->isEvaluatingTruthValue) {
+            if (! $this->isEvaluatingTruthValue) {
                 $this->dataRetriever->setReduceFinal(false);
             }
 

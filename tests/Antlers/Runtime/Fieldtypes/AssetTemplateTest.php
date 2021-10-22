@@ -90,7 +90,6 @@ class AssetTemplateTest extends ParserTestCase
         $this->assertSame('test_container::path/to/asset.jpg', $runtimeData['test_2']);
     }
 
-
     public function test_parameter_values_are_not_lost_when_passed_into_tags()
     {
         $asset = new Asset();
@@ -100,7 +99,7 @@ class AssetTemplateTest extends ParserTestCase
         $value = new Value($asset, 'test_asset');
 
         $data = [
-            'image' => $value
+            'image' => $value,
         ];
 
         // These partials are located in /tests/__fixtures__/views/

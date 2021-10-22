@@ -339,7 +339,6 @@ class AntlersNode extends AbstractNode
         foreach ($this->parameters as $param) {
             $value = $param->value;
 
-
             if ($param->isVariableReference) {
                 $pathToParse = $this->reduceParameterInterpolations($param, $processor->cloneProcessor()->setIsProvidingParameterContent(true), $param->value, $data);
 

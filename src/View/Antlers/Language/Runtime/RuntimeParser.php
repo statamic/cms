@@ -160,7 +160,7 @@ class RuntimeParser implements ParserContract
      */
     protected function sanitizePhp($text)
     {
-        if (GlobalRuntimeState::$isEvaluatingUserData && !GlobalRuntimeState::$allowPhpInContent) {
+        if (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowPhpInContent) {
             return StringUtilities::sanitizePhp($text);
         }
 
