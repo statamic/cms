@@ -4,7 +4,6 @@ namespace Tests\Data\Assets;
 
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -100,5 +99,4 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertCount(4, $assets);
         $this->assertEquals(['a', 'b', 'd', 'c'], $assets->map->filename()->all());
     }
-
 }

@@ -19,9 +19,7 @@ class UserQueryBuilder extends Builder
     {
         return collect($wheres)->reduce(function ($ids, $where) {
             if ($where['type'] == 'Nested') {
-
                 $keys = $this->getKeysWithWheres($where['query']->wheres);
-
             } else {
 
                 $items = app('stache')
@@ -31,7 +29,6 @@ class UserQueryBuilder extends Builder
                 // Perform the filtering, and get the keys (the references, we don't care about the values).
                 $method = 'filterWhere'.$where['type'];
                 $keys = $this->{$method}($items, $where)->keys();
-
             }
 
             // Continue intersecting the keys across the where clauses.

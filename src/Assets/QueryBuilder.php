@@ -36,9 +36,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
     {
         return collect($wheres)->reduce(function ($ids, $where) use ($containers) {
             if ($where['type'] == 'Nested') {
-
                 $keys = $this->getKeysFromContainersWithWheres($containers, $where['query']->wheres);
-
             } else {
 
                 // Get a single array comprised of the items from the same index across all containers.
@@ -53,7 +51,6 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
                 // Perform the filtering, and get the keys (the references, we don't care about the values).
                 $method = 'filterWhere'.$where['type'];
                 $keys = $this->{$method}($items, $where)->keys();
-
             }
 
             // Continue intersecting the keys across the where clauses.

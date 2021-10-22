@@ -95,7 +95,9 @@ class TermQueryBuilderTest extends TestCase
         Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
         Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
 
-        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query){ $query->where('test', 'baz'); })->get();
+        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query){
+            $query->where('test', 'baz');
+        })->get();
 
         $this->assertEquals(['a', 'c', 'd'], $terms->map->slug()->sort()->values()->all());
     }
@@ -110,7 +112,9 @@ class TermQueryBuilderTest extends TestCase
         Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
         Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
 
-        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query){ $query->whereIn('test', ['baz', 'raz']); })->get();
+        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query){
+            $query->whereIn('test', ['baz', 'raz']);
+        })->get();
 
         $this->assertEquals(['a', 'c', 'd', 'e'], $terms->map->slug()->sort()->values()->all());
     }
@@ -125,7 +129,9 @@ class TermQueryBuilderTest extends TestCase
         Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
         Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
 
-        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query){ $query->whereNotIn('test', ['baz', 'raz']); })->get();
+        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query){
+            $query->whereNotIn('test', ['baz', 'raz']);
+        })->get();
 
         $this->assertEquals(['a', 'b', 'd'], $terms->map->slug()->sort()->values()->all());
     }

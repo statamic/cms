@@ -82,15 +82,12 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             });
 
             if ($where['type'] == 'Nested') {
-
                 $keys = $this->getKeysFromCollectionsWithWheres($collections, $where['query']->wheres);
-
             } else {
 
                 // Perform the filtering, and get the keys (the references, we don't care about the values).
                 $method = 'filterWhere'.$where['type'];
                 $keys = $this->{$method}($items, $where)->keys();
-
             }
 
             // Continue intersecting the keys across the where clauses.

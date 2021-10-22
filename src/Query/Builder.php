@@ -100,6 +100,7 @@ abstract class Builder implements Contract
     {
         $newBuilder = clone $this;
         $newBuilder->wheres = [];
+
         return $newBuilder;
     }
 
@@ -118,8 +119,8 @@ abstract class Builder implements Contract
         return $this->where($column, $operator, $value, 'or');
     }
 
-    public function getWhereColumnKeysFromStore($store, $where) {
-
+    public function getWhereColumnKeysFromStore($store, $where)
+    {
         if (isset($where['query'])) {
             $map = [];
             foreach ($where['query']->wheres as $nestedWhere) {

@@ -92,7 +92,9 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
 
-        $entries = Entry::query()->where('title', 'Post 1')->orWhere(function ($query) { return $query->where('title', 'Post 3')->orWhere('title', 'Post 4'); })->get();
+        $entries = Entry::query()->where('title', 'Post 1')->orWhere(function ($query) {
+            return $query->where('title', 'Post 3')->orWhere('title', 'Post 4');
+        })->get();
 
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 1', 'Post 3', 'Post 4'], $entries->map->title->all());
@@ -108,7 +110,9 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
 
-        $entries = Entry::query()->where('title', 'Post 1')->orWhere(function ($query) { return $query->where('title', 'Post 3')->orWhereIn('title', ['Post 4', 'Post 5']); })->get();
+        $entries = Entry::query()->where('title', 'Post 1')->orWhere(function ($query) {
+            return $query->where('title', 'Post 3')->orWhereIn('title', ['Post 4', 'Post 5']);
+        })->get();
 
         $this->assertCount(4, $entries);
         $this->assertEquals(['Post 1', 'Post 3', 'Post 4', 'Post 5'], $entries->map->title->all());
