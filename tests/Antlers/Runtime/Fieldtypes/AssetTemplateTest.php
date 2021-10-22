@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Fields\Value;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
 use Tests\Antlers\ParserTestCase;
 
@@ -87,5 +88,45 @@ class AssetTemplateTest extends ParserTestCase
 
         $this->assertSame($asset, $runtimeData['test']);
         $this->assertSame('test_container::path/to/asset.jpg', $runtimeData['test_2']);
+    }
+
+
+    public function test_parameter_values_are_not_lost_when_passed_into_tags()
+    {
+        $asset = new Asset();
+        $asset->container($this->container);
+        $asset->path('path/to/asset.jpg');
+
+        $value = new Value($asset, 'test_asset');
+
+        $data = [
+            'image' => $value
+        ];
+
+        // These partials are located in /tests/__fixtures__/views/
+        $template = <<<'EOT'
+Root: {{ convert:className(image) }}
+{{ partial:example :image="image" }}
+EOT;
+
+        // The partials will call out to two library methods.
+        // {{ convert:className(value) }} - returns the class name of an object.
+        // {{ convert:typeOf(value) }} - returns a variable's type.
+        // If the asset gets convert to an array, className() will fail since it's expecting an object.
+
+        // Inside the nested partial three, image is being overwritten to an integer to ensure
+        // that overrides like that work, and it is set back to image for nested_four.
+
+        $expected = <<<'EOT'
+Root: Statamic\Assets\Asset
+Example: Statamic\Assets\Asset
+Nested One: Statamic\Assets\Asset
+Nested Two: Statamic\Assets\Asset
+Nested Three Asset: Statamic\Assets\Asset
+Nested Three Image Var: 123 - integer
+Nested Four: Statamic\Assets\Asset
+EOT;
+
+        $this->assertSame(StringUtilities::normalizeLineEndings($expected), $this->renderString($template, $data, true));
     }
 }

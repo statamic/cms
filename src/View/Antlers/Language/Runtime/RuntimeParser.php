@@ -160,6 +160,10 @@ class RuntimeParser implements ParserContract
      */
     protected function sanitizePhp($text)
     {
+        if (GlobalRuntimeState::$isEvaluatingUserData && !GlobalRuntimeState::$allowPhpInContent) {
+            return StringUtilities::sanitizePhp($text);
+        }
+
         if ($this->allowPhp) {
             return $text;
         }
@@ -267,6 +271,8 @@ class RuntimeParser implements ParserContract
         $text = $this->runPreParserCallbacks($text);
 
         if (! $this->canPossiblyParseAntlers($text)) {
+            $text = $this->sanitizePhp($text);
+
             if ($text == null) {
                 return new AntlersString('', $this);
             }

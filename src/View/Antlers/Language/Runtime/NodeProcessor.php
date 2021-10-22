@@ -507,6 +507,11 @@ class NodeProcessor
         return $this;
     }
 
+    public function getAntlersParser()
+    {
+        return $this->antlersParser;
+    }
+
     /**
      * Gets the last scope frame added to the processor.
      *

@@ -3,6 +3,7 @@
 namespace Statamic\View\Antlers\Language\Utilities;
 
 use Exception;
+use Statamic\View\Antlers\Language\Parser\DocumentParser;
 
 class StringUtilities
 {
@@ -50,6 +51,22 @@ class StringUtilities
         }
 
         return mb_str_split($text);
+    }
+
+    public static function containsSymbolicCharacters($text)
+    {
+        $chars = str_split($text);
+
+        foreach ($chars as $char) {
+            if (ctype_punct($char) && $char != DocumentParser::LeftBracket &&
+                $char != DocumentParser::RightBracket &&
+                $char != DocumentParser::Punctuation_Colon &&
+                $char != DocumentParser::Punctuation_Underscore) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

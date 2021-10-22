@@ -339,14 +339,19 @@ class AntlersNode extends AbstractNode
         foreach ($this->parameters as $param) {
             $value = $param->value;
 
-            if ($param->isVariableReference) {
-                $pathToParse = $this->reduceParameterInterpolations($param, $processor, $param->value, $data);
 
-                /* $pathParser = new PathParser();
-                $retriever = new PathDataManager();
-                $retriever->setIsPaired(false)->setReduceFinal(false);
-                $value = $retriever->getData($pathParser->parse($pathToParse), $data);*/
-                $value = Antlers::parser()->getVariable($pathToParse, $data, null);
+            if ($param->isVariableReference) {
+                $pathToParse = $this->reduceParameterInterpolations($param, $processor->cloneProcessor()->setIsProvidingParameterContent(true), $param->value, $data);
+
+                // Only use the full Antlers parser here if the string contains characters like |, (, {, }, etc.
+                if (StringUtilities::containsSymbolicCharacters($pathToParse)) {
+                    $value = Antlers::parser()->getVariable($pathToParse, $data, null);
+                } else {
+                    $pathParser = new PathParser();
+                    $retriever = new PathDataManager();
+                    $retriever->setIsPaired(false)->setReduceFinal(false);
+                    $value = $retriever->getData($pathParser->parse($pathToParse), $data);
+                }
             } else {
                 // If we have a situation where an interpolation is the ONLY content here
                 // we will hand it off to the "bigger, better, stronger" parsing logic.

@@ -13,6 +13,8 @@ class ConvertLibrary extends RuntimeLibrary
         'toInt' => 1,
         'toBool' => 1,
         'toString' => 1,
+        'typeOf' => 1,
+        'className' => 1
     ];
 
     public function toFloat($value)
@@ -33,5 +35,15 @@ class ConvertLibrary extends RuntimeLibrary
     public function toString($value)
     {
         return strval($value);
+    }
+
+    public function typeOf($value)
+    {
+        return gettype($value);
+    }
+
+    public function className($value)
+    {
+        return get_class($value);
     }
 }

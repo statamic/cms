@@ -12,6 +12,7 @@ use Illuminate\Support\ViewErrorBag;
 use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Fields\ArrayableString;
+use Statamic\Fields\Value;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
@@ -881,6 +882,8 @@ class Environment
             if ($operand instanceof LeftAssignmentOperator) {
                 $varName = $this->nameOf($left);
 
+                $right = $this->checkForFieldValue($right);
+
                 $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
                 $this->assignments[$this->dataRetriever->lastPath()] = $right;
 
@@ -1088,6 +1091,10 @@ class Environment
     private function scopeValue($name)
     {
         if ($name instanceof VariableReference) {
+            if (!$this->isEvaluatingTruthValue) {
+                $this->dataRetriever->setReduceFinal(false);
+            }
+
             return $this->dataRetriever->getData($name, $this->data);
         }
 
@@ -1169,6 +1176,8 @@ class Environment
     {
         if ($originalNode instanceof AbstractNode && $originalNode->modifierChain != null) {
             if (! empty($originalNode->modifierChain->modifierChain)) {
+                $value = $this->checkForFieldValue($value);
+
                 return $this->applyModifiers($value, $originalNode->modifierChain);
             }
         }
@@ -1177,6 +1186,21 @@ class Environment
             if (Str::contains($value, $this->interpolationKeys)) {
                 $value = strtr($value, $this->interpolationReplacements);
             }
+        }
+
+        return $this->checkForFieldValue($value);
+    }
+
+    private function checkForFieldValue($value)
+    {
+        if ($value instanceof Value) {
+            GlobalRuntimeState::$isEvaluatingUserData = true;
+            if ($value->shouldParseAntlers()) {
+                $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+            } else {
+                $value = $value->value();
+            }
+            GlobalRuntimeState::$isEvaluatingUserData = false;
         }
 
         return $value;
