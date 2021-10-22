@@ -1,7 +1,7 @@
 <template>
 
     <div class="">
-        <div v-if="showSvg" class="rounded mb-1 flex items-center justify-center asset-thumbnail h-full w-full">
+        <div v-if="showSvg" class="rounded flex items-center justify-center asset-thumbnail h-full w-full">
             <img
                 class="w-full h-full max-w-full max-h-full mx-auto"
                 :src="asset.url"
@@ -37,8 +37,7 @@ export default {
     computed: {
 
         showSvg() {
-            let url = this.asset.url;
-            return url.substring(url.length - 3) === 'svg';
+            return this.asset.extension === 'svg';
         }
 
     }
