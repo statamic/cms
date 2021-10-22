@@ -35,18 +35,26 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
     protected function getKeysFromContainersWithWheres($containers, $wheres)
     {
         return collect($wheres)->reduce(function ($ids, $where) use ($containers) {
-            // Get a single array comprised of the items from the same index across all containers.
-            $items = collect($containers)->flatMap(function ($collection) use ($where) {
-                return $this->store->store($collection)
-                    ->index($where['column'])->items()
-                    ->mapWithKeys(function ($item, $key) use ($collection) {
-                        return ["{$collection}::{$key}" => $item];
-                    });
-            });
+            if ($where['type'] == 'Nested') {
 
-            // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $method = 'filterWhere'.$where['type'];
-            $keys = $this->{$method}($items, $where)->keys();
+                $keys = $this->getKeysFromContainersWithWheres($containers, $where['query']->wheres);
+
+            } else {
+
+                // Get a single array comprised of the items from the same index across all containers.
+                $items = collect($containers)->flatMap(function ($collection) use ($where) {
+                    return $this->store->store($collection)
+                        ->index($where['column'])->items()
+                        ->mapWithKeys(function ($item, $key) use ($collection) {
+                            return ["{$collection}::{$key}" => $item];
+                        });
+                });
+
+                // Perform the filtering, and get the keys (the references, we don't care about the values).
+                $method = 'filterWhere'.$where['type'];
+                $keys = $this->{$method}($items, $where)->keys();
+
+            }
 
             // Continue intersecting the keys across the where clauses.
             return $this->intersectKeysFromWhereClause($ids, $keys, $where);

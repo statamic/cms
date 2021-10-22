@@ -95,16 +95,20 @@ class TermQueryBuilder extends Builder
         return collect($wheres)->reduce(function ($ids, $where) use ($taxonomies) {
             // Get a single array comprised of the items from the same index across all taxonomies.
             $items = collect($taxonomies)->flatMap(function ($taxonomy) use ($where) {
-                return $this->store->store($taxonomy)
-                    ->index($where['column'])->items()
-                    ->mapWithKeys(function ($item, $key) use ($taxonomy) {
-                        return ["{$taxonomy}::{$key}" => $item];
-                    });
+                return $this->getWhereColumnKeysFromStore($taxonomy, $where);
             });
 
-            // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $method = 'filterWhere'.$where['type'];
-            $keys = $this->{$method}($items, $where)->keys();
+            if ($where['type'] == 'Nested') {
+
+                $keys = $this->getKeysFromTaxonomiesWithWheres($taxonomies, $where['query']->wheres);
+
+            } else {
+
+                // Perform the filtering, and get the keys (the references, we don't care about the values).
+                $method = 'filterWhere'.$where['type'];
+                $keys = $this->{$method}($items, $where)->keys();
+
+            }
 
             // Continue intersecting the keys across the where clauses.
             return $this->intersectKeysFromWhereClause($ids, $keys, $where);

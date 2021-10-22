@@ -4,6 +4,7 @@ namespace Tests\Data\Assets;
 
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -23,7 +24,6 @@ class AssetQueryBuilderTest extends TestCase
         Storage::disk('test')->put('d.jpg', '');
         Storage::disk('test')->put('e.jpg', '');
         Storage::disk('test')->put('f.jpg', '');
-
         $this->container = tap(AssetContainer::make('test')->disk('test'))->save();
     }
 
@@ -70,4 +70,35 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertCount(2, $assets);
         $this->assertEquals(['d', 'e'], $assets->map->filename()->all());
     }
+
+    /** @test **/
+    public function assets_are_found_using_nested_where()
+    {
+        $assets = $this->container->queryAssets()
+            ->where('filename', 'a')
+            ->orWhere(function ($query) {
+                $query->where('filename', 'b')
+                    ->orWhere('filename', 'd');
+            })
+            ->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'b', 'd'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_nested_where_in()
+    {
+        $assets = $this->container->queryAssets()
+            ->whereIn('filename', ['a', 'b'])
+            ->orWhere(function ($query) {
+                $query->whereIn('filename', ['a', 'd'])
+                    ->orWhereIn('extension', ['txt']);
+            })
+            ->get();
+
+        $this->assertCount(4, $assets);
+        $this->assertEquals(['a', 'b', 'd', 'c'], $assets->map->filename()->all());
+    }
+
 }

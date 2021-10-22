@@ -53,4 +53,34 @@ class UserQueryBuilderTest extends TestCase
         $this->assertCount(3, $users);
         $this->assertEquals(['Smeagol', 'Aragorn', 'Tommy'], $users->map->name->all());
     }
+
+    /** @test **/
+    public function users_are_found_using_nested_where()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
+        User::make()->email('aragorn@precious.com')->data(['name' => 'Aragorn'])->save();
+        User::make()->email('bombadil@precious.com')->data(['name' => 'Tommy'])->save();
+
+        $users = User::query()->where('email', 'gandalf@precious.com')->orWhere(function ($query) { $query->where('name', 'Frodo')->orWhere('name', 'Aragorn'); })->get();
+
+        $this->assertCount(3, $users);
+        $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn'], $users->map->name->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_nested_where_in()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
+        User::make()->email('aragorn@precious.com')->data(['name' => 'Aragorn'])->save();
+        User::make()->email('bombadil@precious.com')->data(['name' => 'Tommy'])->save();
+
+        $users = User::query()->where('email', 'gandalf@precious.com')->orWhere(function ($query) { $query->where('name', 'Frodo')->orWhereIn('name', ['Aragorn', 'Tommy']); })->get();
+
+        $this->assertCount(4, $users);
+        $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Tommy'], $users->map->name->all());
+    }
 }
