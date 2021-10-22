@@ -102,11 +102,9 @@ abstract class Builder extends BaseBuilder
 
         // If it's a `orWhere` or `orWhereIn`, concatenate the `$newKeys`;
         // Otherwise, intersect to ensure each where is respected.
-        $vals = $where['boolean'] === 'or' && $where['type'] !== 'NotIn'
+        return $where['boolean'] === 'or' && $where['type'] !== 'NotIn'
             ? $keys->concat($newKeys)->unique()->values()
             : $keys->intersect($newKeys)->values();
-
-        return $vals;
     }
 
     abstract protected function getOrderKeyValuesByIndex();
