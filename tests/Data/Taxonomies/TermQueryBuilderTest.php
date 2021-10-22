@@ -95,7 +95,7 @@ class TermQueryBuilderTest extends TestCase
         Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
         Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
 
-        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query){
+        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query) {
             $query->where('test', 'baz');
         })->get();
 
@@ -112,7 +112,7 @@ class TermQueryBuilderTest extends TestCase
         Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
         Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
 
-        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query){
+        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query) {
             $query->whereIn('test', ['baz', 'raz']);
         })->get();
 
@@ -129,7 +129,7 @@ class TermQueryBuilderTest extends TestCase
         Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
         Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
 
-        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query){
+        $terms = Term::query()->where('test', 'foo')->orWhere(function ($query) {
             $query->whereNotIn('test', ['baz', 'raz']);
         })->get();
 

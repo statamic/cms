@@ -124,9 +124,11 @@ abstract class Builder implements Contract
         if (isset($where['query'])) {
             $map = [];
             foreach ($where['query']->wheres as $nestedWhere) {
-                foreach ($this->getWhereColumnKeysFromStore($store, $nestedWhere) as $key => $nest)
+                foreach ($this->getWhereColumnKeysFromStore($store, $nestedWhere) as $key => $nest) {
                     $map[$key] = $nest;
+                }
             }
+
             return $map;
         }
 

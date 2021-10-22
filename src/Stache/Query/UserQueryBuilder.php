@@ -21,7 +21,6 @@ class UserQueryBuilder extends Builder
             if ($where['type'] == 'Nested') {
                 $keys = $this->getKeysWithWheres($where['query']->wheres);
             } else {
-
                 $items = app('stache')
                     ->store('users')
                     ->index($where['column'])->items();

@@ -98,7 +98,6 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 1', 'Post 3', 'Post 4'], $entries->map->title->all());
-
     }
 
     /** @test **/
