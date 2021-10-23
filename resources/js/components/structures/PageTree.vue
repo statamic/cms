@@ -42,6 +42,7 @@
                     :has-collection="hasCollection"
                     :is-open="page.open"
                     :has-children="page.children.length > 0"
+                    :show-slugs="showSlugs"
                     @edit="$emit('edit-page', page, vm, store, $event)"
                     @toggle-open="store.toggleOpen(page)"
                     @removed="pageRemoved"
@@ -88,6 +89,7 @@ export default {
         localizations: { type: Array },
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
+        showSlugs: { type: Boolean, default: false },
         hasCollection: { type: Boolean, required: true },
         preferencesPrefix: { type: String },
     },

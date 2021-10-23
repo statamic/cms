@@ -115,7 +115,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) use ($key) {
                 return Blink::once($key, function () use ($blueprint) {
-                    return $this->collection()->entryBlueprint($blueprint ?? $this->value('blueprint'), $this);
+                    if (! $blueprint) {
+                        $blueprint = $this->hasOrigin()
+                            ? $this->origin()->blueprint()->handle()
+                            : $this->get('blueprint');
+                    }
+
+                    return $this->collection()->entryBlueprint($blueprint, $this);
                 });
             })
             ->setter(function ($blueprint) use ($key) {
@@ -325,6 +331,14 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             EntrySaved::dispatch($this);
         }
 
+        if ($isNew && ! $this->hasOrigin() && $this->collection()->propagate()) {
+            $this->collection()->sites()
+                ->reject($this->site()->handle())
+                ->each(function ($siteHandle) {
+                    $this->makeLocalization($siteHandle)->save();
+                });
+        }
+
         return true;
     }
 
@@ -395,7 +409,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function toLivePreviewResponse($request, $extras)
     {
-        Cascade::set('live_preview', $extras);
+        Cascade::hydrated(function ($cascade) use ($extras) {
+            $cascade->set('live_preview', $extras);
+        });
 
         return $this->toResponse($request);
     }
@@ -442,11 +458,18 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function fileData()
     {
+        $origin = $this->origin();
+        $blueprint = $this->blueprint()->handle();
+
+        if ($origin && $this->blueprint()->handle() === $origin->blueprint()->handle()) {
+            $blueprint = null;
+        }
+
         $array = Arr::removeNullValues([
             'id' => $this->id(),
-            'origin' => optional($this->origin())->id(),
+            'origin' => optional($origin)->id(),
             'published' => $this->published === false ? false : null,
-            'blueprint' => $this->blueprint()->handle(),
+            'blueprint' => $blueprint,
         ]);
 
         $data = $this->data()->all();
@@ -703,11 +726,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return Facades\Entry::find($origin);
     }
 
-    public function value($key)
-    {
-        return $this->originValue($key) ?? $this->collection()->cascade($key);
-    }
-
     public function values()
     {
         return $this->collection()->cascade()->merge($this->originValues());
@@ -736,6 +754,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         if ($field === 'parent') {
             return optional($this->parent())->entry();
+        }
+
+        if ($field === 'blueprint') {
+            return $this->blueprint();
         }
 
         return $this->traitResolveGqlValue($field);

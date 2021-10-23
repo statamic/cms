@@ -62,7 +62,7 @@ abstract class Builder implements Contract
 
     abstract public function inRandomOrder();
 
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
@@ -79,10 +79,14 @@ abstract class Builder implements Contract
         }
 
         $type = 'Basic';
-
-        $this->wheres[] = compact('type', 'column', 'value', 'operator');
+        $this->wheres[] = compact('type', 'column', 'value', 'operator', 'boolean');
 
         return $this;
+    }
+
+    public function orWhere($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'or');
     }
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
@@ -107,23 +111,49 @@ abstract class Builder implements Contract
         return ! in_array(strtolower($operator), array_keys($this->operators), true);
     }
 
-    public function whereIn($column, $values)
+    public function whereIn($column, $values, $boolean = 'and')
     {
         $this->wheres[] = [
             'type' => 'In',
             'column' => $column,
             'values' => $values,
+            'boolean' => $boolean,
         ];
 
         return $this;
     }
 
-    public function whereNotIn($column, $values)
+    public function orWhereIn($column, $values)
+    {
+        $this->wheres[] = [
+            'type' => 'In',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => 'or',
+        ];
+
+        return $this;
+    }
+
+    public function whereNotIn($column, $values, $boolean = 'and')
     {
         $this->wheres[] = [
             'type' => 'NotIn',
             'column' => $column,
             'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereNotIn($column, $values)
+    {
+        $this->wheres[] = [
+            'type' => 'NotIn',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => 'or',
         ];
 
         return $this;

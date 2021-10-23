@@ -11,7 +11,6 @@ Vue.component('textarea-fieldtype', require('../components/fieldtypes/TextareaFi
 Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.vue').default);
 
 // Fieldtypes
-import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
@@ -28,7 +27,6 @@ Vue.component('code-fieldtype', require('../components/fieldtypes/CodeFieldtype.
 Vue.component('collection_routes-fieldtype', require('../components/collections/Routes.vue').default);
 Vue.component('color-fieldtype', require('../components/fieldtypes/ColorFieldtype.vue').default);
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue').default);
-Vue.component('fieldset-fieldtype', FieldsetFieldtype);
 Vue.component('fields-fieldtype', require('../components/fieldtypes/grid/FieldsFieldtype.vue').default);
 Vue.component('float-fieldtype', require('../components/fieldtypes/FloatFieldtype.vue').default);
 Vue.component('global_set_sites-fieldtype', require('../components/globals/Sites.vue').default);

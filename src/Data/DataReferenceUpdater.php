@@ -30,7 +30,7 @@ abstract class DataReferenceUpdater
     /**
      * Instantiate data reference updater.
      *
-     * @param mixed $item
+     * @param  mixed  $item
      */
     public function __construct($item)
     {
@@ -40,7 +40,7 @@ abstract class DataReferenceUpdater
     /**
      * Instantiate data reference updater.
      *
-     * @param mixed $item
+     * @param  mixed  $item
      * @return static
      */
     public static function item($item)
@@ -51,8 +51,8 @@ abstract class DataReferenceUpdater
     /**
      * Update references.
      *
-     * @param mixed $originalValue
-     * @param mixed $newValue
+     * @param  mixed  $originalValue
+     * @param  mixed  $newValue
      */
     public function updateReferences($originalValue, $newValue)
     {
@@ -79,16 +79,16 @@ abstract class DataReferenceUpdater
     /**
      * Recursively update fields (call `updateNestedFieldValues()` to initiate recursion).
      *
-     * @param \Statamic\Fields\Fields $fields
-     * @param null|string $dottedPrefix
+     * @param  \Statamic\Fields\Fields  $fields
+     * @param  null|string  $dottedPrefix
      */
     abstract protected function recursivelyUpdateFields($fields, $dottedPrefix = null);
 
     /**
      * Update nested field values.
      *
-     * @param \Illuminate\Support\Collection $fields
-     * @param null|string $dottedPrefix
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
      * @return $this
      */
     protected function updateNestedFieldValues($fields, $dottedPrefix)
@@ -110,8 +110,8 @@ abstract class DataReferenceUpdater
     /**
      * Update replicator field children.
      *
-     * @param \Statamic\Fields\Field $field
-     * @param string $dottedKey
+     * @param  \Statamic\Fields\Field  $field
+     * @param  string  $dottedKey
      */
     protected function updateReplicatorChildren($field, $dottedKey)
     {
@@ -133,8 +133,8 @@ abstract class DataReferenceUpdater
     /**
      * Update grid field children.
      *
-     * @param \Statamic\Fields\Field $field
-     * @param string $dottedKey
+     * @param  \Statamic\Fields\Field  $field
+     * @param  string  $dottedKey
      */
     protected function updateGridChildren($field, $dottedKey)
     {
@@ -155,8 +155,8 @@ abstract class DataReferenceUpdater
     /**
      * Update bard field children.
      *
-     * @param \Statamic\Fields\Field $field
-     * @param string $dottedKey
+     * @param  \Statamic\Fields\Field  $field
+     * @param  string  $dottedKey
      */
     protected function updateBardChildren($field, $dottedKey)
     {
@@ -198,8 +198,8 @@ abstract class DataReferenceUpdater
     /**
      * Update string value on item.
      *
-     * @param \Statamic\Fields\Field $field
-     * @param null|string $dottedPrefix
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
      */
     protected function updateStringValue($field, $dottedPrefix)
     {
@@ -221,8 +221,8 @@ abstract class DataReferenceUpdater
     /**
      * Update array value on item.
      *
-     * @param \Statamic\Fields\Field $field
-     * @param null|string $dottedPrefix
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
      */
     protected function updateArrayValue($field, $dottedPrefix)
     {

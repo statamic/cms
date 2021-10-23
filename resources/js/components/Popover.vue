@@ -31,6 +31,10 @@ export default {
         offset: {
             type: Array,
             default: () => [0, 10]
+        },
+        scroll: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -58,7 +62,7 @@ export default {
                     {
                         name: 'eventListeners',
                         options: {
-                            scroll: false,
+                            scroll: this.scroll,
                             resize: true
                         }
                     }

@@ -12,6 +12,7 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Contracts\Structures\Nav;
+use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Blink;
@@ -22,7 +23,7 @@ use Statamic\GraphQL\ResolvesValues;
 
 class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract
 {
-    use HasAugmentedInstance, ForwardsCalls, TracksQueriedColumns, ResolvesValues;
+    use HasAugmentedInstance, ForwardsCalls, TracksQueriedColumns, ResolvesValues, ContainsSupplementalData;
 
     protected $tree;
     protected $reference;
@@ -35,6 +36,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
     protected $title;
     protected $depth;
     protected $data = [];
+
+    public function __construct()
+    {
+        $this->supplements = collect();
+    }
 
     public function setUrl($url)
     {
