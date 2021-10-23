@@ -337,7 +337,7 @@ EOT;
 
         $template = '{{ if topics }}yes{{ else }}no{{ /if }}';
         $this->assertSame('no', $this->renderString($template, [
-            'topics' => $value
+            'topics' => $value,
         ]));
     }
 }

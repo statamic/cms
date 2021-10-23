@@ -132,8 +132,8 @@ EOT;
     {
         $data = [
             'one' => [
-                'two' => Carbon::parse('October 1st, 2012')
-            ]
+                'two' => Carbon::parse('October 1st, 2012'),
+            ],
         ];
 
         $this->assertSame('2012-10-01', $this->renderString('{{ one:two format="Y-m-d" }}', $data, true));
