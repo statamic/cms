@@ -835,7 +835,6 @@ class Environment
                     continue;
                 }
 
-
                 if (is_string($leftVal)) {
                     $leftVal = new StringBoxObject($leftVal);
                 } elseif (is_array($leftVal)) {
