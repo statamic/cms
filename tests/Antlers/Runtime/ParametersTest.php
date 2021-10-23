@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Carbon\Carbon;
 use Tests\Antlers\Fixtures\Addon\Tags\EchoMethod;
 use Tests\Antlers\Fixtures\Addon\Tags\Test;
 use Tests\Antlers\Fixtures\MethodClasses\ClassTwo;
@@ -125,5 +126,16 @@ EOT;
         $this->assertSame('hello_world', $this->renderString($template, [
             'var_name' => 'hello_world',
         ], true));
+    }
+
+    public function test_array_syntax_modifiers_work_on_multi_part_variable_paths()
+    {
+        $data = [
+            'one' => [
+                'two' => Carbon::parse('October 1st, 2012')
+            ]
+        ];
+
+        $this->assertSame('2012-10-01', $this->renderString('{{ one:two format="Y-m-d" }}', $data, true));
     }
 }
