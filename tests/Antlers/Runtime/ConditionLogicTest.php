@@ -2,7 +2,9 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Statamic\Fields\Value;
 use Statamic\Tags\Tags;
+use Statamic\Taxonomies\TermCollection;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Tests\Antlers\ParserTestCase;
 
@@ -326,5 +328,16 @@ EOT;
         ];
 
         $this->assertSame('Not Empty', $this->renderString($template, $data, true));
+    }
+
+    public function test_empty_terms_collection_is_falsey()
+    {
+        $terms = new TermCollection();
+        $value = new Value($terms);
+
+        $template = '{{ if topics }}yes{{ else }}no{{ /if }}';
+        $this->assertSame('no', $this->renderString($template, [
+            'topics' => $value
+        ]));
     }
 }

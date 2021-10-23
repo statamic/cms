@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use DateTime;
 use Exception;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Statamic\Contracts\Antlers\ParserContract;
@@ -357,6 +358,8 @@ class Environment
                 $builderResults = $result->count();
 
                 return $builderResults > 0;
+            } elseif ($result instanceof Collection) {
+                return $result->count() > 0;
             }
 
             return true;
