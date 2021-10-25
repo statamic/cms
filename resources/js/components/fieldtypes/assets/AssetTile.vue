@@ -51,14 +51,18 @@
                     <button
                         v-if="asset.url"
                         @click="open"
-                        class="btn btn-icon icon icon-link"
-                        :alt="__('Open in a new window')"></button>
+                        class="btn btn-icon"
+                        :alt="__('Open in a new window')">
+                        <svg-icon name="external-link" class="h-4 my-1"/>
+                    </button>
 
                     <button
                         v-if="asset.allowDownloading"
                         @click="download"
-                        class="btn btn-icon icon icon-download"
-                        :alt="__('Download file')"></button>
+                        class="btn btn-icon"
+                        :alt="__('Download file')">
+                        <svg-icon name="download" class="h-4 my-1"/>
+                    </button>
                 </div>
             </div>
         </div>
