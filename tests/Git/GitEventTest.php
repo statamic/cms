@@ -158,6 +158,26 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
+    public function it_commits_when_tracked_revisions_are_saved_and_deleted()
+    {
+        Config::set('statamic.revisions.path', base_path('content/revisions'));
+
+        Git::shouldReceive('dispatchCommit')->with('Collection saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Revision saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Revision deleted')->once();
+
+        $collection = Facades\Collection::make('pages');
+        $collection->save();
+
+        $entry = Facades\Entry::make()
+            ->collection($collection)
+            ->locale(Facades\Site::default()->handle());
+
+        $entry->createRevision();
+        $entry->latestRevision()->delete();
+    }
+
+    /** @test */
     public function it_commits_when_navigation_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Navigation saved')->once();
