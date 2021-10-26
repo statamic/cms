@@ -1,6 +1,6 @@
 <template>
-    <div class="code-fieldtype-container relative" :class="themeClass">
-        <div v-text="modeLabel" class="code-mode"></div>
+    <div class="code-fieldtype-container" :class="themeClass">
+        <select-input :options="modes" v-model="mode" class="code-mode-picker" />
         <div ref="codemirror"></div>
     </div>
 </template>
@@ -44,7 +44,35 @@ export default {
 
     data() {
         return {
-            codemirror: null
+            codemirror: null,
+            modes: [
+                { value: 'clike', label: 'C-Like' },
+                { value: 'css', label: 'CSS' },
+                { value: 'diff', label: 'Diff' },
+                { value: 'go', label: 'Go' },
+                { value: 'haml', label: 'HAML' },
+                { value: 'handlebars', label: 'Handlebars' },
+                { value: 'htmlmixed', label: 'HTML' },
+                { value: 'less', label: 'LESS' },
+                { value: 'markdown', label: 'Markdown' },
+                { value: 'gfm', label: 'Markdown (GHF)' },
+                { value: 'nginx', label: 'Nginx' },
+                { value: 'text/x-java', label: 'Java' },
+                { value: 'javascript', label: 'JavaScript' },
+                { value: 'jsx', label: 'JSX' },
+                { value: 'text/x-objectivec', label: 'Objective-C' },
+                { value: 'php', label: 'PHP' },
+                { value: 'python', label: 'Python' },
+                { value: 'ruby', label: 'Ruby' },
+                { value: 'scss', label: 'SCSS' },
+                { value: 'shell', label: 'Shell' },
+                { value: 'sql', label: 'SQL' },
+                { value: 'twig', label: 'Twig' },
+                { value: 'vue', label: 'Vue' },
+                { value: 'xml', label: 'XML' },
+                { value: 'yaml-frontmatter', label: 'YAML' },
+            ],
+            mode: this.config.mode
         }
     },
 
@@ -70,7 +98,7 @@ export default {
     mounted() {
         this.codemirror = CodeMirror(this.$refs.codemirror, {
             value: this.value || '',
-            mode: this.config.mode,
+            mode: this.mode || this.config.mode,
             addModeClass: true,
             keyMap: this.config.key_map,
             tabSize: this.config.indent_size,
@@ -105,7 +133,10 @@ export default {
         },
         readOnlyOption(val) {
             this.codemirror.setOption('readOnly', val);
-        }
+        },
+        mode(mode) {
+            this.codemirror.setOption('mode', mode);
+        },
     },
 
     methods: {

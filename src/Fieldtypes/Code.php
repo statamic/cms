@@ -23,7 +23,7 @@ class Code extends Fieldtype
                 'width' => 50,
             ],
             'mode' => [
-                'display' => __('Mode'),
+                'display' => __('Default Mode'),
                 'instructions' => __('statamic::fieldtypes.code.config.mode'),
                 'type' => 'select',
                 'default' => 'htmlmixed',
