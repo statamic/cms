@@ -3,6 +3,7 @@
 namespace Statamic\Data;
 
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Facades\Blink;
 
 trait HasAugmentedInstance
 {
@@ -13,7 +14,13 @@ trait HasAugmentedInstance
 
     public function toAugmentedCollection($keys = null)
     {
+        $id = method_exists($this, 'id') ? $this->id() : $this->handle();
+
+        $id = class_basename($this).' '.$id.serialize($keys);
+
+        // return Blink::once($id, function () use ($keys) {
         return $this->augmented()->select($keys ?? $this->defaultAugmentedArrayKeys());
+        // });
     }
 
     public function toAugmentedArray($keys = null)

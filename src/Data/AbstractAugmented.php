@@ -3,6 +3,7 @@
 namespace Statamic\Data;
 
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Facades\Blink;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -43,17 +44,24 @@ abstract class AbstractAugmented implements Augmented
 
     public function get($handle)
     {
-        $method = Str::camel($handle);
+        $id = method_exists($this->data, 'id') ? $this->data->id() : $this->data->handle();
 
-        if ($this->methodExistsOnThisClass($method)) {
-            return $this->$method();
-        }
+        $key = class_basename($this).' '.$id.$handle;
 
-        if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
-            return $this->wrapValue($this->data->$method(), $handle);
-        }
+        return Blink::once($key, function () use ($handle) {
+            ray()->count($handle);
+            $method = Str::camel($handle);
 
-        return $this->wrapValue($this->getFromData($handle), $handle);
+            if ($this->methodExistsOnThisClass($method)) {
+                return $this->$method();
+            }
+
+            if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
+                return $this->wrapValue($this->data->$method(), $handle);
+            }
+
+            return $this->wrapValue($this->getFromData($handle), $handle);
+        });
     }
 
     private function methodExistsOnThisClass($method)
