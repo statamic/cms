@@ -49,7 +49,6 @@ abstract class AbstractAugmented implements Augmented
         $key = class_basename($this).' '.$id.$handle;
 
         return Blink::once($key, function () use ($handle) {
-            ray()->count($handle);
             $method = Str::camel($handle);
 
             if ($this->methodExistsOnThisClass($method)) {
