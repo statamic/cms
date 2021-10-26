@@ -213,6 +213,10 @@ class Glide extends Tags
      */
     private function normalizeItem($item)
     {
+        if ($item instanceof \Statamic\Contracts\Assets\Asset) {
+            return $item;
+        }
+
         // External URLs are already fine as-is.
         if (Str::startsWith($item, ['http://', 'https://'])) {
             return $item;
