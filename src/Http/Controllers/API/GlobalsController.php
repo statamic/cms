@@ -19,10 +19,10 @@ class GlobalsController extends ApiController
         );
     }
 
-    public function show($globalSet)
+    public function show($global)
     {
         $this->abortIfDisabled();
 
-        return app(GlobalSetResource::class)::make($globalSet);
+        return app(GlobalSetResource::class)::make($global->globalSet()->in($this->queryParam('site')));
     }
 }
