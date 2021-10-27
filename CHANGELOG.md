@@ -1,5 +1,43 @@
 # Release Notes
 
+## 3.2.18 (2020-10-25)
+
+### What's new
+- Add support for `orWhere()`, `orWhereIn()`, and `orWhereNotIn()` in query builders. [#4356](https://github.com/statamic/cms/issues/4356) by @ryanmitchell
+
+### What's improved
+- The `ResponseCreated` event has access to the data. [#4569](https://github.com/statamic/cms/issues/4569) by @jbreuer95
+- Updated French translations. [#4548](https://github.com/statamic/cms/issues/4548) by @ebeauchamps
+
+### What's fixed
+- Fix custom protector class hydration. [#4550](https://github.com/statamic/cms/issues/4550) by @ChristianPavilonis
+- Use configured CP guard for the Eloquent user driver. [#4225](https://github.com/statamic/cms/issues/4225) by @jbreuer95
+- Fix hard session driver requirement. [#4571](https://github.com/statamic/cms/issues/4571) by @jbreuer95
+- Fix SVG compatibility & consistency in Thumbnail.vue. [#4547](https://github.com/statamic/cms/issues/4547) by @caseydwyer
+- Add check for permissions before showing create link. [#4556](https://github.com/statamic/cms/issues/4556) by @jackmcdade
+
+
+
+## 3.2.17 (2020-10-20)
+
+### What's new
+- Ability to add additional toast notifications from PHP. [#4449](https://github.com/statamic/cms/issues/4449) by @fjahn
+- Add ability to assign user groups when registering. [#4529](https://github.com/statamic/cms/issues/4529) by @jacksleight
+- The "remember me" feature is configurable for OAuth. [#4415](https://github.com/statamic/cms/issues/4415) by @samspinoy
+
+### What's improved
+- Update French translations. [#4531](https://github.com/statamic/cms/issues/4531) by @ebeauchamps
+- Improve UI for selecting user groups/roles, and for containers in Markdown and Bard fields. [#4539](https://github.com/statamic/cms/issues/4539) by @jasonvarga
+
+### What's fixed
+- Fix a number of issues with select (and similar) fieldtypes. [#4483](https://github.com/statamic/cms/issues/4483) by @jasonvarga
+- Fix reversing of entries when re-ordering a `desc` ordered collection. [#4532](https://github.com/statamic/cms/issues/4532) by @jesseleite
+- Speed up the recently added fieldtype input debouncing. [#4470](https://github.com/statamic/cms/issues/4470) by @jasonvarga
+- Fix entry taxonomization indexing for existing terms. [#4530](https://github.com/statamic/cms/issues/4530) by @jesseleite
+- Fix a couple of issues regarding the `User::fromUser()` method when using Eloquent. [#4500](https://github.com/statamic/cms/issues/4500) by @jesseleite
+
+
+
 ## 3.2.16 (2020-10-14)
 
 ### What's improved

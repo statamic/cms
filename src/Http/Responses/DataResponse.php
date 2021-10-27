@@ -45,7 +45,7 @@ class DataResponse implements Responsable
             ->make($this->contents())
             ->withHeaders($this->headers);
 
-        ResponseCreated::dispatch($response);
+        ResponseCreated::dispatch($response, $this->data);
 
         return $response;
     }

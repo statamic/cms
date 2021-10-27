@@ -17,10 +17,12 @@ export default {
     data: {
         toast: null,
         flash: null,
+        initialToasts: null,
     },
 
     created() {
         this.flash = Statamic.$config.get('flash');
+        this.initialToasts = Statamic.$config.get('toasts');
 
         this.$events.$on('toast.success', this.setFlashSuccess);
         this.$events.$on('toast.error', this.setFlashError);
@@ -28,22 +30,24 @@ export default {
     },
 
     mounted() {
-        this.flashExistingMessages();
+        this.flashMessages(this.flash);
+        this.flashMessages(this.initialToasts);
     },
 
     methods: {
-        flashExistingMessages() {
-            this.flash.forEach(
-                ({ type, message }) => {
+        flashMessages(messages) {
+            messages.forEach(
+                ({ type, message, duration }) => {
+                    const options = { duration };
                     switch(type) {
                         case 'error':
-                            this.setFlashError(message, { type: type })
+                            this.$toast.error(message, options);
                             break;
                         case 'success':
-                            this.setFlashSuccess(message, { type: type })
+                            this.$toast.success(message, options);
                             break;
                         default:
-                            this.setFlashInfo(message, { type: 'default' })
+                            this.$toast.info(message, options);
                     }
                 }
             );
@@ -57,7 +61,7 @@ export default {
                     return el;
                 },
             ...opts};
-            this.$toasted.show(message, opts)
+            this.$toasted.show(message, this.normalizeToastOptions(opts))
         },
 
         setFlashSuccess(message, opts) {
@@ -68,7 +72,7 @@ export default {
                     return el;
                 },
             ...opts};
-            this.$toasted.success(message, opts)
+            this.$toasted.success(message, this.normalizeToastOptions(opts))
         },
 
         setFlashError(message, opts) {
@@ -80,7 +84,13 @@ export default {
                 },
                 ...opts
             };
-            this.$toasted.error(message, opts)
+            this.$toasted.error(message, this.normalizeToastOptions(opts))
+        },
+
+        normalizeToastOptions(opts) {
+            if (! opts.duration) delete opts.duration;
+
+            return opts;
         }
     }
 }
