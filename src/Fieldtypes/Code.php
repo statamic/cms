@@ -120,7 +120,7 @@ class Code extends Fieldtype
 
         return new ArrayableString($code = $value['code'], [
             'code' => $code,
-            'mode' => $value['mode']
+            'mode' => $value['mode'],
         ]);
     }
 
