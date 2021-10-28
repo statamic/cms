@@ -4,12 +4,13 @@ namespace Statamic\Auth;
 
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Events\UserGroupDeleted;
 use Statamic\Events\UserGroupSaved;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Data\HasAugmentedData;
+
 abstract class UserGroup implements UserGroupContract, Augmentable
 {
     protected $title;
