@@ -3,9 +3,10 @@
 namespace Statamic\Auth;
 
 use Statamic\Contracts\Auth\Role as RoleContract;
-use Statamic\Facades;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Facades;
+
 abstract class Role implements RoleContract, Augmentable
 {
     use HasAugmentedData;
