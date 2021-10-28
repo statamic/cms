@@ -35,6 +35,7 @@ return [
     'checkboxes.config.inline' => 'Show the checkboxes in a row.',
     'checkboxes.config.options' => 'Set the array keys and their optional labels.',
     'checkboxes.title' => 'Checkboxes',
+    'code.config.mode_selectable' => 'Whether the mode can be changed by the user.',
     'code.config.indent_size' => 'Set your preferred indentation size (in spaces).',
     'code.config.indent_type' => 'Set your preferred type of indentation.',
     'code.config.key_map' => 'Choose preferred set of keyboard shortcuts.',
