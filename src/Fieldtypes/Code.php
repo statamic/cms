@@ -116,7 +116,9 @@ class Code extends Fieldtype
             $value = ['code' => $value, 'mode' => $this->mode()];
         }
 
-        $value['code'] = str_replace('<?php', '&lt;?php', $value['code']);
+        if ($value['code']) {
+            $value['code'] = str_replace('<?php', '&lt;?php', $value['code']);
+        }
 
         return new ArrayableString($code = $value['code'], [
             'code' => $code,
