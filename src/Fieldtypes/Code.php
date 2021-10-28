@@ -103,11 +103,13 @@ class Code extends Fieldtype
 
     public function augment($value)
     {
-        if ($value) {
-            $value = str_replace('<?php', '&lt;?php', $value);
+        if (! is_array($value)) {
+            $value = ['code' => $value, 'mode' => $this->config('mode', 'htmlmixed')];
         }
 
-        return new ArrayableString($value, ['mode' => $this->config('mode', 'htmlmixed')]);
+        $value['code'] = str_replace('<?php', '&lt;?php', $value['code']);
+
+        return new ArrayableString($value['code'], ['mode' => $this->config('mode', 'htmlmixed')]);
     }
 
     public function toGqlType()

@@ -72,7 +72,7 @@ export default {
                 { value: 'xml', label: 'XML' },
                 { value: 'yaml-frontmatter', label: 'YAML' },
             ],
-            mode: this.config.mode
+            mode: this.value.mode || this.config.mode
         }
     },
 
@@ -97,8 +97,8 @@ export default {
 
     mounted() {
         this.codemirror = CodeMirror(this.$refs.codemirror, {
-            value: this.value || '',
-            mode: this.mode || this.config.mode,
+            value: this.value.code || '',
+            mode: this.mode,
             addModeClass: true,
             keyMap: this.config.key_map,
             tabSize: this.config.indent_size,
@@ -111,7 +111,7 @@ export default {
         });
 
         this.codemirror.on('change', (cm) => {
-            this.updateDebounced(cm.doc.getValue());
+            this.updateDebounced({code: cm.doc.getValue(), mode: this.mode});
         });
 
         this.codemirror.on('focus', () => this.$emit('focus'));
@@ -128,14 +128,15 @@ export default {
 
     watch: {
         value(value, oldValue) {
-            if (value == this.codemirror.doc.getValue()) return;
-            this.codemirror.doc.setValue(value);
+            if (value.code == this.codemirror.doc.getValue()) return;
+            this.codemirror.doc.setValue(value.code);
         },
         readOnlyOption(val) {
             this.codemirror.setOption('readOnly', val);
         },
         mode(mode) {
             this.codemirror.setOption('mode', mode);
+            this.updateDebounced({code: this.value.code, mode: this.mode});
         },
     },
 
