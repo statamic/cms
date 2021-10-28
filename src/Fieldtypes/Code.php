@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
+use Statamic\GraphQL\Types\CodeType;
 
 class Code extends Fieldtype
 {
@@ -20,13 +21,13 @@ class Code extends Fieldtype
                     'material' => __('Dark'),
                     'light' => __('Light'),
                 ],
-                'width' => 50,
             ],
             'mode' => [
                 'display' => __('Default Mode'),
                 'instructions' => __('statamic::fieldtypes.code.config.mode'),
                 'type' => 'select',
                 'default' => 'htmlmixed',
+                'width' => 50,
                 'options' => [
                     'clike' => 'C-Like',
                     'css' => 'CSS',
@@ -54,6 +55,12 @@ class Code extends Fieldtype
                     'xml' => 'XML',
                     'yaml-frontmatter' => 'YAML',
                 ],
+                'width' => 50,
+            ],
+            'mode_selectable' => [
+                'display' => __('Selectable Mode'),
+                'instructions' => __('statamic::fieldtypes.code.config.mode_selectable'),
+                'type' => 'toggle',
                 'width' => 50,
             ],
             'indent_type' => [
@@ -110,6 +117,15 @@ class Code extends Fieldtype
         return $value;
     }
 
+    public function process($value)
+    {
+        if ($this->isModeSelectable()) {
+            return $value['code'];
+        }
+
+        return $value;
+    }
+
     public function augment($value)
     {
         if (! is_array($value)) {
@@ -129,9 +145,13 @@ class Code extends Fieldtype
     public function toGqlType()
     {
         return [
-            'type' => GraphQL::string(),
+            'type' => $this->isModeSelectable() ? GraphQL::type(CodeType::NAME) : GraphQL::string(),
             'resolve' => function ($item, $args, $context, $info) {
-                return $item->resolveGqlValue($info->fieldName)->value();
+                $field = $item->resolveGqlValue($info->fieldName);
+
+                return $this->isModeSelectable() && $field->value() !== null
+                    ? $field->extra()
+                    : $field->value();
             },
         ];
     }
@@ -139,5 +159,10 @@ class Code extends Fieldtype
     private function mode()
     {
         return $this->config('mode', 'htmlmixed');
+    }
+
+    private function isModeSelectable()
+    {
+        return $this->config('mode_selectable', false);
     }
 }

@@ -1,6 +1,7 @@
 <template>
     <div class="code-fieldtype-container" :class="themeClass">
-        <select-input :options="modes" v-model="mode" class="code-mode-picker" />
+        <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" class="code-mode-picker" />
+        <div v-else v-text="modeLabel" class="code-mode"></div>
         <div ref="codemirror"></div>
     </div>
 </template>
