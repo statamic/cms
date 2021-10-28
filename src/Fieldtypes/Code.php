@@ -101,10 +101,19 @@ class Code extends Fieldtype
         ];
     }
 
+    public function preProcess($value)
+    {
+        if (! is_array($value)) {
+            $value = ['code' => $value, 'mode' => $this->mode()];
+        }
+
+        return $value;
+    }
+
     public function augment($value)
     {
         if (! is_array($value)) {
-            $value = ['code' => $value, 'mode' => $this->config('mode', 'htmlmixed')];
+            $value = ['code' => $value, 'mode' => $this->mode()];
         }
 
         $value['code'] = str_replace('<?php', '&lt;?php', $value['code']);
@@ -123,5 +132,10 @@ class Code extends Fieldtype
                 return $item->resolveGqlValue($info->fieldName)->value();
             },
         ];
+    }
+
+    private function mode()
+    {
+        return $this->config('mode', 'htmlmixed');
     }
 }
