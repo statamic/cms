@@ -88,7 +88,7 @@ export default {
             return 'theme-' + this.config.theme;
         },
         replicatorPreview() {
-            return this.value ? this.value.replace('<', '&lt;') : '';
+            return this.value.code ? this.value.code.replace('<', '&lt;') : '';
         },
         readOnlyOption() {
             return this.isReadOnly ? 'nocursor' : false;
