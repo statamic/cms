@@ -109,7 +109,10 @@ class Code extends Fieldtype
 
         $value['code'] = str_replace('<?php', '&lt;?php', $value['code']);
 
-        return new ArrayableString($value['code'], ['mode' => $value['mode']]);
+        return new ArrayableString($code = $value['code'], [
+            'code' => $code,
+            'mode' => $value['mode']
+        ]);
     }
 
     public function toGqlType()
