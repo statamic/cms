@@ -109,7 +109,7 @@ class Code extends Fieldtype
 
         $value['code'] = str_replace('<?php', '&lt;?php', $value['code']);
 
-        return new ArrayableString($value['code'], ['mode' => $this->config('mode', 'htmlmixed')]);
+        return new ArrayableString($value['code'], ['mode' => $value['mode']]);
     }
 
     public function toGqlType()
