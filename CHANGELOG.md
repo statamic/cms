@@ -4,7 +4,7 @@
 
 ### What's new
 - Added `lang` to sites to explicitly define the language for translations. [#4612](https://github.com/statamic/cms/issues/4612) by @jelleroorda
-- The mode in the `code` fieldtype may optionally be selectable by the user. [#4586](https://github.com/statamic/cms/issues/4586) by @jackmdade
+- The mode in the `code` fieldtype may optionally be selectable by the user. [#4586](https://github.com/statamic/cms/issues/4586) by @jackmcdade
 - Added `RevisionSaved` and `RevisionDeleted` events [#4587](https://github.com/statamic/cms/issues/4587) by @jesseleite
 - Added `latest_date` to the `date` fieldtype (and fixed `earliest_date`). [#4623](https://github.com/statamic/cms/issues/4623) by @jackmcdade
 
