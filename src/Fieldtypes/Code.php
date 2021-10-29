@@ -61,7 +61,6 @@ class Code extends Fieldtype
                 'display' => __('Selectable Mode'),
                 'instructions' => __('statamic::fieldtypes.code.config.mode_selectable'),
                 'type' => 'toggle',
-                'default' => true,
                 'width' => 50,
             ],
             'indent_type' => [
