@@ -44,7 +44,7 @@ class FormController extends Controller
         $submission = $form->makeSubmission()->data($values);
 
         try {
-            $this->withLocale($site->shortLocale(), function () use ($fields) {
+            $this->withLocale($site->lang(), function () use ($fields) {
                 $fields->validate($this->extraRules($fields));
             });
 
