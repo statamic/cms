@@ -261,7 +261,7 @@ class UserTags extends Tags
 
         $data['url_invalid'] = request()->isNotFilled('token');
 
-        if (!$this->params->has('redirect')) {
+        if (! $this->params->has('redirect')) {
             $this->params->put('redirect', request()->getPathInfo());
         }
 
