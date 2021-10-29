@@ -3,8 +3,8 @@
 namespace Statamic\Structures;
 
 use Illuminate\Support\Traits\Tappable;
-use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 use Statamic\Support\Str;
@@ -124,7 +124,7 @@ abstract class Structure implements StructureContract, Augmentable
     {
         return [
             'title' => $this->title(),
-            'handle' => $this->handle()
+            'handle' => $this->handle(),
         ];
     }
 }
