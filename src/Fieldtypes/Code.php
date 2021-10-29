@@ -125,7 +125,7 @@ class Code extends Fieldtype
 
     public function process($value)
     {
-        if ($this->isModeSelectable()) {
+        if (! $this->isModeSelectable()) {
             return $value['code'];
         }
 
