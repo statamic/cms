@@ -4,9 +4,7 @@ namespace Tests\Search;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Mockery;
-use Statamic\Auth\UserCollection;
 use Statamic\Facades\Search;
-use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Search\Comb\Index;
 use Tests\TestCase;
@@ -52,7 +50,7 @@ class CombIndexTest extends TestCase
                 'driver' => 'local',
                 'searchables' => 'users',
                 'fields' => ['name', 'email'],
-            ]
+            ],
         ]);
 
         $john = User::make()
