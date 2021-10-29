@@ -39,6 +39,7 @@ return [
     'collection_next_steps_configure_description' => 'Configure URLs and routes, define blueprints, date behaviors, ordering and other options.',
     'collection_next_steps_create_entry_description' => 'Create the first entry or stub out a handful of placeholder entries, it\'s up to you.',
     'collection_next_steps_documentation_description' => 'Learn more about collections, how they work, and how to configure them.',
+    'collection_next_steps_blueprints_description' => 'Manage the blueprints and fields available for this collection.',
     'collection_next_steps_scaffold_description' => 'Quickly generate index and detail views from the name of the collection.',
     'collection_scaffold_instructions' => 'Choose which empty views to generate. Existing files will not be overwritten.',
     'collections_amp_instructions' => 'Enable Accelerated Mobile Pages (AMP). Automatically adds routes and URL for entries in this collection. Learn more in the [documentation](https://statamic.dev/amp)',
