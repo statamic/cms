@@ -7,11 +7,12 @@ use Mockery;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\Search\Comb\Index;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CombIndexTest extends TestCase
 {
-    use IndexTests;
+    use IndexTests, PreventSavingStacheItemsToDisk;
 
     private $fs;
 
@@ -72,11 +73,5 @@ class CombIndexTest extends TestCase
         $this->assertCount(1, $users, 'User could not be found by his email address');
         $this->assertEquals($john->id(), $users->first()->id());
         $this->assertNotEquals($jane->id(), $users->first()->id());
-
-        // Clean up the created users
-        $path = __DIR__.'/../__fixtures__/users';
-        $this->files = app(\Illuminate\Filesystem\Filesystem::class);
-        $this->files->cleanDirectory($path);
-        $this->files->put($path.'/.gitkeep', null);
     }
 }
