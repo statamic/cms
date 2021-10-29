@@ -2,6 +2,8 @@
 
 namespace Statamic\Auth;
 
+use Illuminate\Support\Facades\Password;
+use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
@@ -258,6 +260,8 @@ class UserTags extends Tags
         if (session('errors')) {
             $data['errors'] = session('errors')->all();
         }
+
+        $data['url_invalid'] = request()->isNotFilled('token');
 
         $knownParams = ['redirect'];
 
