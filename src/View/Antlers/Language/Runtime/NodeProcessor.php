@@ -1226,6 +1226,10 @@ class NodeProcessor
                         $this->data = $lockData;
 
                         if (is_object($output)) {
+                            if ($output instanceof Collection) {
+                                $output = $output->toArray();
+                            }
+
                             $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
                         }
 
