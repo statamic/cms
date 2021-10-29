@@ -63,8 +63,13 @@ class CollectionsController extends CpController
 
         $site = $request->site ? Site::get($request->site) : Site::selected();
 
-        $columns = $collection
-            ->entryBlueprint()
+        $blueprint = $collection->entryBlueprint();
+
+        if (!$blueprint) {
+            throw new \LogicException("Collection [{$collection->handle()}] does not have any visible blueprints! Check whether you've hidden all blueprints for this collection.");
+        }
+
+        $columns = $blueprint
             ->columns()
             ->setPreferred("collections.{$collection->handle()}.columns")
             ->rejectUnlisted()
