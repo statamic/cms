@@ -1,5 +1,36 @@
 # Release Notes
 
+## 3.2.19 (2020-10-29)
+
+### What's new
+- Added `lang` to sites to explicitly define the language for translations. [#4612](https://github.com/statamic/cms/issues/4612) by @jelleroorda
+- The mode in the `code` fieldtype may optionally be selectable by the user. [#4586](https://github.com/statamic/cms/issues/4586) by @jackmdade
+- Added `RevisionSaved` and `RevisionDeleted` events [#4587](https://github.com/statamic/cms/issues/4587) by @jesseleite
+- Added `latest_date` to the `date` fieldtype (and fixed `earliest_date`). [#4623](https://github.com/statamic/cms/issues/4623) by @jackmcdade
+
+### What's improved
+- Passing asset instances to the `glide` tag results in a little performance boost. [#4585](https://github.com/statamic/cms/issues/4585) by @jasonvarga
+- Make textareas more visually in sync with text inputs. [#4622](https://github.com/statamic/cms/issues/4622) by @jackmcdade
+- Improved the collection listing's empty state. [#4616](https://github.com/statamic/cms/issues/4616) by @jackmcdade
+- Hide the twirldown from the collection view page when it's empty. [#4613](https://github.com/statamic/cms/issues/4613) by @jelleroorda
+- Update Dutch translations. [#4580](https://github.com/statamic/cms/issues/4580) by @robdekort
+
+### What's fixed
+- Fix multisite support on the individual Global API endpoint. [#4594](https://github.com/statamic/cms/issues/4594) by @notnek
+- Fix missing variables and redirect on the `user:reset_password_form` tag. [#4618](https://github.com/statamic/cms/issues/4618) by @jelleroorda
+- Fix the `table` fieldtype's dirty state. [#4620](https://github.com/statamic/cms/issues/4620) by @jackmcdade
+- Fix the `color` fieldtype's dirty state. [#4621](https://github.com/statamic/cms/issues/4621) by @jackmcdade
+- Fix how the `structures` fieldtype saves collections. [#4615](https://github.com/statamic/cms/issues/4615) by @jasonvarga
+- Fix front-end form submissions not showing validation messages in the right language in some cases. [#4612](https://github.com/statamic/cms/issues/4612) by @jelleroorda
+- Prevent filtering out `@` from search queries using the local Comb driver. [#4602](https://github.com/statamic/cms/issues/4602) by @jelleroorda
+- Hide `form` widgets when a user is not allowed to view it. [#4608](https://github.com/statamic/cms/issues/4608) by @jelleroorda
+- Don't show "View" link in entry actions if the entry doesn't have a dedicated URL. [#4606](https://github.com/statamic/cms/issues/4606) by @jelleroorda
+- Support floating point numbers in the `sum` modifier. [#4611](https://github.com/statamic/cms/issues/4611) by @jelleroorda
+- Add augmentation to the `Structure` class. [a950ef47d](https://github.com/statamic/cms/commit/a950ef47d) by @jackmcdade
+- Add augmentation to the `UserGroup` and `Role` classes. [b9f5c4fc8](https://github.com/statamic/cms/commit/b9f5c4fc8) by @jackmcdade
+
+
+
 ## 3.2.18 (2020-10-25)
 
 ### What's new
