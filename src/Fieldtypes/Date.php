@@ -53,7 +53,7 @@ class Date extends Fieldtype
                 'width' => 50,
             ],
             'earliest_date' => [
-                'display' => __('Minimum Date'),
+                'display' => __('Earliest Date'),
                 'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
                 'type' => 'date',
                 'width' => 50,
