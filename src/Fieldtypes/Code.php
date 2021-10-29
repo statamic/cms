@@ -118,6 +118,11 @@ class Code extends Fieldtype
         return $value;
     }
 
+    public function preProcessConfig($value)
+    {
+        return $value;
+    }
+
     public function process($value)
     {
         if ($this->isModeSelectable()) {
