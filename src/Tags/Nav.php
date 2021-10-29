@@ -2,7 +2,9 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Exceptions\NavigationNotFoundException;
 use Statamic\Facades\Data;
+use Statamic\Facades\Nav as NavFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
@@ -11,7 +13,20 @@ class Nav extends Structure
 {
     public function index()
     {
-        return $this->structure($this->params->get('handle', 'collection::pages'));
+        $handle = $this->params->get('handle', 'collection::pages');
+
+        if ($handle !== 'collection::pages' && ! NavFacade::findByHandle($handle)) {
+            throw new NavigationNotFoundException($handle);
+        }
+
+        return $this->structure($handle);
+    }
+
+    public function wildcard($handle)
+    {
+        $this->params->put('handle', $handle);
+
+        return $this->index();
     }
 
     public function breadcrumbs()
