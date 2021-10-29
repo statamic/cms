@@ -49,6 +49,16 @@ class SiteTest extends TestCase
     }
 
     /** @test */
+    public function gets_lang()
+    {
+        $this->assertEquals('en', (new Site('en', ['locale' => 'en_US']))->lang());
+        $this->assertEquals('en_US', (new Site('en', ['locale' => 'en_US', 'lang' => 'en_US']))->lang());
+
+        $this->assertEquals('en', (new Site('en', ['locale' => 'en-US']))->lang());
+        $this->assertEquals('en-US', (new Site('en', ['locale' => 'en-US', 'lang' => 'en-US']))->lang());
+    }
+
+    /** @test */
     public function gets_url_when_given_a_trailing_slash()
     {
         $site = new Site('en', ['url' => 'http://test.com/']);
@@ -233,6 +243,7 @@ class SiteTest extends TestCase
         $this->assertEquals([
             'handle' => 'test',
             'name' => 'Test',
+            'lang' => 'en',
             'locale' => 'en_US',
             'short_locale' => 'en',
             'url' => 'http://test.com',
