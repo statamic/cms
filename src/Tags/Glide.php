@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use League\Glide\Server;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
@@ -213,6 +214,10 @@ class Glide extends Tags
      */
     private function normalizeItem($item)
     {
+        if ($item instanceof AssetContract) {
+            return $item;
+        }
+
         // External URLs are already fine as-is.
         if (Str::startsWith($item, ['http://', 'https://'])) {
             return $item;

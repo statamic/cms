@@ -2,7 +2,7 @@
 
 namespace Statamic\CP\Toasts;
 
-use Illuminate\Session\Store;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Collection;
 
 /**
@@ -17,11 +17,11 @@ class Manager
     private const SESSION_KEY = '_toasts';
 
     /**
-     * @var Store
+     * @var Session
      */
     private $session;
 
-    public function __construct(Store $session)
+    public function __construct(Session $session)
     {
         $this->session = $session;
     }

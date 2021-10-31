@@ -2220,15 +2220,22 @@ class CoreModifiers extends Modifier
     {
         $key = Arr::get($params, 0, null);
 
-        return collect($value)->reduce(function ($carry, $value) use ($key) {
+        $sum = collect($value)->reduce(function ($carry, $value) use ($key) {
             if ($key) {
                 $value = data_get($value, $key);
             }
 
             $value = $value instanceof Value ? $value->value() : $value;
 
-            return $carry + (int) $value;
+            return $carry + (float) $value;
         }, 0);
+
+        // For backwards compatibility integers get cast to integers.
+        if ($sum === round($sum)) {
+            return (int) $sum;
+        }
+
+        return $sum;
     }
 
     /**
