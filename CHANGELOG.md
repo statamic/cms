@@ -1,5 +1,17 @@
 # Release Notes
 
+## 3.2.20 (2020-11-01)
+
+### What's improved
+- Update Dutch translations [#4635](https://github.com/statamic/cms/issues/4635) by @robdekort
+
+### What's fixed
+- Fix nested field validation inside Grids. [#4639](https://github.com/statamic/cms/issues/4639) by @jesseleite
+- Fix nested field validation inside Replicators (specifically Bards). [#4633](https://github.com/statamic/cms/issues/4633) by @jesseleite
+- Fix password reset notification translation. [#4630](https://github.com/statamic/cms/issues/4630) by @rrelmy
+
+
+
 ## 3.2.19 (2020-10-29)
 
 ### What's new
