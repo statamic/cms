@@ -77,7 +77,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'link'
-                    && $this->getConfiguredLinkFieldContainer($field) === $this->container;
+                    && $field->get('container') === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $this->updateStatamicUrlsInLinkValue($field, $dottedPrefix);
@@ -137,25 +137,6 @@ class AssetReferenceUpdater extends DataReferenceUpdater
      * @return string
      */
     protected function getConfiguredAssetsFieldContainer($field)
-    {
-        if ($container = $field->get('container')) {
-            return $container;
-        }
-
-        $containers = AssetContainer::all();
-
-        return $containers->count() === 1
-            ? $containers->first()->handle()
-            : null;
-    }
-
-    /**
-     * Get configured link field container, or implied asset container if only one exists.
-     *
-     * @param  \Statamic\Fields\Field  $field
-     * @return string
-     */
-    protected function getConfiguredLinkFieldContainer($field)
     {
         if ($container = $field->get('container')) {
             return $container;
