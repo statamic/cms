@@ -36,6 +36,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     {
         $this
             ->updateAssetsFieldValues($fields, $dottedPrefix)
+            ->updateLinkFieldValues($fields, $dottedPrefix)
             ->updateBardFieldValues($fields, $dottedPrefix)
             ->updateMarkdownFieldValues($fields, $dottedPrefix)
             ->updateNestedFieldValues($fields, $dottedPrefix);
@@ -59,6 +60,27 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 $field->get('max_files') === 1
                     ? $this->updateStringValue($field, $dottedPrefix)
                     : $this->updateArrayValue($field, $dottedPrefix);
+            });
+
+        return $this;
+    }
+
+    /**
+     * Update link field values.
+     *
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
+     * @return $this
+     */
+    protected function updateLinkFieldValues($fields, $dottedPrefix)
+    {
+        $fields
+            ->filter(function ($field) {
+                return $field->type() === 'link'
+                    && $this->getConfiguredLinkFieldContainer($field) === $this->container;
+            })
+            ->each(function ($field) use ($dottedPrefix) {
+                $this->updateStatamicUrlsInLinkValue($field, $dottedPrefix);
             });
 
         return $this;
@@ -128,6 +150,25 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     }
 
     /**
+     * Get configured link field container, or implied asset container if only one exists.
+     *
+     * @param  \Statamic\Fields\Field  $field
+     * @return string
+     */
+    protected function getConfiguredLinkFieldContainer($field)
+    {
+        if ($container = $field->get('container')) {
+            return $container;
+        }
+
+        $containers = AssetContainer::all();
+
+        return $containers->count() === 1
+            ? $containers->first()->handle()
+            : null;
+    }
+
+    /**
      * Update `statamic://` urls in string value on item.
      *
      * @param  \Statamic\Fields\Field  $field
@@ -150,6 +191,41 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 ? $matches[1].$this->newValue.$matches[3]
                 : $matches[0];
         }, $value);
+
+        if ($originalValue === $value) {
+            return;
+        }
+
+        Arr::set($data, $dottedKey, $value);
+
+        $this->item->data($data);
+
+        $this->updated = true;
+    }
+
+    /**
+     * Update asset references in link values.
+     *
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
+     */
+    private function updateStatamicUrlsInLinkValue($field, $dottedPrefix)
+    {
+        $data = $this->item->data()->all();
+
+        $dottedKey = $dottedPrefix.$field->handle();
+
+        $originalValue = $value = Arr::get($data, $dottedKey);
+
+        if (! $originalValue) {
+            return;
+        }
+
+        if ($value !== "asset::{$this->container}::{$this->originalValue}") {
+            return;
+        }
+
+        $value = "asset::{$this->container}::{$this->newValue}";
 
         if ($originalValue === $value) {
             return;

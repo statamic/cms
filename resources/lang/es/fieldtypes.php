@@ -70,6 +70,7 @@ return [
     'hidden.title' => 'Hidden',
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
+    'link.config.container' => 'Elige qué contenedor de activos usar para este campo.',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Permite saltos de línea automáticos.',

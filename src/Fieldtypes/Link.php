@@ -5,7 +5,9 @@ namespace Statamic\Fieldtypes;
 use Facades\Statamic\Routing\ResolveRedirect;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
@@ -23,6 +25,14 @@ class Link extends Fieldtype
                 'type' => 'collections',
                 'mode' => 'select',
             ],
+            'container' => [
+                'display' => __('Container'),
+                'instructions' => __('statamic::fieldtypes.link.config.container'),
+                'type' => 'asset_container',
+                'mode' => 'select',
+                'max_items' => 1,
+                'width' => 50,
+            ],
         ];
     }
 
@@ -37,25 +47,37 @@ class Link extends Fieldtype
     {
         $value = $this->field->value();
 
+        $showAssetOption = $this->showAssetOption();
+
         $selectedEntry = Str::startsWith($value, 'entry::') ? Str::after($value, 'entry::') : null;
 
-        $url = ($value !== '@child' && ! $selectedEntry) ? $value : null;
+        $selectedAsset = Str::startsWith($value, 'asset::') ? Str::after($value, 'asset::') : null;
+
+        $url = ($value !== '@child' && ! $selectedEntry && ! $selectedAsset) ? $value : null;
 
         $entryFieldtype = $this->nestedEntriesFieldtype($selectedEntry);
+
+        $assetFieldtype = $showAssetOption ? $this->nestedAssetsFieldtype($selectedAsset) : null;
 
         return [
             'initialUrl' => $url,
             'initialSelectedEntries' => $selectedEntry ? [$selectedEntry] : [],
-            'initialOption' => $this->initialOption($value, $selectedEntry),
+            'initialSelectedAssets' => $selectedAsset ? [$selectedAsset] : [],
+            'initialOption' => $this->initialOption($value, $selectedEntry, $selectedAsset),
             'showFirstChildOption' => $this->showFirstChildOption(),
+            'showAssetOption' => $showAssetOption,
             'entry' => [
                 'config' => $entryFieldtype->config(),
                 'meta' => $entryFieldtype->preload(),
             ],
+            'asset' => $showAssetOption ? [
+                'config' => $assetFieldtype->config(),
+                'meta' => $assetFieldtype->preload(),
+            ] : null,
         ];
     }
 
-    private function initialOption($value, $entry)
+    private function initialOption($value, $entry, $asset)
     {
         if (! $value) {
             return $this->field->isRequired() ? 'url' : null;
@@ -65,6 +87,8 @@ class Link extends Fieldtype
             return 'first-child';
         } elseif ($entry) {
             return 'entry';
+        } elseif ($asset) {
+            return 'asset';
         }
 
         return 'url';
@@ -86,6 +110,24 @@ class Link extends Fieldtype
         ));
 
         return $entryField->fieldtype();
+    }
+
+    private function nestedAssetsFieldtype($value): Fieldtype
+    {
+        $assetField = (new Field('entry', [
+            'type' => 'assets',
+            'max_files' => 1,
+            'mode' => 'list',
+        ]));
+
+        $assetField->setValue($value);
+
+        $assetField->setConfig(array_merge(
+            $assetField->config(),
+            ['container' => $this->config('container')]
+        ));
+
+        return $assetField->fieldtype();
     }
 
     private function collections()
@@ -118,5 +160,10 @@ class Link extends Fieldtype
         }
 
         return $collection->hasStructure() && $collection->structure()->maxDepth() !== 1;
+    }
+
+    private function showAssetOption()
+    {
+        return $this->config('container') !== null;
     }
 }

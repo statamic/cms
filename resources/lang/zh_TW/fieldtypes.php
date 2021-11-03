@@ -68,6 +68,7 @@ return [
     'hidden.title' => 'Hidden',
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
+    'link.config.container' => '選擇用於此欄位的素材容器。',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => '啟用自動斷行。',
