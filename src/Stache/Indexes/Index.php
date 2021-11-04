@@ -10,15 +10,13 @@ abstract class Index
 {
     protected $store;
     protected $name;
-    protected $dates;
     protected $items = [];
     protected $loaded = false;
 
-    public function __construct($store, $name, $dates = null)
+    public function __construct($store, $name)
     {
         $this->store = $store;
         $this->name = $name;
-        $this->dates = $dates;
     }
 
     public function name()
@@ -74,17 +72,13 @@ abstract class Index
         $this->items = Cache::get($this->cacheKey());
 
         if ($this->name === 'status') {
-            $scheduledItems = collect($this->items)->filter(function ($value) {
+            collect($this->items)->filter(function ($value) {
                 return $value === 'scheduled';
+            })->each(function ($value, $id) {
+                if ($this->getItemTimestamp($id)->isPast()) {
+                    $this->updateItem(Entry::find($id));
+                }
             });
-
-            $this->dates
-                ->intersectByKeys($scheduledItems)
-                ->each(function ($date, $id) {
-                    if ($date->isPast()) {
-                        $this->updateItem(Entry::find($id));
-                    }
-                });
         }
 
         if ($this->items === null) {

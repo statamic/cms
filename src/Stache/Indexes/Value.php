@@ -3,12 +3,15 @@
 namespace Statamic\Stache\Indexes;
 
 use Statamic\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class Value extends Index
 {
     public function getItems()
     {
         return $this->store->getItemsFromFiles()->map(function ($item) {
+            $this->cacheItemTimestamp($item);
+
             return $this->getItemValue($item);
         })->all();
     }
@@ -39,5 +42,23 @@ class Value extends Index
         }
 
         return $item->get($this->name);
+    }
+
+    public function cacheItemTimestamp($item)
+    {
+        $scheduledItems = Cache::get($this->timestampCacheKey()) ?? collect();
+        $scheduledItems->put($item->id(), $item->date());
+
+        Cache::forever($this->timestampCacheKey(), collect($scheduledItems));
+    }
+
+    public function getItemTimestamp($id)
+    {
+        return Cache::get($this->timestampCacheKey())->get($id);
+    }
+
+    protected function timestampCacheKey()
+    {
+        return "stache::timestamps::{$this->store->key()}";
     }
 }

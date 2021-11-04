@@ -56,11 +56,7 @@ abstract class Store
 
         $class = $this->indexes()->get($name, $this->valueIndex);
 
-        if ($name === 'status') {
-            $dates = (new Value($this, 'date'))->load()->items();
-        }
-
-        $index = new $class($this, $name, $dates ?? null);
+        $index = new $class($this, $name);
 
         $cached->put($key, $index);
 
