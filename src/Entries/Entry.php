@@ -171,6 +171,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                         $parent = null;
                     }
                     $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                        // Prevent children of this entry from being moved to the root of the tree;
+                        // But only if this entry doesn't have a parent, and the tree has a root.
+                        // Instead, we'll just move the child entries to the end of the tree.
+                        if ($parent === null && $tree->structure()->expectsRoot()) {
+                            $tree->remove($child);
+                            $tree->append($child);
+
+                            return;
+                        }
+
                         $tree->move($child->id(), optional($parent)->id());
                     });
                     $tree->remove($this);
