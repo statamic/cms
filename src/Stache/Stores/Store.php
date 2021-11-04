@@ -10,6 +10,7 @@ use Statamic\Facades\Stache;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
+use Statamic\Stache\Indexes\Value;
 use Statamic\Support\Arr;
 
 abstract class Store
@@ -55,7 +56,11 @@ abstract class Store
 
         $class = $this->indexes()->get($name, $this->valueIndex);
 
-        $index = new $class($this, $name);
+        if ($name === 'status') {
+            $dates = (new Value($this, 'date'))->load()->items();
+        }
+
+        $index = new $class($this, $name, $dates ?? null);
 
         $cached->put($key, $index);
 

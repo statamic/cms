@@ -2,20 +2,23 @@
 
 namespace Statamic\Stache\Indexes;
 
-use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
+use Illuminate\Support\Facades\Cache;
 
 abstract class Index
 {
     protected $store;
     protected $name;
+    protected $dates;
     protected $items = [];
     protected $loaded = false;
 
-    public function __construct($store, $name)
+    public function __construct($store, $name, $dates = null)
     {
         $this->store = $store;
         $this->name = $name;
+        $this->dates = $dates;
     }
 
     public function name()
@@ -69,6 +72,20 @@ abstract class Index
         debugbar()->addMessage("Loading index: {$this->store->key()}/{$this->name}", 'stache');
 
         $this->items = Cache::get($this->cacheKey());
+
+        if ($this->name === 'status') {
+            $scheduledItems = collect($this->items)->filter(function ($value) {
+                return $value === 'scheduled';
+            });
+
+            $this->dates
+                ->intersectByKeys($scheduledItems)
+                ->each(function ($date, $id) {
+                    if ($date->isPast()) {
+                        $this->updateItem(Entry::find($id));
+                    }
+                });
+        }
 
         if ($this->items === null) {
             $this->update();
