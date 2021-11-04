@@ -130,5 +130,4 @@ class CacheController extends CpController
 
         return back()->withSuccess(__('Stache warmed.'));
     }
-
 }
