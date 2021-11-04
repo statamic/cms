@@ -130,6 +130,10 @@ export default {
             return this.state.blueprint.sections;
         },
 
+        inStack() {
+            return this.actionsPortal !== 'publish-actions-base';
+        },
+
         mainSections() {
             if (! this.shouldShowSidebar) return this.sections;
 
@@ -183,10 +187,17 @@ export default {
     },
 
     mounted() {
+        if (this.inStack) return;
+
         // Deep linking/refreshing to a specific #section
         if (window.location.hash.length > 0) {
-            console.log(window.location.hash)
-            this.setActive(window.location.hash.substr(1));
+            let hash = window.location.hash.substr(1);
+            // if hash is in this.visibleTabs, make it active.
+            if (this.visibleTabs.indexOf(hash) > -1) {
+                this.setActive(hash);
+            } else {
+                window.location.hash = '';
+            }
         }
     },
 
@@ -199,7 +210,10 @@ export default {
         setActive(tab) {
             this.active = tab;
             this.$events.$emit('tab-switched', tab);
-            window.location.hash = tab;
+
+            if (! this.inStack) {
+                window.location.hash = tab;
+            }
         },
 
         isTabHidden(section) {
