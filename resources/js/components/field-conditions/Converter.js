@@ -73,6 +73,11 @@ export default class {
         // You cannot `null.toString()`, so we'll manually cast it here to prevent error.
         if (value === null) return 'null';
 
+        // Note: We don't document the use of an '' empty string in the yaml,
+        // but for the people that manually add this to their yaml, we'll
+        // treat it as an `empty` check so that it doesn't feel broken.
+        if (value === '') return 'empty';
+
         return value.toString();
     }
 }
