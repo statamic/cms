@@ -182,6 +182,14 @@ export default {
 
     },
 
+    mounted() {
+        // Deep linking/refreshing to a specific #section
+        if (window.location.hash.length > 0) {
+            console.log(window.location.hash)
+            this.setActive(window.location.hash.substr(1));
+        }
+    },
+
     methods: {
 
         sectionHasError(handle) {
@@ -191,6 +199,7 @@ export default {
         setActive(tab) {
             this.active = tab;
             this.$events.$emit('tab-switched', tab);
+            window.location.hash = tab;
         },
 
         isTabHidden(section) {
