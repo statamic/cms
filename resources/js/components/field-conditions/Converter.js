@@ -36,7 +36,7 @@ export default class {
         let operator = '==';
 
         _.chain(this.getOperatorsAndAliases())
-            .filter(value => new RegExp(`^${value} [^=]`).test(condition.toString()))
+            .filter(value => new RegExp(`^${value} [^=]`).test(this.normalizeConditionString(condition)))
             .each(value => operator = value);
 
         return this.normalizeOperator(operator);
@@ -49,7 +49,7 @@ export default class {
     }
 
     getValueFromRhs(condition) {
-        let rhs = condition.toString();
+        let rhs = this.normalizeConditionString(condition);
 
         _.chain(this.getOperatorsAndAliases())
             .filter(value => new RegExp(`^${value} [^=]`).test(rhs))
@@ -67,5 +67,12 @@ export default class {
 
     getOperatorsAndAliases() {
         return OPERATORS.concat(Object.keys(ALIASES));
+    }
+
+    normalizeConditionString(value) {
+        // You cannot `null.toString()`, so we'll manually cast it here to prevent error.
+        if (value === null) return 'null';
+
+        return value.toString();
     }
 }
