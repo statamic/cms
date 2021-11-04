@@ -116,4 +116,19 @@ class CacheController extends CpController
 
         return back()->withSuccess(__('Image cache cleared.'));
     }
+
+    public function warm(Request $request, $cache)
+    {
+        $method = 'warm'.ucfirst($cache).'Cache';
+
+        return $this->$method();
+    }
+
+    protected function warmStacheCache()
+    {
+        Stache::warm();
+
+        return back()->withSuccess(__('Stache warmed.'));
+    }
+
 }
