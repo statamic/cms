@@ -103,7 +103,7 @@ class Locales extends Tags
                 $localized['locale'] = $locale;
                 $localized['current'] = Site::current()->handle();
                 $localized['is_current'] = $key === Site::current()->handle();
-                $localized['available'] = Arr::exists($localized, 'status');
+                $localized['exists'] = Arr::exists($localized, 'status');
                 $localized['permalink'] = Arr::get($localized, 'permalink', $locale['url']);
             }
 
