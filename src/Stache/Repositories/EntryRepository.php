@@ -103,7 +103,7 @@ class EntryRepository implements RepositoryContract
     public function createRules($collection, $site)
     {
         return [
-            'title' => 'required',
+            'title' => $collection->autoGeneratesTitles() ? '' : 'required',
             'slug' => 'alpha_dash'.($collection->requiresSlugs() ? '|required' : ''),
         ];
     }
@@ -111,7 +111,7 @@ class EntryRepository implements RepositoryContract
     public function updateRules($collection, $entry)
     {
         return [
-            'title' => 'required',
+            'title' => $collection->autoGeneratesTitles() ? '' : 'required',
             'slug' => 'alpha_dash'.($collection->requiresSlugs() ? '|required' : ''),
         ];
     }
