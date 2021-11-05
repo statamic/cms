@@ -51,6 +51,7 @@ class Collection implements Contract, AugmentableContract
     protected $structure;
     protected $structureContents;
     protected $taxonomies = [];
+    protected $requiresSlugs = true;
 
     public function __construct()
     {
@@ -84,6 +85,11 @@ class Collection implements Contract, AugmentableContract
     public function route($site)
     {
         return $this->routes()->get($site);
+    }
+
+    public function requiresSlugs($require = null)
+    {
+        return $this->fluentlyGetOrSet('requiresSlugs')->args(func_get_args());
     }
 
     public function dated($dated = null)
@@ -282,9 +288,11 @@ class Collection implements Contract, AugmentableContract
 
     public function ensureEntryBlueprintFields($blueprint)
     {
-        $blueprint
-            ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
-            ->ensureField('slug', ['type' => 'slug', 'required' => true, 'localizable' => true], 'sidebar');
+        $blueprint->ensureFieldPrepended('title', ['type' => 'text', 'required' => true]);
+
+        if ($this->requiresSlugs()) {
+            $blueprint->ensureField('slug', ['type' => 'slug', 'required' => true, 'localizable' => true], 'sidebar');
+        }
 
         if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
