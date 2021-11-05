@@ -66,8 +66,6 @@ class CollectionEntriesStore extends ChildStore
             ->id($id)
             ->collection($collection);
 
-        $slug = (new GetSlugFromPath)($path);
-
         if ($origin = array_pull($data, 'origin')) {
             $entry->origin($origin);
         }
@@ -75,10 +73,13 @@ class CollectionEntriesStore extends ChildStore
         $entry
             ->blueprint($data['blueprint'] ?? null)
             ->locale($site)
-            ->slug($slug)
             ->initialPath($path)
             ->published(array_pull($data, 'published', true))
             ->data($data);
+
+        if ($collection->requiresSlugs()) {
+            $entry->slug((new GetSlugFromPath)($path));
+        }
 
         // if ($collection->orderable() && ! $collection->getEntryPosition($id)) {
         //     $positionGenerated = true;
