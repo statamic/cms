@@ -473,7 +473,7 @@ class EntryTest extends TestCase
             'en' => ['url' => '/'],
         ]]);
 
-        $collection = (new Collection)->handle('blog');
+        $collection = tap(Facades\Collection::make('blog'))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
@@ -488,7 +488,7 @@ class EntryTest extends TestCase
             'fr' => ['url' => '/'],
         ]]);
 
-        $collection = (new Collection)->handle('blog');
+        $collection = tap(Facades\Collection::make('blog'))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.md', $entry->path());
@@ -500,7 +500,8 @@ class EntryTest extends TestCase
     {
         Carbon::setTestNow(Carbon::parse('2015-09-24'));
 
-        $entry = new Entry;
+        $collection = tap(Facades\Collection::make('blog'))->save();
+        $entry = (new Entry)->collection($collection);
 
         // Without explicitly having the date set, it falls back to the last modified date (which if there's no file, is Carbon::now())
         $this->assertInstanceOf(Carbon::class, $entry->date());
