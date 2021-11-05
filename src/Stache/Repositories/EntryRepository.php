@@ -104,7 +104,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => 'required',
-            'slug' => 'required',
+            'slug' => 'alpha_dash'.($collection->requiresSlugs() ? '|required' : ''),
         ];
     }
 
@@ -112,7 +112,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => 'required',
-            'slug' => 'required|alpha_dash',
+            'slug' => 'alpha_dash'.($collection->requiresSlugs() ? '|required' : ''),
         ];
     }
 
