@@ -56,7 +56,6 @@ use Statamic\View\Antlers\Language\Nodes\Structures\TupleListStart;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
-use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class AntlersLexer
