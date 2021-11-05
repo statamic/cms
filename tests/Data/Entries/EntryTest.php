@@ -7,6 +7,7 @@ use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\View;
 use Mockery;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
@@ -1200,6 +1201,27 @@ class EntryTest extends TestCase
         $return = $entry->template('baz');
         $this->assertEquals($entry, $return);
         $this->assertEquals('baz', $entry->template());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_an_inferred_template_from_blueprint()
+    {
+        $collection = tap(Collection::make('articles')->template('@blueprint'))->save();
+        $blueprint = tap(Blueprint::make('standard_article')->setNamespace('collections.articles'))->save();
+        $entry = Entry::make('test')->collection($collection)->blueprint($blueprint->handle());
+
+        // entry uses `articles.standard-article` template
+        $this->assertEquals('articles.standard-article', $entry->template());
+
+        // entry uses `articles.standard_article` template (snake case)
+        // when user has snake cased article instead of slug case in views folder
+        View::shouldReceive('exists')->with('articles.standard_article')->andReturn(true);
+        View::shouldReceive('exists')->with('articles.standard-article')->andReturn(false);
+        $this->assertEquals('articles.standard_article', $entry->template());
+
+        // entry level template overrides `@blueprint` on the collection
+        $entry->template('articles.custom');
+        $this->assertEquals('articles.custom', $entry->template());
     }
 
     /** @test */
