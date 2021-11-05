@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .textarea-fieldtype textarea {
-    @apply p-2;
+    @apply border-grey-50;
     min-height: 80px;
 }
 
@@ -11,5 +11,5 @@
   ========================================================================== */
 
  .grid-fieldtype .textarea-fieldtype textarea {
-     @apply p-1 bg-white;
+     @apply bg-white;
  }

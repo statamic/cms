@@ -224,4 +224,17 @@ class Replicator extends Fieldtype
             return Str::studly($part);
         })->join('_');
     }
+
+    public function preProcessValidatable($value)
+    {
+        return collect($value)->map(function ($values) {
+            $processed = $this->fields($values['type'])
+                ->addValues($values)
+                ->preProcessValidatables()
+                ->values()
+                ->all();
+
+            return array_merge($values, $processed);
+        })->all();
+    }
 }
