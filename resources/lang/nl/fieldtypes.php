@@ -39,7 +39,7 @@ return [
     'code.config.indent_type' => 'Stel in welke indentatietype je voorkeur heeft.',
     'code.config.key_map' => 'Kies een voorkeursset met toetsenbord sneltoetsen.',
     'code.config.mode' => 'Kies de taal voor syntax highlighting.',
-    'code.config.mode_selectable' => 'Of the the modus gewijzigd kan worden door de gebruiker.',
+    'code.config.mode_selectable' => 'Of de modus gewijzigd kan worden door de gebruiker.',
     'code.config.theme' => 'Kies je voorkeursthema.',
     'code.title' => 'Code',
     'collections.title' => 'Collections',
