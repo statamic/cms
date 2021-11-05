@@ -52,6 +52,7 @@ class Collection implements Contract, AugmentableContract
     protected $structureContents;
     protected $taxonomies = [];
     protected $requiresSlugs = true;
+    protected $titleFormats = [];
 
     public function __construct()
     {
@@ -90,6 +91,30 @@ class Collection implements Contract, AugmentableContract
     public function requiresSlugs($require = null)
     {
         return $this->fluentlyGetOrSet('requiresSlugs')->args(func_get_args());
+    }
+
+    public function titleFormats($formats = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('titleFormats')
+            ->getter(function ($formats) {
+                return $this->sites()->mapWithKeys(function ($site) use ($formats) {
+                    $siteRoute = is_string($formats) ? $formats : ($formats[$site] ?? null);
+
+                    return [$site => $siteRoute];
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function titleFormat($site)
+    {
+        return $this->titleFormats()->get($site);
+    }
+
+    public function autoGeneratesTitles()
+    {
+        return $this->titleFormats !== [];
     }
 
     public function dated($dated = null)
