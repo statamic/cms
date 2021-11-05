@@ -39,6 +39,7 @@ class CollectionsStore extends BasicStore
         $collection = Collection::make($handle)
             ->title(array_get($data, 'title'))
             ->routes(array_get($data, 'route'))
+            ->requiresSlugs(array_get($data, 'slugs', true))
             ->mount(array_get($data, 'mount'))
             ->dated(array_get($data, 'date', false))
             ->ampable(array_get($data, 'amp', false))
