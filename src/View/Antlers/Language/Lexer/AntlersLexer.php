@@ -56,6 +56,7 @@ use Statamic\View\Antlers\Language\Nodes\Structures\TupleListStart;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class AntlersLexer
@@ -261,10 +262,10 @@ class AntlersLexer
                     $this->next == DocumentParser::String_Terminator_DoubleQuote ||
                     $this->next == null ||
                     $breakForKeyword) {
+                    $this->currentContent[] = $this->cur;
                     $implodedCurrentContent = implode($this->currentContent);
 
                     if (mb_strlen($implodedCurrentContent) > 0) {
-                        $this->currentContent[] = $this->cur;
                         $parsedValue = implode($this->currentContent);
                         $this->currentContent = [];
 

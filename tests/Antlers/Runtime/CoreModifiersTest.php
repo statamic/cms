@@ -357,4 +357,13 @@ EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, $data, true)));
     }
+
+    public function test_modifiers_in_dynamic_bindings_with_tight_spacing_doesnt_error()
+    {
+        $template = <<<'EOT'
+{{ foreach :array="'one,two,three' | explode:," }}{{ value }}-{{ /foreach }}
+EOT;
+
+        $this->assertSame('one-two-three-', $this->renderString($template, [], true));
+    }
 }
