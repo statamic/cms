@@ -313,7 +313,10 @@ class Collection implements Contract, AugmentableContract
 
     public function ensureEntryBlueprintFields($blueprint)
     {
-        $blueprint->ensureFieldPrepended('title', ['type' => 'text', 'required' => true]);
+        $blueprint->ensureFieldPrepended('title', [
+            'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
+            'required' => ! $auto,
+        ]);
 
         if ($this->requiresSlugs()) {
             $blueprint->ensureField('slug', ['type' => 'slug', 'required' => true, 'localizable' => true], 'sidebar');
