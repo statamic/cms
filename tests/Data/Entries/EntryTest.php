@@ -1011,7 +1011,8 @@ class EntryTest extends TestCase
             return false;
         });
 
-        $entry = (new Entry)->collection(new Collection);
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection);
 
         $return = $entry->save();
 
