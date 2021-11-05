@@ -99,7 +99,7 @@ class Locales extends Tags
         return $locales->map(function ($locale, $key) {
             $localized = $this->getLocalizedData($key);
 
-            if ($localized || $this->params->bool('include_all')) {
+            if ($localized || $this->params->bool('all')) {
                 $localized['locale'] = $locale;
                 $localized['current'] = Site::current()->handle();
                 $localized['is_current'] = $key === Site::current()->handle();
