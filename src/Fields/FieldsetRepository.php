@@ -40,7 +40,7 @@ class FieldsetRepository
             [$key, $fieldsetHandle] = explode('::', $handle);
 
             // check the "override" folder first
-            if (File::exists($path = "/resources/fieldsets/{$key}/{$fieldsetHandle}.yaml")) {
+            if (File::exists($path = "/resources/fieldsets/vendor/{$key}/{$fieldsetHandle}.yaml")) {
                 return $this->addFieldset($fieldsetHandle, $path);
             }
 

@@ -179,6 +179,7 @@ fields: []
 EOT;
         $this->repo->addDirectory('/vendor/foo/resources/fieldsets', 'foo');
 
+        File::shouldReceive('exists')->with('/resources/fieldsets/vendor/foo/test.yaml')->once()->andReturn(false);
         File::shouldReceive('get')->with('/vendor/foo/resources/fieldsets/test.yaml')->once()->andReturn($contents);
 
         $fieldset = $this->repo->find('foo::test');
@@ -197,8 +198,8 @@ EOT;
     EOT;
         $this->repo->addDirectory('/vendor/foo/resources/fieldsets', 'foo');
 
-        File::shouldReceive('exists')->with('/resources/fieldsets/foo/test.yaml')->once()->andReturn(true);
-        File::shouldReceive('get')->with('/resources/fieldsets/foo/test.yaml')->once()->andReturn($contents);
+        File::shouldReceive('exists')->with('/resources/fieldsets/vendor/foo/test.yaml')->once()->andReturn(true);
+        File::shouldReceive('get')->with('/resources/fieldsets/vendor/foo/test.yaml')->once()->andReturn($contents);
 
         $fieldset = $this->repo->find('foo::test');
     }
