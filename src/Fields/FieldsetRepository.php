@@ -39,6 +39,12 @@ class FieldsetRepository
         if (Str::contains($handle, '::')) {
             [$key, $fieldsetHandle] = explode('::', $handle);
 
+            // check the "override" folder first
+            if (File::exists($path = "/resources/fieldsets/{$key}/{$fieldsetHandle}.yaml")) {
+                return $this->addFieldset($fieldsetHandle, $path);
+            }
+
+            // then check addon folder
             if (! $directory = $this->getDirectory($key)) {
                 return null;
             }

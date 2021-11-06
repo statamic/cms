@@ -171,7 +171,7 @@ EOT;
     }
 
     /** @test  */
-    public function it_gets_a_fieldset_in_a_an_addon_directory()
+    public function it_gets_a_fieldset_in_an_addon_directory()
     {
         $contents = <<<'EOT'
 title: Test Fieldset
@@ -186,6 +186,21 @@ EOT;
         $this->assertInstanceOf(Fieldset::class, $fieldset);
         $this->assertEquals('Test Fieldset', $fieldset->title());
         $this->assertEquals('foo::test', $fieldset->handle());
+    }
+
+    /** @test  */
+    public function it_gets_an_overridden_addon_fieldset()
+    {
+        $contents = <<<'EOT'
+    title: Test Fieldset
+    fields: []
+    EOT;
+        $this->repo->addDirectory('/vendor/foo/resources/fieldsets', 'foo');
+
+        File::shouldReceive('exists')->with('/resources/fieldsets/foo/test.yaml')->once()->andReturn(true);
+        File::shouldReceive('get')->with('/resources/fieldsets/foo/test.yaml')->once()->andReturn($contents);
+
+        $fieldset = $this->repo->find('foo::test');
     }
 
     /** @test */
