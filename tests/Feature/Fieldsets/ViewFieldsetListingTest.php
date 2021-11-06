@@ -49,7 +49,7 @@ class ViewFieldsetListingTest extends TestCase
     }
 
     /** @test */
-    public function it_shows_a_list_of_non_addon_fieldsets()
+    public function it_shows_a_list_of_editable_addon_fieldsets()
     {
         Facades\Fieldset::shouldReceive('all')->andReturn(collect([
             'foo' => $fieldsetA = $this->createfieldset('foo'),
@@ -71,8 +71,43 @@ class ViewFieldsetListingTest extends TestCase
                     'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
                     'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
                 ],
-            ]))
-            ->assertDontSee('no-results');
+                [
+                    'id' => 'baz::bar',
+                    'handle' => 'baz::bar',
+                    'title' => 'Baz::bar',
+                    'fields' => 0,
+                    'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
+                    'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
+                ],
+            ]));
+    }
+
+    /** @test */
+    public function it_doesnt_show_non_editable_addon_fieldsets()
+    {
+        $fieldsetA = $this->createfieldset('foo::baz')->setContents(['editable' => false]);
+
+        Facades\Fieldset::shouldReceive('all')->andReturn(collect([
+            'foo::baz' => $fieldsetA,
+            'baz::bar' => $fieldsetB = $this->createFieldset('baz::bar'),
+        ]));
+
+        $user = Facades\User::make()->makeSuper()->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('fieldsets.index'))
+            ->assertSuccessful()
+            ->assertViewHas('fieldsets', collect([
+                [
+                    'id' => 'baz::bar',
+                    'handle' => 'baz::bar',
+                    'title' => 'Baz::bar',
+                    'fields' => 0,
+                    'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
+                    'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
+                ],
+            ]));
     }
 
     /** @test */
