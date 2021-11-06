@@ -24,7 +24,7 @@ class TaxonomiesStore extends BasicStore
         return $item->handle();
     }
 
-    public function getFileFilter(SplFileInfo $file)
+    public function getItemFilter(SplFileInfo $file)
     {
         $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
 

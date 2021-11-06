@@ -26,7 +26,7 @@ class TaxonomyTermsStore extends ChildStore
         'site' => Indexes\Terms\Site::class,
     ];
 
-    public function getFileFilter(SplFileInfo $file)
+    public function getItemFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory(), '/');
         $relative = $file->getPathname();
@@ -60,6 +60,7 @@ class TaxonomyTermsStore extends ChildStore
         }
 
         $term->dataForLocale($term->defaultLocale(), $data);
+        $term->syncOriginal();
 
         return $term;
     }
@@ -118,7 +119,7 @@ class TaxonomyTermsStore extends ChildStore
         $associations->cache();
 
         foreach ($terms as $slug => $value) {
-            $term = $this->makeTerm($taxonomy, $slug);
+            $term = Term::find("$taxonomy::$slug") ?? $this->makeTerm($taxonomy, $slug);
             $indexes->each->updateItem($term);
         }
     }

@@ -22,7 +22,7 @@ class Column
     /**
      * Make new column instance.
      *
-     * @param null|string $field
+     * @param  null|string  $field
      * @return static
      */
     public static function make($field = null)
@@ -37,7 +37,7 @@ class Column
     /**
      * Get or set field.
      *
-     * @param null|string $field
+     * @param  null|string  $field
      * @return mixed
      */
     public function field($field = null)
@@ -55,7 +55,7 @@ class Column
     /**
      * Get or set the value field.
      *
-     * @param null|string $value
+     * @param  null|string  $value
      * @return mixed
      */
     public function value($value = null)
@@ -66,7 +66,7 @@ class Column
     /**
      * Get or set fieldtype.
      *
-     * @param null|string $fieldtype
+     * @param  null|string  $fieldtype
      * @return mixed
      */
     public function fieldtype($fieldtype = null)
@@ -77,7 +77,7 @@ class Column
     /**
      * Get or set label.
      *
-     * @param null|string $label
+     * @param  null|string  $label
      * @return mixed
      */
     public function label($label = null)
@@ -88,7 +88,7 @@ class Column
     /**
      * Get or set listable.  Setting `false` will override visibility.
      *
-     * @param mixed $listable
+     * @param  mixed  $listable
      */
     public function listable($listable = null)
     {
@@ -98,7 +98,7 @@ class Column
     /**
      * Get or set default order, for resetting user preferences, etc.
      *
-     * @param null|int $order
+     * @param  null|int  $order
      * @return mixed
      */
     public function defaultOrder($order = null)
@@ -109,7 +109,7 @@ class Column
     /**
      * Get or set default visibility, for resetting user preferences, etc.
      *
-     * @param null|bool $visible
+     * @param  null|bool  $visible
      * @return mixed
      */
     public function defaultVisibility($visible = null)
@@ -120,7 +120,7 @@ class Column
     /**
      * Get or set visibility.
      *
-     * @param null|bool $visible
+     * @param  null|bool  $visible
      * @return mixed
      */
     public function visible($visible = null)
@@ -131,7 +131,7 @@ class Column
     /**
      * Get or set sortable.
      *
-     * @param null|bool $sortable
+     * @param  null|bool  $sortable
      * @return mixed
      */
     public function sortable($sortable = null)

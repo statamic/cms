@@ -20,6 +20,7 @@ class User extends BaseUser
     protected $roles;
     protected $groups;
 
+    /** @deprecated */
     public static function fromModel(Model $model)
     {
         return tap(new static, function ($user) use ($model) {
@@ -41,7 +42,7 @@ class User extends BaseUser
     /**
      * Get or set all the data for the current locale.
      *
-     * @param array|null $data
+     * @param  array|null  $data
      * @return $this|array
      */
     public function data($data = null)
@@ -206,7 +207,7 @@ class User extends BaseUser
     public function removeFromGroup($group)
     {
         $groups = collect(array_wrap($group))->map(function ($group) {
-            return is_string($group) ? group::find($group) : $group;
+            return is_string($group) ? UserGroup::find($group) : $group;
         })->filter();
 
         $groups->each(function ($group) {

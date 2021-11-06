@@ -5,21 +5,29 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Structures\Tree as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\SyncsOriginalState;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class Tree implements Contract, Localization
 {
-    use ExistsAsFile, FluentlyGetsAndSets;
+    use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
 
     protected $handle;
     protected $locale;
     protected $tree = [];
     protected $cachedFlattenedPages;
-    protected $original;
+    protected $withEntries = false;
     protected $uriCacheEnabled = true;
+    protected $syncOriginalProperties = ['tree'];
+
+    public function idKey()
+    {
+        return 'id';
+    }
 
     public function locale($locale = null)
     {
@@ -52,11 +60,7 @@ abstract class Tree implements Contract, Localization
             return null;
         }
 
-        if (! $root = $this->tree()[0] ?? null) {
-            return null;
-        }
-
-        return $root['entry'];
+        return $this->tree()[0] ?? null;
     }
 
     public function handle($handle = null)
@@ -75,9 +79,14 @@ abstract class Tree implements Contract, Localization
             return null;
         }
 
+        $branch = $this->root();
+
         return (new Page)
             ->setTree($this)
-            ->setEntry($this->root())
+            ->setId($branch[$this->idKey()] ?? null)
+            ->setEntry($branch['entry'] ?? null)
+            ->setUrl($branch['url'] ?? null)
+            ->setTitle($branch['title'] ?? null)
             ->setRoute($this->route())
             ->setDepth(1)
             ->setRoot(true);
@@ -130,7 +139,22 @@ abstract class Tree implements Contract, Localization
         return $this->uriCacheEnabled;
     }
 
-    public function page(string $id): ?Page
+    /**
+     * @deprecated  Use find() instead.
+     */
+    public function page($id): ?Page
+    {
+        return $this->find($id);
+    }
+
+    public function find($id): ?Page
+    {
+        return $this->flattenedPages()
+            ->keyBy->id()
+            ->get($id);
+    }
+
+    public function findByEntry($id)
     {
         return $this->flattenedPages()
             ->filter->reference()
@@ -225,9 +249,9 @@ abstract class Tree implements Contract, Localization
         }
 
         if (is_string($page)) {
-            $page = ['entry' => $page];
+            $page = [$this->idKey() => $page];
         } elseif (is_object($page)) {
-            $page = ['entry' => $page->id()];
+            $page = [$this->idKey() => $page->id()];
         }
 
         if ($parent) {
@@ -244,7 +268,7 @@ abstract class Tree implements Contract, Localization
         foreach ($branches as &$branch) {
             $children = $branch['children'] ?? [];
 
-            if ($branch['entry'] === $parent) {
+            if ($branch[$this->idKey()] === $parent) {
                 $children[] = $page;
                 $branch['children'] = $children;
                 break;
@@ -268,7 +292,7 @@ abstract class Tree implements Contract, Localization
             return $this;
         }
 
-        if ($this->structure()->expectsRoot() && Arr::get($this->tree, '0.entry') === $target) {
+        if ($this->structure()->expectsRoot() && Arr::get($this->tree, '0.id') === $target) {
             throw new \Exception('Root page cannot have children');
         }
 
@@ -295,7 +319,7 @@ abstract class Tree implements Contract, Localization
         $match = null;
 
         foreach ($branches as $key => &$branch) {
-            if ($branch['entry'] === $entry) {
+            if ($branch[$this->idKey()] === $entry) {
                 $match = $branch;
                 unset($branches[$key]);
                 break;
@@ -319,22 +343,25 @@ abstract class Tree implements Contract, Localization
 
     public function entry($entry)
     {
-        $blink = static::class.'-'.$this->structure()->handle().'-'.$this->locale();
+        $blink = Blink::store('structure-entries');
 
-        $entries = Blink::store('structure-entries')->once($blink, function () {
+        return $blink->once($entry, function () use ($blink, $entry) {
+            if (! $this->withEntries) {
+                return Entry::find($entry);
+            }
+
             $refs = $this->flattenedPages()->map->reference()->filter()->all();
+            $entries = Entry::query()->whereIn('id', $refs)->get()->keyBy->id()->all();
 
-            return \Statamic\Facades\Entry::query()->whereIn('id', $refs)->get()->keyBy->id();
+            $blink->put($entries);
+
+            return $entries[$entry] ?? null;
         });
-
-        return $entries->get($entry);
     }
 
-    public function syncOriginal()
+    public function withEntries()
     {
-        $this->original = [
-            'tree' => $this->tree,
-        ];
+        $this->withEntries = true;
 
         return $this;
     }

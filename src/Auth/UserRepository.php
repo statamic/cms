@@ -18,6 +18,11 @@ abstract class UserRepository implements RepositoryContract
         return app(UserFactory::class);
     }
 
+    public function make(): User
+    {
+        return app(User::class);
+    }
+
     public function current(): ?User
     {
         if (! $user = auth()->user()) {
@@ -51,8 +56,8 @@ abstract class UserRepository implements RepositoryContract
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
             'name' => ['type' => 'text', 'display' => 'Name'],
             'email' => ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address'],
-            'roles' => ['type' => 'user_roles', 'width' => 50],
-            'groups' => ['type' => 'user_groups', 'width' => 50],
+            'roles' => ['type' => 'user_roles', 'mode' => 'select', 'width' => 50],
+            'groups' => ['type' => 'user_groups', 'mode' => 'select', 'width' => 50],
         ])->setHandle('user');
 
         UserBlueprintFound::dispatch($blueprint);

@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use League\Glide\Server;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
@@ -119,7 +120,7 @@ class Glide extends Tags
     /**
      * Generate the image.
      *
-     * @param mixed $item
+     * @param  mixed  $item
      * @return string
      */
     private function generateImage($item)
@@ -139,7 +140,7 @@ class Glide extends Tags
     /**
      * Output the tag.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string
      */
     private function output($url)
@@ -159,7 +160,7 @@ class Glide extends Tags
     /**
      * The URL generation.
      *
-     * @param  string $item  Either the ID or path of the image.
+     * @param  string  $item  Either the ID or path of the image.
      * @return string
      */
     private function generateGlideUrl($item)
@@ -180,7 +181,7 @@ class Glide extends Tags
     /**
      * Get the raw Glide parameters.
      *
-     * @param string|null $item
+     * @param  string|null  $item
      * @return array
      */
     private function getGlideParams($item = null)
@@ -191,7 +192,7 @@ class Glide extends Tags
     /**
      * Get the image manipulator with the parameters added to it.
      *
-     * @param string|null $item
+     * @param  string|null  $item
      * @return \Statamic\Imaging\GlideImageManipulator
      */
     private function getManipulator($item = null)
@@ -208,11 +209,15 @@ class Glide extends Tags
     /**
      * Normalize an item to be passed into the manipulator.
      *
-     * @param  string $item  An asset ID, asset URL, or external URL.
+     * @param  string  $item  An asset ID, asset URL, or external URL.
      * @return string|Statamic\Contracts\Assets\Asset
      */
     private function normalizeItem($item)
     {
+        if ($item instanceof AssetContract) {
+            return $item;
+        }
+
         // External URLs are already fine as-is.
         if (Str::startsWith($item, ['http://', 'https://'])) {
             return $item;
@@ -278,7 +283,7 @@ class Glide extends Tags
     /**
      * Checks if a file at a given path is resizable.
      *
-     * @param string $item
+     * @param  string  $item
      * @return bool
      */
     private function isResizable($item)
@@ -291,8 +296,9 @@ class Glide extends Tags
      *
      * @see http://image.intervention.io/getting_started/formats
      *
-     * @throws \Exception
      * @return array
+     *
+     * @throws \Exception
      */
     private function allowedFileFormats()
     {

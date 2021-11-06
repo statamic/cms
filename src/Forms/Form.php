@@ -34,7 +34,7 @@ class Form implements FormContract, Augmentable
     /**
      * Get or set the handle.
      *
-     * @param mixed $handle
+     * @param  mixed  $handle
      * @return mixed
      */
     public function handle($handle = null)
@@ -45,7 +45,7 @@ class Form implements FormContract, Augmentable
     /**
      * Get or set the title.
      *
-     * @param mixed $title
+     * @param  mixed  $title
      * @return mixed
      */
     public function title($title = null)
@@ -71,7 +71,7 @@ class Form implements FormContract, Augmentable
     /**
      * Get or set the honeypot field.
      *
-     * @param mixed $honeypot
+     * @param  mixed  $honeypot
      * @return mixed
      */
     public function honeypot($honeypot = null)
@@ -89,7 +89,7 @@ class Form implements FormContract, Augmentable
     /**
      * Get or set the store field.
      *
-     * @param mixed $store
+     * @param  mixed  $store
      * @return mixed
      */
     public function store($store = null)
@@ -107,7 +107,7 @@ class Form implements FormContract, Augmentable
     /**
      * Get or set the email field.
      *
-     * @param mixed $emails
+     * @param  mixed  $emails
      * @return mixed
      */
     public function email($emails = null)
@@ -249,7 +249,7 @@ class Form implements FormContract, Augmentable
     /**
      * Get a submission.
      *
-     * @param  string $id
+     * @param  string  $id
      * @return Submission
      */
     public function submission($id)

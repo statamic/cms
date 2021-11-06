@@ -54,6 +54,12 @@ class DefaultInvalidator implements Invalidator
     {
         if ($url = $term->url()) {
             $this->cacher->invalidateUrl($url);
+
+            $term->taxonomy()->collections()->each(function ($collection) use ($term) {
+                if ($url = $term->collection($collection)->url()) {
+                    $this->cacher->invalidateUrl($url);
+                }
+            });
         }
 
         $this->cacher->invalidateUrls(

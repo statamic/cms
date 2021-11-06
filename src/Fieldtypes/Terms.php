@@ -24,14 +24,16 @@ class Terms extends Relationship
     protected $taggable = true;
     protected $icon = 'taxonomy';
 
-    public static function title()
-    {
-        return __('Taxonomy Terms');
-    }
-
     protected function configFieldItems(): array
     {
         return array_merge(parent::configFieldItems(), [
+            'create' => [
+                'display' => __('Allow Creating'),
+                'instructions' => __('statamic::fieldtypes.terms.config.create'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'taxonomies' => [
                 'display' => __('Taxonomies'),
                 'type' => 'taxonomies',

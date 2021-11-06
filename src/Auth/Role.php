@@ -3,10 +3,14 @@
 namespace Statamic\Auth;
 
 use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 
-abstract class Role implements RoleContract
+abstract class Role implements RoleContract, Augmentable
 {
+    use HasAugmentedData;
+
     public function editUrl()
     {
         return cp_route('roles.edit', $this->handle());
@@ -20,5 +24,13 @@ abstract class Role implements RoleContract
     public static function __callStatic($method, $parameters)
     {
         return Facades\Role::{$method}(...$parameters);
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+        ];
     }
 }

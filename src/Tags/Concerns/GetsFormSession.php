@@ -7,7 +7,7 @@ trait GetsFormSession
     /**
      * Get form session error/success output.
      *
-     * @param string $formName
+     * @param  string  $formName
      * @return array
      */
     protected function getFormSession($formName = 'default')
@@ -38,8 +38,8 @@ trait GetsFormSession
     /**
      * Get value from form session.
      *
-     * @param string $formName
-     * @param string $key
+     * @param  string  $formName
+     * @param  string  $key
      * @return mixed
      */
     protected function getFromFormSession($formName, $key)
@@ -54,7 +54,7 @@ trait GetsFormSession
     /**
      * Get first error for each field.
      *
-     * @param \Illuminate\Support\MessageBag $messageBag
+     * @param  \Illuminate\Support\MessageBag  $messageBag
      * @return array
      */
     protected function getFirstErrorForEachField($messageBag)

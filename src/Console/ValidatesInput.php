@@ -9,8 +9,8 @@ trait ValidatesInput
     /**
      * Check if input fails a set of validation rules, and if so print an error.
      *
-     * @param string $input
-     * @param mixed $rules
+     * @param  string  $input
+     * @param  mixed  $rules
      * @return bool
      */
     private function validationFails($input, $rules)

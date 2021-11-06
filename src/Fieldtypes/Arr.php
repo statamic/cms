@@ -2,7 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\GraphQL\Types\ArrayType;
 
 class Arr extends Fieldtype
 {
@@ -65,5 +67,10 @@ class Arr extends Fieldtype
                 return null;
             })
             ->all();
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::type(ArrayType::NAME);
     }
 }

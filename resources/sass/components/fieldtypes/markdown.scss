@@ -86,13 +86,6 @@
 
     .markdown-cheatsheet-helper {
         @apply py-1 px-2 inline-block;
-        svg {
-            height: 14px;
-            width: 24px;
-            position: relative;
-            bottom: -2px;
-            margin-right: 3px;
-        }
     }
 
     .markdown-asset-helper {
@@ -201,8 +194,17 @@
 
 .markdown-preview {
     @apply mx-auto;
+
     padding: 16px 20px;
     min-height: 167px; // @TODO Refactor to avoid a magic number.
+
+    ol {
+        @apply list-decimal;
+    }
+
+    ul {
+        @apply list-disc;
+    }
 }
 
 .markdown-fieldtype-wrapper.markdown-fullscreen {

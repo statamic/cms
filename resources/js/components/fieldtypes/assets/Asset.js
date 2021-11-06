@@ -9,7 +9,11 @@ export default {
 
     props: {
         asset: Object,
-        readOnly: Boolean
+        readOnly: Boolean,
+        showFilename: {
+            type: Boolean,
+            default: true
+        }
     },
 
     data() {

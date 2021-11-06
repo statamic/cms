@@ -1,6 +1,6 @@
 <template>
 
-    <div 
+    <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
         @dragstart.stop="ignorePageHeader(true)"
@@ -58,12 +58,9 @@
 
             <editor-floating-menu :editor="editor">
                 <div
-                    slot-scope="{ commands, isActive, menu }"
+                    slot-scope="{ menu }"
                     class="bard-set-selector"
-                    :class="{
-                        'invisible': !config.always_show_set_button && !menu.isActive,
-                        'visible': menu.isActive
-                    }"
+                    :class="config.sets.length && (config.always_show_set_button || menu.isActive) ? 'visible' : 'invisible'"
                     :style="`top: ${menu.top}px`"
                 >
                     <dropdown-list>
@@ -285,7 +282,7 @@ export default {
             if (!this.mounted) return;
 
             // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
-            this.update(JSON.stringify(json));
+            this.updateDebounced(JSON.stringify(json));
         },
 
         value(value, oldValue) {
@@ -295,6 +292,7 @@ export default {
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.clearContent()
                 this.editor.setContent(content, true);
             }
         },

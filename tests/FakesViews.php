@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\View\Factory;
 use Illuminate\View\View;
+use InvalidArgumentException;
 
 trait FakesViews
 {
@@ -56,6 +57,10 @@ class FakeViewFactory extends Factory
     {
         $engine = app('FakeViewEngine');
         $ext = $this->extensions[$view] ?? 'antlers.html';
+
+        if (! $engine->exists($view)) {
+            throw new InvalidArgumentException("View [{$view}] not found.");
+        }
 
         return new View($this, $engine, $view, "{$view}.{$ext}", $data);
     }
