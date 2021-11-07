@@ -96,12 +96,20 @@ class FieldsetRepository
 
     public function save(Fieldset $fieldset)
     {
-        if (! File::exists($this->directory)) {
-            File::makeDirectory($this->directory);
+        if ($fieldset->isExternal()) {
+            [$key, $handle] = explode('::', $fieldset->handle());
+            $directory = resource_path("fieldset/vendor/{$key}");
+        } else {
+            $handle = $fieldset->handle();
+            $directory = $this->directory;
+        }
+
+        if (! File::exists($directory)) {
+            File::makeDirectory($directory);
         }
 
         File::put(
-            "{$this->directory}/{$fieldset->handle()}.yaml",
+            "{$directory}/{$handle}.yaml",
             YAML::dump($fieldset->contents())
         );
     }
