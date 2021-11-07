@@ -23,12 +23,13 @@ class FieldsetController extends CpController
                 return $fieldset->isEditable();
             })->map(function (Fieldset $fieldset) {
                 return [
-                    'id' => $fieldset->handle(),
                     'handle' => $fieldset->handle(),
-                    'title' => $fieldset->title(),
-                    'fields' => $fieldset->fields()->all()->count(),
-                    'edit_url' => $fieldset->editUrl(),
+                    'id' => $fieldset->handle(),
                     'delete_url' => $fieldset->deleteUrl(),
+                    'edit_url' => $fieldset->editUrl(),
+                    'fields' => $fieldset->fields()->all()->count(),
+                    'is_deletable' => ! $fieldset->isExternal(),
+                    'title' => $fieldset->title(),
                 ];
             })->values();
 

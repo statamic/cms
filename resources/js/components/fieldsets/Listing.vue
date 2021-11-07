@@ -12,6 +12,7 @@
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
                         <dropdown-item
+                            v-if="fieldset.is_deletable"
                             :text="__('Delete')"
                             class="warning"
                             @click="$refs[`deleter_${fieldset.id}`].confirm()"
