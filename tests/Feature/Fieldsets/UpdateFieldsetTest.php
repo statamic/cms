@@ -106,9 +106,9 @@ class UpdateFieldsetTest extends TestCase
         $user = tap(Facades\User::make()->makeSuper())->save();
 
         FieldsetRepository::swap(new FieldsetRepository);
-        File::shouldReceive('exists')->with(resource_path('fieldset/vendor/foo'))->once()->andReturnTrue();
-        File::shouldReceive('makeDirectory')->with(resource_path('fieldset/vendor/foo'))->once();
-        File::shouldReceive('put')->with(resource_path('fieldset/vendor/foo/test.yaml'), ['title' => 'Test'])->once();
+        File::shouldReceive('exists')->with(resource_path('fieldsets/vendor/foo'))->once()->andReturnTrue();
+        File::shouldReceive('makeDirectory')->with(resource_path('fieldsets/vendor/foo'))->once();
+        File::shouldReceive('put')->with(resource_path('fieldsets/vendor/foo/test.yaml'), ['title' => 'Test'])->once();
 
         $fieldset = (new Fieldset)->setHandle('foo::test')->setContents(['title' => 'Test'])->save();
     }

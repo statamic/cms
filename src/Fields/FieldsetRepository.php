@@ -39,8 +39,9 @@ class FieldsetRepository
         if (Str::contains($handle, '::')) {
             [$key, $fieldsetHandle] = explode('::', $handle);
 
+            ray($key, $fieldsetHandle);
             // check the "override" folder first
-            if (File::exists($path = "/resources/fieldsets/vendor/{$key}/{$fieldsetHandle}.yaml")) {
+            if (File::exists($path = resource_path("fieldsets/vendor/{$key}/{$fieldsetHandle}.yaml"))) {
                 return $this->addFieldset($fieldsetHandle, $path);
             }
 
@@ -97,9 +98,11 @@ class FieldsetRepository
     public function save(Fieldset $fieldset)
     {
         if ($fieldset->isExternal()) {
+            ray('external');
             [$key, $handle] = explode('::', $fieldset->handle());
-            $directory = resource_path("fieldset/vendor/{$key}");
+            $directory = resource_path("fieldsets/vendor/{$key}");
         } else {
+            ray('internal');
             $handle = $fieldset->handle();
             $directory = $this->directory;
         }
