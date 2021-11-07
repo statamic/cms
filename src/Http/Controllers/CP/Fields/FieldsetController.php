@@ -19,8 +19,8 @@ class FieldsetController extends CpController
     public function index(Request $request)
     {
         $fieldsets = Facades\Fieldset::all()
-            ->reject(function (Fieldset $fieldset) {
-                return Arr::get($fieldset->contents(), 'editable') === false;
+            ->filter(function (Fieldset $fieldset) {
+                return $fieldset->isEditable();
             })->map(function (Fieldset $fieldset) {
                 return [
                     'id' => $fieldset->handle(),

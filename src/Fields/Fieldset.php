@@ -7,6 +7,7 @@ use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Facades;
 use Statamic\Facades\Path;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Fieldset
@@ -72,6 +73,16 @@ class Fieldset
     public function field(string $handle): ?Field
     {
         return $this->fields()->get($handle);
+    }
+
+    public function isEditable(): bool
+    {
+        return Arr::get($this->contents, 'editable') !== false;
+    }
+
+    public function isExternal(): bool
+    {
+        return Str::contains($this->handle(), '::');
     }
 
     public function editUrl()
