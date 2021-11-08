@@ -27,7 +27,7 @@ class ViewFieldsetListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('fieldsets.index'))
             ->assertSuccessful()
-            ->assertViewHas('fieldsets', collect([
+            ->assertViewHas('fieldsets', collect(['My Fieldsets' => collect([
                 [
                     'id' => 'foo',
                     'handle' => 'foo',
@@ -35,6 +35,7 @@ class ViewFieldsetListingTest extends TestCase
                     'fields' => 0,
                     'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
                     'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
+                    'is_deletable' => true,
                 ],
                 [
                     'id' => 'bar',
@@ -43,8 +44,9 @@ class ViewFieldsetListingTest extends TestCase
                     'fields' => 0,
                     'edit_url' => 'http://localhost/cp/fields/fieldsets/bar/edit',
                     'delete_url' => 'http://localhost/cp/fields/fieldsets/bar',
+                    'is_deletable' => true,
                 ],
-            ]))
+            ])]))
             ->assertDontSee('no-results');
     }
 
@@ -62,24 +64,34 @@ class ViewFieldsetListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('fieldsets.index'))
             ->assertSuccessful()
-            ->assertViewHas('fieldsets', collect([
+            ->assertViewHas('fieldsets', collect(
                 [
-                    'id' => 'foo',
-                    'handle' => 'foo',
-                    'title' => 'Foo',
-                    'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
-                    'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
+                    'My Fieldsets' => collect([
+                        [
+                            'id' => 'foo',
+                            'handle' => 'foo',
+                            'title' => 'Foo',
+                            'fields' => 0,
+                            'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
+                            'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
+                            'is_deletable' => true,
+                        ],
+                    ]),
                 ],
                 [
-                    'id' => 'baz::bar',
-                    'handle' => 'baz::bar',
-                    'title' => 'Baz::bar',
-                    'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
-                    'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
-                ],
-            ]));
+                    'Baz' => collect([
+                        [
+                            'id' => 'baz::bar',
+                            'handle' => 'baz::bar',
+                            'title' => 'Baz::bar',
+                            'fields' => 0,
+                            'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
+                            'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
+                            'is_deletable' => false,
+                        ],
+                    ]),
+                ]
+            ));
     }
 
     /** @test */
