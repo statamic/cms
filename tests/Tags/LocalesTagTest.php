@@ -21,6 +21,7 @@ $tag
 -{{ title }}
 -{{ url }}
 -{{ permalink }}
+-{{ exists ? 'exists' : 'does not exist' }}
 -{{ locale:name }}
 -{{ locale:handle }}
 -{{ locale:key }}
@@ -89,6 +90,7 @@ EOT;
 -hello
 -/en/1
 -http://localhost/en/1
+-exists
 -English
 -english
 -english
@@ -103,6 +105,7 @@ EOT;
 -bonjour
 -/fr/2
 -http://localhost/fr/2
+-exists
 -French
 -french
 -french
@@ -117,6 +120,7 @@ EOT;
 -hola
 -/es/3
 -http://localhost/es/3
+-exists
 -Spanish
 -espanol
 -espanol
@@ -178,6 +182,7 @@ HTML;
 -hello
 -/en/1
 -http://localhost/en/1
+-exists
 -English
 -english
 -english
@@ -192,6 +197,7 @@ HTML;
 -
 -/fr
 -http://localhost/fr
+-does not exist
 -French
 -french
 -french
@@ -206,6 +212,7 @@ HTML;
 -hola
 -/es/3
 -http://localhost/es/3
+-exists
 -Spanish
 -espanol
 -espanol
@@ -283,6 +290,7 @@ HTML;
 -hello
 -/en/1
 -http://localhost/en/1
+-exists
 -English
 -english
 -english
@@ -297,6 +305,7 @@ HTML;
 -
 -/fr
 -http://localhost/fr
+-does not exist
 -French
 -french
 -french
@@ -311,6 +320,7 @@ HTML;
 -hola
 -/es/3
 -http://localhost/es/3
+-exists
 -Spanish
 -espanol
 -espanol
