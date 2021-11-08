@@ -12,6 +12,24 @@ class LocalesTagTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private function template($tag)
+    {
+        $contents = <<<EOT
+$tag
+- {{ id }}
+- {{ title }}
+- {{ locale:name }}
+- {{ locale:handle }}
+- {{ locale:short }}
+- {{ current }}
+- {{ is_current ? 'current' : 'not current' }}
+
+{{ /locales }}
+EOT;
+
+        return $contents;
+    }
+
     public function setUp(): void
     {
         parent::setUp();
@@ -54,19 +72,6 @@ class LocalesTagTest extends TestCase
             ->data(['title' => 'hola'])
             ->create();
 
-        $template = <<<'HTML'
-{{ locales }}
-- {{ id }}
-- {{ title }}
-- {{ locale:name }}
-- {{ locale:handle }}
-- {{ locale:short }}
-- {{ current }}
-- {{ is_current ? 'current' : 'not current' }}
-
-{{ /locales }}
-HTML;
-
         $expected = <<<'HTML'
 - 1
 - hello
@@ -95,7 +100,7 @@ HTML;
 
 HTML;
 
-        $this->assertEquals($expected, $this->tag($template, ['id' => '1']));
+        $this->assertEquals($expected, $this->tag($this->template('{{ locales }}'), ['id' => '1']));
     }
 
     /** @test */
@@ -119,6 +124,54 @@ HTML;
             '<hello><hola>',
             $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['id' => '1'])
         );
+    }
+
+    /** @test */
+    public function it_falls_back_to_the_sites_details_if_the_entry_doesnt_exist_and_the_all_param_is_used()
+    {
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->id('1')
+            ->data(['title' => 'hello'])
+            ->create();
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('espanol')
+            ->id('3')
+            ->origin('1')
+            ->data(['title' => 'hola'])
+            ->create();
+
+        $expected = <<<'HTML'
+- 1
+- hello
+- English
+- english
+- en
+- english
+- current
+
+-
+-
+- French
+- french
+- fr
+- english
+- not current
+
+- 3
+- hola
+- Spanish
+- espanol
+- es
+- english
+- not current
+
+
+HTML;
+
+        $this->assertEquals($expected, $this->tag($this->template('{{ locales all="true" }}'), ['id' => '1']));
     }
 
     /** @test */
@@ -150,6 +203,62 @@ HTML;
             '<hello><hola>',
             $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['id' => '1'])
         );
+    }
+
+    /** @test */
+    public function it_falls_back_to_the_sites_details_if_the_entry_is_a_draft_and_the_all_param_is_used()
+    {
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->id('1')
+            ->data(['title' => 'hello'])
+            ->create();
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('french')
+            ->id('2')
+            ->origin('1')
+            ->data(['title' => 'bonjour'])
+            ->published(false)
+            ->create();
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('espanol')
+            ->id('3')
+            ->origin('1')
+            ->data(['title' => 'hola'])
+            ->create();
+
+        $expected = <<<'HTML'
+- 1
+- hello
+- English
+- english
+- en
+- english
+- current
+
+-
+-
+- French
+- french
+- fr
+- english
+- not current
+
+- 3
+- hola
+- Spanish
+- espanol
+- es
+- english
+- not current
+
+
+HTML;
+
+        $this->assertEquals($expected, $this->tag($this->template('{{ locales all="true" }}'), ['id' => '1']));
     }
 
     /** @test */
