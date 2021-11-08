@@ -98,7 +98,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Enable Cache Tags
+    | Queue
     |--------------------------------------------------------------------------
     |
     | Some actions like sending emails and invalidating caches are queued.
