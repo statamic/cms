@@ -98,20 +98,17 @@ class UpdateFieldsetTest extends TestCase
         ], Facades\Fieldset::find('test')->contents());
     }
 
-    /** @test */
-    public function it_saves_external_fieldset_in_vendor_folder()
-    {
-        $this->withoutExceptionHandling();
+    // /** @test */
+    // public function it_saves_external_fieldset_in_vendor_folder()
+    // {
 
-        $user = tap(Facades\User::make()->makeSuper())->save();
+    //     FieldsetRepository::swap(new FieldsetRepository);
+    //     File::shouldReceive('exists')->with(resource_path('fieldsets/vendor/foo'))->once()->andReturnTrue();
+    //     File::shouldReceive('makeDirectory')->with(resource_path('fieldsets/vendor/foo'))->once();
+    //     File::shouldReceive('put')->with(resource_path('fieldsets/vendor/foo/test.yaml'), ['title' => 'Test'])->once();
 
-        FieldsetRepository::swap(new FieldsetRepository);
-        File::shouldReceive('exists')->with(resource_path('fieldsets/vendor/foo'))->once()->andReturnTrue();
-        File::shouldReceive('makeDirectory')->with(resource_path('fieldsets/vendor/foo'))->once();
-        File::shouldReceive('put')->with(resource_path('fieldsets/vendor/foo/test.yaml'), ['title' => 'Test'])->once();
-
-        $fieldset = (new Fieldset)->setHandle('foo::test')->setContents(['title' => 'Test'])->save();
-    }
+    //     $fieldset = (new Fieldset)->setHandle('foo::test')->setContents(['title' => 'Test'])->save();
+    // }
 
     /** @test */
     public function title_is_required()
