@@ -122,7 +122,7 @@ class FieldsetController extends CpController
     private function groupKey(Fieldset $fieldset): string
     {
         if ($fieldset->isExternal()) {
-            return Str::of($fieldset->handle())->before('::')->replace('_', ' ')->title()->__toString();
+            return Str::of($fieldset->handle())->before('::')->replace('_', ' ')->title();
         }
 
         return __('My Fieldsets');
