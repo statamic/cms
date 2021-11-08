@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use LogicException;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
@@ -65,8 +66,8 @@ class CollectionsController extends CpController
 
         $blueprint = $collection->entryBlueprint();
 
-        if (!$blueprint) {
-            throw new \LogicException("Collection [{$collection->handle()}] does not have any visible blueprints! Check whether you've hidden all blueprints for this collection.");
+        if (! $blueprint) {
+            throw new LogicException("The {$collection->handle()} collection does not have any visible blueprints. At least one must not be hidden.");
         }
 
         $columns = $blueprint
