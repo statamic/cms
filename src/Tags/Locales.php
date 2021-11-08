@@ -79,15 +79,11 @@ class Locales extends Tags
     {
         $site = $key instanceof \Statamic\Sites\Site ? $key : Site::get($key);
 
-        return [
-            'key' => $site->handle(),
-            'handle' => $site->handle(),
-            'name' => $site->name(),
-            'full' => $site->locale(),
+        return array_merge($site->toAugmentedArray(), [
             'short' => $site->shortLocale(),
-            'url' => $site->url(),
-            'permalink' => $site->absoluteUrl(),
-        ];
+            'full' => $site->locale(),
+            'key' => $site->handle(),
+        ]);
     }
 
     /**

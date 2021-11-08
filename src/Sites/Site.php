@@ -101,6 +101,7 @@ class Site implements Augmentable
             'locale' => $this->locale(),
             'short_locale' => $this->shortLocale(),
             'url' => $this->url(),
+            'permalink' => $this->absoluteUrl(),
             'direction' => $this->direction(),
             'attributes' => $this->attributes(),
         ];
