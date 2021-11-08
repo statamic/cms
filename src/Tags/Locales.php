@@ -2,11 +2,11 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Support\Str;
 
 class Locales extends Tags
 {
@@ -85,7 +85,8 @@ class Locales extends Tags
             'name' => $site->name(),
             'full' => $site->locale(),
             'short' => $site->shortLocale(),
-            'url' => $site->absoluteUrl(),
+            'url' => $site->url(),
+            'permalink' => $site->absoluteUrl(),
         ];
     }
 
@@ -104,7 +105,8 @@ class Locales extends Tags
                 $localized['current'] = Site::current()->handle();
                 $localized['is_current'] = $key === Site::current()->handle();
                 $localized['exists'] = Arr::exists($localized, 'status');
-                $localized['permalink'] = Arr::get($localized, 'permalink', $locale['url']);
+                $localized['url'] = Arr::get($localized, 'url', $locale['url']);
+                $localized['permalink'] = Arr::get($localized, 'permalink', $locale['permalink']);
             }
 
             return $localized;
