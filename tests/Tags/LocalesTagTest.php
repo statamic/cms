@@ -25,6 +25,7 @@ $tag
 - {{ locale:handle }}
 - {{ locale:key }}
 - {{ locale:short }}
+- {{ locale:full }}
 - {{ locale:url }}
 - {{ locale:permalink }}
 - {{ current }}
@@ -92,6 +93,7 @@ EOT;
 - english
 - english
 - en
+- en_US
 - /en
 - http://localhost/en
 - english
@@ -105,6 +107,7 @@ EOT;
 - french
 - french
 - fr
+- fr_FR
 - /fr
 - http://localhost/fr
 - english
@@ -118,6 +121,7 @@ EOT;
 - espanol
 - espanol
 - es
+- es_ES
 - /es
 - http://localhost/es
 - english
@@ -178,6 +182,7 @@ HTML;
 - english
 - english
 - en
+- en_US
 - /en
 - http://localhost/en
 - english
@@ -191,6 +196,7 @@ HTML;
 - french
 - french
 - fr
+- fr_FR
 - /fr
 - http://localhost/fr
 - english
@@ -204,6 +210,7 @@ HTML;
 - espanol
 - espanol
 - es
+- es_ES
 - /es
 - http://localhost/es
 - english
@@ -280,6 +287,7 @@ HTML;
 - english
 - english
 - en
+- en_US
 - /en
 - http://localhost/en
 - english
@@ -293,6 +301,7 @@ HTML;
 - french
 - french
 - fr
+- fr_FR
 - /fr
 - http://localhost/fr
 - english
@@ -306,6 +315,7 @@ HTML;
 - espanol
 - espanol
 - es
+- es_ES
 - /es
 - http://localhost/es
 - english
