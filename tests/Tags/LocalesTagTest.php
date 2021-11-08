@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
 use Tests\Factories\EntryFactory;
@@ -18,9 +19,13 @@ class LocalesTagTest extends TestCase
 $tag
 - {{ id }}
 - {{ title }}
+- {{ url }}
+- {{ permalink }}
 - {{ locale:name }}
 - {{ locale:handle }}
 - {{ locale:short }}
+- {{ locale:url }}
+- {{ locale:permalink }}
 - {{ current }}
 - {{ is_current ? 'current' : 'not current' }}
 
@@ -41,6 +46,11 @@ EOT;
             'french' => ['url' => '/fr', 'name' => 'French', 'locale' => 'fr_FR'],
             'espanol' => ['url' => '/es', 'name' => 'Spanish', 'locale' => 'es_ES'],
         ]]);
+
+        Collection::make('test')
+            ->routes('{id}')
+            ->sites(['english', 'french', 'espanol'])
+            ->save();
     }
 
     private function tag($tag, $context = [])
@@ -75,25 +85,37 @@ EOT;
         $expected = <<<'HTML'
 - 1
 - hello
+- /en/1
+- http://localhost/en/1
 - English
 - english
 - en
+- /en
+- http://localhost/en
 - english
 - current
 
 - 2
 - bonjour
+- /fr/2
+- http://localhost/fr/2
 - French
 - french
 - fr
+- /fr
+- http://localhost/fr
 - english
 - not current
 
 - 3
 - hola
+- /es/3
+- http://localhost/es/3
 - Spanish
 - espanol
 - es
+- /es
+- http://localhost/es
 - english
 - not current
 
@@ -146,25 +168,37 @@ HTML;
         $expected = <<<'HTML'
 - 1
 - hello
+- /en/1
+- http://localhost/en/1
 - English
 - english
 - en
+- /en
+- http://localhost/en
 - english
 - current
 
 -
 -
+- /fr
+- http://localhost/fr
 - French
 - french
 - fr
+- /fr
+- http://localhost/fr
 - english
 - not current
 
 - 3
 - hola
+- /es/3
+- http://localhost/es/3
 - Spanish
 - espanol
 - es
+- /es
+- http://localhost/es
 - english
 - not current
 
@@ -233,25 +267,37 @@ HTML;
         $expected = <<<'HTML'
 - 1
 - hello
+- /en/1
+- http://localhost/en/1
 - English
 - english
 - en
+- /en
+- http://localhost/en
 - english
 - current
 
 -
 -
+- /fr
+- http://localhost/fr
 - French
 - french
 - fr
+- /fr
+- http://localhost/fr
 - english
 - not current
 
 - 3
 - hola
+- /es/3
+- http://localhost/es/3
 - Spanish
 - espanol
 - es
+- /es
+- http://localhost/es
 - english
 - not current
 
