@@ -395,4 +395,20 @@ HTML;
             $this->tag('{{ locales:espanol }}<{{ title }}>{{ /locales:espanol }}', ['id' => '1'])
         );
     }
+
+    /** @test */
+    public function it_displays_nothing_when_there_are_no_results()
+    {
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->id('1')
+            ->data(['title' => 'hello'])
+            ->create();
+
+        $this->assertEquals(
+            '',
+            $this->tag('{{ locales self="false" }}you should not see this{{ /locales }}', ['id' => '1'])
+        );
+    }
 }

@@ -24,7 +24,13 @@ class Locales extends Tags
             return '';
         }
 
-        return $this->getLocales();
+        $locales = $this->getLocales();
+
+        if ($locales->isEmpty()) {
+            return '';
+        }
+
+        return $locales;
     }
 
     /**
