@@ -97,6 +97,7 @@ class Locales extends Tags
             $localized = $this->getLocalizedData($key);
 
             if ($localized || $this->params->bool('all')) {
+                $localized = $this->fillWithNullsFromBlueprint($localized);
                 $localized['locale'] = $locale;
                 $localized['current'] = Site::current()->handle();
                 $localized['is_current'] = $key === Site::current()->handle();
@@ -198,5 +199,24 @@ class Locales extends Tags
         $current = $locales->pull($key);
 
         return collect([$key => $current])->merge($locales);
+    }
+
+    private function fillWithNullsFromBlueprint($item)
+    {
+        // If $item is already an array, it's an entry. We're done.
+        if ($item) {
+            return $item;
+        }
+
+        // Otherwise, the localization doesn't exist, but we don't want
+        // the previous iteration of the loop to be carried over into
+        // this iteration, so we'll add null values for all the fields.
+        return $this->data->blueprint()
+            ->fields()->all()
+            ->map(function () {
+                return null;
+            })
+            ->put('id', null)
+            ->all();
     }
 }
