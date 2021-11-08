@@ -1,5 +1,28 @@
 # Release Notes
 
+## 3.2.21 (2020-11-08)
+
+### What's new
+- The `locales` tag can output data for all sites even when the entry isn't localized. It can also exclude its own locale. [#4665](https://github.com/statamic/cms/issues/4665) by @aerni
+- Utility for warming the Stache. [#4659](https://github.com/statamic/cms/issues/4659) by @jackmcdade
+
+### What's improved
+- Show a more helpful error if someone hides all blueprints. [#4607](https://github.com/statamic/cms/issues/4607) by @jelleroorda
+- French translations. [#4627](https://github.com/statamic/cms/issues/4627) by @ebeauchamps
+- Dutch translations. [#4664](https://github.com/statamic/cms/issues/4664) by @royvanv
+- German translations. [#4642](https://github.com/statamic/cms/issues/4642) by @helloDanuk
+
+### What's fixed
+- Fix nav root pages not showing extra data. [#4650](https://github.com/statamic/cms/issues/4650) by @jelleroorda
+- Fix asset field validation when using Amazon S3. [#4116](https://github.com/statamic/cms/issues/4116) by @arthurperton
+- Fix null and empty string field condition handling. [#4661](https://github.com/statamic/cms/issues/4661) by @jesseleite
+- Style links inside bard tables [3880e39c3](https://github.com/statamic/cms/commit/3880e39c3) by @jackmcdade
+- Add a duplicate translation for backwards compatibility. [#4648](https://github.com/statamic/cms/issues/4648) by @jasonvarga
+- Bump axios from 0.21.1 to 0.21.2 [#4679](https://github.com/statamic/cms/issues/4679) by @dependabot
+- Bump validator from 10.11.0 to 13.7.0 [#4649](https://github.com/statamic/cms/issues/4649) by @dependabot
+
+
+
 ## 3.2.20 (2020-11-01)
 
 ### What's improved
