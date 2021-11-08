@@ -23,6 +23,7 @@ $tag
 - {{ permalink }}
 - {{ locale:name }}
 - {{ locale:handle }}
+- {{ locale:key }}
 - {{ locale:short }}
 - {{ locale:url }}
 - {{ locale:permalink }}
@@ -89,6 +90,7 @@ EOT;
 - http://localhost/en/1
 - English
 - english
+- english
 - en
 - /en
 - http://localhost/en
@@ -101,6 +103,7 @@ EOT;
 - http://localhost/fr/2
 - French
 - french
+- french
 - fr
 - /fr
 - http://localhost/fr
@@ -112,6 +115,7 @@ EOT;
 - /es/3
 - http://localhost/es/3
 - Spanish
+- espanol
 - espanol
 - es
 - /es
@@ -172,6 +176,7 @@ HTML;
 - http://localhost/en/1
 - English
 - english
+- english
 - en
 - /en
 - http://localhost/en
@@ -184,6 +189,7 @@ HTML;
 - http://localhost/fr
 - French
 - french
+- french
 - fr
 - /fr
 - http://localhost/fr
@@ -195,6 +201,7 @@ HTML;
 - /es/3
 - http://localhost/es/3
 - Spanish
+- espanol
 - espanol
 - es
 - /es
@@ -271,6 +278,7 @@ HTML;
 - http://localhost/en/1
 - English
 - english
+- english
 - en
 - /en
 - http://localhost/en
@@ -283,6 +291,7 @@ HTML;
 - http://localhost/fr
 - French
 - french
+- french
 - fr
 - /fr
 - http://localhost/fr
@@ -294,6 +303,7 @@ HTML;
 - /es/3
 - http://localhost/es/3
 - Spanish
+- espanol
 - espanol
 - es
 - /es
