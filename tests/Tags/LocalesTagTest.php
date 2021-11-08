@@ -17,19 +17,19 @@ class LocalesTagTest extends TestCase
     {
         $contents = <<<EOT
 $tag
-- {{ id }}
-- {{ title }}
-- {{ url }}
-- {{ permalink }}
-- {{ locale:name }}
-- {{ locale:handle }}
-- {{ locale:key }}
-- {{ locale:short }}
-- {{ locale:full }}
-- {{ locale:url }}
-- {{ locale:permalink }}
-- {{ current }}
-- {{ is_current ? 'current' : 'not current' }}
+-{{ id }}
+-{{ title }}
+-{{ url }}
+-{{ permalink }}
+-{{ locale:name }}
+-{{ locale:handle }}
+-{{ locale:key }}
+-{{ locale:short }}
+-{{ locale:full }}
+-{{ locale:url }}
+-{{ locale:permalink }}
+-{{ current }}
+-{{ is_current ? 'current' : 'not current' }}
 
 {{ /locales }}
 EOT;
@@ -85,47 +85,47 @@ EOT;
             ->create();
 
         $expected = <<<'HTML'
-- 1
-- hello
-- /en/1
-- http://localhost/en/1
-- English
-- english
-- english
-- en
-- en_US
-- /en
-- http://localhost/en
-- english
-- current
+-1
+-hello
+-/en/1
+-http://localhost/en/1
+-English
+-english
+-english
+-en
+-en_US
+-/en
+-http://localhost/en
+-english
+-current
 
-- 2
-- bonjour
-- /fr/2
-- http://localhost/fr/2
-- French
-- french
-- french
-- fr
-- fr_FR
-- /fr
-- http://localhost/fr
-- english
-- not current
+-2
+-bonjour
+-/fr/2
+-http://localhost/fr/2
+-French
+-french
+-french
+-fr
+-fr_FR
+-/fr
+-http://localhost/fr
+-english
+-not current
 
-- 3
-- hola
-- /es/3
-- http://localhost/es/3
-- Spanish
-- espanol
-- espanol
-- es
-- es_ES
-- /es
-- http://localhost/es
-- english
-- not current
+-3
+-hola
+-/es/3
+-http://localhost/es/3
+-Spanish
+-espanol
+-espanol
+-es
+-es_ES
+-/es
+-http://localhost/es
+-english
+-not current
 
 
 HTML;
@@ -174,47 +174,47 @@ HTML;
             ->create();
 
         $expected = <<<'HTML'
-- 1
-- hello
-- /en/1
-- http://localhost/en/1
-- English
-- english
-- english
-- en
-- en_US
-- /en
-- http://localhost/en
-- english
-- current
+-1
+-hello
+-/en/1
+-http://localhost/en/1
+-English
+-english
+-english
+-en
+-en_US
+-/en
+-http://localhost/en
+-english
+-current
 
 -
 -
-- /fr
-- http://localhost/fr
-- French
-- french
-- french
-- fr
-- fr_FR
-- /fr
-- http://localhost/fr
-- english
-- not current
+-/fr
+-http://localhost/fr
+-French
+-french
+-french
+-fr
+-fr_FR
+-/fr
+-http://localhost/fr
+-english
+-not current
 
-- 3
-- hola
-- /es/3
-- http://localhost/es/3
-- Spanish
-- espanol
-- espanol
-- es
-- es_ES
-- /es
-- http://localhost/es
-- english
-- not current
+-3
+-hola
+-/es/3
+-http://localhost/es/3
+-Spanish
+-espanol
+-espanol
+-es
+-es_ES
+-/es
+-http://localhost/es
+-english
+-not current
 
 
 HTML;
@@ -279,47 +279,47 @@ HTML;
             ->create();
 
         $expected = <<<'HTML'
-- 1
-- hello
-- /en/1
-- http://localhost/en/1
-- English
-- english
-- english
-- en
-- en_US
-- /en
-- http://localhost/en
-- english
-- current
+-1
+-hello
+-/en/1
+-http://localhost/en/1
+-English
+-english
+-english
+-en
+-en_US
+-/en
+-http://localhost/en
+-english
+-current
 
 -
 -
-- /fr
-- http://localhost/fr
-- French
-- french
-- french
-- fr
-- fr_FR
-- /fr
-- http://localhost/fr
-- english
-- not current
+-/fr
+-http://localhost/fr
+-French
+-french
+-french
+-fr
+-fr_FR
+-/fr
+-http://localhost/fr
+-english
+-not current
 
-- 3
-- hola
-- /es/3
-- http://localhost/es/3
-- Spanish
-- espanol
-- espanol
-- es
-- es_ES
-- /es
-- http://localhost/es
-- english
-- not current
+-3
+-hola
+-/es/3
+-http://localhost/es/3
+-Spanish
+-espanol
+-espanol
+-es
+-es_ES
+-/es
+-http://localhost/es
+-english
+-not current
 
 
 HTML;
