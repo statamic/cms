@@ -328,6 +328,36 @@ HTML;
     }
 
     /** @test */
+    public function it_skips_its_own_locale_when_self_param_is_false()
+    {
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->id('1')
+            ->data(['title' => 'hello'])
+            ->create();
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('french')
+            ->id('2')
+            ->origin('1')
+            ->data(['title' => 'bonjour'])
+            ->create();
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('espanol')
+            ->id('3')
+            ->origin('1')
+            ->data(['title' => 'hola'])
+            ->create();
+
+        $this->assertEquals(
+            '<bonjour><hola>',
+            $this->tag('{{ locales self="false" }}<{{ title }}>{{ /locales }}', ['id' => '1'])
+        );
+    }
+
+    /** @test */
     public function it_shows_the_entry_in_a_given_site()
     {
         (new EntryFactory)

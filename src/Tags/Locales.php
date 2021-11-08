@@ -66,7 +66,9 @@ class Locales extends Tags
             return $this->sort($locales);
         })->pipe(function ($locales) {
             return $this->addData($locales);
-        })->filter()->values();
+        })->filter(function ($item) {
+            return $this->shouldInclude($item);
+        })->values();
     }
 
     /**
@@ -218,5 +220,18 @@ class Locales extends Tags
             })
             ->put('id', null)
             ->all();
+    }
+
+    private function shouldInclude($item)
+    {
+        if (! $item) {
+            return false;
+        }
+
+        if (! $this->params->bool('self', true) && $item['locale']['handle'] === $this->data->locale()) {
+            return false;
+        }
+
+        return true;
     }
 }
