@@ -8,6 +8,7 @@ use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FieldsetController extends CpController
 {
@@ -21,17 +22,19 @@ class FieldsetController extends CpController
         $fieldsets = Facades\Fieldset::all()
             ->filter(function (Fieldset $fieldset) {
                 return $fieldset->isEditable();
-            })->map(function (Fieldset $fieldset) {
+            })->mapToGroups(function (Fieldset $fieldset) {
                 return [
-                    'handle' => $fieldset->handle(),
-                    'id' => $fieldset->handle(),
-                    'delete_url' => $fieldset->deleteUrl(),
-                    'edit_url' => $fieldset->editUrl(),
-                    'fields' => $fieldset->fields()->all()->count(),
-                    'is_deletable' => ! $fieldset->isExternal(),
-                    'title' => $fieldset->title(),
+                    $this->groupKey($fieldset) => [
+                        'handle' => $fieldset->handle(),
+                        'id' => $fieldset->handle(),
+                        'delete_url' => $fieldset->deleteUrl(),
+                        'edit_url' => $fieldset->editUrl(),
+                        'fields' => $fieldset->fields()->all()->count(),
+                        'is_deletable' => ! $fieldset->isExternal(),
+                        'title' => $fieldset->title(),
+                    ],
                 ];
-            })->values();
+            });
 
         if ($request->wantsJson()) {
             return $fieldsets;
@@ -114,5 +117,14 @@ class FieldsetController extends CpController
         $fieldset->delete();
 
         return response('');
+    }
+
+    private function groupKey(Fieldset $fieldset): string
+    {
+        if ($fieldset->isExternal()) {
+            return Str::of($fieldset->handle())->before('::')->replace('_', ' ')->title()->__toString();
+        }
+
+        return __('My Fieldsets');
     }
 }
