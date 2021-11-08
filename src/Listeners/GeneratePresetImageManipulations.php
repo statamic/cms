@@ -46,7 +46,7 @@ class GeneratePresetImageManipulations implements ShouldQueue
         if ($queue = config('statamic.system.queue')) {
             return $queue;
         }
-        return config('queue.connections.'. $this->viaConnection().'.queue');
+        return config('queue.connections.'.$this->viaConnection().'.queue');
     }
 
     /**
