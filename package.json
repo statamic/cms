@@ -56,7 +56,7 @@
     "uniqid": "^5.2.0",
     "v-calendar": "^1.0.1",
     "v-tooltip": "^2.0.3",
-    "validator": "^10.11.0",
+    "validator": "^13.7.0",
     "vue": "^2.6.11",
     "vue-clickaway": "~2.2.2",
     "vue-countable": "^1.0.9",
