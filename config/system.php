@@ -98,6 +98,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Enable Cache Tags
+    |--------------------------------------------------------------------------
+    |
+    | Some actions like sending emails and invalidating caches are queued.
+    | By default we will use the laravel queue and connection
+    | unless specified here.
+    |
+    */
+
+    'queue' => env('STATAMIC_QUEUE'),
+    'queue_connection' => env('STATAMIC_QUEUE_CONNECTION'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Intensive Operations
     |--------------------------------------------------------------------------
     |

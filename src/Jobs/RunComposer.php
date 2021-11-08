@@ -37,6 +37,12 @@ class RunComposer implements ShouldQueue
     {
         $this->params = $params;
         $this->cacheKey = $cacheKey;
+        if ($queue = config('statamic.system.queue')) {
+            $this->onQueue($queue);
+        }
+        if ($connection = config('statamic.system.queue_connection')) {
+            $this->onConnection($connection);
+        }
     }
 
     /**

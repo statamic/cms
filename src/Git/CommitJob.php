@@ -27,6 +27,12 @@ class CommitJob implements ShouldQueue
     public function __construct($message = null)
     {
         $this->message = $message;
+        if ($queue = config('statamic.system.queue')) {
+            $this->onQueue($queue);
+        }
+        if ($connection = config('statamic.system.queue_connection')) {
+            $this->onConnection($connection);
+        }
     }
 
     /**

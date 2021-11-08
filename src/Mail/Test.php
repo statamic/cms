@@ -18,7 +18,12 @@ class Test extends Mailable implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        if ($queue = config('statamic.system.queue')) {
+            $this->onQueue($queue);
+        }
+        if ($connection = config('statamic.system.queue_connection')) {
+            $this->onConnection($connection);
+        }
     }
 
     /**

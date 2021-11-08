@@ -20,6 +20,12 @@ class GeneratePresetImageManipulation implements ShouldQueue
     {
         $this->asset = $asset;
         $this->preset = $preset;
+        if ($queue = config('statamic.system.queue')) {
+            $this->onQueue($queue);
+        }
+        if ($connection = config('statamic.system.queue_connection')) {
+            $this->onConnection($connection);
+        }
     }
 
     public function handle(PresetGenerator $generator)

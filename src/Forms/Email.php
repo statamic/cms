@@ -27,6 +27,12 @@ class Email extends Mailable
         $this->config = $this->parseConfig($config);
         $this->site = $site;
         $this->locale($site->shortLocale());
+        if ($queue = config('statamic.system.queue')) {
+            $this->onQueue($queue);
+        }
+        if ($connection = config('statamic.system.queue_connection')) {
+            $this->onConnection($connection);
+        }
     }
 
     public function build()

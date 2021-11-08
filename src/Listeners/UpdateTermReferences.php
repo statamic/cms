@@ -11,6 +11,32 @@ class UpdateTermReferences implements ShouldQueue
     use Concerns\GetsItemsContainingData;
 
     /**
+     * Get the name of the listener's queue connection.
+     *
+     * @return string
+     */
+    public function viaConnection()
+    {
+        if ($connection = config('statamic.system.queue_connection')) {
+            return $connection;
+        }
+        return config('queue.default');
+    }
+
+    /**
+     * Get the name of the listener's queue.
+     *
+     * @return string
+     */
+    public function viaQueue()
+    {
+        if ($queue = config('statamic.system.queue')) {
+            return $queue;
+        }
+        return config('queue.connections.'. $this->viaConnection().'.queue');
+    }
+
+    /**
      * Register the listeners for the subscriber.
      *
      * @param  \Illuminate\Events\Dispatcher  $events

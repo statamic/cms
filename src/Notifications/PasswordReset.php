@@ -16,6 +16,12 @@ class PasswordReset extends Notification
     public function __construct($token)
     {
         $this->token = $token;
+        if ($queue = config('statamic.system.queue')) {
+            $this->onQueue($queue);
+        }
+        if ($connection = config('statamic.system.queue_connection')) {
+            $this->onConnection($connection);
+        }
     }
 
     /**
