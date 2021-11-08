@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
@@ -23,7 +24,13 @@ class Locales extends Tags
             return '';
         }
 
-        return $this->getLocales();
+        $locales = $this->getLocales();
+
+        if ($locales->isEmpty()) {
+            return '';
+        }
+
+        return $locales;
     }
 
     /**
@@ -65,7 +72,9 @@ class Locales extends Tags
             return $this->sort($locales);
         })->pipe(function ($locales) {
             return $this->addData($locales);
-        })->filter()->values();
+        })->filter(function ($item) {
+            return $this->shouldInclude($item);
+        })->values();
     }
 
     /**
@@ -78,13 +87,11 @@ class Locales extends Tags
     {
         $site = $key instanceof \Statamic\Sites\Site ? $key : Site::get($key);
 
-        return [
-            'key' => $site->handle(),
-            'handle' => $site->handle(),
-            'name' => $site->name(),
-            'full' => $site->locale(),
+        return array_merge($site->toAugmentedArray(), [
             'short' => $site->shortLocale(),
-        ];
+            'full' => $site->locale(),
+            'key' => $site->handle(),
+        ]);
     }
 
     /**
@@ -95,13 +102,17 @@ class Locales extends Tags
     private function addData($locales)
     {
         return $locales->map(function ($locale, $key) {
-            if (! $localized = $this->getLocalizedData($key)) {
-                return null;
-            }
+            $localized = $this->getLocalizedData($key);
 
-            $localized['locale'] = $locale;
-            $localized['current'] = Site::current()->handle();
-            $localized['is_current'] = $key === Site::current()->handle();
+            if ($localized || $this->params->bool('all')) {
+                $localized = $this->fillWithNullsFromBlueprint($localized);
+                $localized['locale'] = $locale;
+                $localized['current'] = Site::current()->handle();
+                $localized['is_current'] = $key === Site::current()->handle();
+                $localized['exists'] = Arr::exists($localized, 'status');
+                $localized['url'] = Arr::get($localized, 'url', $locale['url']);
+                $localized['permalink'] = Arr::get($localized, 'permalink', $locale['permalink']);
+            }
 
             return $localized;
         });
@@ -196,5 +207,37 @@ class Locales extends Tags
         $current = $locales->pull($key);
 
         return collect([$key => $current])->merge($locales);
+    }
+
+    private function fillWithNullsFromBlueprint($item)
+    {
+        // If $item is already an array, it's an entry. We're done.
+        if ($item) {
+            return $item;
+        }
+
+        // Otherwise, the localization doesn't exist, but we don't want
+        // the previous iteration of the loop to be carried over into
+        // this iteration, so we'll add null values for all the fields.
+        return $this->data->blueprint()
+            ->fields()->all()
+            ->map(function () {
+                return null;
+            })
+            ->put('id', null)
+            ->all();
+    }
+
+    private function shouldInclude($item)
+    {
+        if (! $item) {
+            return false;
+        }
+
+        if (! $this->params->bool('self', true) && $item['locale']['handle'] === $this->data->locale()) {
+            return false;
+        }
+
+        return true;
     }
 }
