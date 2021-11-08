@@ -19,9 +19,9 @@ class LocalesTagTest extends TestCase
         $this->withoutEvents();
 
         Site::setConfig(['sites' => [
-            'en' => ['url' => '/en', 'name' => 'English', 'locale' => 'en_US'],
-            'fr' => ['url' => '/fr', 'name' => 'French', 'locale' => 'fr_FR'],
-            'es' => ['url' => '/es', 'name' => 'Spanish', 'locale' => 'es_ES'],
+            'english' => ['url' => '/en', 'name' => 'English', 'locale' => 'en_US'],
+            'french' => ['url' => '/fr', 'name' => 'French', 'locale' => 'fr_FR'],
+            'espanol' => ['url' => '/es', 'name' => 'Spanish', 'locale' => 'es_ES'],
         ]]);
     }
 
@@ -35,29 +35,67 @@ class LocalesTagTest extends TestCase
     {
         (new EntryFactory)
             ->collection('test')
-            ->locale('en')
+            ->locale('english')
             ->id('1')
             ->data(['title' => 'hello'])
             ->create();
         (new EntryFactory)
             ->collection('test')
-            ->locale('fr')
+            ->locale('french')
             ->id('2')
             ->origin('1')
             ->data(['title' => 'bonjour'])
             ->create();
         (new EntryFactory)
             ->collection('test')
-            ->locale('es')
+            ->locale('espanol')
             ->id('3')
             ->origin('1')
             ->data(['title' => 'hola'])
             ->create();
 
-        $this->assertEquals(
-            '<hello><bonjour><hola>',
-            $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['id' => '1'])
-        );
+        $template = <<<'HTML'
+{{ locales }}
+- {{ id }}
+- {{ title }}
+- {{ locale:name }}
+- {{ locale:handle }}
+- {{ locale:short }}
+- {{ current }}
+- {{ is_current ? 'current' : 'not current' }}
+
+{{ /locales }}
+HTML;
+
+        $expected = <<<'HTML'
+- 1
+- hello
+- English
+- english
+- en
+- english
+- current
+
+- 2
+- bonjour
+- French
+- french
+- fr
+- english
+- not current
+
+- 3
+- hola
+- Spanish
+- espanol
+- es
+- english
+- not current
+
+
+HTML;
+
+        $this->assertEquals($expected, $this->tag($template, ['id' => '1']));
     }
 
     /** @test */
@@ -65,13 +103,13 @@ class LocalesTagTest extends TestCase
     {
         (new EntryFactory)
             ->collection('test')
-            ->locale('en')
+            ->locale('english')
             ->id('1')
             ->data(['title' => 'hello'])
             ->create();
         (new EntryFactory)
             ->collection('test')
-            ->locale('es')
+            ->locale('espanol')
             ->id('3')
             ->origin('1')
             ->data(['title' => 'hola'])
@@ -88,13 +126,13 @@ class LocalesTagTest extends TestCase
     {
         (new EntryFactory)
             ->collection('test')
-            ->locale('en')
+            ->locale('english')
             ->id('1')
             ->data(['title' => 'hello'])
             ->create();
         (new EntryFactory)
             ->collection('test')
-            ->locale('fr')
+            ->locale('french')
             ->id('2')
             ->origin('1')
             ->data(['title' => 'bonjour'])
@@ -102,7 +140,7 @@ class LocalesTagTest extends TestCase
             ->create();
         (new EntryFactory)
             ->collection('test')
-            ->locale('es')
+            ->locale('espanol')
             ->id('3')
             ->origin('1')
             ->data(['title' => 'hola'])
@@ -119,13 +157,13 @@ class LocalesTagTest extends TestCase
     {
         (new EntryFactory)
             ->collection('test')
-            ->locale('en')
+            ->locale('english')
             ->id('1')
             ->data(['title' => 'hello'])
             ->create();
         (new EntryFactory)
             ->collection('test')
-            ->locale('es')
+            ->locale('espanol')
             ->id('3')
             ->origin('1')
             ->data(['title' => 'hola'])
@@ -133,7 +171,7 @@ class LocalesTagTest extends TestCase
 
         $this->assertEquals(
             '<hola>',
-            $this->tag('{{ locales:es }}<{{ title }}>{{ /locales:es }}', ['id' => '1'])
+            $this->tag('{{ locales:espanol }}<{{ title }}>{{ /locales:espanol }}', ['id' => '1'])
         );
     }
 
@@ -142,14 +180,14 @@ class LocalesTagTest extends TestCase
     {
         (new EntryFactory)
             ->collection('test')
-            ->locale('en')
+            ->locale('english')
             ->id('1')
             ->data(['title' => 'hello'])
             ->create();
 
         $this->assertEquals(
             '',
-            $this->tag('{{ locales:es }}<{{ title }}>{{ /locales:es }}', ['id' => '1'])
+            $this->tag('{{ locales:espanol }}<{{ title }}>{{ /locales:espanol }}', ['id' => '1'])
         );
     }
 }
