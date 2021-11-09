@@ -111,7 +111,7 @@ trait HasSelectOptions
 
     private function isOption($value)
     {
-        return Arr::isAssoc($options = $this->config('options'))
+        return Arr::isAssoc($options = $this->config('options') ?? [])
             ? in_array($value, array_keys($options), true)
             : in_array($value, $options, true);
     }
