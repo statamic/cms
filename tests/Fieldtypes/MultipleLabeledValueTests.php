@@ -34,6 +34,57 @@ trait MultipleLabeledValueTests
     }
 
     /** @test */
+    public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_numeric_keys()
+    {
+        $field = $this->field([
+            'type' => 'select',
+            'multiple' => true,
+            'options' => [
+                1 => 'Australia',
+                2 => 'Canada',
+                3 => 'USA',
+            ],
+        ]);
+
+        $this->assertEquals([
+            ['key' => 2, 'value' => 2, 'label' => 'Canada'],
+            ['key' => null, 'value' => null, 'label' => null],
+            ['key' => false, 'value' => false, 'label' => false],
+            ['key' => true, 'value' => true, 'label' => true],
+            ['key' => 'missing', 'value' => 'missing', 'label' => 'missing'],
+        ], $field->augment([2, null, false, true, 'missing']));
+
+        $this->assertEquals([
+            ['key' => 2, 'value' => 2, 'label' => 'Canada'],
+        ], $field->augment(['2']));
+
+        $this->assertEquals([
+            ['key' => '2.5', 'value' => '2.5', 'label' => '2.5'],
+        ], $field->augment(['2.5']));
+    }
+
+    /** @test */
+    public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_floats_for_keys()
+    {
+        $field = $this->field([
+            'type' => 'select',
+            'multiple' => true,
+            'options' => [
+                '1.5' => 'One point five',
+                '2.5' => 'Two point five',
+            ],
+        ]);
+
+        $this->assertEquals([
+            ['key' => '2.5', 'value' => '2.5', 'label' => 'Two point five'],
+        ], $field->augment(['2.5']));
+
+        $this->assertEquals([
+            ['key' => '2.5', 'value' => '2.5', 'label' => 'Two point five'],
+        ], $field->augment([2.5]));
+    }
+
+    /** @test */
     public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_boolean_casting()
     {
         $field = $this->field([

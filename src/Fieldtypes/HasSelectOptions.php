@@ -65,7 +65,7 @@ trait HasSelectOptions
         if ($this->multiple()) {
             return collect($value)->map(function ($value) {
                 return [
-                    'key' => $value,
+                    'key' => $value = $this->normalizeAugmentableValue($value),
                     'value' => $value,
                     'label' => $this->getLabel($value),
                 ];
@@ -74,7 +74,26 @@ trait HasSelectOptions
 
         throw_if(is_array($value), new MultipleValuesEncounteredException($this));
 
+        $value = $this->normalizeAugmentableValue($value);
+
         return new LabeledValue($value, $this->getLabel($value));
+    }
+
+    private function normalizeAugmentableValue($value)
+    {
+        if (! is_numeric($value)) {
+            return $value;
+        }
+
+        if ($value == (int) $value) {
+            return (int) $value;
+        }
+
+        if ($value == (float) $value) {
+            return (string) $value;
+        }
+
+        return $value;
     }
 
     private function getLabel($actualValue)
