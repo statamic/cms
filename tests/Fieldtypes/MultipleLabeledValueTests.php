@@ -126,4 +126,32 @@ trait MultipleLabeledValueTests
             ['key' => 'missing', 'value' => 'missing', 'label' => 'missing'],
         ], $field->augment([null, false, true, 'missing']));
     }
+
+    /**
+     * @test
+     * @dataProvider noMultipleOptionsProvider
+     */
+    public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_no_options($options)
+    {
+        $field = $this->field([
+            'type' => 'select',
+            'multiple' => true,
+            'options' => $options,
+        ]);
+
+        $this->assertEquals([
+            ['key' => null, 'value' => null, 'label' => null],
+            ['key' => false, 'value' => false, 'label' => false],
+            ['key' => true, 'value' => true, 'label' => true],
+            ['key' => 'missing', 'value' => 'missing', 'label' => 'missing'],
+        ], $field->augment([null, false, true, 'missing']));
+    }
+
+    public function noMultipleOptionsProvider()
+    {
+        return [
+            'empty_array' => [[]],
+            'null' => [null],
+        ];
+    }
 }

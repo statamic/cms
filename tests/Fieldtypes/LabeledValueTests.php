@@ -245,4 +245,44 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->value());
         $this->assertEquals('missing', $augmented->label());
     }
+
+    /**
+     * @test
+     * @dataProvider noOptionsProvider
+     **/
+    public function it_augments_to_a_LabeledValue_object_with_no_options($options)
+    {
+        $field = $this->field([
+            'type' => 'select',
+            'options' => $options,
+        ]);
+
+        $augmented = $field->augment(null);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertNull($augmented->value());
+        $this->assertNull($augmented->label());
+
+        $augmented = $field->augment(false);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertFalse($augmented->value());
+        $this->assertFalse($augmented->label());
+
+        $augmented = $field->augment(true);
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertTrue($augmented->value());
+        $this->assertTrue($augmented->label());
+
+        $augmented = $field->augment('missing');
+        $this->assertInstanceOf(LabeledValue::class, $augmented);
+        $this->assertEquals('missing', $augmented->value());
+        $this->assertEquals('missing', $augmented->label());
+    }
+
+    public function noOptionsProvider()
+    {
+        return [
+            'empty_array' => [[]],
+            'null' => [null],
+        ];
+    }
 }
