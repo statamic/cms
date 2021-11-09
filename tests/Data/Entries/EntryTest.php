@@ -1210,14 +1210,13 @@ class EntryTest extends TestCase
         $blueprint = tap(Blueprint::make('standard_article')->setNamespace('collections.articles'))->save();
         $entry = Entry::make('test')->collection($collection)->blueprint($blueprint->handle());
 
-        // entry uses `articles.standard-article` template
-        $this->assertEquals('articles.standard-article', $entry->template());
-
-        // entry uses `articles.standard_article` template (snake case)
-        // when user has snake cased article instead of slug case in views folder
-        View::shouldReceive('exists')->with('articles.standard_article')->andReturn(true);
-        View::shouldReceive('exists')->with('articles.standard-article')->andReturn(false);
+        // entry looks for `articles.standard_article` template (snake case) by default
         $this->assertEquals('articles.standard_article', $entry->template());
+
+        // entry uses `articles.standard-article` template (slug case)
+        // when user has slug cased template in views folder
+        View::shouldReceive('exists')->with('articles.standard-article')->andReturn(true);
+        $this->assertEquals('articles.standard-article', $entry->template());
 
         // entry level template overrides `@blueprint` on the collection
         $entry->template('articles.custom');

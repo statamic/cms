@@ -402,9 +402,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $slugifiedTemplate = str_replace('_', '-', $template);
 
-        return view()->exists($template) && ! view()->exists($slugifiedTemplate)
-            ? $template
-            : $slugifiedTemplate;
+        return view()->exists($slugifiedTemplate)
+            ? $slugifiedTemplate
+            : $template;
     }
 
     public function layout($layout = null)
