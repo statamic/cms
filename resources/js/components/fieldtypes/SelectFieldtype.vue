@@ -29,6 +29,9 @@
                         v-bind="attributes"
                     >
                 </template>
+                <template #option="option">
+                    <slot name="option" v-bind="option" />
+                </template>
                 <template #no-options>
                     <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
                 </template>
@@ -71,7 +74,7 @@ export default {
         },
 
         options() {
-            return this.normalizeInputOptions(this.config.options);
+            return this.config.options_are_normalized ? this.config.options : this.normalizeInputOptions(this.config.options);
         },
 
         replicatorPreview() {
