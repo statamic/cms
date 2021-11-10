@@ -73,6 +73,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function bootAddon()
     {
+        //
     }
 
     public function bootEvents()
