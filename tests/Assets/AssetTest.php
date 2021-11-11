@@ -15,6 +15,7 @@ use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -968,6 +969,39 @@ class AssetTest extends TestCase
         $this->assertNull($asset->url());
         $this->assertNull($asset->absoluteUrl());
         $this->assertEquals('container-id::path/to/test.txt', (string) $asset);
+    }
+
+    /** @test */
+    public function it_sends_a_download_response()
+    {
+        $fixture = __DIR__.'/__fixtures__/container/a.txt';
+        copy($fixture, Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt');
+
+        $asset = (new Asset)->container($this->container)->path('test.txt');
+
+        $this->assertTrue(method_exists($asset, 'download'));
+
+        $response = $asset->download();
+
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=test.txt', $response->headers->get('content-disposition'));
+    }
+
+    /** @test */
+    public function it_sends_a_download_response_with_a_different_name_and_custom_headers()
+    {
+        $fixture = __DIR__.'/__fixtures__/container/a.txt';
+        copy($fixture, Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt');
+
+        $asset = (new Asset)->container($this->container)->path('test.txt');
+
+        $this->assertTrue(method_exists($asset, 'download'));
+
+        $response = $asset->download('foo.txt', ['foo' => 'bar']);
+
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=foo.txt', $response->headers->get('content-disposition'));
+        $this->assertArraySubset(['foo' => ['bar']], $response->headers->all());
     }
 
     private function toArrayKeysWhenFileExists()
