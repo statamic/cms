@@ -134,6 +134,7 @@ abstract class Builder extends BaseBuilder
             if (is_array($value)) {
                 return count(array_intersect($value, $where['values']));
             }
+
             return in_array($value, $where['values']);
         });
     }
@@ -144,6 +145,7 @@ abstract class Builder extends BaseBuilder
             if (is_array($value)) {
                 return ! count(array_intersect($value, $where['values']));
             }
+
             return ! in_array($value, $where['values']);
         });
     }
