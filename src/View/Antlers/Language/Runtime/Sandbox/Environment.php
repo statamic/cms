@@ -1179,7 +1179,7 @@ class Environment
     {
         if ($originalNode instanceof AbstractNode && $originalNode->modifierChain != null) {
             if (! empty($originalNode->modifierChain->modifierChain)) {
-                $value = $this->checkForFieldValue($value);
+                $value = $this->checkForFieldValue($value, true);
 
                 return $this->applyModifiers($value, $originalNode->modifierChain);
             }
@@ -1194,14 +1194,16 @@ class Environment
         return $this->checkForFieldValue($value);
     }
 
-    private function checkForFieldValue($value)
+    private function checkForFieldValue($value, $hasModifiers = false)
     {
         if ($value instanceof Value) {
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
                 $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
             } else {
-                $value = $value->value();
+                if (! $hasModifiers) {
+                    $value = $value->value();
+                }
             }
             GlobalRuntimeState::$isEvaluatingUserData = false;
         }

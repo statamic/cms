@@ -97,6 +97,10 @@ class ModifierManager
                 }
             }
 
+            if ($returnValue instanceof Value) {
+                $returnValue = $value->value();
+            }
+
             $returnValue = Modify::value($returnValue)
                 ->context($context)->$modifierName($parameters)->fetch();
         }
