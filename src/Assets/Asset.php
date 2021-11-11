@@ -662,7 +662,7 @@ class Asset implements AssetContract, Augmentable
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function download(string $name = null, array $headers = null)
+    public function download(string $name = null, array $headers = [])
     {
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
     }
