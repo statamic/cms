@@ -2,6 +2,8 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
 use Tests\Antlers\ParserTestCase;
 
 class CoreModifiersTest extends ParserTestCase
@@ -365,5 +367,26 @@ EOT;
 EOT;
 
         $this->assertSame('one-two-three-', $this->renderString($template, [], true));
+    }
+
+    public function test_raw_shorthand_modifier_returns_raw_value()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public function augment($data)
+            {
+                return strtoupper($data).'!';
+            }
+
+            public function shallowAugment($data)
+            {
+                return $data.' shallow';
+            }
+        };
+
+        $value = new Value('test', null, $fieldtype);
+
+        $this->assertSame('TEST!', $this->renderString('{{ variable }}', ['variable' => $value]));
+        $this->assertSame('test', $this->renderString('{{ variable | raw }}', ['variable' => $value], true));
     }
 }
