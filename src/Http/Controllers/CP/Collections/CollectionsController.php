@@ -134,6 +134,7 @@ class CollectionsController extends CpController
             'max_depth' => optional($collection->structure())->maxDepth(),
             'expects_root' => optional($collection->structure())->expectsRoot(),
             'show_slugs' => optional($collection->structure())->showSlugs(),
+            'require_slugs' => $collection->requiresSlugs(),
             'links' => $collection->entryBlueprints()->map->handle()->contains('link'),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
             'default_publish_state' => $collection->defaultPublishState(),
@@ -223,7 +224,8 @@ class CollectionsController extends CpController
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
             ->mount(array_get($values, 'mount'))
             ->propagate(array_get($values, 'propagate'))
-            ->titleFormats($values['title_formats']);
+            ->titleFormats($values['title_formats'])
+            ->requiresSlugs($values['require_slugs']);
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -457,6 +459,11 @@ class CollectionsController extends CpController
                         'display' => __('Route'),
                         'instructions' => __('statamic::messages.collections_route_instructions'),
                         'type' => 'collection_routes',
+                    ],
+                    'require_slugs' => [
+                        'display' => __('Require Slugs'),
+                        'instructions' => __('statamic::messages.collection_configure_require_slugs_instructions'),
+                        'type' => 'toggle',
                     ],
                     'mount' => [
                         'display' => __('Mount'),

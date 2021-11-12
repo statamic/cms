@@ -37,6 +37,7 @@ return [
     'collection_configure_title_instructions' => 'We recommend a plural noun, like "Articles" or "Products".',
     'collection_configure_title_format_instructions' => 'Set this to have the entries in this collection generate their titles automatically.',
     'collection_configure_propagate_instructions' => 'Automatically propagate new entries to all configured sites.',
+    'collection_configure_require_slugs_instructions' => 'Whether entries are required to have slugs.',
     'collection_next_steps_configure_description' => 'Configure URLs and routes, define blueprints, date behaviors, ordering and other options.',
     'collection_next_steps_create_entry_description' => 'Create the first entry or stub out a handful of placeholder entries, it\'s up to you.',
     'collection_next_steps_documentation_description' => 'Learn more about collections, how they work, and how to configure them.',

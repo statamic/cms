@@ -477,6 +477,7 @@ class Collection implements Contract, AugmentableContract
 
         $array = Arr::removeNullValues(array_merge($array, [
             'route' => $route,
+            'slugs' => $this->requiresSlugs() === true ? null : false,
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'sort_by' => $this->sortField,
