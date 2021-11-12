@@ -67,7 +67,7 @@ class Email extends Mailable
         $html = array_get($this->config, 'html');
         $text = array_get($this->config, 'text');
 
-        if (!$text && !$html) {
+        if (! $text && ! $html) {
             return $this->view('statamic::forms.automagic-email');
         }
 
