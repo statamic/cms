@@ -779,6 +779,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             }, $format);
         }
 
-        return (string) Antlers::parse($format, $this->values());
+        return (string) Antlers::parse($format, $this->toAugmentedArray());
     }
 }
