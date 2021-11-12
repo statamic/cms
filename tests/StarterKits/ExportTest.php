@@ -107,8 +107,8 @@ class ExportTest extends TestCase
 
         $this->files->put(base_path('README.md'), 'This is readme for the new site!');
         $this->files->makeDirectory(base_path('test-folder'));
-        $this->files->put(base_path('test-folder/one.txt'), 'one');
-        $this->files->put(base_path('test-folder/two.txt'), 'two');
+        $this->files->put(base_path('test-folder/one.txt'), 'One.');
+        $this->files->put(base_path('test-folder/two.txt'), 'Two.');
 
         $this->setExportPaths([
             'config/filesystems.php',
@@ -129,11 +129,13 @@ class ExportTest extends TestCase
         $this->assertFileExists($composerJson);
         $this->assertFileExists($renamedFile);
         $this->assertFileExists($renamedFolder);
+
         $this->assertFileNotExists($this->exportPath('README.md')); // This got renamed above
         $this->assertFileNotExists($this->exportPath('test-folder')); // This got renamed above
+
         $this->assertFileHasContent('This is readme for the new site!', $renamedFile);
-        $this->assertFileHasContent('one', $renamedFolder.'/one.txt');
-        $this->assertFileHasContent('two', $renamedFolder.'/two.txt');
+        $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
+        $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
 
         $this->cleanPaths($paths);
     }
