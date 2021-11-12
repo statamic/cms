@@ -35,6 +35,7 @@ class Email extends Mailable
             ->subject(isset($this->config['subject']) ? __($this->config['subject']) : __('Form Submission'))
             ->addAddresses()
             ->addViews()
+            ->addAttachments()
             ->addData();
     }
 
@@ -66,7 +67,7 @@ class Email extends Mailable
         $html = array_get($this->config, 'html');
         $text = array_get($this->config, 'text');
 
-        if (! $text && ! $html) {
+        if (!$text && !$html) {
             return $this->view('statamic::forms.automagic-email');
         }
 
@@ -78,6 +79,34 @@ class Email extends Mailable
             $method = array_get($this->config, 'markdown') ? 'markdown' : 'view';
             $this->$method($html);
         }
+
+        return $this;
+    }
+
+    protected function addAttachments()
+    {
+        if (!array_get($this->config, 'attachments')) {
+            return;
+        }
+
+        $augmented = $this->submission->toAugmentedArray();
+
+        $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
+            ->filter(function ($field) {
+                return $field['fieldtype'] === 'assets';
+            })
+            ->each(function ($field) {
+                $value = $field['value']->value();
+                if (array_get($field, 'config.max_files') === 1) {
+                    if (isset($value)) {
+                        $this->attachFromStorageDisk($value->container()->diskHandle(), $value->path());
+                    }
+                } else {
+                    foreach ($value as $file) {
+                        $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
+                    }
+                }
+            });
 
         return $this;
     }
@@ -112,12 +141,24 @@ class Email extends Mailable
         });
     }
 
+    protected function getAttachmentFieldData($values)
+    {
+        return collect($values)->map(function ($value, $handle) {
+            $field = $value->field();
+            $display = $field->display();
+            $fieldtype = $field->type();
+            $config = $field->config();
+
+            return compact('display', 'handle', 'fieldtype', 'config', 'value');
+        });
+    }
+
     private function getGlobalsData()
     {
         $data = [];
 
         foreach (GlobalSet::all() as $global) {
-            if (! $global->existsIn($this->site->handle())) {
+            if (!$global->existsIn($this->site->handle())) {
                 continue;
             }
 
@@ -131,7 +172,7 @@ class Email extends Mailable
 
     protected function addresses($addresses)
     {
-        if (! $addresses) {
+        if (!$addresses) {
             return;
         }
 
