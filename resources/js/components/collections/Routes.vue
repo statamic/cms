@@ -57,7 +57,7 @@ export default {
     computed: {
 
         routeMode() {
-            return (typeof this.value === 'string') ? 'single' : 'multiple';
+            return (this.value === null || typeof this.value === 'string') ? 'single' : 'multiple';
         },
 
         sites() {
