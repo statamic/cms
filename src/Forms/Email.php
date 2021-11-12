@@ -86,7 +86,7 @@ class Email extends Mailable
     protected function addAttachments()
     {
         if (! array_get($this->config, 'attachments')) {
-            return;
+            return $this;
         }
 
         $augmented = $this->submission->toAugmentedArray();
