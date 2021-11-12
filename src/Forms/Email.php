@@ -141,18 +141,6 @@ class Email extends Mailable
         });
     }
 
-    protected function getAttachmentFieldData($values)
-    {
-        return collect($values)->map(function ($value, $handle) {
-            $field = $value->field();
-            $display = $field->display();
-            $fieldtype = $field->type();
-            $config = $field->config();
-
-            return compact('display', 'handle', 'fieldtype', 'config', 'value');
-        });
-    }
-
     private function getGlobalsData()
     {
         $data = [];
