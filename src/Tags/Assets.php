@@ -33,7 +33,10 @@ class Assets extends Tags
         $value = Arr::get($this->context, $this->method);
 
         if ($this->isAssetsFieldValue($value)) {
-            return $value->value();
+            // Normalize to an asset collection, this way it works for a single asset but also a collection.
+            $this->assets = (new AssetCollection([$value->value()]))->flatten();
+
+            return $this->output();
         }
 
         if ($value instanceof Value) {
