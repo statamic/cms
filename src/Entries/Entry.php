@@ -774,7 +774,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $format = $this->collection()->titleFormat($this->locale());
 
         if (! Str::contains($format, '{{')) {
-            $format = preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
+            $format = preg_replace_callback('/{\s*([a-zA-Z0-9_\-\:\.]+)\s*}/', function ($match) {
                 return "{{ {$match[1]} }}";
             }, $format);
         }
