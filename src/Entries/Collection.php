@@ -548,6 +548,7 @@ class Collection implements Contract, AugmentableContract
             'mount' => $this->mount,
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
+            'title_format' => $this->titleFormats,
         ];
     }
 

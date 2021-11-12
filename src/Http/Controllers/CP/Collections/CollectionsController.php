@@ -146,6 +146,9 @@ class CollectionsController extends CpController
                 ? $collection->routes()->first()
                 : $collection->routes()->all(),
             'mount' => optional($collection->mount())->id(),
+            'title_formats' => $collection->titleFormats()->unique()->count() === 1
+                ? $collection->titleFormats()->first()
+                : $collection->titleFormats()->all(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))
@@ -219,7 +222,8 @@ class CollectionsController extends CpController
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
             ->mount(array_get($values, 'mount'))
-            ->propagate(array_get($values, 'propagate'));
+            ->propagate(array_get($values, 'propagate'))
+            ->titleFormats($values['title_formats']);
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -417,6 +421,11 @@ class CollectionsController extends CpController
                         'display' => __('Layout'),
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
                         'type' => 'template',
+                    ],
+                    'title_formats' => [
+                        'display' => __('Title Format'),
+                        'instructions' => __('statamic::messages.collection_configure_title_format_instructions'),
+                        'type' => 'collection_title_formats',
                     ],
                 ],
             ],
