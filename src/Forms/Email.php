@@ -146,7 +146,7 @@ class Email extends Mailable
         $data = [];
 
         foreach (GlobalSet::all() as $global) {
-            if (!$global->existsIn($this->site->handle())) {
+            if (! $global->existsIn($this->site->handle())) {
                 continue;
             }
 
@@ -160,7 +160,7 @@ class Email extends Mailable
 
     protected function addresses($addresses)
     {
-        if (!$addresses) {
+        if (! $addresses) {
             return;
         }
 
