@@ -94,11 +94,11 @@ export default {
                 this.multipleValue = this.value;
 
                 value = this.singleValue || Object.values(this.value)[0];
-            } 
-            
+            }
+
             if (mode === 'multiple') {
                 this.singleValue = this.value;
-                
+
                 if (this.multipleValue) {
                     value = this.multipleValue;
                 } else {
@@ -107,7 +107,7 @@ export default {
                 }
             }
 
-            if (value) this.update(value);
+            this.update(value);
         },
 
         updateSiteRoute(site, route) {
