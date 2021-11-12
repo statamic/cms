@@ -22,39 +22,40 @@
 </template>
 
 <script>
-import Fieldtype from './Fieldtype.vue';
+    import Fieldtype from "./Fieldtype.vue";
 
-export default {
+    export default {
+        mixins: [Fieldtype],
 
-    mixins: [Fieldtype],
+        data() {
+            return {
+                val: this.value || this.config.default || this.getDefault(),
+            };
+        },
 
-     data() {
-        return {
-            val: this.value || this.config.default || this.getDefault()
-        }
-    },
+        methods: {
+            getDefault() {
+                // Spec: https://html.spec.whatwg.org/multipage/input.html#range-state-(type=range)
+                if (this.config.max < this.config.min) return this.config.min;
 
-    methods: {
-        getDefault() {
-            // Spec: https://html.spec.whatwg.org/multipage/input.html#range-state-(type=range)
-            if (this.config.max < this.config.min) return this.config.min;
+                var val = this.config.min + (this.config.max - this.config.min) / 2;
 
-            var val = this.config.min + (this.config.max - this.config.min) / 2;
+                // make sure on a valid step
+                if (this.config.step) {
+                    val = Math.floor(val / this.config.step) * this.config.step;
+                }
 
-            // make sure on a valid step
-            if (this.config.step) {
-                val = Math.floor(val / this.config.step) * this.config.step;
-            }
+                return val;
+            },
+        },
 
-            return val;
-        }
-    },
-
-    watch: {
-        val(value) {
-            this.updateDebounced(value);
-        }
-    }
-
-}
+        watch: {
+            value(value) {
+                this.val = value;
+            },
+            val(value) {
+                this.updateDebounced(value);
+            },
+        },
+    };
 </script>
