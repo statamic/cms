@@ -1571,7 +1571,7 @@ class NodeProcessor
                                         }
 
                                         if ($val instanceof AntlersString) {
-                                            $val = (string)$val;
+                                            $val = (string) $val;
                                         }
 
                                         if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
