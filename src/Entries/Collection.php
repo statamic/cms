@@ -97,6 +97,13 @@ class Collection implements Contract, AugmentableContract
     {
         return $this
             ->fluentlyGetOrSet('titleFormats')
+            ->setter(function ($format) {
+                if (! $format) {
+                    $format = [];
+                }
+
+                return $format;
+            })
             ->getter(function ($formats) {
                 return $this->sites()->mapWithKeys(function ($site) use ($formats) {
                     $siteRoute = is_string($formats) ? $formats : ($formats[$site] ?? null);

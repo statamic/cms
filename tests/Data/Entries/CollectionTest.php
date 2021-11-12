@@ -115,6 +115,9 @@ class CollectionTest extends TestCase
         $this->assertEquals(['en' => null], $collection->titleFormats()->all());
         $this->assertFalse($collection->autoGeneratesTitles());
 
+        $collection->titleFormats(null);
+        $this->assertFalse($collection->autoGeneratesTitles());
+
         $return = $collection->titleFormats([
             'en' => 'Quote by {author}',
             'fr' => 'Citation de {author}',
