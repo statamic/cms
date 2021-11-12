@@ -1517,14 +1517,9 @@ class NodeProcessor
                         $executedParamModifiers = false;
 
                         if ($node->hasParameters) {
-                            // It's possible that something will get scoped/aliased.
-                            // To account for the possibility we will loop later, we
-                            // will go ahead and add loop variables now so that
-                            // if the data does get scoped/aliased the loop
-                            // variables that used later will be adjusted.
-                            if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
-                                $val = $this->addLoopIterationVariables($val);
-                            }
+                            $this->pathDataManager->setIsPaired(false);
+                            $this->pathDataManager->setReduceFinal(false);
+                            $val = $this->pathDataManager->getData($node->pathReference, $this->getActiveData());
 
                             if (! $this->shouldProcessAsTag($node)) {
                                 foreach ($node->parameters as $param) {
@@ -1563,10 +1558,40 @@ class NodeProcessor
                                             }
                                         }
 
+                                        if ($val instanceof Collection) {
+                                            $val = $val->toArray();
+                                        } elseif ($val instanceof  Value) {
+                                            if ($val->shouldParseAntlers()) {
+                                                GlobalRuntimeState::$isEvaluatingUserData = true;
+                                                $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
+                                                GlobalRuntimeState::$isEvaluatingUserData = false;
+                                            } else {
+                                                $val = $val->value();
+                                            }
+                                        }
+
+                                        if ($val instanceof AntlersString) {
+                                            $val = (string)$val;
+                                        }
+
+                                        if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
+                                            $val = $this->addLoopIterationVariables($val);
+                                        }
+
                                         $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
                                     } else {
-                                        // Throw an exception here to maintain consistent behavior with the regex parser.
-                                        throw new ModifierNotFoundException($param->name);
+                                        if ($param->name === 'raw') {
+                                            if ($val instanceof Value) {
+                                                $val = $val->raw();
+                                            }
+                                        } elseif ($param->name === 'noparse') {
+                                            if ($val instanceof Value) {
+                                                $val = $val->value();
+                                            }
+                                        } else {
+                                            // Throw an exception here to maintain consistent behavior with the regex parser.
+                                            throw new ModifierNotFoundException($param->name);
+                                        }
                                     }
                                 }
 

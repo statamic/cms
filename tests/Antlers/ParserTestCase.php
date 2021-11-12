@@ -218,11 +218,15 @@ class ParserTestCase extends TestCase
         return $manager;
     }
 
-    protected function runFieldTypeTest($handle)
+    protected function runFieldTypeTest($handle, $testTemplate = null)
     {
+        if ($testTemplate == null) {
+            $testTemplate = $handle;
+        }
+
         $value = $this->getTestValue($handle);
-        $template = file_get_contents(__DIR__.'/../__fixtures__/fieldtype_tests/'.$handle.'/template.antlers.html');
-        $expectedResults = file_get_contents(__DIR__.'/../__fixtures__/fieldtype_tests/'.$handle.'/expected.txt');
+        $template = file_get_contents(__DIR__.'/../__fixtures__/fieldtype_tests/'.$testTemplate.'/template.antlers.html');
+        $expectedResults = file_get_contents(__DIR__.'/../__fixtures__/fieldtype_tests/'.$testTemplate.'/expected.txt');
 
         $this->assertSame($this->normalize($expectedResults), $this->normalize(
             $this->renderString($template, [$handle => $value], true)
