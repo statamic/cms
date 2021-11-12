@@ -17,6 +17,10 @@ class Value extends Index
     {
         $method = Str::camel($this->name);
 
+        if ($method == 'parent') {
+            return optional($item)->parent()->id();
+        }
+
         if ($method === 'blueprint') {
             return $item->blueprint()->handle();
         }
