@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Indexes;
 
-class parent extends Value
+class Parents extends Value
 {
     public function getItemValue($item)
     {
