@@ -413,6 +413,22 @@ EOT
     }
 
     /** @test */
+    public function it_does_not_export_as_with_opinionated_app_composer_json()
+    {
+        $this->setExportPaths([
+            'config/filesystems.php',
+        ], [
+            'composer.json' => 'composer-renamed.json',
+        ]);
+
+        $this->assertFileExists(base_path('composer.json'));
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileNotExists($this->exportPath('composer.json'));
+    }
+
+    /** @test */
     public function it_exports_basic_composer_json_file()
     {
         $this->setExportPaths([

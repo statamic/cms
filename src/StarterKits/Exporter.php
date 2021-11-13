@@ -167,7 +167,7 @@ class Exporter
     {
         $paths = collect($this->config()->get('export_as'));
 
-        if ($paths->contains('composer.json')) {
+        if ($paths->keys()->contains('composer.json')) {
             throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array!');
         }
 
