@@ -1926,10 +1926,11 @@ class NodeProcessor
      *
      * This prevents arrays with non-ordered numeric keys from being flagged as associative.
      *
-     * @param array|mixed $value The array to check.
+     * @param  array|mixed  $value  The array to check.
      * @return array|mixed
      */
-    private function massageKeys($value) {
+    private function massageKeys($value)
+    {
         if (! is_array($value)) {
             return $value;
         }
@@ -1950,6 +1951,7 @@ class NodeProcessor
 
             return $value;
         }
+
         return $value;
     }
 }

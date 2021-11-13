@@ -6,7 +6,6 @@ use Tests\Antlers\ParserTestCase;
 
 class LoopTest extends ParserTestCase
 {
-
     public function test_non_sequential_numeric_keys_are_not_treated_as_associative_arrays()
     {
         // Non-sequential numeric keys are not treated as associative arrays
@@ -38,5 +37,4 @@ class LoopTest extends ParserTestCase
 EOT;
         $this->assertSame('Hello, wilderness', $this->renderString($template, $data));
     }
-
 }
