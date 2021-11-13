@@ -619,7 +619,7 @@ final class Installer
     }
 
     /**
-     * Get `export` paths.
+     * Get `export_paths` paths from config.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -631,7 +631,7 @@ final class Installer
     }
 
     /**
-     * Get `export_as` paths.
+     * Get `export_as` paths (to be renamed on install) from config.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -664,42 +664,34 @@ final class Installer
 
         return collect()
             ->merge($installableFromExportPaths)
-            ->merge($installableFromExportAsPaths)
-            ->mapWithKeys(function ($to, $from) {
-                return [Path::tidy($from) => Path::tidy(str_replace("/vendor/{$this->package}", '', $to))];
-            });
+            ->merge($installableFromExportAsPaths);
     }
 
     /**
-     * Expand export paths.
+     * Expand config export path to `[$from => $to]` array format, normalizing directories to files.
      *
      * @param  string  $to
      * @param  string  $from
+     * @return \Illuminate\Support\Collection
      */
     protected function expandConfigExportPaths($to, $from = null)
     {
-        $toAbsolute = $this->starterKitPath($to);
-        $fromAbsolute = $from ? $this->starterKitPath($from) : null;
+        $to = $this->starterKitPath($to);
+        $from = $from ? $this->starterKitPath($from) : $to;
 
-        if ($this->files->isDirectory($toAbsolute) && ! $from) {
-            return collect($this->files->allFiles($toAbsolute))
+        $paths = collect([$from => $to]);
+
+        if ($this->files->isDirectory($from)) {
+            $paths = collect($this->files->allFiles($from))
                 ->map->getPathname()
-                ->mapWithKeys(function ($path) {
-                    return [$path => $path];
-                })
-                ->all();
-        } elseif ($this->files->isDirectory($fromAbsolute)) {
-            return collect($this->files->allFiles($fromAbsolute))
-                ->map->getPathname()
-                ->mapWithKeys(function ($path) use ($fromAbsolute, $toAbsolute) {
-                    return [$path => str_replace($fromAbsolute, $toAbsolute, $path)];
-                })
-                ->all();
+                ->mapWithKeys(function ($path) use ($from, $to) {
+                    return [$path => str_replace($from, $to, $path)];
+                });
         }
 
-        return $from
-            ? [$fromAbsolute => $toAbsolute]
-            : [$toAbsolute => $toAbsolute];
+        return $paths->mapWithKeys(function ($to, $from) {
+            return [Path::tidy($from) => Path::tidy(str_replace("/vendor/{$this->package}", '', $to))];
+        });
     }
 
     /**

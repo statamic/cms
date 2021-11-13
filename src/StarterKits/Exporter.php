@@ -137,7 +137,7 @@ class Exporter
     }
 
     /**
-     * Get starter kit export paths from config.
+     * Get starter kit `export_paths` paths from config.
      *
      * @return \Illuminate\Support\Collection
      *
@@ -157,7 +157,7 @@ class Exporter
     }
 
     /**
-     * Get starter kit 'export as' paths (to be renamed on export) from config.
+     * Get starter kit 'export_as' paths (to be renamed on export) from config.
      *
      * @return \Illuminate\Support\Collection
      *
