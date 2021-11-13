@@ -1618,6 +1618,8 @@ class NodeProcessor
 
                             if ($this->isLoopable($val)) {
                                 if (! empty($val)) {
+                                    $val = $this->massageKeys($val);
+
                                     if (is_array($val) && Arr::isAssoc($val)) {
                                         $tmpArrayData = $this->getActiveData();
 
@@ -1917,5 +1919,37 @@ class NodeProcessor
 
             return $value;
         }
+    }
+
+    /**
+     * Resets an array's keys if they are all numeric.
+     *
+     * This prevents arrays with non-ordered numeric keys from being flagged as associative.
+     *
+     * @param array|mixed $value The array to check.
+     * @return array|mixed
+     */
+    private function massageKeys($value) {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        if (Arr::isAssoc($value)) {
+            $resetValues = true;
+
+            foreach ($value as $tKey => $tVal) {
+                if (! is_numeric($tKey)) {
+                    $resetValues = false;
+                    break;
+                }
+            }
+
+            if ($resetValues) {
+                $value = array_values($value);
+            }
+
+            return $value;
+        }
+        return $value;
     }
 }
