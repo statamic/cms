@@ -974,12 +974,9 @@ class AssetTest extends TestCase
     /** @test */
     public function it_sends_a_download_response()
     {
-        $fixture = __DIR__.'/__fixtures__/container/a.txt';
-        copy($fixture, Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt');
+        Storage::disk('test')->put('test.txt', '');
 
         $asset = (new Asset)->container($this->container)->path('test.txt');
-
-        $this->assertTrue(method_exists($asset, 'download'));
 
         $response = $asset->download();
 
@@ -990,12 +987,9 @@ class AssetTest extends TestCase
     /** @test */
     public function it_sends_a_download_response_with_a_different_name_and_custom_headers()
     {
-        $fixture = __DIR__.'/__fixtures__/container/a.txt';
-        copy($fixture, Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt');
+        Storage::disk('test')->put('test.txt', '');
 
         $asset = (new Asset)->container($this->container)->path('test.txt');
-
-        $this->assertTrue(method_exists($asset, 'download'));
 
         $response = $asset->download('foo.txt', ['foo' => 'bar']);
 
