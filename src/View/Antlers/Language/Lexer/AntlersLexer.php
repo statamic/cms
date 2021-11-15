@@ -778,7 +778,7 @@ class AntlersLexer
                             $spaceshipOperator->endPosition = $node->relativeOffset($this->currentIndex + 3);
 
                             $this->runtimeNodes[] = $spaceshipOperator;
-                            $this->lastNode = $subtractionOperator;
+                            $this->lastNode = $spaceshipOperator;
                             $this->currentIndex += 2;
                             continue;
                         }
