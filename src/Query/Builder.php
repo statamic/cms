@@ -162,7 +162,7 @@ abstract class Builder implements Contract
         return $this->whereContains($column, $values, 'or');
     }
 
-    public function whereNotContains($column, $values, $boolean = 'and')
+    public function whereDoesntContain($column, $values, $boolean = 'and')
     {
         $this->wheres[] = [
             'type' => 'NotContains',
