@@ -7,7 +7,7 @@ use Illuminate\Support\ViewErrorBag;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
-class ErrorBagTest extends TestCase
+class GetErrorsTest extends TestCase
 {
     public function setUp(): void
     {
@@ -23,7 +23,7 @@ class ErrorBagTest extends TestCase
     public function it_returns_empty_string_with_empty_view_error_bag()
     {
         view()->share('errors', new ViewErrorBag);
-        $this->assertEquals('', $this->tag('{{ error_bag }}{{ fields }}{{ field }}: {{ field_errors }}{{ value }}{{ /field_errors}}{{ /fields }}{{ /error_bag }}'));
+        $this->assertEquals('', $this->tag('{{ get_errors }}{{ fields }}{{ field }}: {{ field_errors }}{{ value }}{{ /field_errors}}{{ /fields }}{{ /get_errors }}'));
     }
 
     /** @test */
@@ -36,7 +36,7 @@ class ErrorBagTest extends TestCase
 
         $this->assertEquals(
             'name is required',
-            $this->tag('{{ error_bag:name }}{{ field_error }}{{ /error_bag:name }}')
+            $this->tag('{{ get_errors:name }}{{ field_error }}{{ /get_errors:name }}')
         );
     }
 
@@ -52,7 +52,7 @@ class ErrorBagTest extends TestCase
 
         $this->assertEquals(
             'name is requiredname should be 10 chars',
-            $this->tag('{{ error_bag:name }}{{ field_error }}{{ /error_bag:name }}')
+            $this->tag('{{ get_errors:name }}{{ field_error }}{{ /get_errors:name }}')
         );
     }
 
@@ -68,7 +68,7 @@ class ErrorBagTest extends TestCase
 
         $this->assertEquals(
             'name: name is requirednumber: number should be a number',
-            $this->tag('{{ error_bag }}{{ fields }}{{ field }}: {{ field_errors }}{{ value }}{{ /field_errors}}{{ /fields }}{{ /error_bag }}')
+            $this->tag('{{ get_errors }}{{ fields }}{{ field }}: {{ field_errors }}{{ value }}{{ /field_errors}}{{ /fields }}{{ /get_errors }}')
         );
     }
 }

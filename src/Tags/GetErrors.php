@@ -4,7 +4,7 @@ namespace Statamic\Tags;
 
 use Illuminate\Support\MessageBag;
 
-class ErrorBag extends Tags
+class GetErrors extends Tags
 {
     public function index()
     {
@@ -16,7 +16,7 @@ class ErrorBag extends Tags
     }
 
     /**
-     * {{ error_bag:fieldname }}.
+     * {{ get_errors:fieldname }}.
      */
     public function wildcard(string $name)
     {
