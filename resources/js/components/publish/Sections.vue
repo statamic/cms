@@ -193,7 +193,7 @@ export default {
         if (window.location.hash.length > 0) {
             let hash = window.location.hash.substr(1);
             // if hash is in this.visibleTabs, make it active.
-            if (this.visibleTabs.indexOf(hash) > -1) {
+            if (_.chain(this.visibleTabs).values().contains(hash)) {
                 this.setActive(hash);
             } else {
                 window.location.hash = '';
