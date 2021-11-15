@@ -100,6 +100,8 @@ class AssetFolder implements Contract, Arrayable
     {
         $this->disk()->makeDirectory($this->path());
 
+        $this->container()->contents()->add($this->path())->save();
+
         AssetFolderSaved::dispatch($this);
 
         return $this;

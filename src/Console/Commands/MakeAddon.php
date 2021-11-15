@@ -233,7 +233,7 @@ class MakeAddon extends GeneratorCommand
     /**
      * Run optional addon generator command.
      *
-     * @param string $type
+     * @param  string  $type
      */
     protected function runOptionalAddonGenerator($type)
     {
@@ -268,7 +268,7 @@ class MakeAddon extends GeneratorCommand
     /**
      * Build absolute path for an addon or addon file.
      *
-     * @param string|null $file
+     * @param  string|null  $file
      * @return string
      */
     protected function addonPath($file = null, $makeDirectory = true)

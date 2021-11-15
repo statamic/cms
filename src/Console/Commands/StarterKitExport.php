@@ -88,7 +88,7 @@ class StarterKitExport extends Command
     /**
      * Ask to create export path.
      *
-     * @param string $path
+     * @param  string  $path
      */
     protected function askToCreateExportPath($path)
     {

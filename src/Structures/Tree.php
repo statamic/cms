@@ -89,6 +89,7 @@ abstract class Tree implements Contract, Localization
             ->setTitle($branch['title'] ?? null)
             ->setRoute($this->route())
             ->setDepth(1)
+            ->setPageData($branch['data'] ?? [])
             ->setRoot(true);
     }
 

@@ -24,6 +24,7 @@ class Bard extends Replicator
 
     public $category = ['text', 'structured'];
     protected $defaultValue = '[]';
+    protected $rules = [];
 
     protected function configFieldItems(): array
     {
@@ -63,6 +64,7 @@ class Bard extends Replicator
                 'display' => __('Container'),
                 'instructions' => __('statamic::fieldtypes.bard.config.container'),
                 'type' => 'asset_container',
+                'mode' => 'select',
                 'max_items' => 1,
                 'if' => [
                     'buttons' => 'contains_any anchor, image',
@@ -157,7 +159,7 @@ class Bard extends Replicator
     protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
-            return $this->resolveStatamicUrls($value);
+            return is_null($value) ? $value : $this->resolveStatamicUrls($value);
         }
 
         if ($this->isLegacyData($value)) {

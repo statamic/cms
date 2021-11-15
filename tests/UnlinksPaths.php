@@ -9,7 +9,7 @@ trait UnlinksPaths
     /**
      * Unlink passed path/paths after test (during tearDown).
      *
-     * @param string|array|\Illuminate\Support\Collection $paths
+     * @param  string|array|\Illuminate\Support\Collection  $paths
      */
     protected function unlinkAfter($paths)
     {

@@ -125,11 +125,25 @@ class Grid extends Fieldtype
 
     public function extraRules(): array
     {
-        $rules = $this->fields()->validator()->rules();
+        return collect($this->field->value())->map(function ($row, $index) {
+            return $this->rowRules($row, $index);
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
+    }
 
-        return collect($rules)->mapWithKeys(function ($rules, $handle) {
-            return ["{$this->field->handle()}.*.{$handle}" => $rules];
+    protected function rowRules($data, $index)
+    {
+        $rules = $this->fields()->addValues($data)->validator()->rules();
+
+        return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
+            return [$this->setRuleFieldKey($handle, $index) => $rules];
         })->all();
+    }
+
+    protected function setRuleFieldKey($handle, $index)
+    {
+        return "{$this->field->handle()}.{$index}.{$handle}";
     }
 
     public function preload()
@@ -188,5 +202,18 @@ class Grid extends Fieldtype
         return 'GridItem_'.collect($this->field->handlePath())->map(function ($part) {
             return Str::studly($part);
         })->join('_');
+    }
+
+    public function preProcessValidatable($value)
+    {
+        return collect($value)->map(function ($values) {
+            $processed = $this->fields()
+                ->addValues($values)
+                ->preProcessValidatables()
+                ->values()
+                ->all();
+
+            return array_merge($values, $processed);
+        })->all();
     }
 }

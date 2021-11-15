@@ -7,7 +7,7 @@ interface AssetContainer
     /**
      * Get or set the ID.
      *
-     * @param null|string $id
+     * @param  null|string  $id
      * @return string
      */
     public function id($id = null);
@@ -15,7 +15,7 @@ interface AssetContainer
     /**
      * Get or set the handle.
      *
-     * @param null|string $handle
+     * @param  null|string  $handle
      * @return string
      */
     public function handle($handle = null);
@@ -23,7 +23,7 @@ interface AssetContainer
     /**
      * Get or set the title.
      *
-     * @param null|string $title
+     * @param  null|string  $title
      * @return string
      */
     public function title($title = null);
@@ -38,7 +38,7 @@ interface AssetContainer
     /**
      * Create an asset.
      *
-     * @param string $path
+     * @param  string  $path
      * @return \Statamic\Assets\Asset
      */
     public function asset($path);
@@ -46,8 +46,8 @@ interface AssetContainer
     /**
      * Get all the assets in this container.
      *
-     * @param string|null $folder Narrow down assets by folder
-     * @param bool $recursive Whether to look for assets recursively
+     * @param  string|null  $folder  Narrow down assets by folder
+     * @param  bool  $recursive  Whether to look for assets recursively
      * @return \Statamic\Assets\AssetCollection
      */
     public function assets($folder = null, $recursive = false);
@@ -55,7 +55,7 @@ interface AssetContainer
     /**
      * Get all the asset files in this container.
      *
-     * @param string|null $folder  Narrow down assets by folder
+     * @param  string|null  $folder  Narrow down assets by folder
      * @return \Illuminate\Support\Collection
      */
     public function files($folder = null);
@@ -63,8 +63,8 @@ interface AssetContainer
     /**
      * Get all the subfolders in this container.
      *
-     * @param string|null $folder Narrow down subfolders by folder
-     * @param bool $recursive
+     * @param  string|null  $folder  Narrow down subfolders by folder
+     * @param  bool  $recursive
      * @return \Illuminate\Support\Collection
      */
     public function folders($folder = null, $recursive = false);

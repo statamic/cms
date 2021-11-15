@@ -10,8 +10,8 @@ class Manager
     /**
      * Get a filesystem disk.
      *
-     * @param string|null $name  Either the name of a native filesystem (eg. "content"), null for the
-     *                           project root, or the name of a user defined disk in filesystems.php
+     * @param  string|null  $name  Either the name of a native filesystem (eg. "content"), null for the
+     *                             project root, or the name of a user defined disk in filesystems.php
      * @return \Statamic\Filesystem\Filesystem
      */
     public function disk($name = null)
@@ -22,7 +22,7 @@ class Manager
 
         try {
             $root = app("filesystems.paths.$name");
-        } catch (\ReflectionException | BindingResolutionException $e) {
+        } catch (\ReflectionException|BindingResolutionException $e) {
             return new FlysystemAdapter(Storage::disk($name));
         }
 
@@ -35,8 +35,8 @@ class Manager
     /**
      * Pass methods through to the default disk.
      *
-     * @param string $method
-     * @param array $args
+     * @param  string  $method
+     * @param  array  $args
      * @return mixed
      */
     public function __call($method, $args)

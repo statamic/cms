@@ -19,8 +19,8 @@ class ApplicationCacher extends AbstractCacher
     /**
      * Cache a page.
      *
-     * @param \Illuminate\Http\Request $request     Request associated with the page to be cached
-     * @param string                   $content     The response content to be cached
+     * @param  \Illuminate\Http\Request  $request  Request associated with the page to be cached
+     * @param  string  $content  The response content to be cached
      */
     public function cachePage(Request $request, $content)
     {
@@ -50,7 +50,7 @@ class ApplicationCacher extends AbstractCacher
     /**
      * Check if a page has been cached.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return bool
      */
     public function hasCachedPage(Request $request)
@@ -61,7 +61,7 @@ class ApplicationCacher extends AbstractCacher
     /**
      * Get a cached page.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return string
      */
     public function getCachedPage(Request $request)
@@ -95,7 +95,7 @@ class ApplicationCacher extends AbstractCacher
     /**
      * Invalidate a URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return void
      */
     public function invalidateUrl($url)

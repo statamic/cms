@@ -15,7 +15,7 @@
         <td class="p-0 w-8 text-right align-middle">
 
             <button v-if="!readOnly" class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90" @click="remove" :aria-label="__('Remove Asset')">
-                <svg-icon name="trash" />
+                <svg-icon name="trash" class="w-6 h-6" />
             </button>
 
             <asset-editor
