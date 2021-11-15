@@ -125,14 +125,7 @@ abstract class Builder implements Contract
 
     public function orWhereIn($column, $values)
     {
-        $this->wheres[] = [
-            'type' => 'In',
-            'column' => $column,
-            'values' => $values,
-            'boolean' => 'or',
-        ];
-
-        return $this;
+        return $this->whereIn($column, $values, 'or');
     }
 
     public function whereNotIn($column, $values, $boolean = 'and')
@@ -149,14 +142,41 @@ abstract class Builder implements Contract
 
     public function orWhereNotIn($column, $values)
     {
+        return $this->whereNotIn($column, $values, 'or');
+    }
+
+    public function whereContains($column, $values, $boolean = 'and')
+    {
         $this->wheres[] = [
-            'type' => 'NotIn',
+            'type' => 'Contains',
             'column' => $column,
             'values' => $values,
-            'boolean' => 'or',
+            'boolean' => $boolean,
         ];
 
         return $this;
+    }
+
+    public function orWhereContains($column, $values)
+    {
+        return $this->whereContains($column, $values, 'or');
+    }
+
+    public function whereNotContains($column, $values, $boolean = 'and')
+    {
+        $this->wheres[] = [
+            'type' => 'NotContains',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereNotContains($column, $values)
+    {
+        return $this->whereNotContains($column, $values, 'or');
     }
 
     public function find($id, $columns = ['*'])

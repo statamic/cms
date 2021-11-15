@@ -149,4 +149,24 @@ abstract class Builder extends BaseBuilder
             return ! in_array($value, $where['values']);
         });
     }
+
+    protected function filterWhereContains($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (!is_array($value))
+                return false;
+
+            return count(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereNotContains($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (!is_array($value))
+                return true;
+
+            return ! count(array_intersect($value, $where['values']));
+        });
+    }
 }
