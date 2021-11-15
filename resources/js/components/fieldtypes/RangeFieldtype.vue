@@ -30,7 +30,7 @@ export default {
 
      data() {
         return {
-            val: this.value || this.config.default || this.getDefault(),
+            val: this.value || this.config.default || this.getDefault()
         }
     },
 
@@ -58,5 +58,6 @@ export default {
             this.updateDebounced(value);
         }
     }
+
 }
 </script>
