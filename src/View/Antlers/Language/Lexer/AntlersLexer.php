@@ -943,7 +943,7 @@ class AntlersLexer
                         }
 
                         if ($peek == DocumentParser::Punctuation_Equals) {
-                            // !===
+                            // !==
                             $strictNotEqual = new NotStrictEqualCompOperator();
                             $strictNotEqual->content = '!==';
                             $strictNotEqual->startPosition = $node->relativeOffset($this->currentIndex);
