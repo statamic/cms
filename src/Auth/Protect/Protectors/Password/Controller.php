@@ -11,8 +11,7 @@ class Controller extends BaseController
 
     public function show()
     {
-        return (new View)
-            ->template('statamic::auth.protect.password');
+        return View::make('statamic::auth.protect.password');
     }
 
     public function store()
