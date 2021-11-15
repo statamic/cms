@@ -22,15 +22,16 @@
 </template>
 
 <script>
-import Fieldtype from "./Fieldtype.vue";
+import Fieldtype from './Fieldtype.vue';
 
 export default {
+
     mixins: [Fieldtype],
 
-    data() {
+     data() {
         return {
             val: this.value || this.config.default || this.getDefault(),
-        };
+        }
     },
 
     methods: {
@@ -46,7 +47,7 @@ export default {
             }
 
             return val;
-        },
+        }
     },
 
     watch: {
@@ -55,7 +56,7 @@ export default {
         },
         val(value) {
             this.updateDebounced(value);
-        },
-    },
-};
+        }
+    }
+}
 </script>
