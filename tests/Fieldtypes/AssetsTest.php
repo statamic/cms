@@ -8,8 +8,11 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Field;
-use Statamic\Fieldtypes\Assets\AssetRule;
 use Statamic\Fieldtypes\Assets\Assets;
+use Statamic\Fieldtypes\Assets\DimensionsRule;
+use Statamic\Fieldtypes\Assets\ImageRule;
+use Statamic\Fieldtypes\Assets\MimesRule;
+use Statamic\Fieldtypes\Assets\MimetypesRule;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -93,7 +96,7 @@ class AssetsTest extends TestCase
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertInstanceOf(DimensionsRule::class, $replaced[0]);
         $this->assertEquals(__('statamic::validation.dimensions'), $replaced[0]->message());
     }
 
@@ -104,7 +107,7 @@ class AssetsTest extends TestCase
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertInstanceOf(ImageRule::class, $replaced[0]);
         $this->assertEquals(__('statamic::validation.image'), $replaced[0]->message());
     }
 
@@ -115,8 +118,8 @@ class AssetsTest extends TestCase
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
-        $this->assertEquals(__('statamic::validation.mimes', ['values' => 'jpg, png']), $replaced[0]->message());
+        $this->assertInstanceOf(MimesRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.mimes', ['values' => 'jpg, png, jpeg']), $replaced[0]->message());
     }
 
     /** @test */
@@ -126,7 +129,7 @@ class AssetsTest extends TestCase
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertInstanceOf(MimetypesRule::class, $replaced[0]);
         $this->assertEquals(__('statamic::validation.mimetypes', ['values' => 'image/jpg, image/png']), $replaced[0]->message());
     }
 
