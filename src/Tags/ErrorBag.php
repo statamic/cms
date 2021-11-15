@@ -16,7 +16,7 @@ class ErrorBag extends Tags
     }
 
     /**
-     * {{ error:fieldname }}.
+     * {{ error_bag:fieldname }}.
      */
     public function wildcard(string $name)
     {
