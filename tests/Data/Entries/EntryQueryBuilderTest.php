@@ -96,7 +96,7 @@ class EntryQueryBuilderTest extends TestCase
         $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
 
         $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1' ,'Post 3', 'Post 5'], $entries->map->title->all());
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
     }
 
     /** @test **/
@@ -111,7 +111,7 @@ class EntryQueryBuilderTest extends TestCase
         $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1'])->orWhereJsonContains('test_taxonomy', ['taxonomy-5'])->get();
 
         $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1' ,'Post 3', 'Post 5'], $entries->map->title->all());
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
     }
 
     /** @test **/
