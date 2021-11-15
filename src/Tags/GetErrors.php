@@ -12,7 +12,23 @@ class GetErrors extends Tags
             return false;
         }
 
-        return ['fields' => $this->formatErrors($errors->getMessages())];
+        return [
+            'fields' => collect($errors->getMessages())->map(function ($errors, $field) {
+                return [
+                    'field' => $field,
+                    'messages' => $this->messages($errors),
+                ];
+            })->values()->all(),
+        ];
+    }
+
+    public function all()
+    {
+        if (! $errors = $this->getMessageBag()) {
+            return false;
+        }
+
+        return ['messages' => $this->messages($errors->all())];
     }
 
     /**
@@ -24,34 +40,27 @@ class GetErrors extends Tags
             return false;
         }
 
-        if (! $messages = $errors->get($name)) {
+        if (empty($errors = $errors->get($name))) {
             return false;
         }
 
-        return collect($messages)
-            ->map(function ($error) {
-                return ['field_error' => $error];
-            });
+        return ['messages' => $this->messages($errors)];
     }
 
-    private function getMessageBag(): ?MessageBag
+    protected function getMessageBag(): ?MessageBag
     {
         /** @var \Illuminate\Support\ViewErrorBag */
-        $errorBag = view()->shared('errors');
+        $errors = view()->shared('errors');
 
-        if ($errorBag->count() === 0) {
-            return null;
-        }
+        $messages = $errors->getBag($this->params->get('bag', 'default'));
 
-        return $errorBag->getBag($this->params->get('bag', 'default'));
+        return $messages->isEmpty() ? null : $messages;
     }
 
-    private function formatErrors(array $messages): array
+    private function messages(array $messages): array
     {
-        return collect($messages)
-            ->map(function ($errors, $field) {
-                return ['field' => $field, 'field_errors' => $errors];
-            })->values()
-            ->all();
+        return collect($messages)->map(function ($message) {
+            return ['message' => $message];
+        })->all();
     }
 }

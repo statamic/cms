@@ -9,66 +9,206 @@ use Tests\TestCase;
 
 class GetErrorsTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     private function tag($tag, $data = [])
     {
         return (string) Parse::template($tag, $data);
     }
 
-    /** @test */
-    public function it_returns_empty_string_with_empty_view_error_bag()
+    /**
+     * @test
+     * @dataProvider organizedProvider
+     */
+    public function it_gets_errors_organized_into_fields($params, $bag, $errors, $expected)
     {
-        view()->share('errors', new ViewErrorBag);
-        $this->assertEquals('', $this->tag('{{ get_errors }}{{ fields }}{{ field }}: {{ field_errors }}{{ value }}{{ /field_errors}}{{ /fields }}{{ /get_errors }}'));
+        view()->share('errors', (new ViewErrorBag())->put($bag, new MessageBag($errors)));
+
+        $template = <<<EOT
+{{ get_errors $params }}
+before
+{{ fields }}
+{{ field }}
+{{ messages }}
+- {{ message }}
+{{ /messages }}
+{{ /fields }}
+after
+{{ /get_errors }}
+EOT;
+
+        $this->assertEquals($expected, $this->tag($template));
     }
 
-    /** @test */
-    public function it_returns_single_error_from_single_error_field()
+    public function organizedProvider()
     {
-        $messageBag = (new MessageBag())->add('name', 'name is required');
-        $errorBag = (new ViewErrorBag())->put('default', $messageBag);
+        $filledExpectation = <<<'EOT'
+before
+name
+- name is required
+- name should be 10 chars
 
-        view()->share('errors', $errorBag);
+email
+- email should be an email
 
-        $this->assertEquals(
-            'name is required',
-            $this->tag('{{ get_errors:name }}{{ field_error }}{{ /get_errors:name }}')
-        );
+
+after
+
+EOT;
+
+        $messages = [
+            'name' => ['name is required', 'name should be 10 chars'],
+            'email' => ['email should be an email'],
+        ];
+
+        return [
+            'empty bag' => [
+                '',
+                'default',
+                [],
+                '',
+            ],
+            'filled default bag' => [
+                '',
+                'default',
+                $messages,
+                $filledExpectation,
+            ],
+            'filled custom bag' => [
+                ' bag="custom"',
+                'custom',
+                $messages,
+                $filledExpectation,
+            ],
+        ];
     }
 
-    /** @test */
-    public function it_returns_multiple_errors_from_single_error_field()
+    /**
+     * @test
+     * @dataProvider allProvider
+     */
+    public function it_gets_errors_for_all_fields_together($params, $bag, $errors, $expected)
     {
-        $messageBag = (new MessageBag())
-            ->add('name', 'name is required')
-            ->add('name', 'name should be 10 chars');
-        $errorBag = (new ViewErrorBag())->put('default', $messageBag);
+        view()->share('errors', (new ViewErrorBag())->put($bag, new MessageBag($errors)));
 
-        view()->share('errors', $errorBag);
+        $template = <<<EOT
+{{ get_errors:all $params }}
+before
+{{ messages }}
+- {{ message }}
+{{ /messages }}
+after
+{{ /get_errors:all }}
+EOT;
 
-        $this->assertEquals(
-            'name is requiredname should be 10 chars',
-            $this->tag('{{ get_errors:name }}{{ field_error }}{{ /get_errors:name }}')
-        );
+        $this->assertEquals($expected, $this->tag($template));
     }
 
-    /** @test */
-    public function it_returns_single_errors_from_multiple_error_fields()
+    public function allProvider()
     {
-        $messageBag = (new MessageBag())
-            ->add('name', 'name is required')
-            ->add('number', 'number should be a number');
-        $errorBag = (new ViewErrorBag())->put('default', $messageBag);
+        $filledExpectation = <<<'EOT'
+before
+- name is required
+- name should be 10 chars
+- email should be an email
 
-        view()->share('errors', $errorBag);
+after
 
-        $this->assertEquals(
-            'name: name is requirednumber: number should be a number',
-            $this->tag('{{ get_errors }}{{ fields }}{{ field }}: {{ field_errors }}{{ value }}{{ /field_errors}}{{ /fields }}{{ /get_errors }}')
-        );
+EOT;
+
+        $messages = [
+            'name' => ['name is required', 'name should be 10 chars'],
+            'email' => ['email should be an email'],
+        ];
+
+        return [
+            'empty bag' => [
+                '',
+                'default',
+                [],
+                '',
+            ],
+            'filled default bag' => [
+                '',
+                'default',
+                $messages,
+                $filledExpectation,
+            ],
+            'filled custom bag' => [
+                ' bag="custom"',
+                'custom',
+                $messages,
+                $filledExpectation,
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider fieldProvider
+     */
+    public function it_gets_errors_for_a_single_field($params, $bag, $errors, $expected)
+    {
+        view()->share('errors', (new ViewErrorBag())->put($bag, new MessageBag($errors)));
+
+        $template = <<<EOT
+{{ get_errors:name $params }}
+before
+{{ messages }}
+- {{ message }}
+{{ /messages }}
+after
+{{ /get_errors:name }}
+EOT;
+
+        $this->assertEquals($expected, $this->tag($template));
+    }
+
+    public function fieldProvider()
+    {
+        $filledExpectation = <<<'EOT'
+before
+- name is required
+- name should be 10 chars
+
+after
+
+EOT;
+
+        $messages = [
+            'name' => ['name is required', 'name should be 10 chars'],
+            'email' => ['email should be an email'],
+        ];
+
+        return [
+            'empty bag' => [
+                '',
+                'default',
+                [],
+                '',
+            ],
+            'filled default bag' => [
+                '',
+                'default',
+                $messages,
+                $filledExpectation,
+            ],
+            'filled custom bag' => [
+                ' bag="custom"',
+                'custom',
+                $messages,
+                $filledExpectation,
+            ],
+            'filled default bag but not for given field' => [
+                '',
+                'default',
+                ['email' => ['email should be an email']],
+                '',
+            ],
+            'filled custom bag but not for given field' => [
+                ' bag="custom"',
+                'custom',
+                ['email' => ['email should be an email']],
+                '',
+            ],
+        ];
     }
 }

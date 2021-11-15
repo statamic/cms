@@ -130,6 +130,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Dd::class,
         Tags\Dump::class,
         Tags\GetContent::class,
+        Tags\GetError::class,
         Tags\GetErrors::class,
         Tags\GetFiles::class,
         Tags\Glide::class,
