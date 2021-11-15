@@ -153,8 +153,9 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereContains($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
-            if (!is_array($value))
+            if (! is_array($value)) {
                 return false;
+            }
 
             return count(array_intersect($value, $where['values']));
         });
@@ -163,8 +164,9 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereNotContains($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
-            if (!is_array($value))
+            if (! is_array($value)) {
                 return true;
+            }
 
             return ! count(array_intersect($value, $where['values']));
         });
