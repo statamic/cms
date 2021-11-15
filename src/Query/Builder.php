@@ -145,10 +145,10 @@ abstract class Builder implements Contract
         return $this->whereNotIn($column, $values, 'or');
     }
 
-    public function whereContains($column, $values, $boolean = 'and')
+    public function whereJsonContains($column, $values, $boolean = 'and')
     {
         $this->wheres[] = [
-            'type' => 'Contains',
+            'type' => 'JsonContains',
             'column' => $column,
             'values' => $values,
             'boolean' => $boolean,
@@ -157,15 +157,15 @@ abstract class Builder implements Contract
         return $this;
     }
 
-    public function orWhereContains($column, $values)
+    public function orWhereJsonContains($column, $values)
     {
-        return $this->whereContains($column, $values, 'or');
+        return $this->whereJsonContains($column, $values, 'or');
     }
 
-    public function whereDoesntContain($column, $values, $boolean = 'and')
+    public function whereJsonDoesntContain($column, $values, $boolean = 'and')
     {
         $this->wheres[] = [
-            'type' => 'NotContains',
+            'type' => 'JsonDoesntContain',
             'column' => $column,
             'values' => $values,
             'boolean' => $boolean,
@@ -174,9 +174,34 @@ abstract class Builder implements Contract
         return $this;
     }
 
-    public function orWhereNotContains($column, $values)
+    public function orWhereJsonDoesntContain($column, $values)
     {
-        return $this->whereNotContains($column, $values, 'or');
+        return $this->whereJsonDoesntContain($column, $values, 'or');
+    }
+
+    public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        if ($this->invalidOperator($operator)) {
+            [$value, $operator] = [$operator, '='];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonLength',
+            'column' => $column,
+            'value' => $value,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonLength($column, $operator, $value)
+    {
+        return $this->whereJsonDoesntContain($column, $operator, $value = null, 'or');
     }
 
     public function find($id, $columns = ['*'])

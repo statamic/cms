@@ -150,7 +150,7 @@ abstract class Builder extends BaseBuilder
         });
     }
 
-    protected function filterWhereContains($values, $where)
+    protected function filterWhereJsonContains($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
             if (! is_array($value)) {
@@ -161,7 +161,7 @@ abstract class Builder extends BaseBuilder
         });
     }
 
-    protected function filterWhereNotContains($values, $where)
+    protected function filterWhereJsonDoesntContain($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
             if (! is_array($value)) {
@@ -169,6 +169,17 @@ abstract class Builder extends BaseBuilder
             }
 
             return ! count(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonLength($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return count($value) == $where['value'];
         });
     }
 }
