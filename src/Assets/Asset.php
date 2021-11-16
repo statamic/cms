@@ -657,6 +657,16 @@ class Asset implements AssetContract, Augmentable
         return $this;
     }
 
+    /**
+     * Download a file.
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function download(string $name = null, array $headers = [])
+    {
+        return $this->disk()->filesystem()->download($this->path(), $name, $headers);
+    }
+
     private function getSafeFilename($string)
     {
         $replacements = [
