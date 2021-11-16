@@ -167,6 +167,7 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereJsonLength($values, $where)
     {
         $method = 'filterTest'.$this->operators[$where['operator']];
+
         return $values->filter(function ($value) use ($method, $where) {
             if (! is_array($value)) {
                 return false;
