@@ -15,7 +15,21 @@ class Value extends Index
 
     public function getItemValue($item)
     {
-        $method = Str::camel($this->name);
+        $nameExploded = explode('->', $this->name);
+        while (! empty($nameExploded)) {
+            $name = array_shift($nameExploded);
+            $item = $this->getItemPartValue($item, $name);
+            if (is_null($item)) {
+                return;
+            }
+        }
+
+        return $item;
+    }
+
+    private function getItemPartValue($item, $name)
+    {
+        $method = Str::camel($name);
 
         if ($method === 'blueprint') {
             return $item->blueprint()->handle();
@@ -30,14 +44,26 @@ class Value extends Index
             return $item->value('authors');
         }
 
+        if (is_array($item)) {
+            return $item[$name] ?? null;
+        }
+
+        if (is_scalar($item)) {
+            return null;
+        }
+
+        if ($item instanceof stdClass) {
+            return $item->$name ?? null;
+        }
+
         if (method_exists($item, $method)) {
             return $item->{$method}();
         }
 
         if (method_exists($item, 'value')) {
-            return $item->value($this->name);
+            return $item->value($name);
         }
 
-        return $item->get($this->name);
+        return $item->get($name);
     }
 }
