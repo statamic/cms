@@ -160,7 +160,7 @@ abstract class Builder implements Contract
         return $this;
     }
 
-    public function whereBetween($column, $values, $boolean = 'and')
+    public function whereBetween($column, $values, $boolean = 'and', $not = false)
     {
         $values = array_slice(Arr::flatten($values), 0, 2);
         sort($values);
@@ -170,7 +170,7 @@ abstract class Builder implements Contract
         }
 
         $this->wheres[] = [
-            'type' => 'Between',
+            'type' => ($not ? 'Not' : '').'Between',
             'column' => $column,
             'values' => $values,
             'boolean' => $boolean,
@@ -186,21 +186,7 @@ abstract class Builder implements Contract
 
     public function whereNotBetween($column, $values, $boolean = 'and')
     {
-        $values = array_slice(Arr::flatten($values), 0, 2);
-        sort($values);
-
-        if (count($values) != 2) {
-            throw new InvalidArgumentException('values should be an array of length 2');
-        }
-
-        $this->wheres[] = [
-            'type' => 'NotBetween',
-            'column' => $column,
-            'values' => $values,
-            'boolean' => $boolean,
-        ];
-
-        return $this;
+        return $this->whereBetween($column, $values, 'or', true);
     }
 
     public function orWhereNotBetween($column, $values)
