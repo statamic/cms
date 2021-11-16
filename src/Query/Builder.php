@@ -3,6 +3,7 @@
 namespace Statamic\Query;
 
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
@@ -157,6 +158,54 @@ abstract class Builder implements Contract
         ];
 
         return $this;
+    }
+
+    public function whereBetween($column, $values, $boolean = 'and')
+    {
+        $values = array_slice(Arr::flatten($values), 0, 2);
+        sort($values);
+
+        if (count($values) != 2) {
+            throw new InvalidArgumentException('Values should be an array of length 2');
+        }
+
+        $this->wheres[] = [
+            'type' => 'Between',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereBetween($column, $values)
+    {
+        return $this->whereBetween($column, $values, 'or');
+    }
+
+    public function whereNotBetween($column, $values, $boolean = 'and')
+    {
+        $values = array_slice(Arr::flatten($values), 0, 2);
+        sort($values);
+
+        if (count($values) != 2) {
+            throw new InvalidArgumentException('values should be an array of length 2');
+        }
+
+        $this->wheres[] = [
+            'type' => 'NotBetween',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereNotBetween($column, $values)
+    {
+        return $this->whereNotBetween($column, $values, 'or');
     }
 
     public function find($id, $columns = ['*'])

@@ -141,4 +141,18 @@ abstract class Builder extends BaseBuilder
             return ! in_array($value, $where['values']);
         });
     }
+
+    protected function filterWhereBetween($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            return $value >= $where['values'][0] && $value <= $where['values'][1];
+        });
+    }
+
+    protected function filterWhereNotBetween($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            return $value < $where['values'][0] || $value > $where['values'][1];
+        });
+    }
 }
