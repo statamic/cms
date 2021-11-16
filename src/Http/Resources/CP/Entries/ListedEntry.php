@@ -34,7 +34,7 @@ class ListedEntry extends JsonResource
             'id' => $entry->id(),
             'published' => $entry->published(),
             'private' => $entry->private(),
-            'date' => $this->when($collection->dated(), function () {
+            'date' => $this->when(optional($collection)->dated(), function () {
                 return $this->resource->date()->inPreferredFormat();
             }),
 
@@ -44,7 +44,7 @@ class ListedEntry extends JsonResource
             'edit_url' => $entry->editUrl(),
             'viewable' => User::current()->can('view', $entry),
             'editable' => User::current()->can('edit', $entry),
-            'actions' => Action::for($entry, ['collection' => $collection->handle()]),
+            'actions' => Action::for($entry, ['collection' => optional($collection)->handle()]),
         ];
     }
 
