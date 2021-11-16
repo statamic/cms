@@ -257,7 +257,7 @@ trait QueriesConditions
 
     protected function queryIsEmptyCondition($query, $field, $boolean)
     {
-        return $boolean ? $query->whereNull($field) : $query->whereNotNull($field);
+        return $query->where($field, $boolean ? '=' : '!=', null);
     }
 
     protected function queryIsAfterCondition($query, $field, $value)
