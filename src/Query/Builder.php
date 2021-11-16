@@ -201,7 +201,7 @@ abstract class Builder implements Contract
 
     public function orWhereJsonLength($column, $operator, $value)
     {
-        return $this->whereJsonDoesntContain($column, $operator, $value = null, 'or');
+        return $this->whereJsonLength($column, $operator, $value = null, 'or');
     }
 
     public function find($id, $columns = ['*'])
