@@ -192,6 +192,7 @@ abstract class Builder implements Contract
         $this->wheres[] = [
             'type' => 'JsonLength',
             'column' => $column,
+            'operator' => $operator,
             'value' => $value,
             'boolean' => $boolean,
         ];
