@@ -159,10 +159,10 @@ abstract class Builder implements Contract
         return $this;
     }
 
-    public function whereNull($column, $boolean = 'and')
+    public function whereNull($column, $boolean = 'and', $not = false)
     {
         $this->wheres[] = [
-            'type' => 'Null',
+            'type' => ($not ? 'Not' : '').'Null',
             'column' => $column,
             'boolean' => $boolean,
         ];
@@ -177,13 +177,7 @@ abstract class Builder implements Contract
 
     public function whereNotNull($column, $boolean = 'and')
     {
-        $this->wheres[] = [
-            'type' => 'NotNull',
-            'column' => $column,
-            'boolean' => $boolean,
-        ];
-
-        return $this;
+        return $this->whereNull($column, $boolean, true);
     }
 
     public function orWhereNotNull($column)
