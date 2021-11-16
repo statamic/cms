@@ -160,7 +160,7 @@ abstract class Builder extends BaseBuilder
                 return true;
             }
 
-            return ! count(array_intersect($value, $where['values']));
+            return empty(array_intersect($value, $where['values']));
         });
     }
 
@@ -171,7 +171,7 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return count($value) == $where['value'];
+            return ! empty($value) == $where['value'];
         });
     }
 }
