@@ -141,4 +141,16 @@ abstract class Builder extends BaseBuilder
             return ! in_array($value, $where['values']);
         });
     }
+
+    protected function filterWhereColumn($values, $where)
+    {
+        $whereColumnKeys = $this->getWhereColumnKeyValuesByIndex($where['value']);
+        return $values->filter(function ($value, $key) use ($where, $whereColumnKeys) {
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
+            return $this->{$method}($value, $whereColumnKeys->get($key));
+        });
+    }
+
+    abstract protected function getWhereColumnKeyValuesByIndex($column);
 }

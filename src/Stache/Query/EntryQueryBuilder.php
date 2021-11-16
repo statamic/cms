@@ -124,4 +124,19 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             return $carry;
         }, collect());
     }
+
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        $collections = empty($this->collections)
+            ? Facades\Collection::handles()
+            : $this->collections;
+
+        return collect($collections)->flatMap(function ($collection) use ($column) {
+            return $this->store->store($collection)
+                ->index($column)->items()
+                ->mapWithKeys(function ($item, $key) use ($collection) {
+                    return ["{$collection}::{$key}" => $item];
+                });
+        });
+    }
 }
