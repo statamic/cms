@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Query;
 
+use Illuminate\Support\Carbon;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
@@ -140,5 +141,98 @@ abstract class Builder extends BaseBuilder
         return $values->filter(function ($value) use ($where) {
             return ! in_array($value, $where['values']);
         });
+    }
+
+    protected function filterWhereDate($values, $where)
+    {
+        $method = $this->operatorToCarbonMethod($where['operator']);
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value))
+                return false;
+
+            return Carbon::parse($value)->$method($where['value']);
+        });
+    }
+
+    protected function filterWhereMonth($values, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value))
+                return false;
+
+            return $this->{$method}(Carbon::parse($value)->format('m'), $where['value']);
+        });
+    }
+
+    protected function filterWhereDay($values, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value))
+                return false;
+
+            return $this->{$method}(Carbon::parse($value)->format('j'), $where['value']);
+        });
+    }
+
+    protected function filterWhereYear($values, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value))
+                return false;
+
+            return $this->{$method}(Carbon::parse($value)->format('Y'), $where['value']);
+        });
+    }
+
+    protected function filterWhereTime($values, $where)
+    {
+        $method = $this->operatorToCarbonMethod($where['operator']);
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value))
+                return false;
+
+            $value = Carbon::parse($value);
+            $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
+
+            return $value->$method($compareValue);
+        });
+    }
+
+    protected function operatorToCarbonMethod($operator)
+    {
+        $method = 'eq';
+
+        switch ($operator) {
+            case '<>':
+            case '!=':
+                $method = 'neq';
+            break;
+
+            case '>':
+                $method = 'gt';
+            break;
+
+            case '>=':
+                $method = 'gte';
+            break;
+
+            case '<':
+                $method = 'lt';
+            break;
+
+            case '<=':
+                $method = 'lte';
+            break;
+        }
+
+        return $method;
     }
 }
