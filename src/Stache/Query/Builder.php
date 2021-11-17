@@ -151,7 +151,10 @@ abstract class Builder extends BaseBuilder
             if (is_null($value))
                 return false;
 
-            return Carbon::parse($value)->$method($where['value']);
+            $value = Carbon::parse($value);
+            $value = Carbon::parse($value->format('Y-m-d'));
+
+            return $value->$method($where['value']);
         });
     }
 

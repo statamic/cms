@@ -175,6 +175,8 @@ abstract class Builder implements Contract
             $value = Carbon::parse($value);
         }
 
+        $value = Carbon::parse($value->format('Y-m-d')); // we only care about the date part
+
         $this->wheres[] = [
             'type' => 'Date',
             'column' => $column,
