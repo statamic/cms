@@ -2527,7 +2527,6 @@ class LanguageParser
 
         $negatedTokenCount = count($negatedGroupedTokens);
 
-        $break = false;
         for ($i = 0; $i < $negatedTokenCount; $i++) {
             $token = $negatedGroupedTokens[$i];
 
@@ -2572,11 +2571,10 @@ class LanguageParser
                     $wrapperGroup->endPosition = $token->endPosition;
                     $wrapperGroup->originalAbstractNode = $token;
                     $wrapperGroup->nodes = [
-                        $prev, $factorialOperator,
+                        $prev, $token,
                     ];
 
                     $groupedTokens[] = $wrapperGroup;
-                    $break = true;
                 } else {
                     $groupedTokens[] = $token;
                 }
