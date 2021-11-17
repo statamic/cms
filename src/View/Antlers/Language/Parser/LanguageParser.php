@@ -479,7 +479,7 @@ class LanguageParser
 
                 if ($prevNode instanceof VariableNode && array_key_exists($prevNode->name, LibraryManager::$deferredCoreLibraries)) {
                     /** @var VariableNode $varRef */
-                    $varRef = array_shift($newTokens);
+                    $varRef = array_pop($newTokens);
 
                     $libraryInvocation = new LibraryInvocationConstruct();
                     $libraryInvocation->startPosition = $varRef->startPosition;
