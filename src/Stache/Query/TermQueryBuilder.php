@@ -167,4 +167,25 @@ class TermQueryBuilder extends Builder
                 });
         })->all());
     }
+
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        $taxonomies = empty($this->taxonomies)
+            ? Facades\Taxonomy::handles()
+            : $this->taxonomies;
+
+        if ($this->collections) {
+            $this->filterUsagesWithinCollections($taxonomies);
+        }
+
+        $items = collect($taxonomies)->flatMap(function ($taxonomy) use ($column) {
+            return $this->store->store($taxonomy)
+                ->index($column)->items()
+                ->mapWithKeys(function ($item, $key) use ($taxonomy) {
+                    return ["{$taxonomy}::{$key}" => $item];
+                });
+        });
+
+        return $items;
+    }
 }
