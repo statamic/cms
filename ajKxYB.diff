@@ -1,0 +1,46 @@
+diff --git a/src/View/Antlers/Language/Runtime/NodeProcessor.php b/src/View/Antlers/Language/Runtime/NodeProcessor.php
+index 6de8eb4c008e99ff030bfb6fa5bff4f3786eb59d..d534669e001e97f8bc1ee3981b0d371dada9edd2 100644
+--- a/src/View/Antlers/Language/Runtime/NodeProcessor.php
++++ b/src/View/Antlers/Language/Runtime/NodeProcessor.php
+@@ -1926,10 +1926,11 @@ class NodeProcessor
+      *
+      * This prevents arrays with non-ordered numeric keys from being flagged as associative.
+      *
+-     * @param array|mixed $value The array to check.
++     * @param  array|mixed  $value  The array to check.
+      * @return array|mixed
+      */
+-    private function massageKeys($value) {
++    private function massageKeys($value)
++    {
+         if (! is_array($value)) {
+             return $value;
+         }
+@@ -1950,6 +1951,7 @@ class NodeProcessor
+ 
+             return $value;
+         }
++
+         return $value;
+     }
+ }
+diff --git a/tests/Antlers/Runtime/LoopTest.php b/tests/Antlers/Runtime/LoopTest.php
+index 6bb89f4d96dc78a15b258eff52b4b6f2302fe8c0..8dd4698a7369448675b2ef1e04e398d8243058f7 100644
+--- a/tests/Antlers/Runtime/LoopTest.php
++++ b/tests/Antlers/Runtime/LoopTest.php
+@@ -6,7 +6,6 @@ use Tests\Antlers\ParserTestCase;
+ 
+ class LoopTest extends ParserTestCase
+ {
+-
+     public function test_non_sequential_numeric_keys_are_not_treated_as_associative_arrays()
+     {
+         // Non-sequential numeric keys are not treated as associative arrays
+@@ -38,5 +37,4 @@ class LoopTest extends ParserTestCase
+ EOT;
+         $this->assertSame('Hello, wilderness', $this->renderString($template, $data));
+     }
+-
+-}
+\ No newline at end of file
++}

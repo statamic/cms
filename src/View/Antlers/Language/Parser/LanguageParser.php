@@ -397,9 +397,9 @@ class LanguageParser
 
                 if ($i + 2 > $nodeCount) {
                     throw ErrorFactory::makeSyntaxError(
-                        AntlersErrorCodes::TYPE_INVALID_METHOD_CALL_ARG_GROUP,
+                        AntlersErrorCodes::TYPE_METHOD_CALL_MISSING_ARG_GROUP,
                         $thisNode,
-                        'Unexpected ['.TypeLabeler::getPrettyTypeName($argGroup).'] while parsing [T_METHOD_CALL]; expecting [T_ARG_GROUP].'
+                        'Unexpected end of input while parsing method call.'
                     );
                 }
 
