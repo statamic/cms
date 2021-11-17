@@ -145,6 +145,7 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereColumn($values, $where)
     {
         $whereColumnKeys = $this->getWhereColumnKeyValuesByIndex($where['value']);
+
         return $values->filter(function ($value, $key) use ($where, $whereColumnKeys) {
             $method = 'filterTest'.$this->operators[$where['operator']];
 
