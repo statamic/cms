@@ -148,8 +148,9 @@ abstract class Builder extends BaseBuilder
         $method = $this->operatorToCarbonMethod($where['operator']);
 
         return $values->filter(function ($value) use ($method, $where) {
-            if (is_null($value))
+            if (is_null($value)) {
                 return false;
+            }
 
             $value = Carbon::parse($value);
             $value = Carbon::parse($value->format('Y-m-d'));
@@ -163,8 +164,9 @@ abstract class Builder extends BaseBuilder
         $method = 'filterTest'.$this->operators[$where['operator']];
 
         return $values->filter(function ($value) use ($method, $where) {
-            if (is_null($value))
+            if (is_null($value)) {
                 return false;
+            }
 
             return $this->{$method}(Carbon::parse($value)->format('m'), $where['value']);
         });
@@ -175,8 +177,9 @@ abstract class Builder extends BaseBuilder
         $method = 'filterTest'.$this->operators[$where['operator']];
 
         return $values->filter(function ($value) use ($method, $where) {
-            if (is_null($value))
+            if (is_null($value)) {
                 return false;
+            }
 
             return $this->{$method}(Carbon::parse($value)->format('j'), $where['value']);
         });
@@ -187,8 +190,9 @@ abstract class Builder extends BaseBuilder
         $method = 'filterTest'.$this->operators[$where['operator']];
 
         return $values->filter(function ($value) use ($method, $where) {
-            if (is_null($value))
+            if (is_null($value)) {
                 return false;
+            }
 
             return $this->{$method}(Carbon::parse($value)->format('Y'), $where['value']);
         });
@@ -199,8 +203,9 @@ abstract class Builder extends BaseBuilder
         $method = $this->operatorToCarbonMethod($where['operator']);
 
         return $values->filter(function ($value) use ($method, $where) {
-            if (is_null($value))
+            if (is_null($value)) {
                 return false;
+            }
 
             $value = Carbon::parse($value);
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
