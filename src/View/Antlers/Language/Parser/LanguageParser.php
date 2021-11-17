@@ -450,7 +450,7 @@ class LanguageParser
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_INVALID_METHOD_CALL_ARG_GROUP,
                         $thisNode,
-                        'Unexpected ['.TypeLabeler::getPrettyTypeName($argGroup).'] while parsing [T_METHOD_CALL]; expecting [T_ARG_GROUP].'
+                        'Unexpected end of input while parsing method call.'
                     );
                 }
 
@@ -461,7 +461,7 @@ class LanguageParser
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_INVALID_METHOD_CALL_ARG_GROUP,
                         $thisNode,
-                        'Unexpected ['.TypeLabeler::getPrettyTypeName($argGroup).'] while parsing [T_METHOD_CALL]; expecting [T_ARG_GROUP].'
+                        'Unexpected ['.TypeLabeler::getPrettyTypeName($next).'] while parsing [T_METHOD_CALL]; expecting [T_ARG_GROUP].'
                     );
                 }
 
