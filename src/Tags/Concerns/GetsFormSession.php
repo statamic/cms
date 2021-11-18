@@ -62,9 +62,9 @@ trait GetsFormSession
     }
 
     /**
-     * Get errors from session
+     * Get errors from session.
      *
-     * @param string $formName
+     * @param  string  $formName
      * @return array
      */
     protected function getErrorsFromFormSession($formName = 'default')
