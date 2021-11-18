@@ -27,9 +27,9 @@ class FormType extends \Rebing\GraphQL\Support\Type
                 'type' => GraphQL::string(),
             ],
             'fields' => [
-                'type' => GraphQL::listOf(GraphQL::type(ArrayType::NAME)),
+                'type' => GraphQL::listOf(GraphQL::type(FieldType::NAME)),
                 'resolve' => function ($form, $args, $context, $info) {
-                    return $form->blueprint()->fields()->all()->map->toArray()->all();
+                    return $form->blueprint()->fields()->all();
                 },
             ],
         ])

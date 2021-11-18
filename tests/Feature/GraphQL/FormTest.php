@@ -72,7 +72,13 @@ GQL;
         Form::make('contact')->title('Contact Us')->save();
 
         $blueprint = Blueprint::makeFromFields([
-            'name' => ['type' => 'text'],
+            'name' => [
+                'type' => 'text',
+                'display' => 'Your Name',
+                'instructions' => 'Enter your name',
+                'placeholder' => 'Type here...',
+                'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+            ],
             'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
             'message' => ['type' => 'textarea'],
         ]);
@@ -82,7 +88,13 @@ GQL;
         $query = <<<'GQL'
 {
     form(handle: "contact") {
-        fields
+        fields {
+            handle
+            type
+            display
+            instructions
+            config
+        }
     }
 }
 GQL;
@@ -97,18 +109,27 @@ GQL;
                         [
                             'handle' => 'name',
                             'type' => 'text',
-                            'width' => 100,
+                            'display' => 'Your Name',
+                            'instructions' => 'Enter your name',
+                            'config' => [
+                                'placeholder' => 'Type here...',
+                            ],
                         ],
                         [
                             'handle' => 'subject',
-                            'options' => ['disco' => 'Disco', 'house' => 'House'],
                             'type' => 'select',
-                            'width' => 100,
+                            'display' => 'Subject',
+                            'instructions' => null,
+                            'config' => [
+                                'options' => ['disco' => 'Disco', 'house' => 'House'],
+                            ],
                         ],
                         [
                             'handle' => 'message',
                             'type' => 'textarea',
-                            'width' => 100,
+                            'display' => 'Message',
+                            'instructions' => null,
+                            'config' => [],
                         ],
                     ],
                 ],
