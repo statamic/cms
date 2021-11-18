@@ -13,7 +13,7 @@ class UpdateTermReferences implements ShouldQueue
     /**
      * Register the listeners for the subscriber.
      *
-     * @param \Illuminate\Events\Dispatcher $events
+     * @param  \Illuminate\Events\Dispatcher  $events
      */
     public function subscribe($events)
     {
@@ -23,7 +23,7 @@ class UpdateTermReferences implements ShouldQueue
     /**
      * Handle the events.
      *
-     * @param TermSaved $event
+     * @param  TermSaved  $event
      */
     public function handle(TermSaved $event)
     {

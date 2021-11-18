@@ -647,6 +647,7 @@ class FrontendTest extends TestCase
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/1537
      **/
     public function home_page_is_not_overridden_by_entries_in_another_structured_collection_with_no_url()

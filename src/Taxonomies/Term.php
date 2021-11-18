@@ -146,7 +146,12 @@ class Term implements TermContract
 
     public function entriesCount()
     {
-        return Blink::once('term-entries-count-'.$this->id(), function () {
+        $key = vsprintf('term-entries-count-%s-%s', [
+            $this->id(),
+            optional($this->collection())->handle(),
+        ]);
+
+        return Blink::once($key, function () {
             return Facades\Term::entriesCount($this);
         });
     }

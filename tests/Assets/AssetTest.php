@@ -15,6 +15,7 @@ use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -562,6 +563,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
@@ -580,6 +582,7 @@ class AssetTest extends TestCase
         $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('new/asset.txt');
         $disk->assertExists('new/.meta/asset.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('new/.meta/asset.txt.yaml'));
         $this->assertEquals([
             'new/asset.txt',
         ], $container->files()->all());
@@ -607,6 +610,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
@@ -622,6 +626,7 @@ class AssetTest extends TestCase
         $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('new/newfilename.txt');
         $disk->assertExists('new/.meta/newfilename.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('new/.meta/newfilename.txt.yaml'));
         $this->assertEquals([
             'new/newfilename.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
@@ -645,6 +650,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
+        $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
@@ -663,6 +669,7 @@ class AssetTest extends TestCase
         $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/newfilename.txt');
         $disk->assertExists('old/.meta/newfilename.txt.yaml');
+        $this->assertEquals($oldMeta, $disk->get('old/.meta/newfilename.txt.yaml'));
         $this->assertEquals([
             'old/newfilename.txt',
         ], $container->files()->all());
@@ -846,25 +853,38 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_can_upload_a_file()
+    public function it_can_upload_a_file_without_an_existing_cache()
+    {
+        $this->uploadFileTest();
+    }
+
+    /** @test */
+    public function it_can_upload_a_file_with_an_existing_cache()
+    {
+        Cache::put('asset-list-contents-test_container', collect());
+        $this->uploadFileTest();
+    }
+
+    private function uploadFileTest()
     {
         Event::fake();
-        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
-        $this->assertEquals([
-        ], $this->container->files()->all());
-        $this->assertEquals([
-        ], $this->container->assets('/', true)->keyBy->path()->map(function ($item) {
-            return $item->data()->all();
-        })->all());
-
-        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg'));
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
 
         $this->assertEquals($asset, $return);
         Storage::disk('test')->assertExists('path/to/asset.jpg');
         $this->assertEquals('path/to/asset.jpg', $asset->path());
+
+        $meta = $asset->meta();
+        $this->assertEquals(13, $meta['width']);
+        $this->assertEquals(15, $meta['height']);
+        $this->assertEquals('image/jpeg', $meta['mime_type']);
+        $this->assertArrayHasKey('size', $meta);
+        $this->assertArrayHasKey('last_modified', $meta);
         $this->assertEquals([
             'path/to/asset.jpg',
         ], $this->container->files()->all());
@@ -949,6 +969,33 @@ class AssetTest extends TestCase
         $this->assertNull($asset->url());
         $this->assertNull($asset->absoluteUrl());
         $this->assertEquals('container-id::path/to/test.txt', (string) $asset);
+    }
+
+    /** @test */
+    public function it_sends_a_download_response()
+    {
+        Storage::disk('test')->put('test.txt', '');
+
+        $asset = (new Asset)->container($this->container)->path('test.txt');
+
+        $response = $asset->download();
+
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=test.txt', $response->headers->get('content-disposition'));
+    }
+
+    /** @test */
+    public function it_sends_a_download_response_with_a_different_name_and_custom_headers()
+    {
+        Storage::disk('test')->put('test.txt', '');
+
+        $asset = (new Asset)->container($this->container)->path('test.txt');
+
+        $response = $asset->download('foo.txt', ['foo' => 'bar']);
+
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=foo.txt', $response->headers->get('content-disposition'));
+        $this->assertArraySubset(['foo' => ['bar']], $response->headers->all());
     }
 
     private function toArrayKeysWhenFileExists()

@@ -13,7 +13,7 @@
         :placeholder="config.placeholder"
         :name="name"
         :id="fieldId"
-        @input="update"
+        @input="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />

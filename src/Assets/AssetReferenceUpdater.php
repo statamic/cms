@@ -16,7 +16,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Filter by container.
      *
-     * @param string $container
+     * @param  string  $container
      * @return $this
      */
     public function filterByContainer(string $container)
@@ -29,8 +29,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Recursively update fields.
      *
-     * @param \Illuminate\Support\Collection $fields
-     * @param null|string $dottedPrefix
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
      */
     protected function recursivelyUpdateFields($fields, $dottedPrefix = null)
     {
@@ -44,8 +44,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Update assets field values.
      *
-     * @param \Illuminate\Support\Collection $fields
-     * @param null|string $dottedPrefix
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
      * @return $this
      */
     protected function updateAssetsFieldValues($fields, $dottedPrefix)
@@ -67,8 +67,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Update bard field values.
      *
-     * @param \Illuminate\Support\Collection $fields
-     * @param null|string $dottedPrefix
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
      * @return $this
      */
     protected function updateBardFieldValues($fields, $dottedPrefix)
@@ -90,8 +90,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Update markdown field values.
      *
-     * @param \Illuminate\Support\Collection $fields
-     * @param null|string $dottedPrefix
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
      * @return $this
      */
     protected function updateMarkdownFieldValues($fields, $dottedPrefix)
@@ -111,7 +111,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Get configured assets field container, or implied asset container if only one exists.
      *
-     * @param \Statamic\Fields\Field $field
+     * @param  \Statamic\Fields\Field  $field
      * @return string
      */
     protected function getConfiguredAssetsFieldContainer($field)
@@ -130,8 +130,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Update `statamic://` urls in string value on item.
      *
-     * @param \Statamic\Fields\Field $field
-     * @param null|string $dottedPrefix
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
      */
     protected function updateStatamicUrlsInStringValue($field, $dottedPrefix)
     {
@@ -165,8 +165,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Update asset references in bard set on item.
      *
-     * @param \Statamic\Fields\Field $field
-     * @param null|string $dottedPrefix
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
      */
     protected function updateStatamicUrlsInArrayValue($field, $dottedPrefix)
     {
@@ -177,8 +177,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Update asset references in bard image nodes.
      *
-     * @param \Statamic\Fields\Field $field
-     * @param null|string $dottedPrefix
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
      */
     private function updateStatamicUrlsInImageNodes($field, $dottedPrefix)
     {
@@ -221,8 +221,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Update asset references in bard link nodes.
      *
-     * @param \Statamic\Fields\Field $field
-     * @param null|string $dottedPrefix
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
      */
     private function updateStatamicUrlsInLinkNodes($field, $dottedPrefix)
     {

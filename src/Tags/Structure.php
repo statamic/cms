@@ -3,9 +3,14 @@
 namespace Statamic\Tags;
 
 use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Exceptions\NavigationNotFoundException;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Structures\TreeBuilder;
+use Statamic\Support\Str;
 
 class Structure extends Tags
 {
@@ -32,6 +37,8 @@ class Structure extends Tags
             $handle = $handle->handle();
         }
 
+        $this->ensureStructureExists($handle);
+
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
             'include_home' => $this->params->get('include_home'),
@@ -44,9 +51,21 @@ class Structure extends Tags
         return $this->toArray($tree);
     }
 
+    protected function ensureStructureExists(string $handle): void
+    {
+        if (Str::startsWith($handle, 'collection::')) {
+            $collection = Str::after($handle, 'collection::');
+            throw_unless(Collection::findByHandle($collection), new CollectionNotFoundException($collection));
+
+            return;
+        }
+
+        throw_unless(Nav::findByHandle($handle), new NavigationNotFoundException($handle));
+    }
+
     public function toArray($tree, $parent = null, $depth = 1)
     {
-        return collect($tree)->map(function ($item) use ($parent, $depth) {
+        return collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
             $data = $page->toAugmentedArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
@@ -55,6 +74,10 @@ class Structure extends Tags
                 'children'    => $children,
                 'parent'      => $parent,
                 'depth'       => $depth,
+                'index'       => $index,
+                'count'       => $index + 1,
+                'first'       => $index === 0,
+                'last'        => $index === count($tree) - 1,
                 'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->urlWithoutRedirect(), '/'),
                 'is_parent'   => Site::current()->absoluteUrl() === $page->absoluteUrl() ? false : URL::isAncestorOf(URL::getCurrent(), $page->urlWithoutRedirect()),
                 'is_external' => URL::isExternal($page->absoluteUrl()),
