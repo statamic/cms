@@ -67,7 +67,7 @@ trait GetsFormSession
      * @param string $formName
      * @return array
      */
-    protected function getErrorsFromSession(string $formName): array
+    protected function getErrorsFromSession($formName = 'default')
     {
         $data = [];
 
