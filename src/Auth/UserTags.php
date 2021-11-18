@@ -251,7 +251,7 @@ class UserTags extends Tags
             return $this->parse(['success' => true]);
         }
 
-        $data = $this->getErrorsFromSession();
+        $data = $this->getErrorsFromFormSession();
 
         $data['url_invalid'] = request()->isNotFilled('token');
 

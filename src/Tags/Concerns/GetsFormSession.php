@@ -12,7 +12,7 @@ trait GetsFormSession
      */
     protected function getFormSession($formName = 'default')
     {
-        $data = $this->getErrorsFromSession($formName);
+        $data = $this->getErrorsFromFormSession($formName);
         $data['success'] = $this->getFromFormSession($formName, 'success');
 
         // Only include this boolean if it's actually passed in session;
@@ -67,7 +67,7 @@ trait GetsFormSession
      * @param string $formName
      * @return array
      */
-    protected function getErrorsFromSession($formName = 'default')
+    protected function getErrorsFromFormSession($formName = 'default')
     {
         $data = [];
 
