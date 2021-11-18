@@ -41,7 +41,7 @@ class FormTest extends TestCase
     public function it_queries_a_form_by_handle()
     {
         Form::make('contact')->title('Contact Us')->save();
-        Form::make('support')->title('Request Support')->save();
+        Form::make('support')->title('Request Support')->honeypot('age')->save();
 
         $query = <<<'GQL'
 {
@@ -61,7 +61,7 @@ GQL;
                 'form' => [
                     'handle' => 'support',
                     'title' => 'Request Support',
-                    'honeypot' => 'honeypot',
+                    'honeypot' => 'age',
                 ],
             ]]);
     }
