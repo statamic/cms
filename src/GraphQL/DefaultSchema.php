@@ -13,6 +13,8 @@ use Statamic\GraphQL\Queries\CollectionQuery;
 use Statamic\GraphQL\Queries\CollectionsQuery;
 use Statamic\GraphQL\Queries\EntriesQuery;
 use Statamic\GraphQL\Queries\EntryQuery;
+use Statamic\GraphQL\Queries\FormQuery;
+use Statamic\GraphQL\Queries\FormsQuery;
 use Statamic\GraphQL\Queries\GlobalSetQuery;
 use Statamic\GraphQL\Queries\GlobalSetsQuery;
 use Statamic\GraphQL\Queries\NavQuery;
@@ -58,6 +60,7 @@ class DefaultSchema implements ConfigConvertible
             'taxonomies' => [TaxonomiesQuery::class, TaxonomyQuery::class, TermsQuery::class, TermQuery::class],
             'globals' => [GlobalSetsQuery::class, GlobalSetQuery::class],
             'navs' => [NavsQuery::class, NavQuery::class],
+            'forms' => [FormsQuery::class, FormQuery::class],
             'sites' => [SitesQuery::class],
             'users' => [UsersQuery::class, UserQuery::class],
         ])->each(function ($qs, $key) use (&$queries) {
