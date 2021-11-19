@@ -57,7 +57,6 @@ abstract class IteratorBuilder extends Builder
 
         $originalEntries = $entries->values();
         foreach ($wheres as $index => $where) {
-
             if ($where['type'] == 'Nested') {
                 $filteredEntries = $this->filterWheres($originalEntries, $where['query']->wheres);
             } else {
@@ -68,13 +67,9 @@ abstract class IteratorBuilder extends Builder
             if ($where['boolean'] === 'or' && $where['type'] !== 'NotIn') {
                 $entries = $entries->concat($filteredEntries)->unique()->values();
             } else {
-
                 if ($index == 0) {
-
                     $entries = $filteredEntries;
-
                 } else {
-
                     $newEntries = collect([]);
 
                     foreach ($filteredEntries as $filteredEntry) {
@@ -84,10 +79,8 @@ abstract class IteratorBuilder extends Builder
                     }
 
                     $entries = $newEntries;
-
                 }
             }
-
         }
 
         return $entries->values();
