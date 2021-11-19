@@ -34,6 +34,8 @@ trait ListensForContentEvents
         \Statamic\Events\NavSaved::class,
         \Statamic\Events\NavTreeSaved::class,
         \Statamic\Events\NavTreeDeleted::class,
+        \Statamic\Events\RevisionDeleted::class,
+        \Statamic\Events\RevisionSaved::class,
         \Statamic\Events\RoleDeleted::class,
         \Statamic\Events\RoleSaved::class,
         \Statamic\Events\SubmissionDeleted::class,

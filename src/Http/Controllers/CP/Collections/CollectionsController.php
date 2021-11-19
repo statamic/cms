@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use LogicException;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
@@ -63,8 +64,13 @@ class CollectionsController extends CpController
 
         $site = $request->site ? Site::get($request->site) : Site::selected();
 
-        $columns = $collection
-            ->entryBlueprint()
+        $blueprint = $collection->entryBlueprint();
+
+        if (! $blueprint) {
+            throw new LogicException("The {$collection->handle()} collection does not have any visible blueprints. At least one must not be hidden.");
+        }
+
+        $columns = $blueprint
             ->columns()
             ->setPreferred("collections.{$collection->handle()}.columns")
             ->rejectUnlisted()

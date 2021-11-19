@@ -8,7 +8,9 @@
                 <span>{{ $title }}</span>
             </a>
         </h2>
+        @can('create', ['Statamic\Contracts\Entries\Entry', $collection])
         <a href="{{ $collection->createEntryUrl() }}" class="text-blue hover:text-blue-dark text-sm">{{ $button }}</a>
+        @endcan
     </div>
     <collection-widget
         collection="{{ $collection->handle() }}"

@@ -20,13 +20,15 @@
                 @endforeach
             </div>
 
-            <div class="text-center italic my-3">or</div>
+            @if($emailLoginEnabled)
+                <div class="text-center italic my-3">or</div>
 
-            <div class="login-with-email" v-if="! showEmailLogin">
-                <a class="btn block" @click.prevent="showEmailLogin = true">
-                    {{ __('Log in with email') }}
-                </a>
-            </div>
+                <div class="login-with-email" v-if="! showEmailLogin">
+                    <a class="btn block" @click.prevent="showEmailLogin = true">
+                        {{ __('Log in with email') }}
+                    </a>
+                </div>
+            @endif
         @endif
 
         <form method="POST" v-show="showEmailLogin" class="email-login select-none" @if ($oauth) v-cloak @endif>

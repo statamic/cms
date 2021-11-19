@@ -416,6 +416,17 @@
                 content: '';
             }
         }
+
+        a {
+            @apply text-blue underline break-words;
+        }
+
+        a:active,
+        a:focus,
+        a:hover {
+            outline: 0;
+            text-decoration: underline;
+        }
     }
 
     p > code {

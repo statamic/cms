@@ -387,9 +387,24 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('template')
             ->getter(function ($template) {
-                return $template ?? optional($this->origin())->template() ?? $this->collection()->template();
+                $template = $template ?? optional($this->origin())->template() ?? $this->collection()->template();
+
+                return $template === '@blueprint'
+                    ? $this->inferTemplateFromBlueprint()
+                    : $template;
             })
             ->args(func_get_args());
+    }
+
+    protected function inferTemplateFromBlueprint()
+    {
+        $template = $this->collection()->handle().'.'.$this->blueprint();
+
+        $slugifiedTemplate = str_replace('_', '-', $template);
+
+        return view()->exists($slugifiedTemplate)
+            ? $slugifiedTemplate
+            : $template;
     }
 
     public function layout($layout = null)

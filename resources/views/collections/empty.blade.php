@@ -42,6 +42,15 @@
                 @endif
             </div>
         @if ($multipleBlueprints)</div>@else</a>@endif
+        <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+            <div class="h-8 w-8 mr-2 text-grey-80">
+                @cp_svg('blueprint')
+            </div>
+            <div class="flex-1 mb-2 md:mb-0 md:mr-3">
+                <h3 class="mb-1 text-blue">{{ __('Configure Blueprints') }} &rarr;</h3>
+                <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
+            </div>
+        </a>
         <a href="{{ cp_route('collections.scaffold', $collection->handle()) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
                 @cp_svg('crane')
@@ -51,15 +60,11 @@
                 <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
             </div>
         </a>
-        <a href="{{ Statamic::docsUrl('collections') }}" target="_blank" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
-            <div class="h-8 w-8 mr-2 text-grey-80">
-                @cp_svg('book-pages')
-            </div>
-            <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-                <h3 class="mb-1 text-blue">{{ __('Read the Documentation') }} &rarr;</h3>
-                <p>{{ __('statamic::messages.collection_next_steps_documentation_description') }}</p>
-            </div>
-        </a>
     </div>
 </div>
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Collections'),
+        'url' => 'collection'
+    ])
 @stop
