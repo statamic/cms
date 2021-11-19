@@ -52,6 +52,48 @@ class QueryBuilderTest extends TestCase
     {
         $this->markTestSkipped();
     }
+
+    /** @test **/
+    public function results_are_found_using_nested_where()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->where('title', 'Frodo')
+            ->orWhere(function ($query) {
+                $query->where('title', 'Gandalf')
+                    ->orWhere('title', 'Smeagol\'s Precious');
+            })
+            ->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals(['a', 'b', 'd'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_nested_where_in()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereIn('title', ['Frodo', 'Gandalf'])
+            ->orWhere(function ($query) {
+                $query->whereIn('title', ['Frodo', 'Smeagol\'s Precious'])
+                    ->orWhereIn('title', ['Frodo\'s Precious']);
+            })
+            ->get();
+
+        $this->assertCount(4, $results);
+        $this->assertEquals(['a', 'b', 'd', 'c'], $results->map->reference->all());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder
