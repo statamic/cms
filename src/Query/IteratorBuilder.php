@@ -56,7 +56,7 @@ abstract class IteratorBuilder extends Builder
         }
 
         $originalEntries = $entries->values();
-        foreach ($wheres as $where) {
+        foreach ($wheres as $index => $where) {
 
             if ($where['type'] == 'Nested') {
                 $filteredEntries = $this->filterWheres($originalEntries, $where['query']->wheres);
@@ -65,14 +65,32 @@ abstract class IteratorBuilder extends Builder
                 $filteredEntries = $this->{$method}($originalEntries, $where);
             }
 
-            $entries = ($where['boolean'] === 'or' && $where['type'] !== 'NotIn') ?
-                $entries->concat($filteredEntries)->unique()->values()
-                :
-                $filteredEntries->values();
+            if ($where['boolean'] === 'or' && $where['type'] !== 'NotIn') {
+                $entries = $entries->concat($filteredEntries)->unique()->values();
+            } else {
+
+                if ($index == 0) {
+
+                    $entries = $filteredEntries;
+
+                } else {
+
+                    $newEntries = collect([]);
+
+                    foreach ($filteredEntries as $filteredEntry) {
+                        if ($entries->contains($filteredEntry)) {
+                            $newEntries = $newEntries->concat([$filteredEntry]);
+                        }
+                    }
+
+                    $entries = $newEntries;
+
+                }
+            }
 
         }
 
-        return $entries;
+        return $entries->values();
     }
 
     protected function filterWhereIn($entries, $where)
