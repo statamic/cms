@@ -326,7 +326,7 @@ class Collection implements Contract, AugmentableContract
         ]);
 
         if ($this->requiresSlugs()) {
-            $blueprint->ensureField('slug', ['type' => 'slug', 'required' => true, 'localizable' => true], 'sidebar');
+            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
         }
 
         if ($this->dated()) {

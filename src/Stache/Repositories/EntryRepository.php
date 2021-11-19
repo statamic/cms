@@ -104,7 +104,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => $collection->autoGeneratesTitles() ? '' : 'required',
-            'slug' => 'alpha_dash'.($collection->requiresSlugs() ? '|required' : ''),
+            'slug' => 'alpha_dash',
         ];
     }
 
@@ -112,7 +112,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => $collection->autoGeneratesTitles() ? '' : 'required',
-            'slug' => 'alpha_dash'.($collection->requiresSlugs() ? '|required' : ''),
+            'slug' => 'alpha_dash',
         ];
     }
 
