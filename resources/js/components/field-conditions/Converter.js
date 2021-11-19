@@ -36,7 +36,7 @@ export default class {
         let operator = '==';
 
         _.chain(this.getOperatorsAndAliases())
-            .filter(value => new RegExp(`^${value} [^=]`).test(condition.toString()))
+            .filter(value => new RegExp(`^${value} [^=]`).test(this.normalizeConditionString(condition)))
             .each(value => operator = value);
 
         return this.normalizeOperator(operator);
@@ -49,7 +49,7 @@ export default class {
     }
 
     getValueFromRhs(condition) {
-        let rhs = condition.toString();
+        let rhs = this.normalizeConditionString(condition);
 
         _.chain(this.getOperatorsAndAliases())
             .filter(value => new RegExp(`^${value} [^=]`).test(rhs))
@@ -67,5 +67,17 @@ export default class {
 
     getOperatorsAndAliases() {
         return OPERATORS.concat(Object.keys(ALIASES));
+    }
+
+    normalizeConditionString(value) {
+        // You cannot `null.toString()`, so we'll manually cast it here to prevent error.
+        if (value === null) return 'null';
+
+        // Note: We don't document the use of an '' empty string in the yaml,
+        // but for the people that manually add this to their yaml, we'll
+        // treat it as an `empty` check so that it doesn't feel broken.
+        if (value === '') return 'empty';
+
+        return value.toString();
     }
 }

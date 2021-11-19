@@ -3,9 +3,14 @@
 namespace Statamic\Tags;
 
 use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Exceptions\NavigationNotFoundException;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Structures\TreeBuilder;
+use Statamic\Support\Str;
 
 class Structure extends Tags
 {
@@ -32,6 +37,8 @@ class Structure extends Tags
             $handle = $handle->handle();
         }
 
+        $this->ensureStructureExists($handle);
+
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
             'include_home' => $this->params->get('include_home'),
@@ -42,6 +49,18 @@ class Structure extends Tags
         ]);
 
         return $this->toArray($tree);
+    }
+
+    protected function ensureStructureExists(string $handle): void
+    {
+        if (Str::startsWith($handle, 'collection::')) {
+            $collection = Str::after($handle, 'collection::');
+            throw_unless(Collection::findByHandle($collection), new CollectionNotFoundException($collection));
+
+            return;
+        }
+
+        throw_unless(Nav::findByHandle($handle), new NavigationNotFoundException($handle));
     }
 
     public function toArray($tree, $parent = null, $depth = 1)

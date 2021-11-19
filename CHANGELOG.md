@@ -1,5 +1,53 @@
 # Release Notes
 
+## 3.2.22 (2020-11-15)
+
+### What's new
+- Publish form tabs are pushed into the URL so you can link to specific tabs or stay where you are when refreshing. [#4660](https://github.com/statamic/cms/issues/4660) by @jackmcdade
+- Option to hide email login button when using OAuth. [#4625](https://github.com/statamic/cms/issues/4625) by @duncanmcclean
+- Include cascade data (like globals) on the password protection page. [#4706](https://github.com/statamic/cms/issues/4706) by @ryanmitchell
+- Add `download` method to the Asset class. [#4712](https://github.com/statamic/cms/issues/4712) by @edalzell
+- Using an invalid nav or collection on the `nav` tag will throw an exception. [#4624](https://github.com/statamic/cms/issues/4624) by @jelleroorda
+- Add `bootAddon()` method to `AddonServiceProvider`. [#4696](https://github.com/statamic/cms/issues/4696) by @ryanmitchell
+- Ability to infer template from blueprint. [#4668](https://github.com/statamic/cms/issues/4668) by @jesseleite
+
+### What's improved
+- Chinese translations. [#4734](https://github.com/statamic/cms/issues/4734) by @binotaliu
+- Russian translations. [#4695](https://github.com/statamic/cms/issues/4695) by @dragomano
+
+### What's fixed
+- Store `parent` as ID in the Stache to make it queryable. [#4728](https://github.com/statamic/cms/issues/4728) by @jasonvarga
+- Fix `range` field not updating when changing sites. [#4713](https://github.com/statamic/cms/issues/4713) by @edalzell
+- Fix spacing on the `entries` fieldtype. [#4714](https://github.com/statamic/cms/issues/4714) by @edalzell
+- The app translator locale is set to the site's `lang`. [#4715](https://github.com/statamic/cms/issues/4715) by @marcorieser
+- Fix error on `select` (and similar) field when there are no options. [#4689](https://github.com/statamic/cms/issues/4689) by @jasonvarga
+- Handle numeric keys on `select` (and similar) fields. [#4688](https://github.com/statamic/cms/issues/4688) by @jasonvarga
+
+
+
+## 3.2.21 (2020-11-08)
+
+### What's new
+- The `locales` tag can output data for all sites even when the entry isn't localized. It can also exclude its own locale. [#4665](https://github.com/statamic/cms/issues/4665) by @aerni
+- Utility for warming the Stache. [#4659](https://github.com/statamic/cms/issues/4659) by @jackmcdade
+
+### What's improved
+- Show a more helpful error if someone hides all blueprints. [#4607](https://github.com/statamic/cms/issues/4607) by @jelleroorda
+- French translations. [#4627](https://github.com/statamic/cms/issues/4627) by @ebeauchamps
+- Dutch translations. [#4664](https://github.com/statamic/cms/issues/4664) by @royvanv
+- German translations. [#4642](https://github.com/statamic/cms/issues/4642) by @helloDanuk
+
+### What's fixed
+- Fix nav root pages not showing extra data. [#4650](https://github.com/statamic/cms/issues/4650) by @jelleroorda
+- Fix asset field validation when using Amazon S3. [#4116](https://github.com/statamic/cms/issues/4116) by @arthurperton
+- Fix null and empty string field condition handling. [#4661](https://github.com/statamic/cms/issues/4661) by @jesseleite
+- Style links inside bard tables [3880e39c3](https://github.com/statamic/cms/commit/3880e39c3) by @jackmcdade
+- Add a duplicate translation for backwards compatibility. [#4648](https://github.com/statamic/cms/issues/4648) by @jasonvarga
+- Bump axios from 0.21.1 to 0.21.2 [#4679](https://github.com/statamic/cms/issues/4679) by @dependabot
+- Bump validator from 10.11.0 to 13.7.0 [#4649](https://github.com/statamic/cms/issues/4649) by @dependabot
+
+
+
 ## 3.2.20 (2020-11-01)
 
 ### What's improved
