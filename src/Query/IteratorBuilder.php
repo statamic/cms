@@ -79,6 +79,7 @@ abstract class IteratorBuilder extends Builder
                     }
 
                     $entries = $newEntries;
+                    $originalEntries = $entries;
                 }
             }
         }
