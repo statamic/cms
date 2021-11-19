@@ -12,6 +12,8 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
 
+use Statamic\Contracts\Taxonomies\Term;
+
 class EntriesQuery extends Query
 {
     use QueriesConditions;
@@ -57,6 +59,41 @@ class EntriesQuery extends Query
 
     private function filterQuery($query, $filters)
     {
+        collect($filters)->filter(function ($value, $key) {
+            return $key === 'taxonomy' || Str::startsWith($key, 'taxonomy:');
+        })->each(function ($values, $param) use ($query) {
+            $taxonomy = substr($param, 9);
+            [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, 'any');
+
+            if (is_string($values)) {
+                $values = array_filter(explode('|', $values));
+            }
+
+            if (is_null($values) || (is_iterable($values) && count($values) === 0)) {
+                return;
+            }
+
+            $values = collect($values)->map(function ($term) use ($taxonomy) {
+                if ($term instanceof Term) {
+                    return $term->id();
+                }
+
+                return Str::contains($term, '::') ? $term : $taxonomy.'::'.$term;
+            });
+
+            if ($modifier === 'all') {
+                $values->each(function ($value) use ($query) {
+                    $query->whereTaxonomy($value);
+                });
+            } elseif ($modifier === 'any') {
+                $query->whereTaxonomyIn($values->all());
+            }
+        });
+
+        if (isset($filters['taxonomy'])) {
+            unset($filters['taxonomy']);
+        }
+
         if (! isset($filters['status']) && ! isset($filters['published'])) {
             $filters['status'] = 'published';
         }
