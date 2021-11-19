@@ -2,6 +2,8 @@
 
 namespace Statamic\Query;
 
+use Illuminate\Support\Carbon;
+
 abstract class IteratorBuilder extends Builder
 {
     protected $randomize = false;
@@ -87,6 +89,87 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function filterWhereDate($entries, $where)
+    {
+        $method = $this->operatorToCarbonMethod($where['operator']);
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            $value = Carbon::parse($value);
+            $value = Carbon::parse($value->format('Y-m-d'));
+
+            return $value->$method($where['value']);
+        });
+    }
+
+    protected function filterWhereMonth($entries, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $this->{$method}(Carbon::parse($value)->format('m'), $where['value']);
+        });
+    }
+
+    protected function filterWhereDay($entries, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $this->{$method}(Carbon::parse($value)->format('j'), $where['value']);
+        });
+    }
+
+    protected function filterWhereYear($entries, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $this->{$method}(Carbon::parse($value)->format('Y'), $where['value']);
+        });
+    }
+
+    protected function filterWhereTime($entries, $where)
+    {
+        $method = $this->operatorToCarbonMethod($where['operator']);
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            $value = Carbon::parse($value);
+            $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
+
+            return $value->$method($compareValue);
+        });
+    }
+
     protected function getFilterItemValue($item, $column)
     {
         if (is_array($item)) {
@@ -96,6 +179,36 @@ abstract class IteratorBuilder extends Builder
         return method_exists($item, $column)
             ? $item->{$column}()
             : $item->get($column);
+    }
+
+    protected function operatorToCarbonMethod($operator)
+    {
+        $method = 'eq';
+
+        switch ($operator) {
+            case '<>':
+            case '!=':
+                $method = 'neq';
+            break;
+
+            case '>':
+                $method = 'gt';
+            break;
+
+            case '>=':
+                $method = 'gte';
+            break;
+
+            case '<':
+                $method = 'lt';
+            break;
+
+            case '<=':
+                $method = 'lte';
+            break;
+        }
+
+        return $method;
     }
 
     abstract protected function getBaseItems();
