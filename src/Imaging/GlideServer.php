@@ -18,6 +18,7 @@ class GlideServer
     {
         return ServerFactory::create([
             'source'   => base_path(), // this gets overriden on the fly by the image generator
+            'watermarks' => public_path(),
             'cache'    => $this->cachePath(),
             'response' => new LaravelResponseFactory(app('request')),
             'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
