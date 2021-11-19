@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Middleware\ResolvePage;
@@ -11,8 +12,6 @@ use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
-
-use Statamic\Contracts\Taxonomies\Term;
 
 class EntriesQuery extends Query
 {
