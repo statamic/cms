@@ -4,7 +4,9 @@ namespace Statamic\Forms;
 
 use Statamic\CP\Column;
 use Statamic\Facades;
+use Statamic\Facades\GraphQL;
 use Statamic\Fieldtypes\Relationship;
+use Statamic\GraphQL\Types\FormType;
 
 class Fieldtype extends Relationship
 {
@@ -77,5 +79,10 @@ class Fieldtype extends Relationship
     protected function shallowAugmentValue($value)
     {
         return $value->toShallowAugmentedCollection();
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::type(FormType::NAME);
     }
 }
