@@ -54,6 +54,35 @@ class QueryBuilderTest extends TestCase
     }
 
     /** @test */
+    public function results_are_found_using_where_not_null()
+    {
+        $items = collect([
+            ['reference' => 'a', 'text' => 'Text 1'],
+            ['reference' => 'b', 'text' => 'Text 2'],
+            ['reference' => 'c'],
+            ['reference' => 'd', 'text' => 'Text 4'],
+            ['reference' => 'e'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereNotNull('text')->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals(['a', 'b', 'd'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_or_where_null()
+    {
+        $this->markTestSkipped();
+    }
+
+    /** @test **/
+    public function results_are_found_using_or_where_not_null()
+    {
+        $this->markTestSkipped();
+    }
+
+    /** @test */
     public function results_are_found_using_where_between()
     {
         $items = collect([
@@ -97,6 +126,22 @@ class QueryBuilderTest extends TestCase
     public function results_are_found_using_or_where_not_between()
     {
         $this->markTestSkipped();
+    }
+
+    public function results_are_found_using_where_null()
+    {
+        $items = collect([
+            ['reference' => 'a', 'text' => 'Text 1'],
+            ['reference' => 'b', 'text' => 'Text 2'],
+            ['reference' => 'c'],
+            ['reference' => 'd', 'text' => 'Text 4'],
+            ['reference' => 'e'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereNull('text')->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['c', 'e'], $results->map->reference->all());
     }
 }
 

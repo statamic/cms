@@ -87,6 +87,20 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function filterWhereNull($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            return $this->getFilterItemValue($entry, $where['column']) === null;
+        });
+    }
+
+    protected function filterWhereNotNull($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            return $this->getFilterItemValue($entry, $where['column']) !== null;
+        });
+    }
+
     protected function filterWhereBetween($entries, $where)
     {
         return $entries->filter(function ($entry) use ($where) {
