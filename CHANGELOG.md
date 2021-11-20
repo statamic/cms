@@ -1,5 +1,18 @@
 # Release Notes
 
+## 3.2.23 (2020-11-19)
+
+### What's new
+- You can specify `export_as` paths in your starter kit config. [#4733](https://github.com/statamic/cms/issues/4733) by @jesseleite
+- Add `get_errors` tag. [#4192](https://github.com/statamic/cms/issues/4192) by @edalzell
+- Add `whereNull` support to query builders. [#4740](https://github.com/statamic/cms/issues/4740) by @ryanmitchell
+- Add Forms support to GraphQL. [#4115](https://github.com/statamic/cms/issues/4115) by @arthurperton
+
+### What's fixed
+- Added missing `antlers` config to the UI for Bard fields. [#4782](https://github.com/statamic/cms/issues/4782) by @jackmcdade
+- Fixed error when submitting forms from other domains. [#4745](https://github.com/statamic/cms/issues/4745) by @SteJW
+
+
 ## 3.2.22 (2020-11-15)
 
 ### What's new
