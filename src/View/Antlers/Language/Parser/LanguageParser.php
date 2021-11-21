@@ -55,6 +55,7 @@ use Statamic\View\Antlers\Language\Nodes\Operators\LogicalXorOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\NullCoalesceOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\ScopeAssignmentOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\StringConcatenationOperator;
+use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\StringValueNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\AliasedScopeLogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArgSeparator;
@@ -2102,13 +2103,28 @@ class LanguageParser
 
                 if ($this->isValidModifierValue($next)) {
                     if ($next instanceof VariableNode) {
-                        $modifierValue = new ModifierValueNode();
-                        $modifierValue->startPosition = $next->startPosition;
-                        $modifierValue->endPosition = $next->endPosition;
-                        $modifierValue->value = $next->name;
-                        $modifierValue->name = $next->name;
+                        if ($next->variableReference != null && count($next->variableReference->pathParts) > 1) {
+                            // Unwind the combined variable and covert them to modifier parameters.
+                            foreach ($next->variableReference->pathParts as $combinedPart) {
+                                if ($combinedPart instanceof PathNode) {
+                                    $modifierValue = new ModifierValueNode();
+                                    $modifierValue->startPosition = $combinedPart->startPosition;
+                                    $modifierValue->endPosition = $combinedPart->endPosition;
+                                    $modifierValue->value = $combinedPart->name;
+                                    $modifierValue->name = $combinedPart->name;
 
-                        $values[] = $modifierValue;
+                                    $values[] = $modifierValue;
+                                }
+                            }
+                        } else {
+                            $modifierValue = new ModifierValueNode();
+                            $modifierValue->startPosition = $next->startPosition;
+                            $modifierValue->endPosition = $next->endPosition;
+                            $modifierValue->value = $next->name;
+                            $modifierValue->name = $next->name;
+
+                            $values[] = $modifierValue;
+                        }
                     } else {
                         $values[] = $next;
                     }
