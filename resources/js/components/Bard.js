@@ -12,7 +12,7 @@ class Bard {
         this.instance = instance;
         this.extensionCallbacks = [];
         this.extensionReplacementCallbacks = [];
-        this.buttonCallbacks = [];        
+        this.buttonCallbacks = [];
     }
 
     /** @deprecated */
