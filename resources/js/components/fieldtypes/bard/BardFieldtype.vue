@@ -89,7 +89,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble, Paragraph } from 'tiptap';
+import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble, Paragraph, Text } from 'tiptap';
 import {
     Blockquote,
     CodeBlock,
@@ -242,6 +242,7 @@ export default {
         this.initToolbarButtons();
 
         this.editor = new Editor({
+            useBuiltInExtensions: false,
             extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
@@ -470,6 +471,7 @@ export default {
             let exts = [
                 new Doc(),
                 new Set({ bard: this }),
+                new Text(),
                 new Paragraph(),
                 new HardBreak(),
                 new History()
