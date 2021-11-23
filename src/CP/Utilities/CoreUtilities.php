@@ -24,6 +24,7 @@ class CoreUtilities
             ->docsUrl(Statamic::docsUrl('utilities/cache-manager'))
             ->routes(function ($router) {
                 $router->post('cache/{cache}', [CacheController::class, 'clear'])->name('clear');
+                $router->post('cache/{cache}/warm', [CacheController::class, 'warm'])->name('warm');
             })
             ->register();
 

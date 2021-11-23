@@ -195,6 +195,8 @@ Statamic.app({
         this.fixAutofocus();
 
         this.showBanner = Statamic.$config.get('hasLicenseBanner');
+
+        this.$toast.intercept();
     },
 
     created() {
