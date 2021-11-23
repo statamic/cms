@@ -371,7 +371,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $this->collectionHandle(),
             Site::hasMultiple() ? $this->locale().'/' : '',
             $prefix,
-            $this->collection()->requiresSlugs() ? $this->slug() : $this->id(),
+            $this->slug() ?? $this->id(),
             $this->fileExtension(),
         ]);
     }

@@ -72,6 +72,22 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function the_slug_gets_slugified()
+    {
+        $entry = new Entry;
+        $entry->slug('foo bar');
+        $this->assertEquals('foo-bar', $entry->slug());
+    }
+
+    /** @test */
+    public function explicitly_setting_slug_to_null_will_return_null()
+    {
+        $entry = new Entry;
+        $entry->slug(null);
+        $this->assertNull($entry->slug());
+    }
+
+    /** @test */
     public function it_sets_gets_and_removes_data_values()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -494,6 +510,24 @@ class EntryTest extends TestCase
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.md', $entry->path());
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/2018-01-02.post.md', $entry->date('2018-01-02')->path());
+    }
+
+    /** @test */
+    public function the_path_uses_the_slug_if_set_even_if_slugs_arent_required()
+    {
+        $collection = tap(Facades\Collection::make('blog')->requiresSlugs(false))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug('post')->id('123');
+
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
+    }
+
+    /** @test */
+    public function the_path_uses_the_id_if_slug_is_not_set()
+    {
+        $collection = tap(Facades\Collection::make('blog')->requiresSlugs(false))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug(null)->id('123');
+
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/123.md', $entry->path());
     }
 
     /** @test */

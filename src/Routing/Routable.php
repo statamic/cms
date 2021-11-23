@@ -17,7 +17,7 @@ trait Routable
     public function slug($slug = null)
     {
         return $this->fluentlyGetOrSet('slug')->setter(function ($slug) {
-            return Str::slug($slug);
+            return $slug ? Str::slug($slug) : null;
         })->args(func_get_args());
     }
 
