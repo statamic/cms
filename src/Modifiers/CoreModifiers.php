@@ -1175,6 +1175,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Determines if the date is tomorrow.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isTomorrow($value)
+    {
+        return $this->carbon($value)->isTomorrow();
+    }
+    
+    /**
      * Converts a string to kebab-case.
      *
      * @param $value
