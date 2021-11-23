@@ -536,15 +536,12 @@ export default {
                 );
             });
 
-            this.$bard.extensionReplacementCallbacks.forEach(callback => {
-                let returned = callback({ bard: this, mark, node, languages, levels });
-                let replaceExts = Array.isArray(returned[0] || []) ? returned : [returned];
-                replaceExts.forEach(([searchExt, replaceExt]) => {
-                    const index = exts.findIndex(ext => ext instanceof searchExt);
-                    if (index !== -1) {
-                        exts[index] = replaceExt;
-                    }
-                });
+            this.$bard.extensionReplacementCallbacks.forEach(({callback, name}) => {
+                let index = exts.findIndex(ext => ext.name === name);
+                if (index === -1) return;
+                let extension = exts[index];
+                let newExtension = callback({ bard: this, mark, node, extension });
+                exts[index] = newExtension;
             });
 
             return exts;

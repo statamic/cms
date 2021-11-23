@@ -19,8 +19,8 @@ class Bard {
         this.extensionCallbacks.push(callback);
     }
 
-    extendReplace(callback) {
-        this.extensionReplacementCallbacks.push(callback);
+    replaceExtension(name, callback) {
+        this.extensionReplacementCallbacks.push({ name, callback });
     }
 
     buttons(callback) {
