@@ -15,7 +15,12 @@ class Bard {
         this.buttonCallbacks = [];        
     }
 
+    /** @deprecated */
     extend(callback) {
+        this.addExtension(callback);
+    }
+
+    addExtension(callback) {
         this.extensionCallbacks.push(callback);
     }
 
