@@ -38,7 +38,6 @@ return [
     'publish_{taxonomy}_terms' => 'Közzétételi állapot kezelése',
     'reorder_{taxonomy}_terms' => 'Kifejezések átrendezése',
 
-
     'group_navigation' => 'Navigáció',
     'configure_navs' => 'Navigáció konfigurálása',
     'configure_navs_desc' => 'Hozzáférést biztosít az összes navigációval kapcsolatos engedélyhez',
