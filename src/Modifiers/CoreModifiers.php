@@ -1184,7 +1184,7 @@ class CoreModifiers extends Modifier
     {
         return $this->carbon($value)->isTomorrow();
     }
-    
+
     /**
      * Converts a string to kebab-case.
      *
