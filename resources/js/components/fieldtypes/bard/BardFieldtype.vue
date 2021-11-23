@@ -474,9 +474,6 @@ export default {
                 new HardBreak(),
                 new History()
             ];
-            
-            let languages = { javascript, css };
-            let levels = [];
 
             let btns = this.buttons.map(button => button.name);
 
@@ -501,7 +498,7 @@ export default {
             if (btns.includes('codeblock') || btns.includes('code')) {
                 if (btns.includes('code')) exts.push(new Code());
                 if (btns.includes('codeblock')) exts.push(new CodeBlock());
-                exts.push(new CodeBlockHighlight({ languages }));
+                exts.push(new CodeBlockHighlight({ languages: { javascript, css }}));
             }
 
             if (btns.includes('table')) {
@@ -520,6 +517,7 @@ export default {
                 btns.includes('h5') ||
                 btns.includes('h6')
             ) {
+                let levels = [];
                 if (btns.includes('h1')) levels.push(1);
                 if (btns.includes('h2')) levels.push(2);
                 if (btns.includes('h3')) levels.push(3);
