@@ -401,20 +401,21 @@ export default {
 
             // Let addons add, remove, or control the position of buttons.
             this.$bard.buttonCallbacks.forEach(callback => {
-                // Let's pass two variables to the callback:
-                // buttons: Can be used to manipulate the array per reference. The callback can also simply return
-                //          a single or an array of buttons.
-                // selectedButtons: An array of strings of the buttons that have been selected to be available in this
-                //                  specific field.
-                const returned = callback(buttons, selectedButtons);
+                // Since the developer uses the same callback to add buttons to the field itself, and for the
+                // button configurator, we need to make the button conditional when on the Bard fieldtype
+                // but not in the button configurator. So here we'll filter it out if it's not selected.
+                const buttonFn = (button) => selectedButtons.includes(button.name) ? button : null;
 
-                // No return value means they intend to manipulate the
-                // buttons object manually. Just continue on.
-                if (! returned) return;
+                const addedButtons = callback(buttons, buttonFn);
+
+                // No return value means either they literally returned nothing, with the intention
+                // of manipulating the buttons object manually. Or, they used the button() and
+                // the button was not configured in the field so it was stripped out.
+                if (! addedButtons) return;
 
                 buttons = buttons.concat(
-                    Array.isArray(returned) ? returned : [returned]
-                ).filter(button => selectedButtons.includes(button.name));
+                    Array.isArray(addedButtons) ? addedButtons.filter(button => !!button) : [addedButtons]
+                );
             });
 
             // Remove any non-objects. This would happen if you configure a button name that doesn't exist.

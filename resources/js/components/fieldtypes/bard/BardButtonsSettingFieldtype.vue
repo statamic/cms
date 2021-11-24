@@ -63,7 +63,12 @@ export default {
 
             // Add custom buttons from a project or addon
             this.$bard.buttonCallbacks.map(callback => {
-                let returned = callback(available);
+                // Since the developer uses the same callback to add buttons to the field itself, and for the
+                // button configurator, we need to make the button conditional when on the Bard fieldtype,
+                // but not here. Here we want to just show them all, so the user is able to toggle it.
+                const buttonFn = (button) => button;
+
+                let returned = callback(available, buttonFn);
 
                 // No return value means they intend to manipulate the
                 // buttons object manually. Just continue on.
