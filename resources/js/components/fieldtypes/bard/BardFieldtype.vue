@@ -414,9 +414,12 @@ export default {
                 if (! addedButtons) return;
 
                 buttons = buttons.concat(
-                    Array.isArray(addedButtons) ? addedButtons.filter(button => !!button) : [addedButtons]
+                    Array.isArray(addedButtons) ? addedButtons : [addedButtons]
                 );
             });
+
+            // Remove any nulls. This could happen if a developer-added button was not specified in this field's buttons array.
+            buttons = buttons.filter(button => !!button);
 
             // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
             buttons = buttons.filter(button => typeof button != 'string');
