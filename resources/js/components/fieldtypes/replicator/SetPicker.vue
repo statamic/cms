@@ -76,7 +76,7 @@ export default {
             const result = {};
             array.forEach(item => {
                 if (!item[key]) {
-                    item[key] = '';
+                    item[key] = 'Default';
                 }
 
                 if (!result[item[key]]){
