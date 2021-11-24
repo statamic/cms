@@ -107,9 +107,9 @@ class TreeTest extends TestCase
     {
         $tree = $this->tree();
         $tree->structure()->expectsRoot(true);
-        $tree->tree([['entry' => 'pages-home']]);
+        $tree->tree([$root = ['id' => 'pages-home']]);
 
-        $this->assertEquals('pages-home', $tree->root());
+        $this->assertEquals($root, $tree->root());
     }
 
     /** @test */
@@ -139,14 +139,17 @@ class TreeTest extends TestCase
 
         $this->assertInstanceOf(Pages::class, $pages);
         $this->assertCount(3, $pages->all());
+
+        $this->assertEquals(['test' => 'home'], $pages->all()[0]->pageData()->all());
+        $this->assertEquals(['test' => 'about'], $pages->all()[1]->pageData()->all());
     }
 
     /** @test */
-    public function it_gets_a_page_by_key()
+    public function it_gets_a_page_by_id()
     {
         $page = $this->tree()->page('pages-directors');
 
-        $this->assertEquals('Directors', $page->title());
+        $this->assertEquals('Custom Directors Title', $page->title());
     }
 
     /** @test */
@@ -158,23 +161,27 @@ class TreeTest extends TestCase
 
         $this->assertEquals([
             [
+                'id' => 'root-id',
                 'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                         'children' => [
                             [
-                                'entry' => 'pages-directors',
+                                'id' => 'pages-directors',
+                                'title' => 'Custom Directors Title',
                             ],
                         ],
                     ],
                 ],
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
             [
                 'entry' => 'appended-page',
@@ -191,26 +198,30 @@ class TreeTest extends TestCase
 
         $this->assertEquals([
             [
+                'id' => 'root-id',
                 'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                         'children' => [
                             [
-                                'entry' => 'pages-directors',
+                                'id' => 'pages-directors',
+                                'title' => 'Custom Directors Title',
                             ],
                             [
-                                'entry' => 'appended-page',
+                                'id' => 'appended-page',
                             ],
                         ],
                     ],
                 ],
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
         ], $tree->tree());
     }
@@ -229,22 +240,26 @@ class TreeTest extends TestCase
 
         $this->assertEquals([
             [
+                'id' => 'root-id',
                 'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                     ],
                     [
-                        'entry' => 'pages-directors',
+                        'id' => 'pages-directors',
                         'foo' => 'bar',
+                        'title' => 'Custom Directors Title',
                     ],
                 ],
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
         ], $tree->tree());
     }
@@ -254,21 +269,23 @@ class TreeTest extends TestCase
     {
         $tree = $this->tree($arr = [
             [
-                'entry' => 'pages-home',
+                'id' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                     ],
                     [
-                        'entry' => 'pages-directors',
+                        'id' => 'pages-directors',
                     ],
                 ],
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
         ]);
 
@@ -279,27 +296,28 @@ class TreeTest extends TestCase
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/3148
      */
     public function it_doesnt_get_moved_to_root_if_its_already_there_and_the_target_is_null()
     {
         $tree = $this->tree()->tree($arr = [
             [
-                'entry' => 'pages-home',
+                'id' => 'pages-home',
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                     ],
                     [
-                        'entry' => 'pages-directors',
+                        'id' => 'pages-directors',
                     ],
                 ],
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
         ]);
 
@@ -310,25 +328,26 @@ class TreeTest extends TestCase
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/1548
      **/
     public function it_can_move_the_root()
     {
         $tree = $this->tree([
             [
-                'entry' => 'pages-home',
+                'id' => 'pages-home',
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                         'children' => [
                             [
-                                'entry' => 'pages-directors',
+                                'id' => 'pages-directors',
                             ],
                         ],
                     ],
@@ -340,19 +359,19 @@ class TreeTest extends TestCase
 
         $this->assertEquals([
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                         'children' => [
                             [
-                                'entry' => 'pages-directors',
+                                'id' => 'pages-directors',
                             ],
                             [
-                                'entry' => 'pages-home',
+                                'id' => 'pages-home',
                             ],
                         ],
                     ],
@@ -366,16 +385,16 @@ class TreeTest extends TestCase
     {
         $tree = $this->tree([
             [
-                'entry' => 'pages-home',
+                'id' => 'pages-home',
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                     ],
                 ],
             ],
@@ -386,16 +405,16 @@ class TreeTest extends TestCase
         // If the indexes hadn't been fixed, we'd have an array starting with 1.
         $this->assertEquals([
             [
-                'entry' => 'pages-home',
+                'id' => 'pages-home',
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                     ],
                     [
-                        'entry' => 'pages-blog',
+                        'id' => 'pages-blog',
                     ],
                 ],
             ],
@@ -440,21 +459,21 @@ class TreeTest extends TestCase
 
         $tree = $this->tree()->tree([
             [
-                'entry' => 'pages-home',
+                'id' => 'pages-home',
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                     ],
                     [
-                        'entry' => 'pages-directors',
+                        'id' => 'pages-directors',
                     ],
                 ],
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
         ]);
 
@@ -469,21 +488,21 @@ class TreeTest extends TestCase
 
         $tree->tree([
             [
-                'entry' => 'pages-home',
+                'id' => 'pages-home',
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                     ],
                     [
-                        'entry' => 'pages-directors',
+                        'id' => 'pages-directors',
                     ],
                 ],
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
         ]);
 
@@ -491,23 +510,23 @@ class TreeTest extends TestCase
 
         $this->assertEquals([
             [
-                'entry' => 'pages-home',
+                'id' => 'pages-home',
                 'children' => [
                     [
-                        'entry' => 'pages-board',
+                        'id' => 'pages-board',
                     ],
                 ],
             ],
             [
-                'entry' => 'pages-about',
+                'id' => 'pages-about',
                 'children' => [
                     [
-                        'entry' => 'pages-directors',
+                        'id' => 'pages-directors',
                     ],
                 ],
             ],
             [
-                'entry' => 'pages-blog',
+                'id' => 'pages-blog',
             ],
         ], $tree->tree());
     }
@@ -519,23 +538,27 @@ class TreeTest extends TestCase
             ->setStructure((new Nav)->expectsRoot(true))
             ->tree($tree ?? [
                 [
+                    'id' => 'root-id',
                     'entry' => 'pages-home',
+                    'data' => ['test' => 'home'],
                 ],
                 [
-                    'entry' => 'pages-about',
+                    'id' => 'pages-about',
+                    'data' => ['test' => 'about'],
                     'children' => [
                         [
-                            'entry' => 'pages-board',
+                            'id' => 'pages-board',
                             'children' => [
                                 [
-                                    'entry' => 'pages-directors',
+                                    'id' => 'pages-directors',
+                                    'title' => 'Custom Directors Title',
                                 ],
                             ],
                         ],
                     ],
                 ],
                 [
-                    'entry' => 'pages-blog',
+                    'id' => 'pages-blog',
                 ],
             ])
             ->syncOriginal();

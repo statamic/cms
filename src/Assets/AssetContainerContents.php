@@ -136,7 +136,7 @@ class AssetContainerContents
                 $this->add($dir);
             }
 
-            $this->files->put($path, $metadata + Util::pathinfo($path));
+            $this->all()->put($path, $metadata + Util::pathinfo($path));
 
             $this->filteredFiles = null;
             $this->filteredDirectories = null;

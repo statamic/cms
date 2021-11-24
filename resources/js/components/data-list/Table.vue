@@ -1,9 +1,9 @@
 <template>
-    <table class="data-table" :class="{ 'opacity-50': loading }">
+    <table ref="table" tabindex="0" class="data-table" :class="{ 'opacity-50': loading, 'select-none' : shifting }" @keydown.shift="shiftDown" @keyup="clearShift">
         <thead v-if="allowBulkActions || allowColumnPicker || visibleColumns.length > 1">
             <tr>
                 <th class="checkbox-column" v-if="allowBulkActions || reorderable">
-                    <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions" />
+                    <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions && !singleSelect" />
                 </th>
                 <th
                     v-for="column in visibleColumns"
@@ -44,10 +44,10 @@
                         :checked="isSelected(row.id)"
                         :disabled="reachedSelectionLimit && !singleSelect && !isSelected(row.id)"
                         :id="`checkbox-${row.id}`"
-                        @click="toggleSelection(row.id)"
+                        @click="checkboxClicked(row, index, $event)"
                     />
                 </td>
-                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row)" :width="column.width">
+                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width">
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
@@ -83,6 +83,13 @@ export default {
     components: {
         TableField,
         SortableList,
+    },
+
+    data() {
+        return {
+            shifting: false,
+            lastItemClicked: null
+        }
     },
 
     props: {
@@ -151,7 +158,6 @@ export default {
     },
 
     methods: {
-
         changeSortColumn(column) {
             if (!this.sortable) return;
 
@@ -190,10 +196,25 @@ export default {
             return _.findIndex(this.sharedState.originalRows, row);
         },
 
-        rowClicked(row, i) {
-            if (this.toggleSelectionOnRowClick) {
-                this.toggleSelection(row.id);
+        rowClicked(row, index, $event) {
+            if ($event.shiftKey && this.lastItemClicked !== null) {
+                this.selectRange(
+                    Math.min(this.lastItemClicked, index),
+                    Math.max(this.lastItemClicked, index)
+                );
+            } else if (this.toggleSelectionOnRowClick) {
+                this.toggleSelection(row.id, index);
             }
+            this.lastItemClicked = index;
+        },
+
+        selectRange(from, to) {
+            for (var i = from; i <= to; i++ ) {
+                let row = this.sharedState.rows[i].id;
+                if (! this.sharedState.selections.includes(row) && ! this.reachedSelectionLimit) {
+                    this.sharedState.selections.push(row);
+                }
+            };
         },
 
         isSelected(id) {
@@ -216,8 +237,31 @@ export default {
             if (! this.reachedSelectionLimit) {
                 this.sharedState.selections.push(id);
             }
-        }
+        },
 
-    }
+        shiftDown() {
+            this.shifting = true
+        },
+
+        clearShift() {
+            this.shifting = false
+        },
+
+        checkboxClicked(row, index, $event) {
+            this.$refs.table.focus();
+            if ($event.shiftKey && this.lastItemClicked !== null) {
+                this.selectRange(
+                    Math.min(this.lastItemClicked, index),
+                    Math.max(this.lastItemClicked, index)
+                );
+            } else {
+                this.toggleSelection(row.id, index)
+            }
+
+            if ($event.target.checked) {
+                this.lastItemClicked = index
+            }
+        }
+    },
 }
 </script>

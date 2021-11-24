@@ -18,10 +18,15 @@ class EventServiceProvider extends ServiceProvider
             \Statamic\Entries\UpdateStructuredEntryUris::class,
             \Statamic\Entries\UpdateStructuredEntryOrder::class,
         ],
+        \Statamic\Events\EntryBlueprintFound::class => [
+            \Statamic\Entries\AddSiteColumnToBlueprint::class,
+        ],
     ];
 
     protected $subscribe = [
         // \Statamic\Taxonomies\TermTracker::class, // TODO
         \Statamic\Listeners\GeneratePresetImageManipulations::class,
+        \Statamic\Listeners\UpdateAssetReferences::class,
+        \Statamic\Listeners\UpdateTermReferences::class,
     ];
 }

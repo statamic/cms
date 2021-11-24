@@ -18,6 +18,7 @@ class Augmentor
     protected $sets = [];
     protected $includeDisabledSets = false;
     protected $augmentSets = true;
+    protected $withStatamicImageUrls = false;
 
     protected static $customMarks = [];
     protected static $customNodes = [];
@@ -27,6 +28,13 @@ class Augmentor
     public function __construct($fieldtype)
     {
         $this->fieldtype = $fieldtype;
+    }
+
+    public function withStatamicImageUrls()
+    {
+        $this->withStatamicImageUrls = true;
+
+        return $this;
     }
 
     public function augment($value, $shallow = false)
@@ -96,8 +104,10 @@ class Augmentor
 
     public function convertToHtml($value)
     {
+        $customImageNode = $this->withStatamicImageUrls ? StatamicImageNode::class : CustomImageNode::class;
+
         $renderer = (new Renderer)
-            ->replaceNode(DefaultImageNode::class, CustomImageNode::class)
+            ->replaceNode(DefaultImageNode::class, $customImageNode)
             ->replaceMark(DefaultLinkMark::class, CustomLinkMark::class)
             ->addNode(SetNode::class)
             ->addNodes(static::$customNodes)

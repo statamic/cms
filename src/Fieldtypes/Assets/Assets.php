@@ -24,7 +24,7 @@ class Assets extends Fieldtype
                 'display' => __('Mode'),
                 'instructions' => __('statamic::fieldtypes.assets.config.mode'),
                 'type' => 'select',
-                'default' => 'grid',
+                'default' => 'list',
                 'options' => [
                     'grid' => __('Grid'),
                     'list' => __('List'),
@@ -55,6 +55,13 @@ class Assets extends Fieldtype
             'allow_uploads' => [
                 'display' => __('Allow Uploads'),
                 'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'show_filename' => [
+                'display' => __('Show Filename'),
+                'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
                 'type' => 'toggle',
                 'default' => true,
                 'width' => 50,
@@ -173,7 +180,26 @@ class Assets extends Fieldtype
     public function fieldRules()
     {
         return collect(parent::fieldRules())->map(function ($rule) {
-            return AssetRule::makeFromRule($rule);
+            $name = Str::before($rule, ':');
+            $parameters = explode(',', Str::after($rule, ':'));
+
+            if ($name === 'dimensions') {
+                return new DimensionsRule($parameters);
+            }
+
+            if ($name === 'image') {
+                return new ImageRule();
+            }
+
+            if ($name === 'mimes') {
+                return new MimesRule($parameters);
+            }
+
+            if ($name === 'mimetypes') {
+                return new MimetypesRule($parameters);
+            }
+
+            return $rule;
         })->all();
     }
 
@@ -191,6 +217,7 @@ class Assets extends Fieldtype
             $arr = [
                 'id' => $asset->id(),
                 'is_image' => $isImage = $asset->isImage(),
+                'extension' => $asset->extension(),
                 'url' => $asset->url(),
             ];
 

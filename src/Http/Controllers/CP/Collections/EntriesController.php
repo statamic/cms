@@ -282,14 +282,14 @@ class EntriesController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site) {
+            'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site, $blueprint) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
                     'active' => $handle === $site->handle(),
                     'exists' => false,
                     'published' => false,
-                    'url' => cp_route('collections.entries.create', [$collection->handle(), $handle]),
+                    'url' => cp_route('collections.entries.create', [$collection->handle(), $handle, 'blueprint' => $blueprint->handle()]),
                     'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
                 ];
             })->all(),

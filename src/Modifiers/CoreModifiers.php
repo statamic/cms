@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
@@ -67,6 +68,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns a string with backslashes added before characters that need to be escaped.
+     *
+     * @param $value
+     * @return string
+     */
+    public function addSlashes($value)
+    {
+        return addslashes($value);
+    }
+
+    /**
      * Creates a sentence list from the given array and the ability to set the glue.
      *
      * @param $value
@@ -94,7 +106,7 @@ class CoreModifiers extends Modifier
      */
     public function alias($value, $params)
     {
-        if (! is_array($value)) {
+        if (! (is_array($value) || $value instanceof Collection)) {
             return;
         }
 
@@ -301,6 +313,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Returns the number of items in an array.
+     *
      * @param  $value
      * @param  $params
      * @return int
@@ -339,9 +352,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in days.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function daysAgo($value, $params)
@@ -601,6 +613,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns a converted string in a Carbon translated format.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function formatTranslated($value, $params)
+    {
+        return $this->carbon($value)->translatedFormat(Arr::get($params, 0));
+    }
+
+    /**
      * Converts a string to a Carbon instance and formats it according to the whim of the Overlord.
      *
      * @param $value
@@ -709,7 +733,70 @@ class CoreModifiers extends Modifier
      */
     public function groupBy($value, $params)
     {
-        return collect($value)->groupBy($params[0])->toArray();
+        // Workaround for https://github.com/statamic/cms/issues/3614
+        // At the moment this modifier only works properly when using the param syntax.
+        $params = implode(':', $params);
+        $params = explode('|', $params);
+        $groupBy = $params[0];
+
+        $groupLabels = [];
+
+        $grouped = collect($value)->groupBy(function ($item) use ($groupBy, $params, &$groupLabels) {
+            $value = $this->getGroupByValue($item, $groupBy);
+
+            return $this->handleGroupByDateValue($value, $params, $groupLabels);
+        });
+
+        $iterable = $grouped->map(function ($items, $key) use ($groupLabels) {
+            return [
+                'key' => $key,
+                'group' => $groupLabels[$key] ?? $key,
+                'items' => $items,
+            ];
+        })->values();
+
+        return collect($grouped)->merge(['groups' => $iterable]);
+    }
+
+    private function getGroupByValue($item, $groupBy)
+    {
+        $value = is_object($item)
+            ? $this->getGroupByValueFromObject($item, $groupBy)
+            : $item[$groupBy];
+
+        if ($value instanceof Value) {
+            $value = $value->value();
+        }
+
+        return $value;
+    }
+
+    private function getGroupByValueFromObject($item, $groupBy)
+    {
+        // Make the array just from the params, so it only augments the values that might be needed.
+        $keys = explode(':', $groupBy);
+        $context = $item->toAugmentedArray($keys);
+
+        return Antlers::parser()->getVariable($groupBy, $context);
+    }
+
+    private function handleGroupByDateValue($value, $params, &$groupLabels)
+    {
+        if (! $value instanceof Carbon) {
+            return $value;
+        }
+
+        $date = $value;
+        $dateFormat = $params[1] ?? 'Y-m-d';
+        $dateGroupFormat = $params[2] ?? $dateFormat;
+
+        $value = $date->format($dateFormat);
+
+        if ($dateFormat !== $dateGroupFormat) {
+            $groupLabels[$value] = $date->format($dateGroupFormat);
+        }
+
+        return $value;
     }
 
     /**
@@ -737,9 +824,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in hours.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function hoursAgo($value, $params)
@@ -1089,6 +1175,29 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Determines if the date is tomorrow.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isTomorrow($value)
+    {
+        return $this->carbon($value)->isTomorrow();
+    }
+
+    /**
+     * Converts a string to kebab-case.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function kebab($value, $params)
+    {
+        return Str::kebab($value);
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @param $value
@@ -1266,9 +1375,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in minutes.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function minutesAgo($value, $params)
@@ -1308,9 +1416,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in months.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function monthsAgo($value, $params)
@@ -1492,6 +1599,10 @@ class CoreModifiers extends Modifier
         }
 
         $items = $value->map(function ($item) use ($key) {
+            if (is_array($item)) {
+                return Arr::get($item, $key);
+            }
+
             return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
         });
 
@@ -1727,6 +1838,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Rounds a number to a specified precision (number of digits after the decimal point).
+     *
      * @param $value
      * @param $params
      * @return float
@@ -1817,7 +1929,7 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in seconds.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
      * @return int
      */
@@ -1951,6 +2063,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a string to snake_case.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function snake($value, $params)
+    {
+        return Str::snake($value);
+    }
+
+    /**
      * Sort an array by key $params[0] and direction $params[1].
      *
      * @param $value
@@ -2001,6 +2125,26 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Break an array into a given number of groups.
+     *
+     * @param $value
+     * @param $params
+     * @return array
+     */
+    public function split($value, $params)
+    {
+        $size = Arr::get($params, 0, 1);
+
+        return collect($value)
+            ->split($size)
+            ->map(function ($collection) {
+                return [
+                    'items' => $collection->all(),
+                ];
+            })->all();
+    }
+
+    /**
      * Returns true if the string starts with a given substring ($params[0]), false otherwise.
      * The comparison is case-insensitive.
      *
@@ -2038,6 +2182,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a string to StudlyCase.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function studly($value, $params)
+    {
+        return Str::studly($value);
+    }
+
+    /**
      * Subtracts values with the help of science. Context aware.
      *
      * @param $value
@@ -2066,6 +2222,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Returns the sum of all items in the array, optionally by specific key.
+     *
      * @param $value
      * @param $params
      * @return mixed
@@ -2074,15 +2231,22 @@ class CoreModifiers extends Modifier
     {
         $key = Arr::get($params, 0, null);
 
-        return collect($value)->reduce(function ($carry, $value) use ($key) {
+        $sum = collect($value)->reduce(function ($carry, $value) use ($key) {
             if ($key) {
                 $value = data_get($value, $key);
             }
 
             $value = $value instanceof Value ? $value->value() : $value;
 
-            return $carry + (int) $value;
+            return $carry + (float) $value;
         }, 0);
+
+        // For backwards compatibility integers get cast to integers.
+        if ($sum === round($sum)) {
+            return (int) $sum;
+        }
+
+        return $sum;
     }
 
     /**
@@ -2234,6 +2398,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Returns the trimmed string.
+     *
      * @param $value
      * @return string
      */
@@ -2386,9 +2551,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in weeks.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function weeksAgo($value, $params)
@@ -2399,7 +2563,7 @@ class CoreModifiers extends Modifier
     /**
      * Filters the data by a given key / value pair.
      *
-     * @param array $value
+     * @param  array  $value
      * @param $params
      * @return array
      */
@@ -2469,9 +2633,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in years.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function yearsAgo($value, $params)
@@ -2483,7 +2646,7 @@ class CoreModifiers extends Modifier
      * Get the embed URL when given a youtube or vimeo link that's
      * direct to the page.
      *
-     * @param string  $url
+     * @param  string  $url
      * @return string
      */
     public function embedUrl($url)
@@ -2523,7 +2686,7 @@ class CoreModifiers extends Modifier
     /**
      * Whether a given video URL is embeddable.
      *
-     * @param string $url
+     * @param  string  $url
      * @return bool
      */
     public function isEmbeddable($url)
@@ -2549,7 +2712,7 @@ class CoreModifiers extends Modifier
      * Takes a modifier array, split on ":", and formats it for HTML attribute key:value pairs.
      *
      * @param $params
-     * @param string $delimiter
+     * @param  string  $delimiter
      * @return array
      */
     private function buildAttributesFromParameters($params, $delimiter = ':')

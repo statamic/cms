@@ -37,18 +37,59 @@ class Link extends Fieldtype
     {
         $value = $this->field->value();
 
+        $selectedEntry = Str::startsWith($value, 'entry::') ? Str::after($value, 'entry::') : null;
+
+        $url = ($value !== '@child' && ! $selectedEntry) ? $value : null;
+
+        $entryFieldtype = $this->nestedEntriesFieldtype($selectedEntry);
+
+        return [
+            'initialUrl' => $url,
+            'initialSelectedEntries' => $selectedEntry ? [$selectedEntry] : [],
+            'initialOption' => $this->initialOption($value, $selectedEntry),
+            'showFirstChildOption' => $this->showFirstChildOption(),
+            'entry' => [
+                'config' => $entryFieldtype->config(),
+                'meta' => $entryFieldtype->preload(),
+            ],
+        ];
+    }
+
+    private function initialOption($value, $entry)
+    {
+        if (! $value) {
+            return $this->field->isRequired() ? 'url' : null;
+        }
+
+        if ($value === '@child') {
+            return 'first-child';
+        } elseif ($entry) {
+            return 'entry';
+        }
+
+        return 'url';
+    }
+
+    private function nestedEntriesFieldtype($value): Fieldtype
+    {
         $entryField = (new Field('entry', [
             'type' => 'entries',
             'max_items' => 1,
             'create' => false,
         ]));
 
-        if (Str::startsWith($value, 'entry::')) {
-            $entryField->setValue(Str::after($value, 'entry::'));
-        }
+        $entryField->setValue($value);
 
-        $entryFieldtype = $entryField->fieldtype();
+        $entryField->setConfig(array_merge(
+            $entryField->config(),
+            ['collections' => $this->collections()]
+        ));
 
+        return $entryField->fieldtype();
+    }
+
+    private function collections()
+    {
         $collections = $this->config('collections');
 
         if (empty($collections)) {
@@ -57,20 +98,14 @@ class Link extends Fieldtype
             $collections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
                 return Facades\Collection::all()->reject(function ($collection) use ($site) {
                     return is_null($collection->route($site));
-                })->map->handle()->values();
+                })->map->handle()->values()->all();
             });
         }
 
-        return [
-            'showFirstChildOption' => $this->showFirstChildOption(),
-            'entry' => [
-                'config' => array_merge($entryFieldtype->config(), ['collections' => $collections]),
-                'meta' => $entryFieldtype->preload(),
-            ],
-        ];
+        return $collections;
     }
 
-    protected function showFirstChildOption()
+    private function showFirstChildOption()
     {
         $parent = $this->field()->parent();
 

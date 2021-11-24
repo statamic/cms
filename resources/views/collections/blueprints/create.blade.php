@@ -16,6 +16,9 @@
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     {{ __('statamic::messages.blueprints_title_instructions') }}
                 </div>
+                @if ($errors->has('title'))
+                    <div class="text-red text-xs mt-1">{{ $errors->first('title') }}</div>
+                @endif
             </div>
         </div>
 

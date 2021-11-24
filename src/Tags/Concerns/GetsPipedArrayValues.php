@@ -7,7 +7,7 @@ trait GetsPipedArrayValues
     /**
      * Explode piped array values from tag params into php array.
      *
-     * @param string $string
+     * @param  string  $string
      * @return array
      */
     protected function getPipedValues($string)

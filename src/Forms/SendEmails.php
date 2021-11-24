@@ -28,7 +28,7 @@ class SendEmails implements ShouldQueue
     /**
      * Send form submission emails.
      *
-     * @param Submission $submission
+     * @param  Submission  $submission
      */
     public function handle()
     {
@@ -40,7 +40,7 @@ class SendEmails implements ShouldQueue
     /**
      * Parse email configs.
      *
-     * @param \Statamic\Forms\Submission $submission
+     * @param  \Statamic\Forms\Submission  $submission
      * @return \Illuminate\Support\Collection
      */
     protected function parseEmailConfigs($submission)
@@ -61,8 +61,8 @@ class SendEmails implements ShouldQueue
     /**
      * Parse antlers in email configs.
      *
-     * @param array $config
-     * @param array $data
+     * @param  array  $config
+     * @param  array  $data
      * @return array
      */
     protected function parseAntlersInConfig($config, $data)

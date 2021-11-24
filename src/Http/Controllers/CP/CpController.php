@@ -25,7 +25,7 @@ class CpController extends Controller
     /**
      * Create a new CpController.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      */
     public function __construct(Request $request)
     {

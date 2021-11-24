@@ -66,8 +66,14 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootMiddleware()
                 ->bootUpdateScripts()
                 ->bootViews()
-                ->bootPublishAfterInstall();
+                ->bootPublishAfterInstall()
+                ->bootAddon();
         });
+    }
+
+    public function bootAddon()
+    {
+        //
     }
 
     public function bootEvents()
@@ -268,7 +274,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     /**
      * Register routes from the root of the site.
      *
-     * @param string|Closure $routes   Either the path to a routes file, or a closure containing routes.
+     * @param  string|Closure  $routes  Either the path to a routes file, or a closure containing routes.
      * @return void
      */
     public function registerWebRoutes($routes)
@@ -281,7 +287,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     /**
      * Register routes scoped to the addon's section in the Control Panel.
      *
-     * @param string|Closure $routes   Either the path to a routes file, or a closure containing routes.
+     * @param  string|Closure  $routes  Either the path to a routes file, or a closure containing routes.
      * @return void
      */
     public function registerCpRoutes($routes)
@@ -294,7 +300,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     /**
      * Register routes scoped to the addon's front-end actions.
      *
-     * @param string|Closure $routes   Either the path to a routes file, or a closure containing routes.
+     * @param  string|Closure  $routes  Either the path to a routes file, or a closure containing routes.
      * @return void
      */
     public function registerActionRoutes($routes)
@@ -309,8 +315,8 @@ abstract class AddonServiceProvider extends ServiceProvider
     /**
      * Register a route group.
      *
-     * @param string|Closure $routes   Either the path to a routes file, or a closure containing routes.
-     * @param array $attributes  Additional attributes to be applied to the route group.
+     * @param  string|Closure  $routes  Either the path to a routes file, or a closure containing routes.
+     * @param  array  $attributes  Additional attributes to be applied to the route group.
      * @return void
      */
     protected function registerRouteGroup($routes, array $attributes = [])
@@ -329,7 +335,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     /**
      * The attributes to be applied to the route group.
      *
-     * @param array $overrides  Any additional attributes.
+     * @param  array  $overrides  Any additional attributes.
      * @return array
      */
     protected function routeGroupAttributes($overrides = [])
@@ -432,7 +438,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     private function getAddonByServiceProvider()
     {
         return Addon::all()->first(function ($addon) {
-            return Str::startsWith(get_class($this), $addon->namespace());
+            return Str::startsWith(get_class($this), $addon->namespace().'\\');
         });
     }
 

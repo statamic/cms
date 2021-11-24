@@ -10,12 +10,8 @@
 
         <div
             class="help-block"
-            v-if="field.instructions"
-            v-html="$options.filters.markdown(field.instructions)" />
-
-        <div v-if="hasError">
-            <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
-        </div>
+            v-if="instructions && field.instructions_position !== 'below'"
+            v-html="instructions" />
 
         <component
             :is="fieldtypeComponent"
@@ -32,6 +28,15 @@
             @blur="$emit('blur')"
             @replicator-preview-updated="$emit('replicator-preview-updated', $event)"
         />
+
+        <div
+            class="help-block mt-1"
+            v-if="instructions && field.instructions_position === 'below'"
+            v-html="instructions" />
+
+        <div v-if="hasError">
+            <small class="help-block text-red mt-1" v-for="(error, i) in errors" :key="i" v-text="error" />
+        </div>
 
     </div>
 
@@ -79,6 +84,12 @@ export default {
 
         display() {
             return this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1)
+        },
+
+        instructions() {
+            return this.field.instructions
+                ? this.$options.filters.markdown(this.field.instructions)
+                : null
         },
 
         hasError() {

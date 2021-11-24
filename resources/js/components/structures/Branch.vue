@@ -9,7 +9,20 @@
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
-                    v-text="page.title || page.url" />
+                    v-text="title" />
+
+                <span v-if="showSlugs" class="ml-1 font-mono text-grey-70 text-2xs pt-px">
+                    {{ isRoot ? '/' : page.slug }}
+                </span>
+
+                <button
+                    v-if="hasChildren"
+                    class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
+                    :class="{ '-rotate-90': !isOpen }"
+                    @click="$emit('toggle-open')"
+                >
+                    <svg-icon name="chevron-down-xs" class="h-2.5" />
+                </button>
 
                 <div v-if="page.collection" class="ml-2 flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
@@ -51,6 +64,9 @@ export default {
         vm: Object,
         firstPageIsRoot: Boolean,
         hasCollection: Boolean,
+        isOpen: Boolean,
+        hasChildren: Boolean,
+        showSlugs: Boolean
     },
 
     data() {
@@ -83,6 +99,10 @@ export default {
 
         isText() {
             return this.page.title && !this.page.url;
+        },
+
+        title() {
+            return this.page.title || this.page.entry_title || this.page.url;
         }
 
     },

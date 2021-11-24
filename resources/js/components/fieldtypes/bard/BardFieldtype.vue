@@ -89,7 +89,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble } from 'tiptap';
+import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble, Paragraph, Text } from 'tiptap';
 import {
     Blockquote,
     CodeBlock,
@@ -242,6 +242,7 @@ export default {
         this.initToolbarButtons();
 
         this.editor = new Editor({
+            useBuiltInExtensions: false,
             extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
@@ -282,7 +283,7 @@ export default {
             if (!this.mounted) return;
 
             // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
-            this.update(JSON.stringify(json));
+            this.updateDebounced(JSON.stringify(json));
         },
 
         value(value, oldValue) {
@@ -292,6 +293,7 @@ export default {
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.clearContent()
                 this.editor.setContent(content, true);
             }
         },
@@ -473,6 +475,8 @@ export default {
             let exts = [
                 new Doc(),
                 new Set({ bard: this }),
+                new Text(),
+                new Paragraph(),
                 new HardBreak(),
                 new History()
             ];
@@ -534,6 +538,14 @@ export default {
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
+            });
+
+            this.$bard.extensionReplacementCallbacks.forEach(({callback, name}) => {
+                let index = exts.findIndex(ext => ext.name === name);
+                if (index === -1) return;
+                let extension = exts[index];
+                let newExtension = callback({ bard: this, mark, node, extension });
+                exts[index] = newExtension;
             });
 
             return exts;

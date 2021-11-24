@@ -40,7 +40,7 @@ export default {
         });
 
         this.codemirror.on('change', (cm) => {
-            this.update(cm.doc.getValue());
+            this.updateDebounced(cm.doc.getValue());
         });
     },
 
