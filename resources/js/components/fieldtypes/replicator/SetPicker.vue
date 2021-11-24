@@ -14,7 +14,11 @@
             <div :class="{'grid grid-flow-col w-80' : groupToShow != ''}" v-if="groupedSets.keys.length >= 1">
                 <div>
                     <div v-for="group in groupedSets.keys">
-                        <a @click="showGroup(group)">{{ group }}</a>
+                        <a @click="showGroup(group)" :class="{'' : groupToShow == group }">
+                            <span :class="{ 'float-left' : groupToShow == '', 'float-left' : groupToShow != '' && groupToShow == group, 'float-left text-grey-60' : groupToShow != '' && groupToShow != group }">{{ group }}</span>
+                            <span class="icon icon-arrow-right float-right"></span>
+                            <span class="clear-both block"></span>
+                        </a>
                     </div>
                 </div>
                 <div v-if="groupToShow != ''">
