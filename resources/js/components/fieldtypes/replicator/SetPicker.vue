@@ -13,12 +13,13 @@
 
             <div :class="{'grid grid-flow-col w-80' : groupToShow != ''}" v-if="groupedSets.keys.length >= 1">
                 <div>
-                    <div v-for="group in groupedSets.keys">
-                        <a @click="showGroup(group)" :class="{'' : groupToShow == group }">
-                            <span :class="{ 'float-left' : groupToShow == '', 'float-left' : groupToShow != '' && groupToShow == group, 'float-left text-grey-60' : groupToShow != '' && groupToShow != group }">{{ group }}</span>
+                    <div v-for="group in groupedSets.selectionList">
+                        <a @click="showGroup(group.text)" :class="{'' : groupToShow == group.text }" v-if="group.type == 'group'">
+                            <span :class="{ 'float-left' : groupToShow == '', 'float-left' : groupToShow != '' && groupToShow == group.text, 'float-left text-grey-60' : groupToShow != '' && groupToShow != group.text }">{{ group.text }}</span>
                             <span class="icon icon-arrow-right float-right"></span>
                             <span class="clear-both block"></span>
                         </a>
+                        <dropdown-item :text="group.set.display || group.set.handle" @click="addSet(group.set.handle)" v-else />
                     </div>
                 </div>
                 <div v-if="groupToShow != ''">
@@ -61,8 +62,38 @@ export default {
 
         groupedSets() {
             let groupedSets = this.groupBy(this.sets, 'group');
+            let keys = Object.keys(groupedSets);
+            let selectionList = [];
+            keys.forEach((key) => {
+                if (key == '') {
+
+                    groupedSets[''].forEach((set) => {
+
+                        selectionList.push({
+                           type: 'set',
+                           text: set.display || set.handle,
+                           set: set
+                        });
+
+                    });
+
+                } else {
+
+                    selectionList.push({
+                       type: 'group',
+                       text: key
+                    });
+
+                }
+            });
+
+            selectionList = selectionList.sort((a, b) => {
+                return a.text > b.text ? 1 : -1;
+            });
+
             return {
-                keys: Object.keys(groupedSets),
+                keys: keys,
+                selectionList: selectionList,
                 sets: groupedSets,
             };
         }
@@ -80,7 +111,7 @@ export default {
             const result = {};
             array.forEach(item => {
                 if (!item[key]) {
-                    item[key] = 'Default';
+                    item[key] = '';
                 }
 
                 if (!result[item[key]]){
@@ -94,7 +125,7 @@ export default {
 
         showGroup(group) {
             return this.groupToShow = group;
-        },
+        }
 
     }
 
