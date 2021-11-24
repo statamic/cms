@@ -11,9 +11,25 @@
                 </button>
             </template>
 
-            <div v-for="set in sets" :key="set.handle">
-                <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
+            <div :class="{'grid grid-flow-col w-80' : groupToShow != ''}" v-if="groupedSets.keys.length >= 1">
+                <div>
+                    <div v-for="group in groupedSets.keys">
+                        <a @click="showGroup(group)">{{ group }}</a>
+                    </div>
+                </div>
+                <div v-if="groupToShow != ''">
+                    <div v-for="set in groupedSets.sets[groupToShow]" :key="set.handle">
+                        <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
+                    </div>
+                </div>
             </div>
+
+            <div v-else>
+                <div v-for="set in sets" :key="set.handle">
+                    <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
+                </div>
+            </div>
+
         </dropdown-list>
         <button v-else :class="{'btn-round': last, 'dropdown-icon': !last }" v-tooltip.right="__('Add Set')" :aria-label="__('Add Set')" @click="addSet(sets[0].handle)">
             <span class="icon icon-plus text-grey-80 antialiased"></span>
@@ -31,11 +47,50 @@ export default {
         last: Boolean,
     },
 
+    data() {
+        return {
+            groupToShow: '',
+        }
+    },
+
+    computed: {
+
+        groupedSets() {
+            let groupedSets = this.groupBy(this.sets, 'group');
+            return {
+                keys: Object.keys(groupedSets),
+                sets: groupedSets,
+            };
+        }
+
+    },
+
     methods: {
 
         addSet(handle) {
             this.$emit('added', handle, this.index + 1);
-        }
+            this.groupToShow = '';
+        },
+
+        groupBy(array, key) {
+            const result = {};
+            array.forEach(item => {
+                if (!item[key]) {
+                    item[key] = '';
+                }
+
+                if (!result[item[key]]){
+                    result[item[key]] = [];
+                }
+
+                result[item[key]].push(item);
+            })
+            return result;
+        },
+
+        showGroup(group) {
+            return this.groupToShow = group;
+        },
 
     }
 
