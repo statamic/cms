@@ -1,5 +1,31 @@
 # Release Notes
 
+## 3.2.24 (2020-11-24)
+
+### What's new
+- Native Bard / TipTap extensions can be replaced by custom ones. [#4314](https://github.com/statamic/cms/issues/4314) by @jacksleight
+- Added an `is_tomorrow` modifier. [#4802](https://github.com/statamic/cms/issues/4802) by @joseph-d
+- Added a Hungarian translation. [#4804](https://github.com/statamic/cms/issues/4804) by @matkovsky
+
+### What's improved
+- Custom Bard buttons can be added conditionally. [#4106](https://github.com/statamic/cms/issues/4106) by @morhi
+- French translations [#4809](https://github.com/statamic/cms/issues/4809) by @ebauchamps
+
+
+
+## 3.2.23 (2020-11-19)
+
+### What's new
+- You can specify `export_as` paths in your starter kit config. [#4733](https://github.com/statamic/cms/issues/4733) by @jesseleite
+- Add `get_errors` tag. [#4192](https://github.com/statamic/cms/issues/4192) by @edalzell
+- Add `whereNull` support to query builders. [#4740](https://github.com/statamic/cms/issues/4740) by @ryanmitchell
+- Add Forms support to GraphQL. [#4115](https://github.com/statamic/cms/issues/4115) by @arthurperton
+
+### What's fixed
+- Added missing `antlers` config to the UI for Bard fields. [#4782](https://github.com/statamic/cms/issues/4782) by @jackmcdade
+- Fixed error when submitting forms from other domains. [#4745](https://github.com/statamic/cms/issues/4745) by @SteJW
+
+
 ## 3.2.22 (2020-11-15)
 
 ### What's new

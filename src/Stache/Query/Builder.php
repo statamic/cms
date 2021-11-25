@@ -141,4 +141,18 @@ abstract class Builder extends BaseBuilder
             return ! in_array($value, $where['values']);
         });
     }
+
+    protected function filterWhereNull($values, $where)
+    {
+        return $values->filter(function ($value) {
+            return $value === null;
+        });
+    }
+
+    protected function filterWhereNotNull($values, $where)
+    {
+        return $values->filter(function ($value) {
+            return $value !== null;
+        });
+    }
 }

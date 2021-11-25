@@ -619,7 +619,7 @@ final class Installer
     }
 
     /**
-     * Get export paths.
+     * Get `export_paths` paths from config.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -631,38 +631,67 @@ final class Installer
     }
 
     /**
+     * Get `export_as` paths (to be renamed on install) from config.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function exportAsPaths()
+    {
+        $config = YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml')));
+
+        return collect($config['export_as'] ?? []);
+    }
+
+    /**
      * Get installable files.
      *
      * @return \Illuminate\Support\Collection
      */
     protected function installableFiles()
     {
-        return $this
+        $installableFromExportPaths = $this
             ->exportPaths()
             ->flatMap(function ($path) {
                 return $this->expandConfigExportPaths($path);
-            })
-            ->mapWithKeys(function ($path) {
-                $path = Path::tidy($path);
-
-                return [$path => str_replace("/vendor/{$this->package}", '', $path)];
             });
+
+        $installableFromExportAsPaths = $this
+            ->exportAsPaths()
+            ->flip()
+            ->flatMap(function ($to, $from) {
+                return $this->expandConfigExportPaths($to, $from);
+            });
+
+        return collect()
+            ->merge($installableFromExportPaths)
+            ->merge($installableFromExportAsPaths);
     }
 
     /**
-     * Expand export paths.
+     * Expand config export path to `[$from => $to]` array format, normalizing directories to files.
      *
-     * @param  string  $path
+     * @param  string  $to
+     * @param  string  $from
+     * @return \Illuminate\Support\Collection
      */
-    protected function expandConfigExportPaths($path)
+    protected function expandConfigExportPaths($to, $from = null)
     {
-        $path = $this->starterKitPath($path);
+        $to = $this->starterKitPath($to);
+        $from = $from ? $this->starterKitPath($from) : $to;
 
-        if ($this->files->isDirectory($path)) {
-            return collect($this->files->allFiles($path))->map->getPathname()->all();
+        $paths = collect([$from => $to]);
+
+        if ($this->files->isDirectory($from)) {
+            $paths = collect($this->files->allFiles($from))
+                ->map->getPathname()
+                ->mapWithKeys(function ($path) use ($from, $to) {
+                    return [$path => str_replace($from, $to, $path)];
+                });
         }
 
-        return [$path];
+        return $paths->mapWithKeys(function ($to, $from) {
+            return [Path::tidy($from) => Path::tidy(str_replace("/vendor/{$this->package}", '', $to))];
+        });
     }
 
     /**
