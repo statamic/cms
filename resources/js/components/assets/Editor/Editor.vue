@@ -105,12 +105,9 @@
                             {{ __('Move File') }}
                         </button>
 
-                        <!--
-                        <button
-                            type="button" class="btn"
-                            @click.prevent="replaceFile">Replace File
+                        <button v-if="canRunAction('replace_asset')" type="button" class="btn" @click.prevent="runAction('replace_asset')">
+                            {{ __('Replace File') }}
                         </button>
-                        -->
                     </div>
 
                 </div>
