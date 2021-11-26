@@ -22,6 +22,7 @@ use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -29,7 +30,6 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
-use Statamic\GraphQL\ResolvesValues;
 
 class Asset implements AssetContract, Augmentable
 {
