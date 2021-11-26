@@ -29,6 +29,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
+use Statamic\GraphQL\ResolvesValues;
 
 class Asset implements AssetContract, Augmentable
 {
@@ -37,6 +38,10 @@ class Asset implements AssetContract, Augmentable
         get as traitGet;
         remove as traitRemove;
         data as traitData;
+    }
+
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
     }
 
     protected $container;
@@ -773,5 +778,14 @@ class Asset implements AssetContract, Augmentable
     protected function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
+    }
+
+    public function resolveGqlValue($field)
+    {
+        if ($field === 'blueprint') {
+            return $this->blueprint();
+        }
+
+        return $this->traitResolveGqlValue($field);
     }
 }
