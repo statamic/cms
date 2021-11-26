@@ -42,7 +42,10 @@ class ReplaceAsset extends Action
 
     public function run($assets, $values)
     {
-        //
+        $originalAsset = $assets->first();
+        $newAsset = Facades\Asset::find($values['asset'][0]);
+
+        AssetReplaced::dispatch($originalAsset, $newAsset);
     }
 
     protected function fieldItems()
