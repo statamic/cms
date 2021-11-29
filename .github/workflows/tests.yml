@@ -51,14 +51,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
-      - name: Set minimum PHP 7.4 versions
-        run: composer require mockery/mockery:>=1.2.3 --no-interaction --no-update
-        if: matrix.php >= 7.4
-
-      - name: Set minimum PHP 8.0 versions
-        run: composer require mockery/mockery:>=1.2.3 --no-interaction --no-update
-        if: matrix.php >= 8.0
-
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel-constraint }}" ${{ matrix.additional-deps }} --no-interaction --no-update
