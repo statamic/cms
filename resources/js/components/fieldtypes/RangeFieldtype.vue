@@ -51,6 +51,9 @@ export default {
     },
 
     watch: {
+        value(value) {
+            this.val = value;
+        },
         val(value) {
             this.updateDebounced(value);
         }

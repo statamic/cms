@@ -234,7 +234,7 @@ class SiteTest extends TestCase
     {
         $site = new Site('test', [
             'name' => 'Test',
-            'url' => 'http://test.com',
+            'url' => '/sub',
             'locale' => 'en_US',
         ]);
 
@@ -246,18 +246,19 @@ class SiteTest extends TestCase
             'lang' => 'en',
             'locale' => 'en_US',
             'short_locale' => 'en',
-            'url' => 'http://test.com',
+            'url' => '/sub',
+            'permalink' => 'http://absolute-url-resolved-from-request.com/sub',
             'direction' => 'ltr',
             'attributes' => [],
         ], $values->all());
 
         $this->assertEquals(
-            'test Test en_US en http://test.com',
-            Antlers::parse('{{ site }}{{ handle }} {{ name }} {{ locale }} {{ short_locale }} {{ url }}{{ /site }}', ['site' => $site])
+            'test Test en_US en /sub http://absolute-url-resolved-from-request.com/sub',
+            (string) Antlers::parse('{{ site }}{{ handle }} {{ name }} {{ locale }} {{ short_locale }} {{ url }} {{ permalink }}{{ /site }}', ['site' => $site])
         );
         $this->assertEquals(
-            'test Test en_US en http://test.com',
-            Antlers::parse('{{ site:handle }} {{ site:name }} {{ site:locale }} {{ site:short_locale }} {{ site:url }}', ['site' => $site])
+            'test Test en_US en /sub http://absolute-url-resolved-from-request.com/sub',
+            (string) Antlers::parse('{{ site:handle }} {{ site:name }} {{ site:locale }} {{ site:short_locale }} {{ site:url }} {{ site:permalink }}', ['site' => $site])
         );
     }
 
