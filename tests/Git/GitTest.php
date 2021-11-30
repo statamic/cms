@@ -253,9 +253,7 @@ EOT;
     /** @test */
     public function it_can_run_custom_commands()
     {
-        if ($this->isRunningWindows()) {
-            $this->markTestSkipped();
-        }
+        $this->markTestSkippedInWindows();
 
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
         $this->files->put(base_path('content/taxonomies/tags.yaml'), 'title: Added Tags');
