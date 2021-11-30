@@ -11,7 +11,7 @@ return [
     | assumes that git is already installed and accessible by your
     | PHP process' server user. For more info, see the docs at:
     |
-    | @see https://statamic.dev/git-automation
+    | https://statamic.dev/git-automation
     |
     */
 
@@ -26,7 +26,7 @@ return [
     | events are fired. If you prefer users to manually trigger commits
     | using the `Git` utility interface, you may set this to `false`.
     |
-    | @see https://statamic.dev/git-automation#committing-changes
+    | https://statamic.dev/git-automation#committing-changes
     |
     */
 
@@ -40,7 +40,7 @@ return [
     | You may choose which queue connection should be used when dispatching
     | commit jobs. Unless specified, the default connection will be used.
     |
-    | @see https://statamic.dev/git-automation#queueing-commits
+    | https://statamic.dev/git-automation#queueing-commits
     |
     */
 
@@ -71,7 +71,7 @@ return [
     | will attempt to commit with the authenticated user's name and email
     | when possible, falling back to the below user when not available.
     |
-    | @see https://statamic.dev/git-automation#git-user
+    | https://statamic.dev/git-automation#git-user
     |
     */
 
@@ -125,7 +125,7 @@ return [
     | and `git commit` your changes. These commands will be run once
     | per repo, attempting to consolidate commits where possible.
     |
-    | @see https://statamic.dev/git-automation#customizing-commits
+    | https://statamic.dev/git-automation#customizing-commits
     |
     */
 
@@ -143,7 +143,7 @@ return [
     | have finished. This is disabled by default, but can be enabled
     | globally, or per environment using the provided variable.
     |
-    | @see https://statamic.dev/git-automation#pushing-changes
+    | https://statamic.dev/git-automation#pushing-changes
     |
     */
 
