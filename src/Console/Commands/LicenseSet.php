@@ -58,13 +58,23 @@ class LicenseSet extends Command
             return false;
         }
 
-        if (Str::contains($this->envContents(), 'STATAMIC_LICENSE_KEY=')) {
+        if ($this->licenseKeyExists()) {
             $this->replaceKeyInEnv($key);
         } else {
             $this->appendKeyToEnv($key);
         }
 
         return true;
+    }
+
+    /**
+     * Whether the license key already exists in the .env file.
+     *
+     * @return bool
+     */
+    protected function licenseKeyExists()
+    {
+        return preg_match('/^STATAMIC_LICENSE_KEY=/m', $this->envContents());
     }
 
     /**
