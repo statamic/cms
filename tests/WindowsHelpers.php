@@ -2,15 +2,8 @@
 
 namespace Tests;
 
-trait WindowsFriendlyAssertions
+trait WindowsHelpers
 {
-    public static function assertEquals($expected, $actual, string $message = ''): void
-    {
-        $args = static::normalizeArgsForWindows(func_get_args());
-
-        parent::assertEquals(...$args);
-    }
-
     protected static function normalizeArgsForWindows($args)
     {
         if (static::isRunningWindows()) {

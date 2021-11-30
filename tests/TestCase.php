@@ -6,7 +6,7 @@ use PHPUnit\Framework\Assert;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    use WindowsFriendlyAssertions;
+    use WindowsHelpers;
 
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
@@ -111,6 +111,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'file',
             'path' => storage_path('framework/cache/outpost-data'),
         ]);
+    }
+
+    public static function assertEquals($expected, $actual, string $message = ''): void
+    {
+        $args = static::normalizeArgsForWindows(func_get_args());
+
+        parent::assertEquals(...$args);
     }
 
     protected function assertEveryItem($items, $callback)
