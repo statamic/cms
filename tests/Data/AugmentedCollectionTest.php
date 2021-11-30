@@ -137,7 +137,7 @@ class TestJsonableObject implements Jsonable
 
 class TestJsonSerializeObject implements JsonSerializable
 {
-    public function jsonSerialize(): mixed
+    public function jsonSerialize()
     {
         return ['foo' => 'bar'];
     }

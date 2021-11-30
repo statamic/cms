@@ -9,7 +9,6 @@ use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Parser;
-use Traversable;
 
 class Value implements IteratorAggregate, JsonSerializable
 {
@@ -55,7 +54,7 @@ class Value implements IteratorAggregate, JsonSerializable
         return (string) $this->value();
     }
 
-    public function jsonSerialize($options = 0): mixed
+    public function jsonSerialize($options = 0)
     {
         $value = $this->value();
 
@@ -66,7 +65,7 @@ class Value implements IteratorAggregate, JsonSerializable
         return $value;
     }
 
-    public function getIterator(): Traversable
+    public function getIterator()
     {
         return new ArrayIterator($this->value());
     }
