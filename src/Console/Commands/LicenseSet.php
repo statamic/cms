@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
-use Statamic\Support\Str;
 
 class LicenseSet extends Command
 {
