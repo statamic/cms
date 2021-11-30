@@ -113,7 +113,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         ]);
     }
 
-    public static function assertEquals($expected, $actual, string $message = ''): void
+    public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
     {
         $args = static::normalizeArgsForWindows(func_get_args());
 
