@@ -6,6 +6,8 @@ use PHPUnit\Framework\Assert;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
+    use WindowsFriendlyAssertions;
+
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
 
@@ -163,11 +165,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         $class = version_compare(app()->version(), 7, '>=') ? \Illuminate\Testing\Assert::class : \Illuminate\Foundation\Testing\Assert::class;
         $class::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
-    }
-
-    protected function isRunningWindows()
-    {
-        return DIRECTORY_SEPARATOR === '\\';
     }
 
     // This method is unavailable on earlier versions of Laravel.
