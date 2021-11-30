@@ -33,14 +33,14 @@ trait WindowsFriendlyAssertions
         return $value;
     }
 
-    protected function isRunningWindows()
+    protected static function isRunningWindows()
     {
         return DIRECTORY_SEPARATOR === '\\';
     }
 
     protected function markTestSkippedInWindows()
     {
-        if ($this->isRunningWindows()) {
+        if (static::isRunningWindows()) {
             $this->markTestSkipped();
         }
     }
