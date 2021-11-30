@@ -55,7 +55,7 @@ jobs:
 
       - name: Set PHP 8.1 Testbench
         run: composer require orchestra/testbench:^6.26.0 --no-interaction --no-update
-        if: matrix.laravel == '8.*'' && matrix.php >= 8.1
+        if: matrix.laravel == '8.*' && matrix.php >= 8.1
 
       - name: Install dependencies
         run: |
