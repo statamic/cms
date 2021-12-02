@@ -120,6 +120,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         parent::assertEquals(...$args);
     }
 
+    public static function assertStringEqualsFile(string $expectedFile, string $actualString, string $message = ''): void
+    {
+        $args = static::normalizeArgsForWindows(func_get_args());
+
+        parent::assertStringEqualsFile(...$args);
+    }
+
     protected function assertEveryItem($items, $callback)
     {
         if ($items instanceof \Illuminate\Support\Collection) {
@@ -154,6 +161,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $this->assertEquals(count($items), $matches, 'Failed asserting that every item is an instance of '.$class);
     }
 
+    // TODO: Remove this in favour of `assertStringEqualsFile()`?
     protected function assertFileEqualsString($filename, $expected)
     {
         $this->assertFileExists($filename);
