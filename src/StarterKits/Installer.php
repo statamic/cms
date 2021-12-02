@@ -705,13 +705,13 @@ final class Installer
     {
         $directory = $this->files->isDirectory($path)
             ? $path
-            : preg_replace('/(.*)\/[^\/]*/', '$1', $path);
+            : preg_replace('/(.*)\/[^\/]*/', '$1', Path::tidy($path));
 
         if (! $this->files->exists($directory)) {
             $this->files->makeDirectory($directory, 0755, true);
         }
 
-        return $path;
+        return Path::tidy($path);
     }
 
     /**
