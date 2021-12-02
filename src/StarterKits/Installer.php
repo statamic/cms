@@ -677,8 +677,8 @@ final class Installer
      */
     protected function expandConfigExportPaths($to, $from = null)
     {
-        $to = $this->starterKitPath($to);
-        $from = $from ? $this->starterKitPath($from) : $to;
+        $to = Path::tidy($this->starterKitPath($to));
+        $from = Path::tidy($from ? $this->starterKitPath($from) : $to);
 
         $paths = collect([$from => $to]);
 
