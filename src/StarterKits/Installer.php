@@ -269,10 +269,11 @@ final class Installer
      */
     protected function ensureExportPathsExist()
     {
-        $this->exportPaths()
-             ->reject(function ($path) {
-                 return $this->files->exists($this->starterKitPath($path));
-             })
+        $this
+            ->exportPaths()
+            ->reject(function ($path) {
+                return $this->files->exists($this->starterKitPath($path));
+            })
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");
             });
