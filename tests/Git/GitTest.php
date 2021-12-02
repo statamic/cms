@@ -238,7 +238,7 @@ EOT;
 
         $expectedUser = 'Jimmy\; echo deleting all your files now\; \# <jimmy@haxor.org\; echo deleting all your files now\; \#>';
         $expectedMessage = 'Message\; echo deleting all your files now\; \#';
-        
+
         if (static::isRunningWindows()) {
             $expectedUser = str_replace('\\', '^', $expectedUser);
             $expectedMessage = str_replace('\\', '^', $expectedMessage);
