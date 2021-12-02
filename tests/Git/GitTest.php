@@ -135,8 +135,9 @@ EOT;
     public function it_can_handle_configured_paths_that_are_symlinks()
     {
         $externalPath = Path::resolve(base_path('../assets-external'));
-        $symlinkPath = base_path('content/assets-linked');
+        $symlinkPath = Path::resolve(base_path('content/assets-linked'));
 
+        $this->markTestSkippedInWindows(); // TODO: Figure out why calling `symlink()` results in permissions error in Windows
         @symlink($externalPath, $symlinkPath);
 
         $this->files->put($externalPath.'/statement.txt', 'Change statement.');
