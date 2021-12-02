@@ -161,14 +161,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $this->assertEquals(count($items), $matches, 'Failed asserting that every item is an instance of '.$class);
     }
 
-    // TODO: Remove this in favour of `assertStringEqualsFile()`?
-    protected function assertFileEqualsString($filename, $expected)
-    {
-        $this->assertFileExists($filename);
-
-        $this->assertEquals($expected, file_get_contents($filename));
-    }
-
     protected function assertContainsHtml($string)
     {
         preg_match('/<[^<]+>/', $string, $matches);
