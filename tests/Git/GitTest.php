@@ -69,7 +69,7 @@ class GitTest extends TestCase
 
         $statuses = Git::statuses();
         $contentStatus = $statuses->get(Path::resolve(base_path('content')));
-        $assetsStatus = $statuses->get($this->basePath('temp/assets'));
+        $assetsStatus = $statuses->get(Path::resolve($this->basePath('temp/assets')));
 
         $expectedContentStatus = <<<'EOT'
  M collections/pages.yaml
@@ -236,8 +236,18 @@ EOT;
 
         Git::commit('Message"; echo "deleting all your files now"; #');
 
-        $this->assertStringContainsString('Message\; echo deleting all your files now\; \#', $commit = $this->showLastCommit(base_path('content')));
-        $this->assertStringContainsString('Jimmy\; echo deleting all your files now\; \# <jimmy@haxor.org\; echo deleting all your files now\; \#>', $commit);
+        $expectedUser = 'Jimmy\; echo deleting all your files now\; \# <jimmy@haxor.org\; echo deleting all your files now\; \#>';
+        $expectedMessage = 'Message\; echo deleting all your files now\; \#';
+        
+        if (static::isRunningWindows()) {
+            $expectedUser = str_replace('\\', '^', $expectedUser);
+            $expectedMessage = str_replace('\\', '^', $expectedMessage);
+        }
+
+        $lastCommit = $this->showLastCommit(base_path('content'));
+
+        $this->assertStringContainsString($expectedUser, $lastCommit);
+        $this->assertStringContainsString($expectedMessage, $lastCommit);
     }
 
     /** @test */
