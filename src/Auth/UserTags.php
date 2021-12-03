@@ -26,13 +26,13 @@ class UserTags extends Tags
      */
     public function __call($method, $args)
     {
-        $id = Arr::get($this->context, $method);
+        $user = $this->getUser();
 
-        if (! $user = User::find($id)) {
-            return;
+        if (! $user) {
+            return $this->parseNoResults();
         }
 
-        return $user;
+        return $user->get($method);
     }
 
     /**
@@ -44,33 +44,49 @@ class UserTags extends Tags
      */
     public function index()
     {
+        $user = $this->getUser();
+
+        if (! $user) {
+            return $this->parseNoResults();
+        }
+
+        return $user;
+    }
+
+    /**
+     * Fetch a user.
+     *
+     * @return User
+     */
+    protected function getUser()
+    {
         $user = null;
 
         // Get a user by ID, if the `id` parameter was used.
         if ($id = $this->params->get('id')) {
             if (! $user = User::find($id)) {
-                return $this->parseNoResults();
+                return false;
             }
         }
 
         // Get a user by email, if the `email` parameter was used.
         if ($email = $this->params->get('email')) {
             if (! $user = User::findByEmail($email)) {
-                return $this->parseNoResults();
+                return false;
             }
         }
 
         // Get a user by field, if the `field` parameter was used.
         if ($field = $this->params->get('field')) {
             if (! $user = User::query()->where($field, $this->params->get('value'))->first()) {
-                return $this->parseNoResults();
+                return false;
             }
         }
 
         // No user found? Get the current one.
         if (! $user) {
             if (! $user = User::current()) {
-                return $this->parseNoResults();
+                return false;
             }
         }
 
