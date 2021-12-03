@@ -22,6 +22,14 @@ class UserTagsTest extends TestCase
     }
 
     /** @test */
+    public function it_renders_user_variable()
+    {
+        $this->actingAs(User::make()->email('foo@bar.com')->save());
+
+        $this->assertEquals('foo@bar.com', $this->tag('{{ user:email }}'));
+    }
+
+    /** @test */
     public function it_renders_user_can_tag_content()
     {
         $this->setTestRoles([
