@@ -120,13 +120,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         parent::assertEquals(...$args);
     }
 
-    public static function assertStringEqualsFile(string $expectedFile, string $actualString, string $message = ''): void
-    {
-        $args = static::normalizeArgsForWindows(func_get_args());
-
-        parent::assertStringEqualsFile(...$args);
-    }
-
     protected function assertEveryItem($items, $callback)
     {
         if ($items instanceof \Illuminate\Support\Collection) {
