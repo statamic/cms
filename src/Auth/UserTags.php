@@ -24,13 +24,13 @@ class UserTags extends Tags
      *
      * @return string
      */
-    public function __call($method, $args)
+    public function wildcard(string $name)
     {
         if (! $user = $this->getUser()) {
             return $this->parseNoResults();
         }
 
-        return $user->augmentedValue($method);
+        return $user->augmentedValue($name);
     }
 
     /**
