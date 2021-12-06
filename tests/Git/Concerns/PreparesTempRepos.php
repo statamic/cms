@@ -41,5 +41,9 @@ trait PreparesTempRepos
         $process->run('git init');
         $process->run('git add --all');
         $process->run('git -c "user.name=Tests" -c "user.email=tests@example.com" commit -m "Initial commit."');
+
+        if (static::isRunningWindows()) {
+            $process->run("chmod -R 0755 {$path}");
+        }
     }
 }
