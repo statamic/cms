@@ -119,6 +119,7 @@
                         v-for="asset in assets"
                         :key="asset.id"
                         :asset="asset"
+                        :read-only="isReadOnly"
                         @updated="assetUpdated"
                         @removed="assetRemoved">
                     </asset-tile>
