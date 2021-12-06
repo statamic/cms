@@ -4,12 +4,15 @@ namespace Tests\Git\Concerns;
 
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Processes\Process;
+use Statamic\Facades\Path;
 
 trait PreparesTempRepos
 {
     protected function createTempDirectory($path)
     {
         $files = app(Filesystem::class);
+
+        $path = Path::resolve($path);
 
         if (! $files->exists($path)) {
             $files->makeDirectory($path, 0755, true);
@@ -22,6 +25,8 @@ trait PreparesTempRepos
     {
         $files = app(Filesystem::class);
 
+        $path = Path::resolve($path);
+
         if ($files->exists($path)) {
             $files->deleteDirectory($path);
         }
@@ -29,6 +34,8 @@ trait PreparesTempRepos
 
     protected function createTempRepo($path)
     {
+        $path = Path::resolve($path);
+
         $process = Process::create($path);
 
         $process->run('git init');
