@@ -30,7 +30,7 @@ class FormController extends Controller
      */
     public function submit(Request $request, $form)
     {
-        $site = Site::findByUrl(URL::previous());
+        $site = Site::findByUrl(URL::previous()) ?? Site::default();
         $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
         $values = array_merge($request->all(), $this->normalizeAssetsValues($fields, $request));
@@ -44,7 +44,7 @@ class FormController extends Controller
         $submission = $form->makeSubmission()->data($values);
 
         try {
-            $this->withLocale($site->shortLocale(), function () use ($fields) {
+            $this->withLocale($site->lang(), function () use ($fields) {
                 $fields->validate($this->extraRules($fields));
             });
 
@@ -85,14 +85,14 @@ class FormController extends Controller
      *
      * Used for actual success and by honeypot.
      *
-     * @param array $params
-     * @param Submission $submission
-     * @param bool $silentFailure
+     * @param  array  $params
+     * @param  Submission  $submission
+     * @param  bool  $silentFailure
      * @return Response
      */
     private function formSuccess($params, $submission, $silentFailure = false)
     {
-        if (request()->ajax()) {
+        if (request()->ajax() || request()->wantsJson()) {
             return response([
                 'success' => true,
                 'submission_created' => ! $silentFailure,
@@ -114,9 +114,9 @@ class FormController extends Controller
     /**
      * The steps for a failed form submission.
      *
-     * @param array $params
-     * @param array $submission
-     * @param string $form
+     * @param  array  $params
+     * @param  array  $submission
+     * @param  string  $form
      * @return Response|RedirectResponse
      */
     private function formFailure($params, $errors, $form)

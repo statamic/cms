@@ -15,7 +15,7 @@ class GithubReleasePresenter
     /**
      * Instantiate github release presenter.
      *
-     * @param string $githubRelease
+     * @param  string  $githubRelease
      */
     public function __construct(string $githubRelease)
     {

@@ -125,6 +125,7 @@ class CollectionsServiceProvider extends ServiceProvider
      * ];
      *
      * @see https://adamwathan.me/2016/04/06/cleaning-up-form-input-with-transpose
+     *
      * @return void
      */
     private function transpose()

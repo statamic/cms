@@ -48,6 +48,7 @@ class SiteClear extends Command
         $this
             ->clearCollections()
             ->clearNavigations()
+            ->clearTrees()
             ->clearTaxonomies()
             ->clearAssets()
             ->clearGlobals()
@@ -100,6 +101,20 @@ class SiteClear extends Command
         $this->cleanAndKeep(base_path('content/navigation'));
 
         $this->info('Navigations cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all trees.
+     *
+     * @return $this
+     */
+    protected function clearTrees()
+    {
+        $this->cleanAndKeep(base_path('content/trees'));
+
+        $this->info('Trees cleared successfully.');
 
         return $this;
     }
@@ -329,7 +344,7 @@ EOT
     /**
      * Clean directory and add .gitkeep file.
      *
-     * @param string $path
+     * @param  string  $path
      */
     protected function cleanAndKeep($path)
     {
@@ -345,7 +360,7 @@ EOT
     /**
      * Prepare path directory.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     protected function preparePath($path)

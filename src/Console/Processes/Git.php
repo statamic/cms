@@ -31,7 +31,7 @@ class Git extends Process
     /**
      * Get git status.
      *
-     * @param mixed $subPaths
+     * @param  mixed  $subPaths
      * @return string
      */
     public function status($subPaths = null)
@@ -52,7 +52,7 @@ class Git extends Process
     /**
      * Run git command.
      *
-     * @param mixed $parts
+     * @param  mixed  $parts
      * @return mixed
      */
     private function runGitCommand(...$parts)
@@ -63,7 +63,7 @@ class Git extends Process
     /**
      * Prepare process arguments.
      *
-     * @param array $parts
+     * @param  array  $parts
      * @return array
      */
     private function prepareProcessArguments($parts)

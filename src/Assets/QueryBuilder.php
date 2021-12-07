@@ -49,9 +49,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
             $keys = $this->{$method}($items, $where)->keys();
 
             // Continue intersecting the keys across the where clauses.
-            // If a key exists in the reduced array but not in the current iteration, it should be removed.
-            // On the first iteration, there's nothing to intersect, so just use the result as a starting point.
-            return $ids ? $ids->intersect($keys)->values() : $keys;
+            return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
     }
 
@@ -93,7 +91,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
             : Facades\AssetContainer::find($this->container);
     }
 
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column === 'container') {
             throw_if($this->container, new Exception('Only one asset container may be queried.'));
@@ -102,7 +100,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
             return $this;
         }
 
-        return parent::where($column, $operator, $value);
+        return parent::where($column, $operator, $value, $boolean);
     }
 
     protected function collect($items = [])

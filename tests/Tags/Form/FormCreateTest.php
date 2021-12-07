@@ -58,8 +58,8 @@ class FormCreateTest extends FormTestCase
 EOT
 ));
 
-        $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name">', $output);
-        $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" required>', $output);
+        $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name" value="">', $output);
+        $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" value="" required>', $output);
         $this->assertStringContainsString('<label>Message</label><textarea name="message" rows="5" required></textarea>', $output);
 
         preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
@@ -71,7 +71,7 @@ EOT
     public function it_dynamically_renders_text_field()
     {
         $this->assertFieldRendersHtml([
-            '<input type="text" name="favourite_animal">',
+            '<input type="text" name="favourite_animal" value="">',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -95,7 +95,7 @@ EOT
     public function it_dynamically_renders_text_field_with_custom_input_type()
     {
         $this->assertFieldRendersHtml([
-            '<input type="number" name="age">',
+            '<input type="number" name="age" value="">',
         ], [
             'handle' => 'age',
             'field' => [
@@ -426,7 +426,7 @@ EOT
     public function it_dynamically_renders_field_with_fallback_to_default_partial()
     {
         $this->assertFieldRendersHtml([
-            '<input type="text" name="custom">',
+            '<input type="text" name="custom" value="">',
         ], [
             'handle' => 'custom',
             'field' => [

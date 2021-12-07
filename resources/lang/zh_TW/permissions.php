@@ -24,6 +24,9 @@ return [
     'publish_{collection}_entries_desc' => '可將草稿更改為已發佈狀態等',
     'reorder_{collection}_entries' => '重新排序條目',
     'reorder_{collection}_entries_desc' => '啟用拖放排序',
+    'edit_other_authors_{collection}_entries' => '編輯其他作者的條目',
+    'publish_other_authors_{collection}_entries' => '管理其他作者條目的發表狀態',
+    'delete_other_authors_{collection}_entries' => '刪除其他作者的條目',
 
     'group_taxonomies' => '分類',
     'configure_taxonomies' => '設定分類',
@@ -80,5 +83,7 @@ return [
     'access_utility_desc' => '給予存取所有 :title 公用程式的權限',
 
     'group_misc' => '其他',
+    'resolve_duplicate_ids' => '解析重複的 ID',
+    'resolve_duplicate_ids_desc' => '給予檢視與解析重複 ID 的權限。',
 
 ];

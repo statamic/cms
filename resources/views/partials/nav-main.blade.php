@@ -5,7 +5,7 @@
                 @if ($section !== 'Top Level')
                     <h6>{{ __($section) }}</h6>
                 @endif
-                <ul>
+                <ul class="nav-section-{{ Statamic\Support\Str::slug($section) }}">
                     @foreach ($items as $item)
                         @unless ($item->view())
                             <li class="{{ $item->isActive() ? 'current' : '' }}">

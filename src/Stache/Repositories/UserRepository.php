@@ -26,11 +26,6 @@ class UserRepository extends BaseRepository
         $this->config = $config;
     }
 
-    public function make(): User
-    {
-        return new FileUser;
-    }
-
     public function all(): UserCollection
     {
         return $this->query()->get();
@@ -72,5 +67,12 @@ class UserRepository extends BaseRepository
         }
 
         return null;
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            User::class => FileUser::class,
+        ];
     }
 }

@@ -3,6 +3,7 @@
 namespace Statamic\Auth\Protect\Protectors\Password;
 
 use Statamic\Http\Controllers\Controller as BaseController;
+use Statamic\View\View;
 
 class Controller extends BaseController
 {
@@ -10,7 +11,7 @@ class Controller extends BaseController
 
     public function show()
     {
-        return view('statamic::auth.protect.password');
+        return View::make('statamic::auth.protect.password');
     }
 
     public function store()
