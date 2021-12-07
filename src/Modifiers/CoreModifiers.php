@@ -2684,6 +2684,35 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Get the embed URL when given a youtube or vimeo link that's
+     * direct to the page.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function trackableEmbedUrl($url)
+    {
+        if (Str::contains($url, 'vimeo')) {
+            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+        }
+
+        if (Str::contains($url, 'youtu.be')) {
+            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
+
+            // Check for start at point and replace it with correct parameter.
+            if (Str::contains($url, '?t=')) {
+                $url = str_replace('?t=', '?start=', $url);
+            }
+        }
+
+        if (Str::contains($url, 'youtube.com/watch?v=')) {
+            $url = str_replace('watch?v=', 'embed/', $url);
+        }
+
+        return $url;
+    }
+
+    /**
      * Whether a given video URL is embeddable.
      *
      * @param  string  $url
