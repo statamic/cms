@@ -15,7 +15,6 @@ abstract class AbstractAugmented implements Augmented
     public function __construct($data)
     {
         $this->data = $data;
-        $this->blueprintFields = $this->blueprintFields();
     }
 
     public function all()
@@ -76,7 +75,7 @@ abstract class AbstractAugmented implements Augmented
 
     protected function wrapValue($value, $handle)
     {
-        $fields = $this->blueprintFields;
+        $fields = $this->blueprintFields();
 
         if (! $fields->has($handle)) {
             return $value;
@@ -92,8 +91,12 @@ abstract class AbstractAugmented implements Augmented
 
     protected function blueprintFields()
     {
-        return (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
-            ? $blueprint->fields()->all()
-            : collect();
+        if (!isset($this->blueprintFields)) {
+            $this->blueprintFields = (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
+                ? $blueprint->fields()->all()
+                : collect();
+        }
+
+        return $this->blueprintFields;
     }
 }
