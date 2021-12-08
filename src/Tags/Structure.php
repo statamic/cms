@@ -59,7 +59,7 @@ class Structure extends Tags
         ]);
 
         $defaultKeys = ['id', 'permalink', 'title', 'uri', 'url'];
-        $this->augmentKeys = $this->params->get('shallow', true)
+        $this->augmentKeys = $this->params->get('shallow', false)
             ? array_merge($defaultKeys, explode('|', $this->params->get('augment_keys', '')))
             : null;
 
