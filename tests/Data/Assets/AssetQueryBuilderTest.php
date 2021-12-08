@@ -73,6 +73,69 @@ class AssetQueryBuilderTest extends TestCase
     }
 
     /** @test **/
+    public function assets_are_found_using_where_null()
+    {
+        Asset::find('test::a.jpg')->data(['text' => 'Text 1'])->save();
+        Asset::find('test::b.txt')->data(['text' => 'Text 2'])->save();
+        Asset::find('test::c.txt')->data([])->save();
+        Asset::find('test::d.jpg')->data(['text' => 'Text 4'])->save();
+        Asset::find('test::e.jpg')->data([])->save();
+        Asset::find('test::f.jpg')->data([])->save();
+
+        $assets = $this->container->queryAssets()->whereNull('text')->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['c', 'e', 'f'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_not_null()
+    {
+        Asset::find('test::a.jpg')->data(['text' => 'Text 1'])->save();
+        Asset::find('test::b.txt')->data(['text' => 'Text 2'])->save();
+        Asset::find('test::c.txt')->data([])->save();
+        Asset::find('test::d.jpg')->data(['text' => 'Text 4'])->save();
+        Asset::find('test::e.jpg')->data([])->save();
+        Asset::find('test::f.jpg')->data([])->save();
+
+        $assets = $this->container->queryAssets()->whereNotNull('text')->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'b', 'd'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_or_where_null()
+    {
+        Asset::find('test::a.jpg')->data(['text' => 'Text 1', 'content' => 'Content 1'])->save();
+        Asset::find('test::b.txt')->data(['text' => 'Text 2'])->save();
+        Asset::find('test::c.txt')->data(['content' => 'Content 1'])->save();
+        Asset::find('test::d.jpg')->data(['text' => 'Text 4'])->save();
+        Asset::find('test::e.jpg')->data([])->save();
+        Asset::find('test::f.jpg')->data([])->save();
+
+        $assets = $this->container->queryAssets()->whereNull('text')->orWhereNull('content')->get();
+
+        $this->assertCount(5, $assets);
+        $this->assertEquals(['c', 'e', 'f', 'b', 'd'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_or_where_not_null()
+    {
+        Asset::find('test::a.jpg')->data(['text' => 'Text 1', 'content' => 'Content 1'])->save();
+        Asset::find('test::b.txt')->data(['text' => 'Text 2'])->save();
+        Asset::find('test::c.txt')->data(['content' => 'Content 1'])->save();
+        Asset::find('test::d.jpg')->data(['text' => 'Text 4'])->save();
+        Asset::find('test::e.jpg')->data([])->save();
+        Asset::find('test::f.jpg')->data([])->save();
+
+        $assets = $this->container->queryAssets()->whereNotNull('content')->orWhereNotNull('text')->get();
+
+        $this->assertCount(4, $assets);
+        $this->assertEquals(['a', 'c', 'b', 'd'], $assets->map->filename()->all());
+    }
+
     public function assets_are_found_using_where_json_contains()
     {
         Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
@@ -148,4 +211,5 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertCount(2, $assets);
         $this->assertEquals(['b', 'e'], $assets->map->filename()->all());
     }
+
 }

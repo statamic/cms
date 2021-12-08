@@ -120,6 +120,7 @@ return [
     'licensing_production_alert' => 'This site is using Statamic Pro and commercial addons. Please purchase appropriate licenses.',
     'licensing_production_alert_addons' => 'This site is using commercial addons. Please purchase appropriate licenses.',
     'licensing_production_alert_statamic' => 'This site is using Statamic Pro. Please purchase a license.',
+    'licensing_production_alert_renew_statamic' => 'Using this version of Statamic Pro requires a license renewal.',
     'licensing_sync_instructions' => 'Data from statamic.com is synced once per hour. Force a sync to see any changes you\'ve made.',
     'licensing_trial_mode_alert' => 'This site is using Statamic Pro and commercial addons. Make sure to buy licenses before launching. Thanks!',
     'licensing_trial_mode_alert_addons' => 'This site is using commercial addons. Make sure to buy licenses before launching. Thanks!',

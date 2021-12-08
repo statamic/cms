@@ -142,6 +142,20 @@ abstract class Builder extends BaseBuilder
         });
     }
 
+    protected function filterWhereNull($values, $where)
+    {
+        return $values->filter(function ($value) {
+            return $value === null;
+        });
+    }
+
+    protected function filterWhereNotNull($values, $where)
+    {
+        return $values->filter(function ($value) {
+            return $value !== null;
+        });
+    }
+
     protected function filterWhereJsonContains($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
