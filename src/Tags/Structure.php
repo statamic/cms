@@ -16,6 +16,7 @@ class Structure extends Tags
 {
     protected $siteCurrentUrl;
     protected $siteAbsoluteUrl;
+    protected $augmentKeys;
 
     public function __construct()
     {
@@ -57,6 +58,11 @@ class Structure extends Tags
             'max_depth' => $this->params->get('max_depth'),
         ]);
 
+        $defaultKeys = ['id', 'permalink', 'title', 'uri', 'url'];
+        $this->augmentKeys = $this->params->get('shallow', true)
+            ? array_merge($defaultKeys, explode('|', $this->params->get('augment_keys', '')))
+            : null;
+
         return $this->toArray($tree);
     }
 
@@ -76,7 +82,7 @@ class Structure extends Tags
     {
         return collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
-            $data = $page->toAugmentedArray();
+            $data = $page->toAugmentedArray($this->augmentKeys);
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
             $currentUrl = $page->urlWithoutRedirect();
