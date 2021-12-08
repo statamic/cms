@@ -144,6 +144,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 1', 'Post 3', 'Post 2', 'Post 4'], $entries->map->title->all());
     }
 
+    /** @test **/
     public function entries_are_found_using_where_json_contains()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
@@ -201,7 +202,6 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(4, $entries);
         $this->assertEquals(['Post 1', 'Post 3', 'Post 2', 'Post 4'], $entries->map->title->all());
-
     }
 
     /** @test **/

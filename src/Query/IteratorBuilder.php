@@ -87,7 +87,6 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
-
     protected function filterWhereNull($entries, $where)
     {
         return $entries->filter(function ($entry) use ($where) {
