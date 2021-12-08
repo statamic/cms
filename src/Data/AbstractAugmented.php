@@ -10,10 +10,12 @@ use Statamic\Support\Str;
 abstract class AbstractAugmented implements Augmented
 {
     protected $data;
+    protected $blueprintFields;
 
     public function __construct($data)
     {
         $this->data = $data;
+        $this->blueprintFields = $this->blueprintFields();
     }
 
     public function all()
@@ -74,7 +76,7 @@ abstract class AbstractAugmented implements Augmented
 
     protected function wrapValue($value, $handle)
     {
-        $fields = $this->blueprintFields();
+        $fields = $this->blueprintFields;
 
         if (! $fields->has($handle)) {
             return $value;
