@@ -144,6 +144,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 1', 'Post 3', 'Post 2', 'Post 4'], $entries->map->title->all());
     }
 
+    /** @test **/
     public function entries_are_found_using_nested_where()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
