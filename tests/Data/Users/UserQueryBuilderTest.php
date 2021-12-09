@@ -62,13 +62,20 @@ class UserQueryBuilderTest extends TestCase
         User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
         User::make()->email('aragorn@precious.com')->data(['name' => 'Aragorn'])->save();
         User::make()->email('bombadil@precious.com')->data(['name' => 'Tommy'])->save();
+        User::make()->email('sauron@precious.com')->data(['name' => 'Sauron'])->save();
 
-        $users = User::query()->where('email', 'gandalf@precious.com')->orWhere(function ($query) {
-            $query->where('name', 'Frodo')->orWhere('name', 'Aragorn');
-        })->get();
+        $users = User::query()
+            ->where(function ($query) {
+                $query->where('name', 'Gandalf');
+            })
+            ->orWhere(function ($query) {
+                $query->where('name', 'Frodo')->orWhere('name', 'Aragorn');
+            })
+            ->orWhere('email', 'sauron@precious.com')
+            ->get();
 
-        $this->assertCount(3, $users);
-        $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn'], $users->map->name->all());
+        $this->assertCount(4, $users);
+        $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Sauron'], $users->map->name->all());
     }
 
     /** @test **/
@@ -79,12 +86,19 @@ class UserQueryBuilderTest extends TestCase
         User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
         User::make()->email('aragorn@precious.com')->data(['name' => 'Aragorn'])->save();
         User::make()->email('bombadil@precious.com')->data(['name' => 'Tommy'])->save();
+        User::make()->email('sauron@precious.com')->data(['name' => 'Sauron'])->save();
 
-        $users = User::query()->where('email', 'gandalf@precious.com')->orWhere(function ($query) {
-            $query->where('name', 'Frodo')->orWhereIn('name', ['Aragorn', 'Tommy']);
-        })->get();
+        $users = User::query()
+            ->where(function ($query) {
+                $query->where('name', 'Gandalf');
+            })
+            ->orWhere(function ($query) {
+                $query->where('name', 'Frodo')->orWhereIn('name', ['Gandalf', 'Aragorn']);
+            })
+            ->orWhere('email', 'sauron@precious.com')
+            ->get();
 
         $this->assertCount(4, $users);
-        $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Tommy'], $users->map->name->all());
+        $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Sauron'], $users->map->name->all());
     }
 }

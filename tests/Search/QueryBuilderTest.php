@@ -107,17 +107,22 @@ class QueryBuilderTest extends TestCase
             ['reference' => 'b', 'title' => 'Gandalf'],
             ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
             ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+            ['reference' => 'e', 'title' => 'Sauron'],
         ]);
 
-        $results = (new FakeQueryBuilder($items))->withoutData()->where('title', 'Frodo')
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->where(function ($query) {
+                $query->where('title', 'Frodo');
+            })
             ->orWhere(function ($query) {
                 $query->where('title', 'Gandalf')
                     ->orWhere('title', 'Smeagol\'s Precious');
             })
+            ->orWhere('title', 'Sauron')
             ->get();
 
-        $this->assertCount(3, $results);
-        $this->assertEquals(['a', 'b', 'd'], $results->map->reference->all());
+        $this->assertCount(4, $results);
+        $this->assertEquals(['a', 'b', 'd', 'e'], $results->map->reference->all());
     }
 
     /** @test **/
@@ -128,17 +133,21 @@ class QueryBuilderTest extends TestCase
             ['reference' => 'b', 'title' => 'Gandalf'],
             ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
             ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+            ['reference' => 'e', 'title' => 'Sauron'],
         ]);
 
-        $results = (new FakeQueryBuilder($items))->withoutData()->whereIn('title', ['Frodo', 'Gandalf'])
-            ->orWhere(function ($query) {
-                $query->whereIn('title', ['Frodo', 'Smeagol\'s Precious'])
-                    ->orWhereIn('title', ['Frodo\'s Precious']);
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->where(function ($query) {
+                $query->where('title', 'Frodo');
             })
+            ->orWhere(function ($query) {
+                $query->whereIn('title', ['Frodo', 'Smeagol\'s Precious'])->orWhereIn('title', ['Frodo\'s Precious']);
+            })
+            ->orWhere('title', 'Sauron')
             ->get();
 
         $this->assertCount(4, $results);
-        $this->assertEquals(['a', 'b', 'd', 'c'], $results->map->reference->all());
+        $this->assertEquals(['a', 'd', 'c', 'e'], $results->map->reference->all());
     }
 }
 

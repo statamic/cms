@@ -139,29 +139,34 @@ class AssetQueryBuilderTest extends TestCase
     public function assets_are_found_using_nested_where()
     {
         $assets = $this->container->queryAssets()
-            ->where('filename', 'a')
-            ->orWhere(function ($query) {
-                $query->where('filename', 'b')
-                    ->orWhere('filename', 'd');
+            ->where(function ($query) {
+                $query->where('filename', 'a');
             })
+            ->orWhere(function ($query) {
+                $query->where('filename', 'c')->orWhere('filename', 'd');
+            })
+            ->orWhere('filename', 'f')
             ->get();
 
-        $this->assertCount(3, $assets);
-        $this->assertEquals(['a', 'b', 'd'], $assets->map->filename()->all());
+        $this->assertCount(4, $assets);
+        $this->assertEquals(['a', 'c', 'd', 'f'], $assets->map->filename()->all());
     }
 
     /** @test **/
     public function assets_are_found_using_nested_where_in()
     {
         $assets = $this->container->queryAssets()
-            ->whereIn('filename', ['a', 'b'])
+            ->where(function ($query) {
+                $query->whereIn('filename', ['a', 'b']);
+            })
             ->orWhere(function ($query) {
                 $query->whereIn('filename', ['a', 'd'])
                     ->orWhereIn('extension', ['txt']);
             })
+            ->orWhereIn('filename', ['f'])
             ->get();
 
-        $this->assertCount(4, $assets);
-        $this->assertEquals(['a', 'b', 'd', 'c'], $assets->map->filename()->all());
+        $this->assertCount(5, $assets);
+        $this->assertEquals(['a', 'b', 'd', 'c', 'f'], $assets->map->filename()->all());
     }
 }
