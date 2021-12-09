@@ -264,6 +264,11 @@ class Blueprint implements Augmentable
         return $this;
     }
 
+    public function parent()
+    {
+        return $this->parent;
+    }
+
     public function sections(): Collection
     {
         return collect(Arr::get($this->contents(), 'sections', []))->map(function ($contents, $handle) {
