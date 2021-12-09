@@ -117,6 +117,11 @@ class Users extends Relationship
         return User::find($value);
     }
 
+    protected function shallowAugmentValue($value)
+    {
+        return $value->toShallowAugmentedCollection();
+    }
+
     protected function getCreateItemUrl()
     {
         return cp_route('users.create');

@@ -2,6 +2,7 @@
     <div>
         <div class="flex items-center mb-3">
             <h1 class="flex-1" v-text="addon.name" />
+            <a :href="addon.url" target="_blank" class="btn mr-2" v-text="__('View on Marketplace')" />
             <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall" v-text="__('Uninstall')" />
             <button v-else class="btn btn-primary" :disabled="processing" @click="install" v-text="__('Install')" />
         </div>

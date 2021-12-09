@@ -28,8 +28,8 @@ abstract class UpdateScript
     /**
      * Whether the update should be run.
      *
-     * @param string $newVersion
-     * @param string $oldVersion
+     * @param  string  $newVersion
+     * @param  string  $oldVersion
      * @return bool
      */
     abstract public function shouldUpdate($newVersion, $oldVersion);
@@ -62,7 +62,7 @@ abstract class UpdateScript
     /**
      * Determine if user is updating to specific version.
      *
-     * @param mixed $version
+     * @param  mixed  $version
      * @return bool
      */
     public function isUpdatingTo($version)

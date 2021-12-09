@@ -125,6 +125,14 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    public function augmenting_an_empty_value_when_saving_as_html_returns_null()
+    {
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
+
+        $this->assertNull($bard->augment(null));
+    }
+
+    /** @test */
     public function it_removes_disabled_sets()
     {
         $data = [

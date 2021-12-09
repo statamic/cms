@@ -100,6 +100,8 @@ class AssetFolder implements Contract, Arrayable
     {
         $this->disk()->put($this->path().'/.gitkeep', '');
 
+        $this->container()->contents()->add($this->path())->save();
+
         AssetFolderSaved::dispatch($this);
 
         return $this;

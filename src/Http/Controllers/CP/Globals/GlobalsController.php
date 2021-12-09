@@ -21,17 +21,21 @@ class GlobalsController extends CpController
         })->tap(function ($globals) {
             $this->authorizeIf($globals->isEmpty(), 'create', GlobalSetContract::class);
         })->map(function ($set) {
-            $localized = $set->in(Site::selected()->handle());
+            $localized = $set->inSelectedSite();
+
+            if (! $localized && User::current()->cant('edit', $set)) {
+                return null;
+            }
 
             return [
                 'id' => $set->id(),
                 'handle' => $set->handle(),
                 'title' => $set->title(),
                 'deleteable' => User::current()->can('delete', $set),
-                'edit_url' => $localized->editUrl(),
+                'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
                 'delete_url' => $set->deleteUrl(),
             ];
-        })->values();
+        })->filter()->values();
 
         return view('statamic::globals.index', [
             'globals' => $globals,
@@ -69,7 +73,23 @@ class GlobalsController extends CpController
             'values' => $fields->values(),
             'meta' => $fields->meta(),
             'set' => $set,
+            'breadcrumb' => $this->breadcrumb($set),
         ]);
+    }
+
+    private function breadcrumb(GlobalSetContract $set)
+    {
+        if ($localized = $set->inSelectedSite()) {
+            return [
+                'title' => $localized->title(),
+                'url' => $localized->editUrl(),
+            ];
+        }
+
+        return [
+            'title' => __('Globals'),
+            'url' => cp_route('globals.index'),
+        ];
     }
 
     public function update(Request $request, $set)

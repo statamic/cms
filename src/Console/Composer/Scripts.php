@@ -9,7 +9,7 @@ class Scripts
     /**
      * Run Statamic pre-update-cmd hook.
      *
-     * @param Event $event
+     * @param  Event  $event
      */
     public static function preUpdateCmd(Event $event)
     {

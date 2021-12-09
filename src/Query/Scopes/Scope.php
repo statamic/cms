@@ -14,8 +14,8 @@ abstract class Scope
     /**
      * Apply the scope to a given query builder.
      *
-     * @param \Statamic\Query\Builder $builder
-     * @param array $values
+     * @param  \Statamic\Query\Builder  $builder
+     * @param  array  $values
      * @return void
      */
     abstract public function apply($query, $values);

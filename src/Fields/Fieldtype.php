@@ -5,7 +5,6 @@ namespace Statamic\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
-use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
@@ -14,10 +13,11 @@ use Statamic\Support\Str;
 
 abstract class Fieldtype implements Arrayable
 {
-    use RegistersItself, HasTitle, HasHandle {
+    use RegistersItself, HasHandle {
         handle as protected traitHandle;
     }
 
+    protected static $title;
     protected static $binding = 'fieldtypes';
 
     protected $field;
@@ -32,6 +32,21 @@ abstract class Fieldtype implements Arrayable
     protected $defaultValue;
     protected $configFields = [];
     protected $icon;
+
+    public static function title()
+    {
+        if (static::$title) {
+            return __(static::$title);
+        }
+
+        $translation = __($key = 'statamic::fieldtypes.'.static::handle().'.title');
+
+        if ($translation !== $key) {
+            return $translation;
+        }
+
+        return __(Str::title(Str::humanize(static::handle())));
+    }
 
     public function setField(Field $field)
     {

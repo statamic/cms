@@ -30,7 +30,7 @@ class Yaml
     /**
      * Parse a string of raw YAML into an array.
      *
-     * @param null|string $str  The YAML string
+     * @param  null|string  $str  The YAML string
      * @return array
      */
     public function parse($str = null)
@@ -77,8 +77,8 @@ class Yaml
     /**
      * Dump some YAML.
      *
-     * @param array        $data
-     * @param string|bool  $content
+     * @param  array  $data
+     * @param  string|bool  $content
      * @return string
      */
     public function dump($data, $content = null)
@@ -97,8 +97,8 @@ class Yaml
     /**
      * Dump some YAML with fenced front-matter.
      *
-     * @param array        $data
-     * @param string|bool  $content
+     * @param  array  $data
+     * @param  string|bool  $content
      * @return string
      */
     public function dumpFrontMatter($data, $content = null)

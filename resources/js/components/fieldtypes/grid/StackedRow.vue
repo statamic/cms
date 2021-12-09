@@ -22,6 +22,7 @@
                 :read-only="grid.isReadOnly"
                 :name-prefix="namePrefix"
                 :errors="errors(field.handle)"
+                :error-key-prefix="errorKey(field.handle)"
                 class="p-2"
                 @input="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"

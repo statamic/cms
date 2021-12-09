@@ -18,9 +18,9 @@ class Str extends \Illuminate\Support\Str
     /**
      * Creates a sentence list from the given $list.
      *
-     * @param array  $list  List of items to list
-     * @param string  $glue  Joining string before the last item when more than one item
-     * @param bool  $oxford_comma  Include a comma before $glue?
+     * @param  array  $list  List of items to list
+     * @param  string  $glue  Joining string before the last item when more than one item
+     * @param  bool  $oxford_comma  Include a comma before $glue?
      * @return string
      */
     public static function makeSentenceList(array $list, $glue = 'and', $oxford_comma = true)
@@ -126,8 +126,8 @@ class Str extends \Illuminate\Support\Str
     /**
      * Get the human file size of a given file.
      *
-     * @param int $bytes
-     * @param int $decimals
+     * @param  int  $bytes
+     * @param  int  $decimals
      * @return string
      */
     public static function fileSizeForHumans($bytes, $decimals = 2)
@@ -162,7 +162,7 @@ class Str extends \Illuminate\Support\Str
      * Attempts to prevent widows in a string by adding a
      * &nbsp; between the last two words of each paragraph.
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     public static function widont($value, $words = 1)
@@ -206,8 +206,8 @@ class Str extends \Illuminate\Support\Str
     /**
      * Apply multiple string modifications via array.
      *
-     * @param string $string
-     * @param array $modifications
+     * @param  string  $string
+     * @param  array  $modifications
      * @return string
      */
     public static function modifyMultiple($string, $modifications)
@@ -240,7 +240,7 @@ class Str extends \Illuminate\Support\Str
     /**
      * Output either literal "true" or "false" strings given a boolean.
      *
-     * @param bool $value
+     * @param  bool  $value
      * @return string
      */
     public static function bool(bool $value): string
@@ -251,7 +251,7 @@ class Str extends \Illuminate\Support\Str
     /**
      * Get an actual boolean from a string based boolean.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return bool
      */
     public static function toBool($value): bool
