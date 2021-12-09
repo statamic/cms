@@ -342,9 +342,9 @@ class Entries
         });
 
         if ($isSortingByOrder) {
-            $nonOrderableCollections = $this->collections->reject->orderable();
+            $nonOrderableCollections = $this->collections->reject->hasStructure();
             if ($nonOrderableCollections->isNotEmpty()) {
-                throw new \LogicException('Cannot sort a nested collection by order.');
+                throw new \LogicException('Cannot sort a structureless collection by order.');
             }
         }
 
