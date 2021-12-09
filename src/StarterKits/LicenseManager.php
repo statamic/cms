@@ -18,9 +18,9 @@ final class LicenseManager
     /**
      * Instantiate starter kit license manager.
      *
-     * @param string $package
-     * @param string|null $licenseKey
-     * @param mixed $console
+     * @param  string  $package
+     * @param  string|null  $licenseKey
+     * @param  mixed  $console
      */
     public function __construct(string $package, $licenseKey = null, $console = null)
     {
@@ -32,9 +32,9 @@ final class LicenseManager
     /**
      * Instantiate starter kit license manager.
      *
-     * @param string $package
-     * @param string|null $licenceKey
-     * @param mixed $console
+     * @param  string  $package
+     * @param  string|null  $licenceKey
+     * @param  mixed  $console
      * @return static
      */
     public static function validate(string $package, $licenceKey = null, $console = null)
@@ -185,7 +185,7 @@ final class LicenseManager
     /**
      * Output info message.
      *
-     * @param string $message
+     * @param  string  $message
      * @return $this
      */
     private function info(string $message)
@@ -198,7 +198,7 @@ final class LicenseManager
     /**
      * Output error message.
      *
-     * @param string $message
+     * @param  string  $message
      * @return $this
      */
     private function error(string $message)
@@ -211,7 +211,7 @@ final class LicenseManager
     /**
      * Output comment line.
      *
-     * @param string $message
+     * @param  string  $message
      * @return $this
      */
     private function comment(string $message)

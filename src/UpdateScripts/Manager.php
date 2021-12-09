@@ -11,7 +11,7 @@ class Manager
     /**
      * Run all registered update scripts.
      *
-     * @param mixed $console
+     * @param  mixed  $console
      * @return bool
      */
     public function runAll($console = null)
@@ -33,9 +33,9 @@ class Manager
     /**
      * Run all registered update scripts for a specific package version.
      *
-     * @param string $package
-     * @param string $oldVersion
-     * @param mixed $console
+     * @param  string  $package
+     * @param  string  $oldVersion
+     * @param  mixed  $console
      * @return bool
      */
     public function runUpdatesForSpecificPackageVersion($package, $oldVersion, $console = null)
@@ -59,7 +59,7 @@ class Manager
     /**
      * Get registered update scripts.
      *
-     * @param mixed $console
+     * @param  mixed  $console
      * @return \Illuminate\Support\Collection
      */
     protected function getRegisteredScripts($console)
@@ -72,9 +72,9 @@ class Manager
     /**
      * Run updatable scripts.
      *
-     * @param \Illuminate\Support\Collection $scripts
-     * @param Lock $oldLockFile
-     * @param Lock $newLockFile
+     * @param  \Illuminate\Support\Collection  $scripts
+     * @param  Lock  $oldLockFile
+     * @param  Lock  $newLockFile
      * @return \Illuminate\Support\Collection
      */
     protected function runUpdatableScripts($scripts, $oldLockFile, $newLockFile)
@@ -86,7 +86,7 @@ class Manager
                         $newLockFile->getNormalizedInstalledVersion($script->package()),
                         $oldLockFile->getNormalizedInstalledVersion($script->package())
                     );
-                } catch (ComposerLockFileNotFoundException | ComposerLockPackageNotFoundException $exception) {
+                } catch (ComposerLockFileNotFoundException|ComposerLockPackageNotFoundException $exception) {
                     return false;
                 }
             })

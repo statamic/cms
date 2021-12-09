@@ -22,6 +22,7 @@ return [
         'taxonomies' => false,
         'assets' => false,
         'globals' => false,
+        'forms' => false,
         'sites' => false,
         'users' => false,
     ],

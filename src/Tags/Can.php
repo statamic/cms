@@ -10,8 +10,8 @@ class Can extends Tags
     /**
      * Maps to {{ can:[permission] }}.
      *
-     * @param  string $method
-     * @param  array $args
+     * @param  string  $method
+     * @param  array  $args
      * @return string
      */
     public function wildcard($method)

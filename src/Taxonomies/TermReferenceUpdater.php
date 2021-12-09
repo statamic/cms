@@ -20,7 +20,7 @@ class TermReferenceUpdater extends DataReferenceUpdater
     /**
      * Filter by taxonomy.
      *
-     * @param string $taxonomy
+     * @param  string  $taxonomy
      * @return $this
      */
     public function filterByTaxonomy(string $taxonomy)
@@ -33,8 +33,8 @@ class TermReferenceUpdater extends DataReferenceUpdater
     /**
      * Recursively update fields.
      *
-     * @param \Illuminate\Support\Collection $fields
-     * @param null|string $dottedPrefix
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
      */
     protected function recursivelyUpdateFields($fields, $dottedPrefix = null)
     {
@@ -47,8 +47,8 @@ class TermReferenceUpdater extends DataReferenceUpdater
     /**
      * Update terms field values.
      *
-     * @param \Illuminate\Support\Collection $fields
-     * @param null|string $dottedPrefix
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
      * @return $this
      */
     protected function updateTermsFieldValues($fields, $dottedPrefix)
@@ -72,8 +72,8 @@ class TermReferenceUpdater extends DataReferenceUpdater
     /**
      * Update scoped terms field values.
      *
-     * @param \Illuminate\Support\Collection $fields
-     * @param null|string $dottedPrefix
+     * @param  \Illuminate\Support\Collection  $fields
+     * @param  null|string  $dottedPrefix
      * @return $this
      */
     protected function updateScopedTermsFieldValues($fields, $dottedPrefix)

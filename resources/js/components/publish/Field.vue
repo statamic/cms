@@ -24,9 +24,10 @@
                     v-if="!isReadOnly && !isSection"
                     v-show="syncable && isSynced"
                     class="outline-none"
+                    :class="{ flex: syncable && isSynced }"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="hyperlink" class="h-4 w-4 ml-.5 mt-sm text-grey-60"
+                    <svg-icon name="hyperlink" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
@@ -34,17 +35,18 @@
                     v-if="!isReadOnly && !isSection"
                     v-show="syncable && !isSynced"
                     class="outline-none"
+                    :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-.5 mt-sm text-grey-60"
+                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>
 
             <div
                 class="help-block -mt-1"
-                v-if="config.instructions"
-                v-html="$options.filters.markdown(config.instructions)" />
+                v-if="instructions && config.instructions_position !== 'below'"
+                v-html="instructions" />
         </div>
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
@@ -67,6 +69,11 @@
                 @blur="blurred"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
+
+        <div
+            class="help-block mt-1"
+            v-if="instructions && config.instructions_position === 'below'"
+            v-html="instructions" />
 
         <div v-if="hasError">
             <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
@@ -117,6 +124,12 @@ export default {
 
         fieldtypeComponentExists() {
             return Vue.options.components[this.fieldtypeComponent] !== undefined;
+        },
+
+        instructions() {
+            return this.config.instructions
+                ? this.$options.filters.markdown(this.config.instructions)
+                : null
         },
 
         hasError() {

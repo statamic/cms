@@ -84,6 +84,7 @@ class HasAvatarTest extends TestCase
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/3207
      **/
     public function it_gets_the_gravatar_if_theres_a_field_defined_in_the_blueprint_and_an_uploaded_asset_was_deleted()

@@ -139,6 +139,9 @@ class TreeTest extends TestCase
 
         $this->assertInstanceOf(Pages::class, $pages);
         $this->assertCount(3, $pages->all());
+
+        $this->assertEquals(['test' => 'home'], $pages->all()[0]->pageData()->all());
+        $this->assertEquals(['test' => 'about'], $pages->all()[1]->pageData()->all());
     }
 
     /** @test */
@@ -160,9 +163,11 @@ class TreeTest extends TestCase
             [
                 'id' => 'root-id',
                 'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
                 'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
                         'id' => 'pages-board',
@@ -195,9 +200,11 @@ class TreeTest extends TestCase
             [
                 'id' => 'root-id',
                 'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
                 'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
                         'id' => 'pages-board',
@@ -235,9 +242,11 @@ class TreeTest extends TestCase
             [
                 'id' => 'root-id',
                 'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
                 'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
                         'id' => 'pages-board',
@@ -261,9 +270,11 @@ class TreeTest extends TestCase
         $tree = $this->tree($arr = [
             [
                 'id' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
                 'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
                         'id' => 'pages-board',
@@ -285,6 +296,7 @@ class TreeTest extends TestCase
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/3148
      */
     public function it_doesnt_get_moved_to_root_if_its_already_there_and_the_target_is_null()
@@ -316,6 +328,7 @@ class TreeTest extends TestCase
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/1548
      **/
     public function it_can_move_the_root()
@@ -527,9 +540,11 @@ class TreeTest extends TestCase
                 [
                     'id' => 'root-id',
                     'entry' => 'pages-home',
+                    'data' => ['test' => 'home'],
                 ],
                 [
                     'id' => 'pages-about',
+                    'data' => ['test' => 'about'],
                     'children' => [
                         [
                             'id' => 'pages-board',

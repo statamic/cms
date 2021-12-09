@@ -8,8 +8,9 @@
                 @if ($customLogo)
                     <img src="{{ $customLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="white-label-logo">
                 @else
-                    @cp_svg('statamic-wordmark')
+                    @cp_svg('statamic-wordmark', 'w-24')
                     @if (Statamic::pro())<span class="font-bold text-4xs align-top">PRO</span>@endif
+
                 @endif
             </div>
         </a>
@@ -35,13 +36,13 @@
                 @cp_svg('horizon')
             </a>
         @endif
-        
+
         @if (config('nova.path') && (app()->environment('local') || $user->can('viewNova')))
             <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
                 @cp_svg('nova')
             </a>
         @endif
-        
+
         @if (Route::has('telescope') && \Laravel\Telescope\Telescope::check(request()))
             <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('telescope') }}" target="_blank" v-tooltip="'Laravel Telescope'">
                 @cp_svg('telescope')

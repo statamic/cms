@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -17,6 +19,13 @@ class AssetTest extends TestCase
     use EnablesQueries;
 
     protected $enabledQueries = ['assets'];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        BlueprintRepository::partialMock();
+    }
 
     /**
      * @test
@@ -39,7 +48,10 @@ class AssetTest extends TestCase
         Storage::disk('test')->putFileAs('sub', $file, 'image.jpg');
         $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'sub/image.jpg';
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
-        AssetContainer::make('test')->disk('test')->title('Test')->save();
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $container->makeAsset('sub/image.jpg')->data(['potato' => 'baked'])->save();
+        $blueprint = Blueprint::makeFromFields(['potato' => ['type' => 'text']]);
+        BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
 
         $query = <<<'GQL'
 {
@@ -73,6 +85,9 @@ class AssetTest extends TestCase
         width
         orientation
         ratio
+        ... on Asset_Test {
+            potato
+        }
     }
 }
 GQL;
@@ -109,6 +124,7 @@ GQL;
                     'width' => 30,
                     'orientation' => 'portrait',
                     'ratio' => 0.5,
+                    'potato' => 'baked',
                 ],
             ]]);
     }

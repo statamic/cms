@@ -11,7 +11,7 @@ class TermQueryBuilder extends Builder
     protected $taxonomies;
     protected $collections;
 
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column === 'taxonomy') {
             $this->taxonomies[] = $operator;
@@ -25,10 +25,15 @@ class TermQueryBuilder extends Builder
             return $this;
         }
 
-        return parent::where($column, $operator, $value);
+        return parent::where($column, $operator, $value, $boolean);
     }
 
-    public function whereIn($column, $values)
+    public function orWhere($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'or');
+    }
+
+    public function whereIn($column, $values, $boolean = 'and')
     {
         if (in_array($column, ['taxonomy', 'taxonomies'])) {
             $this->taxonomies = array_merge($this->taxonomies ?? [], $values);
@@ -42,7 +47,12 @@ class TermQueryBuilder extends Builder
             return $this;
         }
 
-        return parent::whereIn($column, $values);
+        return parent::whereIn($column, $values, $boolean);
+    }
+
+    public function orWhereIn($column, $values)
+    {
+        return $this->whereIn($column, $values, 'or');
     }
 
     protected function collect($items = [])
@@ -97,9 +107,7 @@ class TermQueryBuilder extends Builder
             $keys = $this->{$method}($items, $where)->keys();
 
             // Continue intersecting the keys across the where clauses.
-            // If a key exists in the reduced array but not in the current iteration, it should be removed.
-            // On the first iteration, there's nothing to intersect, so just use the result as a starting point.
-            return $ids ? $ids->intersect($keys)->values() : $keys;
+            return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
     }
 

@@ -25,7 +25,7 @@
                     v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
                 ></button>
             </div>
-            <dropdown-list class="ml-1 v-cloak" v-if="showHiddenTabsDropdown">
+            <dropdown-list class="ml-1" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
                     v-for="(section, index) in mainSections"
                     v-show="isTabHidden(index)"
@@ -130,6 +130,10 @@ export default {
             return this.state.blueprint.sections;
         },
 
+        inStack() {
+            return this.actionsPortal !== 'publish-actions-base';
+        },
+
         mainSections() {
             if (! this.shouldShowSidebar) return this.sections;
 
@@ -182,6 +186,21 @@ export default {
 
     },
 
+    mounted() {
+        if (this.inStack) return;
+
+        // Deep linking/refreshing to a specific #section
+        if (window.location.hash.length > 0) {
+            let hash = window.location.hash.substr(1);
+            // if hash is in this.visibleTabs, make it active.
+            if (_.chain(this.visibleTabs).values().contains(hash)) {
+                this.setActive(hash);
+            } else {
+                window.location.hash = '';
+            }
+        }
+    },
+
     methods: {
 
         sectionHasError(handle) {
@@ -191,6 +210,10 @@ export default {
         setActive(tab) {
             this.active = tab;
             this.$events.$emit('tab-switched', tab);
+
+            if (! this.inStack) {
+                window.location.hash = tab;
+            }
         },
 
         isTabHidden(section) {

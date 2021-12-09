@@ -2202,6 +2202,7 @@ EOT;
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/2936
      **/
     public function it_compares_to_a_string_that_looks_like_array_access()
@@ -2215,6 +2216,7 @@ EOT;
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/3374
      **/
     public function it_parses_single_and_tag_pairs_with_modifiers()

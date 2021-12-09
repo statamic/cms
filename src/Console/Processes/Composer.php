@@ -14,7 +14,7 @@ class Composer extends Process
     /**
      * Instantiate composer process.
      *
-     * @param mixed $basePath
+     * @param  mixed  $basePath
      */
     public function __construct($basePath = null)
     {
@@ -42,7 +42,7 @@ class Composer extends Process
     /**
      * Check if specific package is installed.
      *
-     * @param string $package
+     * @param  string  $package
      * @return bool
      */
     public function isInstalled(string $package)
@@ -76,7 +76,7 @@ class Composer extends Process
     /**
      * Get installed version of a specific package.
      *
-     * @param string $package
+     * @param  string  $package
      * @return string
      */
     public function installedVersion(string $package)
@@ -95,7 +95,7 @@ class Composer extends Process
     /**
      * Get installed path of a specific package.
      *
-     * @param string $package
+     * @param  string  $package
      * @return string
      */
     public function installedPath(string $package)
@@ -109,9 +109,9 @@ class Composer extends Process
     /**
      * Require a package.
      *
-     * @param string $package
-     * @param string|null $version
-     * @param mixed $extraParams
+     * @param  string  $package
+     * @param  string|null  $version
+     * @param  mixed  $extraParams
      */
     public function require(string $package, string $version = null, ...$extraParams)
     {
@@ -129,8 +129,8 @@ class Composer extends Process
     /**
      * Require a dev package.
      *
-     * @param string $package
-     * @param string|null $version
+     * @param  string  $package
+     * @param  string|null  $version
      */
     public function requireDev(string $package, string $version = null, ...$extraParams)
     {
@@ -140,8 +140,8 @@ class Composer extends Process
     /**
      * Remove a package.
      *
-     * @param string $package
-     * @param mixed $extraParams
+     * @param  string  $package
+     * @param  mixed  $extraParams
      */
     public function remove(string $package, ...$extraParams)
     {
@@ -151,7 +151,7 @@ class Composer extends Process
     /**
      * Remove a dev package.
      *
-     * @param string $package
+     * @param  string  $package
      */
     public function removeDev(string $package)
     {
@@ -161,7 +161,7 @@ class Composer extends Process
     /**
      * Update a package.
      *
-     * @param string $package
+     * @param  string  $package
      */
     public function update(string $package)
     {
@@ -171,7 +171,7 @@ class Composer extends Process
     /**
      * Get cached output for package process.
      *
-     * @param string $package
+     * @param  string  $package
      * @return mixed
      */
     public function cachedOutput(string $package)
@@ -182,7 +182,7 @@ class Composer extends Process
     /**
      * Get cached output for last completed package process.
      *
-     * @param string $package
+     * @param  string  $package
      * @return mixed
      */
     public function lastCompletedCachedOutput(string $package)
@@ -201,8 +201,8 @@ class Composer extends Process
     /**
      * Run composer and externally operate on ouput.
      *
-     * @param mixed $command
-     * @param mixed $operateOnOutput
+     * @param  mixed  $command
+     * @param  mixed  $operateOnOutput
      * @return string
      */
     public function runAndOperateOnOutput($command, $operateOnOutput)
@@ -215,7 +215,7 @@ class Composer extends Process
     /**
      * Run composer command.
      *
-     * @param mixed $parts
+     * @param  mixed  $parts
      * @return mixed
      */
     public function runComposerCommand(...$parts)
@@ -226,7 +226,7 @@ class Composer extends Process
     /**
      * Run json composer command.
      *
-     * @param mixed $parts
+     * @param  mixed  $parts
      * @return string
      */
     private function runJsonComposerCommand(...$parts)
@@ -242,9 +242,9 @@ class Composer extends Process
     /**
      * Queue composer command.
      *
-     * @param string $command
-     * @param string $package
-     * @param mixed $extraParams
+     * @param  string  $command
+     * @param  string  $package
+     * @param  mixed  $extraParams
      */
     private function queueComposerCommand($command, $package, ...$extraParams)
     {
@@ -260,7 +260,7 @@ class Composer extends Process
     /**
      * Prepare process arguments.
      *
-     * @param array $parts
+     * @param  array  $parts
      * @return array
      */
     private function prepareProcessArguments($parts)
@@ -276,7 +276,7 @@ class Composer extends Process
     /**
      * Sometimes composer returns versions with a 'v', sometimes it doesn't.
      *
-     * @param string $version
+     * @param  string  $version
      * @return string
      */
     private function normalizeVersion(string $version)
@@ -287,7 +287,7 @@ class Composer extends Process
     /**
      * Get cache key for composer output storage.
      *
-     * @param string $package
+     * @param  string  $package
      * @return string
      */
     private function getCacheKey($package)

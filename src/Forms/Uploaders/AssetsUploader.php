@@ -13,7 +13,7 @@ class AssetsUploader
     /**
      * Instantiate assets uploader.
      *
-     * @param array $config
+     * @param  array  $config
      */
     public function __construct($config)
     {
@@ -23,7 +23,7 @@ class AssetsUploader
     /**
      * Instantiate assets uploader.
      *
-     * @param array $config
+     * @param  array  $config
      * @return static
      */
     public static function field($config)
@@ -34,7 +34,7 @@ class AssetsUploader
     /**
      * Upload the files and return their paths.
      *
-     * @param mixed $files
+     * @param  mixed  $files
      * @return array|string
      */
     public function upload($files)
@@ -51,7 +51,7 @@ class AssetsUploader
     /**
      * Get uploadable files.
      *
-     * @param mixed $files
+     * @param  mixed  $files
      * @return \Illuminate\Support\Collection
      */
     protected function getUploadableFiles($files)
@@ -68,7 +68,7 @@ class AssetsUploader
     /**
      * Create an asset from a file.
      *
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
+     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return \Statamic\Assets\File\Asset
      */
     protected function createAsset($file)
