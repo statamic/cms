@@ -119,27 +119,6 @@ abstract class Builder implements Contract
         return $this->where($column, $operator, $value, 'or');
     }
 
-    public function getWhereColumnKeysFromStore($store, $where)
-    {
-        if (isset($where['query'])) {
-            $map = [];
-            foreach ($where['query']->wheres as $nestedWhere) {
-                foreach ($this->getWhereColumnKeysFromStore($store, $nestedWhere) as $key => $nest) {
-                    $map[$key] = $nest;
-                }
-            }
-
-            return $map;
-        }
-
-        return $this->store->store($store)
-            ->index($where['column'])
-            ->items()
-            ->mapWithKeys(function ($item, $key) use ($store) {
-                return ["{$store}::{$key}" => $item];
-            });
-    }
-
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
         if ($useDefault) {
