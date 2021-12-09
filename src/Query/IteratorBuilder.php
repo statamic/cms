@@ -51,40 +51,41 @@ abstract class IteratorBuilder extends Builder
 
     protected function filterWheres($entries, $wheres = null)
     {
-        if (! $wheres) {
-            $wheres = $this->wheres;
+        if (! $wheres = $wheres ?? $this->wheres) {
+            return $entries;
         }
 
         $originalEntries = $entries->values();
-        foreach ($wheres as $index => $where) {
-            if ($where['type'] == 'Nested') {
-                $filteredEntries = $this->filterWheres($originalEntries, $where['query']->wheres);
-            } else {
-                $method = 'filterWhere'.$where['type'];
-                $filteredEntries = $this->{$method}($originalEntries, $where);
-            }
 
-            if ($where['boolean'] === 'or' && $where['type'] !== 'NotIn') {
-                $entries = $entries->concat($filteredEntries)->unique()->values();
-            } else {
-                if ($index == 0) {
-                    $entries = $filteredEntries;
-                } else {
-                    $newEntries = collect([]);
+        return collect($wheres)->reduce(function ($entries, $where) use ($originalEntries) {
+            $newEntries = $where['type'] == 'Nested'
+                ? $this->filterWheres($originalEntries, $where['query']->wheres)
+                : $this->filterWhere($originalEntries, $where);
 
-                    foreach ($filteredEntries as $filteredEntry) {
-                        if ($entries->contains($filteredEntry)) {
-                            $newEntries = $newEntries->concat([$filteredEntry]);
-                        }
-                    }
+            return $this->intersectFromWhereClause($entries, $newEntries, $where);
+        });
+    }
 
-                    $entries = $newEntries;
-                    $originalEntries = $entries;
-                }
-            }
+    protected function filterWhere($entries, $where)
+    {
+        $method = 'filterWhere'.$where['type'];
+
+        return $this->{$method}($entries, $where);
+    }
+
+    protected function intersectFromWhereClause($entries, $filteredEntries, $where)
+    {
+        // On the first iteration, there's nothing to intersect;
+        // Just use the new entries as a starting point.
+        if (! $entries) {
+            return $filteredEntries->values();
         }
 
-        return $entries->values();
+        // If it's a `orWhere` or `orWhereIn`, concatenate the new entries;
+        // Otherwise, intersect to ensure each where is respected.
+        return $where['boolean'] === 'or' && $where['type'] !== 'NotIn'
+            ? $entries->concat($filteredEntries)->unique()->values()
+            : $entries->intersect($filteredEntries)->values();
     }
 
     protected function filterWhereIn($entries, $where)
