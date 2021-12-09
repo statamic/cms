@@ -76,23 +76,23 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
     protected function getKeysFromCollectionsWithWheres($collections, $wheres)
     {
         return collect($wheres)->reduce(function ($ids, $where) use ($collections) {
-            // Get a single array comprised of the items from the same index across all collections.
-            $items = collect($collections)->flatMap(function ($collection) use ($where) {
-                return $this->getWhereColumnKeysFromStore($collection, $where);
-            });
+            $keys = $where['type'] == 'Nested'
+                ? $this->getKeysFromCollectionsWithWheres($collections, $where['query']->wheres)
+                : $this->getKeysFromCollectionsWithWhere($collections, $where);
 
-            if ($where['type'] == 'Nested') {
-                $keys = $this->getKeysFromCollectionsWithWheres($collections, $where['query']->wheres);
-            } else {
-
-                // Perform the filtering, and get the keys (the references, we don't care about the values).
-                $method = 'filterWhere'.$where['type'];
-                $keys = $this->{$method}($items, $where)->keys();
-            }
-
-            // Continue intersecting the keys across the where clauses.
             return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
+    }
+
+    protected function getKeysFromCollectionsWithWhere($collections, $where)
+    {
+        $items = collect($collections)->flatMap(function ($collection) use ($where) {
+            return $this->getWhereColumnKeysFromStore($collection, $where);
+        });
+
+        $method = 'filterWhere'.$where['type'];
+
+        return $this->{$method}($items, $where)->keys();
     }
 
     protected function getOrderKeyValuesByIndex()

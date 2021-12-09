@@ -18,21 +18,23 @@ class UserQueryBuilder extends Builder
     protected function getKeysWithWheres($wheres)
     {
         return collect($wheres)->reduce(function ($ids, $where) {
-            if ($where['type'] == 'Nested') {
-                $keys = $this->getKeysWithWheres($where['query']->wheres);
-            } else {
-                $items = app('stache')
-                    ->store('users')
-                    ->index($where['column'])->items();
+            $keys = $where['type'] == 'Nested'
+                ? $this->getKeysWithWheres($where['query']->wheres)
+                : $this->getKeysWithWhere($where);
 
-                // Perform the filtering, and get the keys (the references, we don't care about the values).
-                $method = 'filterWhere'.$where['type'];
-                $keys = $this->{$method}($items, $where)->keys();
-            }
-
-            // Continue intersecting the keys across the where clauses.
             return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
+    }
+
+    protected function getKeysWithWhere($where)
+    {
+        $items = app('stache')
+            ->store('users')
+            ->index($where['column'])->items();
+
+        $method = 'filterWhere'.$where['type'];
+
+        return $this->{$method}($items, $where)->keys();
     }
 
     protected function collect($items = [])
