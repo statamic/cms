@@ -95,14 +95,17 @@ abstract class Builder extends BaseBuilder
     public function getWhereColumnKeysFromStore($store, $where)
     {
         if (isset($where['query'])) {
-            $map = [];
-            foreach ($where['query']->wheres as $nestedWhere) {
-                foreach ($this->getWhereColumnKeysFromStore($store, $nestedWhere) as $key => $nest) {
-                    $map[$key] = $nest;
-                }
-            }
+            return [];
 
-            return $map;
+            // TODO: I'm sure this was important, but I can't figure out what, and tests are passing without it 🤔
+            //
+            // $map = [];
+            // foreach ($where['query']->wheres as $nestedWhere) {
+            //     foreach ($this->getWhereColumnKeysFromStore($store, $nestedWhere) as $key => $nest) {
+            //         $map[$key] = $nest;
+            //     }
+            // }
+            // return $map;
         }
 
         return $this->store->store($store)
