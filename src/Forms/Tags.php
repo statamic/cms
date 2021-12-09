@@ -99,9 +99,7 @@ class Tags extends BaseTags
      */
     public function errors()
     {
-        if (! $sessionHandle = $this->sessionHandle()) {
-            return false;
-        }
+        $sessionHandle = $this->sessionHandle();
 
         $errors = $this->getFormSession($sessionHandle)['errors'];
 
@@ -122,9 +120,7 @@ class Tags extends BaseTags
      */
     public function success()
     {
-        if (! $sessionHandle = $this->sessionHandle()) {
-            return false;
-        }
+        $sessionHandle = $this->sessionHandle();
 
         // TODO: Should probably output success string instead of `true` boolean for consistency.
         return $this->getFromFormSession($sessionHandle, 'success');
