@@ -243,7 +243,9 @@ class AssetFolderTest extends TestCase
         $disk->put('path/to/sub/folder/three.txt', '');
         $disk->put('path/to/sub/folder/four.txt', '');
         $disk->put('path/to/sub/folder/subdirectory/five.txt', '');
-        $this->assertCount(5, $disk->allFiles());
+        $disk->put('path/to/sub/folder/subdirectory/.gitkeep', '');
+        $disk->put('path/to/sub/folder/.gitkeep', '');
+        $this->assertCount(7, $disk->allFiles());
 
         $this->assertEquals([
             'path',

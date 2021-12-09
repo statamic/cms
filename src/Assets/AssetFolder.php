@@ -124,7 +124,7 @@ class AssetFolder implements Contract, Arrayable
         $this->disk()->delete($this->path());
 
         $cache = $this->container->contents();
-        $cache->directories()->keys()->filter(function ($path) {
+        $cache->all()->keys()->filter(function ($path) {
             return Str::startsWith($path, $this->path());
         })->each(function ($path) use ($cache) {
             $cache->forget($path);
