@@ -56,11 +56,9 @@ class Tags extends BaseTags
         $formHandle = $this->getForm();
         $form = $this->form();
 
-        $data = array_merge(
-            $form->toArray(),
-            $this->getFormSession($this->sessionHandle())
-        );
+        $data = $this->getFormSession($this->sessionHandle());
         $data['fields'] = $this->getFields($this->sessionHandle());
+        $data['honeypot'] = $form->honeypot();
 
         $this->addToDebugBar($data, $formHandle);
 
