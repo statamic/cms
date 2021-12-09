@@ -11,7 +11,6 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -104,9 +103,7 @@ class Term implements TermContract
         }
 
         if (! $localizations->isEmpty()) {
-            $array['localizations'] = $localizations->map(function ($item) {
-                return Arr::removeNullValues($item->all());
-            })->all();
+            $array['localizations'] = $localizations->map->all()->all();
         }
 
         return $array->all();

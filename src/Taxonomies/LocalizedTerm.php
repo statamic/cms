@@ -87,8 +87,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
 
     public function value($key)
     {
-        return $this->get($key)
-            ?? $this->inDefaultLocale()->get($key)
+        if ($this->data()->has($key)) {
+            return $this->get($key);
+        }
+
+        return $this->inDefaultLocale()->get($key)
             ?? $this->taxonomy()->cascade($key);
     }
 
