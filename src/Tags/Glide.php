@@ -168,7 +168,7 @@ class Glide extends Tags
         static $urls = [];
 
         $token = is_string($item)
-            ? $item . '?' . http_build_query($this->params->except(['src', 'id', 'path'])->sortKeys()->all())
+            ? $item.'?'.http_build_query($this->params->except(['src', 'id', 'path'])->sortKeys()->all())
             : null;
         if ($token && isset($urls[$token])) {
             return $urls[$token];
