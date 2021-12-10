@@ -3,8 +3,12 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache as FacadesCache;
+use Statamic\Facades\Antlers;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\Support\Arr;
 
 class Cache
 {
@@ -28,7 +32,11 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return response($this->cacher->getCachedPage($request));
+            $response = response($this->cacher->getCachedPage($request));
+
+            $response = $this->replaceNoCache($response);
+
+            return $response;
         }
 
         $response = $next($request);
@@ -72,5 +80,21 @@ class Cache
         }
 
         return true;
+    }
+
+    private function replaceNoCache(Response $response)
+    {
+        $content = preg_replace_callback('/__STATIC_NOCACHE_(.*)__/', function ($matches) use ($response) {
+            $key = $matches[1];
+            $cached = FacadesCache::get('nocache-tag-'.$key);
+            $context = unserialize($cached);
+            $content = Arr::pull($context, '__content');
+
+            return Antlers::parse($content, $context);
+        }, $response->getContent());
+
+        $response->setContent($content);
+
+        return $response;
     }
 }
