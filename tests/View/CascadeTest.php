@@ -4,6 +4,7 @@ namespace Tests\View;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -104,6 +105,16 @@ class CascadeTest extends TestCase
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertFalse($cascade['logged_in']);
             $this->assertTrue($cascade['logged_out']);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_current_user()
+    {
+        $this->actingAs(User::make())->get('/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertInstanceOf(UserContract::class, $cascade['current_user']);
         });
     }
 
