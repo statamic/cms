@@ -62,6 +62,11 @@ class Fields
         return $this->items;
     }
 
+    public function parent()
+    {
+        return $this->parent;
+    }
+
     public function all(): Collection
     {
         return $this->fields;

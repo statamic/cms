@@ -278,7 +278,7 @@ class Blueprint implements Augmentable
 
     public function fields(): Fields
     {
-        if ($this->fieldsCache) {
+        if ($this->fieldsCache and $this->fieldsCache->parent() === $this->parent) {
             return $this->fieldsCache;
         }
 
