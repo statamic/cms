@@ -1,5 +1,17 @@
 # Release Notes
 
+## 3.2.26 (2020-12-10)
+
+### What's new
+- Add create and link button to Terms fieldtype. [#4073](https://github.com/statamic/cms/issues/4073) by @arthurperton
+- Swedish translation. [#4880](https://github.com/statamic/cms/issues/4880) by @adevade
+- Add `parent` method to Blueprint class. [#4885](https://github.com/statamic/cms/issues/4885) by @aerni
+
+### What's fixed
+- Fix `form:errors` not showing errors. [#4095](https://github.com/statamic/cms/issues/4095) by @arthurperton
+
+
+
 ## 3.2.25 (2020-12-07)
 
 ### What's new
