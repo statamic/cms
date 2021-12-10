@@ -42,7 +42,7 @@ class Cache
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
-            $this->cacher->cachePage($request, $response);
+            $this->cacher->cachePage($request, $this->replaceNoCache($response));
         }
 
         return $response;
