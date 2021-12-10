@@ -12,9 +12,7 @@ class ComposerTest extends TestCase
 {
     public function setUp(): void
     {
-        if ($this->isRunningWindows()) {
-            $this->markTestSkipped();
-        }
+        $this->markTestSkippedInWindows();
 
         parent::setUp();
 
