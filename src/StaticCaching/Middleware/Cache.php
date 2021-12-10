@@ -84,7 +84,7 @@ class Cache
 
     private function replaceNoCache(Response $response)
     {
-        $content = preg_replace_callback('/__STATIC_NOCACHE_(.*)__/', function ($matches) use ($response) {
+        $content = preg_replace_callback('/__STATIC_NOCACHE_(.*)__/', function ($matches) {
             $key = $matches[1];
             $cached = FacadesCache::get('nocache-tag-'.$key);
             $context = unserialize($cached);
