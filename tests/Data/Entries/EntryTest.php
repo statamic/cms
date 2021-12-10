@@ -88,6 +88,17 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function if_the_slug_is_a_function_it_will_resolve_it()
+    {
+        $entry = new Entry;
+        $entry->set('title', 'Foo Bar');
+        $entry->slug(function ($entry) {
+            return $entry->get('title');
+        });
+        $this->assertEquals('foo-bar', $entry->slug());
+    }
+
+    /** @test */
     public function it_sets_gets_and_removes_data_values()
     {
         $collection = tap(Collection::make('test'))->save();

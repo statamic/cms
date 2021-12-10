@@ -3,6 +3,8 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -139,6 +141,33 @@ class StoreEntryTest extends TestCase
         $this->assertEquals('Auto bar', $entry->value('title'));
         $this->assertEquals('manually-entered-slug', $entry->slug());
         $this->assertEquals('manually-entered-slug.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function slug_and_auto_title_get_generated_after_save()
+    {
+        // We want addons to be able to add/modify data that the auto title could rely on.
+        // Since they only get the change after it's saved, we need to generate the slug and title after that.
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {magic}')->save();
+
+        Event::listen(EntrySaving::class, function (EntrySaving $event) {
+            $event->entry->set('magic', 'Avada Kedavra');
+        });
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => '', 'slug' => ''])->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('Avada Kedavra', $entry->value('magic'));
+        $this->assertEquals('Auto Avada Kedavra', $entry->value('title'));
+        $this->assertEquals('auto-avada-kedavra', $entry->slug());
+        $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
     private function seedUserAndCollection()
