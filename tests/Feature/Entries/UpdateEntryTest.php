@@ -63,7 +63,7 @@ class UpdateEntryTest extends TestCase
     }
 
     /** @test */
-    public function slug_is_not_required_and_will_get_created_from_the_submitted_title()
+    public function slug_is_not_required_and_will_get_created_from_the_submitted_title_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty()
     {
         [$user, $collection] = $this->seedUserAndCollection();
 
@@ -72,6 +72,7 @@ class UpdateEntryTest extends TestCase
             ->data(['title' => 'Existing Entry'])
             ->create();
 
+        $this->assertTrue($entry->blueprint()->hasField('slug'));
         $this->assertCount(1, Entry::all());
 
         $this
@@ -83,6 +84,34 @@ class UpdateEntryTest extends TestCase
         $entry = $entry->fresh();
         $this->assertEquals('Foo Bar Baz', $entry->value('title'));
         $this->assertEquals('foo-bar-baz', $entry->slug());
+        $this->assertEquals('foo-bar-baz.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function slug_is_not_required_and_will_be_null_if_slug_is_not_in_the_blueprint()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->requiresSlugs(false);
+
+        $entry = EntryFactory::collection($collection)
+            ->id('the-id')
+            ->slug(null)
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $this->assertFalse($entry->blueprint()->hasField('slug'));
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Foo Bar Baz', 'slug' => ''])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Foo Bar Baz', $entry->value('title'));
+        $this->assertNull($entry->slug());
+        $this->assertEquals($entry->id().'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
     /** @test */
@@ -107,6 +136,32 @@ class UpdateEntryTest extends TestCase
         $entry = $entry->fresh();
         $this->assertEquals('Auto bar', $entry->value('title'));
         $this->assertEquals('auto-bar', $entry->slug());
+        $this->assertEquals('auto-bar.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function submitted_slug_is_favored_over_auto_generated_title_when_using_title_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => '', 'slug' => 'manually-entered-slug', 'foo' => 'bar'])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Auto bar', $entry->value('title'));
+        $this->assertEquals('manually-entered-slug', $entry->slug());
+        $this->assertEquals('manually-entered-slug.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
     /** @test */

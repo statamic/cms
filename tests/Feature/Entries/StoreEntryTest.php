@@ -51,10 +51,11 @@ class StoreEntryTest extends TestCase
     }
 
     /** @test */
-    public function slug_is_not_required_and_will_get_created_from_the_submitted_title()
+    public function slug_is_not_required_and_will_get_created_from_the_submitted_title_if_slug_is_in_blueprint()
     {
         [$user, $collection] = $this->seedUserAndCollection();
 
+        $this->assertTrue($collection->entryBlueprint()->hasField('slug'));
         $this->assertCount(0, Entry::all());
 
         $this
@@ -67,6 +68,29 @@ class StoreEntryTest extends TestCase
         $entry = Entry::all()->first();
         $this->assertEquals('Test Entry', $entry->value('title'));
         $this->assertEquals('test-entry', $entry->slug());
+        $this->assertEquals('test-entry.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function slug_is_not_required_and_will_be_null_if_slug_is_not_in_the_blueprint()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->requiresSlugs(false);
+
+        $this->assertFalse($collection->entryBlueprint()->hasField('slug'));
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Test Entry', 'slug' => ''])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('Test Entry', $entry->value('title'));
+        $this->assertNull($entry->slug());
+        $this->assertEquals($entry->id().'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
     /** @test */
@@ -90,6 +114,31 @@ class StoreEntryTest extends TestCase
         $entry = Entry::all()->first();
         $this->assertEquals('Auto bar', $entry->value('title'));
         $this->assertEquals('auto-bar', $entry->slug());
+        $this->assertEquals('auto-bar.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function submitted_slug_is_favored_over_auto_generated_title_when_using_title_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text']]);
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => '',
+                'slug' => 'manually-entered-slug',
+                'foo' => 'bar',
+            ])->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('Auto bar', $entry->value('title'));
+        $this->assertEquals('manually-entered-slug', $entry->slug());
+        $this->assertEquals('manually-entered-slug.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
     private function seedUserAndCollection()
