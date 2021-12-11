@@ -25,7 +25,7 @@
                     v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
                 ></button>
             </div>
-            <dropdown-list class="ml-1 v-cloak" v-if="showHiddenTabsDropdown">
+            <dropdown-list class="ml-1" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
                     v-for="(section, index) in mainSections"
                     v-show="isTabHidden(index)"

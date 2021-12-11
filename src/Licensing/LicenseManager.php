@@ -83,6 +83,11 @@ class LicenseManager
         return $this->statamicValid() && ! $this->addonsValid();
     }
 
+    public function statamicNeedsRenewal()
+    {
+        return $this->statamic()->needsRenewal();
+    }
+
     public function response($key = null, $default = null)
     {
         $response = $this->outpost->response();

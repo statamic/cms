@@ -1,5 +1,64 @@
 # Release Notes
 
+## 3.2.26 (2020-12-10)
+
+### What's new
+- Add create and link button to Terms fieldtype. [#4073](https://github.com/statamic/cms/issues/4073) by @arthurperton
+- Swedish translation. [#4880](https://github.com/statamic/cms/issues/4880) by @adevade
+- Add `parent` method to Blueprint class. [#4885](https://github.com/statamic/cms/issues/4885) by @aerni
+
+### What's fixed
+- Fix `form:errors` not showing errors. [#4095](https://github.com/statamic/cms/issues/4095) by @arthurperton
+
+
+
+## 3.2.25 (2020-12-07)
+
+### What's new
+- Add `please license:set` command. [#4840](https://github.com/statamic/cms/issues/4840) by @jesseleite
+- Add `trackable_embed_url` modifier. [#4856](https://github.com/statamic/cms/issues/4856) by @edalzell
+
+### What's fixed
+
+- Fix Starter Kits not being installable on Windows. [#4843](https://github.com/statamic/cms/issues/4843) by @jesseleite
+- Adjusted some licensing messaging. [#4870](https://github.com/statamic/cms/issues/4870) by @jasonvarga
+- Fix double scheduling. [#4855](https://github.com/statamic/cms/issues/4855) by @edalzell
+- Fix action file downloads not being completed. [#4851](https://github.com/statamic/cms/issues/4851) by @wanze
+- Fix jumpy publish tabs on page load. [#4866](https://github.com/statamic/cms/issues/4866) by @jackmcdade
+- Fix jumpy origin sync button. [#4819](https://github.com/statamic/cms/issues/4819) by @aerni
+- Fix read-only mode on grid solo assets. [#4865](https://github.com/statamic/cms/issues/4865) by @jackmcdade
+- Emails will use the site's `lang` for translations if provided. [#4842](https://github.com/statamic/cms/issues/4842) by @okaufmann
+- Fix paths to git documentation in config files. [#4824](https://github.com/statamic/cms/issues/4824) by @McGo
+- Added PHP 8.1 tests. [#4724](https://github.com/statamic/cms/issues/4724) by @jasonvarga
+
+
+
+## 3.2.24 (2020-11-24)
+
+### What's new
+- Native Bard / TipTap extensions can be replaced by custom ones. [#4314](https://github.com/statamic/cms/issues/4314) by @jacksleight
+- Added an `is_tomorrow` modifier. [#4802](https://github.com/statamic/cms/issues/4802) by @joseph-d
+- Added a Hungarian translation. [#4804](https://github.com/statamic/cms/issues/4804) by @matkovsky
+
+### What's improved
+- Custom Bard buttons can be added conditionally. [#4106](https://github.com/statamic/cms/issues/4106) by @morhi
+- French translations [#4809](https://github.com/statamic/cms/issues/4809) by @ebauchamps
+
+
+
+## 3.2.23 (2020-11-19)
+
+### What's new
+- You can specify `export_as` paths in your starter kit config. [#4733](https://github.com/statamic/cms/issues/4733) by @jesseleite
+- Add `get_errors` tag. [#4192](https://github.com/statamic/cms/issues/4192) by @edalzell
+- Add `whereNull` support to query builders. [#4740](https://github.com/statamic/cms/issues/4740) by @ryanmitchell
+- Add Forms support to GraphQL. [#4115](https://github.com/statamic/cms/issues/4115) by @arthurperton
+
+### What's fixed
+- Added missing `antlers` config to the UI for Bard fields. [#4782](https://github.com/statamic/cms/issues/4782) by @jackmcdade
+- Fixed error when submitting forms from other domains. [#4745](https://github.com/statamic/cms/issues/4745) by @SteJW
+
+
 ## 3.2.22 (2020-11-15)
 
 ### What's new
@@ -175,7 +234,7 @@
 ## 3.2.13 (2020-10-07)
 
 ### What's improved
-- Update Dutch translations. [#4413](https://github.com/statamic/cms/issues/4413) by @robdekort 
+- Update Dutch translations. [#4413](https://github.com/statamic/cms/issues/4413) by @robdekort
 - Update French translations. [#4411](https://github.com/statamic/cms/issues/4411) by @ebeauchamps
 
 ### What's fixed
@@ -314,7 +373,7 @@
 ### What's fixed
 - Fix issue where newly created asset folders wouldn't show on reload. [#4176](https://github.com/statamic/cms/issues/4176)
 - Make the `site:clear` command clear trees. [#4231](https://github.com/statamic/cms/issues/4231)
-- Bring back the HTML field on the HTML fieldtype so you can HTML in your HTML field. [a3f7caabb](https://github.com/statamic/cms/commit/a3f7caabb)  
+- Bring back the HTML field on the HTML fieldtype so you can HTML in your HTML field. [a3f7caabb](https://github.com/statamic/cms/commit/a3f7caabb)
 - Read inline SVGs from Composer vendor directory which improves Vapor support. [#4216](https://github.com/statamic/cms/issues/4216)
 - Escape user input on git commands. [#4220](https://github.com/statamic/cms/issues/4220)
 - Validate replicator as an array. [#4212](https://github.com/statamic/cms/issues/4212)

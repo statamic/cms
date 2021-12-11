@@ -24,9 +24,10 @@
                     v-if="!isReadOnly && !isSection"
                     v-show="syncable && isSynced"
                     class="outline-none"
+                    :class="{ flex: syncable && isSynced }"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="hyperlink" class="h-4 w-4 ml-.5 mt-sm text-grey-60"
+                    <svg-icon name="hyperlink" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
@@ -34,9 +35,10 @@
                     v-if="!isReadOnly && !isSection"
                     v-show="syncable && !isSynced"
                     class="outline-none"
+                    :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-.5 mt-sm text-grey-60"
+                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>

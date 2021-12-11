@@ -83,4 +83,64 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 3', 'Post 4'], $entries->map->title->all());
     }
+
+    /** @test **/
+    public function entries_are_found_using_where_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'text' => 'Text 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'text' => 'Text 2'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'text' => 'Text 4'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+
+        $entries = Entry::query()->whereNull('text')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 3', 'Post 5'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_where_not_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'text' => 'Text 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'text' => 'Text 2'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'text' => 'Text 4'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+
+        $entries = Entry::query()->whereNotNull('text')->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 4'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_or_where_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'text' => 'Text 1', 'content' => 'Content 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'text' => 'Text 2'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'content' => 'Content 1'])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'text' => 'Text 4'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+
+        $entries = Entry::query()->whereNull('text')->orWhereNull('content')->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 3', 'Post 5', 'Post 2', 'Post 4'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_or_where_not_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'text' => 'Text 1', 'content' => 'Content 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'text' => 'Text 2'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'content' => 'Content 1'])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'text' => 'Text 4'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+
+        $entries = Entry::query()->whereNotNull('content')->orWhereNotNull('text')->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 2', 'Post 4'], $entries->map->title->all());
+    }
 }

@@ -54,6 +54,7 @@ class Value implements IteratorAggregate, JsonSerializable
         return (string) $this->value();
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize($options = 0)
     {
         $value = $this->value();
@@ -65,6 +66,7 @@ class Value implements IteratorAggregate, JsonSerializable
         return $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->value());

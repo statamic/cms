@@ -62,6 +62,15 @@ class Exporter
                 $this->copyPath($path);
             });
 
+        $this
+            ->exportAsPaths()
+            ->each(function ($to, $from) {
+                $this->ensureExportPathExists($from);
+            })
+            ->each(function ($to, $from) {
+                $this->copyPath($from, $to);
+            });
+
         return $this;
     }
 
@@ -74,7 +83,7 @@ class Exporter
      */
     protected function ensureExportPathExists($path)
     {
-        if (! $this->files->exists($path)) {
+        if (! $this->files->exists(base_path($path))) {
             throw new StarterKitException("Export path [{$path}] does not exist.");
         }
     }
@@ -83,11 +92,15 @@ class Exporter
      * Copy path to new export path location.
      *
      * @param  string  $fromPath
+     * @param  string  $toPath
      */
-    protected function copyPath($fromPath)
+    protected function copyPath($fromPath, $toPath = null)
     {
-        $relativePath = str_replace(base_path().'/', '', $fromPath);
-        $toPath = "{$this->exportPath}/{$relativePath}";
+        $toPath = $toPath
+            ? "{$this->exportPath}/{$toPath}"
+            : "{$this->exportPath}/{$fromPath}";
+
+        $fromPath = base_path($fromPath);
 
         $this->preparePath($fromPath, $toPath);
 
@@ -124,7 +137,7 @@ class Exporter
     }
 
     /**
-     * Get starter kit export paths from config.
+     * Get starter kit `export_paths` paths from config.
      *
      * @return \Illuminate\Support\Collection
      *
@@ -140,9 +153,25 @@ class Exporter
             throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array!');
         }
 
-        return $paths->map(function ($path) {
-            return base_path($path);
-        });
+        return $paths;
+    }
+
+    /**
+     * Get starter kit 'export_as' paths (to be renamed on export) from config.
+     *
+     * @return \Illuminate\Support\Collection
+     *
+     * @throws StarterKitException
+     */
+    protected function exportAsPaths()
+    {
+        $paths = collect($this->config()->get('export_as'));
+
+        if ($paths->keys()->contains('composer.json')) {
+            throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array!');
+        }
+
+        return $paths;
     }
 
     /**
