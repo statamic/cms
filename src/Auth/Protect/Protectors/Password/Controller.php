@@ -20,13 +20,13 @@ class Controller extends BaseController
         $this->tokenData = session('statamic:protect:password.tokens.'.request('token'));
 
         if (! $this->tokenData) {
-            return back()->withErrors(['token' => 'Invalid or expired token.'], 'passwordProtect');
+            return back()->withErrors(['token' => __('Invalid or expired token.')], 'passwordProtect');
         }
 
         $guard = new Guard($this->getScheme());
 
         if (! $guard->check($this->password)) {
-            return back()->withErrors(['password' => 'Incorrect password.'], 'passwordProtect');
+            return back()->withErrors(['password' => __('Incorrect password.')], 'passwordProtect');
         }
 
         return $this
