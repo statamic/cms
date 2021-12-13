@@ -89,11 +89,14 @@ class CascadeTest extends TestCase
     /** @test */
     public function it_hydrates_auth_when_logged_in()
     {
-        $this->actingAs(User::make())->get('/');
+        $user = User::make();
 
-        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+        $this->actingAs($user)->get('/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) use ($user) {
             $this->assertTrue($cascade['logged_in']);
             $this->assertFalse($cascade['logged_out']);
+            $this->assertSame($user, $cascade['current_user']);
         });
     }
 
@@ -105,6 +108,7 @@ class CascadeTest extends TestCase
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertFalse($cascade['logged_in']);
             $this->assertTrue($cascade['logged_out']);
+            $this->assertNull($cascade['current_user']);
         });
     }
 
