@@ -51,6 +51,8 @@ class Collection implements Contract, AugmentableContract
     protected $structure;
     protected $structureContents;
     protected $taxonomies = [];
+    protected $requiresSlugs = true;
+    protected $titleFormats = [];
 
     public function __construct()
     {
@@ -84,6 +86,42 @@ class Collection implements Contract, AugmentableContract
     public function route($site)
     {
         return $this->routes()->get($site);
+    }
+
+    public function requiresSlugs($require = null)
+    {
+        return $this->fluentlyGetOrSet('requiresSlugs')->args(func_get_args());
+    }
+
+    public function titleFormats($formats = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('titleFormats')
+            ->setter(function ($format) {
+                if (! $format) {
+                    $format = [];
+                }
+
+                return $format;
+            })
+            ->getter(function ($formats) {
+                return $this->sites()->mapWithKeys(function ($site) use ($formats) {
+                    $siteRoute = is_string($formats) ? $formats : ($formats[$site] ?? null);
+
+                    return [$site => $siteRoute];
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function titleFormat($site)
+    {
+        return $this->titleFormats()->get($site);
+    }
+
+    public function autoGeneratesTitles()
+    {
+        return $this->titleFormats !== [];
     }
 
     public function dated($dated = null)
@@ -282,9 +320,14 @@ class Collection implements Contract, AugmentableContract
 
     public function ensureEntryBlueprintFields($blueprint)
     {
-        $blueprint
-            ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
-            ->ensureField('slug', ['type' => 'slug', 'required' => true, 'localizable' => true], 'sidebar');
+        $blueprint->ensureFieldPrepended('title', [
+            'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
+            'required' => ! $auto,
+        ]);
+
+        if ($this->requiresSlugs()) {
+            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
+        }
 
         if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
@@ -441,6 +484,7 @@ class Collection implements Contract, AugmentableContract
 
         $array = Arr::removeNullValues(array_merge($array, [
             'route' => $route,
+            'slugs' => $this->requiresSlugs() === true ? null : false,
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'sort_by' => $this->sortField,
@@ -512,6 +556,7 @@ class Collection implements Contract, AugmentableContract
             'mount' => $this->mount,
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
+            'title_format' => $this->titleFormats,
         ];
     }
 
