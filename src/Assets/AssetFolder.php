@@ -161,7 +161,7 @@ class AssetFolder implements Contract, Arrayable
     public function move($parent, $name = null)
     {
         if (Str::startsWith($parent, $this->path())) {
-            throw new \Exception(__('Folder cannot be moved to its own subfolder.'));
+            throw new \Exception('Folder cannot be moved to its own subfolder.');
         }
 
         $name = $name ?: $this->basename();
