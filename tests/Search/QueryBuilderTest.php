@@ -98,7 +98,7 @@ class QueryBuilderTest extends TestCase
     {
         $this->markTestSkipped();
     }
- 
+
     /** @test **/
     public function results_are_found_using_nested_where()
     {
@@ -148,6 +148,7 @@ class QueryBuilderTest extends TestCase
 
         $this->assertCount(4, $results);
         $this->assertEquals(['a', 'd', 'c', 'e'], $results->map->reference->all());
+    }
 
     /** @test **/
     public function entries_are_found_using_where_json_contains()

@@ -143,7 +143,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(4, $entries);
         $this->assertEquals(['Post 1', 'Post 3', 'Post 2', 'Post 4'], $entries->map->title->all());
     }
- 
+
     /** @test **/
     public function entries_are_found_using_nested_where()
     {
@@ -193,6 +193,7 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(6, $entries);
         $this->assertEquals(['1', '2', '4', '6', '7', '9'], $entries->map->id()->all());
+    }
 
     /** @test **/
     public function entries_are_found_using_where_json_contains()

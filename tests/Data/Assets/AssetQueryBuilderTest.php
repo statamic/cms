@@ -169,7 +169,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertCount(5, $assets);
         $this->assertEquals(['a', 'b', 'd', 'c', 'f'], $assets->map->filename()->all());
     }
-  
+
     /** @test **/
     public function assets_are_found_using_where_json_contains()
     {
