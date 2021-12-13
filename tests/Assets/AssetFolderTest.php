@@ -407,6 +407,7 @@ class AssetFolderTest extends TestCase
             ->path('move');
 
         $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Folder cannot be moved to its own subfolder.');
 
         $folder->move('move/sub');
 
@@ -419,6 +420,52 @@ class AssetFolderTest extends TestCase
             'move',
             'move/sub',
             'move/sub/foo.txt',
+        ], $container->contents()->cached()->keys()->all());
+    }
+
+    /** @test */
+    public function it_cannot_be_moved_if_the_destination_already_exists()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $disk->put($path = 'alfa/foo/one.txt', '');
+        $container->makeAsset($path)->save();
+        $disk->put($path = 'bravo/foo/two.txt', '');
+        $container->makeAsset($path)->save();
+
+        $this->assertCount(4, $disk->allFiles());
+
+        $this->assertEquals([
+            'alfa',
+            'alfa/foo',
+            'bravo',
+            'bravo/foo',
+        ], $container->folders()->all());
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('alfa/foo');
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Folder already exists.');
+
+        $folder->move('bravo');
+
+        $this->assertEquals([
+            'alfa',
+            'alfa/foo',
+            'bravo',
+            'bravo/foo',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'alfa',
+            'alfa/foo',
+            'alfa/foo/one.txt',
+            'bravo',
+            'bravo/foo',
+            'bravo/foo/two.txt',
         ], $container->contents()->cached()->keys()->all());
     }
 
@@ -487,6 +534,46 @@ class AssetFolderTest extends TestCase
         Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) {
             return $event->asset->path() === 'after/sub/foo.txt';
         });
+    }
+
+    /** @test */
+    public function it_cannot_be_renamed_if_the_destination_exists()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $disk->put($path = 'alfa/one.txt', '');
+        $container->makeAsset($path)->save();
+        $disk->put($path = 'bravo/two.txt', '');
+        $container->makeAsset($path)->save();
+
+        $this->assertCount(4, $disk->allFiles());
+
+        $this->assertEquals([
+            'alfa',
+            'bravo',
+        ], $container->folders()->all());
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('alfa');
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Folder already exists.');
+
+        $folder->rename('bravo');
+
+        $this->assertEquals([
+            'alfa',
+            'bravo',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'alfa',
+            'alfa/one.txt',
+            'bravo',
+            'bravo/two.txt',
+        ], $container->contents()->cached()->keys()->all());
     }
 
     /** @test */

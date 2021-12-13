@@ -172,7 +172,9 @@ class AssetFolder implements Contract, Arrayable
             return $this;
         }
 
-        $newPath = $this->ensureUniquePath($newPath);
+        if ($this->disk()->exists($newPath)) {
+            throw new \Exception('Folder already exists.');
+        }
 
         $folder = $this->container->assetFolder($newPath)->save();
         $this->container()->assetFolders($oldPath)->each->move($newPath);
@@ -210,17 +212,5 @@ class AssetFolder implements Contract, Arrayable
             'parent_path' => optional($this->parent())->path(),
             'basename' => $this->basename(),
         ];
-    }
-
-    protected function ensureUniquePath($path, $count = 0)
-    {
-        $suffix = $count ? "-$count" : '';
-        $newPath = Str::removeLeft($path.$suffix, '/');
-
-        if ($this->disk()->exists($newPath)) {
-            return $this->ensureUniquePath($path, $count + 1);
-        }
-
-        return $newPath;
     }
 }
