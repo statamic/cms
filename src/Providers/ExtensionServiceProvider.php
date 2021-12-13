@@ -43,6 +43,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
         Fieldtypes\CollectionRoutes::class,
+        Fieldtypes\CollectionTitleFormats::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
