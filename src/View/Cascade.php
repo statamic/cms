@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
+use Statamic\Facades\User;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 
@@ -188,6 +189,7 @@ class Cascade
             // Auth
             'logged_in' => $loggedIn = auth()->check(),
             'logged_out' => ! $loggedIn,
+            'current_user' => User::current(),
 
             // Date
             'current_date' => $now = now(),

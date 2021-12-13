@@ -24,7 +24,6 @@ class AssetQueryBuilderTest extends TestCase
         Storage::disk('test')->put('d.jpg', '');
         Storage::disk('test')->put('e.jpg', '');
         Storage::disk('test')->put('f.jpg', '');
-
         $this->container = tap(AssetContainer::make('test')->disk('test'))->save();
     }
 
@@ -134,5 +133,40 @@ class AssetQueryBuilderTest extends TestCase
 
         $this->assertCount(4, $assets);
         $this->assertEquals(['a', 'c', 'b', 'd'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_nested_where()
+    {
+        $assets = $this->container->queryAssets()
+            ->where(function ($query) {
+                $query->where('filename', 'a');
+            })
+            ->orWhere(function ($query) {
+                $query->where('filename', 'c')->orWhere('filename', 'd');
+            })
+            ->orWhere('filename', 'f')
+            ->get();
+
+        $this->assertCount(4, $assets);
+        $this->assertEquals(['a', 'c', 'd', 'f'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_nested_where_in()
+    {
+        $assets = $this->container->queryAssets()
+            ->where(function ($query) {
+                $query->whereIn('filename', ['a', 'b']);
+            })
+            ->orWhere(function ($query) {
+                $query->whereIn('filename', ['a', 'd'])
+                    ->orWhereIn('extension', ['txt']);
+            })
+            ->orWhereIn('filename', ['f'])
+            ->get();
+
+        $this->assertCount(5, $assets);
+        $this->assertEquals(['a', 'b', 'd', 'c', 'f'], $assets->map->filename()->all());
     }
 }

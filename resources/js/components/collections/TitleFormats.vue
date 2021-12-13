@@ -4,7 +4,7 @@
         :value="value"
         :state="$store.state.publish[this.storeName]"
         @input="update"
-        :column-header="__('Route')"
+        :column-header="__('Format')"
     ></one-or-many-sites-field>
 </template>
 

@@ -471,7 +471,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                this.title = this.values.title;
+                this.title = response.data.data.title;
                 this.isWorkingCopy = true;
                 if (this.isBase) {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
