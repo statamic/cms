@@ -139,8 +139,9 @@ class AssetFolder implements Contract, Arrayable
     /**
      * Rename the folder.
      *
-     * @param string $filename
+     * @param  string  $filename
      * @return AssetFolder
+     *
      * @throws \Exception
      */
     public function rename($name)
@@ -151,9 +152,10 @@ class AssetFolder implements Contract, Arrayable
     /**
      * Move the folder to a different location.
      *
-     * @param string      $parent   The destination folder relative to the container.
-     * @param string|null $name     The new folder name, if renaming.
+     * @param  string  $parent  The destination folder relative to the container.
+     * @param  string|null  $name  The new folder name, if renaming.
      * @return AssetFolder
+     *
      * @throws \Exception
      */
     public function move($parent, $name = null)
