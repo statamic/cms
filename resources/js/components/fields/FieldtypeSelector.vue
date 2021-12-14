@@ -27,10 +27,10 @@
                 </div>
                 <div class="fieldtype-list">
                     <div class="p-1" v-for="option in fieldtypeOptions">
-                        <a class="border flex items-center group w-full rounded shadow-sm py-1 px-2"
+                        <a class="border flex items-center group w-full rounded hover:border-grey-50 shadow-sm py-1 px-1.5"
                             @click="select(option)">
-                            <svg-icon class="h-4 w-4 text-grey-80 group-hover:text-blue" :name="option.icon"></svg-icon>
-                            <span class="pl-2 text-grey-80 group-hover:text-blue">{{ option.text }}</span>
+                            <svg-icon class="h-4 w-4 text-grey-80 group-hover:text-blue" :name="option.icon" default="generic-field"></svg-icon>
+                            <span class="pl-1.5 text-grey-80 text-md group-hover:text-blue">{{ option.text }}</span>
                         </a>
                     </div>
                 </div>
