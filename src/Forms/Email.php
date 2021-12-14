@@ -26,7 +26,7 @@ class Email extends Mailable
         $this->submission = $submission;
         $this->config = $this->parseConfig($config);
         $this->site = $site;
-        $this->locale($site->shortLocale());
+        $this->locale($site->lang());
     }
 
     public function build()

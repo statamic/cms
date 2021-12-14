@@ -136,7 +136,6 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'slug',
                                 'localizable' => true,
-                                'required' => true,
                             ],
                         ],
                     ],
@@ -312,7 +311,6 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'slug',
                                 'localizable' => true,
-                                'required' => true,
                             ],
                         ],
                     ],
@@ -429,7 +427,6 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'slug',
                                 'localizable' => true,
-                                'required' => true,
                             ],
                         ],
                     ],
