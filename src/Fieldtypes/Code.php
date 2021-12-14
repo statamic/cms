@@ -9,6 +9,8 @@ use Statamic\GraphQL\Types\CodeType;
 
 class Code extends Fieldtype
 {
+    protected $categories = ['text'];
+
     protected function configFieldItems(): array
     {
         return [
