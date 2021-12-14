@@ -85,7 +85,14 @@ abstract class IteratorBuilder extends Builder
         // Otherwise, intersect to ensure each where is respected.
         return $where['boolean'] === 'or' && $where['type'] !== 'NotIn'
             ? $entries->concat($filteredEntries)->unique()->values()
-            : $entries->intersect($filteredEntries)->values();
+            : $this->intersectEntries($entries, $filteredEntries)->values();
+    }
+
+    protected function intersectEntries($entries, $filteredEntries)
+    {
+        return $entries->filter(function ($entry) use ($filteredEntries) {
+            return $filteredEntries->contains($entry);
+        });
     }
 
     protected function filterWhereIn($entries, $where)
