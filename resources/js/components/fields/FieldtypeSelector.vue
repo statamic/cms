@@ -1,7 +1,7 @@
 <template>
 
     <div class="h-full bg-white overflow-auto">
-        <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+        <div class="bg-grey-30 px-3 py-1 border-b text-lg font-medium flex items-center justify-between">
             {{ __('Fieldtypes') }}
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
@@ -10,22 +10,19 @@
             <loading-graphic />
         </div>
 
-        <div class="p-3" v-if="fieldtypesLoaded">
-            <div class="filter mb-0">
-                <a @click="filterBy = 'all'" :class="{'active': filterBy == 'all'}">{{ __('All') }}</a>
-                <a @click="filterBy = filter" v-for="filter in filteredFilters" :class="{'active': filterBy == filter}">
+        <div class="py-2 px-3 border-b bg-grey-10 mb-2 flex items-center" v-if="fieldtypesLoaded">
+            <input type="text" class="input-text flex-1 mr-2 bg-white text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
+            <div class="flex items-center">
+                <button @click="switchFilter('all')" class="btn-flat" :class="{'bg-grey-50': filterBy == 'all'}">{{ __('All') }}</button>
+                <button @click="switchFilter(filter)" v-for="filter in filteredFilters" class="btn-flat ml-1" :class="{'bg-grey-50': filterBy == filter}">
                     {{ filterLabels[filter] }}
-                </a>
-                <a @click.prevent="openSearch" :class="['no-dot', {'active': search}]"><span class="icon icon-magnifying-glass"></span></a>
+                </button>
             </div>
         </div>
 
-        <div class="p-3 pt-0" v-if="fieldtypesLoaded">
+        <div class="p-2 pt-0" v-if="fieldtypesLoaded">
             <div class="fieldtype-selector">
-                <div :class="['search', { 'is-searching': isSearching }]">
-                    <input type="text" v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
-                </div>
-                <div class="fieldtype-list">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-x-2 gap-y-sm">
                     <div class="p-1" v-for="option in fieldtypeOptions">
                         <a class="border flex items-center group w-full rounded hover:border-grey-50 shadow-sm py-1 px-1.5"
                             @click="select(option)">
@@ -67,16 +64,15 @@ export default {
             isActive: false,
             filterBy: 'all',
             filterLabels: {
-                text: __('Text'),
+                controls: __('Controls'),
                 media: __('Media'),
-                pickable: __('Pickable'),
                 structured: __('Structured'),
                 relationship: __('Relationship'),
                 special: __('Special'),
-                system: __('System')
+                system: __('System'),
+                text: __('Text'),
             },
-            search: '',
-            isSearchOpen: false
+            search: ''
         }
     },
 
@@ -142,7 +138,7 @@ export default {
         },
 
         isSearching() {
-            return this.search || this.isSearchOpen;
+            return this.search;
         }
     },
 
@@ -231,8 +227,8 @@ export default {
             this.$emit('closed');
         },
 
-        openSearch() {
-            this.isSearchOpen = true;
+        switchFilter(filter) {
+            this.filterBy = filter;
             this.$refs.search.focus();
         },
 
@@ -240,7 +236,6 @@ export default {
             if (! this.search) return;
 
             event.stopPropagation();
-            this.isSearchOpen = false;
             this.search = '';
         }
 
