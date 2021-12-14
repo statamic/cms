@@ -215,5 +215,4 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(2, $entries);
         $this->assertEquals(['3', '5'], $entries->map->id()->all());
     }
-
 }
