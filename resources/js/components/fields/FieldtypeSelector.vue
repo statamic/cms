@@ -21,7 +21,6 @@
         </div>
 
         <div class="p-2 pt-0" v-if="fieldtypesLoaded">
-            {{ categories }}
             <div class="fieldtype-selector">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-x-2 gap-y-sm">
                     <div class="p-1" v-for="option in fieldtypeOptions">
