@@ -87,15 +87,14 @@
     display: grid;
     grid-template-columns: auto;
     grid-template-rows: repeat(20, 40px);
-    grid-row-gap: 16px;
-    grid-column-gap: 32px;
+    gap: 16px;
     grid-auto-flow: column;
 
 }
 
 @screen lg {
     .fieldtype-list {
-        grid-template-rows: repeat(12, 40px);
+        grid-template-rows: repeat(14, 40px);
         grid-template-columns: repeat(4, 1fr);
     }
 }
