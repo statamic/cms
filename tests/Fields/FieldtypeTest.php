@@ -139,6 +139,7 @@ class FieldtypeTest extends TestCase
             'localizable' => true,
             'validatable' => true,
             'defaultable' => true,
+            'categories' => [],
             'icon' => 'test',
             'config' => [],
         ], $fieldtype->toArray());
