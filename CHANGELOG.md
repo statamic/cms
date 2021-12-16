@@ -13,6 +13,7 @@
 ### What's fixed
 - Fieldtypes no longer get assigned to the `text` category by default. [447c27343](https://github.com/statamic/cms/commit/447c27343) by @jackmcdade
 - Links in instruction text are no longer red. [#4905](https://github.com/statamic/cms/issues/4905) by @jackmcdade
+- Fix issue where the wrong entry's values could appear on the front-end. [#4918](https://github.com/statamic/cms/issues/4918) by @jasonvarga
 - Bumped TailwindCSS to 1.9.6. [a307c78bd](https://github.com/statamic/cms/commit/a307c78bd) by @jackmcdade
 
 
