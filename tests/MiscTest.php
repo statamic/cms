@@ -16,6 +16,7 @@ class MiscTest extends TestCase
     /**
      * @test
      * @dataProvider localesTagTestProvider
+     *
      * @see https://github.com/statamic/cms/issues/4839
      **/
     public function locales_tag_doesnt_ruin_future_tag_pairs($withParameter)
@@ -67,11 +68,13 @@ EOT;
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/4889
      **/
     public function fieldtype_gets_correct_parent_in_loop()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public static function handle()
             {
                 return 'custom';
