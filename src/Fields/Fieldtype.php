@@ -50,7 +50,7 @@ abstract class Fieldtype implements Arrayable
 
     public function setField(Field $field)
     {
-        $this->field = $field;
+        $this->field = clone $field;
 
         return $this;
     }
