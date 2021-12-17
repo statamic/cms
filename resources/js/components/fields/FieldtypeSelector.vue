@@ -131,24 +131,18 @@ export default {
         },
 
         groupedFieldtypes() {
-            let groupedFieldtypes = [];
-
-            _.mapObject(this.categories, (category, handle) => {
-                let group = category;
-                let fieldtypes = [];
-                group.handle = handle;
+            return _.mapObject(this.categories, (category, handle) => {
+                category.handle = handle;
+                category.fieldtypes = [];
 
                 this.allFieldtypes.forEach(fieldtype => {
                     let categories = fieldtype.categories;
                     if (categories.length === 0) categories = ['special'];
-                    if (categories.includes(handle)) fieldtypes.push(fieldtype);
+                    if (categories.includes(handle)) category.fieldtypes.push(fieldtype);
                 })
 
-                group.fieldtypes = fieldtypes;
-                groupedFieldtypes.push(group);
+                return category;
             });
-
-            return groupedFieldtypes;
         },
 
         filters() {
