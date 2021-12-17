@@ -8,7 +8,6 @@ class ButtonGroup extends Fieldtype
 {
     use HasSelectOptions;
 
-    protected $categories = ['controls'];
     protected $indexComponent = 'tags';
 
     protected function configFieldItems(): array

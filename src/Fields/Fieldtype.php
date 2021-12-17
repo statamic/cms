@@ -26,7 +26,7 @@ abstract class Fieldtype implements Arrayable
     protected $defaultable = true;
     protected $selectable = true;
     protected $selectableInForms = false;
-    protected $categories = [];
+    protected $categories = ['text'];
     protected $rules = [];
     protected $extraRules = [];
     protected $defaultValue;

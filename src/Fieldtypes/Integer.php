@@ -7,7 +7,6 @@ use Statamic\Fields\Fieldtype;
 
 class Integer extends Fieldtype
 {
-    protected $categories = ['number'];
     protected $rules = ['integer'];
     protected $selectableInForms = true;
 

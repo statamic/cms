@@ -6,7 +6,6 @@ use Statamic\Fields\Fieldtype;
 
 class Floatval extends Fieldtype
 {
-    protected $categories = ['number'];
     protected $icon = 'float';
     protected $rules = ['numeric'];
     protected static $handle = 'float';

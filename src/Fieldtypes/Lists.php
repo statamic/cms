@@ -7,7 +7,6 @@ use Statamic\Fields\Fieldtype;
 
 class Lists extends Fieldtype
 {
-    protected $categories = ['structured', 'text'];
     protected static $handle = 'list';
 
     protected function configFieldItems(): array

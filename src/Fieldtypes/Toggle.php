@@ -7,7 +7,6 @@ use Statamic\Fields\Fieldtype;
 
 class Toggle extends Fieldtype
 {
-    protected $categories = ['controls'];
     protected $defaultValue = false;
 
     protected function configFieldItems(): array

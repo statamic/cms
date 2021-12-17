@@ -8,7 +8,6 @@ class Select extends Fieldtype
 {
     use HasSelectOptions;
 
-    protected $categories = ['controls'];
     protected $selectableInForms = true;
     protected $indexComponent = 'tags';
 

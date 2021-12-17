@@ -116,6 +116,19 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
+    public function it_belongs_to_the_text_category_by_default()
+    {
+        $this->assertEquals(['text'], (new TestFieldtype)->categories());
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $categories = ['foo', 'bar'];
+        };
+
+        $this->assertEquals(['foo', 'bar'], $fieldtype->categories());
+    }
+
+    /** @test */
     public function it_can_be_flagged_as_hidden_from_the_fieldtype_selector()
     {
         $this->assertTrue((new TestFieldtype)->selectable());
@@ -139,7 +152,7 @@ class FieldtypeTest extends TestCase
             'localizable' => true,
             'validatable' => true,
             'defaultable' => true,
-            'categories' => [],
+            'categories' => ['text'],
             'icon' => 'test',
             'config' => [],
         ], $fieldtype->toArray());

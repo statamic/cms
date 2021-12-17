@@ -11,7 +11,6 @@ use Statamic\Support\Str;
 
 class Grid extends Fieldtype
 {
-    protected $categories = ['structured'];
     protected $defaultable = false;
     protected $defaultValue = [];
 

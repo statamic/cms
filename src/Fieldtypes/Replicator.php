@@ -13,7 +13,6 @@ use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
-    protected $categories = ['structured'];
     protected $defaultValue = [];
     protected $rules = ['array'];
 

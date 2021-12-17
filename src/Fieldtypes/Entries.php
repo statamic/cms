@@ -20,7 +20,6 @@ class Entries extends Relationship
 {
     use QueriesFilters;
 
-    protected $categories = ['relationship'];
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;

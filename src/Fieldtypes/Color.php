@@ -6,8 +6,6 @@ use Statamic\Fields\Fieldtype;
 
 class Color extends Fieldtype
 {
-    protected $categories = ['special'];
-
     protected function configFieldItems(): array
     {
         return [

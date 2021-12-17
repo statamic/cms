@@ -6,7 +6,6 @@ module.exports = {
       'md': '768px',
       'lg': '992px',
       'xl': '1200px',
-      '2xl': '1440px',
     },
     colors: {
       'transparent':  'transparent',
@@ -134,7 +133,6 @@ module.exports = {
       '2xs':  '12px',
       'xs':   '13px',
       'sm':   '14px',
-      'md':   '15px',
       'base': '16px',
       'lg':   '18px',
       'xl':   '21px',

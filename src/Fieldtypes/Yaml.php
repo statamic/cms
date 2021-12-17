@@ -7,8 +7,6 @@ use Statamic\Fields\Fieldtype;
 
 class Yaml extends Fieldtype
 {
-    protected $categories = ['special'];
-
     protected function configFieldItems(): array
     {
         return [
