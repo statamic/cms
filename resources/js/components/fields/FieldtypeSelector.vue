@@ -1,6 +1,6 @@
 <template>
 
-    <div class="h-full bg-white overflow-auto">
+    <div class="h-full bg-grey-10 overflow-auto">
         <div class="bg-grey-30 px-3 py-1 border-b text-lg font-medium flex items-center justify-between">
             {{ __('Fieldtypes') }}
             <button type="button" class="btn-close" @click="close">×</button>
@@ -10,25 +10,40 @@
             <loading-graphic />
         </div>
 
-        <div class="py-2 px-3 border-b bg-grey-10 mb-2 flex items-center" v-if="fieldtypesLoaded">
-            <input type="text" class="input-text flex-1 mr-2 bg-white text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
-            <div class="flex items-center">
-                <button @click="switchFilter('all')" class="btn-flat" :class="{'bg-grey-50': filterBy == 'all'}">{{ __('All') }}</button>
-                <button @click="switchFilter(filter)" v-for="filter in filteredFilters" class="btn-flat ml-1" :class="{'bg-grey-50': filterBy == filter}">
-                    {{ filterLabels[filter] }}
-                </button>
-            </div>
+        <div class="py-2 px-3 border-b bg-white flex items-center" v-if="fieldtypesLoaded">
+            <input type="text" class="input-text flex-1 bg-white text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
         </div>
 
-        <div class="p-2 pt-0" v-if="fieldtypesLoaded">
-            <div class="fieldtype-selector">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-x-2 gap-y-sm">
-                    <div class="p-1" v-for="option in fieldtypeOptions">
-                        <a class="border flex items-center group w-full rounded hover:border-grey-50 shadow-sm py-1 px-1.5"
-                            @click="select(option)">
-                            <svg-icon class="h-4 w-4 text-grey-80 group-hover:text-blue" :name="option.icon" default="generic-field"></svg-icon>
-                            <span class="pl-1.5 text-grey-80 text-md group-hover:text-blue">{{ option.text }}</span>
-                        </a>
+        <div class="p-2" v-if="fieldtypesLoaded">
+            <div v-if="isSearching">
+                <div class="fieldtype-selector">
+                    <div class="fieldtype-list">
+                        <div class="p-1" v-for="fieldtype in searchFieldtypes" :key="fieldtype.handle">
+                            <button class="bg-white border border-grey-50 flex items-center group w-full rounded hover:border-grey-60 shadow-sm hover:shadow-md pr-1.5"
+                                @click="select(fieldtype)">
+                                <div class="p-1 border-r flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
+                                    <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
+                                </div>
+                                <span class="pl-1.5 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else v-for="group in groupedFieldtypes" :key="group.handle" class="mb-4">
+                <h2 v-text="group.title" class="px-1 mb-sm" />
+                <p v-text="group.description" class="px-1 mb-1 text-grey-70 text-sm"/>
+                <div class="fieldtype-selector">
+                    <div class="fieldtype-list">
+                        <div class="p-1" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                            <button class="bg-white border border-grey-50 flex items-center group w-full rounded hover:border-grey-60 shadow-sm hover:shadow-md pr-1.5"
+                                @click="select(fieldtype)">
+                                <div class="p-1 flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
+                                    <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
+                                </div>
+                                <span class="pl-1.5 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -61,16 +76,35 @@ export default {
 
     data: function() {
         return {
-            isActive: false,
-            filterBy: 'all',
-            filterLabels: {
-                controls: __('Controls'),
-                media: __('Media'),
-                structured: __('Structured'),
-                relationship: __('Relationship'),
-                special: __('Special'),
-                system: __('System'),
-                text: __('Text'),
+            categories: {
+                text: {
+                    title: __('Text & Rich Content'),
+                    description: __('Fields that store strings of text, rich content, or both.'),
+                },
+                controls: {
+                    title: __('Buttons & Controls'),
+                    description: __('Fields that provide selectable options or buttons that can control logic.'),
+                },
+                media: {
+                    title: __('Media'),
+                    description: __('Fields that store images, videos, or other media.'),
+                },
+                number: {
+                    title: __('Number'),
+                    description: __('Fields that store numbers.'),
+                },
+                relationship: {
+                    title: __('Relationship'),
+                    description: __('Fields that store relationships to other resources.'),
+                },
+                structured: {
+                    title: __('Structured'),
+                    description: __('Fields that store structured data. Some can even nest other fields inside themselves.'),
+                },
+                special: {
+                    title: __('Special'),
+                    description: __('These fields are special, each in their own way.'),
+                },
             },
             search: ''
         }
@@ -96,29 +130,32 @@ export default {
             return options;
         },
 
-        categories() {
-            let categories = [];
+        groupedFieldtypes() {
+            let groupedFieldtypes = [];
 
-            this.fieldtypes.map(fieldtype => {
-                fieldtype.categories.map(category => {
-                    if (!categories.includes(category)) categories.push(category);
-                });
-            })
+            _.mapObject(this.categories, (category, handle) => {
+                let group = category;
+                let fieldtypes = [];
+                group.handle = handle;
 
+                this.allFieldtypes.forEach(fieldtype => {
+                    if (fieldtype.categories.includes(handle)) {
+                        fieldtypes.push(fieldtype);
+                    }
+                })
 
-            console.log(categories);
+                group.fieldtypes = fieldtypes;
+                groupedFieldtypes.push(group);
+            });
 
-            return categories;
-
-            // return this.fieldtypes grouped by all fieldtype.categories values
-
+            return groupedFieldtypes;
         },
 
         filters() {
             return Object.keys(this.filterLabels);
         },
 
-        searchFilteredFieldtypes() {
+        searchFieldtypes() {
             let options = this.allFieldtypes;
 
             if (this.search) {
@@ -133,22 +170,6 @@ export default {
             }
 
             return options;
-        },
-
-        fieldtypeOptions() {
-            const options = this.searchFilteredFieldtypes;
-
-            return this.filterBy === 'all'
-                ? options
-                : options.filter(fieldtype => fieldtype.categories.includes(this.filterBy.toLowerCase()));
-        },
-
-        filteredFilters() {
-            if (!this.search && this.allowMeta) return this.filters;
-
-            return this.filters.filter(filter => {
-                return this.searchFilteredFieldtypes.filter(fieldtype => fieldtype.categories.includes(filter)).length;
-            });
         },
 
         allowMeta() {
