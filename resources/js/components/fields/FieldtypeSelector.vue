@@ -139,9 +139,9 @@ export default {
                 group.handle = handle;
 
                 this.allFieldtypes.forEach(fieldtype => {
-                    if (fieldtype.categories.includes(handle)) {
-                        fieldtypes.push(fieldtype);
-                    }
+                    let categories = fieldtype.categories;
+                    if (categories.length === 0) categories = ['special'];
+                    if (categories.includes(handle)) fieldtypes.push(fieldtype);
                 })
 
                 group.fieldtypes = fieldtypes;
