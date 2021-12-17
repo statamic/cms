@@ -10,6 +10,7 @@ use Statamic\Support\Str;
 abstract class AbstractAugmented implements Augmented
 {
     protected $data;
+    protected $blueprintFields;
 
     public function __construct($data)
     {
@@ -90,8 +91,12 @@ abstract class AbstractAugmented implements Augmented
 
     protected function blueprintFields()
     {
-        return (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
-            ? $blueprint->fields()->all()
-            : collect();
+        if (! isset($this->blueprintFields)) {
+            $this->blueprintFields = (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
+                ? $blueprint->fields()->all()
+                : collect();
+        }
+
+        return $this->blueprintFields;
     }
 }
