@@ -8,6 +8,7 @@ use Statamic\GraphQL\Types\ArrayType;
 
 class Arr extends Fieldtype
 {
+    protected $categories = ['structured'];
     protected static $handle = 'array';
 
     protected function configFieldItems(): array

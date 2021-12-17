@@ -7,6 +7,8 @@ use Statamic\Fields\Fieldtype;
 
 class Range extends Fieldtype
 {
+    protected $categories = ['controls'];
+
     protected function configFieldItems(): array
     {
         return [
