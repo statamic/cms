@@ -138,7 +138,12 @@ class Locales extends Tags
             return null;
         }
 
-        return $localized->toAugmentedArray();
+        $defaultKeys = ['id', 'permalink', 'status', 'title', 'uri', 'url'];
+        $augmentKeys = $this->params->get('shallow', false)
+            ? array_merge($defaultKeys, explode('|', $this->params->get('augment_keys', '')))
+            : null;
+
+        return $localized->toAugmentedArray($augmentKeys);
     }
 
     /**
