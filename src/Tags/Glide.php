@@ -165,6 +165,15 @@ class Glide extends Tags
      */
     private function generateGlideUrl($item)
     {
+        static $urls = [];
+
+        $token = is_string($item)
+            ? $item.'?'.http_build_query($this->params->except(['src', 'id', 'path'])->sortKeys()->all())
+            : null;
+        if ($token && isset($urls[$token])) {
+            return $urls[$token];
+        }
+
         try {
             $url = $this->isResizable($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
@@ -174,6 +183,10 @@ class Glide extends Tags
         }
 
         $url = ($this->params->bool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+
+        if ($token !== null) {
+            $urls[$token] = $url;
+        }
 
         return $url;
     }
