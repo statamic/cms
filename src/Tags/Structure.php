@@ -14,6 +14,15 @@ use Statamic\Support\Str;
 
 class Structure extends Tags
 {
+    protected $siteCurrentUrl;
+    protected $siteAbsoluteUrl;
+
+    public function __construct()
+    {
+        $this->siteCurrentUrl = URL::getCurrent();
+        $this->siteAbsoluteUrl = Site::current()->absoluteUrl();
+    }
+
     public function wildcard($tag)
     {
         $handle = $this->context->value($tag, $tag);
@@ -70,6 +79,9 @@ class Structure extends Tags
             $data = $page->toAugmentedArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
+            $currentUrl = $page->urlWithoutRedirect();
+            $absoluteUrl = $page->absoluteUrl();
+
             return array_merge($data, [
                 'children'    => $children,
                 'parent'      => $parent,
@@ -78,9 +90,9 @@ class Structure extends Tags
                 'count'       => $index + 1,
                 'first'       => $index === 0,
                 'last'        => $index === count($tree) - 1,
-                'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->urlWithoutRedirect(), '/'),
-                'is_parent'   => Site::current()->absoluteUrl() === $page->absoluteUrl() ? false : URL::isAncestorOf(URL::getCurrent(), $page->urlWithoutRedirect()),
-                'is_external' => URL::isExternal($page->absoluteUrl()),
+                'is_current'  => rtrim($this->siteCurrentUrl, '/') === rtrim($currentUrl, '/'),
+                'is_parent'   => $this->siteAbsoluteUrl === $absoluteUrl ? false : URL::isAncestorOf($this->siteCurrentUrl, $currentUrl),
+                'is_external' => URL::isExternal($absoluteUrl),
             ]);
         })->filter()->values()->all();
     }
