@@ -79,31 +79,31 @@ export default {
             categories: {
                 text: {
                     title: __('Text & Rich Content'),
-                    description: __('Fields that store strings of text, rich content, or both.'),
+                    description: __('fieldtypes.picker.category.text.description'),
                 },
                 controls: {
                     title: __('Buttons & Controls'),
-                    description: __('Fields that provide selectable options or buttons that can control logic.'),
+                    description: __('fieldtypes.picker.category.controls.description'),
                 },
                 media: {
                     title: __('Media'),
-                    description: __('Fields that store images, videos, or other media.'),
+                    description: __('fieldtypes.picker.category.media.description'),
                 },
                 number: {
                     title: __('Number'),
-                    description: __('Fields that store numbers.'),
+                    description: __('fieldtypes.picker.category.number.description'),
                 },
                 relationship: {
                     title: __('Relationship'),
-                    description: __('Fields that store relationships to other resources.'),
+                    description: __('fieldtypes.picker.category.relationship.description'),
                 },
                 structured: {
                     title: __('Structured'),
-                    description: __('Fields that store structured data. Some can even nest other fields inside themselves.'),
+                    description: __('fieldtypes.picker.category.structured.description'),
                 },
                 special: {
                     title: __('Special'),
-                    description: __('These fields are special, each in their own way.'),
+                    description: __('fieldtypes.picker.category.special.description'),
                 },
             },
             search: ''
