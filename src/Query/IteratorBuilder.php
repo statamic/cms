@@ -49,14 +49,43 @@ abstract class IteratorBuilder extends Builder
         return $items->slice($this->offset, $this->limit);
     }
 
-    protected function filterWheres($entries)
+    protected function filterWheres($entries, $wheres = null)
     {
-        foreach ($this->wheres as $where) {
-            $method = 'filterWhere'.$where['type'];
-            $entries = $this->{$method}($entries, $where);
+        if (! $wheres = $wheres ?? $this->wheres) {
+            return $entries;
         }
 
-        return $entries->values();
+        $originalEntries = $entries->values();
+
+        return collect($wheres)->reduce(function ($entries, $where) use ($originalEntries) {
+            $newEntries = $where['type'] == 'Nested'
+                ? $this->filterWheres($originalEntries, $where['query']->wheres)
+                : $this->filterWhere($originalEntries, $where);
+
+            return $this->intersectFromWhereClause($entries, $newEntries, $where);
+        });
+    }
+
+    protected function filterWhere($entries, $where)
+    {
+        $method = 'filterWhere'.$where['type'];
+
+        return $this->{$method}($entries, $where);
+    }
+
+    protected function intersectFromWhereClause($entries, $filteredEntries, $where)
+    {
+        // On the first iteration, there's nothing to intersect;
+        // Just use the new entries as a starting point.
+        if (! $entries) {
+            return $filteredEntries->values();
+        }
+
+        // If it's a `orWhere` or `orWhereIn`, concatenate the new entries;
+        // Otherwise, intersect to ensure each where is respected.
+        return $where['boolean'] === 'or' && $where['type'] !== 'NotIn'
+            ? $entries->concat($filteredEntries)->unique()->values()
+            : $entries->intersect($filteredEntries)->values();
     }
 
     protected function filterWhereIn($entries, $where)

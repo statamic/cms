@@ -329,7 +329,7 @@ GQL;
                                 'slug' => 'standard-blog-post',
                                 'intro' => 'The intro',
                                 'foo' => 'bar',
-                                'edit_url' => 'http://localhost/cp/collections/blog/entries/1/standard-blog-post',
+                                'edit_url' => 'http://localhost/cp/collections/blog/entries/1',
                             ],
                             'children' => [
                                 [

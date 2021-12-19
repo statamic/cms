@@ -1,7 +1,7 @@
 <template>
 
-    <div class="h-full bg-white overflow-auto">
-        <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+    <div class="h-full bg-grey-10 overflow-auto">
+        <div class="bg-grey-30 px-3 py-1 border-b text-lg font-medium flex items-center justify-between">
             {{ __('Fieldtypes') }}
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
@@ -10,28 +10,40 @@
             <loading-graphic />
         </div>
 
-        <div class="p-3" v-if="fieldtypesLoaded">
-            <div class="filter mb-0">
-                <a @click="filterBy = 'all'" :class="{'active': filterBy == 'all'}">{{ __('All') }}</a>
-                <a @click="filterBy = filter" v-for="filter in filteredFilters" :class="{'active': filterBy == filter}">
-                    {{ filterLabels[filter] }}
-                </a>
-                <a @click.prevent="openSearch" :class="['no-dot', {'active': search}]"><span class="icon icon-magnifying-glass"></span></a>
-            </div>
+        <div class="py-2 px-3 border-b bg-white flex items-center" v-if="fieldtypesLoaded">
+            <input type="text" class="input-text flex-1 bg-white text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
         </div>
 
-        <div class="p-3 pt-0" v-if="fieldtypesLoaded">
-            <div class="fieldtype-selector">
-                <div :class="['search', { 'is-searching': isSearching }]">
-                    <input type="text" v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
+        <div class="p-2" v-if="fieldtypesLoaded">
+            <div v-if="isSearching">
+                <div class="fieldtype-selector">
+                    <div class="fieldtype-list">
+                        <div class="p-1" v-for="fieldtype in searchFieldtypes" :key="fieldtype.handle">
+                            <button class="bg-white border border-grey-50 flex items-center group w-full rounded hover:border-grey-60 shadow-sm hover:shadow-md pr-1.5"
+                                @click="select(fieldtype)">
+                                <div class="p-1 border-r flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
+                                    <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
+                                </div>
+                                <span class="pl-1.5 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="fieldtype-list">
-                    <div class="p-1" v-for="option in fieldtypeOptions">
-                        <a class="border flex items-center group w-full rounded shadow-sm py-1 px-2"
-                            @click="select(option)">
-                            <svg-icon class="h-4 w-4 text-grey-80 group-hover:text-blue" :name="option.icon"></svg-icon>
-                            <span class="pl-2 text-grey-80 group-hover:text-blue">{{ option.text }}</span>
-                        </a>
+            </div>
+            <div v-else v-for="group in groupedFieldtypes" :key="group.handle" class="mb-4">
+                <h2 v-text="group.title" class="px-1 mb-sm" />
+                <p v-text="group.description" class="px-1 mb-1 text-grey-70 text-sm"/>
+                <div class="fieldtype-selector">
+                    <div class="fieldtype-list">
+                        <div class="p-1" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                            <button class="bg-white border border-grey-50 flex items-center group w-full rounded hover:border-grey-60 shadow-sm hover:shadow-md pr-1.5"
+                                @click="select(fieldtype)">
+                                <div class="p-1 flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
+                                    <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
+                                </div>
+                                <span class="pl-1.5 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -64,19 +76,37 @@ export default {
 
     data: function() {
         return {
-            isActive: false,
-            filterBy: 'all',
-            filterLabels: {
-                text: __('Text'),
-                media: __('Media'),
-                pickable: __('Pickable'),
-                structured: __('Structured'),
-                relationship: __('Relationship'),
-                special: __('Special'),
-                system: __('System')
+            categories: {
+                text: {
+                    title: __('Text & Rich Content'),
+                    description: __('fieldtypes.picker.category.text.description'),
+                },
+                controls: {
+                    title: __('Buttons & Controls'),
+                    description: __('fieldtypes.picker.category.controls.description'),
+                },
+                media: {
+                    title: __('Media'),
+                    description: __('fieldtypes.picker.category.media.description'),
+                },
+                number: {
+                    title: __('Number'),
+                    description: __('fieldtypes.picker.category.number.description'),
+                },
+                relationship: {
+                    title: __('Relationship'),
+                    description: __('fieldtypes.picker.category.relationship.description'),
+                },
+                structured: {
+                    title: __('Structured'),
+                    description: __('fieldtypes.picker.category.structured.description'),
+                },
+                special: {
+                    title: __('Special'),
+                    description: __('fieldtypes.picker.category.special.description'),
+                },
             },
-            search: '',
-            isSearchOpen: false
+            search: ''
         }
     },
 
@@ -100,11 +130,26 @@ export default {
             return options;
         },
 
+        groupedFieldtypes() {
+            return _.mapObject(this.categories, (category, handle) => {
+                category.handle = handle;
+                category.fieldtypes = [];
+
+                this.allFieldtypes.forEach(fieldtype => {
+                    let categories = fieldtype.categories;
+                    if (categories.length === 0) categories = ['special'];
+                    if (categories.includes(handle)) category.fieldtypes.push(fieldtype);
+                })
+
+                return category;
+            });
+        },
+
         filters() {
             return Object.keys(this.filterLabels);
         },
 
-        searchFilteredFieldtypes() {
+        searchFieldtypes() {
             let options = this.allFieldtypes;
 
             if (this.search) {
@@ -121,28 +166,12 @@ export default {
             return options;
         },
 
-        fieldtypeOptions() {
-            const options = this.searchFilteredFieldtypes;
-
-            return this.filterBy === 'all'
-                ? options
-                : options.filter(fieldtype => fieldtype.categories.includes(this.filterBy.toLowerCase()));
-        },
-
-        filteredFilters() {
-            if (!this.search && this.allowMeta) return this.filters;
-
-            return this.filters.filter(filter => {
-                return this.searchFilteredFieldtypes.filter(fieldtype => fieldtype.categories.includes(filter)).length;
-            });
-        },
-
         allowMeta() {
             return this.allowTitle || this.allowSlug || this.allowDate;
         },
 
         isSearching() {
-            return this.search || this.isSearchOpen;
+            return this.search;
         }
     },
 
@@ -231,8 +260,8 @@ export default {
             this.$emit('closed');
         },
 
-        openSearch() {
-            this.isSearchOpen = true;
+        switchFilter(filter) {
+            this.filterBy = filter;
             this.$refs.search.focus();
         },
 
@@ -240,7 +269,6 @@ export default {
             if (! this.search) return;
 
             event.stopPropagation();
-            this.isSearchOpen = false;
             this.search = '';
         }
 

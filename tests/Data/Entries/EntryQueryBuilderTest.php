@@ -143,4 +143,55 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(4, $entries);
         $this->assertEquals(['Post 1', 'Post 3', 'Post 2', 'Post 4'], $entries->map->title->all());
     }
+
+    /** @test **/
+    public function entries_are_found_using_nested_where()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+        EntryFactory::id('6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6'])->create();
+
+        $entries = Entry::query()
+            ->where(function ($query) {
+                $query->where('title', 'Post 1');
+            })
+            ->orWhere(function ($query) {
+                $query->where('title', 'Post 3')->orWhere('title', 'Post 4');
+            })
+            ->orWhere('title', 'Post 6')
+            ->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['1', '3', '4', '6'], $entries->map->id()->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_nested_where_in()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+        EntryFactory::id('6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6'])->create();
+        EntryFactory::id('7')->slug('post-7')->collection('posts')->data(['title' => 'Post 7'])->create();
+        EntryFactory::id('8')->slug('post-8')->collection('posts')->data(['title' => 'Post 8'])->create();
+        EntryFactory::id('9')->slug('post-9')->collection('posts')->data(['title' => 'Post 9'])->create();
+
+        $entries = Entry::query()
+            ->where(function ($query) {
+                $query->whereIn('title', ['Post 1', 'Post 2']);
+            })
+            ->orWhere(function ($query) {
+                $query->where('title', 'Post 4')->orWhereIn('title', ['Post 6', 'Post 7']);
+            })
+            ->orWhere('title', 'Post 9')
+            ->get();
+
+        $this->assertCount(6, $entries);
+        $this->assertEquals(['1', '2', '4', '6', '7', '9'], $entries->map->id()->all());
+    }
 }

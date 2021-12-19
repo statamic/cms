@@ -22,7 +22,7 @@ class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls;
 
-    public $category = ['text', 'structured'];
+    protected $categories = ['text', 'structured'];
     protected $defaultValue = '[]';
     protected $rules = [];
 
