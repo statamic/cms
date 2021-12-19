@@ -31,6 +31,11 @@ class RuntimeValueCache
         return null;
     }
 
+    public static function resetRuntimeCache()
+    {
+        self::$runtimeValueCache = [];
+    }
+
     protected static function getRawKey($value)
     {
         if (is_object($value)) {

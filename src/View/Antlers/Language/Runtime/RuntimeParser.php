@@ -27,6 +27,7 @@ use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -268,6 +269,8 @@ class RuntimeParser implements ParserContract
      */
     protected function renderText($text, $data = [])
     {
+        RuntimeValueCache::resetRuntimeCache();
+
         $text = $this->runPreParserCallbacks($text);
 
         if (! $this->canPossiblyParseAntlers($text)) {
