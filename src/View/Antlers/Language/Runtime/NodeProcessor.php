@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use ParseError;
 use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Entries\EntryCollection;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\ModifierException;
@@ -1558,9 +1559,7 @@ class NodeProcessor
                                             }
                                         }
 
-                                        if ($val instanceof Collection) {
-                                            $val = $val->toArray();
-                                        } elseif ($val instanceof  Value) {
+                                        if ($val instanceof  Value) {
                                             if ($val->shouldParseAntlers()) {
                                                 GlobalRuntimeState::$isEvaluatingUserData = true;
                                                 $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
@@ -1568,6 +1567,10 @@ class NodeProcessor
                                             } else {
                                                 $val = $val->value();
                                             }
+                                        }
+
+                                        if ($val instanceof Collection) {
+                                            $val = $val->values()->all();
                                         }
 
                                         if ($val instanceof AntlersString) {
