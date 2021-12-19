@@ -10,7 +10,6 @@ use InvalidArgumentException;
 use ParseError;
 use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Entries\EntryCollection;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\ModifierException;
