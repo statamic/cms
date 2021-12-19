@@ -85,8 +85,14 @@ class View
         $contents = view($this->templateViewName(), $cascade);
 
         if ($this->shouldUseLayout()) {
+            if (Str::endsWith($this->layoutViewPath(), '.blade.php')) {
+                $renderedContent = $contents->render();
+            } else {
+                $renderedContent = $contents->withoutExtractions()->render();
+            }
+
             $contents = view($this->layoutViewName(), array_merge($cascade, [
-                'template_content' => $contents->withoutExtractions()->render(),
+                'template_content' => $renderedContent,
             ]));
         }
 
