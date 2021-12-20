@@ -29,11 +29,11 @@ class CompactTest extends TestCase
     public function compact_coverts_variables_to_array()
     {
         $template = <<<'EOT'
-{{ foreach :array="'view:var_one, view:var_two, title, nested:variable:path'|compact" }}{{ value }}-{{ /foreach }}
+{{ foreach :array="'view:var_one, view:var_two, title, nested:variable:path'|compact" }}<{{ value }}>{{ /foreach }}
 EOT;
 
         $this->assertSame(
-            'value one-value two-Hello, there!-nested-value-',
+            '<value one><value two><Hello, there!><nested-value>',
             $this->tag($template, $this->data)
         );
     }
