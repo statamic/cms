@@ -46,8 +46,6 @@ export default {
     mixins: [ProvidesFieldtypes],
 
     props: {
-        onSelect: {},
-        show: {},
         allowTitle: {
             default: false
         },
@@ -97,10 +95,6 @@ export default {
 
     computed: {
 
-        fieldtypeSelectionText: function() {
-            return _.findWhere(this.fieldtypesSelectOptions, { value: this.fieldtypeSelection }).text;
-        },
-
         allFieldtypes() {
             if (!this.fieldtypesLoaded) return [];
 
@@ -128,10 +122,6 @@ export default {
 
                 return category;
             });
-        },
-
-        filters() {
-            return Object.keys(this.filterLabels);
         },
 
         searchFieldtypes() {
@@ -167,10 +157,6 @@ export default {
     },
 
     watch: {
-
-        show(val) {
-            if (val) this.$refs.search.focus();
-        },
 
         fieldtypesLoaded: {
             immediate: true,
@@ -249,11 +235,6 @@ export default {
             this.search = '';
             this.filterBy = 'all';
             this.$emit('closed');
-        },
-
-        switchFilter(filter) {
-            this.filterBy = filter;
-            this.$refs.search.focus();
         },
 
         cancelSearch(event) {
