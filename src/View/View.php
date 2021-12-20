@@ -6,6 +6,7 @@ use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
 use Statamic\View\Events\ViewRendered;
 
@@ -85,10 +86,10 @@ class View
         $contents = view($this->templateViewName(), $cascade);
 
         if ($this->shouldUseLayout()) {
-            if (Str::endsWith($this->layoutViewPath(), '.blade.php')) {
-                $renderedContent = $contents->render();
-            } else {
+            if (Str::endsWith($this->layoutViewPath(), Engine::EXTENSIONS)) {
                 $renderedContent = $contents->withoutExtractions()->render();
+            } else {
+                $renderedContent = $contents->render();
             }
 
             $contents = view($this->layoutViewName(), array_merge($cascade, [
