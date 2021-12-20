@@ -71,7 +71,7 @@ class StaticWarm extends Command
         $promise->wait();
     }
 
-    public function concurrency(): int
+    private function concurrency(): int
     {
         $strategy = config('statamic.static_caching.strategy');
 
