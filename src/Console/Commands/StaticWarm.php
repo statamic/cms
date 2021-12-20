@@ -58,6 +58,7 @@ class StaticWarm extends Command
         $this->line('Compiling URLs...');
 
         $pool = new Pool($client, $this->requests(), [
+            'concurrency' => $this->concurrency(),
             'fulfilled' => [$this, 'outputSuccessLine'],
             'rejected' => [$this, 'outputFailureLine'],
         ]);
@@ -68,6 +69,13 @@ class StaticWarm extends Command
         $this->line('Visiting URLs...');
 
         $promise->wait();
+    }
+
+    private function concurrency(): int
+    {
+        $strategy = config('statamic.static_caching.strategy');
+
+        return config("statamic.static_caching.strategies.$strategy.warm_concurrency", 25);
     }
 
     public function outputSuccessLine(Response $response, $index): void
