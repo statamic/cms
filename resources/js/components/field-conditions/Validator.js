@@ -9,7 +9,7 @@ export default class {
     constructor(field, values, store, storeName) {
         this.field = field;
         this.values = values;
-        this.rootValues = store.state.publish[storeName].values;
+        this.rootValues = store ? store.state.publish[storeName].values : false;
         this.store = store;
         this.storeName = storeName;
         this.passOnAny = false;
