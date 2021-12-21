@@ -87,13 +87,11 @@ class View
 
         if ($this->shouldUseLayout()) {
             if (Str::endsWith($this->layoutViewPath(), Engine::EXTENSIONS)) {
-                $renderedContent = $contents->withoutExtractions()->render();
-            } else {
-                $renderedContent = $contents->render();
+                $contents = $contents->withoutExtractions();
             }
 
             $contents = view($this->layoutViewName(), array_merge($cascade, [
-                'template_content' => $renderedContent,
+                'template_content' => $contents->render(),
             ]));
         }
 
