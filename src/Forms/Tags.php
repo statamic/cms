@@ -196,7 +196,7 @@ class Tags extends BaseTags
     {
         return $this->form()->fields()
             ->map(function ($field) use ($sessionHandle) {
-                return $this->getRenderableField($field, $sessionHandle);
+                return $this->getRenderableField($field, $sessionHandle, $this->params->get('alpine'));
             })
             ->values()
             ->all();
