@@ -18,7 +18,7 @@ class AssetContainersController extends CpController
 
     public function index(Request $request)
     {
-        $containers = AssetContainer::all()->filter(function ($container) {
+        $containers = AssetContainer::all()->sortBy->title()->filter(function ($container) {
             return User::current()->can('view', $container);
         })->map(function ($container) {
             return [
