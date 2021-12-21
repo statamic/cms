@@ -373,7 +373,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function order()
     {
         if (! $this->hasStructure()) {
-            return null;
+            return $this->value('order');
         }
 
         return $this->structure()->in($this->locale())
