@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Concerns;
 
 use Illuminate\Support\MessageBag;
+use Statamic\Support\Html;
 
 trait RendersForms
 {
@@ -101,7 +102,7 @@ trait RendersForms
     {
         $xData = collect($fieldHandles)
             ->mapWithKeys(function ($fieldHandle) {
-                return [$fieldHandle => ''];
+                return [$fieldHandle => old($fieldHandle)];
             })
             ->all();
 
