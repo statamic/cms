@@ -16,7 +16,7 @@
                 @deleted="deleteSection(i)"
             />
 
-            <div class="blueprint-add-section-container w-full md:w-1/2 2xl:w-1/3" v-if="!singleSection">
+            <div class="blueprint-add-section-container w-full md:w-1/2" v-if="!singleSection">
                 <button class="blueprint-add-section-button outline-none" @click="addSection">
                     <div class="text-center flex items-center leading-none">
                         <div class="text-2xl mr-1">+</div>

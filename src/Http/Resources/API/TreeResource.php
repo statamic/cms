@@ -10,6 +10,7 @@ class TreeResource extends JsonResource
 {
     protected $fields;
     protected $depth;
+    protected $site;
 
     /**
      * Set selected fields.
@@ -38,6 +39,19 @@ class TreeResource extends JsonResource
     }
 
     /**
+     * Set site.
+     *
+     * @param  string|null  $site
+     * @return $this
+     */
+    public function site($site = null)
+    {
+        $this->site = $site;
+
+        return $this;
+    }
+
+    /**
      * Transform the resource into an array.
      *
      * @param \Illuminate\Http\Request
@@ -49,7 +63,7 @@ class TreeResource extends JsonResource
             'structure' => $this->resource->structure(),
             'include_home' => true,
             'show_unpublished' => false,
-            'site' => Site::default()->handle(),
+            'site' => $this->site ?? Site::default()->handle(),
             'fields' => $this->fields,
             'max_depth' => $this->maxDepth,
         ]);

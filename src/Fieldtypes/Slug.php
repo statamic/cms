@@ -4,6 +4,8 @@ namespace Statamic\Fieldtypes;
 
 class Slug extends Text
 {
+    protected $categories = ['special'];
+
     protected function configFieldItems(): array
     {
         return [
