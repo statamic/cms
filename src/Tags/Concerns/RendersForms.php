@@ -80,11 +80,11 @@ trait RendersForms
             'error' => $errors->first($field->handle()) ?: null,
             'old' => old($field->handle()),
             'alpine' => $alpine,
-            'conditions' => $this->jsonEncodeForHtmlAttribute($field->conditions()),
         ]);
 
         if ($alpine) {
             $data['alpine_data_key'] = $this->getAlpineXDataKey($data['handle'], $alpine);
+            $data['conditions'] = $this->renderAlpineFieldConditions($field->conditions(), $alpine);
         }
 
         $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());
@@ -128,6 +128,26 @@ trait RendersForms
         return is_string($alpineScope)
             ? "{$alpineScope}.{$fieldHandle}"
             : $fieldHandle;
+    }
+
+    /**
+     * Get alpine field conditions.
+     *
+     * @param  array  $conditions
+     * @param  string  $alpineScope
+     * @return string
+     */
+    protected function renderAlpineFieldConditions($conditions, $alpineScope)
+    {
+        if (is_string($alpineScope)) {
+            $conditions = collect($conditions)->map(function ($fields) use ($alpineScope) {
+                return collect($fields)->mapWithKeys(function ($condition, $fieldHandle) use ($alpineScope) {
+                    return ["{$alpineScope}.{$fieldHandle}" => $condition];
+                });
+            });
+        }
+
+        return $this->jsonEncodeForHtmlAttribute($conditions);
     }
 
     /**
