@@ -242,6 +242,19 @@ abstract class Tree implements Contract, Localization
         return $this;
     }
 
+    public function appendWithChildren(Page $page, ?Page $parent = null): void
+    {
+        if ($parent === null) {
+            $this->append($page);
+        } else {
+            $this->appendTo($parent->id(), $page->id());
+        }
+
+        foreach ($page->pages()->all() as $childPage) {
+            $this->appendWithChildren($childPage, $page);
+        }
+    }
+
     public function appendTo($parent, $page)
     {
         if ($parent && ! $this->page($parent)) {

@@ -117,6 +117,67 @@ class DeleteEntryTest extends TestCase
     }
 
     /** @test */
+    public function it_can_delete_a_parent_entry_when_the_structure_has_a_root()
+    {
+        $this->withoutExceptionHandling();
+        $user = tap(User::make('test')->makeSuper())->save();
+        EntryFactory::id('root')->slug('four')->collection('test')->create();
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+        EntryFactory::id('2')->slug('two')->collection('test')->create();
+        EntryFactory::id('3')->slug('three')->collection('test')->create();
+        EntryFactory::id('4')->slug('three')->collection('test')->create();
+        EntryFactory::id('5')->slug('three')->collection('test')->create();
+        EntryFactory::id('6')->slug('three')->collection('test')->create();
+
+        $collection = tap(Collection::findByHandle('test')->structureContents([
+            'root' => true, // Important, since we're fixing the 'Root page can not have children' error
+            'max_depth' => 10,
+        ]))->save();
+
+        // Deleting Entry '1' should move the children to the end of the tree instead of an error.
+        $collection->structure()->in('en')->tree(
+            [
+                ['entry' => 'root'],
+                ['entry' => '1', 'children' => [
+                    ['entry' => '2'],
+                    ['entry' => '3', 'children' => [
+                        ['entry' => '5'],
+                        ['entry' => '4', 'children' => [
+                            ['entry' => '6'],
+                        ]],
+                    ]],
+                ]],
+            ]
+        )->save();
+        $originalStructure = $collection->structure();
+        $originalTree = $originalStructure->in('en');
+
+        $this->assertCount(7, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->deleteEntries(['1'])
+            ->assertOk();
+
+        $updatedCollection = Collection::findByHandle('test');
+        $updatedStructure = $updatedCollection->structure();
+        $updatedTree = $updatedStructure->in('en')->tree();
+
+        $this->assertEquals([
+            ['entry' => 'root'],
+            ['entry' => '2'],
+            ['entry' => '3', 'children' => [
+                ['entry' => '5'],
+                ['entry' => '4', 'children' => [
+                    ['entry' => '6'],
+                ]],
+            ]],
+        ], $updatedTree);
+
+        $this->assertNotSame($originalTree, $updatedTree);
+    }
+
+    /** @test */
     public function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_parent_and_maintain_order()
     {
         // TODO: This is a reminder that the previous test needs to have the following assertion swapped in.

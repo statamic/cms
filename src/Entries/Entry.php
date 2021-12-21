@@ -171,12 +171,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                         $parent = null;
                     }
                     $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                        /** @var $tree \Statamic\Structures\CollectionTree */
+                        /** @var $child \Statamic\Structures\Page */
+                        /** @var $parent null|\Statamic\Structures\Page */
+
                         // Prevent children of this entry from being moved to the root of the tree;
                         // But only if this entry doesn't have a parent, and the tree has a root.
                         // Instead, we'll just move the child entries to the end of the tree.
                         if ($parent === null && $tree->structure()->expectsRoot()) {
                             $tree->remove($child);
-                            $tree->append($child);
+                            $tree->appendWithChildren($child);
 
                             return;
                         }
