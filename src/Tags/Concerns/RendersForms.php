@@ -80,6 +80,7 @@ trait RendersForms
             'error' => $errors->first($field->handle()) ?: null,
             'old' => old($field->handle()),
             'alpine' => $alpine,
+            'conditions' => $this->jsonEncodeForHtmlAttribute($field->conditions()),
         ]);
 
         if ($alpine) {
@@ -112,7 +113,7 @@ trait RendersForms
             ];
         }
 
-        return str_replace('"', '\'', json_encode($xData));
+        return $this->jsonEncodeForHtmlAttribute($xData);
     }
 
     /**
@@ -127,6 +128,17 @@ trait RendersForms
         return is_string($alpineScope)
             ? "{$alpineScope}.{$fieldHandle}"
             : $fieldHandle;
+    }
+
+    /**
+     * Json encode for html attribute.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function jsonEncodeForHtmlAttribute($value)
+    {
+        return str_replace('"', '\'', json_encode($value));
     }
 
     /**
