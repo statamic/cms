@@ -86,7 +86,7 @@ trait RendersForms
             $data['alpine_data_key'] = $this->getAlpineXDataKey($data['handle'], $alpine);
         }
 
-        $data['field'] = view($field->fieldtype()->view(), $data);
+        $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());
 
         return $data;
     }
@@ -127,5 +127,19 @@ trait RendersForms
         return is_string($alpineScope)
             ? "{$alpineScope}.{$fieldHandle}"
             : $fieldHandle;
+    }
+
+    /**
+     * Minify field html.
+     *
+     * @param  string  $html
+     * @return string
+     */
+    protected function minifyFieldHtml($html)
+    {
+        // Trim whitespace between elements.
+        $html = preg_replace('/>\s*([^<>]*)\s*</', '>$1<', $html);
+
+        return $html;
     }
 }
