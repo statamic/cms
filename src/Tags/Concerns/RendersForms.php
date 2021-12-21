@@ -12,25 +12,28 @@ trait RendersForms
      * Open a form.
      *
      * @param  string  $action
+     * @param  string  $method
+     * @param  array  $knownTagParams
+     * @param  array  $additionalAttrs
      * @return string
      */
-    protected function formOpen($action, $method = 'POST', $knownTagParams = [])
+    protected function formOpen($action, $method = 'POST', $knownTagParams = [], $additionalAttrs = [])
     {
         $formMethod = $method === 'GET' ? 'GET' : 'POST';
 
-        $defaultAttrs = [
+        $attrs = array_merge([
             'method' => $formMethod,
             'action' => $action,
-        ];
+        ], $additionalAttrs);
 
         if ($this->params->bool('files')) {
-            $defaultAttrs['enctype'] = 'multipart/form-data';
+            $attrs['enctype'] = 'multipart/form-data';
         }
 
-        $defaultAttrs = $this->renderAttributes($defaultAttrs);
-        $additionalAttrs = $this->renderAttributesFromParams(array_merge(['method', 'action'], $knownTagParams));
+        $attrs = $this->renderAttributes($attrs);
+        $paramAttrs = $this->renderAttributesFromParams(array_merge(['method', 'action'], $knownTagParams));
 
-        $html = collect(['<form', $defaultAttrs, $additionalAttrs])->filter()->implode(' ').'>';
+        $html = collect(['<form', $attrs, $paramAttrs])->filter()->implode(' ').'>';
         $html .= csrf_field();
 
         $method = strtoupper($method);
