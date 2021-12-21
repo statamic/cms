@@ -75,8 +75,8 @@ class Tags extends BaseTags
 
         $attrs = [];
 
-        if ($this->params->get('alpine') === true) {
-            $attrs['x-data'] = $this->createAlpineFieldData($form);
+        if ($alpineScope = $this->params->get('alpine')) {
+            $attrs['x-data'] = $this->renderAlpineXData($form->fields()->keys(), $alpineScope);
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
@@ -255,14 +255,5 @@ class Tags extends BaseTags
         return URL::prependSiteUrl(
             config('statamic.routes.action').'/form/'.$url
         );
-    }
-
-    protected function createAlpineFieldData($form)
-    {
-        $defaultData = $form->fields()->map(function ($field) {
-            return '';
-        });
-
-        return str_replace('"', '\'', json_encode($defaultData));
     }
 }

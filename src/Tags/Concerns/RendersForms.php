@@ -68,7 +68,7 @@ trait RendersForms
      * Get field with extra data for rendering.
      *
      * @param  \Statamic\Fields\Field  $field
-     * @param  bool  $alpine
+     * @param  bool|string  $alpine
      * @return array
      */
     protected function getRenderableField($field, $errorBag = 'default', $alpine = false)
@@ -81,8 +81,50 @@ trait RendersForms
             'alpine' => $alpine,
         ]);
 
+        if ($alpine) {
+            $data['alpine_data_key'] = $this->getAlpineXDataKey($data['handle'], $alpine);
+        }
+
         $data['field'] = view($field->fieldtype()->view(), $data);
 
         return $data;
+    }
+
+    /**
+     * Render alpine x-data string for field handles, with scope if necessary.
+     *
+     * @param  array|\Illuminate\Support\Collection  $fieldHandles
+     * @param  bool|string  $alpineScope
+     * @return string
+     */
+    protected function renderAlpineXData($fieldHandles, $alpineScope)
+    {
+        $xData = collect($fieldHandles)
+            ->mapWithKeys(function ($fieldHandle) {
+                return [$fieldHandle => ''];
+            })
+            ->all();
+
+        if (is_string($alpineScope)) {
+            $xData = [
+                $alpineScope => $xData,
+            ];
+        }
+
+        return str_replace('"', '\'', json_encode($xData));
+    }
+
+    /**
+     * Get alpine x-data key, with scope if necessary.
+     *
+     * @param  string  $fieldHandle
+     * @param  bool|string  $alpineScope
+     * @return string
+     */
+    protected function getAlpineXDataKey($fieldHandle, $alpineScope)
+    {
+        return is_string($alpineScope)
+            ? "{$alpineScope}.{$fieldHandle}"
+            : $fieldHandle;
     }
 }
