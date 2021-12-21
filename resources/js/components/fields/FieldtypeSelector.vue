@@ -15,24 +15,9 @@
         </div>
 
         <div class="p-2" v-if="fieldtypesLoaded">
-            <div v-if="isSearching">
-                <div class="fieldtype-selector">
-                    <div class="fieldtype-list">
-                        <div class="p-1" v-for="fieldtype in searchFieldtypes" :key="fieldtype.handle">
-                            <button class="bg-white border border-grey-50 flex items-center group w-full rounded hover:border-grey-60 shadow-sm hover:shadow-md pr-1.5"
-                                @click="select(fieldtype)">
-                                <div class="p-1 border-r flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
-                                    <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
-                                </div>
-                                <span class="pl-1.5 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div v-else v-for="group in groupedFieldtypes" :key="group.handle" class="mb-4">
-                <h2 v-text="group.title" class="px-1 mb-sm" />
-                <p v-text="group.description" class="px-1 mb-1 text-grey-70 text-sm"/>
+            <div v-for="group in displayedFieldtypes" :key="group.handle" class="mb-4">
+                <h2 v-if="group.title" v-text="group.title" class="px-1 mb-sm" />
+                <p v-if="group.description" v-text="group.description" class="px-1 mb-1 text-grey-70 text-sm"/>
                 <div class="fieldtype-selector">
                     <div class="fieldtype-list">
                         <div class="p-1" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
@@ -61,8 +46,6 @@ export default {
     mixins: [ProvidesFieldtypes],
 
     props: {
-        onSelect: {},
-        show: {},
         allowTitle: {
             default: false
         },
@@ -112,10 +95,6 @@ export default {
 
     computed: {
 
-        fieldtypeSelectionText: function() {
-            return _.findWhere(this.fieldtypesSelectOptions, { value: this.fieldtypeSelection }).text;
-        },
-
         allFieldtypes() {
             if (!this.fieldtypesLoaded) return [];
 
@@ -145,10 +124,6 @@ export default {
             });
         },
 
-        filters() {
-            return Object.keys(this.filterLabels);
-        },
-
         searchFieldtypes() {
             let options = this.allFieldtypes;
 
@@ -166,6 +141,12 @@ export default {
             return options;
         },
 
+        displayedFieldtypes() {
+            return this.isSearching
+                ? [{fieldtypes: this.searchFieldtypes}]
+                : this.groupedFieldtypes;
+        },
+
         allowMeta() {
             return this.allowTitle || this.allowSlug || this.allowDate;
         },
@@ -176,10 +157,6 @@ export default {
     },
 
     watch: {
-
-        show(val) {
-            if (val) this.$refs.search.focus();
-        },
 
         fieldtypesLoaded: {
             immediate: true,
@@ -258,11 +235,6 @@ export default {
             this.search = '';
             this.filterBy = 'all';
             this.$emit('closed');
-        },
-
-        switchFilter(filter) {
-            this.filterBy = filter;
-            this.$refs.search.focus();
         },
 
         cancelSearch(event) {
