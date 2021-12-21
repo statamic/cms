@@ -68,15 +68,17 @@ trait RendersForms
      * Get field with extra data for rendering.
      *
      * @param  \Statamic\Fields\Field  $field
+     * @param  bool  $alpine
      * @return array
      */
-    protected function getRenderableField($field, $errorBag = 'default')
+    protected function getRenderableField($field, $errorBag = 'default', $alpine = false)
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
         $data = array_merge($field->toArray(), [
             'error' => $errors->first($field->handle()) ?: null,
             'old' => old($field->handle()),
+            'alpine' => $alpine,
         ]);
 
         $data['field'] = view($field->fieldtype()->view(), $data);
