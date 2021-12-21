@@ -30,7 +30,7 @@
                     </div>
                 </div>
             </div>
-            <div v-else v-for="group in groupedFieldtypes" :key="group.handle" class="mb-4">
+            <div v-else v-for="group in groupedFieldtypes" :key="group.handle" v-show="group.fieldtypes.length > 0" class="mb-4">
                 <h2 v-text="group.title" class="px-1 mb-sm" />
                 <p v-text="group.description" class="px-1 mb-1 text-grey-70 text-sm"/>
                 <div class="fieldtype-selector">
