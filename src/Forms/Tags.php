@@ -66,12 +66,20 @@ class Tags extends BaseTags
             $this->params->put('files', $form->hasFiles());
         }
 
-        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect', 'files']);
+        $knownParams = array_merge(static::HANDLE_PARAM, [
+            'redirect', 'error_redirect', 'allow_request_redirect', 'files', 'alpine'
+        ]);
 
         $action = $this->params->get('action', route('statamic.forms.submit', $formHandle));
         $method = $this->params->get('method', 'POST');
 
-        $html = $this->formOpen($action, $method, $knownParams);
+        $attrs = [];
+
+        if ($this->params->get('alpine') === true) {
+            $attrs['x-data'] = $this->createAlpineFieldData($form);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams, $attrs);
 
         $params = [];
 
@@ -247,5 +255,14 @@ class Tags extends BaseTags
         return URL::prependSiteUrl(
             config('statamic.routes.action').'/form/'.$url
         );
+    }
+
+    protected function createAlpineFieldData($form)
+    {
+        $defaultData = $form->fields()->map(function ($field) {
+            return '';
+        });
+
+        return str_replace('"', '\'', json_encode($defaultData));
     }
 }
