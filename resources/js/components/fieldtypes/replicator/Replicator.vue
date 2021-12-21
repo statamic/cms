@@ -115,14 +115,7 @@ export default {
         },
 
         updated(index, set) {
-            let oldValues = clone(this.values);
-            let newValues = clone(this.values);
-
-            newValues.splice(index, 1, set);
-
-            if (JSON.stringify(oldValues) !== JSON.stringify(newValues)) {
-                this.values = newValues;
-            }
+            this.values.splice(index, 1, set);
         },
 
         removed(set, index) {

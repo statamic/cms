@@ -10,8 +10,9 @@
 
         <template v-else>
             <img v-if="asset.is_image"
-                :data-src="asset.thumbnail"
-                class="asset-thumbnail rounded max-h-full max-w-full mx-auto rounded lazyload"
+                :src="asset.thumbnail"
+                class="asset-thumbnail rounded max-h-full max-w-full mx-auto rounded"
+                loading="lazy"
                 :class="{'w-8 h-8 fit-cover': square}"
                 />
             <file-icon v-else :extension="asset.extension" class="p-px asset-thumbnail rounded w-full h-full" />
@@ -22,8 +23,6 @@
 </template>
 
 <script>
-require('lazysizes')
-
 export default {
 
     props: {
