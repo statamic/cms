@@ -386,15 +386,6 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    public function it_cannot_sort_a_structureless_collection()
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot sort a structureless collection by order.');
-
-        $this->getEntries(['sort' => 'order|title']);
-    }
-
-    /** @test */
     public function it_can_sort_a_nested_structured_collection()
     {
         $this->makeEntry('a')->save();
