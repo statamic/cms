@@ -1,6 +1,10 @@
 import Converter from './Converter.js';
 import { KEYS } from './Constants.js';
-import { isString, isObject, isEmpty, chain, intersection } from 'underscore';
+import isString from 'underscore/modules/isString.js'
+import isObject from 'underscore/modules/isObject.js'
+import isEmpty from 'underscore/modules/isEmpty.js'
+import chain from 'underscore/modules/chain.js'
+import intersection from 'underscore/modules/intersection.js'
 import { data_get } from  '../../bootstrap/globals.js'
 
 const NUMBER_SPECIFIC_COMPARISONS = [

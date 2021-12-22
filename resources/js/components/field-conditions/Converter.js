@@ -1,5 +1,7 @@
 import { OPERATORS, ALIASES } from './Constants.js';
-import { map, each, chain } from 'underscore';
+import map from 'underscore/modules/map.js'
+import each from 'underscore/modules/each.js'
+import chain from 'underscore/modules/chain.js'
 
 export default class {
 
