@@ -6,8 +6,8 @@
 - Entries in a multi-level structured collection can be sorted by depth-first order. [#4883](https://github.com/statamic/cms/issues/4883) by @FrittenKeeZ
 - Asset folder can be renamed/moved in the Control Panel. [#4028](https://github.com/statamic/cms/issues/4028) by @arthurperton
 - The pool concurrency can be configured for the Static Cache warming command. [#4931](https://github.com/statamic/cms/issues/4931) by @jelleroorda
-- Add `compact` modifier. [#4933](https://github.com/statamic/cms/issues/4933) by @JonathonKoster
-- Add `increment:reset` tag. [#4932](https://github.com/statamic/cms/issues/4932) by @JonathonKoster
+- Add `compact` modifier. [#4933](https://github.com/statamic/cms/issues/4933) by @JohnathonKoster
+- Add `increment:reset` tag. [#4932](https://github.com/statamic/cms/issues/4932) by @JohnathonKoster
 
 ### What's improved
 - Improve augmentation performance by caching blueprint fields. [#4923](https://github.com/statamic/cms/issues/4923) by @FrittenKeeZ
@@ -19,7 +19,7 @@
 - Alphabetically order asset container tabs, and fix the redirect. [#4947](https://github.com/statamic/cms/issues/4947) by @duncanmcclean
 - Fix params not working on `assets` tag when it's an assets fieldtype. [#4731](https://github.com/statamic/cms/issues/4731) by @jelleroorda
 - Fix error when attempting to view a revision. [#4945](https://github.com/statamic/cms/issues/4945) by @jasonvarga
-- Fix noparse extractions with non-Antlers layouts. [#4934](https://github.com/statamic/cms/issues/4934) by @JonathonKoster
+- Fix noparse extractions with non-Antlers layouts. [#4934](https://github.com/statamic/cms/issues/4934) by @JohnathonKoster
 - Adjust Replicator update logic, which fixes nested `table` fields losing data. [#4903](https://github.com/statamic/cms/issues/4903) by @jesseleite
 - Fix `site` query param on tree API endpoints. [#4907](https://github.com/statamic/cms/issues/4907) by @jesseleite
 - Replace JS lazyloading with native. [#4943](https://github.com/statamic/cms/issues/4943) by @jackmcdade
