@@ -314,7 +314,7 @@ class Field implements Arrayable
             'unless',
             'unless_any',
             'hide_when',
-            'hide_when_any'
+            'hide_when_any',
         ])->all();
     }
 
