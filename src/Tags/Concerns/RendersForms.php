@@ -84,7 +84,7 @@ trait RendersForms
 
         if ($alpine) {
             $data['alpine_data_key'] = $this->getAlpineXDataKey($data['handle'], $alpine);
-            $data['conditions'] = $this->renderAlpineFieldConditions($field->conditions(), $alpine);
+            $data['alpine_show_field'] = $this->renderAlpineShowFieldJs($field->conditions(), $alpine);
         }
 
         $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());
@@ -131,13 +131,13 @@ trait RendersForms
     }
 
     /**
-     * Get alpine field conditions.
+     * Render alpine `x-if` show field JS logic.
      *
      * @param  array  $conditions
      * @param  string  $alpineScope
      * @return string
      */
-    protected function renderAlpineFieldConditions($conditions, $alpineScope)
+    protected function renderAlpineShowFieldJs($conditions, $alpineScope)
     {
         if (is_string($alpineScope)) {
             $conditions = collect($conditions)->map(function ($fields) use ($alpineScope) {
@@ -147,7 +147,9 @@ trait RendersForms
             });
         }
 
-        return $this->jsonEncodeForHtmlAttribute($conditions);
+        $attrFriendlyConditions = $this->jsonEncodeForHtmlAttribute($conditions);
+
+        return 'Statamic.$conditions.showField('.$attrFriendlyConditions.', $data)';
     }
 
     /**
