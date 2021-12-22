@@ -5,7 +5,7 @@ import filter from 'underscore/modules/filter.js'
 import chain from 'underscore/modules/chain.js'
 import chainable from 'underscore/modules/mixin.js'
 
-chainable({ filter, each });
+chainable({ chain, filter, each });
 
 export default class {
 
