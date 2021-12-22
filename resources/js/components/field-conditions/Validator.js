@@ -1,5 +1,7 @@
 import Converter from './Converter.js';
 import { KEYS } from './Constants.js';
+import { isString, isObject, isEmpty, chain, intersection } from 'underscore';
+import { data_get } from  '../../bootstrap/globals.js'
 
 const NUMBER_SPECIFIC_COMPARISONS = [
     '>', '>=', '<', '<='
@@ -22,7 +24,7 @@ export default class {
 
         if (conditions === undefined) {
             return true;
-        } else if (_.isString(conditions)) {
+        } else if (isString(conditions)) {
             return this.passesCustomCondition(this.prepareCondition(conditions));
         }
 
@@ -36,7 +38,7 @@ export default class {
     }
 
     getConditions() {
-        let key = _.chain(KEYS)
+        let key = chain(KEYS)
             .filter(key => this.field[key])
             .first()
             .value();
@@ -57,7 +59,7 @@ export default class {
     }
 
     passesAllConditions(conditions) {
-        return _.chain(conditions)
+        return chain(conditions)
             .map(condition => this.prepareCondition(condition))
             .reject(condition => this.passesCondition(condition))
             .isEmpty()
@@ -65,7 +67,7 @@ export default class {
     }
 
     passesAnyConditions(conditions) {
-        return ! _.chain(conditions)
+        return ! chain(conditions)
             .map(condition => this.prepareCondition(condition))
             .filter(condition => this.passesCondition(condition))
             .isEmpty()
@@ -73,7 +75,7 @@ export default class {
     }
 
     prepareCondition(condition) {
-        if (_.isString(condition) || condition.operator === 'custom') {
+        if (isString(condition) || condition.operator === 'custom') {
             return this.prepareCustomCondition(condition);
         }
 
@@ -115,17 +117,17 @@ export default class {
         }
 
         // When performing lhs.includes(), if lhs is not an object or array, cast to string.
-        if (operator === 'includes' && ! _.isObject(lhs)) {
+        if (operator === 'includes' && ! isObject(lhs)) {
             return lhs ? lhs.toString() : '';
         }
 
         // When lhs is an empty string, cast to null.
-        if (_.isString(lhs) && _.isEmpty(lhs)) {
+        if (isString(lhs) && isEmpty(lhs)) {
             lhs = null;
         }
 
         // Prepare for eval() and return.
-        return _.isString(lhs)
+        return isString(lhs)
             ? JSON.stringify(lhs.trim())
             : lhs;
     }
@@ -152,7 +154,7 @@ export default class {
         }
 
         // Prepare for eval() and return.
-        return _.isString(rhs)
+        return isString(rhs)
             ? JSON.stringify(rhs.trim())
             : rhs;
     }
@@ -202,11 +204,11 @@ export default class {
         }
 
         if (condition.rhs === 'empty') {
-            condition.lhs = _.isEmpty(condition.lhs);
+            condition.lhs = isEmpty(condition.lhs);
             condition.rhs = true;
         }
 
-        if (_.isObject(condition.lhs)) {
+        if (isObject(condition.lhs)) {
             return false;
         }
 
@@ -221,7 +223,7 @@ export default class {
         let values = condition.rhs.split(',').map(string => string.trim());
 
         if (Array.isArray(condition.lhs)) {
-            return _.intersection(condition.lhs, values).length;
+            return intersection(condition.lhs, values).length;
         }
 
         return new RegExp(values.join('|')).test(condition.lhs);
