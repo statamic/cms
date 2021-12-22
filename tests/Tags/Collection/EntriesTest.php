@@ -386,15 +386,32 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    public function it_cannot_sort_a_nested_structured_collection()
+    public function it_can_sort_a_nested_structured_collection()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot sort a nested collection by order.');
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('b1')->save();
+        $this->makeEntry('b2')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('c1')->save();
+        $this->makeEntry('c2')->save();
 
-        $structure = (new CollectionStructure)->maxDepth(2);
+        $structure = (new CollectionStructure)->maxDepth(1);
         $this->collection->structure($structure)->save();
+        $structure->makeTree('en')->tree([
+            ['entry' => 'b', 'children' => [
+                ['entry' => 'b1'],
+                ['entry' => 'b2'],
+            ]],
+            ['entry' => 'c', 'children' => [
+                ['entry' => 'c2'],
+                ['entry' => 'c1'],
+            ]],
+            ['entry' => 'a'],
+        ])->save();
 
-        $this->getEntries(['sort' => 'order|title']);
+        $this->assertEquals(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'], $this->getEntries(['sort' => 'id'])->map->id()->all());
+        $this->assertEquals(['b', 'b1', 'b2', 'c', 'c2', 'c1', 'a'], $this->getEntries(['sort' => 'order|title'])->map->id()->all());
     }
 
     /** @test */

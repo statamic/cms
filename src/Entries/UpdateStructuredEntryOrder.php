@@ -10,13 +10,6 @@ class UpdateStructuredEntryOrder
     {
         $tree = $event->tree;
         $collection = $tree->collection();
-
-        // Only orderable (single depth structure) entries will
-        // have order attributes, so don't bother otherwise.
-        if (! $collection->orderable()) {
-            return;
-        }
-
         $diff = $tree->diff();
 
         $ids = array_merge($diff->moved(), $diff->added());
