@@ -1,7 +1,11 @@
 import { OPERATORS, ALIASES } from './Constants.js';
 import map from 'underscore/modules/map.js'
 import each from 'underscore/modules/each.js'
+import filter from 'underscore/modules/filter.js'
 import chain from 'underscore/modules/chain.js'
+import chainable from 'underscore/modules/mixin.js'
+
+chainable({ filter, each });
 
 export default class {
 

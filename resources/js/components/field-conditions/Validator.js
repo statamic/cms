@@ -1,11 +1,19 @@
 import Converter from './Converter.js';
 import { KEYS } from './Constants.js';
+import { data_get } from  '../../bootstrap/globals.js'
 import isString from 'underscore/modules/isString.js'
 import isObject from 'underscore/modules/isObject.js'
 import isEmpty from 'underscore/modules/isEmpty.js'
-import chain from 'underscore/modules/chain.js'
 import intersection from 'underscore/modules/intersection.js'
-import { data_get } from  '../../bootstrap/globals.js'
+import map from 'underscore/modules/map.js'
+import each from 'underscore/modules/each.js'
+import filter from 'underscore/modules/filter.js'
+import reject from 'underscore/modules/reject.js'
+import first from 'underscore/modules/first.js'
+import chain from 'underscore/modules/chain.js'
+import chainable from 'underscore/modules/mixin.js'
+
+chainable({ chain, map, each, filter, reject, first, isEmpty });
 
 const NUMBER_SPECIFIC_COMPARISONS = [
     '>', '>=', '<', '<='
