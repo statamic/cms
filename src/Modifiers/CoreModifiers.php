@@ -761,7 +761,7 @@ class CoreModifiers extends Modifier
         $grouped = collect($value)->groupBy(function ($item) use ($groupBy, $params, &$groupLabels) {
             $value = $this->getGroupByValue($item, $groupBy);
 
-            return $this->handleGroupByDateValue($value, $params, $groupLabels);
+            return (string) $this->handleGroupByDateValue($value, $params, $groupLabels);
         });
 
         $iterable = $grouped->map(function ($items, $key) use ($groupLabels) {
