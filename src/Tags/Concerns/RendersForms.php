@@ -69,22 +69,24 @@ trait RendersForms
      * Get field with extra data for rendering.
      *
      * @param  \Statamic\Fields\Field  $field
-     * @param  bool|string  $alpine
+     * @param  string  $errorBag
+     * @param  bool|string  $jsDriver
+     * @param  array  $jsOptions
      * @return array
      */
-    protected function getRenderableField($field, $errorBag = 'default', $alpine = false)
+    protected function getRenderableField($field, $errorBag = 'default', $jsDriver = false, $jsOptions = [])
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
         $data = array_merge($field->toArray(), [
             'error' => $errors->first($field->handle()) ?: null,
             'old' => old($field->handle()),
-            'alpine' => $alpine,
+            'alpine' => $jsDriver === 'alpine',
         ]);
 
-        if ($alpine) {
-            $data['alpine_data_key'] = $this->getAlpineXDataKey($data['handle'], $alpine);
-            $data['alpine_show_field'] = $this->renderAlpineShowFieldJs($field->conditions(), $alpine);
+        if ($jsDriver === 'alpine') {
+            $data['alpine_data_key'] = $this->getAlpineXDataKey($data['handle'], $jsOptions[0] ?? null);
+            $data['show_field'] = $this->renderAlpineShowFieldJs($field->conditions(), $jsOptions[0] ?? null);
         }
 
         $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());

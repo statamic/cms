@@ -8,6 +8,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -56,12 +57,15 @@ class Tags extends BaseTags
         $formHandle = $this->getForm();
         $form = $this->form();
 
+        [$jsDriver, $jsOptions] = $this->parseJsParamDriverAndOptions($this->params->get('js'));
+
         $data = $this->getFormSession($this->sessionHandle());
-        $data['fields'] = $this->getFields($this->sessionHandle());
+
+        $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver, $jsOptions);
         $data['honeypot'] = $form->honeypot();
 
-        if ($this->params->get('alpine')) {
-            $data['alpine_show_field'] = collect($data['fields'])->pluck('alpine_show_field', 'handle');
+        if ($jsDriver) {
+            $data['show_field'] = collect($data['fields'])->pluck('show_field', 'handle');
         }
 
         $this->addToDebugBar($data, $formHandle);
@@ -71,7 +75,7 @@ class Tags extends BaseTags
         }
 
         $knownParams = array_merge(static::HANDLE_PARAM, [
-            'redirect', 'error_redirect', 'allow_request_redirect', 'files', 'alpine',
+            'redirect', 'error_redirect', 'allow_request_redirect', 'files', 'js',
         ]);
 
         $action = $this->params->get('action', route('statamic.forms.submit', $formHandle));
@@ -79,8 +83,8 @@ class Tags extends BaseTags
 
         $attrs = [];
 
-        if ($alpineScope = $this->params->get('alpine')) {
-            $attrs['x-data'] = $this->renderAlpineXData($form->fields()->keys(), $alpineScope);
+        if ($jsDriver === 'alpine') {
+            $attrs['x-data'] = $this->renderAlpineXData($form->fields()->keys(), $jsOptions[0] ?? []);
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
@@ -194,16 +198,41 @@ class Tags extends BaseTags
      * Get fields with extra data for looping over and rendering.
      *
      * @param  string  $sessionHandle
+     * @param  bool|string  $jsDriver
+     * @param  array  $jsOptions
      * @return array
      */
-    protected function getFields($sessionHandle)
+    protected function getFields($sessionHandle, $jsDriver, $jsOptions)
     {
         return $this->form()->fields()
-            ->map(function ($field) use ($sessionHandle) {
-                return $this->getRenderableField($field, $sessionHandle, $this->params->get('alpine'));
+            ->map(function ($field) use ($sessionHandle, $jsDriver, $jsOptions) {
+                return $this->getRenderableField($field, $sessionHandle, $jsDriver, $jsOptions);
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Parse JS param to get driver and driver related options.
+     *
+     * @param  null|string  $value
+     * @return array
+     */
+    protected function parseJsParamDriverAndOptions($value)
+    {
+        if (! $value) {
+            return [false, []];
+        }
+
+        $driver = $value;
+        $options = [];
+
+        if (Str::contains($value, ':')) {
+            $options = explode(':', $value);
+            $driver = array_shift($options);
+        }
+
+        return [$driver, $options];
     }
 
     /**
