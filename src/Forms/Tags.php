@@ -60,6 +60,10 @@ class Tags extends BaseTags
         $data['fields'] = $this->getFields($this->sessionHandle());
         $data['honeypot'] = $form->honeypot();
 
+        if ($this->params->get('alpine')) {
+            $data['alpine_show_field'] = collect($data['fields'])->pluck('alpine_show_field', 'handle');
+        }
+
         $this->addToDebugBar($data, $formHandle);
 
         if (! $this->params->has('files')) {
