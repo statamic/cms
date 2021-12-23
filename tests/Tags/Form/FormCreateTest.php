@@ -684,4 +684,56 @@ EOT
         $this->assertEquals($expected, $errors[1]);
         $this->assertEquals($expectedInline, $inlineErrors[1]);
     }
+
+    /** @test */
+    public function it_renders_x_data_on_form_with_alpine_js_enabled()
+    {
+        $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="{\'name\':null,\'email\':null,\'message\':null}">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    /** @test */
+    public function it_renders_x_data_with_old_data_on_form_with_alpine_js_enabled()
+    {
+        $this
+            ->post('/!/forms/contact', [
+                'name' => 'Frodo Braggins',
+            ])
+            ->assertSessionHasErrors(['email', 'message'], null, 'form.contact');
+
+        $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="{\'name\':\'Frodo Braggins\',\'email\':null,\'message\':null}">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    /** @test */
+    public function it_renders_scoped_x_data_on_form_with_alpine_js_enabled()
+    {
+        $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="{\'my_form\':{\'name\':null,\'email\':null,\'message\':null}}">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    /** @test */
+    public function it_renders_scoped_x_data_with_old_data_on_form_with_alpine_js_enabled()
+    {
+        $this
+            ->post('/!/forms/contact', [
+                'name' => 'Frodo Braggins',
+            ])
+            ->assertSessionHasErrors(['email', 'message'], null, 'form.contact');
+
+        $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="{\'my_form\':{\'name\':\'Frodo Braggins\',\'email\':null,\'message\':null}}">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
 }
