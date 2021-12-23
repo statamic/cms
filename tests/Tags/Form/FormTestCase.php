@@ -67,6 +67,9 @@ abstract class FormTestCase extends TestCase
                     'type' => 'textarea',
                     'display' => 'Message',
                     'validate' => 'required',
+                    'if' => [
+                        'email' => 'not empty',
+                    ],
                 ],
             ],
         ];

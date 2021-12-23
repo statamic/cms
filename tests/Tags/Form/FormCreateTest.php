@@ -736,4 +736,64 @@ EOT
 
         $this->assertStringContainsString($expected, $output);
     }
+
+    /** @test */
+    public function it_renders_show_field_js_with_alpine_enabled()
+    {
+        $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact js="alpine" }}
+    <template x-if="{{ show_field:name }}"></template>
+    <template x-if="{{ show_field:message }}"></template>
+    {{ fields }}
+        <template x-if="{{ show_field }}"></template>
+    {{ /fields }}
+{{ /form:contact }}
+EOT
+        );
+
+        preg_match_all('/<template x-if="(.+)"><\/template>/U', $output, $js);
+
+        $expected = [
+            'Statamic.$conditions.showField([], $data)',
+            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data)',
+            'Statamic.$conditions.showField([], $data)',
+            'Statamic.$conditions.showField([], $data)',
+            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data)',
+        ];
+
+        $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
+        $this->assertEquals($expected, $js[1]);
+    }
+
+    /** @test */
+    public function it_renders_scoped_show_field_js_with_alpine_enabled()
+    {
+        $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact js="alpine:my_form" }}
+    <template x-if="{{ show_field:name }}"></template>
+    <template x-if="{{ show_field:message }}"></template>
+    {{ fields }}
+        <template x-if="{{ show_field }}"></template>
+    {{ /fields }}
+{{ /form:contact }}
+EOT
+        );
+
+        preg_match_all('/<template x-if="(.+)"><\/template>/U', $output, $js);
+
+        $expected = [
+            'Statamic.$conditions.showField([], $data)',
+            'Statamic.$conditions.showField({\'if\':{\'my_form.email\':\'not empty\'}}, $data)',
+            'Statamic.$conditions.showField([], $data)',
+            'Statamic.$conditions.showField([], $data)',
+            'Statamic.$conditions.showField({\'if\':{\'my_form.email\':\'not empty\'}}, $data)',
+        ];
+
+        $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
+        $this->assertEquals($expected, $js[1]);
+    }
 }
