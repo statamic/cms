@@ -290,7 +290,7 @@ class TermsController extends CpController
             $term->updateLastModified(User::current())->save();
         }
 
-        return ['data' => ['redirect' => $term->editUrl()]];
+        return new TermResource($term);
     }
 
     protected function extractFromFields($term, $blueprint)

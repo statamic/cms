@@ -72,6 +72,33 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function the_slug_gets_slugified()
+    {
+        $entry = new Entry;
+        $entry->slug('foo bar');
+        $this->assertEquals('foo-bar', $entry->slug());
+    }
+
+    /** @test */
+    public function explicitly_setting_slug_to_null_will_return_null()
+    {
+        $entry = new Entry;
+        $entry->slug(null);
+        $this->assertNull($entry->slug());
+    }
+
+    /** @test */
+    public function if_the_slug_is_a_function_it_will_resolve_it()
+    {
+        $entry = new Entry;
+        $entry->set('title', 'Foo Bar');
+        $entry->slug(function ($entry) {
+            return $entry->get('title');
+        });
+        $this->assertEquals('foo-bar', $entry->slug());
+    }
+
+    /** @test */
     public function it_sets_gets_and_removes_data_values()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -474,7 +501,7 @@ class EntryTest extends TestCase
             'en' => ['url' => '/'],
         ]]);
 
-        $collection = (new Collection)->handle('blog');
+        $collection = tap(Facades\Collection::make('blog'))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
@@ -489,7 +516,7 @@ class EntryTest extends TestCase
             'fr' => ['url' => '/'],
         ]]);
 
-        $collection = (new Collection)->handle('blog');
+        $collection = tap(Facades\Collection::make('blog'))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.md', $entry->path());
@@ -497,11 +524,30 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function the_path_uses_the_slug_if_set_even_if_slugs_arent_required()
+    {
+        $collection = tap(Facades\Collection::make('blog')->requiresSlugs(false))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug('post')->id('123');
+
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
+    }
+
+    /** @test */
+    public function the_path_uses_the_id_if_slug_is_not_set()
+    {
+        $collection = tap(Facades\Collection::make('blog')->requiresSlugs(false))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug(null)->id('123');
+
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/123.md', $entry->path());
+    }
+
+    /** @test */
     public function it_gets_and_sets_the_date()
     {
         Carbon::setTestNow(Carbon::parse('2015-09-24'));
 
-        $entry = new Entry;
+        $collection = tap(Facades\Collection::make('blog'))->save();
+        $entry = (new Entry)->collection($collection);
 
         // Without explicitly having the date set, it falls back to the last modified date (which if there's no file, is Carbon::now())
         $this->assertInstanceOf(Carbon::class, $entry->date());
@@ -537,25 +583,48 @@ class EntryTest extends TestCase
         $one = tap((new Entry)->locale('en')->id('one')->collection($collection))->save();
         $two = tap((new Entry)->locale('en')->id('two')->collection($collection))->save();
         $three = tap((new Entry)->locale('en')->id('three')->collection($collection))->save();
+        $four = tap((new Entry)->locale('en')->id('four')->collection($collection))->save();
 
         $this->assertNull($one->order());
-        $this->assertNull($one->order());
-        $this->assertNull($one->order());
+        $this->assertNull($two->order());
+        $this->assertNull($three->order());
+        $this->assertNull($four->order());
 
         $collection->structureContents([
-            'max_depth' => 1,
+            'max_depth' => 3,
         ])->save();
         $collection->structure()->in('en')->tree(
             [
                 ['entry' => 'three'],
-                ['entry' => 'one'],
+                ['entry' => 'one', 'children' => [
+                    ['entry' => 'four'],
+                ]],
                 ['entry' => 'two'],
             ]
         )->save();
 
         $this->assertEquals(2, $one->order());
-        $this->assertEquals(3, $two->order());
+        $this->assertEquals(4, $two->order());
         $this->assertEquals(1, $three->order());
+        $this->assertEquals(3, $four->order());
+    }
+
+    /** @test */
+    public function it_gets_the_order_from_the_data_if_not_structured()
+    {
+        $collection = tap(Collection::make('test'))->save();
+
+        $one = tap((new Entry)->locale('en')->id('one')->collection($collection))->save();
+        $two = tap((new Entry)->locale('en')->id('two')->collection($collection)->data(['order' => 17]))->save();
+        $three = tap((new Entry)->locale('en')->id('three')->collection($collection)->data(['order' => 'potato']))->save();
+        $four = tap((new Entry)->locale('en')->id('four')->collection($collection)->data(['order' => 24]))->save();
+        $five = tap((new Entry)->locale('fr')->id('five')->collection($collection)->origin('four'))->save();
+
+        $this->assertNull($one->order());
+        $this->assertEquals(17, $two->order());
+        $this->assertEquals('potato', $three->order());
+        $this->assertEquals(24, $four->order());
+        $this->assertEquals(24, $five->order());
     }
 
     /** @test */
@@ -1011,7 +1080,8 @@ class EntryTest extends TestCase
             return false;
         });
 
-        $entry = (new Entry)->collection(new Collection);
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection);
 
         $return = $entry->save();
 
@@ -1459,6 +1529,46 @@ class EntryTest extends TestCase
 
         $this->assertNull($entry->page());
         $this->assertNull($entry->parent());
+    }
+
+    /**
+     * @test
+     * @dataProvider autoGeneratedTitleProvider
+     */
+    public function it_gets_the_auto_generated_title($format)
+    {
+        $other = EntryFactory::collection('products')
+            ->slug('talkboy')
+            ->data(['name' => 'Talkboy', 'company' => 'Tiger Electronics'])
+            ->create();
+
+        $collection = tap(Collection::make('test')->titleFormats($format))->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'products' => ['type' => 'entries'],
+        ]);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'product' => $blueprint->setHandle('product'),
+        ]));
+
+        $entry = (new Entry)->id('entry-id')->locale('en')->collection($collection)->data([
+            'product' => 'Talkboy',
+            'company' => 'Tiger Electronics',
+            'products' => [$other->id()],
+        ]);
+
+        $this->assertEquals('Talkboy by Tiger Electronics', $entry->autoGeneratedTitle());
+    }
+
+    public function autoGeneratedTitleProvider()
+    {
+        return [
+            'antlers' => ['{{ product }} by {{ company }}'],
+            'mustache' => ['{product} by {company}'],
+            'antlers nested' => ['{{ products:0:name }} by {{ products:0:company }}'],
+            'mustache nested with colons' => ['{products:0:name} by {products:0:company}'],
+            'mustache nested with dots' => ['{products.0.name} by {products.0.company}'],
+        ];
     }
 
     // todo: add tests for localization things. in(), descendants(), addLocalization(), etc

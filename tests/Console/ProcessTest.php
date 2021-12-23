@@ -31,13 +31,13 @@ class ProcessTest extends TestCase
     public function it_can_run_process_on_custom_path()
     {
         $this->assertEquals(
-            Path::resolve(resource_path()),
-            Process::create(resource_path())->run('pwd')
+            $this->tidy(resource_path()),
+            $this->tidy(trim(Process::create(resource_path())->run($this->pwdCmd())))
         );
 
         $this->assertNotEquals(
-            Path::resolve(resource_path()),
-            Process::create()->run('pwd')
+            $this->tidy(resource_path()),
+            $this->tidy(Process::create()->run($this->pwdCmd()))
         );
     }
 
@@ -46,7 +46,7 @@ class ProcessTest extends TestCase
     {
         $process = Process::create();
 
-        $process->run('pwd');
+        $process->run($this->pwdCmd());
         $this->assertFalse($process->hasErrorOutput());
 
         $process->run('not-a-command');
@@ -61,13 +61,13 @@ class ProcessTest extends TestCase
         $process->run('not-a-command');
         $this->assertTrue($process->hasErrorOutput());
 
-        $process->run('pwd');
+        $process->run($this->pwdCmd());
         $this->assertFalse($process->hasErrorOutput());
 
         $process->run('not-a-command');
         $this->assertTrue($process->hasErrorOutput());
 
-        $process->runAndOperateOnOutput('pwd', function ($output) {
+        $process->runAndOperateOnOutput($this->pwdCmd(), function ($output) {
             return $output;
         });
         $this->assertFalse($process->hasErrorOutput());
@@ -97,20 +97,35 @@ class ProcessTest extends TestCase
         });
 
         $this->assertTrue($process->hasErrorOutput());
-        $this->assertStringContainsString('not found', $output);
+        $this->assertStringContainsString(
+            static::isRunningWindows() ? 'not recognized' : 'not found',
+            $output
+        );
     }
 
     /** @test */
     public function it_can_get_cloned_process_for_running_commands_from_parent_path()
     {
         $this->assertEquals(
-            Path::resolve(resource_path()),
-            Process::create(resource_path())->getBasePath()
+            $this->tidy(resource_path()),
+            $this->tidy(Process::create(resource_path())->getBasePath())
         );
 
         $this->assertEquals(
-            Path::resolve(base_path()),
-            Process::create(resource_path())->fromParent()->getBasePath()
+            $this->tidy(base_path()),
+            $this->tidy(Process::create(resource_path())->fromParent()->getBasePath())
         );
+    }
+
+    private function pwdCmd()
+    {
+        return static::isRunningWindows()
+            ? 'echo %cd%'
+            : 'pwd';
+    }
+
+    private function tidy($path)
+    {
+        return Path::tidy(trim($path));
     }
 }
