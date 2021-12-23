@@ -6,6 +6,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
 use Statamic\Support\Arr;
+use Statamic\Support\Html;
 use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -89,7 +90,7 @@ abstract class FormTestCase extends TestCase
         Form::makePartial();
     }
 
-    protected function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [])
+    protected function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [], $extraParams = [])
     {
         $randomString = str_shuffle('nobodymesseswiththehoff');
 
@@ -107,8 +108,10 @@ abstract class FormTestCase extends TestCase
                 ->assertLocation('/');
         }
 
+        $extraParams = $extraParams ? Html::attributes($extraParams) : '';
+
         $output = $this->normalizeHtml(
-            $this->tag("{{ form:{$handle} }}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
+            $this->tag("{{ form:{$handle} {$extraParams}}}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
         );
 
         $expected = collect(Arr::wrap($expectedHtmlParts))->implode('');

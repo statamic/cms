@@ -796,4 +796,32 @@ EOT
         $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
         $this->assertEquals($expected, $js[1]);
     }
+
+    /** @test */
+    public function it_dynamically_renders_text_field_x_model_with_alpine_enabled()
+    {
+        $textConfig = [
+            'handle' => 'name',
+            'field' => [
+                'type' => 'text',
+            ],
+        ];
+
+        $this->assertFieldRendersHtml(['<input type="text" name="name" value="" x-model="name">'], $textConfig, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="text" name="name" value="" x-model="my_form.name">'], $textConfig, [], ['js' => 'alpine:my_form']);
+    }
+
+    /** @test */
+    public function it_dynamically_renders_textarea_field_x_model_with_alpine_enabled()
+    {
+        $textConfig = [
+            'handle' => 'comment',
+            'field' => [
+                'type' => 'textarea',
+            ],
+        ];
+
+        $this->assertFieldRendersHtml(['<textarea name="comment" rows="5" x-model="comment"></textarea>'], $textConfig, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<textarea name="comment" rows="5" x-model="my_form.comment"></textarea>'], $textConfig, [], ['js' => 'alpine:my_form']);
+    }
 }
