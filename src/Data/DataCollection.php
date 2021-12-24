@@ -107,6 +107,8 @@ class DataCollection extends IlluminateCollection
     {
         if ($value instanceof Carbon) {
             $value = $value->timestamp;
+        } elseif (is_array($value)) {
+            $value = count($value) ? $this->normalizeSortableValue($value[0]) : null;
         }
 
         return $value;
