@@ -894,12 +894,21 @@ class Environment
             } elseif ($operand instanceof AdditionAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->numericScopeValue($varName);
-                $right = floatval($right);
 
-                $this->assertNumericValue($curVal);
-                $this->assertNumericValue($right);
+                if (is_string($curVal) && is_string($right)) {
+                    // Allows for addition assignment to act
+                    // like string concatenation when both
+                    // the left and right are string types.
+                    $newVal = $curVal . $right;
+                } else {
+                    // Handle numeric case.
+                    $right = floatval($right);
 
-                $newVal = $curVal + $right;
+                    $this->assertNumericValue($curVal);
+                    $this->assertNumericValue($right);
+
+                    $newVal = $curVal + $right;
+                }
 
                 $this->dataRetriever->setRuntimeValue(
                     $varName,

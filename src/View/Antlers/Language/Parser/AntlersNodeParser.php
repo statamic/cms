@@ -379,6 +379,30 @@ class AntlersNodeParser
 
         $charCount = count($chars);
 
+        // Calculate the index that appears immediately after the node's name (if available).
+        // This index will be utilized to help determine if we should break early when
+        // encountering strings. We want to break if we find strings outside of a
+        // parameter only if they do not appear as part of the node's name.
+        //
+        // This should not cause the parser to exit early:
+        //     {{ data['key'] first="true" }}
+        //
+        // This should cause parser to exit early:
+        //     {{ data['other_key'] + 'first="true"'; }}
+        $parseContentOffset = 0;
+
+        if ($node->name != null) {
+            $trimmedName = ltrim($node->content, ' ');
+            $leadOffset = mb_strlen($node->content) - mb_strlen($trimmedName);
+            $nameLength = mb_strlen($node->name->content);
+
+            if ($leadOffset > 0) {
+                $parseContentOffset = $leadOffset + $nameLength;
+            } else {
+                $parseContentOffset = $nameLength;
+            }
+        }
+
         for ($i = 0; $i < $charCount; $i++) {
             $current = $chars[$i];
             $prev = null;
@@ -532,6 +556,12 @@ class AntlersNodeParser
             }
 
             $currentChars[] = $current;
+
+            if ($hasFoundName == false && ($current == DocumentParser::String_Terminator_DoubleQuote || $current == DocumentParser::String_Terminator_SingleQuote)) {
+                if ($i > $parseContentOffset) {
+                    break;
+                }
+            }
 
             if (count($currentChars) == 1) {
                 $startAt = $i + 1;

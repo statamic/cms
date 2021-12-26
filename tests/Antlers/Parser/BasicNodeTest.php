@@ -34,9 +34,9 @@ class BasicNodeTest extends ParserTestCase
 
     public function test_it_removes_params_from_node_content()
     {
-        $nodes = $this->parseNodes('{{ meta_title ?? title ?? "No Title Set" param="Test" }}');
+        $nodes = $this->parseNodes('{{ meta_title["No Title Set"] ?? title param="Test" }}');
 
-        $this->assertSame(' meta_title ?? title ?? "No Title Set" ', $nodes[0]->getContent());
+        $this->assertSame(' meta_title["No Title Set"] ?? title ', $nodes[0]->getContent());
     }
 
     public function test_node_name_ignores_modifier_start()
@@ -50,9 +50,8 @@ class BasicNodeTest extends ParserTestCase
 
     public function test_it_removes_tags_from_node_content()
     {
-        // NOTE: Hello source divers! This is not valid syntax, but is a good test of resolving the inner node content. :)
-        $nodes = $this->parseNodes('{{ if meta_title ?? title ?? "No Title Set" param="Test" }}{{ /if }}');
-        $this->assertSame(' meta_title ?? title ?? "No Title Set" ', $nodes[0]->getContent());
+        $nodes = $this->parseNodes('{{ meta_title["No Title Set"] param="Test" }}{{ /if }}');
+        $this->assertSame(' meta_title["No Title Set"] ', $nodes[0]->getContent());
     }
 
     public function test_it_parses_simple_comments()
