@@ -30,4 +30,13 @@ EOT;
 
         $this->assertSame('String Value test!', $this->renderString($input, ['var' => 'String Value']));
     }
+
+    public function test_empty_strings_can_be_combined_using_addition_assignment()
+    {
+        $input = <<<'EOT'
+{{ test = ''; test += 'hello, world'; test }}
+EOT;
+
+        $this->assertSame('hello, world', $this->renderString($input));
+    }
 }

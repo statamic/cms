@@ -893,7 +893,7 @@ class Environment
                 return null;
             } elseif ($operand instanceof AdditionAssignmentOperator) {
                 $varName = $this->nameOf($left);
-                $curVal = $this->numericScopeValue($varName);
+                $curVal = $this->scopeValue($varName);
 
                 if (is_string($curVal) && is_string($right)) {
                     // Allows for addition assignment to act
@@ -901,6 +901,8 @@ class Environment
                     // the left and right are string types.
                     $newVal = $curVal . $right;
                 } else {
+                    $curVal = $this->convertToRuntimeNumeric($curVal, $varName);
+
                     // Handle numeric case.
                     $right = floatval($right);
 
@@ -1075,6 +1077,11 @@ class Environment
     {
         $value = $this->scopeValue($name);
 
+        return $this->convertToRuntimeNumeric($value, $name);
+    }
+
+    private function convertToRuntimeNumeric($value, $name)
+    {
         if (is_numeric($value)) {
             return $value;
         }
