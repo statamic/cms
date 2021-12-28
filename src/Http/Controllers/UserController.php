@@ -29,7 +29,7 @@ class UserController extends Controller
         if ($validator->passes()) {
             if ($this->hasTooManyLoginAttempts($request)) {
                 $this->fireLockoutEvent($request);
-    
+
                 return $this->sendLockoutResponse($request);
             }
 
