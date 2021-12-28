@@ -105,10 +105,12 @@ class DataCollection extends IlluminateCollection
      */
     protected function normalizeSortableValue($value)
     {
-        if ($value instanceof Carbon) {
+        if (is_array($value)) {
+            $value = count($value)
+                ? $this->normalizeSortableValue(array_values($value)[0])
+                : null;
+        } elseif ($value instanceof Carbon) {
             $value = $value->timestamp;
-        } elseif (is_array($value)) {
-            $value = count($value) ? $this->normalizeSortableValue($value[0]) : null;
         }
 
         return $value;
