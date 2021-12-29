@@ -111,6 +111,6 @@ class TermReferenceUpdater extends DataReferenceUpdater
      */
     public function newValue()
     {
-        return $this->scope.$this->newValue;
+        return is_null($this->newValue) ? null : $this->scope.$this->newValue;
     }
 }

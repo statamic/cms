@@ -28,5 +28,6 @@ class EventServiceProvider extends ServiceProvider
         \Statamic\Listeners\GeneratePresetImageManipulations::class,
         \Statamic\Listeners\UpdateAssetReferences::class,
         \Statamic\Listeners\UpdateTermReferences::class,
+        \Statamic\Listeners\DeleteTermReferences::class,
     ];
 }

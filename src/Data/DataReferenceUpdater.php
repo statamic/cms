@@ -211,7 +211,11 @@ abstract class DataReferenceUpdater
             return;
         }
 
-        Arr::set($data, $dottedKey, $this->newValue());
+        if (is_null($this->newValue())) {
+            Arr::forget($data, $dottedKey);
+        } else {
+            Arr::set($data, $dottedKey, $this->newValue());
+        }
 
         $this->item->data($data);
 
@@ -236,9 +240,15 @@ abstract class DataReferenceUpdater
             return;
         }
 
-        $fieldData->transform(function ($value) {
-            return $value === $this->originalValue() ? $this->newValue() : $value;
-        });
+        if (is_null($this->newValue())) {
+            $fieldData = $fieldData->reject(function ($value) {
+                return $value === $this->originalValue();
+            })->values();
+        } else {
+            $fieldData->transform(function ($value) {
+                return $value === $this->originalValue() ? $this->newValue() : $value;
+            });
+        }
 
         Arr::set($data, $dottedKey, $fieldData->all());
 
