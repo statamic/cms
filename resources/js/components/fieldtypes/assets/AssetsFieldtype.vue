@@ -439,6 +439,10 @@ export default {
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', ');
+        },
+
+        assetUrlsAreNull(assets) {
+            return assets.length && assets.every(asset => asset.url === null);
         }
 
     },
@@ -447,6 +451,10 @@ export default {
     watch: {
 
         assets(assets) {
+            if (this.assetUrlsAreNull(assets)) {
+                this.$toast.error(__('Assets not accessible. Please check your asset container\'s disk configuration for a correct URL.'));
+            }
+
             if (this.initializing) return;
 
             // The components deal with passing around asset objects, however
