@@ -6,7 +6,6 @@ use Tests\Antlers\ParserTestCase;
 
 class StringsTest extends ParserTestCase
 {
-
     public function test_strings_with_html_are_not_parsed_as_antlers_parameters()
     {
         $input = <<<'EOT'

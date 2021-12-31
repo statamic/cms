@@ -899,7 +899,7 @@ class Environment
                     // Allows for addition assignment to act
                     // like string concatenation when both
                     // the left and right are string types.
-                    $newVal = $curVal . $right;
+                    $newVal = $curVal.$right;
                 } else {
                     $curVal = $this->convertToRuntimeNumeric($curVal, $varName);
 
