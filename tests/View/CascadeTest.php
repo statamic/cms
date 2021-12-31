@@ -143,6 +143,17 @@ class CascadeTest extends TestCase
             $this->assertEquals('http://test.com/test', $cascade['current_url']);
             $this->assertEquals('http://test.com/test?test=test', $cascade['current_full_url']);
             $this->assertEquals('/test', $cascade['current_uri']);
+            $this->assertFalse($cascade['is_homepage']);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_request_is_homepage_when_request_is_homepage()
+    {
+        $this->get('http://test.com/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertTrue($cascade['is_homepage']);
         });
     }
 
@@ -485,7 +496,10 @@ class FakeSite extends \Statamic\Sites\Site
 {
     public function __construct()
     {
-        parent::__construct('en', config('statamic.sites.sites.en'));
+        $site = ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'];
+
+        // parent::__construct('en', config('statamic.sites.sites.en'));
+        parent::__construct('en', $site);
     }
 }
 
