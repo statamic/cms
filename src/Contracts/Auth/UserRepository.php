@@ -6,9 +6,11 @@ use Statamic\Auth\UserCollection;
 
 interface UserRepository
 {
-    public function make(): User;
-
     public function all(): UserCollection;
+
+    public function current(): ?User;
+
+    public function delete(User $user);
 
     public function find($id): ?User;
 
@@ -16,11 +18,9 @@ interface UserRepository
 
     public function findByOAuthId(string $provider, string $id): ?User;
 
-    public function current(): ?User;
-
     public function fromUser($user): ?User;
 
-    public function save(User $user);
+    public function make(): User;
 
-    public function delete(User $user);
+    public function save(User $user);
 }
