@@ -71,4 +71,18 @@ abstract class UserRepository implements RepositoryContract
             (new Provider($provider))->getUserId($id)
         );
     }
+
+    public function firstOrCreate(string $email): User
+    {
+        return $this->firstOrNew($email)->save();
+    }
+
+    public function firstOrNew(string $email): User
+    {
+        if (! $user = $this->findByEmail($email)) {
+            return $this->make()->email($email);
+        }
+
+        return $user;
+    }
 }

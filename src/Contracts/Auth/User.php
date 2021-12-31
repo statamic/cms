@@ -43,4 +43,6 @@ interface User
     public function isSuper();
 
     public function makeSuper();
+
+    public function save(): self;
 }

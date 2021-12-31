@@ -18,6 +18,10 @@ interface UserRepository
 
     public function findByOAuthId(string $provider, string $id): ?User;
 
+    public function firstOrCreate(string $email): User;
+
+    public function firstOrNew(string $email): User;
+
     public function fromUser($user): ?User;
 
     public function make(): User;

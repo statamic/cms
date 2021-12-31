@@ -87,4 +87,23 @@ trait UserRepositoryTests
     {
         $this->assertNull(User::fromUser(null));
     }
+
+    /** @test */
+    public function it_creates_new_user_when_user_doesnt_exist()
+    {
+        $newUser = User::firstOrNew('foo@bar.com');
+
+        $this->assertInstanceOf($this->userClass(), $newUser);
+        $this->assertEquals('foo@bar.com', $newUser->email());
+    }
+
+    /** @test */
+    public function it_finds_existing_user_when_first_or_new()
+    {
+        $existingUser = User::make()->email('foo@bar.com')->data(['name' => 'foo', 'password' => 'foo'])->save();
+
+        $user = User::firstOrNew('foo@bar.com');
+
+        $this->assertEquals($existingUser->id(), $user->id());
+    }
 }

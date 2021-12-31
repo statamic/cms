@@ -136,7 +136,7 @@ abstract class User implements
         return Facades\User::blueprint();
     }
 
-    public function save()
+    public function save(): UserContract
     {
         Facades\User::save($this);
 
