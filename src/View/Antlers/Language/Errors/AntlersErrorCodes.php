@@ -2,6 +2,10 @@
 
 namespace Statamic\View\Antlers\Language\Errors;
 
+/**
+ * Range 500-699 error codes are reserved for linter error codes.
+ * Please do not use them for parser errors or runtime errors.
+ */
 class AntlersErrorCodes
 {
     const TYPE_EXPECTING_OPERAND = 'ANTLR_001';
