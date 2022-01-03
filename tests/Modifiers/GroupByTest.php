@@ -140,6 +140,27 @@ class GroupByTest extends TestCase
     }
 
     /** @test */
+    public function if_the_grouped_keys_are_objects_itll_convert_them_to_strings()
+    {
+        $items = collect([
+            $jazz = EntryFactory::collection('sports')->data(['sport' => new TestGroupByClass('basketball'), 'team' => 'jazz'])->create(),
+            $yankees = EntryFactory::collection('sports')->data(['sport' => new TestGroupByClass('baseball'), 'team' => 'yankees'])->create(),
+            $bulls = EntryFactory::collection('sports')->data(['sport' => new TestGroupByClass('basketball'), 'team' => 'bulls'])->create(),
+        ]);
+
+        $expected = collect([
+            'basketball' => collect([$jazz, $bulls]),
+            'baseball' => collect([$yankees]),
+            'groups' => collect([
+                ['key' => 'basketball', 'group' => 'basketball', 'items' => collect([$jazz, $bulls])],
+                ['key' => 'baseball', 'group' => 'baseball', 'items' => collect([$yankees])],
+            ]),
+        ]);
+
+        $this->assertEquals($expected, $this->modify($items, 'sport'));
+    }
+
+    /** @test */
     public function it_groups_by_date()
     {
         Carbon::setTestNow(now()->startOfDay());
@@ -230,5 +251,20 @@ class GroupByTest extends TestCase
     public function modify($items, $value)
     {
         return Modify::value($items)->groupBy($value)->fetch();
+    }
+}
+
+class TestGroupByClass
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->value;
     }
 }

@@ -47,7 +47,7 @@ return [
     'collections_mount_instructions' => 'Izberite vnos, na katerega naj bo nameščena ta zbirka. Več o tem v [dokumentaciji] (https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Omogočite ročno naročanje s povleci in spusti.',
     'collections_past_date_behavior_instructions' => 'Kako naj se obnašajo pretekli vnosi.',
-    'collections_route_instructions' => 'Pot nadzoruje vzorec URL-ja vnosov.',
+    'collections_route_instructions' => 'Pot nadzoruje vzorec URL-ja vnosov. Več o tem v [dokumentaciji] (https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Privzeta smer razvrščanja.',
     'collections_taxonomies_instructions' => 'Povežite vnose v tej zbirki s taksonomijami. Polja bodo samodejno dodana za objavo obrazcev.',
     'email_utility_configuration_description' => 'Nastavitve pošte so nastavljene v <code>:path</code>',

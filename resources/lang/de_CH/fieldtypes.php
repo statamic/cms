@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'any.config.antlers' => 'Soll dieses Feld von Antlers geparst werden?',
+    'any.config.antlers' => 'Antlers-Parsing für den Inhalt dieses Feldes aktivieren.',
     'any.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
     'any.config.default' => 'Standardwert festlegen.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
@@ -87,6 +87,13 @@ return [
     'markdown.config.restrict' => 'Verhindern, dass Benutzer*innen zu anderen Ordnern navigieren können.',
     'markdown.config.smartypants' => 'Automatische Konvertierung von geraden in geschweifte Anführungszeichen, Striche in en/em-Dashes und andere ähnliche Texttransformationen.',
     'markdown.title' => 'Markdown',
+    'picker.category.text.description' => 'Diese Felder speichern Zeichenfolgen aus Text, Rich Content oder beides.',
+    'picker.category.controls.description' => 'Diese Felder bieten auswählbare Optionen oder Buttons, die eine Logik steuern können.',
+    'picker.category.media.description' => 'Diese Felder speichern Bilder, Videos oder andere Medien.',
+    'picker.category.number.description' => 'Diese Felder speichern Zahlen.',
+    'picker.category.relationship.description' => 'Diese Felder speichern Beziehungen zu anderen Ressourcen.',
+    'picker.category.structured.description' => 'Diese Felder speichern strukturierte Daten. Einige können sogar andere Felder in sich selbst verschachteln.',
+    'picker.category.special.description' => 'Diese Felder sind besonders, jedes auf seine Weise.',
     'radio.config.inline' => 'Radio-Buttons in einer Reihe anzeigen.',
     'radio.config.options' => 'Arrayschlüssel und deren optionale Beschriftungen festlegen.',
     'radio.title' => 'Radio',

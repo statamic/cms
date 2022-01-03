@@ -109,6 +109,12 @@ export default [
         label: 'E-Mail',
         value: 'email'
     },
+    {
+        label: 'Ends With',
+        value: 'ends_with:',
+        example: 'ends_with:foo,bar,...',
+        minVersion: '5.8.17'
+    },
     // {
     //     label: 'Exists (Database)',
     //     value: 'exists:',
