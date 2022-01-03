@@ -78,7 +78,7 @@ export default {
             if (! this.syncableFields) return true;
 
             return this.syncableFields.includes(field.handle);
-        },
+        }
 
     }
 
