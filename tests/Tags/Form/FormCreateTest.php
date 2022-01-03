@@ -786,11 +786,11 @@ EOT
         preg_match_all('/<template x-if="(.+)"><\/template>/U', $output, $js);
 
         $expected = [
-            'Statamic.$conditions.showField([], $data)',
-            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'},\'prefix\':\'my_form.\'}, $data)',
-            'Statamic.$conditions.showField([], $data)',
-            'Statamic.$conditions.showField([], $data)',
-            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'},\'prefix\':\'my_form.\'}, $data)',
+            'Statamic.$conditions.showField([], $data.my_form)',
+            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data.my_form)',
+            'Statamic.$conditions.showField([], $data.my_form)',
+            'Statamic.$conditions.showField([], $data.my_form)',
+            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data.my_form)',
         ];
 
         $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);

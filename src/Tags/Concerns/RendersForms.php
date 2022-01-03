@@ -141,15 +141,15 @@ trait RendersForms
      */
     protected function renderAlpineShowFieldJs($conditions, $alpineScope)
     {
-        $fieldConfig = $conditions;
+        $attrFriendlyConditions = $this->jsonEncodeForHtmlAttribute($conditions);
 
-        if ($conditions && is_string($alpineScope)) {
-            $fieldConfig['prefix'] = "{$alpineScope}.";
+        $data = '$data';
+
+        if (is_string($alpineScope)) {
+            $data .= ".{$alpineScope}";
         }
 
-        $attrFriendlyFieldConfig = $this->jsonEncodeForHtmlAttribute($fieldConfig);
-
-        return 'Statamic.$conditions.showField('.$attrFriendlyFieldConfig.', $data)';
+        return 'Statamic.$conditions.showField('.$attrFriendlyConditions.', '.$data.')';
     }
 
     /**
