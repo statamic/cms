@@ -111,11 +111,6 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
-        },
-
-
-        setsWithErrors() {
-            
         }
     },
 
