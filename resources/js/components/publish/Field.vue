@@ -62,7 +62,6 @@
                 :handle="config.handle"
                 :name-prefix="namePrefix"
                 :error-key-prefix="errorKeyPrefix"
-                :has-error="hasError || hasNestedError"
                 :read-only="isReadOnly"
                 @input="$emit('input', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -100,7 +99,6 @@ export default {
         errors: {
             type: Array
         },
-        hasNestedError: Boolean,
         readOnly: Boolean,
         syncable: Boolean,
         namePrefix: String,
@@ -190,6 +188,12 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        hasNestedError() {
+            const prefix = `${this.errorKeyPrefix || this.config.handle}.`;
+
+            return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
 
         labelText() {

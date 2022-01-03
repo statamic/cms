@@ -93,12 +93,12 @@ export default {
                 : null
         },
 
-        state() {
+        storeState() {
             return this.$store.state.publish[this.storeName] || [];
         },
 
         errors() {
-            return this.state.errors[this.errorKey] || [];
+            return this.storeState.errors[this.errorKey] || [];
         },
 
         hasError() {
@@ -108,7 +108,7 @@ export default {
         hasNestedError() {
             const prefix = `${this.errorKey}.`;
 
-            return Object.keys(this.state.errors).some(handle => handle.startsWith(prefix));
+            return Object.keys(this.storeState.errors).some(handle => handle.startsWith(prefix));
         },
 
         isReadOnly() {
