@@ -36,7 +36,7 @@ trait OutputsItems
     {
         $paginator->withQueryString();
 
-        if ($window = $this->params->int('paginate_each_side')) {
+        if ($window = $this->params->int('on_each_side')) {
             $paginator->onEachSide($window);
         }
 
