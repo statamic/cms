@@ -30,6 +30,7 @@
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
                     :error-key-prefix="errorKeyPrefix || handle"
+                    :has-error="hasError"
                     :previews="previews[set._id]"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"

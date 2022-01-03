@@ -10,6 +10,7 @@
             :value="values[field.handle]"
             :meta="meta[field.handle]"
             :errors="errors[field.handle]"
+            :has-nested-error="hasNestedError(field)"
             :read-only="readOnly"
             :syncable="isSyncableField(field)"
             :can-toggle-label="canToggleLabels"
@@ -78,6 +79,12 @@ export default {
             if (! this.syncableFields) return true;
 
             return this.syncableFields.includes(field.handle);
+        },
+
+        hasNestedError(field) {
+            const prefix = `${field.handle}.`;
+
+            return Object.keys(this.errors).some(handle => handle.startsWith(prefix));
         }
 
     }

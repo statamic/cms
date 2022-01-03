@@ -62,6 +62,7 @@
                 :handle="config.handle"
                 :name-prefix="namePrefix"
                 :error-key-prefix="errorKeyPrefix"
+                :has-error="hasError || hasNestedError"
                 :read-only="isReadOnly"
                 @input="$emit('input', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -99,6 +100,7 @@ export default {
         errors: {
             type: Array
         },
+        hasNestedError: Boolean,
         readOnly: Boolean,
         syncable: Boolean,
         namePrefix: String,
@@ -158,7 +160,7 @@ export default {
                 `field-${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
-                { 'has-error': this.hasError }
+                { 'has-error': this.hasError || this.hasNestedError }
             ];
         },
 
