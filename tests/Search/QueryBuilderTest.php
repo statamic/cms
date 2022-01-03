@@ -149,6 +149,21 @@ class QueryBuilderTest extends TestCase
         $this->assertCount(4, $results);
         $this->assertEquals(['a', 'd', 'c', 'e'], $results->map->reference->all());
     }
+    /** @test **/
+    public function results_are_found_using_multiple_wheres()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->where('title', 'like', '%Frodo%')->where('reference', 'a')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals(['a'], $results->map->reference->all());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder
