@@ -50,7 +50,7 @@ return [
     'collections_mount_instructions' => '選擇此條目集應掛載的位置。詳情可參考 [說明文件](https://statamic.dev/collections-and-entries#mounting) 。',
     'collections_orderable_instructions' => '啟用通過拖放的手動排序。',
     'collections_past_date_behavior_instructions' => '過去日期的行為。',
-    'collections_route_instructions' => '路由控制了條目的 URL 格式。',
+    'collections_route_instructions' => '路由控制了條目的 URL 格式。詳情可參考 [說明文件](https://statamic.dev/collections#routing) 。',
     'collections_sort_direction_instructions' => '預設排序方向。',
     'collections_taxonomies_instructions' => '將本條目集中的條目連結到分類。欄位會自動新增以發佈表格。',
     'email_utility_configuration_description' => '郵件設定可於 <code>:path</code> 內設定。',

@@ -51,7 +51,7 @@ return [
     'collections_mount_instructions' => 'Eintrag auswählen, auf dem diese Sammlung gemountet werden soll. Erfahre mehr in der [Dokumentation](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Manuelle Reihenfolge per Drag & Drop aktivieren.',
     'collections_past_date_behavior_instructions' => 'Wie sollen sich in der Vergangenheit liegende Einträge verhalten?',
-    'collections_route_instructions' => 'Die Route steuert das URL-Schema der Einträge.',
+    'collections_route_instructions' => 'Die Route steuert das URL-Schema der Einträge. Erfahre mehr in der [Dokumentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Die voreingestellte Sortierrichtung.',
     'collections_taxonomies_instructions' => 'Einträge in dieser Sammlung mit Taxonomien verknüpfen. Die Felder werden automatisch den Eingabemasken hinzugefügt.',
     'email_utility_configuration_description' => 'Die E-Mail-Einstellungen werden in <code>:path</code> konfiguriert.',

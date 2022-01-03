@@ -51,7 +51,7 @@ return [
     'collections_mount_instructions' => 'Choisissez une entrée sur laquelle cette collection doit être montée. En savoir plus dans la [documentation](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Activez le réordonnancement manuel par glisser-déposer.',
     'collections_past_date_behavior_instructions' => 'Conditions d’accès aux entrées datées ayant expiré.',
-    'collections_route_instructions' => 'La route contrôle le modèle d’URL des entrées.',
+    'collections_route_instructions' => 'La route contrôle le modèle d’URL des entrées. En savoir plus dans la [documentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Le sens de tri par défaut.',
     'collections_taxonomies_instructions' => 'Reliez les entrées de cette collection à des taxonomies. Les champs seront automatiquement ajoutés aux formulaires de publication.',
     'email_utility_configuration_description' => 'Les paramètres de messagerie sont configurés dans <code>:path</code>',
