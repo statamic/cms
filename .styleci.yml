@@ -3,3 +3,6 @@ risky: false
 finder:
   exclude:
     - resources
+  name: '*.php'
+  not-name:
+    - '*.blade.php'
