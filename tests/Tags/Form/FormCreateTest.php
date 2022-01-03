@@ -787,10 +787,10 @@ EOT
 
         $expected = [
             'Statamic.$conditions.showField([], $data)',
-            'Statamic.$conditions.showField({\'if\':{\'my_form.email\':\'not empty\'}}, $data)',
+            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'},\'prefix\':\'my_form.\'}, $data)',
             'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField([], $data)',
-            'Statamic.$conditions.showField({\'if\':{\'my_form.email\':\'not empty\'}}, $data)',
+            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'},\'prefix\':\'my_form.\'}, $data)',
         ];
 
         $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
