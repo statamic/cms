@@ -1,5 +1,28 @@
 # Release Notes
 
+## 3.2.29 (2022-01-04)
+
+### What's new
+- Support `where([...])` syntax in the query builder. [#4899](https://github.com/statamic/cms/issues/4899) by @ryanmitchell
+- Added login throttling to `user:login_form`. [#4971](https://github.com/statamic/cms/issues/4971) by @arthurperton
+- Add `is_homepage` variable to cascade. [#4995](https://github.com/statamic/cms/issues/4995) by @edalzell
+- The pagination slider window can be adjusted. [#5001](https://github.com/statamic/cms/issues/5001) by @ryanmitchell
+
+### What's improved
+- Updated French translations. [#4976](https://github.com/statamic/cms/issues/4976) by @ebeauchamps
+- Updated German translations. [#4998](https://github.com/statamic/cms/issues/4998) by @helloDanuk
+
+### What's fixed
+- Fix red error states when dealing with nested fields (Replicator, Grid, Bard). [#5002](https://github.com/statamic/cms/issues/5002) by @arthurperton
+- Prevent error when when uploading assets in forms when there's no container configured. [#4974](https://github.com/statamic/cms/issues/4974) by @arthurperton
+- Fix intersection error in iterator query builder, which search uses. [#5006](https://github.com/statamic/cms/issues/5006) by @jasonvarga
+- In the fieldtype selector, hide empty sections, and hide slug for forms. [#4948](https://github.com/statamic/cms/issues/4948) by @jesseleite
+- Link to docs in route config field. [#4986](https://github.com/statamic/cms/issues/4986) by @Konafets
+- Fix reordering in a collection ending with the word "collection". [#4978](https://github.com/statamic/cms/issues/4978) by @arthurperton
+- Fix changelog dates. [#4973](https://github.com/statamic/cms/issues/4973) by @markguleno
+
+
+
 ## 3.2.28 (2021-12-22)
 
 ### What's new
