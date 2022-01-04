@@ -93,22 +93,23 @@ class TermQueryBuilder extends Builder
     protected function getKeysFromTaxonomiesWithWheres($taxonomies, $wheres)
     {
         return collect($wheres)->reduce(function ($ids, $where) use ($taxonomies) {
-            // Get a single array comprised of the items from the same index across all taxonomies.
-            $items = collect($taxonomies)->flatMap(function ($taxonomy) use ($where) {
-                return $this->store->store($taxonomy)
-                    ->index($where['column'])->items()
-                    ->mapWithKeys(function ($item, $key) use ($taxonomy) {
-                        return ["{$taxonomy}::{$key}" => $item];
-                    });
-            });
+            $keys = $where['type'] == 'Nested'
+                ? $this->getKeysFromTaxonomiesWithWheres($taxonomies, $where['query']->wheres)
+                : $this->getKeysFromTaxonomiesWithWhere($taxonomies, $where);
 
-            // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $method = 'filterWhere'.$where['type'];
-            $keys = $this->{$method}($items, $where)->keys();
-
-            // Continue intersecting the keys across the where clauses.
             return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
+    }
+
+    protected function getKeysFromTaxonomiesWithWhere($taxonomies, $where)
+    {
+        $items = collect($taxonomies)->flatMap(function ($taxonomy) use ($where) {
+            return $this->getWhereColumnKeysFromStore($taxonomy, $where);
+        });
+
+        $method = 'filterWhere'.$where['type'];
+
+        return $this->{$method}($items, $where)->keys();
     }
 
     protected function getOrderKeyValuesByIndex()

@@ -14,18 +14,20 @@ class CollectionTreeController extends ApiController
     {
         $this->abortIfDisabled();
 
-        return app(TreeResource::class)::make($this->getCollectionTree($collection))
+        $site = $this->queryParam('site');
+
+        return app(TreeResource::class)::make($this->getCollectionTree($collection, $site))
             ->fields($this->queryParam('fields'))
-            ->maxDepth($this->queryParam('max_depth'));
+            ->maxDepth($this->queryParam('max_depth'))
+            ->site($site);
     }
 
-    private function getCollectionTree($collection)
+    private function getCollectionTree($collection, $site)
     {
         $structure = $collection->structure();
 
         throw_unless($structure, new NotFoundHttpException("Collection [{$collection->handle()}] is not a structured collection"));
 
-        $site = $this->queryParam('site');
         $tree = $structure->in($site);
 
         throw_unless($tree, new NotFoundHttpException("Collection [{$collection->handle()}] not found in [{$site}] site"));

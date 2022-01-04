@@ -98,6 +98,95 @@ class QueryBuilderTest extends TestCase
     {
         $this->markTestSkipped();
     }
+
+    /** @test **/
+    public function results_are_found_using_nested_where()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+            ['reference' => 'e', 'title' => 'Sauron'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->where(function ($query) {
+                $query->where('title', 'Frodo');
+            })
+            ->orWhere(function ($query) {
+                $query->where('title', 'Gandalf')
+                    ->orWhere('title', 'Smeagol\'s Precious');
+            })
+            ->orWhere('title', 'Sauron')
+            ->get();
+
+        $this->assertCount(4, $results);
+        $this->assertEquals(['a', 'b', 'd', 'e'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_nested_where_in()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+            ['reference' => 'e', 'title' => 'Sauron'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->where(function ($query) {
+                $query->where('title', 'Frodo');
+            })
+            ->orWhere(function ($query) {
+                $query->whereIn('title', ['Frodo', 'Smeagol\'s Precious'])->orWhereIn('title', ['Frodo\'s Precious']);
+            })
+            ->orWhere('title', 'Sauron')
+            ->get();
+
+        $this->assertCount(4, $results);
+        $this->assertEquals(['a', 'd', 'c', 'e'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_multiple_wheres()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->where('title', 'like', '%Frodo%')->where('reference', 'a')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals(['a'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_array_of_wheres()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+            ['reference' => 'e', 'title' => 'Gandalf'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->where([
+                'title' => 'Gandalf',
+                ['reference', '<>', 'b'],
+            ])
+            ->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals(['e'], $results->map->reference->all());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder

@@ -84,7 +84,7 @@ GQL;
                     'slug' => 'event-one',
                     'url' => '/events/event-one',
                     'uri' => '/events/event-one',
-                    'edit_url' => 'http://localhost/cp/collections/events/entries/3/event-one',
+                    'edit_url' => 'http://localhost/cp/collections/events/entries/3',
                     'permalink' => 'http://localhost/events/event-one',
                     'published' => true,
                     'private' => false,
