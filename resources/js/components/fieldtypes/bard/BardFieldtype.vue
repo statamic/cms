@@ -218,10 +218,14 @@ export default {
             return indexes;
         },
 
-        site() {
-            if (! this.storeName) return this.$config.get('selectedSite');
+        storeState() {
+            if (! this.storeName) return undefined;
 
-            return this.$store.state.publish[this.storeName].site;
+            return this.$store.state.publish[this.storeName];
+        },
+
+        site() {
+            return this.storeState ? this.storeState.site : this.$config.get('selectedSite');
         },
 
         htmlWithReplacedLinks() {
@@ -234,6 +238,16 @@ export default {
 
                 return `"${linkData.permalink}"`;
             });
+        },
+
+        setsWithErrors() {
+            if (! this.storeState) return [];
+
+            return Object.values(this.setIndexes).filter((setIndex) => {
+                const prefix = `${this.errorKeyPrefix || this.handle}.${setIndex}.`;
+
+                return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
+            })
         }
 
     },
