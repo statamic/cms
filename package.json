@@ -10,7 +10,7 @@
     "prod": "npm run production",
     "production": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "svgo": "svgo -f ./resources/svg/  -r",
-    "test": "cross-env NODE_ENV=test jest",
+    "test": "cross-env NODE_ENV=test jest --silent",
     "test-watch": "npm run test -- --watch --notify",
     "frontend-dev": "npm run development -- --env.mixfile=frontend.mix",
     "frontend-prod": "npm run production -- --env.mixfile=frontend.mix",
