@@ -17,7 +17,7 @@ label {
 input[type="checkbox"] {
     font-size: 18px;
     position: relative;
-    top: -1px;
+    top: 1px;
 }
 
 input[type="radio"] {
@@ -308,9 +308,9 @@ input.slug {
 .help-block {
     @apply .block .mb-1 .text-grey-70 .text-xs;
     a {
-        @apply .text-red;
+        @apply .text-grey-80 underline;
         &:hover {
-            @apply .text-grey-80;
+            @apply .text-blue-darker;
         }
     }
 }

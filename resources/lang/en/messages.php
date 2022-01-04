@@ -52,7 +52,7 @@ return [
     'collections_mount_instructions' => 'Choose an entry on which this collection should be mounted. Learn more in the [documentation](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Enable manual ordering via drag & drop.',
     'collections_past_date_behavior_instructions' => 'How past dated entries should behave.',
-    'collections_route_instructions' => 'The route controls entries URL pattern.',
+    'collections_route_instructions' => 'The route controls entries URL pattern. Learn more in the [documentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'The default sort direction.',
     'collections_taxonomies_instructions' => 'Connect entries in this collection to taxonomies. Fields will be automatically added to publish forms.',
     'email_utility_configuration_description' => 'Mail settings are configured in <code>:path</code>',
