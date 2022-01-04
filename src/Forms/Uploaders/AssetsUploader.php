@@ -90,7 +90,7 @@ class AssetsUploader
     /**
      * Find the asset container.
      *
-     * @return null|\Statamic\Contracts\Assets\AssetContainer
+     * @return \Statamic\Contracts\Assets\AssetContainer
      */
     protected function assetContainer()
     {
