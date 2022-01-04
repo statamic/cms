@@ -257,7 +257,6 @@ trait QueriesConditions
 
     protected function queryIsEmptyCondition($query, $field, $boolean)
     {
-        // TODO: Add `whereNull()` and `whereNotNull()` to our query builder so that this can be Eloquent compatible.
         return $query->where($field, $boolean ? '=' : '!=', null);
     }
 

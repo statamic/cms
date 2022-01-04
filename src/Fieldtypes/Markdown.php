@@ -9,6 +9,8 @@ use Statamic\Support\Html;
 
 class Markdown extends Fieldtype
 {
+    protected $categories = ['text'];
+
     use Concerns\ResolvesStatamicUrls;
 
     protected function configFieldItems(): array

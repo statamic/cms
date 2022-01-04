@@ -48,7 +48,7 @@ return [
     'collections_mount_instructions' => 'Vælg en post, som denne samling skal monteres på. Lær mere i [dokumentationen](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Aktivér manuel sortering via træk og slip.',
     'collections_past_date_behavior_instructions' => 'Hvordan tidligere daterede poster skal opføre sig.',
-    'collections_route_instructions' => 'Ruten styrer sidens URL-mønster.',
+    'collections_route_instructions' => 'Ruten styrer sidens URL-mønster. Lær mere i [dokumentationen](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Standardsorteringsretningen.',
     'collections_taxonomies_instructions' => 'Forbind poster i denne samling til taxonomier. Felter tilføjes automatisk for at udgive formularer.',
     'email_utility_configuration_description' => 'Mailindstillinger er konfigureret i <code>:path</code>',

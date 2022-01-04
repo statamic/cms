@@ -22,7 +22,7 @@ class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls;
 
-    public $category = ['text', 'structured'];
+    protected $categories = ['text', 'structured'];
     protected $defaultValue = '[]';
     protected $rules = [];
 
@@ -146,6 +146,12 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.bard.config.enable_paste_rules'),
                 'type' => 'toggle',
                 'default' => true,
+                'width' => 50,
+            ],
+            'antlers' => [
+                'display' => 'Antlers',
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
                 'width' => 50,
             ],
         ];
