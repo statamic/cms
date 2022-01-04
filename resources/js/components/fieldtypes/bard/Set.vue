@@ -44,6 +44,7 @@
                 :parent-name="parentName"
                 :set-index="index"
                 :error-key="errorKey(field)"
+                :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="focused"
@@ -76,7 +77,7 @@ export default {
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
-    inject: ['setConfigs'],
+    inject: ['setConfigs', 'isReadOnly'],
 
     computed: {
 
