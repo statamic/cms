@@ -70,7 +70,7 @@ class View
 
     public function template($template = null)
     {
-        if (! $template) {
+        if (func_num_args() === 0) {
             return $this->template;
         }
 
