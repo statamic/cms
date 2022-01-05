@@ -183,10 +183,10 @@ class Assets extends Fieldtype
         $classes = [
             'dimensions' => DimensionsRule::class,
             'image' => ImageRule::class,
-            'max' => MaxRule::class,
+            'max_filesize' => MaxRule::class,
             'mimes' => MimesRule::class,
             'mimetypes' => MimetypesRule::class,
-            'min' => MinRule::class,
+            'min_filesize' => MinRule::class,
         ];
 
         return collect(parent::fieldRules())->map(function ($rule) use ($classes) {
