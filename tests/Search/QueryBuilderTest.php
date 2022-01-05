@@ -187,6 +187,31 @@ class QueryBuilderTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertEquals(['e'], $results->map->reference->all());
     }
+
+    /** @test **/
+    public function results_are_found_using_where_with_json_value()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo', 'content' => ['value' => 1]],
+            ['reference' => 'b', 'title' => 'Gandalf', 'content' => ['value' => 2]],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious', 'content' => ['value' => 3]],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious', 'content' => ['value' => 1]],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->where('content->value', 1)
+            ->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'd'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->where('content->value', '<>', 1)
+            ->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['b', 'c'], $results->map->reference->all());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder

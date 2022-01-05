@@ -27,6 +27,7 @@ class Value extends Index
         return $item;
     }
 
+    // any changes to this method should also be reflected in Statamic\Query\IteratorBuilder::getFilterItemPartValue()
     private function getItemPartValue($item, $name)
     {
         $method = Str::camel($name);
