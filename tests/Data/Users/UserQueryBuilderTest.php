@@ -101,4 +101,29 @@ class UserQueryBuilderTest extends TestCase
         $this->assertCount(4, $users);
         $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Sauron'], $users->map->name->all());
     }
+
+    /** @test **/
+    public function users_are_found_using_where_with_json_value()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'content' => ['value' => 1]])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol', 'content' => ['value' => 2]])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'content' => ['value' => 3]])->save();
+        User::make()->email('aragorn@precious.com')->data(['name' => 'Aragorn', 'content' => ['value' => 1]])->save();
+        User::make()->email('bombadil@precious.com')->data(['name' => 'Tommy', 'content' => ['value' => 2]])->save();
+        User::make()->email('sauron@precious.com')->data(['name' => 'Sauron', 'content' => ['value' => 3]])->save();
+
+        $users = User::query()
+            ->where('content->value', 1)
+            ->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals(['Gandalf', 'Aragorn'], $users->map->name->all());
+
+        $users = User::query()
+            ->where('content->value', '<>', 1)
+            ->get();
+
+        $this->assertCount(4, $users);
+        $this->assertEquals(['Smeagol', 'Frodo', 'Tommy', 'Sauron'], $users->map->name->all());
+    }
 }
