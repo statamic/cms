@@ -59,7 +59,7 @@ class View
 
     public function layout($layout = null)
     {
-        if (count(func_get_args()) === 0) {
+        if (func_num_args() === 0) {
             return $this->layout;
         }
 
