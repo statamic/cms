@@ -52,7 +52,6 @@ abstract class SizeBasedRule implements Rule
      * Get the file size.
      *
      * @param  string|UploadedFile  $id
-     * 
      * @return int|false
      */
     protected function getFileSize($id)
