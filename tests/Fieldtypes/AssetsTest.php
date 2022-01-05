@@ -136,9 +136,9 @@ class AssetsTest extends TestCase
     }
 
     /** @test */
-    public function it_replaces_min_rule()
+    public function it_replaces_min_filesize_rule()
     {
-        $replaced = $this->fieldtype(['validate' => ['min:100']])->fieldRules();
+        $replaced = $this->fieldtype(['validate' => ['min_filesize:100']])->fieldRules();
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
@@ -147,9 +147,9 @@ class AssetsTest extends TestCase
     }
 
     /** @test */
-    public function it_replaces_max_rule()
+    public function it_replaces_max_filesize_rule()
     {
-        $replaced = $this->fieldtype(['validate' => ['max:100']])->fieldRules();
+        $replaced = $this->fieldtype(['validate' => ['max_filesize:100']])->fieldRules();
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
