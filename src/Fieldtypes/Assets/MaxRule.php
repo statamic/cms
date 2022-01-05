@@ -24,5 +24,4 @@ class MaxRule extends SizeBasedRule
     {
         return str_replace(':max', $this->parameters[0], __('statamic::validation.max.file'));
     }
-
 }
