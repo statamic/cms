@@ -158,7 +158,7 @@ export default {
                 `field-${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
-                { 'has-error': this.hasError }
+                { 'has-error': this.hasError || this.hasNestedError }
             ];
         },
 
@@ -188,6 +188,12 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        hasNestedError() {
+            const prefix = `${this.errorKeyPrefix || this.config.handle}.`;
+
+            return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
 
         labelText() {
