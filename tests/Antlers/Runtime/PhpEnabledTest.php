@@ -192,8 +192,8 @@ EOT;
 <p>{{ title }}</p>
 
 {{$<?php
-$articles = \Statamic\Facades\Entry::query()->where('collection', $var_1)->get();
-$news = \Statamic\Facades\Entry::query()->where('collection', $var_2)->get();
+$articles = \Statamic\Facades\Entry::query()->where('collection', $var_1)->limit(3)->get();
+$news = \Statamic\Facades\Entry::query()->where('collection', $var_2)->limit(5)->get();
 ?>$}}
 
 
