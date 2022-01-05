@@ -1062,7 +1062,7 @@ class Parser implements ParserContract
         }
     }
 
-    public function valueWithNoParse($text)
+    public function valueWithNoparse($text)
     {
         return $this->extractNoparse(str_replace('{{', '@{{', $text));
     }

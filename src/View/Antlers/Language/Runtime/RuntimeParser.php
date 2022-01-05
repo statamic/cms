@@ -525,7 +525,7 @@ class RuntimeParser implements ParserContract
         return $this->renderText($text, $data);
     }
 
-    public function valueWithNoParse($text)
+    public function valueWithNoparse($text)
     {
         // Just pass-thru.
         return $text;

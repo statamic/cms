@@ -53,7 +53,7 @@ interface ParserContract
      */
     public function injectNoparse($text);
 
-    public function valueWithNoParse($text);
+    public function valueWithNoparse($text);
 
     /**
      * Takes a scope-notated key and finds the value for it in the given

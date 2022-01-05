@@ -90,7 +90,7 @@ class Value implements IteratorAggregate, JsonSerializable
         }
 
         if (Str::contains($value, '{')) {
-            return $parser->valueWithNoParse($value);
+            return $parser->valueWithNoparse($value);
         }
 
         return $value;
