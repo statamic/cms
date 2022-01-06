@@ -455,7 +455,7 @@ export default {
 
             this.updateMeta({
                 ...this.meta,
-                data: assets,
+                data: [...assets],
             });
         },
 
