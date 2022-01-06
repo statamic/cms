@@ -12,7 +12,12 @@ trait GetsFormSession
      */
     protected function getFormSession($formName = 'default')
     {
-        $data = $this->getErrorsFromFormSession($formName);
+        $data = [];
+
+        $errors = optional(session()->get('errors'))->getBag($formName);
+
+        $data['errors'] = $errors ? $errors->all() : [];
+        $data['error'] = $errors ? $this->getFirstErrorForEachField($errors) : [];
         $data['success'] = $this->getFromFormSession($formName, 'success');
 
         // Only include this boolean if it's actually passed in session;
@@ -59,23 +64,5 @@ trait GetsFormSession
                 return $errors[0];
             })
             ->all();
-    }
-
-    /**
-     * Get errors from session.
-     *
-     * @param  string  $formName
-     * @return array
-     */
-    protected function getErrorsFromFormSession($formName = 'default')
-    {
-        $data = [];
-
-        $errors = optional(session()->get('errors'))->getBag($formName);
-
-        $data['errors'] = $errors ? $errors->all() : [];
-        $data['error'] = $errors ? $this->getFirstErrorForEachField($errors) : [];
-
-        return $data;
     }
 }
