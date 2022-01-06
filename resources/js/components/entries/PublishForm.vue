@@ -471,7 +471,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                this.title = this.values.title;
+                this.title = response.data.data.title;
                 this.isWorkingCopy = true;
                 if (this.isBase) {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
@@ -588,7 +588,7 @@ export default {
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.clearDirtyState());
+                setTimeout(() => this.$refs.container.clearDirtyState(), 300); // after any fieldtypes do a debounced update
             })
         },
 

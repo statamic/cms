@@ -66,8 +66,6 @@ class CollectionEntriesStore extends ChildStore
             ->id($id)
             ->collection($collection);
 
-        $slug = (new GetSlugFromPath)($path);
-
         if ($origin = array_pull($data, 'origin')) {
             $entry->origin($origin);
         }
@@ -75,10 +73,17 @@ class CollectionEntriesStore extends ChildStore
         $entry
             ->blueprint($data['blueprint'] ?? null)
             ->locale($site)
-            ->slug($slug)
             ->initialPath($path)
             ->published(array_pull($data, 'published', true))
             ->data($data);
+
+        $slug = (new GetSlugFromPath)($path);
+
+        if (! $collection->requiresSlugs() && $slug == $id) {
+            $entry->slug(null);
+        } else {
+            $entry->slug($slug);
+        }
 
         // if ($collection->orderable() && ! $collection->getEntryPosition($id)) {
         //     $positionGenerated = true;
@@ -151,6 +156,7 @@ class CollectionEntriesStore extends ChildStore
             'title',
             'site' => Indexes\Site::class,
             'origin' => Indexes\Origin::class,
+            'parent' => Indexes\Parents::class,
         ]);
 
         if (! $collection = Collection::findByHandle($this->childKey())) {

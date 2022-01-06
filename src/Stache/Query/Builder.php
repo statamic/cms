@@ -92,6 +92,16 @@ abstract class Builder extends BaseBuilder
         return $items->keys();
     }
 
+    public function getWhereColumnKeysFromStore($store, $where)
+    {
+        return $this->store->store($store)
+            ->index($where['column'])
+            ->items()
+            ->mapWithKeys(function ($item, $key) use ($store) {
+                return ["{$store}::{$key}" => $item];
+            });
+    }
+
     protected function intersectKeysFromWhereClause($keys, $newKeys, $where)
     {
         // On the first iteration, there's nothing to intersect;
@@ -139,6 +149,20 @@ abstract class Builder extends BaseBuilder
     {
         return $values->filter(function ($value) use ($where) {
             return ! in_array($value, $where['values']);
+        });
+    }
+
+    protected function filterWhereNull($values, $where)
+    {
+        return $values->filter(function ($value) {
+            return $value === null;
+        });
+    }
+
+    protected function filterWhereNotNull($values, $where)
+    {
+        return $values->filter(function ($value) {
+            return $value !== null;
         });
     }
 }
