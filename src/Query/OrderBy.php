@@ -32,10 +32,10 @@ class OrderBy
 
         if (in_array($lastPart, ['asc', 'desc'])) {
             $direction = $lastPart;
-            $sort = implode(':', array_slice($parts, 0, -1));
+            $sort = implode('->', array_slice($parts, 0, -1));
         } else {
             $direction = 'asc';
-            $sort = $orderBy;
+            $sort = str_replace(':', '->', $orderBy);
         }
 
         return new static($sort, $direction);

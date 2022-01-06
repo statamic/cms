@@ -26,13 +26,13 @@ class OrderByTest extends TestCase
             ['foo:asc', 'foo', 'asc'],
             ['foo:desc', 'foo', 'desc'],
 
-            ['foo:bar', 'foo:bar', 'asc'],
-            ['foo:bar:asc', 'foo:bar', 'asc'],
-            ['foo:bar:desc', 'foo:bar', 'desc'],
+            ['foo:bar', 'foo->bar', 'asc'],
+            ['foo:bar:asc', 'foo->bar', 'asc'],
+            ['foo:bar:desc', 'foo->bar', 'desc'],
 
-            ['foo:bar:baz', 'foo:bar:baz', 'asc'],
-            ['foo:bar:baz:asc', 'foo:bar:baz', 'asc'],
-            ['foo:bar:baz:desc', 'foo:bar:baz', 'desc'],
+            ['foo:bar:baz', 'foo->bar->baz', 'asc'],
+            ['foo:bar:baz:asc', 'foo->bar->baz', 'asc'],
+            ['foo:bar:baz:desc', 'foo->bar->baz', 'desc'],
         ];
     }
 }
