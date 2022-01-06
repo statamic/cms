@@ -9,7 +9,7 @@
             {{ if ! old && value === default }} checked{{ /if }}
             {{ if validate|contains:required }} required{{ /if }}
         >
-        {{ label }}
+        {{ label !== null ? label : value }}
     </label>
     {{ unless inline }}
         <br>
