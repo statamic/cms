@@ -13,7 +13,7 @@ class TernaryGroupsTest extends ParserTestCase
                 'sm' => 'text-sm',
                 'md' => 'text-base',
                 'lg' => 'text-lg',
-            ]
+            ],
         ];
 
         $this->assertSame('text-base', $this->renderString('{{ size = size ? sizes[size] : sizes["md"]; size }}', $data));
@@ -27,7 +27,7 @@ class TernaryGroupsTest extends ParserTestCase
                 'sm' => 'text-sm',
                 'md' => 'text-base',
                 'lg' => 'text-lg',
-            ]
+            ],
         ];
 
         $this->assertSame('text-base', $this->renderString("{{ size = sizes[{size ?? 'md'}]; size }}", $data));

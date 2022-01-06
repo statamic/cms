@@ -16,7 +16,6 @@ use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\VariableAccessException;
-use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Parser\PathParser;
@@ -116,7 +115,7 @@ class PathDataManager
     /**
      * Sets the internal environment reference.
      *
-     * @param Environment $environment
+     * @param  Environment  $environment
      */
     public function setEnvironment($environment)
     {
@@ -126,7 +125,7 @@ class PathDataManager
     /**
      * Sets the data manager's internal interpolation reference.
      *
-     * @param array $interpolations
+     * @param  array  $interpolations
      */
     public function setInterpolations($interpolations)
     {

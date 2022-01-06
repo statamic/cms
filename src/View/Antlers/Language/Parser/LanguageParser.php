@@ -2423,7 +2423,6 @@ class LanguageParser
                 $ternaryStructure->truthBranch = $truthBranch;
                 $ternaryStructure->falseBranch = $falseBranch;
 
-
                 $newTokens[] = $ternaryStructure;
                 $targetJumpIndex = $separator[1] + 1;
 

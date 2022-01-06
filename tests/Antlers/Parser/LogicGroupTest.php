@@ -6,7 +6,6 @@ use Tests\Antlers\ParserTestCase;
 
 class LogicGroupTest extends ParserTestCase
 {
-
     public function test_logic_groups_can_neighbor_path_terminators()
     {
         $data = [
@@ -14,7 +13,7 @@ class LogicGroupTest extends ParserTestCase
                 'sm' => 'text-sm',
                 'md' => 'text-base',
                 'lg' => 'text-lg',
-            ]
+            ],
         ];
 
         $this->assertSame('text-base', $this->renderString('{{ size = (size ? sizes[size] : sizes["md"]); size }}', $data));
