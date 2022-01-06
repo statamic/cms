@@ -129,6 +129,44 @@ class FormCreateAlpineTest extends FormTestCase
     }
 
     /** @test */
+    public function it_renders_proper_x_data_for_multiple_select_field()
+    {
+        $config = [
+            'handle' => 'favourite_animals',
+            'field' => [
+                'type' => 'select',
+                'multiple' => true,
+                'options' => [
+                    'cat' => 'Cat',
+                    'armadillo' => 'Armadillo',
+                    'rat' => 'Rat',
+                ],
+            ],
+        ];
+
+        $expectedXData = "x-data=\"{'favourite_animals':[]}\"";
+
+        $this->assertFieldRendersHtml($expectedXData, $config, [], ['js' => 'alpine']);
+    }
+
+    /** @test */
+    public function it_renders_proper_x_data_for_multiple_assets_field()
+    {
+        $config = [
+            'handle' => 'selfies',
+            'field' => [
+                'type' => 'assets',
+                'display' => 'Selfies',
+                'max_files' => 3,
+            ],
+        ];
+
+        $expectedXData = "x-data=\"{'selfies':[]}\"";
+
+        $this->assertFieldRendersHtml($expectedXData, $config, [], ['js' => 'alpine']);
+    }
+
+    /** @test */
     public function it_renders_show_field_js()
     {
         $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
