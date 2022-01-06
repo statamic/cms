@@ -178,6 +178,9 @@
     }
 }
 
+.bard-set.has-error > .replicator-set-header label {
+    color: $color_red;
+}
 
 /* The set selection options for each text block
   ========================================================================== */

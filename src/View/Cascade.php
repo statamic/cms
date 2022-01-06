@@ -208,6 +208,7 @@ class Cascade
             'site' => $this->site,
             'sites' => Facades\Site::all()->values(),
             'homepage' => $this->site->url(),
+            'is_homepage' => $this->site->absoluteUrl() == $this->request->url(),
             'cp_url' => cp_route('index'),
         ];
     }

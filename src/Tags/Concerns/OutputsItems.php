@@ -35,6 +35,11 @@ trait OutputsItems
     protected function paginatedOutput($paginator)
     {
         $paginator->withQueryString();
+
+        if ($window = $this->params->int('on_each_side')) {
+            $paginator->onEachSide($window);
+        }
+
         $as = $this->getPaginationResultsKey();
         $items = $paginator->getCollection()->supplement('total_results', $paginator->total());
 

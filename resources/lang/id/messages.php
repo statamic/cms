@@ -47,7 +47,7 @@ return [
     'collections_mount_instructions' => 'Pilih entri tempat koleksi ini harus dipasang. Pelajari lebih lanjut di [dokumentasi](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Aktifkan penyusunan ulang manual melalui seret & lepas.',
     'collections_past_date_behavior_instructions' => 'Bagaimana entri tanggal yang lalu harus berperilaku.',
-    'collections_route_instructions' => 'Rute mengontrol pola URL entri.',
+    'collections_route_instructions' => 'Rute mengontrol pola URL entri. Pelajari lebih lanjut di [dokumentasi](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Arah pengurutan default.',
     'collections_taxonomies_instructions' => 'Hubungkan entri dalam koleksi ini ke taksonomi. Bidang akan secara otomatis ditambahkan untuk menerbitkan formulir.',
     'email_utility_configuration_description' => 'Pengaturan email dikonfigurasi di <code>:path</code>',
