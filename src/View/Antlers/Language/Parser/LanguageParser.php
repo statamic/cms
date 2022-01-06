@@ -776,6 +776,18 @@ class LanguageParser
         }
     }
 
+    private function isAssignmentOperator($token)
+    {
+        if ($token instanceof AdditionAssignmentOperator ||
+            $token instanceof DivisionAssignmentOperator || $token instanceof LeftAssignmentOperator ||
+            $token instanceof ModulusAssignmentOperator || $token instanceof MultiplicationAssignmentOperator ||
+            $token instanceof SubtractionAssignmentOperator) {
+            return true;
+        }
+
+        return false;
+    }
+
     private function isOperatorType($token)
     {
         if ($token instanceof OperatorNodeContract || $token instanceof AdditionAssignmentOperator ||
@@ -2316,6 +2328,10 @@ class LanguageParser
         $collectedTokens = [];
 
         for ($i = $len - 1; $i >= 0; $i--) {
+            if ($this->isAssignmentOperator($tokens[$i])) {
+                break;
+            }
+
             $collectedTokens[] = array_pop($tokens);
         }
 
@@ -2347,6 +2363,7 @@ class LanguageParser
     {
         $newTokens = [];
         $tokenCount = count($tokens);
+
         for ($i = 0; $i < $tokenCount; $i++) {
             $node = $tokens[$i];
 
@@ -2406,8 +2423,9 @@ class LanguageParser
                 $ternaryStructure->truthBranch = $truthBranch;
                 $ternaryStructure->falseBranch = $falseBranch;
 
+
                 $newTokens[] = $ternaryStructure;
-                $targetJumpIndex = $separator[1] + 2;
+                $targetJumpIndex = $separator[1] + 1;
 
                 /*if ($targetTokenIndex >= $tokenCount) {
                     throw ErrorFactory::makeSyntaxError(
@@ -2417,7 +2435,7 @@ class LanguageParser
                     );
                 }*/
 
-                $i += ($targetJumpIndex);
+                $i = $targetJumpIndex;
                 continue;
             } else {
                 $newTokens[] = $node;

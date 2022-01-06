@@ -1348,6 +1348,10 @@ class NodeProcessor
 
                             $environment->setIsPaired($node->isPaired());
 
+                            if (! empty($node->processedInterpolationRegions)) {
+                                $environment->setDataManagerInterpolations($node->processedInterpolationRegions);
+                            }
+
                             $runtimeResult = $environment->evaluate($node->parsedRuntimeNodes);
                             $this->data = $restoreData;
 

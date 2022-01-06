@@ -136,6 +136,10 @@ class AntlersLexer
             return false;
         }
 
+        if ($this->isParsingString == false && $char == ']') {
+            return true;
+        }
+
         if ($this->isParsingString == false && $char == ')') {
             return false;
         }

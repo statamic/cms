@@ -99,6 +99,7 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $referenceVars = [];
+    protected $dataManagerInterpolations = [];
 
     /**
      * @var LanguageOperatorManager|null
@@ -139,10 +140,19 @@ class Environment
         $this->libraryManager = $libraryManager;
         $this->pathParser = new PathParser();
         $this->dataRetriever = new PathDataManager();
+        $this->dataRetriever->setEnvironment($this);
         $this->dataRetriever->setIsPaired(false);
         $this->operatorManager = new LanguageOperatorManager();
 
         $this->operatorManager->setEnvironment($this)->setLibraryManager($this->libraryManager);
+    }
+
+    public function setDataManagerInterpolations($interpolations)
+    {
+        $this->dataManagerInterpolations = $interpolations;
+        $this->dataRetriever->setInterpolations($interpolations);
+
+        return $this;
     }
 
     public function setIsPaired($paired)
@@ -200,6 +210,11 @@ class Environment
         $this->operatorManager->setNodeProcessor($this->nodeProcessor);
 
         return $this;
+    }
+
+    public function _getNodeProcessor()
+    {
+        return $this->nodeProcessor;
     }
 
     /***

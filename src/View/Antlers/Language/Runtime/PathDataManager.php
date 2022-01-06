@@ -16,9 +16,11 @@ use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\VariableAccessException;
+use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Parser\PathParser;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
@@ -98,6 +100,38 @@ class PathDataManager
      * @var Cascade|null
      */
     private $cascade = null;
+
+    /**
+     * @var Environment|null
+     */
+    private $environment = null;
+
+    /**
+     * A collection of internal interpolation references.
+     *
+     * @var array
+     */
+    private $interpolations = [];
+
+    /**
+     * Sets the internal environment reference.
+     *
+     * @param Environment $environment
+     */
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
+    }
+
+    /**
+     * Sets the data manager's internal interpolation reference.
+     *
+     * @param array $interpolations
+     */
+    public function setInterpolations($interpolations)
+    {
+        $this->interpolations = $interpolations;
+    }
 
     /**
      * Attempts to locate a value within the provided data.
@@ -316,6 +350,19 @@ class PathDataManager
                     continue;
                 }
 
+                if (array_key_exists($pathItem->name, $this->interpolations) && $this->environment != null) {
+                    $nodeProcessor = $this->environment->_getNodeProcessor();
+
+                    if ($nodeProcessor != null) {
+                        $varResult = $this->environment->_getNodeProcessor()->reduce($this->interpolations[$pathItem->name]);
+                        $this->resolvedPath[] = $pathItem->name;
+                        $this->reducedVar = $varResult;
+
+                        $this->compact($pathItem->isFinal);
+                        continue;
+                    }
+                }
+
                 if ($didScanSourceData == false) {
                     if ($this->namedSlotsInScope && $pathItem->name == 'slot' &&
                         $path->originalContent != 'slot' &&
@@ -404,6 +451,9 @@ class PathDataManager
                     continue;
                 } else {
                     $retriever = new PathDataManager();
+                    $retriever->setInterpolations($this->interpolations);
+                    $retriever->setEnvironment($this->environment);
+                    $retriever->setIsPaired(false);
                     $referencePath = $retriever->getData($pathItem, $data);
 
                     $this->reduceVar($referencePath);
