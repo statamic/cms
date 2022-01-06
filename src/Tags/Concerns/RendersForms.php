@@ -95,17 +95,21 @@ trait RendersForms
     }
 
     /**
-     * Render alpine x-data string for field handles, with scope if necessary.
+     * Render alpine x-data string for fields, with scope if necessary.
      *
-     * @param  array|\Illuminate\Support\Collection  $fieldHandles
+     * @param  \Statamic\Fields\Fields  $fields
      * @param  bool|string  $alpineScope
      * @return string
      */
-    protected function renderAlpineXData($fieldHandles, $alpineScope)
+    protected function renderAlpineXData($fields, $alpineScope)
     {
-        $xData = collect($fieldHandles)
-            ->mapWithKeys(function ($fieldHandle) {
-                return [$fieldHandle => old($fieldHandle)];
+        $oldValues = collect(old());
+
+        $xData = $fields->preProcess()->values()
+            ->map(function ($defaultProcessedValue, $handle) use ($oldValues) {
+                return $oldValues->has($handle)
+                    ? $oldValues->get($handle)
+                    : $defaultProcessedValue;
             })
             ->all();
 

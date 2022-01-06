@@ -84,7 +84,7 @@ class Tags extends BaseTags
         $attrs = [];
 
         if ($jsDriver === 'alpine') {
-            $attrs['x-data'] = $this->renderAlpineXData($form->fields()->keys(), $jsOptions[0] ?? []);
+            $attrs['x-data'] = $this->renderAlpineXData($form->blueprint()->fields(), $jsOptions[0] ?? []);
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
