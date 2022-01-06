@@ -2,8 +2,6 @@
 
 namespace Tests\Tags\Form;
 
-use Statamic\Facades\Form;
-
 class FormCreateAlpineTest extends FormTestCase
 {
     protected $defaultFields = [
