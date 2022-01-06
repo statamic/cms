@@ -247,17 +247,11 @@ class UserTags extends Tags
      */
     public function resetPasswordForm()
     {
-        $data = [
-            'errors' => [],
-        ];
-
         if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
 
-        if (session('errors')) {
-            $data['errors'] = session('errors')->all();
-        }
+        $data = $this->getFormSession();
 
         $data['url_invalid'] = request()->isNotFilled('token');
 
