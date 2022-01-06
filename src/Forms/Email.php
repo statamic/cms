@@ -97,14 +97,13 @@ class Email extends Mailable
             })
             ->each(function ($field) {
                 $value = $field['value']->value();
+
                 if (array_get($field, 'config.max_files') === 1) {
-                    if (isset($value)) {
-                        $this->attachFromStorageDisk($value->container()->diskHandle(), $value->path());
-                    }
-                } else {
-                    foreach ($value as $file) {
-                        $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
-                    }
+                    $value = collect([$value])->filter();
+                }
+
+                foreach ($value as $file) {
+                    $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
                 }
             });
 
