@@ -15,6 +15,34 @@ abstract class FormTestCase extends TestCase
 {
     use PreventSavingStacheItemsToDisk, NormalizesHtml;
 
+    protected $defaultFields = [
+        [
+            'handle' => 'name',
+            'field' => [
+                'type' => 'text',
+                'display' => 'Full Name',
+                'validate' => 'min:3|alpha_num',
+            ],
+        ],
+        [
+            'handle' => 'email',
+            'field' => [
+                'type' => 'text',
+                'input_type' => 'email',
+                'display' => 'Email Address',
+                'validate' => 'required|email',
+            ],
+        ],
+        [
+            'handle' => 'message',
+            'field' => [
+                'type' => 'textarea',
+                'display' => 'Message',
+                'validate' => 'required',
+            ],
+        ],
+    ];
+
     public function setUp(): void
     {
         parent::setUp();
@@ -44,39 +72,8 @@ abstract class FormTestCase extends TestCase
 
     protected function createContactForm($fields = null)
     {
-        $defaultFields = [
-            [
-                'handle' => 'name',
-                'field' => [
-                    'type' => 'text',
-                    'display' => 'Full Name',
-                    'validate' => 'min:3|alpha_num',
-                ],
-            ],
-            [
-                'handle' => 'email',
-                'field' => [
-                    'type' => 'text',
-                    'input_type' => 'email',
-                    'display' => 'Email Address',
-                    'validate' => 'required|email',
-                ],
-            ],
-            [
-                'handle' => 'message',
-                'field' => [
-                    'type' => 'textarea',
-                    'display' => 'Message',
-                    'validate' => 'required',
-                    'if' => [
-                        'email' => 'not empty',
-                    ],
-                ],
-            ],
-        ];
-
         $blueprint = Blueprint::make()->setContents([
-            'fields' => $fields ?? $defaultFields,
+            'fields' => $fields ?? $this->defaultFields,
         ]);
 
         $handle = $fields ? $this->customFieldBlueprintHandle : 'contact';
