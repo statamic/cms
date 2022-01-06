@@ -1,8 +1,8 @@
 <select
     name="{{ handle }}{{ multiple ?= "[]" }}"
     {{ if alpine }}x-model="{{ alpine_data_key }}"{{ /if }}
-    {{ if multiple }} multiple{{ /if }}
-    {{ if validate|contains:required }} required{{ /if }}
+    {{ if multiple }}multiple{{ /if }}
+    {{ if validate|contains:required }}required{{ /if }}
 >
     {{ unless multiple }}
         <option value>{{ trans key="Please select..." }}</option>

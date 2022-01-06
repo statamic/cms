@@ -5,9 +5,9 @@
             name="{{ handle }}"
             value="{{ value }}"
             {{ if alpine }}x-model="{{ alpine_data_key }}"{{ /if }}
-            {{ if old === value }} checked{{ /if }}
-            {{ if ! old && value === default }} checked{{ /if }}
-            {{ if validate|contains:required }} required{{ /if }}
+            {{ if old === value }}checked{{ /if }}
+            {{ if ! old && value === default }}checked{{ /if }}
+            {{ if validate|contains:required }}required{{ /if }}
         >
         {{ label !== null ? label : value }}
     </label>
