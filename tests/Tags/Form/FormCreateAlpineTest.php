@@ -58,6 +58,17 @@ class FormCreateAlpineTest extends FormTestCase
                 ],
             ],
         ],
+        [
+            'handle' => 'fav_subject',
+            'field' => [
+                'type' => 'select',
+                'display' => 'Fav Subject',
+                'options' => [
+                    'math' => 'Math',
+                    'english' => 'English',
+                ],
+            ],
+        ],
     ];
 
     /** @test */
@@ -65,7 +76,7 @@ class FormCreateAlpineTest extends FormTestCase
     {
         $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
 
-        $expectedXData = "{'name':null,'email':null,'message':null,'fav_animals':[],'fav_colour':null}";
+        $expectedXData = "{'name':null,'email':null,'message':null,'fav_animals':[],'fav_colour':null,'fav_subject':null}";
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -82,7 +93,7 @@ class FormCreateAlpineTest extends FormTestCase
 
         $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
 
-        $expectedXData = "{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':[],'fav_colour':null}";
+        $expectedXData = "{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':[],'fav_colour':null,'fav_subject':null}";
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -93,7 +104,7 @@ class FormCreateAlpineTest extends FormTestCase
     {
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
 
-        $expectedXData = "{'my_form':{'name':null,'email':null,'message':null,'fav_animals':[],'fav_colour':null}}";
+        $expectedXData = "{'my_form':{'name':null,'email':null,'message':null,'fav_animals':[],'fav_colour':null,'fav_subject':null}}";
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -111,7 +122,7 @@ class FormCreateAlpineTest extends FormTestCase
 
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
 
-        $expectedXData = "{'my_form':{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':['cat'],'fav_colour':null}}";
+        $expectedXData = "{'my_form':{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':['cat'],'fav_colour':null,'fav_subject':null}}";
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -141,6 +152,7 @@ EOT
             'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data)',
+            'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField([], $data)',
         ];
@@ -175,6 +187,7 @@ EOT
             'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data.my_form)',
             'Statamic.$conditions.showField([], $data.my_form)',
             'Statamic.$conditions.showField([], $data.my_form)',
+            'Statamic.$conditions.showField([], $data.my_form)',
         ];
 
         $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
@@ -184,35 +197,35 @@ EOT
     /** @test */
     public function it_dynamically_renders_text_field_x_model()
     {
-        $textConfig = [
+        $config = [
             'handle' => 'name',
             'field' => [
                 'type' => 'text',
             ],
         ];
 
-        $this->assertFieldRendersHtml(['<input type="text" name="name" value="" x-model="name">'], $textConfig, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<input type="text" name="name" value="" x-model="my_form.name">'], $textConfig, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input type="text" name="name" value="" x-model="name">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="text" name="name" value="" x-model="my_form.name">'], $config, [], ['js' => 'alpine:my_form']);
     }
 
     /** @test */
     public function it_dynamically_renders_textarea_field_x_model()
     {
-        $textConfig = [
+        $config = [
             'handle' => 'comment',
             'field' => [
                 'type' => 'textarea',
             ],
         ];
 
-        $this->assertFieldRendersHtml(['<textarea name="comment" rows="5" x-model="comment"></textarea>'], $textConfig, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<textarea name="comment" rows="5" x-model="my_form.comment"></textarea>'], $textConfig, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<textarea name="comment" rows="5" x-model="comment"></textarea>'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<textarea name="comment" rows="5" x-model="my_form.comment"></textarea>'], $config, [], ['js' => 'alpine:my_form']);
     }
 
     /** @test */
     public function it_dynamically_renders_checkboxes_field_x_model()
     {
-        $textConfig = [
+        $config = [
             'handle' => 'fav_animals',
             'field' => [
                 'type' => 'checkboxes',
@@ -224,19 +237,19 @@ EOT
             ],
         ];
 
-        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="cat" x-model="fav_animals">'], $textConfig, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="rat" x-model="fav_animals">'], $textConfig, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="armadillo" x-model="fav_animals">'], $textConfig, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="cat" x-model="fav_animals">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="rat" x-model="fav_animals">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="armadillo" x-model="fav_animals">'], $config, [], ['js' => 'alpine']);
 
-        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="cat" x-model="my_form.fav_animals">'], $textConfig, [], ['js' => 'alpine:my_form']);
-        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="rat" x-model="my_form.fav_animals">'], $textConfig, [], ['js' => 'alpine:my_form']);
-        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="armadillo" x-model="my_form.fav_animals">'], $textConfig, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="cat" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="rat" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="armadillo" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
     }
 
     /** @test */
     public function it_dynamically_renders_radio_field_x_model()
     {
-        $textConfig = [
+        $config = [
             'handle' => 'fav_animal',
             'field' => [
                 'type' => 'radio',
@@ -248,12 +261,50 @@ EOT
             ],
         ];
 
-        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="cat" x-model="fav_animal">'], $textConfig, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="rat" x-model="fav_animal">'], $textConfig, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="armadillo" x-model="fav_animal">'], $textConfig, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="cat" x-model="fav_animal">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="rat" x-model="fav_animal">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="armadillo" x-model="fav_animal">'], $config, [], ['js' => 'alpine']);
 
-        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="cat" x-model="my_form.fav_animal">'], $textConfig, [], ['js' => 'alpine:my_form']);
-        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="rat" x-model="my_form.fav_animal">'], $textConfig, [], ['js' => 'alpine:my_form']);
-        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="armadillo" x-model="my_form.fav_animal">'], $textConfig, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="cat" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="rat" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="armadillo" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
+    }
+
+    /** @test */
+    public function it_dynamically_renders_select_field_x_model()
+    {
+        $config = [
+            'handle' => 'favourite_animal',
+            'field' => [
+                'type' => 'select',
+                'options' => [
+                    'cat' => 'Cat',
+                    'armadillo' => 'Armadillo',
+                    'rat' => 'Rat',
+                ],
+            ],
+        ];
+
+        $expected = [
+            '<select name="favourite_animal" x-model="favourite_animal">',
+            '<option value>Please select...</option>',
+            '<option value="cat">Cat</option>',
+            '<option value="armadillo">Armadillo</option>',
+            '<option value="rat">Rat</option>',
+            '</select>',
+        ];
+
+        $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
+
+        $expectedScoped = [
+            '<select name="favourite_animal" x-model="my_form.favourite_animal">',
+            '<option value>Please select...</option>',
+            '<option value="cat">Cat</option>',
+            '<option value="armadillo">Armadillo</option>',
+            '<option value="rat">Rat</option>',
+            '</select>',
+        ];
+
+        $this->assertFieldRendersHtml($expectedScoped, $config, [], ['js' => 'alpine:my_form']);
     }
 }
