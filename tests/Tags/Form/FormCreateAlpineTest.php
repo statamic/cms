@@ -47,6 +47,17 @@ class FormCreateAlpineTest extends FormTestCase
                 ],
             ],
         ],
+        [
+            'handle' => 'fav_colour',
+            'field' => [
+                'type' => 'radio',
+                'display' => 'Fav Colour',
+                'options' => [
+                    'red' => 'Red',
+                    'blue' => 'Blue',
+                ],
+            ],
+        ],
     ];
 
     /** @test */
@@ -54,7 +65,7 @@ class FormCreateAlpineTest extends FormTestCase
     {
         $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
 
-        $expectedXData = "{'name':null,'email':null,'message':null,'fav_animals':[]}";
+        $expectedXData = "{'name':null,'email':null,'message':null,'fav_animals':[],'fav_colour':null}";
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -71,7 +82,7 @@ class FormCreateAlpineTest extends FormTestCase
 
         $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
 
-        $expectedXData = "{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':[]}";
+        $expectedXData = "{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':[],'fav_colour':null}";
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -82,7 +93,7 @@ class FormCreateAlpineTest extends FormTestCase
     {
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
 
-        $expectedXData = "{'my_form':{'name':null,'email':null,'message':null,'fav_animals':[]}}";
+        $expectedXData = "{'my_form':{'name':null,'email':null,'message':null,'fav_animals':[],'fav_colour':null}}";
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -100,7 +111,7 @@ class FormCreateAlpineTest extends FormTestCase
 
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
 
-        $expectedXData = "{'my_form':{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':['cat']}}";
+        $expectedXData = "{'my_form':{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':['cat'],'fav_colour':null}}";
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -130,6 +141,7 @@ EOT
             'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data)',
+            'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField([], $data)',
         ];
 
@@ -161,6 +173,7 @@ EOT
             'Statamic.$conditions.showField([], $data.my_form)',
             'Statamic.$conditions.showField([], $data.my_form)',
             'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data.my_form)',
+            'Statamic.$conditions.showField([], $data.my_form)',
             'Statamic.$conditions.showField([], $data.my_form)',
         ];
 
@@ -218,5 +231,29 @@ EOT
         $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="cat" x-model="my_form.fav_animals">'], $textConfig, [], ['js' => 'alpine:my_form']);
         $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="rat" x-model="my_form.fav_animals">'], $textConfig, [], ['js' => 'alpine:my_form']);
         $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="armadillo" x-model="my_form.fav_animals">'], $textConfig, [], ['js' => 'alpine:my_form']);
+    }
+
+    /** @test */
+    public function it_dynamically_renders_radio_field_x_model()
+    {
+        $textConfig = [
+            'handle' => 'fav_animal',
+            'field' => [
+                'type' => 'radio',
+                'options' => [
+                    'cat' => 'Cat',
+                    'armadillo' => 'Armadillo',
+                    'rat' => 'Rat',
+                ],
+            ],
+        ];
+
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="cat" x-model="fav_animal">'], $textConfig, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="rat" x-model="fav_animal">'], $textConfig, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="armadillo" x-model="fav_animal">'], $textConfig, [], ['js' => 'alpine']);
+
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="cat" x-model="my_form.fav_animal">'], $textConfig, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="rat" x-model="my_form.fav_animal">'], $textConfig, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="armadillo" x-model="my_form.fav_animal">'], $textConfig, [], ['js' => 'alpine:my_form']);
     }
 }
