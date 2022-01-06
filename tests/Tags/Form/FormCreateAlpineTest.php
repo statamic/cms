@@ -307,4 +307,18 @@ EOT
 
         $this->assertFieldRendersHtml($expectedScoped, $config, [], ['js' => 'alpine:my_form']);
     }
+
+    /** @test */
+    public function it_dynamically_renders_field_with_fallback_to_default_partial_x_model()
+    {
+        $config = [
+            'handle' => 'custom',
+            'field' => [
+                'type' => 'markdown', // 'markdown' doesn't have a template, so it should fall back to default.antlers.html
+            ],
+        ];
+
+        $this->assertFieldRendersHtml('<input type="text" name="custom" value="" x-model="custom">', $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml('<input type="text" name="custom" value="" x-model="my_form.custom">', $config, [], ['js' => 'alpine:my_form']);
+    }
 }
