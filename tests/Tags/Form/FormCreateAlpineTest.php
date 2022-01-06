@@ -309,6 +309,22 @@ EOT
     }
 
     /** @test */
+    public function it_dynamically_renders_asset_field_x_model()
+    {
+        $config = [
+            'handle' => 'cat_selfie',
+            'field' => [
+                'type' => 'assets',
+                'display' => 'Cat Selfie',
+                'max_files' => 1,
+            ],
+        ];
+
+        $this->assertFieldRendersHtml('<input type="file" name="cat_selfie" x-model="cat_selfie">', $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml('<input type="file" name="cat_selfie" x-model="my_form.cat_selfie">', $config, [], ['js' => 'alpine:my_form']);
+    }
+
+    /** @test */
     public function it_dynamically_renders_field_with_fallback_to_default_partial_x_model()
     {
         $config = [
