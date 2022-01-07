@@ -137,9 +137,9 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
-    protected function getFilterItemValue($item, $name)
+    protected function getFilterItemValue($item, $column)
     {
-        return (new ResolveValue)($item, $name);
+        return (new ResolveValue)($item, $column);
     }
 
     abstract protected function getBaseItems();
