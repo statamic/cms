@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Indexes;
 
+use Statamic\Query\ResolveValue;
 use Statamic\Support\Str;
 
 class Value extends Index
@@ -15,22 +16,7 @@ class Value extends Index
 
     public function getItemValue($item)
     {
-        $nameExploded = explode('->', $this->name);
-        while (! empty($nameExploded)) {
-            $name = array_shift($nameExploded);
-            $item = $this->getItemPartValue($item, $name);
-            if (is_null($item)) {
-                return;
-            }
-        }
-
-        return $item;
-    }
-
-    // any changes to this method should also be reflected in Statamic\Query\IteratorBuilder::getFilterItemPartValue()
-    private function getItemPartValue($item, $name)
-    {
-        $method = Str::camel($name);
+        $method = Str::camel($this->name);
 
         if ($method === 'blueprint') {
             return $item->blueprint()->handle();
@@ -45,22 +31,6 @@ class Value extends Index
             return $item->value('authors');
         }
 
-        if (is_array($item)) {
-            return $item[$name] ?? null;
-        }
-
-        if (is_scalar($item)) {
-            return null;
-        }
-
-        if (method_exists($item, $method)) {
-            return $item->{$method}();
-        }
-
-        if (method_exists($item, 'value')) {
-            return $item->value($name);
-        }
-
-        return $item->get($name);
+        return (new ResolveValue)($item, $this->name);
     }
 }
