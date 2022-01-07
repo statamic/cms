@@ -27,6 +27,7 @@ class EventServiceProvider extends ServiceProvider
         // \Statamic\Taxonomies\TermTracker::class, // TODO
         \Statamic\Listeners\GeneratePresetImageManipulations::class,
         \Statamic\Listeners\UpdateAssetReferences::class,
+        \Statamic\Listeners\DeleteAssetReferences::class,
         \Statamic\Listeners\UpdateTermReferences::class,
         \Statamic\Listeners\DeleteTermReferences::class,
     ];

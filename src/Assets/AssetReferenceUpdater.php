@@ -145,13 +145,15 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             return;
         }
 
-        $value = preg_replace_callback('/([("]statamic:\/\/[^()"]*::)([^)"]*)([)"])/im', function ($matches) {
-            return $matches[2] === $this->originalValue
-                ? $matches[1].$this->newValue.$matches[3]
-                : $matches[0];
-        }, $value);
+        $pattern = '/([("]statamic:\/\/[^()"]*::)'.$this->originalValue.'([)"])/i';
 
-        if ($originalValue === $value) {
+        $replacement = is_null($this->newValue)
+            ? ''
+            : '${1}'.$this->newValue.'${2}';
+        
+        $value = preg_replace($pattern, $replacement, $value, -1, $count);
+
+        if ($count === 0) {
             return;
         }
 
@@ -200,8 +202,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             ->filter(function ($value) {
                 return $value === "asset::{$this->container}::{$this->originalValue}";
             })
-            ->map(function ($value) {
-                return "asset::{$this->container}::{$this->newValue}";
+            ->map(function () {
+                return $this->newValue ? "asset::{$this->container}::{$this->newValue}" : null;
             })
             ->each(function ($value, $key) use (&$bardPayload) {
                 Arr::set($bardPayload, $key, $value);
@@ -244,8 +246,8 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             ->filter(function ($value) {
                 return $value === "statamic://asset::{$this->container}::{$this->originalValue}";
             })
-            ->map(function ($value) {
-                return "statamic://asset::{$this->container}::{$this->newValue}";
+            ->map(function () {
+                return $this->newValue ? "statamic://asset::{$this->container}::{$this->newValue}" : null;
             })
             ->each(function ($value, $key) use (&$bardPayload) {
                 Arr::set($bardPayload, $key, $value);
