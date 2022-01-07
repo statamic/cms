@@ -70,8 +70,9 @@ class AssetTest extends TestCase
 
         $this->assertEquals('bar', $asset->get('foo'));
 
-        $asset->remove('foo');
+        $return = $asset->remove('foo');
 
+        $this->assertEquals($asset, $return);
         $this->assertNull($asset->get('foo'));
     }
 
