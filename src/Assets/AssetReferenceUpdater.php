@@ -150,7 +150,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $replacement = is_null($this->newValue)
             ? ''
             : '${1}'.$this->newValue.'${2}';
-        
+
         $value = preg_replace($pattern, $replacement, $value, -1, $count);
 
         if ($count === 0) {
