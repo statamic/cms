@@ -77,8 +77,6 @@ class Asset implements AssetContract, Augmentable
     public function remove($key)
     {
         return $this->hydrate()->traitRemove($key);
-
-        return $this;
     }
 
     public function data($data = null)
