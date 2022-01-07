@@ -62,9 +62,9 @@ class DeleteTermReferencesTest extends TestCase
         $this->assertEquals('term2', $entry->fresh()->get('leave_be'));
     }
 
-     /** @test */
-     public function it_updates_multi_terms_fields()
-     {
+    /** @test */
+    public function it_updates_multi_terms_fields()
+    {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
         $this->setInBlueprints('collections/articles', [
@@ -153,9 +153,9 @@ class DeleteTermReferencesTest extends TestCase
         $this->assertEquals('test::term2', $entry->fresh()->get('leave_be'));
     }
 
-   /** @test */
-   public function it_updates_scoped_multi_terms_fields()
-   {
+    /** @test */
+    public function it_updates_scoped_multi_terms_fields()
+    {
         $collection = tap(Facades\Collection::make('articles'))->save();
 
         $this->setInBlueprints('collections/articles', [
