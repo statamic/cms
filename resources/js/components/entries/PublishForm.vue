@@ -444,7 +444,7 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            this.runBeforeSaveHook();
+            setTimeout(() => this.runBeforeSaveHook(), 151); // 150ms is the debounce time for fieldtype updates
         },
 
         runBeforeSaveHook() {
@@ -588,7 +588,7 @@ export default {
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
-                setTimeout(() => this.$refs.container.clearDirtyState(), 300); // after any fieldtypes do a debounced update
+                setTimeout(() => this.$refs.container.clearDirtyState(), 150); // after any fieldtypes do a debounced update
             })
         },
 
