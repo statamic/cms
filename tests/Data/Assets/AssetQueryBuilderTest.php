@@ -203,6 +203,5 @@ class AssetQueryBuilderTest extends TestCase
 
         $this->assertCount(4, $assets);
         $this->assertEquals(['b', 'c', 'd', 'e'], $assets->map->filename()->all());
-
     }
 }
