@@ -1,6 +1,6 @@
 <template>
 
-    <div :class="sortableItemClass" class="replicator-set">
+    <div :class="classes" class="replicator-set">
 
         <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
@@ -108,6 +108,10 @@ export default {
             type: String,
             required: true
         },
+        hasError: {
+            type: Boolean,
+            default: false
+        },
         sortableItemClass: {
             type: String
         },
@@ -138,6 +142,13 @@ export default {
 
         isHidden() {
             return this.values['#hidden'] === true;
+        },
+
+        classes() {
+            return [
+                this.sortableItemClass,
+                { 'has-error': this.hasError }
+            ];
         }
 
     },

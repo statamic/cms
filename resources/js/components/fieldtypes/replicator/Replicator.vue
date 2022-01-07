@@ -30,6 +30,7 @@
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
                     :error-key-prefix="errorKeyPrefix || handle"
+                    :has-error="setHasError(index)"
                     :previews="previews[set._id]"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
@@ -78,6 +79,8 @@ export default {
         SetPicker,
     },
 
+    inject: ['storeName'],
+
     data() {
         return {
             values: this.value,
@@ -104,8 +107,11 @@ export default {
 
         sortableHandleClass() {
             return `${this.name}-sortable-handle`;
-        }
+        },
 
+        storeState() {
+            return this.$store.state.publish[this.storeName] || {};
+        }
     },
 
     methods: {
@@ -173,6 +179,12 @@ export default {
                     this.focused = false;
                 }
             }, 1);
+        },
+
+        setHasError(index) {
+            const prefix = `${this.errorKeyPrefix || this.handle}.${index}.`;
+
+            return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
     },
 
