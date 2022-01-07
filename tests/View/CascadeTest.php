@@ -9,6 +9,7 @@ use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Sites\Site as SiteInstance;
+use Statamic\Support\Arr;
 use Statamic\View\Cascade;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -18,6 +19,7 @@ class CascadeTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     private $cascade;
+    private $siteConfig;
 
     public function setUp(): void
     {
@@ -31,7 +33,7 @@ class CascadeTest extends TestCase
             return $this->cascade;
         }
 
-        return $this->cascade = new Cascade(request(), new FakeSite);
+        return $this->cascade = new Cascade(request(), new \Statamic\Sites\Site('en', $this->siteConfig['sites']['en']));
     }
 
     /** @test */
@@ -143,6 +145,29 @@ class CascadeTest extends TestCase
             $this->assertEquals('http://test.com/test', $cascade['current_url']);
             $this->assertEquals('http://test.com/test?test=test', $cascade['current_full_url']);
             $this->assertEquals('/test', $cascade['current_uri']);
+            $this->assertFalse($cascade['is_homepage']);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_request_is_homepage_when_request_is_homepage()
+    {
+        $this->get('http://test.com/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertTrue($cascade['is_homepage']);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_request_is_homepage_when_request_is_homepage_with_relative_site_url()
+    {
+        Arr::set($this->siteConfig, 'sites.en.url', '/');
+
+        $this->get('http://test.com/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertTrue($cascade['is_homepage']);
         });
     }
 
@@ -461,7 +486,7 @@ class CascadeTest extends TestCase
     {
         config(['app.url' => 'http://test.com']);
         url()->forceRootUrl(config('app.url'));
-        Site::setConfig([
+        Site::setConfig($this->siteConfig = [
             'default' => 'en',
             'sites' => [
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
@@ -478,14 +503,6 @@ class CascadeTest extends TestCase
             $global->makeLocalization('en')->data($data)
         );
         $global->save();
-    }
-}
-
-class FakeSite extends \Statamic\Sites\Site
-{
-    public function __construct()
-    {
-        parent::__construct('en', config('statamic.sites.sites.en'));
     }
 }
 
