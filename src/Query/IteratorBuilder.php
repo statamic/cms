@@ -179,10 +179,6 @@ abstract class IteratorBuilder extends Builder
             return null;
         }
 
-        if ($item instanceof stdClass) {
-            return $item->$name ?? null;
-        }
-
         if (method_exists($item, $method)) {
             return $item->{$method}();
         }
