@@ -104,6 +104,7 @@ class DeleteTermReferencesTest extends TestCase
 
         $this->assertEquals(['term3', 'term1'], $entry->get('delete_one'));
         $this->assertEquals(['term1', 'term2', 'term3'], $entry->get('delete_two'));
+        $this->assertEquals(['term2', 'term3'], $entry->get('delete_all'));
 
         $this->term2->delete();
         $this->term3->delete();
