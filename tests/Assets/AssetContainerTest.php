@@ -518,6 +518,46 @@ class AssetContainerTest extends TestCase
             $this->assertCount(4, $assets);
             $this->assertEveryItemIsInstanceOf(Asset::class, $assets);
         });
+
+        tap($this->containerWithDisk()->assets('nested/double-nested', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertCount(2, $assets);
+            $this->assertEveryItemIsInstanceOf(Asset::class, $assets);
+        });
+    }
+
+    /** @test */
+    public function it_wont_get_the_assets_in_a_folder_recursively_when_the_folder_name_matches_partially()
+    {
+        tap($this->containerWithDisk()->assets('nes', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertCount(0, $assets);
+        });
+
+        tap($this->containerWithDisk()->assets('ted', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertCount(0, $assets);
+        });
+
+        tap($this->containerWithDisk()->assets('nested/double', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertCount(0, $assets);
+        });
+
+        tap($this->containerWithDisk()->assets('ted/double-nested', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertCount(0, $assets);
+        });
+
+        tap($this->containerWithDisk()->assets('double-', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertCount(0, $assets);
+        });
+
+        tap($this->containerWithDisk()->assets('-nested', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertCount(0, $assets);
+        });
     }
 
     /** @test */

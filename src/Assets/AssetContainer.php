@@ -283,10 +283,12 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $folder = null;
         }
 
-        if ($folder && $recursive) {
-            $query->where('folder', 'like', "{$folder}%");
-        } elseif ($folder) {
+        if ($folder) {
             $query->where('folder', $folder);
+
+            if ($recursive) {
+                $query->orWhere('folder', 'like', "{$folder}/%");
+            }
         }
 
         return $query->get();
