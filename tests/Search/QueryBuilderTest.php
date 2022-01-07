@@ -196,6 +196,9 @@ class QueryBuilderTest extends TestCase
             ['reference' => 'b', 'title' => 'Gandalf', 'content' => ['value' => 2]],
             ['reference' => 'c', 'title' => 'Frodo\'s Precious', 'content' => ['value' => 3]],
             ['reference' => 'd', 'title' => 'Smeagol\'s Precious', 'content' => ['value' => 1]],
+            // the following two results use scalars for the content field to test that they get successfully ignored.
+            ['reference' => 'e', 'title' => 'Arwen', 'content' => 'string'],
+            ['reference' => 'f', 'title' => 'Bilbo', 'content' => 123],
         ]);
 
         $results = (new FakeQueryBuilder($items))->withoutData()
@@ -209,8 +212,8 @@ class QueryBuilderTest extends TestCase
             ->where('content->value', '<>', 1)
             ->get();
 
-        $this->assertCount(2, $results);
-        $this->assertEquals(['b', 'c'], $results->map->reference->all());
+        $this->assertCount(4, $results);
+        $this->assertEquals(['b', 'c', 'e', 'f'], $results->map->reference->all());
     }
 }
 

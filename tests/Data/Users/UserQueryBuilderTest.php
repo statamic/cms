@@ -111,6 +111,9 @@ class UserQueryBuilderTest extends TestCase
         User::make()->email('aragorn@precious.com')->data(['name' => 'Aragorn', 'content' => ['value' => 1]])->save();
         User::make()->email('bombadil@precious.com')->data(['name' => 'Tommy', 'content' => ['value' => 2]])->save();
         User::make()->email('sauron@precious.com')->data(['name' => 'Sauron', 'content' => ['value' => 3]])->save();
+        // the following two users use scalars for the content field to test that they get successfully ignored.
+        User::make()->email('arwen@precious.com')->data(['name' => 'Arwen', 'content' => 'string'])->save();
+        User::make()->email('bilbo@precious.com')->data(['name' => 'Bilbo', 'content' => 'string'])->save();
 
         $users = User::query()
             ->where('content->value', 1)
@@ -123,7 +126,7 @@ class UserQueryBuilderTest extends TestCase
             ->where('content->value', '<>', 1)
             ->get();
 
-        $this->assertCount(4, $users);
-        $this->assertEquals(['Smeagol', 'Frodo', 'Tommy', 'Sauron'], $users->map->name->all());
+        $this->assertCount(6, $users);
+        $this->assertEquals(['Smeagol', 'Frodo', 'Tommy', 'Sauron', 'Arwen', 'Bilbo'], $users->map->name->all());
     }
 }

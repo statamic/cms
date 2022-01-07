@@ -189,19 +189,20 @@ class AssetQueryBuilderTest extends TestCase
     {
         Asset::find('test::a.jpg')->data(['text' => 'Text 1', 'content' => ['value' => 1]])->save();
         Asset::find('test::b.txt')->data(['text' => 'Text 2', 'content' => ['value' => 2]])->save();
-        Asset::find('test::c.txt')->data(['content' => ['value' => 3]])->save();
+        Asset::find('test::c.txt')->data(['content' => ['value' => 1]])->save();
         Asset::find('test::d.jpg')->data(['text' => 'Text 4'])->save();
-        Asset::find('test::e.jpg')->data(['content' => ['value' => 2]])->save();
-        Asset::find('test::f.jpg')->data(['content' => ['value' => 1]])->save();
+        // the following two assets use scalars for the content field to test that they get successfully ignored.
+        Asset::find('test::e.jpg')->data(['content' => 'string'])->save();
+        Asset::find('test::f.jpg')->data(['content' => 123])->save();
 
         $assets = $this->container->queryAssets()->where('content->value', 1)->get();
 
         $this->assertCount(2, $assets);
-        $this->assertEquals(['a', 'f'], $assets->map->filename()->all());
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
 
         $assets = $this->container->queryAssets()->where('content->value', '!=', 1)->get();
 
         $this->assertCount(4, $assets);
-        $this->assertEquals(['b', 'c', 'd', 'e'], $assets->map->filename()->all());
+        $this->assertEquals(['b', 'd', 'e', 'f'], $assets->map->filename()->all());
     }
 }

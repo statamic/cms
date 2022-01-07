@@ -224,6 +224,9 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'content' => ['value' => 3]])->create();
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'content' => ['value' => 2]])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'content' => ['value' => 1]])->create();
+        // the following two entries use scalars for the content field to test that they get successfully ignored.
+        EntryFactory::id('6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6', 'content' => 'string'])->create();
+        EntryFactory::id('7')->slug('post-7')->collection('posts')->data(['title' => 'Post 7', 'content' => 123])->create();
 
         $entries = Entry::query()->where('content->value', 1)->get();
 
@@ -232,7 +235,7 @@ class EntryQueryBuilderTest extends TestCase
 
         $entries = Entry::query()->where('content->value', '<>', 1)->get();
 
-        $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 2', 'Post 3', 'Post 4'], $entries->map->title->all());
+        $this->assertCount(5, $entries);
+        $this->assertEquals(['Post 2', 'Post 3', 'Post 4', 'Post 6', 'Post 7'], $entries->map->title->all());
     }
 }
