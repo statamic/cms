@@ -76,7 +76,7 @@ class Asset implements AssetContract, Augmentable
 
     public function remove($key)
     {
-        unset($this->meta['data'][$key]);
+        return $this->hydrate()->traitRemove($key);
 
         return $this;
     }
