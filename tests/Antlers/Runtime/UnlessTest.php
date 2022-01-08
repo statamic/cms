@@ -6,7 +6,6 @@ use Tests\Antlers\ParserTestCase;
 
 class UnlessTest extends ParserTestCase
 {
-
     public function test_elseunless_conditions_does_not_cause_error()
     {
         $template = <<<'EOT'
