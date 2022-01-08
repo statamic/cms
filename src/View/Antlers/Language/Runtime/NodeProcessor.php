@@ -604,6 +604,8 @@ class NodeProcessor
      */
     public function render($nodes)
     {
+        if (count($nodes) != 3) {
+        }
         $bufferContent = $this->reduce($nodes);
 
         if ($this->isInterpolationProcessor == false) {
@@ -896,6 +898,12 @@ class NodeProcessor
                 }
 
                 if ($node instanceof AntlersNode) {
+                    if ($node->name != null) {
+                        if ($node->name->name == 'elseif' || $node->name->name == 'if') {
+                            continue;
+                        }
+                    }
+
                     GlobalRuntimeState::$lastNode = $node;
 
                     if (GlobalDebugManager::$isConnected && GlobalDebugManager::$activeSessionLocator != null) {
