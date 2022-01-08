@@ -588,7 +588,7 @@ export default {
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.clearDirtyState());
+                setTimeout(() => this.$refs.container.clearDirtyState(), 300); // after any fieldtypes do a debounced update
             })
         },
 

@@ -194,4 +194,48 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(6, $entries);
         $this->assertEquals(['1', '2', '4', '6', '7', '9'], $entries->map->id()->all());
     }
+
+    /** @test **/
+    public function entries_are_found_using_array_of_wheres()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'content' => 'Test'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'content' => 'Test two'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'content' => 'Test'])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'content' => 'Test two'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'content' => 'Test'])->create();
+        EntryFactory::id('6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6', 'content' => 'Test two'])->create();
+
+        $entries = Entry::query()
+            ->where([
+                'content' => 'Test',
+                ['title', '<>', 'Post 1'],
+            ])
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['3', '5'], $entries->map->id()->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_where_with_json_value()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'content' => ['value' => 1]])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'content' => ['value' => 2]])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'content' => ['value' => 3]])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'content' => ['value' => 2]])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'content' => ['value' => 1]])->create();
+        // the following two entries use scalars for the content field to test that they get successfully ignored.
+        EntryFactory::id('6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6', 'content' => 'string'])->create();
+        EntryFactory::id('7')->slug('post-7')->collection('posts')->data(['title' => 'Post 7', 'content' => 123])->create();
+
+        $entries = Entry::query()->where('content->value', 1)->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 5'], $entries->map->title->all());
+
+        $entries = Entry::query()->where('content->value', '<>', 1)->get();
+
+        $this->assertCount(5, $entries);
+        $this->assertEquals(['Post 2', 'Post 3', 'Post 4', 'Post 6', 'Post 7'], $entries->map->title->all());
+    }
 }

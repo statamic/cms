@@ -59,6 +59,8 @@ class TermsController extends CpController
     {
         $query = $taxonomy->queryTerms();
 
+        $query->where('site', Site::selected());
+
         if ($search = request('search')) {
             if ($taxonomy->hasSearchIndex()) {
                 return $taxonomy->searchIndex()->ensureExists()->search($search);
