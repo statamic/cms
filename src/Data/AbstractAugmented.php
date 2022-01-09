@@ -4,6 +4,7 @@ namespace Statamic\Data;
 
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Fields\Value;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -31,7 +32,7 @@ abstract class AbstractAugmented implements Augmented
     {
         $arr = [];
 
-        $keys = Arr::wrap($keys ?: $this->keys());
+        $keys = $this->filterKeys(Arr::wrap($keys ?: $this->keys()));
 
         foreach ($keys as $key) {
             $arr[$key] = $this->get($key);
@@ -55,6 +56,23 @@ abstract class AbstractAugmented implements Augmented
         }
 
         return $this->wrapValue($this->getFromData($handle), $handle);
+    }
+
+    protected function filterKeys($keys)
+    {
+        return array_diff($keys, $this->excludedKeys());
+    }
+
+    protected function excludedKeys()
+    {
+        if (! Statamic::isApiRoute()) {
+            return [];
+        }
+
+        return array_filter([
+            config('statamic.api.api_urls') === false ? 'api_url' : null,
+            config('statamic.api.edit_urls') === false ? 'edit_url' : null,
+        ]);
     }
 
     private function methodExistsOnThisClass($method)
