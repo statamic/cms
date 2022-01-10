@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use Facades\Statamic\Assets\Dimensions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Owenoj\LaravelGetId3\GetId3;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -163,13 +164,26 @@ class Asset implements AssetContract, Augmentable
         if ($this->exists()) {
             $dimensions = Dimensions::asset($this)->get();
 
-            $meta = array_merge($meta, [
+            $otherMeta = [
                 'size' => $this->disk()->size($this->path()),
                 'last_modified' => $this->disk()->lastModified($this->path()),
                 'width' => $dimensions[0],
                 'height' => $dimensions[1],
                 'mime_type' => $this->disk()->mimeType($this->path()),
-            ]);
+            ];
+
+            $audioVideo = [];
+
+            if ($this->isVideo() || $this->isAudio()) {
+                $track = GetId3::fromDiskAndPath(
+                    $this->container()->diskHandle(),
+                    $this->basename()
+                );
+
+                $audioVideo = Arr::only($track->extractInfo(), ['audio', 'video']);
+            }
+
+            $meta = array_merge($meta, $otherMeta, $audioVideo);
         }
 
         return $meta;
