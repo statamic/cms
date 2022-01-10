@@ -289,7 +289,7 @@ class Asset implements AssetContract, Augmentable
     public function thumbnailUrl($preset = null)
     {
         if ($this->isSvg()) {
-            return $this->svgUrl();
+            return $this->svgThumbnailUrl();
         }
 
         return cp_route('assets.thumbnails.show', [
@@ -298,7 +298,7 @@ class Asset implements AssetContract, Augmentable
         ]);
     }
 
-    protected function svgUrl()
+    protected function svgThumbnailUrl()
     {
         if ($url = $this->url()) {
             return $url;
