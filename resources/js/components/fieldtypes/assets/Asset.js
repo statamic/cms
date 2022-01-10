@@ -30,7 +30,7 @@ export default {
         },
 
         canShowSvg() {
-            return this.asset.extension === 'svg' && this.asset.thumbnail && ! this.asset.thumbnail.includes('::');
+            return this.asset.extension === 'svg';
         },
 
         canBeTransparent() {
