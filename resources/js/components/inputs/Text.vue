@@ -15,7 +15,7 @@
                 :readonly="isReadOnly"
                 :placeholder="placeholder"
                 :autofocus="focus"
-                :mind="mind"
+                :min="min"
                 @input="$emit('input', $event.target.value)"
                 @keydown="$emit('keydown', $event)"
                 @focus="$emit('focus')"
