@@ -36,6 +36,7 @@ class Collection implements Contract, AugmentableContract
     protected $template;
     protected $layout;
     protected $sites;
+    protected $propagate = false;
     protected $blueprints = [];
     protected $searchIndex;
     protected $dated = false;
@@ -50,6 +51,8 @@ class Collection implements Contract, AugmentableContract
     protected $structure;
     protected $structureContents;
     protected $taxonomies = [];
+    protected $requiresSlugs = true;
+    protected $titleFormats = [];
 
     public function __construct()
     {
@@ -83,6 +86,42 @@ class Collection implements Contract, AugmentableContract
     public function route($site)
     {
         return $this->routes()->get($site);
+    }
+
+    public function requiresSlugs($require = null)
+    {
+        return $this->fluentlyGetOrSet('requiresSlugs')->args(func_get_args());
+    }
+
+    public function titleFormats($formats = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('titleFormats')
+            ->setter(function ($format) {
+                if (! $format) {
+                    $format = [];
+                }
+
+                return $format;
+            })
+            ->getter(function ($formats) {
+                return $this->sites()->mapWithKeys(function ($site) use ($formats) {
+                    $siteRoute = is_string($formats) ? $formats : ($formats[$site] ?? null);
+
+                    return [$site => $siteRoute];
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function titleFormat($site)
+    {
+        return $this->titleFormats()->get($site);
+    }
+
+    public function autoGeneratesTitles()
+    {
+        return $this->titleFormats !== [];
     }
 
     public function dated($dated = null)
@@ -281,9 +320,14 @@ class Collection implements Contract, AugmentableContract
 
     public function ensureEntryBlueprintFields($blueprint)
     {
-        $blueprint
-            ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
-            ->ensureField('slug', ['type' => 'slug', 'required' => true, 'localizable' => true], 'sidebar');
+        $blueprint->ensureFieldPrepended('title', [
+            'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
+            'required' => ! $auto,
+        ]);
+
+        if ($this->requiresSlugs()) {
+            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
+        }
 
         if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
@@ -321,6 +365,16 @@ class Collection implements Contract, AugmentableContract
                 }
 
                 return collect($sites);
+            })
+            ->args(func_get_args());
+    }
+
+    public function propagate($propagate = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('propagate')
+            ->getter(function ($propagate) {
+                return $propagate ?? false;
             })
             ->args(func_get_args());
     }
@@ -430,6 +484,7 @@ class Collection implements Contract, AugmentableContract
 
         $array = Arr::removeNullValues(array_merge($array, [
             'route' => $route,
+            'slugs' => $this->requiresSlugs() === true ? null : false,
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'sort_by' => $this->sortField,
@@ -442,7 +497,7 @@ class Collection implements Contract, AugmentableContract
         ]));
 
         if (! Site::hasMultiple()) {
-            unset($array['sites']);
+            unset($array['sites'], $array['propagate']);
         }
 
         if ($array['date_behavior'] == ['past' => 'public', 'future' => 'public']) {
@@ -490,6 +545,7 @@ class Collection implements Contract, AugmentableContract
             'default_publish_state' => $this->defaultPublishState,
             'amp' => $this->ampable,
             'sites' => $this->sites,
+            'propagate' => $this->propagate(),
             'template' => $this->template,
             'layout' => $this->layout,
             'cascade' => $this->cascade->all(),
@@ -500,6 +556,7 @@ class Collection implements Contract, AugmentableContract
             'mount' => $this->mount,
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
+            'title_format' => $this->titleFormats,
         ];
     }
 
@@ -571,6 +628,7 @@ class Collection implements Contract, AugmentableContract
                 return Arr::removeNullValues([
                     'root' => $structure->expectsRoot(),
                     'max_depth' => $structure->maxDepth(),
+                    'slugs' => $structure->showSlugs() ?: null,
                 ]);
             })
             ->args(func_get_args());
@@ -581,6 +639,7 @@ class Collection implements Contract, AugmentableContract
         return (new CollectionStructure)
             ->handle($this->handle())
             ->expectsRoot($this->structureContents['root'] ?? false)
+            ->showSlugs($this->structureContents['slugs'] ?? false)
             ->maxDepth($this->structureContents['max_depth'] ?? null);
     }
 

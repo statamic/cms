@@ -22,8 +22,9 @@ class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls;
 
-    public $category = ['text', 'structured'];
+    protected $categories = ['text', 'structured'];
     protected $defaultValue = '[]';
+    protected $rules = [];
 
     protected function configFieldItems(): array
     {
@@ -63,6 +64,7 @@ class Bard extends Replicator
                 'display' => __('Container'),
                 'instructions' => __('statamic::fieldtypes.bard.config.container'),
                 'type' => 'asset_container',
+                'mode' => 'select',
                 'max_items' => 1,
                 'if' => [
                     'buttons' => 'contains_any anchor, image',
@@ -146,6 +148,12 @@ class Bard extends Replicator
                 'default' => true,
                 'width' => 50,
             ],
+            'antlers' => [
+                'display' => 'Antlers',
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
         ];
     }
 
@@ -157,7 +165,7 @@ class Bard extends Replicator
     protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
-            return $this->resolveStatamicUrls($value);
+            return is_null($value) ? $value : $this->resolveStatamicUrls($value);
         }
 
         if ($this->isLegacyData($value)) {

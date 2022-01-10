@@ -4,6 +4,7 @@ namespace Statamic\Tags;
 
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
@@ -15,8 +16,8 @@ class Theme extends Tags
      * Namespaces the `src` to the specified directory.
      * eg. {{ theme:img }}, {{ theme:svg }}, etc.
      *
-     * @param string $method    Tag part
-     * @param array  $arguments Unused
+     * @param  string  $method  Tag part
+     * @param  array  $arguments  Unused
      * @return string
      */
     public function __call($method, $arguments)
@@ -28,7 +29,7 @@ class Theme extends Tags
     {
         $src = $this->params->get('src');
 
-        $path = $dir.'/'.$src;
+        $path = Path::tidy($dir.'/'.$src);
 
         return $this->themeUrl($path);
     }
@@ -119,7 +120,7 @@ class Theme extends Tags
         $src = $this->params->get('src');
 
         // Output nothing if the file doesn't exist.
-        if (! File::disk('resources')->exists($src)) {
+        if (! File::disk('resources')->exists(Path::tidy($src))) {
             return '';
         }
 
@@ -148,7 +149,7 @@ class Theme extends Tags
         );
 
         if ($this->params->bool('cache_bust')) {
-            throw_if(! File::exists($path = public_path($path)), new \Exception("File $path does not exist."));
+            throw_if(! File::exists($path = Path::tidy(public_path($path))), new \Exception("File $path does not exist."));
             $url .= '?v='.File::lastModified($path);
         }
 

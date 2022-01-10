@@ -2,38 +2,10 @@
 
 namespace Tests\Tags\Form;
 
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
-use Statamic\Facades\Parse;
-use Statamic\Support\Arr;
-use Tests\NormalizesHtml;
-use Tests\PreventSavingStacheItemsToDisk;
-use Tests\TestCase;
 
-class FormCreateTest extends TestCase
+class FormCreateTest extends FormTestCase
 {
-    use PreventSavingStacheItemsToDisk, NormalizesHtml;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->createContactForm();
-        $this->clearSubmissions();
-    }
-
-    public function tearDown(): void
-    {
-        $this->clearSubmissions();
-
-        parent::tearDown();
-    }
-
-    private function tag($tag)
-    {
-        return Parse::template($tag, []);
-    }
-
     /** @test */
     public function it_renders_form()
     {
@@ -86,8 +58,8 @@ class FormCreateTest extends TestCase
 EOT
 ));
 
-        $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name">', $output);
-        $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" required>', $output);
+        $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name" value="">', $output);
+        $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" value="" required>', $output);
         $this->assertStringContainsString('<label>Message</label><textarea name="message" rows="5" required></textarea>', $output);
 
         preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
@@ -99,7 +71,7 @@ EOT
     public function it_dynamically_renders_text_field()
     {
         $this->assertFieldRendersHtml([
-            '<input type="text" name="favourite_animal">',
+            '<input type="text" name="favourite_animal" value="">',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -123,7 +95,7 @@ EOT
     public function it_dynamically_renders_text_field_with_custom_input_type()
     {
         $this->assertFieldRendersHtml([
-            '<input type="number" name="age">',
+            '<input type="number" name="age" value="">',
         ], [
             'handle' => 'age',
             'field' => [
@@ -454,7 +426,7 @@ EOT
     public function it_dynamically_renders_field_with_fallback_to_default_partial()
     {
         $this->assertFieldRendersHtml([
-            '<input type="text" name="custom">',
+            '<input type="text" name="custom" value="">',
         ], [
             'handle' => 'custom',
             'field' => [
@@ -711,89 +683,5 @@ EOT
 
         $this->assertEquals($expected, $errors[1]);
         $this->assertEquals($expectedInline, $inlineErrors[1]);
-    }
-
-    private function createContactForm($fields = null)
-    {
-        $defaultFields = [
-            [
-                'handle' => 'name',
-                'field' => [
-                    'type' => 'text',
-                    'display' => 'Full Name',
-                    'validate' => 'min:3|alpha_num',
-                ],
-            ],
-            [
-                'handle' => 'email',
-                'field' => [
-                    'type' => 'text',
-                    'input_type' => 'email',
-                    'display' => 'Email Address',
-                    'validate' => 'required|email',
-                ],
-            ],
-            [
-                'handle' => 'message',
-                'field' => [
-                    'type' => 'textarea',
-                    'display' => 'Message',
-                    'validate' => 'required',
-                ],
-            ],
-        ];
-
-        $blueprint = Blueprint::make()->setContents([
-            'fields' => $fields ?? $defaultFields,
-        ]);
-
-        $handle = $fields ? $this->customFieldBlueprintHandle : 'contact';
-
-        Blueprint::shouldReceive('find')->with("forms.{$handle}")->andReturn($blueprint);
-        Blueprint::makePartial();
-
-        $form = Form::make()->handle($handle)->honeypot('winnie');
-
-        Form::shouldReceive('find')->with($handle)->andReturn($form);
-        Form::makePartial();
-    }
-
-    private function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [])
-    {
-        $randomString = str_shuffle('nobodymesseswiththehoff');
-
-        $this->customFieldBlueprintHandle = $handle = $fieldConfig['handle'].'_'.$randomString;
-
-        $fields = $oldData
-            ? array_merge([['handle' => 'failing_field', 'field' => ['type' => 'text', 'validate' => 'required']]], [$fieldConfig])
-            : [$fieldConfig];
-
-        $this->createContactForm($fields);
-
-        if ($oldData) {
-            $this->post('/!/forms/'.$handle, $oldData)
-                ->assertSessionHasErrors(['failing_field'], null, "form.{$handle}")
-                ->assertLocation('/');
-        }
-
-        $output = $this->normalizeHtml(
-            $this->tag("{{ form:{$handle} }}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
-        );
-
-        $expected = collect(Arr::wrap($expectedHtmlParts))->implode('');
-
-        $this->assertStringContainsString($expected, $output);
-    }
-
-    public function post($uri, array $data = [], array $headers = [])
-    {
-        return parent::post($uri, $data, array_merge([
-            'Content-Type' => 'multipart/form-data',
-        ], $headers));
-    }
-
-    private function clearSubmissions()
-    {
-        Form::find('contact')->submissions()->each->delete();
     }
 }

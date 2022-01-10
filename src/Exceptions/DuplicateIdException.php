@@ -10,10 +10,10 @@ class DuplicateIdException extends \Exception
     private $item_id;
 
     /**
-     * @param string $path
-     * @param string $existing_path
-     * @param string $repo
-     * @param string $id
+     * @param  string  $path
+     * @param  string  $existing_path
+     * @param  string  $repo
+     * @param  string  $id
      */
     public function __construct($path, $existing_path, $repo, $id)
     {

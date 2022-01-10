@@ -92,6 +92,31 @@ abstract class Builder extends BaseBuilder
         return $items->keys();
     }
 
+    public function getWhereColumnKeysFromStore($store, $where)
+    {
+        return $this->store->store($store)
+            ->index($where['column'])
+            ->items()
+            ->mapWithKeys(function ($item, $key) use ($store) {
+                return ["{$store}::{$key}" => $item];
+            });
+    }
+
+    protected function intersectKeysFromWhereClause($keys, $newKeys, $where)
+    {
+        // On the first iteration, there's nothing to intersect;
+        // Just use the new keys as a starting point.
+        if (! $keys) {
+            return $newKeys;
+        }
+
+        // If it's a `orWhere` or `orWhereIn`, concatenate the `$newKeys`;
+        // Otherwise, intersect to ensure each where is respected.
+        return $where['boolean'] === 'or' && $where['type'] !== 'NotIn'
+            ? $keys->concat($newKeys)->unique()->values()
+            : $keys->intersect($newKeys)->values();
+    }
+
     abstract protected function getOrderKeyValuesByIndex();
 
     protected function getCountForPagination()
@@ -124,6 +149,20 @@ abstract class Builder extends BaseBuilder
     {
         return $values->filter(function ($value) use ($where) {
             return ! in_array($value, $where['values']);
+        });
+    }
+
+    protected function filterWhereNull($values, $where)
+    {
+        return $values->filter(function ($value) {
+            return $value === null;
+        });
+    }
+
+    protected function filterWhereNotNull($values, $where)
+    {
+        return $values->filter(function ($value) {
+            return $value !== null;
         });
     }
 }

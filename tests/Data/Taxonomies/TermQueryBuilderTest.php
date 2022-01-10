@@ -41,6 +41,121 @@ class TermQueryBuilderTest extends TestCase
     }
 
     /** @test */
+    public function it_filters_using_or_wheres()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+
+        $terms = Term::query()->where('test', 'foo')->orWhere('test', 'bar')->get();
+        $this->assertEquals(['a', 'd', 'b'], $terms->map->slug()->values()->all());
+    }
+
+    /** @test */
+    public function it_filters_using_or_where_ins()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+
+        $terms = Term::query()->whereIn('test', ['foo', 'bar'])->orWhereIn('test', ['foo', 'raz'])->get();
+
+        $this->assertEquals(['a', 'b', 'd', 'e'], $terms->map->slug()->values()->all());
+    }
+
+    /** @test **/
+    public function it_filters_using_or_where_not_ins()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+        Term::make('f')->taxonomy('tags')->data(['test' => 'taz'])->save();
+
+        $terms = Term::query()->whereNotIn('test', ['foo', 'bar'])->orWhereNotIn('test', ['foo', 'raz'])->get();
+
+        $this->assertEquals(['c', 'f'], $terms->map->slug()->values()->all());
+    }
+
+    /** @test */
+    public function it_filters_using_nested_wheres()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+
+        $terms = Term::query()
+            ->where(function ($query) {
+                $query->where('test', 'foo');
+            })
+            ->orWhere(function ($query) {
+                $query->where('test', 'baz');
+            })
+            ->orWhere('test', 'raz')
+            ->get();
+
+        $this->assertCount(4, $terms);
+        $this->assertEquals(['a', 'c', 'd', 'e'], $terms->map->slug()->sort()->values()->all());
+    }
+
+    /** @test */
+    public function it_filters_using_nested_where_ins()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+        Term::make('f')->taxonomy('tags')->data(['test' => 'chaz'])->save();
+
+        $terms = Term::query()
+            ->where(function ($query) {
+                $query->where('test', 'foo');
+            })
+            ->orWhere(function ($query) {
+                $query->whereIn('test', ['baz', 'raz']);
+            })
+            ->orWhere('test', 'chaz')
+            ->get();
+
+        $this->assertCount(5, $terms);
+        $this->assertEquals(['a', 'c', 'd', 'e', 'f'], $terms->map->slug()->sort()->values()->all());
+    }
+
+    /** @test */
+    public function it_filters_using_nested_where_not_ins()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+
+        $terms = Term::query()
+            ->where('test', 'foo')
+            ->orWhere(function ($query) {
+                $query->whereNotIn('test', ['baz', 'raz']);
+            })
+            ->get();
+
+        $this->assertCount(3, $terms);
+        $this->assertEquals(['a', 'b', 'd'], $terms->map->slug()->sort()->values()->all());
+    }
+
+    /** @test */
     public function it_filters_by_taxonomy()
     {
         Taxonomy::make('tags')->save();

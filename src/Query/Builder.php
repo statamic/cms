@@ -2,6 +2,7 @@
 
 namespace Statamic\Query;
 
+use Closure;
 use Illuminate\Pagination\Paginator;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
@@ -62,8 +63,16 @@ abstract class Builder implements Contract
 
     abstract public function inRandomOrder();
 
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if (is_array($column)) {
+            return $this->addArrayOfWheres($column, $boolean);
+        }
+
+        if ($column instanceof Closure && is_null($operator)) {
+            return $this->whereNested($column, $boolean);
+        }
+
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
@@ -79,10 +88,52 @@ abstract class Builder implements Contract
         }
 
         $type = 'Basic';
-
-        $this->wheres[] = compact('type', 'column', 'value', 'operator');
+        $this->wheres[] = compact('type', 'column', 'value', 'operator', 'boolean');
 
         return $this;
+    }
+
+    public function whereNested(Closure $callback, $boolean = 'and')
+    {
+        call_user_func($callback, $query = $this->forNestedWhere());
+
+        return $this->addNestedWhereQuery($query, $boolean);
+    }
+
+    public function forNestedWhere()
+    {
+        $newBuilder = clone $this;
+        $newBuilder->wheres = [];
+
+        return $newBuilder;
+    }
+
+    public function addNestedWhereQuery($query, $boolean = 'and')
+    {
+        if (count($query->wheres)) {
+            $type = 'Nested';
+            $this->wheres[] = compact('type', 'query', 'boolean');
+        }
+
+        return $this;
+    }
+
+    public function orWhere($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'or');
+    }
+
+    protected function addArrayOfWheres($column, $boolean, $method = 'where')
+    {
+        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
+            foreach ($column as $key => $value) {
+                if (is_numeric($key) && is_array($value)) {
+                    $query->{$method}(...array_values($value));
+                } else {
+                    $query->$method($key, '=', $value, $boolean);
+                }
+            }
+        }, $boolean);
     }
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
@@ -107,26 +158,78 @@ abstract class Builder implements Contract
         return ! in_array(strtolower($operator), array_keys($this->operators), true);
     }
 
-    public function whereIn($column, $values)
+    public function whereIn($column, $values, $boolean = 'and')
     {
         $this->wheres[] = [
             'type' => 'In',
             'column' => $column,
             'values' => $values,
+            'boolean' => $boolean,
         ];
 
         return $this;
     }
 
-    public function whereNotIn($column, $values)
+    public function orWhereIn($column, $values)
+    {
+        $this->wheres[] = [
+            'type' => 'In',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => 'or',
+        ];
+
+        return $this;
+    }
+
+    public function whereNotIn($column, $values, $boolean = 'and')
     {
         $this->wheres[] = [
             'type' => 'NotIn',
             'column' => $column,
             'values' => $values,
+            'boolean' => $boolean,
         ];
 
         return $this;
+    }
+
+    public function orWhereNotIn($column, $values)
+    {
+        $this->wheres[] = [
+            'type' => 'NotIn',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => 'or',
+        ];
+
+        return $this;
+    }
+
+    public function whereNull($column, $boolean = 'and', $not = false)
+    {
+        $this->wheres[] = [
+            'type' => ($not ? 'Not' : '').'Null',
+            'column' => $column,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereNull($column)
+    {
+        return $this->whereNull($column, 'or');
+    }
+
+    public function whereNotNull($column, $boolean = 'and')
+    {
+        return $this->whereNull($column, $boolean, true);
+    }
+
+    public function orWhereNotNull($column)
+    {
+        return $this->whereNotNull($column, 'or');
     }
 
     public function find($id, $columns = ['*'])

@@ -264,6 +264,11 @@ class Blueprint implements Augmentable
         return $this;
     }
 
+    public function parent()
+    {
+        return $this->parent;
+    }
+
     public function sections(): Collection
     {
         return collect(Arr::get($this->contents(), 'sections', []))->map(function ($contents, $handle) {
@@ -377,6 +382,17 @@ class Blueprint implements Augmentable
     public function ensureFieldInSection($handle, $config, $section, $prepend = false)
     {
         $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'config');
+
+        $this->resetFieldsCache();
+
+        return $this;
+    }
+
+    public function ensureFieldsInSection($fields, $section, $prepend = false)
+    {
+        foreach ($fields as $handle => $config) {
+            $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'config');
+        }
 
         $this->resetFieldsCache();
 

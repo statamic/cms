@@ -90,7 +90,7 @@ class MakeFieldtype extends GeneratorCommand
     /**
      * Build the class with the given name.
      *
-     * @param string $name
+     * @param  string  $name
      * @return string
      */
     protected function buildVueComponent($name)
@@ -107,7 +107,7 @@ class MakeFieldtype extends GeneratorCommand
     /**
      * Wire up addon JS.
      *
-     * @param string $addon
+     * @param  string  $addon
      */
     protected function wireUpAddonJs($addon)
     {

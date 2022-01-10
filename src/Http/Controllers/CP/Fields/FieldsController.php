@@ -87,6 +87,7 @@ class FieldsController extends CpController
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'text',
                 'width' => 50,
+                'autoselect' => true,
             ],
             'handle' => [
                 'display' => __('Handle'),
@@ -99,6 +100,17 @@ class FieldsController extends CpController
                 'display' => __('Instructions'),
                 'instructions' => __('statamic::messages.fields_instructions_instructions'),
                 'type' => 'text',
+            ],
+            'instructions_position' => [
+                'display' => __('Instructions Position'),
+                'instructions' => __('statamic::messages.fields_instructions_position_instructions'),
+                'type' => 'select',
+                'options' => [
+                    'above' => __('Above'),
+                    'below' => __('Below'),
+                ],
+                'default' => 'above',
+                'width' => 50,
             ],
             'listable' => [
                 'display' => __('Listable'),
