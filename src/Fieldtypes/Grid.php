@@ -135,7 +135,9 @@ class Grid extends Fieldtype
 
     protected function rowRules($data, $index)
     {
-        $rules = $this->fields()->addValues($data)->validator()->rules();
+        $rules = $this->fields()->addValues($data)->validator()->withReplacements([
+            'this' => $this->setRuleKey($index),
+        ])->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
             return [$this->setRuleFieldKey($handle, $index) => $rules];
@@ -144,7 +146,12 @@ class Grid extends Fieldtype
 
     protected function setRuleFieldKey($handle, $index)
     {
-        return "{$this->field->handle()}.{$index}.{$handle}";
+        return "{$this->setRuleKey($index)}.{$handle}";
+    }
+
+    protected function setRuleKey($index)
+    {
+        return "{$this->field->handle()}.{$index}";
     }
 
     public function preload()

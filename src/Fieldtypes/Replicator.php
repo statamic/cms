@@ -105,7 +105,9 @@ class Replicator extends Fieldtype
 
     protected function setRules($handle, $data, $index)
     {
-        $rules = $this->fields($handle)->addValues($data)->validator()->rules();
+        $rules = $this->fields($handle)->addValues($data)->validator()->withReplacements([
+            'this' => $this->setRuleKey($index),
+        ])->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
             return [$this->setRuleFieldKey($handle, $index) => $rules];
@@ -114,7 +116,12 @@ class Replicator extends Fieldtype
 
     protected function setRuleFieldKey($handle, $index)
     {
-        return "{$this->field->handle()}.{$index}.{$handle}";
+        return "{$this->setRuleKey($index)}.{$handle}";
+    }
+
+    protected function setRuleKey($index)
+    {
+        return "{$this->field->handle()}.{$index}";
     }
 
     protected function setConfig($handle)
