@@ -8,7 +8,6 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
-use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
@@ -47,11 +46,7 @@ class UsersController extends CpController
         $query = User::query();
 
         if ($search = request('search')) {
-            if (Search::indexes()->keys()->contains('users')) {
-                return Search::index('users')->ensureExists()->search($search);
-            }
-
-            $query->where('name', 'like', '%'.$search.'%');
+            $query->where('email', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
         }
 
         return $query;
