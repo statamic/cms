@@ -246,7 +246,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertCount(2, $assets);
         $this->assertEquals(['b', 'e'], $assets->map->filename()->all());
     }
-  
+
     /** @test **/
     public function assets_are_found_using_array_of_wheres()
     {
