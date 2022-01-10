@@ -37,7 +37,9 @@ class Dimensions
     {
         if ($this->asset->isImage()) {
             return $this->getImageDimensions();
-        } elseif ($this->asset->isSvg()) {
+        }
+
+        if ($this->asset->isSvg()) {
             return $this->getSvgDimensions();
         }
 
