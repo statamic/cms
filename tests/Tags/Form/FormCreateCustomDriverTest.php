@@ -14,6 +14,15 @@ class FormCreateCustomDriverTest extends FormTestCase
     }
 
     /** @test */
+    public function it_shows_js_driver_in_form_data()
+    {
+        $this->assertStringContainsString(
+            '<span>custom_driver</span>',
+            $this->tag('{{ form:contact js="custom_driver" }}<span>{{ js_driver }}</span>{{ /form:contact }}')
+        );
+    }
+
+    /** @test */
     public function custom_driver_can_add_to_form_attributes()
     {
         $output = $this->tag('{{ form:contact js="custom_driver" }}{{ /form:contact }}');
