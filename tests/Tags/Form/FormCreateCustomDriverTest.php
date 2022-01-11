@@ -125,7 +125,7 @@ EOT
 
 class CustomDriver extends AbstractJsDriver
 {
-    public function addToFormData($data, $form)
+    public function addToFormData($form, $data)
     {
         return [
             'custom_form_js' => "alert('the authorities')",
@@ -140,7 +140,7 @@ class CustomDriver extends AbstractJsDriver
         ];
     }
 
-    public function addToRenderableFieldData($data, $field)
+    public function addToRenderableFieldData($field, $data)
     {
         return [
             'show_field' => "alert('the stormtroopers')",

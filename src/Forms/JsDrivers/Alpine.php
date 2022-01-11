@@ -30,11 +30,11 @@ class Alpine extends AbstractJsDriver
     /**
      * Add to renderable field view data.
      *
-     * @param  array  $data
      * @param  \Statamic\Fields\Field  $field
+     * @param  array  $data
      * @return array
      */
-    public function addToRenderableFieldData($data, $field)
+    public function addToRenderableFieldData($field, $data)
     {
         return [
             'show_field' => $this->renderAlpineShowFieldJs($field->conditions(), $this->scope),

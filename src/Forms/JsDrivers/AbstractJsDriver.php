@@ -37,11 +37,11 @@ abstract class AbstractJsDriver implements JsDriver
     /**
      * Add to form view data.
      *
-     * @param  array  $data
      * @param  \Statamic\Forms\Form  $form
+     * @param  array  $data
      * @return array
      */
-    public function addToFormData($data, $form)
+    public function addToFormData($form, $data)
     {
         return [];
     }
@@ -60,11 +60,11 @@ abstract class AbstractJsDriver implements JsDriver
     /**
      * Add to renderable field view data.
      *
-     * @param  array  $data
      * @param  \Statamic\Fields\Field  $field
+    * @param  array  $data
      * @return array
      */
-    public function addToRenderableFieldData($data, $field)
+    public function addToRenderableFieldData($field, $data)
     {
         return [];
     }

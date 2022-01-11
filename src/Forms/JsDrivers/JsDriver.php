@@ -6,11 +6,11 @@ interface JsDriver
 {
     public function handle();
 
-    public function addToFormData($data, $form);
+    public function addToFormData($form, $data);
 
     public function addToFormAttributes($form);
 
-    public function addToRenderableFieldData($data, $field);
+    public function addToRenderableFieldData($field, $data);
 
     public function addToRenderableFieldAttributes($field);
 

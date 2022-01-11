@@ -86,7 +86,7 @@ trait RendersForms
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();
             $data['js_attributes'] = $this->renderAttributes($jsDriver->addToRenderableFieldAttributes($field));
-            $data = array_merge($data, $jsDriver->addToRenderableFieldData($data, $field));
+            $data = array_merge($data, $jsDriver->addToRenderableFieldData($field, $data));
         }
 
         $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());
