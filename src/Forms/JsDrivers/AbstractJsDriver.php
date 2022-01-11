@@ -61,7 +61,7 @@ abstract class AbstractJsDriver implements JsDriver
      * Add to renderable field view data.
      *
      * @param  \Statamic\Fields\Field  $field
-    * @param  array  $data
+     * @param  array  $data
      * @return array
      */
     public function addToRenderableFieldData($field, $data)
