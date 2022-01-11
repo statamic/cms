@@ -16,6 +16,10 @@ class Yields extends Tags
             return $yield;
         }
 
+        if ($fallback = $this->params->get('or')) {
+            return $fallback;
+        }
+
         return $this->isPair ? $this->parse() : null;
     }
 
