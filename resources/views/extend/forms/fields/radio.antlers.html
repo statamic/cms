@@ -4,7 +4,7 @@
             type="radio"
             name="{{ handle }}"
             value="{{ value }}"
-            {{ if js_driver === 'alpine' }}x-model="{{ alpine_data_key }}"{{ /if }}
+            {{ if js_driver }}{{ js_attributes }}{{ /if }}
             {{ if old === value }}checked{{ /if }}
             {{ if ! old && value === default }}checked{{ /if }}
             {{ if validate|contains:required }}required{{ /if }}

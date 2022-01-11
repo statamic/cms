@@ -15,13 +15,12 @@ class Alpine extends AbstractJsDriver
     }
 
     /**
-     * Add to form tag attributes.
+     * Add to form html tag attributes.
      *
-     * @param  array  $attrs
      * @param  \Statamic\Forms\Form  $form
      * @return array
      */
-    public function addToFormAttributes($attrs, $form)
+    public function addToFormAttributes($form)
     {
         return [
             'x-data' => $this->renderAlpineXData($form->blueprint()->fields(), $this->scope),
@@ -38,8 +37,20 @@ class Alpine extends AbstractJsDriver
     public function addToRenderableFieldData($data, $field)
     {
         return [
-            'alpine_data_key' => $this->getAlpineXDataKey($data['handle'], $this->scope),
             'show_field' => $this->renderAlpineShowFieldJs($field->conditions(), $this->scope),
+        ];
+    }
+
+    /**
+     * Add to renderable field html tag attributes.
+     *
+     * @param  \Statamic\Fields\Field  $field
+     * @return array
+     */
+    public function addToRenderableFieldAttributes($field)
+    {
+        return [
+            'x-model' => $this->getAlpineXDataKey($field->handle(), $this->scope),
         ];
     }
 

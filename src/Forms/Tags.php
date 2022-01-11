@@ -87,7 +87,7 @@ class Tags extends BaseTags
         $attrs = [];
 
         if ($jsDriver) {
-            $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($attrs, $form));
+            $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);

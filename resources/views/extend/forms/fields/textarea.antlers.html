@@ -2,9 +2,9 @@
     name="{{ handle }}"
     rows="5"
     {{ if placeholder }}placeholder="{{ placeholder }}"{{ /if }}
-    {{ if validate|contains:required }}required{{ /if }}
     {{ if character_limit }}maxlength="{{ character_limit }}"{{ /if }}
-    {{ if js_driver === 'alpine' }}x-model="{{ alpine_data_key }}"{{ /if }}
+    {{ if js_driver }}{{ js_attributes }}{{ /if }}
+    {{ if validate|contains:required }}required{{ /if }}
 >
     {{ old ?? default }}
 </textarea>

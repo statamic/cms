@@ -23,16 +23,6 @@ class FormCreateCustomDriverTest extends FormTestCase
     }
 
     /** @test */
-    public function custom_driver_can_add_to_form_attributes()
-    {
-        $output = $this->tag('{{ form:contact js="custom_driver" }}{{ /form:contact }}');
-
-        $expected = '<form method="POST" action="http://localhost/!/forms/contact" z-data="{\'lol\':\'catz\'}" z-rad="absolutely">';
-
-        $this->assertStringContainsString($expected, $output);
-    }
-
-    /** @test */
     public function custom_driver_can_add_to_form_data()
     {
         $output = $this->tag(<<<'EOT'
@@ -48,7 +38,17 @@ EOT
     }
 
     /** @test */
-    public function custom_driver_can_add_to_field_data()
+    public function custom_driver_can_add_to_form_attributes()
+    {
+        $output = $this->tag('{{ form:contact js="custom_driver" }}{{ /form:contact }}');
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" z-data="{\'lol\':\'catz\',\'handle\':\'contact\'}" z-rad="absolutely">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    /** @test */
+    public function custom_driver_can_add_to_renderable_field_data()
     {
         $output = $this->tag(<<<'EOT'
 {{ form:contact js="custom_driver" }}
@@ -61,6 +61,22 @@ EOT
 
         $expected = "<script>alert('the sith')</script>";
 
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    /** @test */
+    public function custom_driver_can_add_to_renderable_field_attributes()
+    {
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:contact js="custom_driver" }}
+    {{ fields }}
+        {{ field }}
+    {{ /fields }}
+{{ /form:contact }}
+EOT
+        ));
+
+        $expected = '<input type="email" name="email" value="" z-unless="Statamic.$conditions.showField(\'email\', __zData)" z-gnarley="true" required>';
         $this->assertStringContainsString($expected, $output);
     }
 
@@ -109,18 +125,18 @@ EOT
 
 class CustomDriver extends AbstractJsDriver
 {
-    public function addToFormAttributes($data, $form)
-    {
-        return [
-            'z-data' => $this->jsonEncodeForHtmlAttribute(['lol' => 'catz']),
-            'z-rad' => 'absolutely',
-        ];
-    }
-
     public function addToFormData($data, $form)
     {
         return [
             'custom_form_js' => "alert('the authorities')",
+        ];
+    }
+
+    public function addToFormAttributes($form)
+    {
+        return [
+            'z-data' => $this->jsonEncodeForHtmlAttribute(['lol' => 'catz', 'handle' => $form->handle()]),
+            'z-rad' => 'absolutely',
         ];
     }
 
@@ -129,6 +145,14 @@ class CustomDriver extends AbstractJsDriver
         return [
             'show_field' => "alert('the stormtroopers')",
             'custom_field_js' => "alert('the sith')",
+        ];
+    }
+
+    public function addToRenderableFieldAttributes($field)
+    {
+        return [
+            'z-unless' => "Statamic.\$conditions.showField('{$field->handle()}', __zData)",
+            'z-gnarley' => true,
         ];
     }
 }

@@ -81,10 +81,11 @@ trait RendersForms
         $data = array_merge($field->toArray(), [
             'error' => $errors->first($field->handle()) ?: null,
             'old' => old($field->handle()),
-            'js_driver' => $jsDriver ? $jsDriver->handle() : false,
         ]);
 
         if ($jsDriver) {
+            $data['js_driver'] = $jsDriver->handle();
+            $data['js_attributes'] = $this->renderAttributes($jsDriver->addToRenderableFieldAttributes($field));
             $data = array_merge($data, $jsDriver->addToRenderableFieldData($data, $field));
         }
 
