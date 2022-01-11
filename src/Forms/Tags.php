@@ -7,6 +7,7 @@ use DebugBar\DebugBarException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
+use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
@@ -57,15 +58,17 @@ class Tags extends BaseTags
         $formHandle = $this->getForm();
         $form = $this->form();
 
-        [$jsDriver, $jsOptions] = $this->parseJsParamDriverAndOptions($this->params->get('js'));
-
         $data = $this->getFormSession($this->sessionHandle());
 
-        $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver, $jsOptions);
+        $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'));
+
+        $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver);
         $data['honeypot'] = $form->honeypot();
 
         if ($jsDriver) {
-            $data['show_field'] = collect($data['fields'])->pluck('show_field', 'handle');
+            $data['js_driver'] = $jsDriver->handle();
+            $data['show_field'] = $jsDriver->copyShowFieldToFormData($data['fields']);
+            $data = array_merge($data, $jsDriver->addToFormData($data, $form));
         }
 
         $this->addToDebugBar($data, $formHandle);
@@ -83,8 +86,8 @@ class Tags extends BaseTags
 
         $attrs = [];
 
-        if ($jsDriver === 'alpine') {
-            $attrs['x-data'] = $this->renderAlpineXData($form->blueprint()->fields(), $jsOptions[0] ?? []);
+        if ($jsDriver) {
+            $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($attrs, $form));
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
@@ -198,15 +201,14 @@ class Tags extends BaseTags
      * Get fields with extra data for looping over and rendering.
      *
      * @param  string  $sessionHandle
-     * @param  bool|string  $jsDriver
-     * @param  array  $jsOptions
+     * @param  JsDriver  $jsDriver
      * @return array
      */
-    protected function getFields($sessionHandle, $jsDriver, $jsOptions)
+    protected function getFields($sessionHandle, $jsDriver)
     {
         return $this->form()->fields()
-            ->map(function ($field) use ($sessionHandle, $jsDriver, $jsOptions) {
-                return $this->getRenderableField($field, $sessionHandle, $jsDriver, $jsOptions);
+            ->map(function ($field) use ($sessionHandle, $jsDriver) {
+                return $this->getRenderableField($field, $sessionHandle, $jsDriver);
             })
             ->values()
             ->all();
@@ -216,23 +218,35 @@ class Tags extends BaseTags
      * Parse JS param to get driver and driver related options.
      *
      * @param  null|string  $value
-     * @return array
+     * @return bool|JsDriver
      */
     protected function parseJsParamDriverAndOptions($value)
     {
         if (! $value) {
-            return [false, []];
+            return false;
         }
 
-        $driver = $value;
+        $handle = $value;
         $options = [];
 
         if (Str::contains($value, ':')) {
             $options = explode(':', $value);
-            $driver = array_shift($options);
+            $handle = array_shift($options);
         }
 
-        return [$driver, $options];
+        $class = "\\Statamic\\Forms\\JsDrivers\\".Str::studly($handle);
+
+        if (! class_exists($class)) {
+            throw new \Exception("Cannot find JS driver class [{$class}]!");
+        }
+
+        $instance = new $class($options);
+
+        if (! $instance instanceof JsDriver) {
+            throw new \Exception("JS driver must implement [Statamic\Forms\JsDrivers\JsDriver] interface!");
+        }
+
+        return $instance;
     }
 
     /**

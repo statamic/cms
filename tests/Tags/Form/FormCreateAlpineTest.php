@@ -70,6 +70,20 @@ class FormCreateAlpineTest extends FormTestCase
     ];
 
     /** @test */
+    public function it_shows_js_driver_in_form_data()
+    {
+        $this->assertStringContainsString(
+            '<span></span>',
+            $this->tag('{{ form:contact }}<span>{{ js_driver }}</span>{{ /form:contact }}')
+        );
+
+        $this->assertStringContainsString(
+            '<span>alpine</span>',
+            $this->tag('{{ form:contact js="alpine" }}<span>{{ js_driver }}</span>{{ /form:contact }}')
+        );
+    }
+
+    /** @test */
     public function it_renders_x_data_on_form_tag()
     {
         $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');

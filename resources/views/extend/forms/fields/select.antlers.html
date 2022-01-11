@@ -1,6 +1,6 @@
 <select
     name="{{ handle }}{{ multiple ?= "[]" }}"
-    {{ if alpine }}x-model="{{ alpine_data_key }}"{{ /if }}
+    {{ if js_driver === 'alpine' }}x-model="{{ alpine_data_key }}"{{ /if }}
     {{ if multiple }}multiple{{ /if }}
     {{ if validate|contains:required }}required{{ /if }}
 >

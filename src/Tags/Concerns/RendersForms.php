@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Concerns;
 
 use Illuminate\Support\MessageBag;
+use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Support\Html;
 
 trait RendersForms
@@ -70,101 +71,26 @@ trait RendersForms
      *
      * @param  \Statamic\Fields\Field  $field
      * @param  string  $errorBag
-     * @param  bool|string  $jsDriver
-     * @param  array  $jsOptions
+     * @param  JsDriver  $jsDriver
      * @return array
      */
-    protected function getRenderableField($field, $errorBag = 'default', $jsDriver = false, $jsOptions = [])
+    protected function getRenderableField($field, $errorBag = 'default', $jsDriver = false)
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
         $data = array_merge($field->toArray(), [
             'error' => $errors->first($field->handle()) ?: null,
             'old' => old($field->handle()),
-            'alpine' => $jsDriver === 'alpine',
+            'js_driver' => $jsDriver ? $jsDriver->handle() : false,
         ]);
 
-        if ($jsDriver === 'alpine') {
-            $data['alpine_data_key'] = $this->getAlpineXDataKey($data['handle'], $jsOptions[0] ?? null);
-            $data['show_field'] = $this->renderAlpineShowFieldJs($field->conditions(), $jsOptions[0] ?? null);
+        if ($jsDriver) {
+            $data = array_merge($data, $jsDriver->addToRenderableFieldData($data, $field));
         }
 
         $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());
 
         return $data;
-    }
-
-    /**
-     * Render alpine x-data string for fields, with scope if necessary.
-     *
-     * @param  \Statamic\Fields\Fields  $fields
-     * @param  bool|string  $alpineScope
-     * @return string
-     */
-    protected function renderAlpineXData($fields, $alpineScope)
-    {
-        $oldValues = collect(old());
-
-        $xData = $fields->preProcess()->values()
-            ->map(function ($defaultProcessedValue, $handle) use ($oldValues) {
-                return $oldValues->has($handle)
-                    ? $oldValues->get($handle)
-                    : $defaultProcessedValue;
-            })
-            ->all();
-
-        if (is_string($alpineScope)) {
-            $xData = [
-                $alpineScope => $xData,
-            ];
-        }
-
-        return $this->jsonEncodeForHtmlAttribute($xData);
-    }
-
-    /**
-     * Get alpine x-data key, with scope if necessary.
-     *
-     * @param  string  $fieldHandle
-     * @param  bool|string  $alpineScope
-     * @return string
-     */
-    protected function getAlpineXDataKey($fieldHandle, $alpineScope)
-    {
-        return is_string($alpineScope)
-            ? "{$alpineScope}.{$fieldHandle}"
-            : $fieldHandle;
-    }
-
-    /**
-     * Render alpine `x-if` show field JS logic.
-     *
-     * @param  array  $conditions
-     * @param  string  $alpineScope
-     * @return string
-     */
-    protected function renderAlpineShowFieldJs($conditions, $alpineScope)
-    {
-        $attrFriendlyConditions = $this->jsonEncodeForHtmlAttribute($conditions);
-
-        $data = '$data';
-
-        if (is_string($alpineScope)) {
-            $data .= ".{$alpineScope}";
-        }
-
-        return 'Statamic.$conditions.showField('.$attrFriendlyConditions.', '.$data.')';
-    }
-
-    /**
-     * Json encode for html attribute.
-     *
-     * @param  mixed  $value
-     * @return string
-     */
-    protected function jsonEncodeForHtmlAttribute($value)
-    {
-        return str_replace('"', '\'', json_encode($value));
     }
 
     /**
