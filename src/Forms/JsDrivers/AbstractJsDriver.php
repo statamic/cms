@@ -106,4 +106,18 @@ abstract class AbstractJsDriver implements JsDriver
     {
         return str_replace('"', '\'', json_encode($value));
     }
+
+    /**
+     * Register driver with Statamic.
+     */
+    public static function register()
+    {
+        if (! app()->has('statamic.form-js-drivers')) {
+            return;
+        }
+
+        $handle = (new static)->handle();
+
+        app('statamic.form-js-drivers')[$handle] = static::class;
+    }
 }

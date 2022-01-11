@@ -234,10 +234,10 @@ class Tags extends BaseTags
             $handle = array_shift($options);
         }
 
-        $class = "\\Statamic\\Forms\\JsDrivers\\".Str::studly($handle);
+        $class = app('statamic.form-js-drivers')->get($handle);
 
-        if (! class_exists($class)) {
-            throw new \Exception("Cannot find JS driver class [{$class}]!");
+        if (! $class) {
+            throw new \Exception("Cannot find JS driver class for [{$handle}]!");
         }
 
         $instance = new $class($options);
