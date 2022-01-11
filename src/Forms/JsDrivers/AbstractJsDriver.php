@@ -35,18 +35,6 @@ abstract class AbstractJsDriver implements JsDriver
     }
 
     /**
-     * Add to form view data.
-     *
-     * @param  array  $data
-     * @param  \Statamic\Forms\Form  $form
-     * @return array
-     */
-    public function addToFormData($data, $form)
-    {
-        return [];
-    }
-
-    /**
      * Add to form tag attributes.
      *
      * @param  array  $attrs
@@ -54,6 +42,18 @@ abstract class AbstractJsDriver implements JsDriver
      * @return array
      */
     public function addToFormAttributes($attrs, $form)
+    {
+        return [];
+    }
+
+    /**
+     * Add to form view data.
+     *
+     * @param  array  $data
+     * @param  \Statamic\Forms\Form  $form
+     * @return array
+     */
+    public function addToFormData($data, $form)
     {
         return [];
     }
