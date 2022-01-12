@@ -2,9 +2,8 @@
 
 namespace Statamic\Tags\Concerns;
 
+use Closure;
 use Illuminate\Support\MessageBag;
-use Statamic\Forms\JsDrivers\JsDriver;
-use Statamic\Support\Html;
 
 trait RendersForms
 {
@@ -71,10 +70,10 @@ trait RendersForms
      *
      * @param  \Statamic\Fields\Field  $field
      * @param  string  $errorBag
-     * @param  JsDriver  $jsDriver
+     * @param  bool|Closure  $manipulateDataCallback
      * @return array
      */
-    protected function getRenderableField($field, $errorBag = 'default', $jsDriver = false)
+    protected function getRenderableField($field, $errorBag = 'default', $manipulateDataCallback = false)
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
@@ -83,10 +82,8 @@ trait RendersForms
             'old' => old($field->handle()),
         ]);
 
-        if ($jsDriver) {
-            $data['js_driver'] = $jsDriver->handle();
-            $data['js_attributes'] = $this->renderAttributes($jsDriver->addToRenderableFieldAttributes($field));
-            $data = array_merge($data, $jsDriver->addToRenderableFieldData($field, $data));
+        if ($manipulateDataCallback instanceof Closure) {
+            $data = $manipulateDataCallback($data, $field);
         }
 
         $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());

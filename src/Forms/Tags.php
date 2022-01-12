@@ -208,10 +208,30 @@ class Tags extends BaseTags
     {
         return $this->form()->fields()
             ->map(function ($field) use ($sessionHandle, $jsDriver) {
-                return $this->getRenderableField($field, $sessionHandle, $jsDriver);
+                return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
+                    return $jsDriver
+                        ? $this->mergeJsDataWithRenderableFieldData($data, $field, $jsDriver)
+                        : $data;
+                });
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Merge JS field data with renderable field data.
+     *
+     * @param  array  $data
+     * @param  \Statamic\Fields\Field  $field
+     * @param  JsDriver  $jsDriver
+     * @return array
+     */
+    protected function mergeJsDataWithRenderableFieldData($data, $field, $jsDriver)
+    {
+        $data['js_driver'] = $jsDriver->handle();
+        $data['js_attributes'] = $this->renderAttributes($jsDriver->addToRenderableFieldAttributes($field));
+
+        return array_merge($data, $jsDriver->addToRenderableFieldData($field, $data));
     }
 
     /**
