@@ -215,7 +215,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Parse JS param to get driver and driver related options.
+     * Parse JS param to get driver and related options.
      *
      * @param  null|string  $value
      * @return bool|JsDriver

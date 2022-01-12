@@ -81,7 +81,7 @@ abstract class AbstractJsDriver implements JsDriver
     }
 
     /**
-     * Copy renderable `show_field` JS from each individual field to top-level form data.
+     * Copy renderable `show_field` JS from each individual field for hardcoding field html using top-level form data.
      *
      * @param  array  $fields
      * @return array
