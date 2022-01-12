@@ -11,6 +11,7 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -94,7 +95,9 @@ class Term implements TermContract
     {
         $localizations = clone $this->data;
 
-        $array = $localizations->pull($this->defaultLocale());
+        $array = Arr::removeNullValues(
+            $localizations->pull($this->defaultLocale())->all()
+        );
 
         // todo: add published bool (for each locale?)
 
@@ -106,7 +109,7 @@ class Term implements TermContract
             $array['localizations'] = $localizations->map->all()->all();
         }
 
-        return $array->all();
+        return $array;
     }
 
     public function in($site)
