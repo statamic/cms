@@ -1,5 +1,53 @@
 # Release Notes
 
+## 3.2.30 (2022-01-07)
+
+### What's new
+- Support sub-field querying (JSON) in the query builder. [#4758](https://github.com/statamic/cms/issues/4758) by @ryanmitchell
+- The `collection` tag (and others) can `sort` by sub-fields. [#5030](https://github.com/statamic/cms/issues/5030) by @jasonvarga
+- Uploaded assets may be attached to form submission emails. [#4726](https://github.com/statamic/cms/issues/4726) by @jacksleight
+- Provide errors indexed by fields for the `user:reset_password_form` tag. [#4822](https://github.com/statamic/cms/issues/4822) by @marcorieser
+- `DataCollection` can use the first value of an array for sorting. [#4967](https://github.com/statamic/cms/issues/4967) by @arthurperton
+- Add `min_` and `max_filesize` validation rules for `assets` fieldtypes. [#4980](https://github.com/statamic/cms/issues/4980) by @arthurperton
+
+### What's improved
+- The `display` field is auto-focused in the blueprint builder. [#5026](https://github.com/statamic/cms/issues/5026) by @jackmcdade
+
+### What's fixed
+- Fix state mutations in Replicator, causing the page to freeze in some situations. [#5031](https://github.com/statamic/cms/issues/5031) by @arthurperton
+- Fix the Asset's `remove` method not removing anything. [#5038](https://github.com/statamic/cms/issues/5038) by @arthurperton
+- Fix inappropriate state mutations in Grid and Assets fieldtypes. [#5005](https://github.com/statamic/cms/issues/5005) by @arthurperton
+- Fix terms not being sorted appropriately in other sites. [#4982](https://github.com/statamic/cms/issues/4982) by @arthurperton
+- Fix the range field's derpy layout of uneven widths [#5027](https://github.com/statamic/cms/issues/5027) by @jackmcdade
+- Fix `View` method chainability. [#5020](https://github.com/statamic/cms/issues/5020) by @jasonvarga
+- Fix unnecessary dirty state when changing sites. [#5013](https://github.com/statamic/cms/issues/5013) by @jasonvarga
+- Fix readonly sub-fields in localizable Grid and Bard fields. [#4962](https://github.com/statamic/cms/issues/4962) by @arthurperton
+
+
+
+## 3.2.29 (2022-01-04)
+
+### What's new
+- Support `where([...])` syntax in the query builder. [#4899](https://github.com/statamic/cms/issues/4899) by @ryanmitchell
+- Added login throttling to `user:login_form`. [#4971](https://github.com/statamic/cms/issues/4971) by @arthurperton
+- Add `is_homepage` variable to cascade. [#4995](https://github.com/statamic/cms/issues/4995) by @edalzell
+- The pagination slider window can be adjusted. [#5001](https://github.com/statamic/cms/issues/5001) by @ryanmitchell
+
+### What's improved
+- Updated French translations. [#4976](https://github.com/statamic/cms/issues/4976) by @ebeauchamps
+- Updated German translations. [#4998](https://github.com/statamic/cms/issues/4998) by @helloDanuk
+
+### What's fixed
+- Fix red error states when dealing with nested fields (Replicator, Grid, Bard). [#5002](https://github.com/statamic/cms/issues/5002) by @arthurperton
+- Prevent error when when uploading assets in forms when there's no container configured. [#4974](https://github.com/statamic/cms/issues/4974) by @arthurperton
+- Fix intersection error in iterator query builder, which search uses. [#5006](https://github.com/statamic/cms/issues/5006) by @jasonvarga
+- In the fieldtype selector, hide empty sections, and hide slug for forms. [#4948](https://github.com/statamic/cms/issues/4948) by @jesseleite
+- Link to docs in route config field. [#4986](https://github.com/statamic/cms/issues/4986) by @Konafets
+- Fix reordering in a collection ending with the word "collection". [#4978](https://github.com/statamic/cms/issues/4978) by @arthurperton
+- Fix changelog dates. [#4973](https://github.com/statamic/cms/issues/4973) by @markguleno
+
+
+
 ## 3.2.28 (2021-12-22)
 
 ### What's new

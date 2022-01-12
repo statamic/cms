@@ -156,21 +156,15 @@ export default {
     methods: {
 
         updated(handle, value) {
-            let set = JSON.parse(JSON.stringify(this.values));
-            set[handle] = value;
-            this.$emit('updated', this.index, set);
+            this.$emit('updated', this.index, {...this.values, [handle]: value });
         },
 
         metaUpdated(handle, value) {
-            let meta = clone(this.meta);
-            meta[handle] = value;
-            this.$emit('meta-updated', meta);
+            this.$emit('meta-updated', { ...this.meta, [handle]: value });
         },
 
         previewUpdated(handle, value) {
-            let previews = this.previews;
-            previews[handle] = value;
-            this.$emit('previews-updated', previews);
+            this.$emit('previews-updated', { ...this.previews, [handle]: value });
         },
 
         destroy() {

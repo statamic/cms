@@ -188,6 +188,11 @@ export default [
         example: 'max:value',
     },
     {
+        label: 'Max Filesize (KB)',
+        value: 'max_filesize:',
+        example: 'max_filesize:value',
+    },
+    {
         label: 'MIME Types',
         value: 'mimetypes:',
         example: 'mimetypes:text/plain,...'
@@ -201,6 +206,11 @@ export default [
         label: 'Min',
         value: 'min:',
         example: 'min:value'
+    },
+    {
+        label: 'Min Filesize (KB)',
+        value: 'min_filesize:',
+        example: 'min_filesize:value',
     },
     {
         label: 'Not In',

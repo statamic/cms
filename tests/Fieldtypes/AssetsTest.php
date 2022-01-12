@@ -11,8 +11,10 @@ use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Assets\Assets;
 use Statamic\Fieldtypes\Assets\DimensionsRule;
 use Statamic\Fieldtypes\Assets\ImageRule;
+use Statamic\Fieldtypes\Assets\MaxRule;
 use Statamic\Fieldtypes\Assets\MimesRule;
 use Statamic\Fieldtypes\Assets\MimetypesRule;
+use Statamic\Fieldtypes\Assets\MinRule;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -134,13 +136,35 @@ class AssetsTest extends TestCase
     }
 
     /** @test */
-    public function it_doesnt_replace_non_image_related_rule()
+    public function it_replaces_min_filesize_rule()
     {
-        $replaced = $this->fieldtype(['validate' => ['min:3']])->fieldRules();
+        $replaced = $this->fieldtype(['validate' => ['min_filesize:100']])->fieldRules();
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertEquals('min:3', $replaced[0]);
+        $this->assertInstanceOf(MinRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.min.file', ['min' => '100']), $replaced[0]->message());
+    }
+
+    /** @test */
+    public function it_replaces_max_filesize_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['max_filesize:100']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(MaxRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.max.file', ['max' => '100']), $replaced[0]->message());
+    }
+
+    /** @test */
+    public function it_doesnt_replace_non_image_related_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['file']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertEquals('file', $replaced[0]);
     }
 
     public function fieldtype($config = [])

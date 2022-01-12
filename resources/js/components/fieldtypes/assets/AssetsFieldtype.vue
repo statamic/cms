@@ -276,7 +276,7 @@ export default {
          * The asset browser expects an array of asset IDs to be passed in as a prop.
          */
         selectedAssets() {
-            return this.value;
+            return clone(this.value);
         },
 
         /**
@@ -334,7 +334,7 @@ export default {
                 return;
             }
 
-            this.assets = this.meta.data;
+            this.assets = clone(this.meta.data);
             this.$nextTick(() => {
                 this.initializing = false;
                 this.loading = false;
@@ -453,9 +453,10 @@ export default {
             // our fieldtype is only concerned with their respective IDs.
             this.update(_.pluck(assets, 'id'));
 
-            let meta = this.meta;
-            meta.data = assets;
-            this.updateMeta(meta);
+            this.updateMeta({
+                ...this.meta,
+                data: [...assets],
+            });
         },
 
         loading(loading) {
