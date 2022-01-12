@@ -9,6 +9,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Modifiers\Modify;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
 use Statamic\Tags\Loader as TagLoader;
@@ -369,5 +370,10 @@ class Statamic
         ]);
 
         return $tag->$method();
+    }
+
+    public static function modify($value)
+    {
+        return Modify::value($value);
     }
 }
