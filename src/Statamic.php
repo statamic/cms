@@ -349,7 +349,7 @@ class Statamic
         return $prefix.'.*';
     }
 
-    public static function tag($name, $params = [])
+    public static function tag($name, $params = [], $context = [])
     {
         if ($pos = strpos($name, ':')) {
             $original_method = substr($name, $pos + 1);
@@ -363,7 +363,7 @@ class Statamic
             'parser'     => app(Parser::class),
             'params'     => $params,
             'content'    => '',
-            'context'    => [],
+            'context'    => $context,
             'tag'        => $name.':'.$original_method,
             'tag_method' => $original_method,
         ]);
