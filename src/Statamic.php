@@ -368,6 +368,6 @@ class Statamic
             'tag_method' => $original_method,
         ]);
 
-        return call_user_func([$tag, $method]);
+        return $tag->$method();
     }
 }
