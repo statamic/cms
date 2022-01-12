@@ -114,11 +114,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
         $container = $this->getContainer()->handle();
 
         $items = collect([$container])->flatMap(function ($collection) use ($column) {
-            return $this->store->store($collection)
-                ->index($column)->items()
-                ->mapWithKeys(function ($item, $key) use ($collection) {
-                    return ["{$collection}::{$key}" => $item];
-                });
+            return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
         });
 
         return $items;

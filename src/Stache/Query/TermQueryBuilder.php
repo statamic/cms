@@ -180,11 +180,7 @@ class TermQueryBuilder extends Builder
         }
 
         $items = collect($taxonomies)->flatMap(function ($taxonomy) use ($column) {
-            return $this->store->store($taxonomy)
-                ->index($column)->items()
-                ->mapWithKeys(function ($item, $key) use ($taxonomy) {
-                    return ["{$taxonomy}::{$key}" => $item];
-                });
+            return $this->getWhereColumnKeysFromStore($taxonomy, ['column' => $column]);
         });
 
         return $items;

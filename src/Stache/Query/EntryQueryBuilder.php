@@ -133,11 +133,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             : $this->collections;
 
         return collect($collections)->flatMap(function ($collection) use ($column) {
-            return $this->store->store($collection)
-                ->index($column)->items()
-                ->mapWithKeys(function ($item, $key) use ($collection) {
-                    return ["{$collection}::{$key}" => $item];
-                });
+            return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
         });
     }
 }
