@@ -8,10 +8,12 @@ class Alpine extends AbstractJsDriver
 
     /**
      * Parse driver options.
+     *
+     * @param  array  $options
      */
-    protected function parseOptions()
+    protected function parseOptions($options)
     {
-        $this->scope = $this->options[0] ?? null;
+        $this->scope = $options[0] ?? null;
     }
 
     /**

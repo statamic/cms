@@ -18,7 +18,7 @@ abstract class AbstractJsDriver implements JsDriver
         $this->options = $options;
 
         if (method_exists($this, 'parseOptions')) {
-            $this->parseOptions();
+            $this->parseOptions($options);
         }
     }
 
