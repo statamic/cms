@@ -2,6 +2,9 @@
 
 namespace Statamic\Tags;
 
+use ArrayIterator;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Parser;
 
@@ -97,7 +100,17 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
             'tag_method' => $originalMethod,
         ]);
 
-        return $tag->$method();
+        $output = $tag->$method();
+
+        if ($output instanceof Collection) {
+            $output = $output->toAugmentedArray();
+        }
+
+        if ($output instanceof Augmentable) {
+            $output = $output->toAugmentedArray();
+        }
+
+        return $output;
     }
 
     /**
@@ -117,7 +130,7 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
      */
     public function getIterator()
     {
-        return $this->fetch();
+        return new ArrayIterator($this->fetch());
     }
 
     /**
