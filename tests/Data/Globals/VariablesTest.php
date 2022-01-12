@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Globals;
 
+use Statamic\Facades\GlobalSet;
 use Statamic\Globals\Variables;
 use Tests\TestCase;
 
@@ -23,5 +24,95 @@ string: 'The string'
 
 EOT;
         $this->assertEquals($expected, $entry->fileContents());
+    }
+
+    /** @test */
+    public function if_the_value_is_explicitly_set_to_null_then_it_should_not_fall_back()
+    {
+        $global = GlobalSet::make('test');
+
+        $a = $global->makeLocalization('a')->data([
+            'one' => 'alfa',
+            'two' => 'bravo',
+            'three' => 'charlie',
+            'four' => 'delta',
+        ]);
+
+        // originates from a
+        $b = $global->makeLocalization('b')->origin($a)->data([
+            'one' => 'echo',
+            'two' => null,
+        ]);
+
+        // originates from b, which originates from a
+        $c = $global->makeLocalization('c')->origin($b)->data([
+            'three' => 'foxtrot',
+        ]);
+
+        // does not originate from anything
+        $d = $global->makeLocalization('d')->data([
+            'one' => 'golf',
+            'two' => 'hotel',
+            'three' => 'india',
+        ]);
+
+        // originates from d. just to test that it doesn't unintentionally fall back to the default/first.
+        $e = $global->makeLocalization('e')->origin($d)->data([
+            'one' => 'juliett',
+            'two' => null,
+        ]);
+
+        $this->assertEquals([
+            'one' => 'alfa',
+            'two' => 'bravo',
+            'three' => 'charlie',
+            'four' => 'delta',
+        ], $a->values()->all());
+        $this->assertEquals('alfa', $a->value('one'));
+        $this->assertEquals('bravo', $a->value('two'));
+        $this->assertEquals('charlie', $a->value('three'));
+        $this->assertEquals('delta', $a->value('four'));
+
+        $this->assertEquals([
+            'one' => 'echo',
+            'two' => null,
+            'three' => 'charlie',
+            'four' => 'delta',
+        ], $b->values()->all());
+        $this->assertEquals('echo', $b->value('one'));
+        $this->assertEquals(null, $b->value('two'));
+        $this->assertEquals('charlie', $b->value('three'));
+        $this->assertEquals('delta', $b->value('four'));
+
+        $this->assertEquals([
+            'one' => 'echo',
+            'two' => null,
+            'three' => 'foxtrot',
+            'four' => 'delta',
+        ], $c->values()->all());
+        $this->assertEquals('echo', $c->value('one'));
+        $this->assertEquals(null, $c->value('two'));
+        $this->assertEquals('foxtrot', $c->value('three'));
+        $this->assertEquals('delta', $c->value('four'));
+
+        $this->assertEquals([
+            'one' => 'golf',
+            'two' => 'hotel',
+            'three' => 'india',
+        ], $d->values()->all());
+        $this->assertEquals('golf', $d->value('one'));
+        $this->assertEquals('hotel', $d->value('two'));
+        $this->assertEquals('india', $d->value('three'));
+        $this->assertEquals(null, $d->value('four'));
+
+        $this->assertEquals([
+            'one' => 'juliett',
+            'two' => null,
+            'three' => 'india',
+        ], $e->values()->all());
+        $this->assertEquals('juliett', $e->value('one'));
+        $this->assertEquals(null, $e->value('two'));
+        $this->assertEquals('india', $e->value('three'));
+        $this->assertEquals(null, $e->value('four'));
     }
 }
