@@ -6,7 +6,7 @@ use Statamic\Support\Str;
 
 abstract class AbstractJsDriver implements JsDriver
 {
-    public $options;
+    protected $options;
 
     /**
      * Instantiate JS driver.

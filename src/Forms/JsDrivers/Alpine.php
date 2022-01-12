@@ -4,7 +4,7 @@ namespace Statamic\Forms\JsDrivers;
 
 class Alpine extends AbstractJsDriver
 {
-    public $scope;
+    protected $scope;
 
     /**
      * Parse driver options.
