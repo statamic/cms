@@ -12,8 +12,7 @@ use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
-use Statamic\Tags\Loader as TagLoader;
-use Statamic\View\Antlers\Parser;
+use Statamic\Tags\FluentTag;
 use Stringy\StaticStringy;
 
 class Statamic
@@ -350,26 +349,9 @@ class Statamic
         return $prefix.'.*';
     }
 
-    public static function tag($name, $params = [], $context = [])
+    public static function tag($name)
     {
-        if ($pos = strpos($name, ':')) {
-            $original_method = substr($name, $pos + 1);
-            $method = Str::camel($original_method);
-            $name = substr($name, 0, $pos);
-        } else {
-            $method = $original_method = 'index';
-        }
-
-        $tag = app(TagLoader::class)->load($name, [
-            'parser'     => app(Parser::class),
-            'params'     => $params,
-            'content'    => '',
-            'context'    => $context,
-            'tag'        => $name.':'.$original_method,
-            'tag_method' => $original_method,
-        ]);
-
-        return $tag->$method();
+        return FluentTag::make($name);
     }
 
     public static function modify($value)
