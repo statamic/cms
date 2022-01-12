@@ -2,8 +2,6 @@
 
 namespace Statamic\Tags;
 
-use ArrayIterator;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Parser;
 
