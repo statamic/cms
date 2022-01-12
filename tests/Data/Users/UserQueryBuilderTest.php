@@ -129,4 +129,24 @@ class UserQueryBuilderTest extends TestCase
         $this->assertCount(6, $users);
         $this->assertEquals(['Smeagol', 'Frodo', 'Tommy', 'Sauron', 'Arwen', 'Bilbo'], $users->map->name->all());
     }
+
+    /** @test **/
+    public function users_are_found_using_where_column()
+    {
+        User::make()->email('1@test.com')->data(['foo' => 'Post 1', 'other_foo' => 'Not Post 1'])->save();
+        User::make()->email('2@test.com')->data(['foo' => 'Post 2', 'other_foo' => 'Not Post 2'])->save();
+        User::make()->email('3@test.com')->data(['foo' => 'Post 3', 'other_foo' => 'Post 3'])->save();
+        User::make()->email('4@test.com')->data(['foo' => 'Post 4', 'other_foo' => 'Post 4'])->save();
+        User::make()->email('5@test.com')->data(['foo' => 'Post 5', 'other_foo' => 'Not Post 5'])->save();
+
+        $entries = User::query()->whereColumn('foo', 'other_foo')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 3', 'Post 4'], $entries->map->foo->all());
+
+        $entries = User::query()->whereColumn('foo', '!=', 'other_foo')->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 5'], $entries->map->foo->all());
+    }
 }
