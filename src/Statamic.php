@@ -349,7 +349,7 @@ class Statamic
         return $prefix.'.*';
     }
 
-    public static function antlersTag($name, $params = [])
+    public static function tag($name, $params = [])
     {
         if ($pos = strpos($name, ':')) {
             $original_method = substr($name, $pos + 1);
