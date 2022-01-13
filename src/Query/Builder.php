@@ -67,6 +67,10 @@ abstract class Builder implements Contract
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if (is_array($column)) {
+            return $this->addArrayOfWheres($column, $boolean);
+        }
+
         if ($column instanceof Closure && is_null($operator)) {
             return $this->whereNested($column, $boolean);
         }
@@ -119,6 +123,19 @@ abstract class Builder implements Contract
     public function orWhere($column, $operator = null, $value = null)
     {
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    protected function addArrayOfWheres($column, $boolean, $method = 'where')
+    {
+        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
+            foreach ($column as $key => $value) {
+                if (is_numeric($key) && is_array($value)) {
+                    $query->{$method}(...array_values($value));
+                } else {
+                    $query->$method($key, '=', $value, $boolean);
+                }
+            }
+        }, $boolean);
     }
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
@@ -240,7 +257,6 @@ abstract class Builder implements Contract
             'value' => $value,
             'boolean' => $boolean,
         ];
-
         return $this;
     }
 
@@ -371,6 +387,26 @@ abstract class Builder implements Contract
         );
 
         return $this->whereTime($column, $operator, $value, 'or');
+    }
+  
+    public function whereColumn($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        // If the given operator is not found in the list of valid operators we will
+        // assume that the developer is just short-cutting the '=' operators and
+        // we will set the operators to '=' and set the values appropriately.
+        if ($this->invalidOperator($operator)) {
+            [$value, $operator] = [$operator, '='];
+        }
+
+        $type = 'Column';
+        $this->wheres[] = compact('type', 'column', 'value', 'operator', 'boolean');
+      
+        return $this;
+    }
+      
+    public function orWhereColumn($column, $operator = null, $value = null)
+    {
+        return $this->whereColumn($column, $operator, $value, 'or');
     }
 
     public function find($id, $columns = ['*'])

@@ -49,7 +49,7 @@ return [
     'collections_mount_instructions' => 'Kies een entry waarop deze collectie gemonteerd moet worden. Lees meer in de [documentatie](https://statamic.dev/colletions-and-entrie#mounting).',
     'collections_orderable_instructions' => 'Activeer handmatig ordenen met drag & drop.',
     'collections_past_date_behavior_instructions' => 'Hoe entries met een datum in het verleden zich moeten gedragen.',
-    'collections_route_instructions' => 'De route definieert het URL-patroon.',
+    'collections_route_instructions' => 'De route definieert het URL-patroon. Lees meer in de [documentatie](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'De standaard sorteervolgorde.',
     'collections_taxonomies_instructions' => 'Koppel entries in deze collectie aan taxonomieën. Velden worden automatisch toegevoegd aan publiceerformulieren.',
     'email_utility_configuration_description' => 'E-mailsettings worden geconfigureerd in <code>:path</code>',

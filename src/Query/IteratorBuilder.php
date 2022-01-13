@@ -75,6 +75,15 @@ abstract class IteratorBuilder extends Builder
         return $this->{$method}($entries, $where);
     }
 
+    protected function filterWhereColumn($entries, $where)
+    {
+        return $entries->filter(function ($value, $key) use ($where) {
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
+            return $this->{$method}($value[$where['column']] ?? '', $value[$where['value']] ?? '');
+        });
+    }
+
     protected function intersectFromWhereClause($entries, $filteredEntries, $where)
     {
         // On the first iteration, there's nothing to intersect;
@@ -87,7 +96,14 @@ abstract class IteratorBuilder extends Builder
         // Otherwise, intersect to ensure each where is respected.
         return $where['boolean'] === 'or' && $where['type'] !== 'NotIn'
             ? $entries->concat($filteredEntries)->unique()->values()
-            : $entries->intersect($filteredEntries)->values();
+            : $this->intersectItems($entries, $filteredEntries)->values();
+    }
+
+    private function intersectItems($entries, $filteredEntries)
+    {
+        return $entries->filter(function ($entry) use ($filteredEntries) {
+            return $filteredEntries->contains($entry);
+        });
     }
 
     protected function filterWhereIn($entries, $where)
@@ -215,13 +231,7 @@ abstract class IteratorBuilder extends Builder
 
     protected function getFilterItemValue($item, $column)
     {
-        if (is_array($item)) {
-            return $item[$column] ?? null;
-        }
-
-        return method_exists($item, $column)
-            ? $item->{$column}()
-            : $item->get($column);
+        return (new ResolveValue)($item, $column);
     }
 
     protected function operatorToCarbonMethod($operator)

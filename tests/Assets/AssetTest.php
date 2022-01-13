@@ -60,6 +60,23 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_removes_data_values()
+    {
+        $asset = (new Asset)->container($this->container);
+
+        $this->assertNull($asset->get('foo'));
+
+        $asset->set('foo', 'bar');
+
+        $this->assertEquals('bar', $asset->get('foo'));
+
+        $return = $asset->remove('foo');
+
+        $this->assertEquals($asset, $return);
+        $this->assertNull($asset->get('foo'));
+    }
+
+    /** @test */
     public function it_gets_and_sets_data_values_using_magic_properties()
     {
         $asset = (new Asset)->container($this->container);

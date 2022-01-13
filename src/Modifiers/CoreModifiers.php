@@ -246,6 +246,23 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a comma-separated list of variable names into an array.
+     *
+     * @param  string  $value
+     * @param $params
+     * @param $context
+     * @return array
+     */
+    public function compact($value, $params, $context)
+    {
+        return collect(explode(',', $value))
+            ->map(function ($variable) use ($context) {
+                return Antlers::parser()
+                    ->getVariable(trim($variable), $context);
+            })->all();
+    }
+
+    /**
      * Debug a value with a call to JavaScript's console.log.
      *
      * @param  $value
@@ -744,7 +761,7 @@ class CoreModifiers extends Modifier
         $grouped = collect($value)->groupBy(function ($item) use ($groupBy, $params, &$groupLabels) {
             $value = $this->getGroupByValue($item, $groupBy);
 
-            return $this->handleGroupByDateValue($value, $params, $groupLabels);
+            return (string) $this->handleGroupByDateValue($value, $params, $groupLabels);
         });
 
         $iterable = $grouped->map(function ($items, $key) use ($groupLabels) {
