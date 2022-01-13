@@ -17,6 +17,7 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
+use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
@@ -224,7 +225,7 @@ class StaticWarm extends Command
                 return $route->getActionName() === $action && ! Str::contains($route->uri(), '{');
             })
             ->map(function (Route $route) {
-                return Facades\URL::tidy(Str::start($route->uri(), config('app.url').'/'));
+                return URL::tidy(Str::start($route->uri(), config('app.url').'/'));
             });
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Custom routes");
