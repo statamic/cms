@@ -17,9 +17,10 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
-use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
+use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
+use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
@@ -66,7 +67,7 @@ class StaticWarm extends Command
         $promise = $pool->promise();
 
         $this->output->newLine();
-        $this->line('Visiting URLs...');
+        $this->line('Visiting '.$this->uris()->count().' URLs...');
 
         $promise->wait();
     }
@@ -120,16 +121,22 @@ class StaticWarm extends Command
             return $this->uris;
         }
 
+        $cacher = app(StaticCacher::class);
+
         return $this->uris = collect()
-            ->merge($this->entries())
-            ->merge($this->terms())
-            ->merge($this->customRoutes())
+            ->merge($this->entryUris())
+            ->merge($this->taxonomyUris())
+            ->merge($this->termUris())
+            ->merge($this->customRouteUris())
             ->unique()
+            ->reject(function ($uri) use ($cacher) {
+                return $cacher->isExcluded($uri);
+            })
             ->sort()
             ->values();
     }
 
-    protected function entries(): Collection
+    protected function entryUris(): Collection
     {
         $this->line('[ ] Entries...');
 
@@ -146,13 +153,41 @@ class StaticWarm extends Command
         return $entries;
     }
 
-    protected function terms(): Collection
+    protected function taxonomyUris(): Collection
+    {
+        $this->line('[ ] Taxonomies...');
+
+        $taxonomyUris = Facades\Taxonomy::all()
+            ->filter(function ($taxonomy) {
+                return view()->exists($taxonomy->template());
+            })
+            ->flatMap(function (Taxonomy $taxonomy) {
+                return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
+                    Facades\Site::setCurrent($site);
+
+                    return $taxonomy->absoluteUrl();
+                });
+            });
+
+        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Taxonomies");
+
+        return $taxonomyUris;
+    }
+
+    protected function termUris(): Collection
     {
         $this->line('[ ] Taxonomy terms...');
 
-        $terms = Facades\Term::all()->map->absoluteUrl();
-
-        $terms = $terms->merge($this->scopedTerms());
+        $terms = Facades\Term::all()
+            ->merge($this->scopedTerms())
+            ->filter(function ($term) {
+                return view()->exists($term->template());
+            })
+            ->flatMap(function (LocalizedTerm $term) {
+                return $term->taxonomy()->sites()->map(function ($site) use ($term) {
+                    return $term->in($site)->absoluteUrl();
+                });
+            });
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Taxonomy terms");
 
@@ -164,8 +199,7 @@ class StaticWarm extends Command
         return Facades\Collection::all()
             ->flatMap(function (EntriesCollection $collection) {
                 return $this->getCollectionTerms($collection);
-            })
-            ->map->absoluteUrl();
+            });
     }
 
     protected function getCollectionTerms($collection)
@@ -177,7 +211,7 @@ class StaticWarm extends Command
             ->map->collection($collection);
     }
 
-    protected function customRoutes(): Collection
+    protected function customRouteUris(): Collection
     {
         $this->line('[ ] Custom routes...');
 
@@ -188,7 +222,7 @@ class StaticWarm extends Command
                 return $route->getActionName() === $action && ! Str::contains($route->uri(), '{');
             })
             ->map(function (Route $route) {
-                return URL::tidy(Str::start($route->uri(), config('app.url').'/'));
+                return Facades\URL::tidy(Str::start($route->uri(), config('app.url').'/'));
             });
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Custom routes");
