@@ -19,7 +19,8 @@ class Entries
 {
     use Concerns\QueriesScopes,
         Concerns\QueriesOrderBys,
-        Concerns\GetsQueryResults;
+        Concerns\GetsQueryResults,
+        Concerns\GetsQuerySelectKeys;
     use Concerns\QueriesConditions {
         queryableConditionParams as traitQueryableConditionParams;
     }
@@ -142,6 +143,7 @@ class Entries
         $query = Entry::query()
             ->whereIn('collection', $this->collections->map->handle()->all());
 
+        $this->querySelect($query);
         $this->querySite($query);
         $this->queryStatus($query);
         $this->queryPastFuture($query);
@@ -215,6 +217,11 @@ class Entries
         }
 
         return 'title:asc';
+    }
+
+    protected function querySelect($query)
+    {
+        $query->select($this->getQuerySelectKeys(Entry::make()));
     }
 
     protected function querySite($query)
