@@ -11,9 +11,12 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Str;
+use Statamic\Tags\Concerns\GetsQuerySelectKeys;
 
 class Structure extends Tags
 {
+    use GetsQuerySelectKeys;
+
     public function wildcard($tag)
     {
         $handle = $this->context->value($tag, $tag);
@@ -67,7 +70,8 @@ class Structure extends Tags
     {
         return collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
-            $data = $page->toAugmentedArray();
+            $keys = $this->getQuerySelectKeys($page);
+            $data = $page->toAugmentedArray($keys);
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
             return array_merge($data, [
