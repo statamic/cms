@@ -257,6 +257,7 @@ abstract class Builder implements Contract
             'value' => $value,
             'boolean' => $boolean,
         ];
+
         return $this;
     }
 
