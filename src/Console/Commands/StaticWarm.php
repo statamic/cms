@@ -163,6 +163,8 @@ class StaticWarm extends Command
             })
             ->flatMap(function (Taxonomy $taxonomy) {
                 return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
+                    // Needed because Taxonomy uses the current site. If the Taxonomy
+                    // class ever gets its own localization logic we can remove this.
                     Facades\Site::setCurrent($site);
 
                     return $taxonomy->absoluteUrl();
