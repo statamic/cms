@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Parser;
+use Traversable;
 
 class FluentTag implements \IteratorAggregate, \ArrayAccess
 {
@@ -30,6 +31,16 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
      */
     private $loader;
 
+    /**
+     * @var bool
+     */
+    protected $augmentation = true;
+
+    /**
+     * Instantiate fluent tag helper.
+     *
+     * @param Loader $loader
+     */
     public function __construct(Loader $loader)
     {
         $this->loader = $loader;
@@ -75,6 +86,18 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     * Disable augmentation in tag output.
+     *
+     * @return $this
+     */
+    public function withoutAugmentation()
+    {
+        $this->augmentation = false;
+
+        return $this;
+    }
+
+    /**
      * Fetch result of a tag.
      *
      * @return mixed
@@ -102,11 +125,11 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
 
         $output = $tag->$method();
 
-        if ($output instanceof Collection) {
+        if ($this->augmentation && $output instanceof Collection) {
             $output = $output->toAugmentedArray();
         }
 
-        if ($output instanceof Augmentable) {
+        if ($this->augmentation && $output instanceof Augmentable) {
             $output = $output->toAugmentedArray();
         }
 
@@ -126,11 +149,13 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
     /**
      * Get the value as an array.
      *
-     * @return \Traversable
+     * @return Traversable
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->fetch());
+        $output = $this->fetch();
+
+        return $output instanceof Traversable ? $output : new ArrayIterator($output);
     }
 
     /**
