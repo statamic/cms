@@ -26,7 +26,7 @@ class Modify implements \IteratorAggregate
     /**
      * Instantiate fluent modifier helper.
      *
-     * @param Loader $loader
+     * @param  Loader  $loader
      */
     public function __construct(Loader $loader)
     {

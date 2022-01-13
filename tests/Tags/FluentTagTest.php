@@ -51,7 +51,7 @@ class FluentTagTest extends TestCase
     {
         $slugs = [];
 
-        foreach(FluentTag::make('collection:pages') as $page) {
+        foreach (FluentTag::make('collection:pages') as $page) {
             $slugs[] = (string) $page['slug'];
         }
 
@@ -65,7 +65,7 @@ class FluentTagTest extends TestCase
     {
         $slugs = [];
 
-        foreach(FluentTag::make('collection:pages')->sort('slug:desc')->limit(3) as $page) {
+        foreach (FluentTag::make('collection:pages')->sort('slug:desc')->limit(3) as $page) {
             $slugs[] = (string) $page['slug'];
         }
 
@@ -79,7 +79,7 @@ class FluentTagTest extends TestCase
     {
         $slugs = [];
 
-        foreach(FluentTag::make('collection:pages')->sort('slug:desc')->limit(3) as $page) {
+        foreach (FluentTag::make('collection:pages')->sort('slug:desc')->limit(3) as $page) {
             $slugs[] = (string) trim($page['content']);
         }
 
@@ -93,7 +93,7 @@ class FluentTagTest extends TestCase
     {
         $slugs = [];
 
-        foreach(FluentTag::make('collection:pages')->sort('slug:desc')->limit(3)->withoutAugmentation() as $page) {
+        foreach (FluentTag::make('collection:pages')->sort('slug:desc')->limit(3)->withoutAugmentation() as $page) {
             $slugs[] = (string) $page->content;
         }
 
