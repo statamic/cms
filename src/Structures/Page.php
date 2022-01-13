@@ -427,6 +427,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return $this->forwardCallTo($this->entry(), $method, $args);
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this
