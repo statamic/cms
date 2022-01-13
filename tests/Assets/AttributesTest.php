@@ -6,12 +6,12 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
-use Statamic\Assets\Dimensions;
+use Statamic\Assets\Attributes;
 use Statamic\Facades\AssetContainer;
 use Statamic\Imaging\ImageGenerator;
 use Tests\TestCase;
 
-class DimensionsTest extends TestCase
+class AttributesTest extends TestCase
 {
     public function setUp(): void
     {
@@ -24,19 +24,21 @@ class DimensionsTest extends TestCase
 
         Storage::fake('test');
 
-        $this->dimensions = new Dimensions(app(ImageGenerator::class));
+        $this->attributes = new Attributes(app(ImageGenerator::class));
     }
 
     /** @test */
     public function a_non_image_asset_has_no_dimensions()
     {
         $asset = $this->mock(Asset::class);
+        $asset->shouldReceive('isAudio')->andReturnFalse();
         $asset->shouldReceive('isImage')->andReturnFalse();
         $asset->shouldReceive('isSvg')->andReturnFalse();
+        $asset->shouldReceive('isVideo')->andReturnFalse();
 
-        $dimensions = $this->dimensions->asset($asset);
+        $dimensions = $this->attributes->asset($asset);
 
-        $this->assertEquals([null, null], $dimensions->get());
+        $this->assertEquals([null, null, null], $dimensions->get());
         $this->assertEquals(null, $dimensions->width());
         $this->assertEquals(null, $dimensions->height());
     }
@@ -59,9 +61,9 @@ class DimensionsTest extends TestCase
         $imagesize = getimagesize($realpath);
         $this->assertEquals([30, 60], array_splice($imagesize, 0, 2));
 
-        $dimensions = $this->dimensions->asset($asset);
+        $dimensions = $this->attributes->asset($asset);
 
-        $this->assertEquals([30, 60], $dimensions->get());
+        $this->assertEquals([30, 60, 0], $dimensions->get());
         $this->assertEquals(30, $dimensions->width());
         $this->assertEquals(60, $dimensions->height());
     }
@@ -71,7 +73,7 @@ class DimensionsTest extends TestCase
     {
         $asset = $this->svgAsset('<svg width="30" height="60" viewBox="0 0 100 200"></svg>');
 
-        $this->assertEquals([30, 60], $this->dimensions->asset($asset)->get());
+        $this->assertEquals([30.0, 60.0, 0], $this->attributes->asset($asset)->get());
     }
 
     /** @test */
@@ -79,7 +81,7 @@ class DimensionsTest extends TestCase
     {
         $asset = $this->svgAsset('<svg viewBox="0 0 300 600"></svg>');
 
-        $this->assertEquals([300, 600], $this->dimensions->asset($asset)->get());
+        $this->assertEquals([300, 600, 0], $this->attributes->asset($asset)->get());
     }
 
     /** @test */
@@ -87,7 +89,7 @@ class DimensionsTest extends TestCase
     {
         $asset = $this->svgAsset('<svg width="100%" height="100%" viewBox="0 0 300 600"></svg>');
 
-        $this->assertEquals([300, 600], $this->dimensions->asset($asset)->get());
+        $this->assertEquals([300, 600, 0], $this->attributes->asset($asset)->get());
     }
 
     /** @test */
@@ -95,15 +97,15 @@ class DimensionsTest extends TestCase
     {
         $asset = $this->svgAsset('<svg width="1em" height="2em" viewBox="0 0 300 600"></svg>');
 
-        $this->assertEquals([300, 600], $this->dimensions->asset($asset)->get());
+        $this->assertEquals([300, 600, 0], $this->attributes->asset($asset)->get());
     }
 
     /** @test */
     public function it_uses_default_dimensions_if_the_svg_has_no_viewbox_and_is_missing_either_or_both_dimensions()
     {
-        $this->assertEquals([300, 150], $this->dimensions->asset($this->svgAsset('<svg></svg>'))->get());
-        $this->assertEquals([300, 150], $this->dimensions->asset($this->svgAsset('<svg width="100"></svg>'))->get());
-        $this->assertEquals([300, 150], $this->dimensions->asset($this->svgAsset('<svg height="100"></svg>'))->get());
+        $this->assertEquals([300, 150, 0], $this->attributes->asset($this->svgAsset('<svg></svg>'))->get());
+        $this->assertEquals([300, 150, 0], $this->attributes->asset($this->svgAsset('<svg width="100"></svg>'))->get());
+        $this->assertEquals([300, 150, 0], $this->attributes->asset($this->svgAsset('<svg height="100"></svg>'))->get());
     }
 
     private function svgAsset($svg)

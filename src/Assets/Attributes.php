@@ -8,7 +8,7 @@ use Owenoj\LaravelGetId3\GetId3;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Arr;
 
-class Dimensions
+class Attributes
 {
     /**
      * @var Asset
@@ -31,7 +31,7 @@ class Dimensions
     }
 
     /**
-     * Get the dimensions of an asset.
+     * Get the attributes of an asset.
      *
      * @return array
      */
@@ -77,7 +77,7 @@ class Dimensions
     }
 
     /**
-     * Get the dimensions of a sound.
+     * Get the attributes of a sound.
      *
      * @return array
      */
@@ -94,14 +94,14 @@ class Dimensions
     }
 
     /**
-     * Get the dimensions of an image.
+     * Get the attributes of an image.
      *
      * @return array
      */
     private function getImageDimensions()
     {
         // Since assets may be located on external platforms like Amazon S3, we can't simply
-        // grab the dimensions. So we'll copy it locally and read the dimensions from there.
+        // grab the attributes. So we'll copy it locally and read the attributes from there.
         $manager = new MountManager([
             'source' => $this->asset->disk()->filesystem()->getDriver(),
             'cache' => $cache = $this->getCacheFlysystem(),
@@ -128,14 +128,14 @@ class Dimensions
     }
 
     /**
-     * Get the dimensions of an SVG.
+     * Get the attributes of an SVG.
      *
      * @return array
      */
     private function getSvgDimensions()
     {
         // Since assets may be located on external platforms like Amazon S3, we can't simply
-        // grab the dimensions. So we'll copy it locally and read the dimensions from there.
+        // grab the attributes. So we'll copy it locally and read the attributes from there.
         $manager = new MountManager([
             'source' => $this->asset->disk()->filesystem()->getDriver(),
             'cache' => $cache = $this->getCacheFlysystem(),
@@ -156,18 +156,18 @@ class Dimensions
         if ($svg['width'] && $svg['height']
             && is_numeric((string) $svg['width'])
             && is_numeric((string) $svg['height'])) {
-            return [(float) $svg['width'], (float) $svg['height']];
+            return [(float) $svg['width'], (float) $svg['height'], 0];
         } elseif ($svg['viewBox']) {
             $viewBox = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
 
-            return [$viewBox[2], $viewBox[3]];
+            return [$viewBox[2], $viewBox[3], 0];
         }
 
-        return [300, 150];
+        return [300, 150, 0];
     }
 
     /**
-     * Get the dimensions of a sound.
+     * Get the attributes of a sound.
      *
      * @return array
      */
@@ -187,11 +187,11 @@ class Dimensions
 
     private function getCacheFlysystem()
     {
-        $disk = 'dimensions-cache';
+        $disk = 'attributes-cache';
 
         config(["filesystems.disks.{$disk}" => [
             'driver' => 'local',
-            'root' => storage_path('statamic/dimensions-cache'),
+            'root' => storage_path('statamic/attributes-cache'),
         ]]);
 
         return Storage::disk($disk)->getDriver();

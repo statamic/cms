@@ -160,7 +160,7 @@ class Asset implements AssetContract, Augmentable
         $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
-            [$width, $height, $length] = app(Dimensions::class)->asset($this)->get();
+            [$width, $height, $length] = app(Attributes::class)->asset($this)->get();
 
             $otherMeta = [
                 'height' => $height,

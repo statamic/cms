@@ -42,7 +42,7 @@ class AssetTest extends TestCase
             ->disk('test');
 
         Storage::fake('test');
-        Storage::fake('dimensions-cache');
+        Storage::fake('attributes-cache');
     }
 
     /** @test */
@@ -360,6 +360,7 @@ class AssetTest extends TestCase
             'width' => 30,
             'height' => 60,
             'mime_type' => 'image/jpeg',
+            'length' => 0,
         ];
 
         $metaWithData = [
@@ -369,6 +370,7 @@ class AssetTest extends TestCase
             'width' => 30,
             'height' => 60,
             'mime_type' => 'image/jpeg',
+            'length' => 0,
         ];
 
         // The meta that's saved to file will also be cached, but will not include in-memory data...
@@ -413,6 +415,7 @@ class AssetTest extends TestCase
             'width' => 30,
             'height' => 60,
             'mime_type' => 'image/jpeg',
+            'length' => 0,
         ];
 
         Storage::disk('test')->put('foo/.meta/image.jpg.yaml', YAML::dump($incompleteMeta));
