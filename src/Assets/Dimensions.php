@@ -4,7 +4,9 @@ namespace Statamic\Assets;
 
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\MountManager;
+use Owenoj\LaravelGetId3\GetId3;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Support\Arr;
 
 class Dimensions
 {
@@ -35,6 +37,10 @@ class Dimensions
      */
     public function get()
     {
+        if ($this->asset->isAudio()) {
+            return $this->getAudioDimensions();
+        }
+
         if ($this->asset->isImage()) {
             return $this->getImageDimensions();
         }
@@ -43,7 +49,11 @@ class Dimensions
             return $this->getSvgDimensions();
         }
 
-        return [null, null];
+        if ($this->asset->isVideo()) {
+            return $this->getVideoDimensions();
+        }
+
+        return [null, null, null];
     }
 
     /**
@@ -64,6 +74,23 @@ class Dimensions
     public function height()
     {
         return array_get($this->get(), 1);
+    }
+
+    /**
+     * Get the dimensions of a sound.
+     *
+     * @return array
+     */
+    private function getAudioDimensions()
+    {
+        $id3 = GetId3::fromDiskAndPath(
+            $this->asset->container()->diskHandle(),
+            $this->asset->basename()
+        )->extractInfo();
+
+        $length = Arr::get($id3, 'playtime_seconds', 0);
+
+        return [null, null, $length];
     }
 
     /**
@@ -90,13 +117,14 @@ class Dimensions
 
         try {
             $size = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
+            $size[2] = 0;
         } catch (\Exception $e) {
-            $size = [0, 0];
+            $size = [0, 0, 0];
         } finally {
             $cache->delete($cachePath);
         }
 
-        return $size ? array_splice($size, 0, 2) : [0, 0];
+        return $size ? array_splice($size, 0, 3) : [0, 0, 0];
     }
 
     /**
@@ -136,6 +164,25 @@ class Dimensions
         }
 
         return [300, 150];
+    }
+
+    /**
+     * Get the dimensions of a sound.
+     *
+     * @return array
+     */
+    private function getVideoDimensions()
+    {
+        $id3 = GetId3::fromDiskAndPath(
+            $this->asset->container()->diskHandle(),
+            $this->asset->basename()
+        )->extractInfo();
+
+        $width = Arr::get($id3, 'video.resolution_x');
+        $height = Arr::get($id3, 'video.resolution_y');
+        $length = Arr::get($id3, 'playtime_seconds');
+
+        return [$width, $height, $length];
     }
 
     private function getCacheFlysystem()
