@@ -10,6 +10,7 @@ use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 abstract class Builder implements Contract
 {
+    protected $columns;
     protected $limit;
     protected $offset = 0;
     protected $wheres = [];
@@ -27,6 +28,13 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+
+    public function select($columns = ['*'])
+    {
+        $this->columns = $columns;
+
+        return $this;
+    }
 
     public function limit($value)
     {
