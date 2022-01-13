@@ -332,6 +332,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return new AugmentedPage($this);
     }
 
+    public function shallowAugmentedArrayKeys()
+    {
+        return optional($this->entry())->shallowAugmentedArrayKeys() ?? ['title', 'url'];
+    }
+
     public function editUrl()
     {
         return optional($this->entry())->editUrl();
