@@ -73,6 +73,15 @@ abstract class IteratorBuilder extends Builder
         return $this->{$method}($entries, $where);
     }
 
+    protected function filterWhereColumn($entries, $where)
+    {
+        return $entries->filter(function ($value, $key) use ($where) {
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
+            return $this->{$method}($value[$where['column']] ?? '', $value[$where['value']] ?? '');
+        });
+    }
+
     protected function intersectFromWhereClause($entries, $filteredEntries, $where)
     {
         // On the first iteration, there's nothing to intersect;

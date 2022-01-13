@@ -229,6 +229,11 @@
         > p > code, > pre code {
             @apply bg-grey-30;
         }
+        
+        // To remove min height from nested bard fields inside bard in fullscreen mode.
+        * > .ProseMirror { 
+            min-height: auto;
+        }
     }
 
     .bard-set-selector {

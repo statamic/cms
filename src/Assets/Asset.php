@@ -286,10 +286,23 @@ class Asset implements AssetContract, Augmentable
 
     public function thumbnailUrl($preset = null)
     {
+        if ($this->isSvg()) {
+            return $this->svgThumbnailUrl();
+        }
+
         return cp_route('assets.thumbnails.show', [
             'encoded_asset' => base64_encode($this->id()),
             'size' => $preset,
         ]);
+    }
+
+    protected function svgThumbnailUrl()
+    {
+        if ($url = $this->url()) {
+            return $url;
+        }
+
+        return cp_route('assets.svgs.show', ['encoded_asset' => base64_encode($this->id())]);
     }
 
     /**
