@@ -16,7 +16,6 @@ use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
-use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Variables implements Contract, Localization, Augmentable, ResolvesValuesContract
@@ -145,16 +144,12 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
             $data['origin'] = $this->origin()->locale();
         }
 
-        if ($this->isRoot()) {
-            $data = Arr::removeNullValues($data);
-        }
-
         return $data;
     }
 
     protected function shouldRemoveNullsFromFileData()
     {
-        return false;
+        return ! $this->hasOrigin();
     }
 
     public function reference()
