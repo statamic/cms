@@ -179,4 +179,17 @@ abstract class Builder extends BaseBuilder
             return $value < $where['values'][0] || $value > $where['values'][1];
         });
     }
+
+    protected function filterWhereColumn($values, $where)
+    {
+        $whereColumnKeys = $this->getWhereColumnKeyValuesByIndex($where['value']);
+
+        return $values->filter(function ($value, $key) use ($where, $whereColumnKeys) {
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
+            return $this->{$method}($value, $whereColumnKeys->get($key));
+        });
+    }
+
+    abstract protected function getWhereColumnKeyValuesByIndex($column);
 }

@@ -138,9 +138,18 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     public function fileData()
     {
-        return array_merge([
-            'origin' => $this->hasOrigin() ? $this->origin()->locale() : null,
-        ], $this->data()->all());
+        $data = $this->data()->all();
+
+        if ($this->hasOrigin()) {
+            $data['origin'] = $this->origin()->locale();
+        }
+
+        return $data;
+    }
+
+    protected function shouldRemoveNullsFromFileData()
+    {
+        return ! $this->hasOrigin();
     }
 
     public function reference()

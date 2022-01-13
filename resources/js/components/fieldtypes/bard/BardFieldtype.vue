@@ -147,6 +147,7 @@ export default {
     provide() {
         return {
             setConfigs: this.config.sets,
+            isReadOnly: this.readOnly,
         }
     },
 
