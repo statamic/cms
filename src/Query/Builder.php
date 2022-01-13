@@ -388,7 +388,7 @@ abstract class Builder implements Contract
 
         return $this->whereTime($column, $operator, $value, 'or');
     }
-  
+
     public function whereColumn($column, $operator = null, $value = null, $boolean = 'and')
     {
         // If the given operator is not found in the list of valid operators we will
@@ -400,10 +400,10 @@ abstract class Builder implements Contract
 
         $type = 'Column';
         $this->wheres[] = compact('type', 'column', 'value', 'operator', 'boolean');
-      
+
         return $this;
     }
-      
+
     public function orWhereColumn($column, $operator = null, $value = null)
     {
         return $this->whereColumn($column, $operator, $value, 'or');
