@@ -91,11 +91,16 @@ class ModifierManager
 
             $parameters = [];
 
-            if (! empty($chain->valueNodes)) {
-                foreach ($chain->valueNodes as $node) {
-                    $parameters[] = $env->getValue($node);
+            if ($chain->methodStyleArguments != null) {
+                $parameters = $env->evaluateArgumentGroup($chain->methodStyleArguments)['a'];
+            } else {
+                if (! empty($chain->valueNodes)) {
+                    foreach ($chain->valueNodes as $node) {
+                        $parameters[] = $env->getValue($node);
+                    }
                 }
             }
+
 
             if ($returnValue instanceof Value) {
                 $returnValue = $value->value();

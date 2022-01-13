@@ -185,6 +185,136 @@ EOT;
         $this->assertSame($expected, $results);
     }
 
+    public function test_implicit_antlers_php_node()
+    {
+        $template = <<<'EOT'
+{{ var_1 = 'blog'; var_2 = 'news'; }}
+<p>{{ title }}</p>
+
+{{$
+$articles = \Statamic\Facades\Entry::query()->where('collection', $var_1)->limit(3)->get();
+$news = \Statamic\Facades\Entry::query()->where('collection', $var_2)->limit(5)->get();
+$}}
+
+
+{{ articles }}
+================ Blog ================
+{{ id | length }}
+Count: {{ count }}
+Index: {{ index }}
+First: {{ str.bool(first) }}
+Last: {{ str.bool(last) }}
+======================================
+{{ /articles }}
+
+{{ news }}
+================ News ================
+{{ id | length }}
+Count: {{ count }}
+Index: {{ index }}
+First: {{ str.bool(first) }}
+Last: {{ str.bool(last) }}
+======================================
+{{ /news }}
+EOT;
+
+        $expected = <<<'EOT'
+
+<p>Antlers PHP Node Test</p>
+
+
+
+
+================ Blog ================
+36
+Count: 1
+Index: 0
+First: true
+Last: false
+======================================
+
+================ Blog ================
+36
+Count: 2
+Index: 1
+First: false
+Last: false
+======================================
+
+================ Blog ================
+36
+Count: 3
+Index: 2
+First: false
+Last: true
+======================================
+
+
+
+================ News ================
+36
+Count: 1
+Index: 0
+First: true
+Last: false
+======================================
+
+================ News ================
+36
+Count: 2
+Index: 1
+First: false
+Last: false
+======================================
+
+================ News ================
+36
+Count: 3
+Index: 2
+First: false
+Last: false
+======================================
+
+================ News ================
+36
+Count: 4
+Index: 3
+First: false
+Last: false
+======================================
+
+================ News ================
+36
+Count: 5
+Index: 4
+First: false
+Last: true
+======================================
+
+EOT;
+
+        $data = [
+            'title' => 'Antlers PHP Node Test',
+        ];
+
+        $entryFactory = new EntryFactory();
+        for ($i = 0; $i < 3; $i++) {
+            $entryFactory->collection('blog')->create();
+        }
+
+        for ($i = 0; $i < 5; $i++) {
+            $entryFactory->collection('news')->create();
+        }
+
+        $results = StringUtilities::normalizeLineEndings(
+            (string) $this->parser($data)->allowPhp()->parse($template, $data)
+        );
+
+        $expected = StringUtilities::normalizeLineEndings($expected);
+
+        $this->assertSame($expected, $results);
+    }
+
     public function test_antlers_php_node()
     {
         $template = <<<'EOT'

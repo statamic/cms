@@ -2100,7 +2100,27 @@ class LanguageParser
         $modifierName = array_shift($tokens);
         $values = [];
 
+        if (! empty($tokens) && $tokens[0] instanceof LogicGroup) {
+            if (count($tokens) > 1) {
+                throw ErrorFactory::makeSyntaxError(
+                    AntlersErrorCodes::TYPE_MODIFIER_UNEXPECTED_TOKEN_METHOD_SYNTAX,
+                    $tokens[1],
+                    'Unexpected ['.TypeLabeler::getPrettyTypeName($tokens[1]).'] while parsing modifier argument group. Expecting [T_MODIFIER_SEPARATOR] or end of current expression.'
+                );
+            }
+
+            $unwrapped = $this->unpack($tokens[0]->nodes);
+            $tArgGroup = $this->makeArgGroup($unwrapped);
+            $modifierNode = new ModifierNode();
+
+            $modifierNode->nameNode = $modifierName;
+            $modifierNode->methodStyleArguments = $tArgGroup;
+
+            return $modifierNode;
+        }
+
         $tokenCount = count($tokens);
+
         for ($i = 0; $i < $tokenCount; $i++) {
             if ($tokens[$i] instanceof ModifierValueSeparator || $tokens[$i] instanceof InlineBranchSeparator) {
                 if ($i + 1 >= $tokenCount) {

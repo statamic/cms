@@ -920,14 +920,6 @@ class NodeProcessor
                 }
 
                 if ($node instanceof PhpExecutionNode) {
-                    if (! $this->allowPhp) {
-                        throw ErrorFactory::makeRuntimeError(
-                            AntlersErrorCodes::RUNTIME_PHP_NODE_WHEN_PHP_DISABLED,
-                            $node,
-                            'Runtime encountered Antlers PHP node when PHP is disabled.'
-                        );
-                    }
-
                     if (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowPhpInContent) {
                         if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
                             throw ErrorFactory::makeRuntimeError(
@@ -1797,11 +1789,12 @@ class NodeProcessor
             return StringUtilities::sanitizePhp($node->content);
         }
 
+        $phpBuffer = $node->content;
+
         if (! Str::contains($node->content, $this->validPhpOpenTags)) {
-            return $node->content;
+            $phpBuffer = '<?php '.$node->content.' ?>';
         }
 
-        $phpBuffer = $node->content;
         $phpRuntimeAssignments = [];
         ob_start();
 

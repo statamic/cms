@@ -229,4 +229,9 @@ EOT;
             $this->assertSame(20, $exception->node->startPosition->line);
         }
     }
+
+    public function test_modifier_method_syntax_with_extra_tokens_throws_error()
+    {
+        $this->assertThrowsParserError('{{ title | modifier_name(param1, param2) : something_else }}');
+    }
 }
