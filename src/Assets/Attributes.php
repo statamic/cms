@@ -38,19 +38,19 @@ class Attributes
     public function get()
     {
         if ($this->asset->isAudio()) {
-            return $this->getAudioDimensions();
+            return $this->getAudioAttributes();
         }
 
         if ($this->asset->isImage()) {
-            return $this->getImageDimensions();
+            return $this->getImageAttributes();
         }
 
         if ($this->asset->isSvg()) {
-            return $this->getSvgDimensions();
+            return $this->getSvgAttributes();
         }
 
         if ($this->asset->isVideo()) {
-            return $this->getVideoDimensions();
+            return $this->getVideoAttributes();
         }
 
         return [null, null, null];
@@ -81,7 +81,7 @@ class Attributes
      *
      * @return array
      */
-    private function getAudioDimensions()
+    private function getAudioAttributes()
     {
         $id3 = GetId3::fromDiskAndPath(
             $this->asset->container()->diskHandle(),
@@ -98,7 +98,7 @@ class Attributes
      *
      * @return array
      */
-    private function getImageDimensions()
+    private function getImageAttributes()
     {
         // Since assets may be located on external platforms like Amazon S3, we can't simply
         // grab the attributes. So we'll copy it locally and read the attributes from there.
@@ -132,7 +132,7 @@ class Attributes
      *
      * @return array
      */
-    private function getSvgDimensions()
+    private function getSvgAttributes()
     {
         // Since assets may be located on external platforms like Amazon S3, we can't simply
         // grab the attributes. So we'll copy it locally and read the attributes from there.
