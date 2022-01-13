@@ -68,6 +68,31 @@ class AttributesTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_attributes_of_audio_file()
+    {
+        $this->markTestSkipped();
+        Carbon::setTestNow(now());
+
+        $asset = (new Asset)
+                ->container(AssetContainer::make('test-container')->disk('test'))
+                ->path('path/to/asset.mp3');
+
+        $file = UploadedFile::fake()->createWithContent('asset.mp3', 'Hello World');
+
+        Storage::disk('test')->putFileAs('path/to', $file, 'asset.mp3');
+
+        // Test about the actual file, for good measure.
+        $realpath = Storage::disk('test')->getAdapter()->getPathPrefix().'path/to/asset.mp3';
+        $this->assertFileExists($realpath);
+
+        $attributes = $this->attributes->asset($asset);
+
+        $this->assertEquals([0, 0, 11], $attributes->get());
+        $this->assertEquals(0, $attributes->width());
+        $this->assertEquals(0, $attributes->height());
+    }
+
+    /** @test */
     public function it_gets_the_attributes_of_an_svg()
     {
         $asset = $this->svgAsset('<svg width="30" height="60" viewBox="0 0 100 200"></svg>');
