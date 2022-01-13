@@ -115,11 +115,11 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
         }
 
         $tag = app(Loader::class)->load($name, [
-            'parser'    => app(Parser::class),
-            'params'    => $this->params,
-            'content'   => '',
-            'context'   => $this->context,
-            'tag'       => $name.':'.$originalMethod,
+            'parser'     => app(Parser::class),
+            'params'     => $this->params,
+            'content'    => '',
+            'context'    => $this->context,
+            'tag'        => $name.':'.$originalMethod,
             'tag_method' => $originalMethod,
         ]);
 
