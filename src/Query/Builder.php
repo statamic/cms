@@ -248,10 +248,10 @@ abstract class Builder implements Contract
             'values' => $values,
             'boolean' => $boolean,
         ];
-  
+
         return $this;
     }
-  
+
     public function orWhereBetween($column, $values)
     {
         return $this->whereBetween($column, $values, 'or');
