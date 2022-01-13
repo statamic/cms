@@ -54,6 +54,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             \Rebing\GraphQL\GraphQLServiceProvider::class,
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
+            \Owenoj\LaravelGetId3\GetId3ServiceProvider::class,
         ];
     }
 
