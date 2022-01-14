@@ -2397,7 +2397,7 @@ class CoreModifiers extends Modifier
 
     public function toString($value)
     {
-        return (string)$value;
+        return (string) $value;
     }
 
     /**

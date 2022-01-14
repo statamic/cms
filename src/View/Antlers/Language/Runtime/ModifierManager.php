@@ -101,7 +101,6 @@ class ModifierManager
                 }
             }
 
-
             if ($returnValue instanceof Value) {
                 $returnValue = $value->value();
             }

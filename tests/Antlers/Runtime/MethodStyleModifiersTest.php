@@ -4,9 +4,8 @@ namespace Tests\Antlers\Runtime;
 
 use Tests\Antlers\ParserTestCase;
 
-class MethodStyleModifiersTest extends  ParserTestCase
+class MethodStyleModifiersTest extends ParserTestCase
 {
-
     public function test_using_method_syntax_works_for_modifiers_with_empty_arg_group()
     {
         $template = <<<'EOT'
@@ -14,7 +13,7 @@ class MethodStyleModifiersTest extends  ParserTestCase
 EOT;
 
         $this->assertSame('HELLO, WILDERNESS', $this->renderString($template, [
-            'title' => 'Hello, Wilderness'
+            'title' => 'Hello, Wilderness',
         ], true));
     }
 
@@ -25,7 +24,7 @@ EOT;
 EOT;
 
         $this->assertSame('HELLO, WILDERNESS', $this->renderString($template, [
-            'title' => 'Hello, Wilderness'
+            'title' => 'Hello, Wilderness',
         ], true));
     }
 
@@ -36,7 +35,7 @@ EOT;
 EOT;
 
         $this->assertSame('hello, wilderness', $this->renderString($template, [
-            'title' => 'Hello, Wilderness'
+            'title' => 'Hello, Wilderness',
         ], true));
     }
 
@@ -48,7 +47,7 @@ EOT;
 
         $result = $this->renderString($template, [
             'title' => 'The Title.',
-            'toTheLeft' => 'The left value.'
+            'toTheLeft' => 'The left value.',
         ], true);
 
         $this->assertSame('The left value.THE TITLE.To the right!', $result);
