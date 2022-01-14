@@ -65,14 +65,9 @@ abstract class AbstractAugmented implements Augmented
 
     protected function excludedKeys()
     {
-        if (! Statamic::isApiRoute()) {
-            return [];
-        }
-
-        return array_filter([
-            config('statamic.api.api_urls') === false ? 'api_url' : null,
-            config('statamic.api.edit_urls') === false ? 'edit_url' : null,
-        ]);
+        return Statamic::isApiRoute()
+            ? config('statamic.api.excluded_keys', [])
+            : [];
     }
 
     private function methodExistsOnThisClass($method)
