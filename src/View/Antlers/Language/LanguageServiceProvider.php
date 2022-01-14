@@ -8,7 +8,6 @@ use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
-use Statamic\View\Antlers\Language\Runtime\Libraries\LibraryManager;
 use Statamic\View\Antlers\Language\Runtime\ModifierManager;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
@@ -32,13 +31,6 @@ class LanguageServiceProvider extends ServiceProvider
                 GlobalDebugManager::loadDebugConfiguration($debugPath, resource_path());
             }
         }
-
-        $this->app->singleton(LibraryManager::class, function ($app) {
-            $globalManager = new  LibraryManager();
-            $globalManager->loadCoreLibraries();
-
-            return $globalManager;
-        });
 
         $this->app->bind(EnvironmentDetails::class, function ($app) {
             $envDetails = new EnvironmentDetails();
