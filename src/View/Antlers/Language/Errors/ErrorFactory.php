@@ -51,19 +51,4 @@ class ErrorFactory
 
         return 'parameters';
     }
-
-    /**
-     * Creates a new runtime library call error with the provided information.
-     *
-     * @param  string  $type  The type of runtime error.
-     * @param  string  $message  The error message to display to the user.
-     * @return LibraryCallException
-     */
-    public static function makeLibraryError($type, $message)
-    {
-        $libraryException = new LibraryCallException($message);
-        $libraryException->type = $type;
-
-        return $libraryException;
-    }
 }

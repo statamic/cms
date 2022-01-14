@@ -819,7 +819,19 @@ class Environment
                 try {
                     $args = $this->evaluateArgumentGroup($currentNode->args);
 
-                    $callRes = call_user_func([$leftVal, $currentNode->method->name], ...$args);
+                    if ($currentNode->method instanceof LanguageOperatorConstruct) {
+                        $methodName = $currentNode->method->content;
+                    } else if ($currentNode->method instanceof VariableNode) {
+                        $methodName = $currentNode->method->name;
+                    } else {
+                        throw ErrorFactory::makeRuntimeError(
+                            AntlersErrorCodes::TYPE_RUNTIME_BAD_METHOD_CALL,
+                            $currentNode,
+                            'Cannot resolve target method name.'
+                        );
+                    }
+
+                    $callRes = call_user_func([$leftVal, $methodName], ...$args);
 
                     $stack[] = $callRes;
                 } catch (Exception $exception) {
