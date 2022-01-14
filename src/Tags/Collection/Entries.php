@@ -216,7 +216,7 @@ class Entries
             return 'date:desc|title:asc';
         }
 
-        return 'title:asc';
+        return $collection->sortField().':'.$collection->sortDirection();
     }
 
     protected function querySelect($query)
