@@ -106,7 +106,7 @@ class APITest extends TestCase
     }
 
     /** @test */
-    public function it_excludes_api_and_edit_urls()
+    public function it_excludes_keys()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
         Facades\Config::set('statamic.api.cache', false);
@@ -128,8 +128,7 @@ class APITest extends TestCase
             ->assertJsonPath('data.api_url', $apiUrl)
             ->assertJsonPath('data.edit_url', $editUrl);
 
-        Facades\Config::set('statamic.api.api_urls', false);
-        Facades\Config::set('statamic.api.edit_urls', false);
+        Facades\Config::set('statamic.api.excluded_keys', ['api_url', 'edit_url']);
 
         $this
             ->get('/api/collections/pages/entries')
