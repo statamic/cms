@@ -194,6 +194,10 @@ abstract class Builder implements Contract
 
     public function whereJsonContains($column, $values, $boolean = 'and')
     {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
         $this->wheres[] = [
             'type' => 'JsonContains',
             'column' => $column,
@@ -211,6 +215,10 @@ abstract class Builder implements Contract
 
     public function whereJsonDoesntContain($column, $values, $boolean = 'and')
     {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
         $this->wheres[] = [
             'type' => 'JsonDoesntContain',
             'column' => $column,

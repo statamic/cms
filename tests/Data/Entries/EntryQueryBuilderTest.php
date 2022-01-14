@@ -228,6 +228,11 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
     }
 
     /** @test **/
@@ -240,6 +245,11 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
 
         $entries = Entry::query()->whereJsonDoesntContain('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 4', 'Post 5'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereJsonDoesntContain('test_taxonomy', 'taxonomy-1')->get();
 
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 2', 'Post 4', 'Post 5'], $entries->map->title->all());

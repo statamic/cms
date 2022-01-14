@@ -165,6 +165,11 @@ class QueryBuilderTest extends TestCase
 
         $this->assertCount(3, $results);
         $this->assertEquals(['a', 'c', 'e'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
     }
 
     /** @test **/
@@ -182,6 +187,12 @@ class QueryBuilderTest extends TestCase
 
         $this->assertCount(3, $results);
         $this->assertEquals(['b', 'd', 'e'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonDoesntContain('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals(['b', 'd', 'e'], $results->map->reference->all());
+
     }
 
     /** @test **/

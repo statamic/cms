@@ -183,6 +183,11 @@ class AssetQueryBuilderTest extends TestCase
 
         $this->assertCount(3, $assets);
         $this->assertEquals(['a', 'c', 'e'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
     }
 
     /** @test **/
@@ -196,6 +201,11 @@ class AssetQueryBuilderTest extends TestCase
         Asset::find('test::f.jpg')->data(['test_taxonomy' => ['taxonomy-1']])->save();
 
         $assets = $this->container->queryAssets()->whereJsonDoesntContain('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['b', 'd', 'e'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereJsonDoesntContain('test_taxonomy', 'taxonomy-1')->get();
 
         $this->assertCount(3, $assets);
         $this->assertEquals(['b', 'd', 'e'], $assets->map->filename()->all());
