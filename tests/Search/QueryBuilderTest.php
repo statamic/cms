@@ -192,7 +192,6 @@ class QueryBuilderTest extends TestCase
 
         $this->assertCount(3, $results);
         $this->assertEquals(['b', 'd', 'e'], $results->map->reference->all());
-
     }
 
     /** @test **/
