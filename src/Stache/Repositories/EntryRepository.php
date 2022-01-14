@@ -8,11 +8,13 @@ use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
+use Statamic\Support\Arr;
 
 class EntryRepository implements RepositoryContract
 {
     protected $stache;
     protected $store;
+    protected $substitutions = [];
 
     public function __construct(Stache $stache)
     {
@@ -122,5 +124,17 @@ class EntryRepository implements RepositoryContract
             Entry::class => \Statamic\Entries\Entry::class,
             QueryBuilder::class => EntryQueryBuilder::class,
         ];
+    }
+
+    public function substitute($item)
+    {
+        $this->substitutions[$item->id()] = $item;
+    }
+
+    public function applySubstitutions($items)
+    {
+        return $items->map(function ($item) {
+            return Arr::get($this->substitutions, $item->id(), $item);
+        });
     }
 }

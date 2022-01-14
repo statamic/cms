@@ -258,4 +258,22 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(5, $entries);
         $this->assertEquals(['Post 2', 'Post 3', 'Post 4', 'Post 6', 'Post 7'], $entries->map->title->all());
     }
+
+    /** @test */
+    public function it_substitutes_entries()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $substitute = EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Replaced Post 2'])->make();
+
+        $found = Entry::query()->where('id', 2)->first();
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substitute);
+
+        Entry::substitute($substitute);
+
+        $found = Entry::query()->where('id', 2)->first();
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substitute);
+    }
 }
