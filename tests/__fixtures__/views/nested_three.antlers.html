@@ -1,3 +1,3 @@
-Nested Three Asset: {{ convert:className(renamed_image_two) }}
-Nested Three Image Var: {{ image }} - {{ convert:typeOf(image) }}
+Nested Three Asset: {{ renamed_image_two | class_name }}
+Nested Three Image Var: {{ image }} - {{ image | type_of }}
 {{ partial:nested_four :image="renamed_image_two" }}

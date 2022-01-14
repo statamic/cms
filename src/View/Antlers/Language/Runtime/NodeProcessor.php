@@ -25,7 +25,6 @@ use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
-use Statamic\View\Antlers\Language\Exceptions\VariableAccessException;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
@@ -45,7 +44,6 @@ use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
-use Statamic\View\Antlers\Language\Runtime\Libraries\LibraryManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -127,11 +125,6 @@ class NodeProcessor
     private $cascade = null;
 
     /**
-     * @var LibraryManager|null
-     */
-    protected $libraryManager = null;
-
-    /**
      * The Antlers parser instance to supply values, and other internal systems.
      *
      * @var ParserContract|null
@@ -192,16 +185,14 @@ class NodeProcessor
      */
     private $validPhpOpenTags = ['<?php'];
 
-    public function __construct(Loader $loader, EnvironmentDetails $envDetails, LibraryManager $libraryManager)
+    public function __construct(Loader $loader, EnvironmentDetails $envDetails)
     {
         $this->loader = $loader;
         $this->envDetails = $envDetails;
-        $this->libraryManager = $libraryManager;
         $this->pathDataManager = new PathDataManager();
         $this->languageParser = new LanguageParser();
         $this->conditionProcessor = new ConditionProcessor();
         $this->conditionProcessor->setProcessor($this);
-        $this->conditionProcessor->setLibraryManager($libraryManager);
 
         if (ini_get('short_open_tag')) {
             $this->validPhpOpenTags[] = '<?';
@@ -320,33 +311,6 @@ class NodeProcessor
         }
 
         return false;
-    }
-
-    /**
-     * Iterates the current scope and updates any mutated value
-     * that was passed by reference to a library method call.
-     *
-     * @param  array  $references  The references to process.
-     *
-     * @throws RuntimeException
-     * @throws VariableAccessException
-     */
-    private function processReferenceVariables($references)
-    {
-        foreach ($references as $referenceValue) {
-            /** @var VariableNode $varReference */
-            $varReference = $referenceValue[0];
-            // This will effectively remove the existing ref.
-            $refValue = array_merge([], $referenceValue[1]);
-
-            foreach ($this->data as &$datum) {
-                $retrieveValue = $this->pathDataManager->getDataWithExistence($varReference->variableReference, $datum);
-
-                if ($retrieveValue[0] == true) {
-                    $this->pathDataManager->setRuntimeValue($varReference->variableReference, $datum, $refValue);
-                }
-            }
-        }
     }
 
     /**
@@ -696,7 +660,7 @@ class NodeProcessor
      */
     public function cloneProcessor()
     {
-        $processor = new NodeProcessor($this->loader, $this->envDetails, $this->libraryManager);
+        $processor = new NodeProcessor($this->loader, $this->envDetails);
         $processor->allowPhp($this->allowPhp);
         $processor->setAntlersParserInstance($this->antlersParser);
         $processor->cascade($this->cascade);
@@ -789,7 +753,7 @@ class NodeProcessor
             $scope = $additionalContext + $scope;
         }
 
-        $environment = new Environment($this->libraryManager);
+        $environment = new Environment();
         $environment->setProcessor($this);
         $environment->cascade($this->cascade)->setData($scope);
 
@@ -798,7 +762,7 @@ class NodeProcessor
 
     public function evaluateDeferredVariable(AbstractNode $deferredNode)
     {
-        $environment = new Environment($this->libraryManager);
+        $environment = new Environment();
         $environment->setProcessor($this);
         $environment->cascade($this->cascade)->setData(($this->getActiveData()));
 
@@ -1302,7 +1266,7 @@ class NodeProcessor
                                 }
                             }
 
-                            $environment = new Environment($this->libraryManager);
+                            $environment = new Environment();
                             $environment->cascade($this->cascade)->setData($environmentData);
                             $environment->setProcessor($this);
 
@@ -1373,11 +1337,6 @@ class NodeProcessor
                             }
 
                             $assignments = $environment->getAssignments();
-                            $referenceValues = $environment->getReferenceValues();
-
-                            if (! empty($referenceValues)) {
-                                $this->processReferenceVariables($referenceValues);
-                            }
 
                             if (! empty($assignments)) {
                                 $runtimeAssignmentsToProcess = [];
@@ -1644,7 +1603,7 @@ class NodeProcessor
 
                                         $childNodes = $node->children;
 
-                                        $processor = new NodeProcessor($this->loader, $this->envDetails, $this->libraryManager);
+                                        $processor = new NodeProcessor($this->loader, $this->envDetails);
 
                                         $processor->allowPhp($this->allowPhp);
                                         $processor->setAntlersParserInstance($this->antlersParser);
@@ -1667,7 +1626,7 @@ class NodeProcessor
 
                                         $runtimeData = $this->getActiveData();
                                         $childNodes = $node->children;
-                                        $processor = new NodeProcessor($this->loader, $this->envDetails, $this->libraryManager);
+                                        $processor = new NodeProcessor($this->loader, $this->envDetails);
                                         $processor->allowPhp($this->allowPhp);
                                         $processor->cascade($this->cascade);
                                         $processor->setAntlersParserInstance($this->antlersParser);

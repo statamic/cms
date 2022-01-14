@@ -202,8 +202,8 @@ $}}
 {{ id | length }}
 Count: {{ count }}
 Index: {{ index }}
-First: {{ str.bool(first) }}
-Last: {{ str.bool(last) }}
+First: {{ first | bool_string }}
+Last: {{ last | bool_string }}
 ======================================
 {{ /articles }}
 
@@ -212,8 +212,8 @@ Last: {{ str.bool(last) }}
 {{ id | length }}
 Count: {{ count }}
 Index: {{ index }}
-First: {{ str.bool(first) }}
-Last: {{ str.bool(last) }}
+First: {{ first | bool_string }}
+Last: {{ last | bool_string }}
 ======================================
 {{ /news }}
 EOT;
@@ -332,8 +332,8 @@ $news = \Statamic\Facades\Entry::query()->where('collection', $var_2)->limit(5)-
 {{ id | length }}
 Count: {{ count }}
 Index: {{ index }}
-First: {{ str.bool(first) }}
-Last: {{ str.bool(last) }}
+First: {{ first | bool_string }}
+Last: {{ last | bool_string }}
 ======================================
 {{ /articles }}
 
@@ -342,8 +342,8 @@ Last: {{ str.bool(last) }}
 {{ id | length }}
 Count: {{ count }}
 Index: {{ index }}
-First: {{ str.bool(first) }}
-Last: {{ str.bool(last) }}
+First: {{ first | bool_string }}
+Last: {{ last | bool_string }}
 ======================================
 {{ /news }}
 EOT;

@@ -29,7 +29,7 @@ EOT;
         $loader = new Loader();
         $envDetails = new EnvironmentDetails();
 
-        $processor = new NodeProcessor($loader, $envDetails, $this->getLibraryManager());
+        $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
 
         $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());

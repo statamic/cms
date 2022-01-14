@@ -82,7 +82,7 @@ class AssetTemplateTest extends ParserTestCase
 
         $value = new Value($asset, 'test_asset');
 
-        [$result, $runtimeData] = $this->evaluateBoth('test = test_asset; test_2 = convert.toString(test_asset)', [
+        [$result, $runtimeData] = $this->evaluateBoth('test = test_asset; test_2 = (test_asset|to_string())', [
             'test_asset' => $value,
         ]);
 
@@ -104,7 +104,7 @@ class AssetTemplateTest extends ParserTestCase
 
         // These partials are located in /tests/__fixtures__/views/
         $template = <<<'EOT'
-Root: {{ convert:className(image) }}
+Root: {{ image | class_name }}
 {{ partial:example :image="image" }}
 EOT;
 

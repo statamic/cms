@@ -1,2 +1,2 @@
 {{ video }}
-{{ str.bool(str.isUrl(video)) }}
+{{ video | is_url() | bool_string() }}

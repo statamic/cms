@@ -15,7 +15,6 @@ use Statamic\View\Antlers\Language\Nodes\AssignmentOperatorNodeContract;
 use Statamic\View\Antlers\Language\Nodes\Constants\FalseConstant;
 use Statamic\View\Antlers\Language\Nodes\Constants\NullConstant;
 use Statamic\View\Antlers\Language\Nodes\Constants\TrueConstant;
-use Statamic\View\Antlers\Language\Nodes\LibraryInvocationConstruct;
 use Statamic\View\Antlers\Language\Nodes\MethodInvocationNode;
 use Statamic\View\Antlers\Language\Nodes\ModifierNameNode;
 use Statamic\View\Antlers\Language\Nodes\Modifiers\ModifierChainNode;
@@ -80,7 +79,6 @@ use Statamic\View\Antlers\Language\Nodes\Structures\TupleListStart;
 use Statamic\View\Antlers\Language\Nodes\Structures\TupleScopedLogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ValueDirectionNode;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
-use Statamic\View\Antlers\Language\Runtime\Libraries\LibraryManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\LanguageOperatorRegistry;
 use Statamic\View\Antlers\Language\Utilities\NodeHelpers;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -110,7 +108,7 @@ class LanguageParser
         $this->tokens = $this->associateMethodCalls($this->tokens);
         $this->tokens = $this->createTupleLists($this->tokens);
 
-        $this->tokens = $this->createLibraryInvocations($this->tokens);
+        $this->tokens = $this->createOperatorInvocations($this->tokens);
         $this->tokens = $this->associateModifiers($this->tokens);
         $this->tokens = $this->createNullCoalescenceGroups($this->tokens);
 
@@ -294,32 +292,6 @@ class LanguageParser
                     }
                 }
 
-                if (array_key_exists($prevNode->variableReference->pathParts[0]->name,
-                        LibraryManager::$deferredCoreLibraries)) {
-                    /** @var VariableNode $varRef */
-                    $varRef = array_pop($newTokens);
-
-                    $libraryInvocation = new LibraryInvocationConstruct();
-                    $libraryInvocation->startPosition = $varRef->startPosition;
-                    $libraryInvocation->endPosition = $thisNode->endPosition;
-                    $libraryInvocation->content = $varRef->content;
-                    $libraryInvocation->originalAbstractNode = $thisNode;
-
-                    $libraryReference = array_shift($varRef->variableReference->pathParts);
-
-                    $libraryName = $libraryReference->name;
-                    $methodName = $varRef->variableReference->implodePaths();
-
-                    $libraryInvocation->libraryName = $libraryName;
-                    $libraryInvocation->methodName = $methodName;
-                    $libraryInvocation->arguments = $this->makeArgGroup($argNodes);
-
-                    $newTokens[] = $libraryInvocation;
-
-                    $i += 1;
-                    continue;
-                }
-
                 $reductionResult = $this->reduceVariableReferenceForObjectAccessor($prevNode);
                 // Construct a dynamic MethodInvocationNode.
                 $methodInvocation = new MethodInvocationNode();
@@ -478,24 +450,6 @@ class LanguageParser
 
                 $args = $this->makeArgGroup($argNodes);
 
-                if ($prevNode instanceof VariableNode && array_key_exists($prevNode->name, LibraryManager::$deferredCoreLibraries)) {
-                    /** @var VariableNode $varRef */
-                    $varRef = array_pop($newTokens);
-
-                    $libraryInvocation = new LibraryInvocationConstruct();
-                    $libraryInvocation->startPosition = $varRef->startPosition;
-                    $libraryInvocation->endPosition = $next->endPosition;
-                    $libraryInvocation->libraryName = $varRef->name;
-                    $libraryInvocation->methodName = $methodNode->name;
-                    $libraryInvocation->originalAbstractNode = $thisNode;
-                    $libraryInvocation->content = $libraryInvocation->libraryName.'->'.$libraryInvocation->methodName;
-                    $libraryInvocation->arguments = $args;
-
-                    $newTokens[] = $libraryInvocation;
-                    $i += 2;
-                    continue;
-                }
-
                 $thisNode->method = $methodNode;
 
                 $thisNode->args = $args;
@@ -525,8 +479,7 @@ class LanguageParser
                 if (Str::contains($thisNode->name, DocumentParser::Punctuation_FullStop)) {
                     $checkParts = explode(DocumentParser::Punctuation_FullStop, $thisNode->name);
 
-                    if (array_key_exists($checkParts[0], LanguageOperatorRegistry::$operators) ||
-                        array_key_exists($checkParts[0], LibraryManager::$deferredCoreLibraries)) {
+                    if (array_key_exists($checkParts[0], LanguageOperatorRegistry::$operators)) {
                         $tokens[$i] = $this->convertVarNodeToOperator($thisNode);
                         continue;
                     }
@@ -800,7 +753,7 @@ class LanguageParser
         return false;
     }
 
-    private function createLibraryInvocations($tokens)
+    private function createOperatorInvocations($tokens)
     {
         $newTokens = [];
 
@@ -809,58 +762,7 @@ class LanguageParser
             $token = $tokens[$i];
 
             if ($token instanceof LanguageOperatorConstruct) {
-                if (Str::contains($token->content, '.')) {
-                    $content = explode('.', $token->content);
-                    $libraryName = array_shift($content);
-                    $methodName = implode('.', $content);
-                    $libraryInvocationConstruct = new LibraryInvocationConstruct();
-                    $libraryInvocationConstruct->startPosition = $token->startPosition;
-                    $libraryInvocationConstruct->endPosition = $token->endPosition;
-                    $libraryInvocationConstruct->content = $token->content;
-                    $libraryInvocationConstruct->libraryName = $libraryName;
-                    $libraryInvocationConstruct->methodName = $methodName;
-                    $libraryInvocationConstruct->originalAbstractNode = $token;
-
-                    if ($i + 1 >= $tokenCount) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_ARG_GROUP,
-                            $token,
-                            'Unexpected end of input while parsing argument group.'
-                        );
-                    }
-
-                    if ($tokens[$i + 1] instanceof LogicGroup == false) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_EXPECTING_ARGUMENT_GROUP,
-                            $token,
-                            'Unexpected token while parsing method call. Expecting [T_ARG_SEPARATOR] got ['.TypeLabeler::getPrettyTypeName($token).'].'
-                        );
-                    }
-
-                    /** @var LogicGroup $logicGroup */
-                    $logicGroup = $tokens[$i + 1];
-                    $argGroup = null;
-
-                    if (! empty($logicGroup->nodes)) {
-                        /** @var SemanticGroup $semanticGroup */
-                        $semanticGroup = $logicGroup->nodes[0];
-
-                        $argGroup = $this->makeArgGroup($semanticGroup->nodes);
-                    }
-
-                    if ($argGroup == null) {
-                        // Wrap everything in an empty argument group.
-                        $argGroup = new ArgumentGroup();
-                        $argGroup->startPosition = $logicGroup->startPosition;
-                        $argGroup->endPosition = $logicGroup->endPosition;
-                        $argGroup->originalAbstractNode = $logicGroup;
-                    }
-
-                    $libraryInvocationConstruct->arguments = $argGroup;
-                    $newTokens[] = $libraryInvocationConstruct;
-                    $i += 1;
-                    continue;
-                } elseif ($token->content == LanguageOperatorRegistry::ARR_ORDERBY) {
+                if ($token->content == LanguageOperatorRegistry::ARR_ORDERBY) {
                     if ($i + 1 >= $tokenCount) {
                         throw ErrorFactory::makeSyntaxError(
                             AntlersErrorCodes::TYPE_UNEXPECTED_EOI_PARSING_ORDER_GROUP,
@@ -1721,9 +1623,9 @@ class LanguageParser
         return $token instanceof VariableNode || $token instanceof LogicGroup ||
             $token instanceof StringValueNode || $token instanceof NumberNode ||
             $token instanceof FalseConstant || $token instanceof NullConstant ||
-            $token instanceof TrueConstant || $token instanceof LibraryInvocationConstruct ||
-            $token instanceof DirectionGroup || $token instanceof ListValueNode ||
-            $token instanceof SwitchGroup || $token instanceof ArrayNode;
+            $token instanceof TrueConstant || $token instanceof DirectionGroup ||
+            $token instanceof ListValueNode || $token instanceof SwitchGroup ||
+            $token instanceof ArrayNode;
     }
 
     private function isProperMethodChainTargetStrict($token)
@@ -1731,9 +1633,9 @@ class LanguageParser
         return $token instanceof LogicGroup ||
             $token instanceof StringValueNode || $token instanceof NumberNode ||
             $token instanceof FalseConstant || $token instanceof NullConstant ||
-            $token instanceof TrueConstant || $token instanceof LibraryInvocationConstruct ||
-            $token instanceof DirectionGroup || $token instanceof ListValueNode ||
-            $token instanceof SwitchGroup || $token instanceof ArrayNode;
+            $token instanceof TrueConstant || $token instanceof DirectionGroup ||
+            $token instanceof ListValueNode || $token instanceof SwitchGroup ||
+            $token instanceof ArrayNode;
     }
 
     /**
@@ -2223,7 +2125,6 @@ class LanguageParser
                 $subToken instanceof StringConcatenationOperator ||
 
                 $subToken instanceof LanguageOperatorConstruct ||
-                $subToken instanceof LibraryInvocationConstruct ||
                 $subToken instanceof MethodInvocationNode ||
                 $subToken instanceof LogicalNegationOperator) {
                 break;

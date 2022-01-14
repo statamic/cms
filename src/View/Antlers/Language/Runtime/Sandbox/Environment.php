@@ -3,8 +3,6 @@
 namespace Statamic\View\Antlers\Language\Runtime\Sandbox;
 
 use ArrayAccess;
-use Carbon\Carbon;
-use DateTime;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -19,7 +17,6 @@ use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Errors\LineRetriever;
 use Statamic\View\Antlers\Language\Errors\TypeLabeler;
-use Statamic\View\Antlers\Language\Exceptions\LibraryCallException;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
 use Statamic\View\Antlers\Language\Exceptions\VariableAccessException;
@@ -29,7 +26,6 @@ use Statamic\View\Antlers\Language\Nodes\ArithmeticNodeContract;
 use Statamic\View\Antlers\Language\Nodes\Constants\FalseConstant;
 use Statamic\View\Antlers\Language\Nodes\Constants\NullConstant;
 use Statamic\View\Antlers\Language\Nodes\Constants\TrueConstant;
-use Statamic\View\Antlers\Language\Nodes\LibraryInvocationConstruct;
 use Statamic\View\Antlers\Language\Nodes\MethodInvocationNode;
 use Statamic\View\Antlers\Language\Nodes\Modifiers\ModifierChainNode;
 use Statamic\View\Antlers\Language\Nodes\ModifierValueNode;
@@ -79,15 +75,9 @@ use Statamic\View\Antlers\Language\Nodes\Structures\TernaryCondition;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
-use Statamic\View\Antlers\Language\Runtime\Libraries\LibraryManager;
 use Statamic\View\Antlers\Language\Runtime\ModifierManager;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\PathDataManager;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\ArrayBoxObject;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\BoolBoxObject;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\DateTimeBoxObject;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\NumericBoxObject;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeBoxing\StringBoxObject;
 use Statamic\View\Cascade;
 
 class Environment
@@ -98,7 +88,6 @@ class Environment
     protected $interpolationReplacements = [];
     protected $interpolationKeys = [];
     protected $assignments = [];
-    protected $referenceVars = [];
     protected $dataManagerInterpolations = [];
 
     /**
@@ -124,27 +113,19 @@ class Environment
     private $lastNode = null;
 
     /**
-     * The internal LibraryManager.
-     *
-     * @var LibraryManager|null
-     */
-    protected $libraryManager = null;
-
-    /**
      * @var NodeProcessor|null
      */
     protected $nodeProcessor = null;
 
-    public function __construct(LibraryManager $libraryManager)
+    public function __construct()
     {
-        $this->libraryManager = $libraryManager;
         $this->pathParser = new PathParser();
         $this->dataRetriever = new PathDataManager();
         $this->dataRetriever->setEnvironment($this);
         $this->dataRetriever->setIsPaired(false);
         $this->operatorManager = new LanguageOperatorManager();
 
-        $this->operatorManager->setEnvironment($this)->setLibraryManager($this->libraryManager);
+        $this->operatorManager->setEnvironment($this);
     }
 
     public function setDataManagerInterpolations($interpolations)
@@ -175,16 +156,6 @@ class Environment
     public function getAssignments()
     {
         return $this->assignments;
-    }
-
-    /**
-     * Returns a list of all referenced values.
-     *
-     * @return array
-     */
-    public function getReferenceValues()
-    {
-        return $this->referenceVars;
     }
 
     /**
@@ -305,7 +276,6 @@ class Environment
      * @param  SemanticGroup[]  $statements
      * @return null
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
@@ -331,7 +301,6 @@ class Environment
      * @param  AbstractNode[]  $nodes  The runtime nodes.
      * @return mixed
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
@@ -355,7 +324,6 @@ class Environment
      * @param  AbstractNode[]|AbstractNode  $nodes  The runtime nodes.
      * @return bool|mixed|null
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
@@ -452,9 +420,7 @@ class Environment
      * @param  AbstractNode[]  $nodes  The runtime nodes.
      * @return mixed
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
-     * @throws LibraryCallException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
      */
@@ -836,9 +802,6 @@ class Environment
 
                 $i += 3;
                 continue;
-            } elseif ($currentNode instanceof LibraryInvocationConstruct) {
-                $stack[] = $this->evaluateLibraryMethodCall($currentNode);
-                continue;
             } elseif ($currentNode instanceof MethodInvocationNode) {
                 $leftNode = array_pop($stack);
 
@@ -853,23 +816,8 @@ class Environment
                     continue;
                 }
 
-                if (is_string($leftVal)) {
-                    $leftVal = new StringBoxObject($leftVal);
-                } elseif (is_array($leftVal)) {
-                    $leftVal = new ArrayBoxObject($leftVal);
-                } elseif (is_numeric($leftVal)) {
-                    $leftVal = new NumericBoxObject($leftVal);
-                } elseif (is_bool($leftVal)) {
-                    $leftVal = new BoolBoxObject($leftVal);
-                } elseif ($leftVal instanceof Carbon) {
-                    $leftVal = new DateTimeBoxObject($leftVal);
-                } elseif ($leftVal instanceof DateTime) {
-                    $leftVal = new DateTimeBoxObject(new Carbon($leftVal));
-                }
-
                 try {
                     $args = $this->evaluateArgumentGroup($currentNode->args);
-                    $args = $args['a'];
 
                     $callRes = call_user_func([$leftVal, $currentNode->method->name], ...$args);
 
@@ -1034,7 +982,6 @@ class Environment
      * @param  NullCoalescenceGroup  $group  The group.
      * @return mixed|DirectionGroup|ListValueNode|string
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
@@ -1061,14 +1008,13 @@ class Environment
      * @param  TernaryCondition  $condition  The ternary expression.
      * @return mixed
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
      */
     private function evaluateTernaryGroup(TernaryCondition $condition)
     {
-        $env = new Environment($this->libraryManager);
+        $env = new Environment();
         $env->setProcessor($this->nodeProcessor);
         $env->setData($this->data);
         $headValue = $env->evaluateBool($condition->head);
@@ -1171,7 +1117,6 @@ class Environment
      * @param  AbstractNode|mixed  $val  The value to resolve.
      * @return bool|float|int|mixed|DirectionGroup|ListValueNode|string|null
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
@@ -1248,7 +1193,6 @@ class Environment
      * @param  AbstractNode  $node  The node to evaluate.
      * @return bool
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
@@ -1267,7 +1211,7 @@ class Environment
             return $node->value >= 1;
         }
 
-        $env = new Environment($this->libraryManager);
+        $env = new Environment();
         $env->setProcessor($this->nodeProcessor);
         $env->setData($this->data);
         $envResult = $env->evaluate([$node]);
@@ -1295,7 +1239,6 @@ class Environment
      * @param  DirectionGroup  $group  The group.
      * @return array
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
@@ -1315,94 +1258,35 @@ class Environment
     }
 
     /**
-     * Pushes the assignments to the environment's referenced variable stack.
-     *
-     * @param  array  $referencedAssignments  The assignments.
-     *
-     * @throws RuntimeException
-     * @throws VariableAccessException
-     */
-    public function pushReferenceAssignments($referencedAssignments)
-    {
-        foreach ($referencedAssignments as $assignment) {
-            /** @var VariableNode $varName */
-            $varName = $assignment[0];
-            $value = $assignment[1];
-
-            $this->dataRetriever->setRuntimeValue($varName->variableReference, $this->data, $value);
-        }
-
-        $this->referenceVars = array_merge($this->referenceVars, $referencedAssignments);
-    }
-
-    /**
      * Evaluates the provided argument group's inner values.
      *
      * @param  ArgumentGroup  $argumentGroup  The argument group.
      * @return array
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
      */
     public function evaluateArgumentGroup(ArgumentGroup $argumentGroup)
     {
-        $env = new Environment($this->libraryManager);
+        $env = new Environment();
         $env->setProcessor($this->nodeProcessor);
         $env->setData($this->data);
 
         $normalArgs = [];
-        $namedArgs = [];
 
         foreach ($argumentGroup->args as $arg) {
             if ($arg instanceof NamedArgumentNode) {
-                if ($arg->name instanceof VariableNode) {
-                    $namedArgs[$arg->name->name] = $env->evaluate([$arg->value]);
-                }
+                // if ($arg->name instanceof VariableNode) {
+                    // TODO: Determine if this system is still useful in other areas.
+                    // $namedArgs[$arg->name->name] = $env->evaluate([$arg->value]);
+                // }
             } else {
                 $normalArgs[] = $env->evaluate([$arg]);
             }
         }
 
-        return [
-            LibraryManager::ARG_NORMAL => $normalArgs,
-            LibraryManager::ARG_NAMED => $namedArgs,
-        ];
-    }
-
-    /**
-     * Evaluates the provided library method call, and returns the result.
-     *
-     * @param  LibraryInvocationConstruct  $invocation  The library call.
-     * @return mixed|null
-     *
-     * @throws LibraryCallException
-     * @throws RuntimeException
-     */
-    private function evaluateLibraryMethodCall(LibraryInvocationConstruct $invocation)
-    {
-        if ($this->libraryManager->hasLibrary($invocation->libraryName)) {
-            try {
-                return $this->libraryManager->tryExecute($invocation, $this);
-            } catch (LibraryCallException $libraryCallException) {
-                $libraryCallException->node = $invocation;
-
-                throw $libraryCallException;
-            } catch (Exception $e) {
-                throw ErrorFactory::makeRuntimeError(
-                    AntlersErrorCodes::TYPE_RUNTIME_LIBRARY_BAD_METHOD_CALL,
-                    $invocation,
-                    'Bad method call to "'.$invocation->content.'". System failed with: '.$e->getMessage()
-                );
-            }
-        } else {
-            throw ErrorFactory::makeRuntimeError(
-                AntlersErrorCodes::TYPE_RUNTIME_UNKNOWN_LIBRARY,
-                $invocation,
-                'Unknown runtime library "'.$invocation->libraryName.'".'
-            );
-        }
+        return $normalArgs;
     }
 
     /**
@@ -1411,7 +1295,6 @@ class Environment
      * @param  ArrayNode  $array  The array representation.
      * @return array|bool[]|mixed|string[]
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
@@ -1444,7 +1327,6 @@ class Environment
      * @param  mixed  $val  The value.
      * @return array|bool|float|int|mixed|DirectionGroup|ListValueNode|string
      *
-     * @throws LibraryCallException
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws VariableAccessException
@@ -1512,8 +1394,6 @@ class Environment
             }
 
             $returnVal = $val->value;
-        } elseif ($val instanceof LibraryInvocationConstruct) {
-            $returnVal = $this->evaluateLibraryMethodCall($val);
         } elseif ($val instanceof ArrayNode) {
             $returnVal = $this->resolveArrayValue($val);
         }

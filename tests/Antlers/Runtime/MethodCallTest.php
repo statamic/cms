@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Tests\Antlers\Fixtures\MethodClasses\ClassOne;
+use Tests\Antlers\Fixtures\MethodClasses\StringLengthObject;
 use Tests\Antlers\ParserTestCase;
 
 class MethodCallTest extends ParserTestCase
@@ -51,7 +52,7 @@ class MethodCallTest extends ParserTestCase
         // This test ensures that the language parser will automatically insert logic groups
         // pairs around method calls so that they can be used without the developer doing so.
         $data = [
-            'title' => 'Hello',
+            'title' => new StringLengthObject('Hello'),
         ];
 
         $template = <<<'EOT'
@@ -66,7 +67,7 @@ EOT;
         // This test ensures that the language parser will automatically insert logic groups
         // pairs around method calls so that they can be used without the developer doing so.
         $data = [
-            'title' => 'Hello',
+            'title' => new StringLengthObject('Hello'),
         ];
 
         $template = <<<'EOT'
@@ -81,7 +82,7 @@ EOT;
         // This test ensures that the language parser will automatically insert logic groups
         // pairs around method calls so that they can be used without the developer doing so.
         $data = [
-            'title' => 'Hello',
+            'title' => new StringLengthObject('Hello'),
         ];
 
         $template = <<<'EOT'
@@ -96,7 +97,7 @@ EOT;
         // This test ensures that the language parser will automatically insert logic groups
         // pairs around method calls so that they can be used without the developer doing so.
         $data = [
-            'title' => 'Hello',
+            'title' => new StringLengthObject('Hello'),
         ];
 
         $template = <<<'EOT'

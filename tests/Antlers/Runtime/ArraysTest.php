@@ -193,8 +193,7 @@ EOT;
         $this->assertIsArray($result);
         $this->assertCount(3, $result);
 
-        $this->assertTrue($this->evaluateRaw('arr.isArray(arr(1,2,3))'));
-        $this->assertEquals(3, $this->evaluateRaw('arr.count(arr(123,3,42))'));
+        $this->assertTrue($this->evaluateRaw('arr(1,2,3) | is_array'));
         $this->assertEquals('3', $this->renderString('{{ arr(1,2,3) | length  }}'));
     }
 
@@ -206,52 +205,7 @@ EOT;
 
     public function test_dangling_element_is_allowed()
     {
-        $this->assertSame(2, $this->evaluateRaw('arr.count(arr(1,2,))'));
         $this->assertSame(3, $this->evaluateRaw('arr(1,2,3,) | length'));
-    }
-
-    public function test_array_push_against_created_array()
-    {
-        $template = <<<'EOT'
-{{  my_array = arr('one', 'two');
-    arr.push(my_array, 'three');
-    my_array = arr.reverse(my_array);
-}}
-
-{{ my_array }}{{ value }}{{ /my_array}}
-EOT;
-
-        $this->assertSame('threetwoone', trim($this->renderString($template)));
-
-        // The final statement is implicitly "returned".
-        $template = <<<'EOT'
-{{  my_array = arr('one', 'two');
-    arr.push(my_array, 'three');
-    my_array = arr.reverse(my_array);
-    arr.implode("", my_array);
-}}
-EOT;
-
-        $this->assertSame('threetwoone', $this->renderString($template));
-
-        $template = <<<'EOT'
-{{  my_array = arr('one', 'two');
-    arr.push(my_array, 'three');
-    arr.implode("", (my_array|reverse));
-}}
-EOT;
-
-        $this->assertSame('threetwoone', $this->renderString($template));
-
-        $template = <<<'EOT'
-{{  my_array    =
- arr   (    'one'   ,     'two'  ) ;
-    arr.push  (         my_array   ,    'three'    )  ;
-    arr.implode   (""    , (my_array              |   reverse));
-}}
-EOT;
-
-        $this->assertSame('threetwoone', $this->renderString($template));
     }
 
     public function test_nested_arrays()

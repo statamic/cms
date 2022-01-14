@@ -170,6 +170,15 @@ class CoreModifiers extends Modifier
         return substr($value, 0, -$params[0]);
     }
 
+    public function boolString($value)
+    {
+        if ($value == true) {
+            return 'true';
+        }
+
+        return 'false';
+    }
+
     /**
      * Returns a camelCase version of the string. Trims surrounding spaces,
      * capitalizes letters following digits, spaces, dashes and underscores,
@@ -219,6 +228,11 @@ class CoreModifiers extends Modifier
                 return ['chunk' => $chunk];
             })
             ->all();
+    }
+
+    public function className($value)
+    {
+        return get_class($value);
     }
 
     /**
@@ -2381,6 +2395,11 @@ class CoreModifiers extends Modifier
         return Stringy::toSpaces($value, Arr::get($params, 0, 4));
     }
 
+    public function toString($value)
+    {
+        return (string)$value;
+    }
+
     /**
      * Converts each occurrence of some consecutive number of spaces, as defined by
      * $param[0], to a tab. By default, each 4 consecutive spaces are converted to a tab.
@@ -2472,6 +2491,11 @@ class CoreModifiers extends Modifier
         $timezone = Arr::get($params, 0, Config::get('app.timezone'));
 
         return $this->carbon($value)->tz($timezone);
+    }
+
+    public function typeOf($value)
+    {
+        return gettype($value);
     }
 
     /**

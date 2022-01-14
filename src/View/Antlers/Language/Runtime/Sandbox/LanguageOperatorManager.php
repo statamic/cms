@@ -18,7 +18,6 @@ use Statamic\View\Antlers\Language\Nodes\Structures\SwitchCase;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\PathParser;
-use Statamic\View\Antlers\Language\Runtime\Libraries\LibraryManager;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\PathDataManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesGroupyBy;
@@ -30,11 +29,6 @@ class LanguageOperatorManager
 {
     use ExecutesPluckInto, ExecutesOrderBy,
         ExecutesGroupyBy, ExecutesWhere;
-
-    /**
-     * @var LibraryManager|null
-     */
-    protected $libraryManager = null;
 
     /**
      * @var NodeProcessor|null
@@ -57,13 +51,6 @@ class LanguageOperatorManager
     public function __construct()
     {
         $this->dataManager = new PathDataManager();
-    }
-
-    public function setLibraryManager(LibraryManager $manager)
-    {
-        $this->libraryManager = $manager;
-
-        return $this;
     }
 
     public function setNodeProcessor(NodeProcessor $processor)
@@ -267,7 +254,7 @@ class LanguageOperatorManager
      */
     private function makeEnvironment()
     {
-        $env = new Environment($this->libraryManager);
+        $env = new Environment();
         $env->setProcessor($this->hostProcessor);
 
         return $env;

@@ -5,7 +5,6 @@ namespace Statamic\View\Antlers\Language\Runtime;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
-use Statamic\View\Antlers\Language\Runtime\Libraries\LibraryManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 
 class ConditionProcessor
@@ -16,11 +15,6 @@ class ConditionProcessor
      * @var NodeProcessor|null
      */
     protected $processor = null;
-
-    /**
-     * @var LibraryManager|null
-     */
-    protected $libraryManager = null;
 
     /**
      * Sets the node processor instance.
@@ -35,11 +29,6 @@ class ConditionProcessor
         return $this;
     }
 
-    public function setLibraryManager(LibraryManager $libraryManager)
-    {
-        $this->libraryManager = $libraryManager;
-    }
-
     public function process(ConditionNode $node, $data)
     {
         foreach ($node->logicBranches as $branch) {
@@ -47,7 +36,7 @@ class ConditionProcessor
                 return $branch;
             } else {
                 $parser = new LanguageParser();
-                $environment = new Environment($this->libraryManager);
+                $environment = new Environment();
                 $environment->setProcessor($this->processor);
                 $dataToUse = $data;
                 $interpolationReplacements = [];

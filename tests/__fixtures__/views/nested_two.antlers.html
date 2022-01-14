@@ -1,5 +1,5 @@
 ---
 test: 123
 ---
-Nested Two: {{ convert:className(renamed_image) }}
+Nested Two: {{ renamed_image | class_name }}
 {{ partial:nested_three :renamed_image_two="renamed_image" :image="view:test" }}

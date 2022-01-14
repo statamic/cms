@@ -24,7 +24,6 @@ use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
-use Statamic\View\Antlers\Language\Runtime\Libraries\LibraryManager;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
@@ -205,19 +204,6 @@ class ParserTestCase extends TestCase
         return $documentParser->getNodes();
     }
 
-    /**
-     * Creates and returns a new LibraryManager instance.
-     *
-     * @return LibraryManager
-     */
-    protected function getLibraryManager()
-    {
-        $manager = new LibraryManager();
-        $manager->loadCoreLibraries();
-
-        return $manager;
-    }
-
     protected function runFieldTypeTest($handle, $testTemplate = null)
     {
         if ($testTemplate == null) {
@@ -272,17 +258,10 @@ class ParserTestCase extends TestCase
             NodeTypeAnalyzer::$environmentDetails = $envDetails;
         }
 
-        $processor = new NodeProcessor($loader, $envDetails, $this->getLibraryManager());
+        $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
 
         return new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
-    }
-
-    protected function renderLibraryMethod($text, $data = [], $withCoreTagsAndModifiers = false)
-    {
-        $text = '{{ '.$text.' }}';
-
-        return $this->renderString($text, $data, $withCoreTagsAndModifiers);
     }
 
     protected function renderStringWithConfiguration($text, RuntimeConfiguration $config, $data = [], $withCoreTagsAndModifiers = false)
@@ -302,7 +281,7 @@ class ParserTestCase extends TestCase
             NodeTypeAnalyzer::$environmentDetails = $envDetails;
         }
 
-        $processor = new NodeProcessor($loader, $envDetails, $this->getLibraryManager());
+        $processor = new NodeProcessor($loader, $envDetails);
         $processor->setRuntimeConfiguration($config);
         $processor->setData($data);
 
@@ -332,7 +311,7 @@ class ParserTestCase extends TestCase
             NodeTypeAnalyzer::$environmentDetails = $envDetails;
         }
 
-        $processor = new NodeProcessor($loader, $envDetails, $this->getLibraryManager());
+        $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
 
         $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
@@ -368,7 +347,7 @@ class ParserTestCase extends TestCase
         $langParser = new LanguageParser();
         $nodes = $langParser->parse($tokens);
 
-        $sandbox = new Environment($this->getLibraryManager());
+        $sandbox = new Environment();
         $sandbox->setData($data);
 
         return $sandbox->evaluateBool($nodes);
@@ -392,9 +371,9 @@ class ParserTestCase extends TestCase
         $loader = new Loader();
         $envDetails = new EnvironmentDetails();
 
-        $processor = new NodeProcessor($loader, $envDetails, $this->getLibraryManager());
+        $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
-        $sandbox = new Environment($this->getLibraryManager());
+        $sandbox = new Environment();
         $sandbox->setProcessor($processor);
         $sandbox->setData($data);
 
@@ -417,9 +396,9 @@ class ParserTestCase extends TestCase
         $loader = new Loader();
         $envDetails = new EnvironmentDetails();
 
-        $processor = new NodeProcessor($loader, $envDetails, $this->getLibraryManager());
+        $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
-        $sandbox = new Environment($this->getLibraryManager());
+        $sandbox = new Environment();
         $sandbox->setProcessor($processor);
         $sandbox->setData($data);
 
@@ -439,11 +418,10 @@ class ParserTestCase extends TestCase
         $langParser = new LanguageParser();
         $nodes = $langParser->parse($tokens);
 
-        $libs = $this->getLibraryManager();
         $loader = new Loader();
         $envDetails = new EnvironmentDetails();
-        $processor = new NodeProcessor($loader, $envDetails, $libs);
-        $sandbox = new Environment($libs);
+        $processor = new NodeProcessor($loader, $envDetails);
+        $sandbox = new Environment();
         $sandbox->setData($data);
         $sandbox->setProcessor($processor);
 

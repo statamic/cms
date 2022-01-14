@@ -57,22 +57,12 @@ EOT;
 
     public function test_actual_value_is_returned_from_interpolations_for_arguments()
     {
-        $this->assertSame(3, intval($this->renderString('{{ arr.count({test}) }}', [
+        $this->assertSame(3, intval($this->renderString('{{ ({test}) | length }}', [
             'test' => ['one', 'two', 'three'],
         ])));
 
-        $this->assertSame(4, intval($this->renderString('{{ arr.count({test}) }}', [
+        $this->assertSame(4, intval($this->renderString('{{ ({test}) | length }}', [
             'test' => ['one', 'two', 'three', 'four'],
         ])));
-    }
-
-    public function test_interpolated_results_from_complex_expressions_return_their_value()
-    {
-        $this->assertSame(4, intval($this->renderString('{{ arr.count({arr.explode(",", "1,2,3,4")}) }}')));
-        $this->assertSame(4, intval($this->renderString('{{ {arr.count({arr.explode(",", "1,2,3,4")})} }}')));
-        $this->assertSame(5, intval($this->renderString('{{ arr.count({arr.explode(",", "1,2,3,4,5")}) }}')));
-        $this->assertSame(6, intval($this->renderString('{{ arr.count({arr.explode(",", "a,b,c,d,e,f")}) }}')));
-        $this->assertSame(6, intval($this->renderString('{{ arr.count({arr.explode("|", "a|b|c|d|e|f")}) }}')));
-        $this->assertSame(6, intval($this->renderString('{{ arr.count({{arr.explode("|", "a|b|c|d|e|f")}}) }}')));
     }
 }

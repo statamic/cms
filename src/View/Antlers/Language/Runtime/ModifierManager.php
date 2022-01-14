@@ -92,7 +92,7 @@ class ModifierManager
             $parameters = [];
 
             if ($chain->methodStyleArguments != null) {
-                $parameters = $env->evaluateArgumentGroup($chain->methodStyleArguments)['a'];
+                $parameters = $env->evaluateArgumentGroup($chain->methodStyleArguments);
             } else {
                 if (! empty($chain->valueNodes)) {
                     foreach ($chain->valueNodes as $node) {
