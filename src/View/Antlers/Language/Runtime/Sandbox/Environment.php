@@ -821,7 +821,7 @@ class Environment
 
                     if ($currentNode->method instanceof LanguageOperatorConstruct) {
                         $methodName = $currentNode->method->content;
-                    } else if ($currentNode->method instanceof VariableNode) {
+                    } elseif ($currentNode->method instanceof VariableNode) {
                         $methodName = $currentNode->method->name;
                     } else {
                         throw ErrorFactory::makeRuntimeError(

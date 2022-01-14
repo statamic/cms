@@ -2,7 +2,6 @@
 
 namespace Statamic\View\Antlers\Language\Errors;
 
-use Statamic\View\Antlers\Language\Exceptions\LibraryCallException;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
