@@ -6,4 +6,9 @@ class StringValueNode extends AbstractNode
 {
     public $value = '';
     public $sourceTerminator = '';
+
+    public function toValueString()
+    {
+        return $this->sourceTerminator.$this->value.$this->sourceTerminator;
+    }
 }

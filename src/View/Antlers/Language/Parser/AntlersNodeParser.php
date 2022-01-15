@@ -14,6 +14,7 @@ use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Nodes\RecursiveNode;
+use Statamic\View\Antlers\Language\Nodes\Structures\ImplicitArrayBegin;
 use Statamic\View\Antlers\Language\Nodes\TagIdentifier;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
@@ -214,13 +215,23 @@ class AntlersNodeParser
             $node->resetContentCache();
         }
 
-        try {
-            $node->pathReference = $this->pathParser->parse($name);
+        $parseName = true;
 
-            if ($node->pathReference->isStrictTagReference) {
-                // Remove the leading # symbol to not frustrate everyone with "tag not found" errors.
-                $node->name->name = StringUtilities::substr($node->name->name, 1);
-                $node->name->content = StringUtilities::substr($node->name->content, 1);
+        // If a node begins with "[", we will skip name resolution.
+        // If we don't, this can lead to an infinite loop.
+        if (Str::startsWith(trim($node->name->name), DocumentParser::LeftBracket)) {
+            $parseName = false;
+        }
+
+        try {
+            if ($parseName) {
+                $node->pathReference = $this->pathParser->parse($name);
+
+                if ($node->pathReference->isStrictTagReference) {
+                    // Remove the leading # symbol to not frustrate everyone with "tag not found" errors.
+                    $node->name->name = StringUtilities::substr($node->name->name, 1);
+                    $node->name->content = StringUtilities::substr($node->name->content, 1);
+                }
             }
         } catch (AntlersException $antlersException) {
             $antlersException->node = $node;

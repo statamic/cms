@@ -60,6 +60,8 @@ use Statamic\View\Antlers\Language\Nodes\Structures\AliasedScopeLogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArgSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArrayNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\DirectionGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\ImplicitArrayBegin;
+use Statamic\View\Antlers\Language\Nodes\Structures\ImplicitArrayEnd;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineBranchSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineTernarySeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\ListValueNode;
@@ -103,7 +105,10 @@ class LanguageParser
 
         $this->tokens = $this->combineVariablePaths($tokens);
 
+        $this->tokens = $this->rewriteImplicitArraysToKeywordForm($this->tokens);
+
         $this->tokens = $this->createLanguageOperators($this->tokens);
+
         $this->tokens = $this->createLogicalGroups($this->tokens);
         $this->tokens = $this->associateMethodCalls($this->tokens);
         $this->tokens = $this->createTupleLists($this->tokens);
@@ -127,6 +132,38 @@ class LanguageParser
         $this->tokens = $this->insertAutomaticStatementSeparators($this->tokens);
 
         return $this->createSemanticGroups($this->tokens);
+    }
+
+    private function rewriteImplicitArraysToKeywordForm($nodes)
+    {
+        $newNodes = [];
+        $nodeLen = count($nodes);
+
+        for ($i = 0; $i < $nodeLen; $i++) {
+            $thisNode = $nodes[$i];
+
+            if ($thisNode instanceof ImplicitArrayBegin) {
+                // Emit the "arr" language operator followed by a LogicGroupBegin.
+                $arrConstruct = new LanguageOperatorConstruct();
+                $arrConstruct->startPosition = $thisNode->startPosition;
+                $arrConstruct->endPosition = $thisNode->endPosition;
+                $arrConstruct->originalAbstractNode = $thisNode;
+                $arrConstruct->content = LanguageOperatorRegistry::ARR_MAKE;
+
+                $logicGroupBegin = new LogicGroupBegin();
+                $newNodes[] = $arrConstruct;
+                $newNodes[] = $logicGroupBegin;
+                continue;
+            } elseif ($thisNode instanceof ImplicitArrayEnd) {
+                $logicGroupEnd = new LogicGroupEnd();
+                $newNodes[] = $logicGroupEnd;
+                continue;
+            } else {
+                $newNodes[] = $thisNode;
+            }
+        }
+
+        return $newNodes;
     }
 
     private function createLogicGroupsToRemoveMethodInvocationAmbiguity($nodes)
@@ -1824,6 +1861,62 @@ class LanguageParser
                 } else {
                     $newNodes[] = $node;
                 }
+            } elseif ($node instanceof ImplicitArrayBegin && $newNodeCount > 0) {
+                $left = $newNodes[$newNodeCount - 1];
+                $right = $tokens[$i + 1];
+
+                if ($left instanceof VariableNode && $right instanceof VariableNode && NodeHelpers::distance($left, $node) <= 1 &&
+                    NodeHelpers::distance($node, $right) <= 1) {
+                    array_pop($newNodes);
+
+                    NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
+                    NodeHelpers::mergeVarContentLeft($right->name, $right, $left);
+
+                    $newNodes[] = $left;
+
+                    $i += 1;
+                    continue;
+                } else if ($this->canMergeIntoVariablePath($right) && $left instanceof VariableNode) {
+                    array_pop($newNodes);
+
+                    NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
+
+                    $rightContent = $this->getMergeContent($right);
+
+                    NodeHelpers::mergeVarContentLeft($rightContent, $right, $left);
+
+                    $newNodes[] = $left;
+                    $i += 1;
+                    continue;
+                } else {
+                    $newNodes[] = $node;
+                    continue;
+                }
+            } elseif ($node instanceof ImplicitArrayEnd && $newNodeCount > 0) {
+                $left = $newNodes[$newNodeCount - 1];
+
+
+                if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) <= 1) {
+                    array_pop($newNodes);
+                    NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
+                    $newNodes[] = $left;
+
+                    continue;
+                } else {
+                    $newNodes[] = $node;
+                }
+            } elseif ($node instanceof VariableNode && $newNodeCount > 0) {
+                $left = $newNodes[$newNodeCount - 1];
+
+                if ($left instanceof VariableNode &&  NodeHelpers::distance($left, $node) < 1) {
+                    array_pop($newNodes);
+                    NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
+                    $newNodes[] = $left;
+                } else {
+                    $newNodes[] = $node;
+                }
+                continue;
+
             } else {
                 $newNodes[] = $node;
             }
@@ -1944,6 +2037,52 @@ class LanguageParser
         }
 
         return $newNodes;
+    }
+
+    private function canMergeIntoVariablePath(AbstractNode $node)
+    {
+        if ($node instanceof ModifierValueNode ||
+            $node instanceof VariableNode ||
+            $node instanceof TrueConstant ||
+            $node instanceof FalseConstant ||
+            $node instanceof NullConstant ||
+            $node instanceof NumberNode ||
+            $node instanceof StringValueNode
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function getMergeContent(AbstractNode $node)
+    {
+        if ($node instanceof ModifierValueNode ||
+            $node instanceof VariableNode) {
+            return $node->content;
+        }
+
+        if ($node instanceof TrueConstant) {
+            return LanguageKeywords::ConstTrue;
+        }
+
+        if ($node instanceof FalseConstant) {
+            return LanguageKeywords::ConstFalse;
+        }
+
+        if ($node instanceof NullConstant) {
+            return LanguageKeywords::ConstNull;
+        }
+
+        if ($node instanceof StringValueNode) {
+            return $node->toValueString();
+        }
+
+        if ($node instanceof NumberNode) {
+            return $node->value;
+        }
+
+        return $node->innerContent();
     }
 
     private function isValidModifierValue($node)

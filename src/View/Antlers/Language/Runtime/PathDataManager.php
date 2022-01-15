@@ -18,6 +18,7 @@ use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\VariableAccessException;
 use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
+use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
@@ -510,6 +511,17 @@ class PathDataManager
         } else {
             $doCompact = (! $path->isFinal || $this->reduceFinal);
             $varPath = $path->name;
+        }
+
+        // Handles some edge-case type values.
+        if ($path instanceof PathNode) {
+            if ($path->name == LanguageKeywords::ConstTrue && isset($this->reducedVar[1])) {
+                $varPath = 1;
+            } elseif ($path->name == LanguageKeywords::ConstFalse && isset($this->reducedVar[0])) {
+                $varPath = 0;
+            } elseif ($path->name == LanguageKeywords::ConstNull && isset($this->reducedVar[""])) {
+                $varPath = "";
+            }
         }
 
         if (is_object($this->reducedVar) && method_exists($this->reducedVar, Str::camel($varPath))) {

@@ -45,6 +45,8 @@ use Statamic\View\Antlers\Language\Nodes\Operators\ScopeAssignmentOperator;
 use Statamic\View\Antlers\Language\Nodes\Operators\StringConcatenationOperator;
 use Statamic\View\Antlers\Language\Nodes\StringValueNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArgSeparator;
+use Statamic\View\Antlers\Language\Nodes\Structures\ImplicitArrayBegin;
+use Statamic\View\Antlers\Language\Nodes\Structures\ImplicitArrayEnd;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineBranchSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineTernarySeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupBegin;
@@ -137,14 +139,14 @@ class AntlersLexer
         }
 
         if ($this->isParsingString == false && $char == ']') {
-            return true;
+            return false;
         }
 
         if ($this->isParsingString == false && $char == ')') {
             return false;
         }
 
-        if (($char == '_' || $char == '.' || $char == '[' || $char == ']') &&
+        if (($char == '_' || $char == '.') &&
             (! empty($this->currentContent) || ctype_alpha($this->cur))) {
             return true;
         }
@@ -1047,7 +1049,7 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::RightParent) {
                     $logicalGroupEnd = new LogicGroupEnd();
                     $logicalGroupEnd->content = ')';
-                    $logicalGroupEnd->startPosition = $node->relativeOffset($this->currentIndex);
+                        $logicalGroupEnd->startPosition = $node->relativeOffset($this->currentIndex);
                     $logicalGroupEnd->endPosition = $node->relativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $logicalGroupEnd;
@@ -1086,6 +1088,28 @@ class AntlersLexer
                     $this->runtimeNodes[] = $branchSeparator;
                     $this->lastNode = $branchSeparator;
                     $this->isParsingModifierName = false;
+                    continue;
+                }
+
+                if ($this->cur == DocumentParser::LeftBracket) {
+                    $implicitArrayBegin = new ImplicitArrayBegin();
+                    $implicitArrayBegin->content = '[';
+                    $implicitArrayBegin->startPosition = $node->relativeOffset($this->currentIndex);
+                    $implicitArrayBegin->endPosition = $node->relativeOffset($this->currentIndex + 1);
+
+                    $this->runtimeNodes[] = $implicitArrayBegin;
+                    $this->lastNode = $implicitArrayBegin;
+                    continue;
+                }
+
+                if ($this->cur == DocumentParser::RightBracket) {
+                    $implicitArrayEnd = new ImplicitArrayEnd();
+                    $implicitArrayEnd->content = ']';
+                    $implicitArrayEnd->startPosition = $node->relativeOffset($this->currentIndex);
+                    $implicitArrayEnd->endPosition = $node->relativeOffset($this->currentIndex + 1);
+
+                    $this->runtimeNodes[] = $implicitArrayEnd;
+                    $this->lastNode = $implicitArrayEnd;
                     continue;
                 }
             }

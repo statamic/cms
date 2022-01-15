@@ -259,4 +259,75 @@ EOT;
             $result
         );
     }
+
+    public function test_nested_arrays_using_bracket_syntax()
+    {
+        $result = $this->evaluateRaw('["one" => 1, "two" => 2, "three" => [1,2,3, 4 => [1,2]]]');
+
+        $this->assertSame(
+            [
+                'one' => 1,
+                'two' => 2,
+                'three' => [
+                    1,
+                    2,
+                    3,
+                    4 => [
+                        1,
+                        2,
+                    ],
+                ],
+            ],
+            $result
+        );
+
+        $result = $this->evaluateRaw('[
+                   "one" => 1,
+                   "two" => 2,
+                   "three" => [
+                        1,
+                        2,
+                        3,
+                        4 => [
+                            1,
+                            2
+                        ]
+                    ]]');
+
+        $this->assertSame(
+            [
+                'one' => 1,
+                'two' => 2,
+                'three' => [
+                    1,
+                    2,
+                    3,
+                    4 => [
+                        1,
+                        2,
+                    ],
+                ],
+            ],
+            $result
+        );
+    }
+
+    public function test_array_key_values()
+    {
+        // Note: This test is to validate the parser/runtime does not explode.
+        //       Using these as array keys should be avoided, if possible.
+        $data = [
+            'data' => [
+                null => 'Null Value',
+                true => 'True Value',
+                false => 'False Value',
+            ],
+        ];
+
+        $template = <<<'EOT'
+<{{ data:true }}><{{ data:false }}><{{ data:null }}>
+EOT;
+
+        $this->assertSame('<True Value><False Value><Null Value>', $this->renderString($template, $data));
+    }
 }
