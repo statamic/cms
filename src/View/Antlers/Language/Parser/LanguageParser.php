@@ -1876,7 +1876,7 @@ class LanguageParser
 
                     $i += 1;
                     continue;
-                } else if ($this->canMergeIntoVariablePath($right) && $left instanceof VariableNode) {
+                } elseif ($this->canMergeIntoVariablePath($right) && $left instanceof VariableNode) {
                     array_pop($newNodes);
 
                     NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
@@ -1895,7 +1895,6 @@ class LanguageParser
             } elseif ($node instanceof ImplicitArrayEnd && $newNodeCount > 0) {
                 $left = $newNodes[$newNodeCount - 1];
 
-
                 if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) <= 1) {
                     array_pop($newNodes);
                     NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
@@ -1908,7 +1907,7 @@ class LanguageParser
             } elseif ($node instanceof VariableNode && $newNodeCount > 0) {
                 $left = $newNodes[$newNodeCount - 1];
 
-                if ($left instanceof VariableNode &&  NodeHelpers::distance($left, $node) < 1) {
+                if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) < 1) {
                     array_pop($newNodes);
                     NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
                     $newNodes[] = $left;
@@ -1916,7 +1915,6 @@ class LanguageParser
                     $newNodes[] = $node;
                 }
                 continue;
-
             } else {
                 $newNodes[] = $node;
             }

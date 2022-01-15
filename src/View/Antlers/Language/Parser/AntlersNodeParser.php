@@ -14,7 +14,6 @@ use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Nodes\RecursiveNode;
-use Statamic\View\Antlers\Language\Nodes\Structures\ImplicitArrayBegin;
 use Statamic\View\Antlers\Language\Nodes\TagIdentifier;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 

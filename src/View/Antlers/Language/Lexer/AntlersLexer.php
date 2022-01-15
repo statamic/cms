@@ -1049,7 +1049,7 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::RightParent) {
                     $logicalGroupEnd = new LogicGroupEnd();
                     $logicalGroupEnd->content = ')';
-                        $logicalGroupEnd->startPosition = $node->relativeOffset($this->currentIndex);
+                    $logicalGroupEnd->startPosition = $node->relativeOffset($this->currentIndex);
                     $logicalGroupEnd->endPosition = $node->relativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $logicalGroupEnd;

@@ -519,8 +519,8 @@ class PathDataManager
                 $varPath = 1;
             } elseif ($path->name == LanguageKeywords::ConstFalse && isset($this->reducedVar[0])) {
                 $varPath = 0;
-            } elseif ($path->name == LanguageKeywords::ConstNull && isset($this->reducedVar[""])) {
-                $varPath = "";
+            } elseif ($path->name == LanguageKeywords::ConstNull && isset($this->reducedVar[''])) {
+                $varPath = '';
             }
         }
 

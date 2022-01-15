@@ -6,5 +6,4 @@ use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 
 class ImplicitArrayBegin extends AbstractNode
 {
-
 }
