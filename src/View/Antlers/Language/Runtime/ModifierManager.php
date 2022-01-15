@@ -15,6 +15,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 class ModifierManager
 {
     public static $statamicModifiers = null;
+    const METHOD_MODIFIER = '{__method_args}';
 
     public static function isModifier(ParameterNode $node)
     {
@@ -93,6 +94,7 @@ class ModifierManager
 
             if ($chain->methodStyleArguments != null) {
                 $parameters = $env->evaluateArgumentGroup($chain->methodStyleArguments);
+                $context[self::METHOD_MODIFIER] = true;
             } else {
                 if (! empty($chain->valueNodes)) {
                     foreach ($chain->valueNodes as $node) {
