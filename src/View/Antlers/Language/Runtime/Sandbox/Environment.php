@@ -465,15 +465,25 @@ class Environment
                 continue;
             } elseif ($currentNode instanceof StringConcatenationOperator) {
                 $left = array_pop($stack);
-                $varName = $this->nameOf($left);
                 $right = $nodes[$i + 1];
 
-                $leftVal = $this->getValue($left);
-                $rightVal = $this->getValue($right);
+                if ($left instanceof VariableNode) {
+                    $varName = $this->nameOf($left);
 
-                $newValue = $leftVal.$rightVal;
-                $this->dataRetriever->setRuntimeValue($varName, $this->data, $newValue);
-                $this->assignments[$this->dataRetriever->lastPath()] = $newValue;
+                    $leftVal = (string)$this->getValue($left);
+                    $rightVal = (string)$this->getValue($right);
+
+                    $newValue = $leftVal.$rightVal;
+                    $this->dataRetriever->setRuntimeValue($varName, $this->data, $newValue);
+                    $this->assignments[$this->dataRetriever->lastPath()] = $newValue;
+                } else {
+                    // Fall back to stack behavior when left is not a variable.
+                    $leftVal = (string)$this->getValue($left);
+                    $rightVal = (string)$this->getValue($right);
+
+                    $stack[] = $leftVal.$rightVal;
+                }
+
                 $i += 1;
                 continue;
             } elseif ($currentNode instanceof FactorialOperator) {
