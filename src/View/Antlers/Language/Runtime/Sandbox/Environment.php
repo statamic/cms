@@ -465,13 +465,15 @@ class Environment
                 continue;
             } elseif ($currentNode instanceof StringConcatenationOperator) {
                 $left = array_pop($stack);
+                $varName = $this->nameOf($left);
                 $right = $nodes[$i + 1];
 
                 $leftVal = $this->getValue($left);
                 $rightVal = $this->getValue($right);
 
-                $stack[] = (string) $leftVal.(string) $rightVal;
-
+                $newValue = $leftVal.$rightVal;
+                $this->dataRetriever->setRuntimeValue($varName, $this->data, $newValue);
+                $this->assignments[$this->dataRetriever->lastPath()] = $newValue;
                 $i += 1;
                 continue;
             } elseif ($currentNode instanceof FactorialOperator) {
@@ -845,6 +847,13 @@ class Environment
             }
 
             $stack[] = $currentNode;
+        }
+
+        // Treats an empty stack as an implicit "null".
+        // This happens when everything inside the
+        // node was purely operation/assignments.
+        if (count($stack) == 0) {
+            return null;
         }
 
         if (count($stack) == 1) {

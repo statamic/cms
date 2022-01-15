@@ -31,4 +31,28 @@ EOT;
 
         $this->assertSame('\\', $this->renderString($template));
     }
+
+    public function test_string_concat_works_without_printing_string_to_output()
+    {
+        $template = <<<'EOT'
+{{
+    test = 'hello';
+    test .= ', world';
+}}
+EOT;
+
+        $this->assertSame('', $this->renderString($template));
+    }
+
+    public function test_string_concat_pushes_data_to_assignments()
+    {
+        $template = <<<'EOT'
+{{
+    test = 'hello';
+    test .= ', world';
+}}{{ test }}
+EOT;
+
+        $this->assertSame('hello, world', $this->renderString($template));
+    }
 }

@@ -236,6 +236,17 @@ class AntlersLexer
             $this->checkCurrentOffsets();
 
             if ($this->isParsingString == false) {
+                if ($this->cur == DocumentParser::Punctuation_FullStop && $this->next == DocumentParser::Punctuation_Equals) {
+                    $stringConcat = new StringConcatenationOperator();
+                    $stringConcat->startPosition = $node->relativeOffset($this->currentIndex);
+                    $stringConcat->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $stringConcat->content = '.=';
+                    $this->currentContent = [];
+                    $this->runtimeNodes[] = $stringConcat;
+                    $this->currentIndex += 1;
+                    continue;
+                }
+
                 if ($this->cur == DocumentParser::String_Terminator_DoubleQuote || $this->cur == DocumentParser::String_Terminator_SingleQuote) {
                     if ($this->prev == DocumentParser::String_EscapeCharacter) {
                         throw ErrorFactory::makeSyntaxError(
