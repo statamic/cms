@@ -470,16 +470,16 @@ class Environment
                 if ($left instanceof VariableNode) {
                     $varName = $this->nameOf($left);
 
-                    $leftVal = (string)$this->getValue($left);
-                    $rightVal = (string)$this->getValue($right);
+                    $leftVal = (string) $this->getValue($left);
+                    $rightVal = (string) $this->getValue($right);
 
                     $newValue = $leftVal.$rightVal;
                     $this->dataRetriever->setRuntimeValue($varName, $this->data, $newValue);
                     $this->assignments[$this->dataRetriever->lastPath()] = $newValue;
                 } else {
                     // Fall back to stack behavior when left is not a variable.
-                    $leftVal = (string)$this->getValue($left);
-                    $rightVal = (string)$this->getValue($right);
+                    $leftVal = (string) $this->getValue($left);
+                    $rightVal = (string) $this->getValue($right);
 
                     $stack[] = $leftVal.$rightVal;
                 }
