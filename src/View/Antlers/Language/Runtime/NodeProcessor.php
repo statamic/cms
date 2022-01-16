@@ -568,8 +568,6 @@ class NodeProcessor
      */
     public function render($nodes)
     {
-        if (count($nodes) != 3) {
-        }
         $bufferContent = $this->reduce($nodes);
 
         if ($this->isInterpolationProcessor == false) {
