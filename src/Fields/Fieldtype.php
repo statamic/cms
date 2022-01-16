@@ -31,6 +31,7 @@ abstract class Fieldtype implements Arrayable
     protected $extraRules = [];
     protected $defaultValue;
     protected $configFields = [];
+    protected static $extraConfigFields = [];
     protected $icon;
 
     public static function title()
@@ -173,9 +174,11 @@ abstract class Fieldtype implements Arrayable
 
     public function configFields(): Fields
     {
-        $fields = collect($this->configFieldItems())->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        });
+        $fields = collect($this->configFieldItems())
+            ->merge(self::$extraConfigFields)
+            ->map(function ($field, $handle) {
+                return compact('handle', 'field');
+            });
 
         return new ConfigFields($fields);
     }
@@ -183,6 +186,11 @@ abstract class Fieldtype implements Arrayable
     protected function configFieldItems(): array
     {
         return $this->configFields;
+    }
+
+    public static function extendConfigFields(array $config)
+    {
+        self::$extraConfigFields = $config;
     }
 
     public function icon()
