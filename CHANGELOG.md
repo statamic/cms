@@ -1,5 +1,52 @@
 # Release Notes
 
+## 3.2.31 (2022-01-14)
+
+### What's new
+- Ability to exclude certain fields from displaying in the REST API. [#5041](https://github.com/statamic/cms/issues/5041) by @arthurperton
+- Ability to `select` fields in `nav`, `locales`, and `collection` tags. [#5068](https://github.com/statamic/cms/issues/5068) by @jasonvarga
+- Add search to the user listing in the CP. [#4084](https://github.com/statamic/cms/issues/4084) by @arthurperton
+- Support `whereColumn` in the query builder. [#4754](https://github.com/statamic/cms/issues/4754) by @ryanmitchell
+
+### What's fixed
+- The `static:warm` command visits taxonomy URLs, excludes taxonomy URLs with no views, includes multisite taxonomy URLs, displays the URL count, and excludes excluded URLs. [#5065](https://github.com/statamic/cms/issues/5065) by @arthurperton
+- Fix how localized terms and globals save their data and fall back to origin values. [#4884](https://github.com/statamic/cms/issues/4884) by @aerni
+- Prevent nested Bard fields from going into fullscreen mode. [#5059](https://github.com/statamic/cms/issues/5059) by @jonassiewertsen
+- Fix infinite loop when using nested Replicator fields. [#5055](https://github.com/statamic/cms/issues/5055) by @jasonvarga
+- Replaced a hardcoded `lang` directory reference. [#5054](https://github.com/statamic/cms/issues/5054) by @Konafets
+- Fix incorrect redirect when saving a taxonomy term. [#5053](https://github.com/statamic/cms/issues/5053) by @arthurperton
+- Fix SVGs not displaying in private asset containers. [#4991](https://github.com/statamic/cms/issues/4991) by @arthurperton
+- Fix saving not using the latest state when you hit save too quickly after typing. [#5039](https://github.com/statamic/cms/issues/5039) by @jackmcdade
+- Fix some PHP 8.1 deprecation messages. [#5063](https://github.com/statamic/cms/issues/5063) by @edalzell
+- Add allowed composer plugins. [#5069](https://github.com/statamic/cms/issues/5069) by @jasonvarga
+
+
+
+## 3.2.30 (2022-01-07)
+
+### What's new
+- Support sub-field querying (JSON) in the query builder. [#4758](https://github.com/statamic/cms/issues/4758) by @ryanmitchell
+- The `collection` tag (and others) can `sort` by sub-fields. [#5030](https://github.com/statamic/cms/issues/5030) by @jasonvarga
+- Uploaded assets may be attached to form submission emails. [#4726](https://github.com/statamic/cms/issues/4726) by @jacksleight
+- Provide errors indexed by fields for the `user:reset_password_form` tag. [#4822](https://github.com/statamic/cms/issues/4822) by @marcorieser
+- `DataCollection` can use the first value of an array for sorting. [#4967](https://github.com/statamic/cms/issues/4967) by @arthurperton
+- Add `min_` and `max_filesize` validation rules for `assets` fieldtypes. [#4980](https://github.com/statamic/cms/issues/4980) by @arthurperton
+
+### What's improved
+- The `display` field is auto-focused in the blueprint builder. [#5026](https://github.com/statamic/cms/issues/5026) by @jackmcdade
+
+### What's fixed
+- Fix state mutations in Replicator, causing the page to freeze in some situations. [#5031](https://github.com/statamic/cms/issues/5031) by @arthurperton
+- Fix the Asset's `remove` method not removing anything. [#5038](https://github.com/statamic/cms/issues/5038) by @arthurperton
+- Fix inappropriate state mutations in Grid and Assets fieldtypes. [#5005](https://github.com/statamic/cms/issues/5005) by @arthurperton
+- Fix terms not being sorted appropriately in other sites. [#4982](https://github.com/statamic/cms/issues/4982) by @arthurperton
+- Fix the range field's derpy layout of uneven widths [#5027](https://github.com/statamic/cms/issues/5027) by @jackmcdade
+- Fix `View` method chainability. [#5020](https://github.com/statamic/cms/issues/5020) by @jasonvarga
+- Fix unnecessary dirty state when changing sites. [#5013](https://github.com/statamic/cms/issues/5013) by @jasonvarga
+- Fix readonly sub-fields in localizable Grid and Bard fields. [#4962](https://github.com/statamic/cms/issues/4962) by @arthurperton
+
+
+
 ## 3.2.29 (2022-01-04)
 
 ### What's new

@@ -4,7 +4,7 @@
         <td class="flex items-center">
             <div v-if="canShowSvg"
                  class="img svg-img mr-1 h-7 w-7 bg-no-repeat bg-center bg-cover text-center flex items-center justify-center"
-                 :style="'background-image:url('+asset.url+')'">
+                 :style="'background-image:url('+thumbnail+')'">
             </div>
             <button class="w-7 h-7 cursor-pointer whitespace-no-wrap flex items-center justify-center" @click="edit" v-else>
                 <img class="asset-thumbnail max-h-full max-w-full rounded w-7 h-7 fit-cover" loading="lazy" :src="thumbnail" v-if="isImage" />

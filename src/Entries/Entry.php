@@ -759,7 +759,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->selectedQueryColumns;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'url', 'permalink', 'api_url'];
     }

@@ -149,6 +149,7 @@ class Form implements FormContract, Augmentable
             'honeypot' => $this->honeypot,
             'email' => collect($this->email)->map(function ($email) {
                 $email['markdown'] = $email['markdown'] ?: null;
+                $email['attachments'] = $email['attachments'] ?: null;
 
                 return Arr::removeNullValues($email);
             })->all(),
@@ -341,7 +342,7 @@ class Form implements FormContract, Augmentable
         return new AugmentedForm($this);
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['handle', 'title', 'api_url'];
     }
