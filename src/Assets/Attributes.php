@@ -167,7 +167,7 @@ class Attributes
     }
 
     /**
-     * Get the attributes of a sound.
+     * Get the attributes of a video.
      *
      * @return array
      */
