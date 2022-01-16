@@ -37,7 +37,7 @@ class AttributesTest extends TestCase
 
         $attributes = $this->attributes->asset($asset);
 
-        $this->assertEquals([null, null, null], $attributes->get());
+        $this->assertEquals([], $attributes->get());
         $this->assertEquals(null, $attributes->width());
         $this->assertEquals(null, $attributes->height());
     }
@@ -57,12 +57,13 @@ class AttributesTest extends TestCase
         // Test about the actual file, for good measure.
         $realpath = Storage::disk('test')->getAdapter()->getPathPrefix().'path/to/asset.jpg';
         $this->assertFileExists($realpath);
-        $imagesize = getimagesize($realpath);
-        $this->assertEquals([30, 60], array_splice($imagesize, 0, 2));
+        [$width, $height] = getimagesize($realpath);
+        $this->assertEquals(30, $width);
+        $this->assertEquals(60, $height);
 
         $attributes = $this->attributes->asset($asset);
 
-        $this->assertEquals([30, 60, 0], $attributes->get());
+        $this->assertEquals(['width' => 30, 'height' => 60], $attributes->get());
         $this->assertEquals(30, $attributes->width());
         $this->assertEquals(60, $attributes->height());
     }
@@ -87,7 +88,7 @@ class AttributesTest extends TestCase
 
         $attributes = $this->attributes->asset($asset);
 
-        $this->assertEquals([0, 0, 11], $attributes->get());
+        $this->assertEquals(['length' => 11], $attributes->get());
         $this->assertEquals(0, $attributes->width());
         $this->assertEquals(0, $attributes->height());
     }
@@ -97,7 +98,7 @@ class AttributesTest extends TestCase
     {
         $asset = $this->svgAsset('<svg width="30" height="60" viewBox="0 0 100 200"></svg>');
 
-        $this->assertEquals([30.0, 60.0, 0], $this->attributes->asset($asset)->get());
+        $this->assertEquals(['width' => 30.0, 'height' => 60.0], $this->attributes->asset($asset)->get());
     }
 
     /** @test */
@@ -105,7 +106,7 @@ class AttributesTest extends TestCase
     {
         $asset = $this->svgAsset('<svg viewBox="0 0 300 600"></svg>');
 
-        $this->assertEquals([300, 600, 0], $this->attributes->asset($asset)->get());
+        $this->assertEquals(['width' => 300, 'height' => 600], $this->attributes->asset($asset)->get());
     }
 
     /** @test */
@@ -113,7 +114,7 @@ class AttributesTest extends TestCase
     {
         $asset = $this->svgAsset('<svg width="100%" height="100%" viewBox="0 0 300 600"></svg>');
 
-        $this->assertEquals([300, 600, 0], $this->attributes->asset($asset)->get());
+        $this->assertEquals(['width' => 300, 'height' => 600], $this->attributes->asset($asset)->get());
     }
 
     /** @test */
@@ -121,15 +122,15 @@ class AttributesTest extends TestCase
     {
         $asset = $this->svgAsset('<svg width="1em" height="2em" viewBox="0 0 300 600"></svg>');
 
-        $this->assertEquals([300, 600, 0], $this->attributes->asset($asset)->get());
+        $this->assertEquals(['width' => 300, 'height' => 600], $this->attributes->asset($asset)->get());
     }
 
     /** @test */
     public function it_uses_default_attributes_if_the_svg_has_no_viewbox_and_is_missing_either_or_both_dimensions()
     {
-        $this->assertEquals([300, 150, 0], $this->attributes->asset($this->svgAsset('<svg></svg>'))->get());
-        $this->assertEquals([300, 150, 0], $this->attributes->asset($this->svgAsset('<svg width="100"></svg>'))->get());
-        $this->assertEquals([300, 150, 0], $this->attributes->asset($this->svgAsset('<svg height="100"></svg>'))->get());
+        $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg></svg>'))->get());
+        $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg width="100"></svg>'))->get());
+        $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg height="100"></svg>'))->get());
     }
 
     private function svgAsset($svg)

@@ -53,7 +53,7 @@ class Attributes
             return $this->getVideoAttributes();
         }
 
-        return [null, null, null];
+        return [];
     }
 
     /**
@@ -63,7 +63,7 @@ class Attributes
      */
     public function width()
     {
-        return array_get($this->get(), 0);
+        return array_get($this->get(), 'width');
     }
 
     /**
@@ -73,7 +73,7 @@ class Attributes
      */
     public function height()
     {
-        return array_get($this->get(), 1);
+        return array_get($this->get(), 'height');
     }
 
     /**
@@ -90,7 +90,7 @@ class Attributes
 
         $length = Arr::get($id3, 'playtime_seconds', 0);
 
-        return [null, null, $length];
+        return ['length' => $length];
     }
 
     /**
@@ -116,15 +116,15 @@ class Attributes
         $manager->copy("source://{$this->asset->path()}", $destination);
 
         try {
-            $size = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
-            $size[2] = 0;
+            [$width, $height] = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
+            $size = compact('width', 'height');
         } catch (\Exception $e) {
-            $size = [0, 0, 0];
+            $size = [];
         } finally {
             $cache->delete($cachePath);
         }
 
-        return $size ? array_splice($size, 0, 3) : [0, 0, 0];
+        return $size;
     }
 
     /**
@@ -156,14 +156,14 @@ class Attributes
         if ($svg['width'] && $svg['height']
             && is_numeric((string) $svg['width'])
             && is_numeric((string) $svg['height'])) {
-            return [(float) $svg['width'], (float) $svg['height'], 0];
+            return ['width' => (float) $svg['width'], 'height' => (float) $svg['height']];
         } elseif ($svg['viewBox']) {
-            $viewBox = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
+            [,,$width, $height] = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
 
-            return [$viewBox[2], $viewBox[3], 0];
+            return compact('width', 'height');
         }
 
-        return [300, 150, 0];
+        return ['width' => 300, 'height' => 150];
     }
 
     /**
@@ -171,18 +171,18 @@ class Attributes
      *
      * @return array
      */
-    private function getVideoDimensions()
+    private function getVideoAttributes()
     {
         $id3 = GetId3::fromDiskAndPath(
             $this->asset->container()->diskHandle(),
             $this->asset->basename()
         )->extractInfo();
 
-        $width = Arr::get($id3, 'video.resolution_x');
-        $height = Arr::get($id3, 'video.resolution_y');
-        $length = Arr::get($id3, 'playtime_seconds');
-
-        return [$width, $height, $length];
+        return [
+            'width' => Arr::get($id3, 'video.resolution_x'),
+            'height' => Arr::get($id3, 'video.resolution_y'),
+            'length' => Arr::get($id3, 'playtime_seconds'),
+        ];
     }
 
     private function getCacheFlysystem()

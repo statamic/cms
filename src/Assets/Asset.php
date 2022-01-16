@@ -158,15 +158,15 @@ class Asset implements AssetContract, Augmentable
         $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
-            [$width, $height, $length] = app(Attributes::class)->asset($this)->get();
+            $attributes = app(Attributes::class)->asset($this)->get();
 
             $otherMeta = [
-                'height' => $height,
+                'height' => Arr::get($attributes, 'height'),
                 'last_modified' => $this->disk()->lastModified($this->path()),
-                'length' => $length,
+                'length' => Arr::get($attributes, 'length'),
                 'mime_type' => $this->disk()->mimeType($this->path()),
                 'size' => $this->disk()->size($this->path()),
-                'width' => $width,
+                'width' => Arr::get($attributes, 'width'),
             ];
 
             $meta = array_merge($meta, $otherMeta);
