@@ -27,11 +27,6 @@ class SubstitutesEntryForLivePreviewTest extends TestCase
         EntryFactory::collection('test')->id('2')->slug('bravo')->data(['title' => 'Bravo', 'foo' => 'Bravo foo'])->create();
         EntryFactory::collection('test')->id('3')->slug('charlie')->data(['title' => 'Charlie', 'foo' => 'Charlie foo'])->create();
 
-        $token = Token::make('test-token', LivePreviewEntry::class, ['entry' => '2', 'data' => ['title' => 'Substituted title', 'foo' => 'Substituted foo']]);
-        Token::shouldReceive('find')->with('test-token')->andReturn($token);
-        Token::shouldReceive('find')->with('invalid-token')->andReturnNull();
-        $this->addToAssertionCount(-2); // Dont want to assert these mocks
-
         $this->withFakeViews();
         $this->viewShouldReturnRaw('test', '{{ collection:test }}{{ title }} {{ foo }} {{ /collection:test }}');
     }
@@ -46,6 +41,9 @@ class SubstitutesEntryForLivePreviewTest extends TestCase
     /** @test */
     public function it_substitutes()
     {
+        $token = Token::make('test-token', LivePreviewEntry::class, ['entry' => '2', 'data' => ['title' => 'Substituted title', 'foo' => 'Substituted foo']]);
+        Token::shouldReceive('find')->with('test-token')->andReturn($token)->once();
+
         $this->get('/test?token=test-token')->assertSeeInOrder([
             'Alfa',
             'Alfa foo',
@@ -59,6 +57,8 @@ class SubstitutesEntryForLivePreviewTest extends TestCase
     /** @test */
     public function it_doesnt_substitute()
     {
+        Token::shouldReceive('find')->with('invalid-token')->andReturnNull()->once();
+
         $this->get('/test?token=invalid-token')->assertSeeInOrder([
             'Alfa',
             'Alfa foo',
