@@ -22,7 +22,7 @@ class TokenRepository
 
         $yaml = YAML::file($path)->parse();
 
-        return $this->make($token, $yaml['handler'], $yaml['data']);
+        return $this->make($token, $yaml['handler'], $yaml['data'] ?? []);
     }
 
     public function save(Token $token)
