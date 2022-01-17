@@ -13,6 +13,7 @@ use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
+    protected $categories = ['structured'];
     protected $defaultValue = [];
     protected $rules = ['array'];
 
@@ -223,5 +224,18 @@ class Replicator extends Fieldtype
         return 'Sets_'.collect($this->field->handlePath())->map(function ($part) {
             return Str::studly($part);
         })->join('_');
+    }
+
+    public function preProcessValidatable($value)
+    {
+        return collect($value)->map(function ($values) {
+            $processed = $this->fields($values['type'])
+                ->addValues($values)
+                ->preProcessValidatables()
+                ->values()
+                ->all();
+
+            return array_merge($values, $processed);
+        })->all();
     }
 }

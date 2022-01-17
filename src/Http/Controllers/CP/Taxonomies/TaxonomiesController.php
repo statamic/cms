@@ -4,14 +4,17 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 
 class TaxonomiesController extends CpController
 {
@@ -152,6 +155,8 @@ class TaxonomiesController extends CpController
 
         $fields->validate();
 
+        $existingSites = $taxonomy->sites();
+
         $values = $fields->process()->values()->all();
 
         $taxonomy->title($values['title']);
@@ -162,9 +167,25 @@ class TaxonomiesController extends CpController
 
         $taxonomy->save();
 
+        $this->clearStacheStore($taxonomy, $existingSites);
+
         $this->associateTaxonomyWithCollections($taxonomy, $values['collections']);
 
         return $taxonomy->toArray();
+    }
+
+    private function clearStacheStore($taxonomy, $oldSites)
+    {
+        // We're only interested in clearing the stache if you're using it.
+        if (! app(TermRepository::class) instanceof StacheTermRepository) {
+            return;
+        }
+
+        if ($oldSites === $taxonomy->sites()->all()) {
+            return;
+        }
+
+        Stache::store('terms::'.$taxonomy->handle())->clear();
     }
 
     protected function associateTaxonomyWithCollections($taxonomy, $collections)

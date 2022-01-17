@@ -247,16 +247,16 @@ class UserTags extends Tags
      */
     public function resetPasswordForm()
     {
-        $data = [
-            'errors' => [],
-        ];
-
-        if (session('success')) {
+        if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
 
-        if (session('errors')) {
-            $data['errors'] = session('errors')->all();
+        $data = $this->getFormSession();
+
+        $data['url_invalid'] = request()->isNotFilled('token');
+
+        if (! $this->params->has('redirect')) {
+            $this->params->put('redirect', request()->getPathInfo());
         }
 
         $knownParams = ['redirect'];

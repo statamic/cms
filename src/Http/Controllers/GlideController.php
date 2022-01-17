@@ -149,7 +149,7 @@ class GlideController extends Controller
         $path = Str::after($this->request->url(), Site::current()->absoluteUrl());
 
         try {
-            SignatureFactory::create(Config::getAppKey())->validateRequest($path, $_GET);
+            SignatureFactory::create(Config::getAppKey())->validateRequest($path, $this->request->query->all());
         } catch (SignatureException $e) {
             abort(400, $e->getMessage());
         }

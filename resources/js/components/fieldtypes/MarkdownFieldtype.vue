@@ -180,7 +180,7 @@ export default {
     watch: {
 
         data(data) {
-            this.update(data);
+            this.updateDebounced(data);
         },
 
         fullScreenMode: {

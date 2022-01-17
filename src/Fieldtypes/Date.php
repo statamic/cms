@@ -13,6 +13,8 @@ use Statamic\Support\DateFormat;
 
 class Date extends Fieldtype
 {
+    protected $categories = ['special'];
+
     const DEFAULT_DATE_FORMAT = 'Y-m-d';
     const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i';
 
@@ -46,17 +48,22 @@ class Date extends Fieldtype
                 'default' => false,
                 'width' => 50,
             ],
-            'earliest_date' => [
-                'display' => __('Earliest Date'),
-                'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
-                'type' => 'text',
-                'default' => '1900-01-01',
-                'width' => 50,
-            ],
             'format' => [
                 'display' => __('Format'),
                 'instructions' => __('statamic::fieldtypes.date.config.format'),
                 'type' => 'text',
+                'width' => 50,
+            ],
+            'earliest_date' => [
+                'display' => __('Earliest Date'),
+                'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
+                'type' => 'date',
+                'width' => 50,
+            ],
+            'latest_date' => [
+                'display' => __('Latest Date'),
+                'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
+                'type' => 'date',
                 'width' => 50,
             ],
             'full_width' => [

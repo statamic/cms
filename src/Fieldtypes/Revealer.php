@@ -6,6 +6,7 @@ use Statamic\Fields\Fieldtype;
 
 class Revealer extends Fieldtype
 {
+    protected $categories = ['controls', 'special'];
     protected $localizable = false;
     protected $validatable = false;
     protected $defaultable = false;

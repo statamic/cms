@@ -3,12 +3,20 @@
 namespace Statamic\Tags;
 
 use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Exceptions\NavigationNotFoundException;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Structures\TreeBuilder;
+use Statamic\Support\Str;
+use Statamic\Tags\Concerns\GetsQuerySelectKeys;
 
 class Structure extends Tags
 {
+    use GetsQuerySelectKeys;
+
     public function wildcard($tag)
     {
         $handle = $this->context->value($tag, $tag);
@@ -32,6 +40,8 @@ class Structure extends Tags
             $handle = $handle->handle();
         }
 
+        $this->ensureStructureExists($handle);
+
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
             'include_home' => $this->params->get('include_home'),
@@ -44,11 +54,24 @@ class Structure extends Tags
         return $this->toArray($tree);
     }
 
+    protected function ensureStructureExists(string $handle): void
+    {
+        if (Str::startsWith($handle, 'collection::')) {
+            $collection = Str::after($handle, 'collection::');
+            throw_unless(Collection::findByHandle($collection), new CollectionNotFoundException($collection));
+
+            return;
+        }
+
+        throw_unless(Nav::findByHandle($handle), new NavigationNotFoundException($handle));
+    }
+
     public function toArray($tree, $parent = null, $depth = 1)
     {
         return collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
-            $data = $page->toAugmentedArray();
+            $keys = $this->getQuerySelectKeys($page);
+            $data = $page->toAugmentedArray($keys);
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
             return array_merge($data, [

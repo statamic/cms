@@ -26,15 +26,7 @@ class ParentTags extends Tags
     {
         $var_name = Stringy::removeLeft($this->tag, 'parent:');
 
-        $data = Arr::get($this->getParent(), $var_name);
-
-        if ($this->isPair) {
-            $this->content = '{{'.$var_name.'}}'.$this->content.'{{/'.$var_name.'}}';
-
-            return $this->parse([$var_name => $data]);
-        }
-
-        return $data;
+        return Arr::get($this->getParent(), $var_name);
     }
 
     /**
@@ -73,7 +65,7 @@ class ParentTags extends Tags
      */
     private function getParent()
     {
-        $segments = explode('/', Str::after(URL::getCurrent(), Site::current()->url()));
+        $segments = explode('/', Str::start(Str::after(URL::getCurrent(), Site::current()->url()), '/'));
         $segment_count = count($segments);
         $segments[0] = '/';
 

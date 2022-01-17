@@ -444,7 +444,7 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            this.runBeforeSaveHook();
+            setTimeout(() => this.runBeforeSaveHook(), 151); // 150ms is the debounce time for fieldtype updates
         },
 
         runBeforeSaveHook() {
@@ -471,7 +471,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                this.title = this.values.title;
+                this.title = response.data.data.title;
                 this.isWorkingCopy = true;
                 if (this.isBase) {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
@@ -588,7 +588,7 @@ export default {
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.clearDirtyState());
+                setTimeout(() => this.$refs.container.clearDirtyState(), 150); // after any fieldtypes do a debounced update
             })
         },
 
@@ -600,8 +600,13 @@ export default {
 
             const url = this.activeLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
-                this.editLocalization(response.data)
-                    .then(() => this.$events.$emit('localization.created', {store: this.publishContainer}));
+                this.editLocalization(response.data).then(() => {
+                    this.$events.$emit('localization.created', {store: this.publishContainer});
+
+                    if (this.originValues.published) {
+                        this.setFieldValue('published', true);
+                    }
+                });
             });
         },
 
