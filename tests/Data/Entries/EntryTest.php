@@ -937,41 +937,44 @@ class EntryTest extends TestCase
 
         $return = $entry->save();
 
-        $this->assertIsObject($fr = $entry->descendants()->get('fr'));
-        $this->assertIsObject($de = $entry->descendants()->get('de'));
+        $this->assertIsObject($fr = $entry->descendants()->get('fr')->fresh());
+        $this->assertIsObject($de = $entry->descendants()->get('de')->fresh());
+
+        $entry = $entry->fresh();
+
         $this->assertNull($entry->descendants()->get('es')); // collection not configured for this site
 
         Event::assertDispatchedTimes(EntrySaving::class, 3);
         Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
-            return $event->entry === $entry;
+            return $event->entry->fresh() == $entry;
         });
         Event::assertDispatched(EntrySaving::class, function ($event) use ($fr) {
-            return $event->entry === $fr;
+            return $event->entry == $fr;
         });
         Event::assertDispatched(EntrySaving::class, function ($event) use ($de) {
-            return $event->entry === $de;
+            return $event->entry == $de;
         });
 
         Event::assertDispatchedTimes(EntryCreated::class, 3);
         Event::assertDispatched(EntryCreated::class, function ($event) use ($entry) {
-            return $event->entry === $entry;
+            return $event->entry == $entry;
         });
         Event::assertDispatched(EntryCreated::class, function ($event) use ($fr) {
-            return $event->entry === $fr;
+            return $event->entry == $fr;
         });
         Event::assertDispatched(EntryCreated::class, function ($event) use ($de) {
-            return $event->entry === $de;
+            return $event->entry == $de;
         });
 
         Event::assertDispatchedTimes(EntrySaved::class, 3);
         Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
-            return $event->entry === $entry;
+            return $event->entry == $entry;
         });
         Event::assertDispatched(EntrySaved::class, function ($event) use ($fr) {
-            return $event->entry === $fr;
+            return $event->entry == $fr;
         });
         Event::assertDispatched(EntrySaved::class, function ($event) use ($de) {
-            return $event->entry === $de;
+            return $event->entry == $de;
         });
     }
 
