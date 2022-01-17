@@ -14,7 +14,8 @@ class EntryRepository implements RepositoryContract
 {
     protected $stache;
     protected $store;
-    protected $substitutions = [];
+    protected $substitutionsById = [];
+    protected $substitutionsByUri = [];
 
     public function __construct(Stache $stache)
     {
@@ -54,6 +55,10 @@ class EntryRepository implements RepositoryContract
     public function findByUri(string $uri, string $site = null): ?Entry
     {
         $site = $site ?? $this->stache->sites()->first();
+
+        if ($substitute = Arr::get($this->substitutionsByUri, $site.'@'.$uri)) {
+            return $substitute;
+        }
 
         $entry = $this->query()
                 ->where('uri', $uri)
@@ -128,13 +133,14 @@ class EntryRepository implements RepositoryContract
 
     public function substitute($item)
     {
-        $this->substitutions[$item->id()] = $item;
+        $this->substitutionsById[$item->id()] = $item;
+        $this->substitutionsByUri[$item->locale().'@'.$item->uri()] = $item;
     }
 
     public function applySubstitutions($items)
     {
         return $items->map(function ($item) {
-            return Arr::get($this->substitutions, $item->id(), $item);
+            return Arr::get($this->substitutionsById, $item->id(), $item);
         });
     }
 }
