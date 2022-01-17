@@ -15,4 +15,8 @@ interface Token
     public function data(): Collection;
 
     public function get(string $key);
+
+    public function save();
+
+    public function delete();
 }
