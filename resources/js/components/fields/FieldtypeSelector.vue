@@ -205,17 +205,11 @@ export default {
         createField(handle) {
             const fieldtype = _.findWhere(this.fieldtypes, { handle });
 
-            // Some titles slugify into a field handle that can cause conflicts.
-            // We'll suffix those with '... Field'.
-            const display = ['assets', 'date', 'link'].includes(fieldtype.title.toLowerCase())
-                ? `${fieldtype.title} ${__('Field')}`
-                : fieldtype.title;
-
             // Build the initial empty field. The event listener will assign display, handle,
             // and id keys. This will be 'field_n' etc, where n would be the total root
             // level, grid, or set fields depending on the event listener location.
             let field = {
-                display,
+                display: `${fieldtype.title} ${__('Field')}`,
                 type: fieldtype.handle,
                 icon: fieldtype.icon,
                 instructions: null,
