@@ -3,8 +3,8 @@
 namespace Statamic\Stache;
 
 use Illuminate\Queue\Events\JobProcessing;
-use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Assets\QueryBuilder as AssetQueryBuilder;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
