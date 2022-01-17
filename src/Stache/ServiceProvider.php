@@ -2,8 +2,11 @@
 
 namespace Statamic\Stache;
 
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Illuminate\Support\Facades\Queue;
 use Statamic\Assets\QueryBuilder as AssetQueryBuilder;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
@@ -35,6 +38,10 @@ class ServiceProvider extends LaravelServiceProvider
 
     public function boot()
     {
+        Queue::before(function (JobProcessing $event) {
+            Blink::flush();
+        });
+
         $stache = $this->app->make(Stache::class);
 
         $stache->sites(Site::all()->keys()->all());
