@@ -83,7 +83,7 @@
     "Are you sure you want to run this action?|Are you sure you want to run this action on :count items?": "Êtes-vous sûr de vouloir exécuter cette action ?|Êtes-vous sûr de vouloir exécuter cette action sur :count éléments ?",
     "Are you sure you want to unpublish this entry?|Are you sure you want to unpublish these :count entries?": "Êtes-vous sûr de vouloir annuler la publication de cette entrée ?|Êtes-vous sûr de vouloir annuler la publication de ces :count entrées ?",
     "Are you sure you want to update to :version?": "Êtes-vous sûr de vouloir mettre à jour vers la version :version ?",
-    "Are you sure you want to want to delete this?|Are you sure you want to delete these :count items?": "Êtes-vous sûr de vouloir supprimer ceci ?|Êtes-vous sûr de vouloir supprimer ces :count éléments ?",
+    "Are you sure you want to delete this?|Are you sure you want to delete these :count items?": "Êtes-vous sûr de vouloir supprimer ceci ?|Êtes-vous sûr de vouloir supprimer ces :count éléments ?",
     "Are you sure?": "Êtes-vous sûr ?",
     "Are you sure? This field's value will be replaced by the value in the original entry.": "Êtes-vous sûr ? La valeur de ce champ sera remplacée par la valeur de l'entrée initiale.",
     "Are you sure? Unsaved changes will be lost.": "Êtes-vous sûr ? les modifications non enregistrées seront perdues.",
