@@ -18,12 +18,11 @@ use Statamic\Tags\Concerns;
 class Entries
 {
     use Concerns\QueriesScopes,
-        Concerns\GetsQueryResults;
+        Concerns\QueriesOrderBys,
+        Concerns\GetsQueryResults,
+        Concerns\GetsQuerySelectKeys;
     use Concerns\QueriesConditions {
         queryableConditionParams as traitQueryableConditionParams;
-    }
-    use Concerns\QueriesOrderBys {
-        queryOrderBys as traitQueryOrderBys;
     }
 
     protected $ignoredParams = ['as'];
@@ -144,6 +143,7 @@ class Entries
         $query = Entry::query()
             ->whereIn('collection', $this->collections->map->handle()->all());
 
+        $this->querySelect($query);
         $this->querySite($query);
         $this->queryStatus($query);
         $this->queryPastFuture($query);
@@ -217,6 +217,11 @@ class Entries
         }
 
         return 'title:asc';
+    }
+
+    protected function querySelect($query)
+    {
+        $query->select($this->getQuerySelectKeys(Entry::make()));
     }
 
     protected function querySite($query)
@@ -333,22 +338,6 @@ class Entries
                 );
             }
         });
-    }
-
-    protected function queryOrderBys($query)
-    {
-        $isSortingByOrder = null !== $this->orderBys->first(function ($orderBy) {
-            return $orderBy->sort === 'order';
-        });
-
-        if ($isSortingByOrder) {
-            $nonOrderableCollections = $this->collections->reject->orderable();
-            if ($nonOrderableCollections->isNotEmpty()) {
-                throw new \LogicException('Cannot sort a nested collection by order.');
-            }
-        }
-
-        return $this->traitQueryOrderBys($query);
     }
 
     protected function queryRedirects($query)

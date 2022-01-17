@@ -29,7 +29,7 @@ class Asset extends JsonResource
             'isVideo' => $this->isVideo(),
             'isPreviewable' => $this->isPreviewable(),
 
-            $this->mergeWhen($this->isImage(), function () {
+            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
                 return [
                     'width' => $this->width(),
                     'height' => $this->height(),

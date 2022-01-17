@@ -583,25 +583,48 @@ class EntryTest extends TestCase
         $one = tap((new Entry)->locale('en')->id('one')->collection($collection))->save();
         $two = tap((new Entry)->locale('en')->id('two')->collection($collection))->save();
         $three = tap((new Entry)->locale('en')->id('three')->collection($collection))->save();
+        $four = tap((new Entry)->locale('en')->id('four')->collection($collection))->save();
 
         $this->assertNull($one->order());
-        $this->assertNull($one->order());
-        $this->assertNull($one->order());
+        $this->assertNull($two->order());
+        $this->assertNull($three->order());
+        $this->assertNull($four->order());
 
         $collection->structureContents([
-            'max_depth' => 1,
+            'max_depth' => 3,
         ])->save();
         $collection->structure()->in('en')->tree(
             [
                 ['entry' => 'three'],
-                ['entry' => 'one'],
+                ['entry' => 'one', 'children' => [
+                    ['entry' => 'four'],
+                ]],
                 ['entry' => 'two'],
             ]
         )->save();
 
         $this->assertEquals(2, $one->order());
-        $this->assertEquals(3, $two->order());
+        $this->assertEquals(4, $two->order());
         $this->assertEquals(1, $three->order());
+        $this->assertEquals(3, $four->order());
+    }
+
+    /** @test */
+    public function it_gets_the_order_from_the_data_if_not_structured()
+    {
+        $collection = tap(Collection::make('test'))->save();
+
+        $one = tap((new Entry)->locale('en')->id('one')->collection($collection))->save();
+        $two = tap((new Entry)->locale('en')->id('two')->collection($collection)->data(['order' => 17]))->save();
+        $three = tap((new Entry)->locale('en')->id('three')->collection($collection)->data(['order' => 'potato']))->save();
+        $four = tap((new Entry)->locale('en')->id('four')->collection($collection)->data(['order' => 24]))->save();
+        $five = tap((new Entry)->locale('fr')->id('five')->collection($collection)->origin('four'))->save();
+
+        $this->assertNull($one->order());
+        $this->assertEquals(17, $two->order());
+        $this->assertEquals('potato', $three->order());
+        $this->assertEquals(24, $four->order());
+        $this->assertEquals(24, $five->order());
     }
 
     /** @test */
