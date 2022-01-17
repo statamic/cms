@@ -45,6 +45,11 @@ class AbstractToken implements Contract
         return Token::save($this);
     }
 
+    public function delete()
+    {
+        return Token::delete($this);
+    }
+
     public function handle(): bool
     {
         app($this->handler)->handle($this);

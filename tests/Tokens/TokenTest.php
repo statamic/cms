@@ -36,6 +36,16 @@ class TokenTest extends TestCase
     }
 
     /** @test */
+    public function it_deletes_through_the_facade()
+    {
+        $token = new Token('test', 'test', ['foo' => 'bar']);
+
+        Facades\Token::shouldReceive('delete')->with($token)->once()->andReturn('passthru');
+
+        $this->assertEquals('passthru', $token->delete()); // the repo delete method will return true.
+    }
+
+    /** @test */
     public function it_can_be_handled()
     {
         $this->app->bind('TestTokenHandler', function () {

@@ -31,4 +31,11 @@ class TokenRepository
 
         return true;
     }
+
+    public function delete(Token $token)
+    {
+        File::delete(storage_path('statamic/tokens/'.$token->token().'.yaml'));
+
+        return true;
+    }
 }

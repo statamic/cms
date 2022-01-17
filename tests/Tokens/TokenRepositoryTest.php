@@ -64,6 +64,20 @@ YAML;
     }
 
     /** @test */
+    public function it_deletes_a_token()
+    {
+        $token = tap($this->tokens->make('test-token', 'The\\Test\\Class', ['foo' => 'bar', 'baz' => 'qux']))->save();
+
+        $this->assertNotNull($this->tokens->find('test-token'));
+
+        $return = $this->tokens->delete($token);
+
+        $this->assertNull($this->tokens->find('test-token'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/test-token.yaml'));
+        $this->assertTrue($return);
+    }
+
+    /** @test */
     public function it_finds_a_token()
     {
         $contents = <<<YAML
