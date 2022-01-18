@@ -39,7 +39,9 @@ class FormController extends Controller
             return Str::startsWith($key, '_');
         })->all();
 
-        $fields = $fields->addValues($values);
+        $submittedFieldKeys = collect($request->all())->forget('_token')->keys()->all();
+
+        $fields = $fields->only($submittedFieldKeys)->addValues($values);
 
         $submission = $form->makeSubmission()->data($values);
 

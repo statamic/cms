@@ -38,7 +38,7 @@ abstract class FormTestCase extends TestCase
             'field' => [
                 'type' => 'textarea',
                 'display' => 'Message',
-                'validate' => 'required',
+                'validate' => 'sometimes|required',
             ],
         ],
     ];
