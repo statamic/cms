@@ -89,7 +89,7 @@ class Validator
     public function validate()
     {
         return LaravelValidator::validate(
-            $this->fields->preProcessValidatables()->values()->all(),
+            $this->fields->preProcessValidatables()->validatableValues()->all(),
             $this->rules(),
             $this->customMessages,
             $this->fieldAttributes()

@@ -7,6 +7,7 @@ use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
+use Statamic\Support\Arr;
 
 class Fields
 {
@@ -14,6 +15,7 @@ class Fields
     protected $fields;
     protected $parent;
     protected $parentField;
+    protected $trackMissingValues = false;
 
     public function __construct($items = [], $parent = null, $parentField = null)
     {
@@ -57,6 +59,13 @@ class Fields
         return $this;
     }
 
+    public function setTrackMissingValues($trackMissingValues)
+    {
+        $this->trackMissingValues = $trackMissingValues;
+
+        return $this;
+    }
+
     public function items()
     {
         return $this->items;
@@ -83,7 +92,8 @@ class Fields
             ->setParent($this->parent)
             ->setParentField($this->parentField)
             ->setItems($this->items)
-            ->setFields($this->fields);
+            ->setFields($this->fields)
+            ->setTrackMissingValues($this->trackMissingValues);
     }
 
     public function localizable()
@@ -118,7 +128,9 @@ class Fields
     public function addValues(array $values)
     {
         $fields = $this->fields->map(function ($field) use ($values) {
-            return $field->newInstance()->setValue(array_get($values, $field->handle()));
+            return $field->newInstance()->setValue(
+                Arr::get($values, $field->handle(), $this->trackMissingValues ? new MissingValue : null)
+            );
         });
 
         return $this->newInstance()->setFields($fields);
@@ -127,8 +139,28 @@ class Fields
     public function values()
     {
         return $this->fields->mapWithKeys(function ($field) {
-            return [$field->handle() => $field->value()];
+            return [$field->handle() => $this->getFieldValue($field)];
         });
+    }
+
+    public function validatableValues()
+    {
+        $values = $this->values();
+
+        if ($this->trackMissingValues) {
+            return $values->reject(function ($value, $handle) {
+                return $this->fields->get($handle)->value() instanceof MissingValue;
+            });
+        }
+
+        return $values;
+    }
+
+    protected function getFieldValue($field)
+    {
+        return $field->value() instanceof MissingValue
+            ? null
+            : $field->value();
     }
 
     public function process()

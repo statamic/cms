@@ -452,7 +452,11 @@ EOT
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this
-            ->post('/!/forms/contact')
+            ->post('/!/forms/contact', [
+                'name' => '',
+                'email' => '',
+                'message' => '',
+            ])
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
@@ -597,6 +601,9 @@ EOT
         $this
             ->post('/!/forms/contact', [
                 '_error_redirect' => '/submission-error',
+                'name' => '',
+                'email' => '',
+                'message' => '',
             ])
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/submission-error');
@@ -651,7 +658,11 @@ EOT
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this
-            ->post('/!/forms/contact', ['name' => '$'])
+            ->post('/!/forms/contact', [
+                'name' => '$',
+                'email' => '',
+                'message' => '',
+            ])
             ->assertSessionHasErrors(['name', 'email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
