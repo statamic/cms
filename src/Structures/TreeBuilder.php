@@ -47,18 +47,18 @@ class TreeBuilder
 
     protected function toTree($pages, $params, $depth = 1)
     {
-        if ($query = Arr::get($params, 'query')) {
-            if (empty($pages = $query->withPages($pages)->get())) {
-                return [];
-            }
-        }
-
         $maxDepth = $params['max_depth'] ?? null;
         $fields = $params['fields'] ?? null;
         $showUnpublished = $params['show_unpublished'] ?? true;
 
         if ($maxDepth && $depth > $maxDepth) {
             return [];
+        }
+
+        if ($query = Arr::get($params, 'query')) {
+            if (empty($pages = $query->withPages($pages)->get())) {
+                return [];
+            }
         }
 
         return $pages->map(function ($page) use ($fields, $params, $depth, $showUnpublished) {
