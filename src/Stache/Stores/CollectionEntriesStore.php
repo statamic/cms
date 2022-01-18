@@ -157,6 +157,7 @@ class CollectionEntriesStore extends ChildStore
             'site' => Indexes\Site::class,
             'origin' => Indexes\Origin::class,
             'parent' => Indexes\Parents::class,
+            'status' => Indexes\Status::class,
         ]);
 
         if (! $collection = Collection::findByHandle($this->childKey())) {
