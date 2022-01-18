@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\API;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Nav;
 use Statamic\Http\Resources\API\TreeResource;
+use Statamic\Structures\PageQueryBuilder;
 
 class NavigationTreeController extends ApiController
 {
@@ -17,7 +18,11 @@ class NavigationTreeController extends ApiController
 
         $site = $this->queryParam('site');
 
+        $query = new PageQueryBuilder();
+        $this->filter($query);
+
         return app(TreeResource::class)::make($this->getNavTree($handle, $site))
+            ->query($query)
             ->fields($this->queryParam('fields'))
             ->maxDepth($this->queryParam('max_depth'))
             ->site($site);

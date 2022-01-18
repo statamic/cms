@@ -9,13 +9,16 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Structures\PageQueryBuilder;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\GetsQuerySelectKeys;
+use Statamic\Tags\Concerns\QueriesConditions;
 
 class Structure extends Tags
 {
     use GetsQuerySelectKeys;
+    use QueriesConditions;
 
     public function wildcard($tag)
     {
@@ -42,8 +45,12 @@ class Structure extends Tags
 
         $this->ensureStructureExists($handle);
 
+        $query = new PageQueryBuilder();
+        $this->queryConditions($query);
+
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
+            'query' => $query,
             'include_home' => $this->params->get('include_home'),
             'show_unpublished' => $this->params->get('show_unpublished', false),
             'site' => $this->params->get('site', Site::current()->handle()),
