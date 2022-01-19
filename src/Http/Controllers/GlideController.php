@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use League\Flysystem\FileNotFoundException;
 use League\Glide\Server;
 use League\Glide\Signatures\SignatureException;
@@ -96,11 +97,21 @@ class GlideController extends Controller
         $decoded = base64_decode($encoded);
 
         // The string before the first slash is the container
-        [$container, $path] = explode('/', $decoded, 2);
+        [$handle, $path] = explode('/', $decoded, 2);
 
-        $asset = AssetContainer::find($container)->asset($path);
+        if (! $container = AssetContainer::find($handle)) {
+            Log::error('Invalid container: '.$handle);
+            Log::error('Request URL: '.request()->fullUrl());
 
-        throw_unless($asset, new NotFoundHttpException);
+            throw new NotFoundHttpException;
+        }
+
+        if (! $asset = $container->asset($path)) {
+            Log::error('Invalid asset path: '.$path);
+            Log::error('Request URL: '.request()->fullUrl());
+
+            throw new NotFoundHttpException;
+        }
 
         return $this->createResponse($this->generateBy('asset', $asset));
     }
