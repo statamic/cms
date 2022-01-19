@@ -20,6 +20,8 @@ abstract class AbstractJsDriver implements JsDriver
         if (method_exists($this, 'parseOptions')) {
             $this->parseOptions($options);
         }
+
+        $this->validateRenderMethodReturnsHtml();
     }
 
     /**
@@ -81,6 +83,17 @@ abstract class AbstractJsDriver implements JsDriver
     }
 
     /**
+     * Render form html.
+     *
+     * @param  string  $html
+     * @return string
+     */
+    public function render($html)
+    {
+        return $html;
+    }
+
+    /**
      * Copy renderable `show_field` JS from each individual field for hardcoding field html using top-level form data.
      *
      * @param  array  $fields
@@ -96,6 +109,7 @@ abstract class AbstractJsDriver implements JsDriver
      *
      * @param  \Illuminate\Support\Collection  $fields
      * @return \Illuminate\Support\Collection
+     * @throws \Exception
      */
     protected function validateShowFieldDefined($fields)
     {
@@ -104,6 +118,18 @@ abstract class AbstractJsDriver implements JsDriver
                 throw new \Exception('JS driver requires [show_field] to be defined in [addToRenderableFieldData()] output!');
             }
         });
+    }
+
+    /**
+     * Validate that render method returns `$html` var.
+     *
+     * @throws \Exception
+     */
+    protected function validateRenderMethodReturnsHtml()
+    {
+        if (! Str::contains($this->render('<VALIDATING-HTML />'), '<VALIDATING-HTML />')) {
+            throw new \Exception('JS driver requires [$html] to be returned in [render()] output!');
+        }
     }
 
     /**

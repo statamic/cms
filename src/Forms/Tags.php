@@ -108,6 +108,10 @@ class Tags extends BaseTags
 
         $html .= $this->formClose();
 
+        if ($jsDriver) {
+            return $jsDriver->render($html);
+        }
+
         return $html;
     }
 

@@ -121,6 +121,25 @@ EOT
 
         $this->assertStringContainsString($expected, $output);
     }
+
+    /** @test */
+    public function custom_driver_can_render_component_around_form()
+    {
+        $output = $this->tag('{{ form:contact js="custom_driver" }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('<custom-form-wrapper-component><form method="POST" action="http://localhost/!/forms/contact"', $output);
+        $this->assertStringContainsString('</form></custom-form-wrapper-component>', $output);
+    }
+
+    /** @test */
+    public function it_validates_render_method_returns_html_var()
+    {
+        $this->expectExceptionMessage('JS driver requires [$html] to be returned in [render()] output!');
+
+        CustomDriverWithBadRenderMethod::register();
+
+        $this->tag('{{ form:contact js="custom_driver_with_bad_render_method" }}{{ /form:contact }}');
+    }
 }
 
 class CustomDriver extends AbstractJsDriver
@@ -155,6 +174,11 @@ class CustomDriver extends AbstractJsDriver
             'z-gnarley' => true,
         ];
     }
+
+    public function render($html)
+    {
+        return "<custom-form-wrapper-component>{$html}</custom-form-wrapper-component>";
+    }
 }
 
 class CustomDriverWithoutShowField extends AbstractJsDriver
@@ -164,5 +188,13 @@ class CustomDriverWithoutShowField extends AbstractJsDriver
         return [
             // 'show_field' => 'This is required and should be validated at runtime',
         ];
+    }
+}
+
+class CustomDriverWithBadRenderMethod extends AbstractJsDriver
+{
+    public function render($html)
+    {
+        return 'oops, forgot to return $html var!';
     }
 }
