@@ -308,7 +308,9 @@ abstract class Builder implements Contract
     {
         if ($value) {
             return $callback($this, $value) ?: $this;
-        } elseif ($default) {
+        }
+
+        if ($default) {
             return $default($this, $value) ?: $this;
         }
 
@@ -324,7 +326,9 @@ abstract class Builder implements Contract
     {
         if (! $value) {
             return $callback($this, $value) ?: $this;
-        } elseif ($default) {
+        }
+
+        if ($default) {
             return $default($this, $value) ?: $this;
         }
 
