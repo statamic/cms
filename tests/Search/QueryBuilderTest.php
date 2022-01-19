@@ -253,12 +253,16 @@ class QueryBuilderTest extends TestCase
             ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
         ]);
 
-        $results = (new FakeQueryBuilder($items))->withoutData()->when(true, function($query) { $query->where('title', 'like', '%Frodo%'); })->get();
+        $results = (new FakeQueryBuilder($items))->withoutData()->when(true, function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
 
         $this->assertCount(2, $results);
         $this->assertEquals(['a', 'c'], $results->map->reference->all());
 
-        $results = (new FakeQueryBuilder($items))->withoutData()->when(false, function($query) { $query->where('title', 'like', '%Frodo%'); })->get();
+        $results = (new FakeQueryBuilder($items))->withoutData()->when(false, function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
 
         $this->assertCount(4, $results);
         $this->assertEquals(['a', 'b', 'c', 'd'], $results->map->reference->all());
@@ -274,12 +278,16 @@ class QueryBuilderTest extends TestCase
             ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
         ]);
 
-        $results = (new FakeQueryBuilder($items))->withoutData()->unless(true, function($query) { $query->where('title', 'like', '%Frodo%'); })->get();
+        $results = (new FakeQueryBuilder($items))->withoutData()->unless(true, function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
 
         $this->assertCount(4, $results);
         $this->assertEquals(['a', 'b', 'c', 'd'], $results->map->reference->all());
 
-        $results = (new FakeQueryBuilder($items))->withoutData()->unless(false, function($query) { $query->where('title', 'like', '%Frodo%'); })->get();
+        $results = (new FakeQueryBuilder($items))->withoutData()->unless(false, function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
 
         $this->assertCount(2, $results);
         $this->assertEquals(['a', 'c'], $results->map->reference->all());
@@ -295,7 +303,9 @@ class QueryBuilderTest extends TestCase
             ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
         ]);
 
-        $results = (new FakeQueryBuilder($items))->withoutData()->tap(function($query) { $query->where('title', 'like', '%Frodo%'); })->get();
+        $results = (new FakeQueryBuilder($items))->withoutData()->tap(function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
 
         $this->assertCount(2, $results);
         $this->assertEquals(['a', 'c'], $results->map->reference->all());

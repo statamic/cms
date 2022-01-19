@@ -230,12 +230,16 @@ class AssetQueryBuilderTest extends TestCase
     /** @test */
     public function it_can_get_assets_using_when()
     {
-        $assets = $this->container->queryAssets()->when(true, function($query){ $query->where('filename', 'a'); })->get();
+        $assets = $this->container->queryAssets()->when(true, function ($query) {
+            $query->where('filename', 'a');
+        })->get();
 
         $this->assertCount(1, $assets);
         $this->assertEquals(['a'], $assets->map->filename()->all());
 
-        $assets = $this->container->queryAssets()->when(false, function($query){ $query->where('filename', 'a'); })->get();
+        $assets = $this->container->queryAssets()->when(false, function ($query) {
+            $query->where('filename', 'a');
+        })->get();
 
         $this->assertCount(6, $assets);
         $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $assets->map->filename()->all());
@@ -244,12 +248,16 @@ class AssetQueryBuilderTest extends TestCase
     /** @test */
     public function it_can_get_assets_using_unless()
     {
-        $assets = $this->container->queryAssets()->unless(true, function($query){ $query->where('filename', 'a'); })->get();
+        $assets = $this->container->queryAssets()->unless(true, function ($query) {
+            $query->where('filename', 'a');
+        })->get();
 
         $this->assertCount(6, $assets);
         $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $assets->map->filename()->all());
 
-        $assets = $this->container->queryAssets()->unless(false, function($query){ $query->where('filename', 'a'); })->get();
+        $assets = $this->container->queryAssets()->unless(false, function ($query) {
+            $query->where('filename', 'a');
+        })->get();
 
         $this->assertCount(1, $assets);
         $this->assertEquals(['a'], $assets->map->filename()->all());
@@ -258,7 +266,9 @@ class AssetQueryBuilderTest extends TestCase
     /** @test */
     public function it_can_get_assets_using_tap()
     {
-        $assets = $this->container->queryAssets()->tap(function($query){ $query->where('filename', 'a'); })->get();
+        $assets = $this->container->queryAssets()->tap(function ($query) {
+            $query->where('filename', 'a');
+        })->get();
 
         $this->assertCount(1, $assets);
         $this->assertEquals(['a'], $assets->map->filename()->all());

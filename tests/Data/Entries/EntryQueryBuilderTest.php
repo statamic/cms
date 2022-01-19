@@ -264,12 +264,16 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $entries = Entry::query()->when(true, function ($query){ $query->where('title', 'Post 1'); })->get();
+        $entries = Entry::query()->when(true, function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
 
         $this->assertCount(1, $entries);
         $this->assertEquals(['Post 1'], $entries->map->title->all());
 
-        $entries = Entry::query()->when(false, function ($query){ $query->where('title', 'Post 1'); })->get();
+        $entries = Entry::query()->when(false, function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
 
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
@@ -280,12 +284,16 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $entries = Entry::query()->unless(true, function ($query){ $query->where('title', 'Post 1'); })->get();
+        $entries = Entry::query()->unless(true, function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
 
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
 
-        $entries = Entry::query()->unless(false, function ($query){ $query->where('title', 'Post 1'); })->get();
+        $entries = Entry::query()->unless(false, function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
 
         $this->assertCount(1, $entries);
         $this->assertEquals(['Post 1'], $entries->map->title->all());
@@ -296,7 +304,9 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $entries = Entry::query()->tap(function ($query){ $query->where('title', 'Post 1'); })->get();
+        $entries = Entry::query()->tap(function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
 
         $this->assertCount(1, $entries);
         $this->assertEquals(['Post 1'], $entries->map->title->all());

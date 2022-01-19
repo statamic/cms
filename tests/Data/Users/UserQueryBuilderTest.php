@@ -157,12 +157,16 @@ class UserQueryBuilderTest extends TestCase
         User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
         User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
 
-        $users = User::query()->when(true, function($query) { $query->where('email', 'gandalf@precious.com'); })->get();
+        $users = User::query()->when(true, function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
 
         $this->assertCount(1, $users);
         $this->assertEquals(['Gandalf'], $users->map->name->all());
 
-        $users = User::query()->when(false, function($query) { $query->where('email', 'gandalf@precious.com'); })->get();
+        $users = User::query()->when(false, function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
 
         $this->assertCount(3, $users);
         $this->assertEquals(['Gandalf', 'Smeagol', 'Frodo'], $users->map->name->all());
@@ -175,12 +179,16 @@ class UserQueryBuilderTest extends TestCase
         User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
         User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
 
-        $users = User::query()->unless(true, function($query) { $query->where('email', 'gandalf@precious.com'); })->get();
+        $users = User::query()->unless(true, function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
 
         $this->assertCount(3, $users);
         $this->assertEquals(['Gandalf', 'Smeagol', 'Frodo'], $users->map->name->all());
 
-        $users = User::query()->unless(false, function($query) { $query->where('email', 'gandalf@precious.com'); })->get();
+        $users = User::query()->unless(false, function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
 
         $this->assertCount(1, $users);
         $this->assertEquals(['Gandalf'], $users->map->name->all());
@@ -193,7 +201,9 @@ class UserQueryBuilderTest extends TestCase
         User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
         User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
 
-        $users = User::query()->tap(function($query) { $query->where('email', 'gandalf@precious.com'); })->get();
+        $users = User::query()->tap(function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
 
         $this->assertCount(1, $users);
         $this->assertEquals(['Gandalf'], $users->map->name->all());
