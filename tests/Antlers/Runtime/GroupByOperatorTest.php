@@ -1021,7 +1021,6 @@ EOT;
             trim(StringUtilities::normalizeLineEndings($this->renderString($template, $this->groupByData))));
     }
 
-
     public function test_group_by_with_renamed_group()
     {
         $template = <<<'EOT'
