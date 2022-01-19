@@ -109,6 +109,7 @@ abstract class AbstractJsDriver implements JsDriver
      *
      * @param  \Illuminate\Support\Collection  $fields
      * @return \Illuminate\Support\Collection
+     *
      * @throws \Exception
      */
     protected function validateShowFieldDefined($fields)
