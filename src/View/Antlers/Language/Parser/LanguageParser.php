@@ -60,6 +60,8 @@ use Statamic\View\Antlers\Language\Nodes\Structures\AliasedScopeLogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArgSeparator;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArrayNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\DirectionGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\FieldsNode;
+use Statamic\View\Antlers\Language\Nodes\Structures\GroupByField;
 use Statamic\View\Antlers\Language\Nodes\Structures\ImplicitArrayBegin;
 use Statamic\View\Antlers\Language\Nodes\Structures\ImplicitArrayEnd;
 use Statamic\View\Antlers\Language\Nodes\Structures\InlineBranchSeparator;
@@ -876,10 +878,10 @@ class LanguageParser
                         $subNodes = $subNodes[0]->nodes;
                     }
 
-                    $listValues = $this->getValues($subNodes);
+                    $groupFields = $this->makeGroupByFields($subNodes);
 
                     $newTokens[] = $token;
-                    $newTokens[] = $listValues;
+                    $newTokens[] = $groupFields;
 
                     if ($i + 2 < $tokenCount && $i + 3 < $tokenCount) {
                         $peekOne = $tokens[$i + 2];
@@ -887,8 +889,8 @@ class LanguageParser
 
                         if (NodeHelpers::isVariableMatching($peekOne, LanguageKeywords::ScopeAs)) {
                             if ($peekTwo instanceof StringValueNode) {
-                                $listValues->isNamedNode = true;
-                                $listValues->parsedName = $peekTwo;
+                                $groupFields->isNamedNode = true;
+                                $groupFields->parsedName = $peekTwo;
 
                                 $i += 3;
                                 continue;
@@ -1377,8 +1379,85 @@ class LanguageParser
         return $valueNode;
     }
 
+    private function makeGroupByFields($nodes)
+    {
+        $nodeCount = count($nodes);
+        $fields = [];
+
+        if ($nodeCount == 1 && $nodes[0] instanceof VariableNode) {
+            $fieldNode = new GroupByField();
+            $fieldNode->field = $nodes[0];
+
+            $stringAlias = new StringValueNode();
+            $stringAlias->value = $fieldNode->field->name;
+            $stringAlias->startPosition = $fieldNode->field->startPosition;
+            $stringAlias->endPosition = $fieldNode->field->endPosition;
+            $fieldNode->alias = $stringAlias;
+
+            $fields[] = $fieldNode;
+        } else {
+            for ($i = 0; $i < $nodeCount; $i++) {
+                $thisNode = $nodes[$i];
+
+                $next = null;
+
+                if ($i + 1 < $nodeCount) {
+                    $next = $nodes[$i + 1];
+                }
+
+                if ($next == null || $next instanceof ArgSeparator) {
+                    $fieldNode = new GroupByField();
+                    if ($i > 0) {
+                        $fieldNode->field = $nodes[$i - 1];
+                        $fieldNode->alias = $thisNode;
+                    } else {
+                        $fieldNode->field = $thisNode;
+                        $fieldNode->alias = null;
+                    }
+                    if ($fieldNode->field instanceof ArgSeparator) {
+                        $fieldNode->field = $fieldNode->alias;
+
+                        if ($fieldNode->field instanceof VariableNode) {
+                            $stringAlias = new StringValueNode();
+                            $stringAlias->value = $fieldNode->field->name;
+                            $stringAlias->startPosition = $fieldNode->field->startPosition;
+                            $stringAlias->endPosition = $fieldNode->field->endPosition;
+                            $fieldNode->alias = $stringAlias;
+                        }
+                    }
+
+                    if ($fieldNode->alias instanceof StringValueNode == false) {
+                        if ($fieldNode->alias == null && $fieldNode->field instanceof VariableNode) {
+                            $stringAlias = new StringValueNode();
+                            $stringAlias->value = $fieldNode->field->name;
+                            $stringAlias->startPosition = $fieldNode->field->startPosition;
+                            $stringAlias->endPosition = $fieldNode->field->endPosition;
+                            $fieldNode->alias = $stringAlias;
+                        }
+                    }
+
+                    $fieldNode->startPosition = $fieldNode->field->startPosition;
+                    if ($fieldNode->alias != null) {
+                        $fieldNode->endPosition = $fieldNode->alias->endPosition;
+                    } else {
+                        $fieldNode->endPosition = $fieldNode->field->endPosition;
+                    }
+
+                    $fields[] = $fieldNode;
+                    $i += 1;
+                    continue;
+                }
+            }
+        }
+
+        $fieldStructure = new FieldsNode();
+        $fieldStructure->fields = $fields;
+
+        return $fieldStructure;
+    }
+
     /**
-     * Parses the provided nodes into a a list of ValueDirectionNode.
+     * Parses the provided nodes into a list of ValueDirectionNode.
      *
      * @param  AbstractNode[]  $nodes  The nodes to parse.
      * @return ValueDirectionNode[]
@@ -1662,7 +1741,7 @@ class LanguageParser
             $token instanceof FalseConstant || $token instanceof NullConstant ||
             $token instanceof TrueConstant || $token instanceof DirectionGroup ||
             $token instanceof ListValueNode || $token instanceof SwitchGroup ||
-            $token instanceof ArrayNode;
+            $token instanceof FieldsNode || $token instanceof ArrayNode;
     }
 
     private function isProperMethodChainTargetStrict($token)
@@ -1672,7 +1751,7 @@ class LanguageParser
             $token instanceof FalseConstant || $token instanceof NullConstant ||
             $token instanceof TrueConstant || $token instanceof DirectionGroup ||
             $token instanceof ListValueNode || $token instanceof SwitchGroup ||
-            $token instanceof ArrayNode;
+            $token instanceof FieldsNode || $token instanceof ArrayNode;
     }
 
     /**

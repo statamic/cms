@@ -3,26 +3,28 @@
 namespace Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators;
 
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
+use Statamic\View\Antlers\Language\Nodes\StringValueNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\AliasedScopeLogicGroup;
-use Statamic\View\Antlers\Language\Nodes\Structures\ListValueNode;
+use Statamic\View\Antlers\Language\Nodes\Structures\FieldsNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ScopedLogicGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\PathDataManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
-trait ExecutesGroupyBy
+trait ExecutesGroupBy
 {
     /**
      * Groups the provided $data according to the rules specified in $groups.
      *
      * @param  array  $data  The data to group.
-     * @param  ListValueNode  $groups  The grouping instructions.
+     * @param  FieldsNode  $groups  The grouping instructions.
      * @param  array  $context  The context data.
      * @return array
      */
-    protected function executeGroupBy($data, ListValueNode $groups, $context)
+    protected function executeGroupBy($data, FieldsNode $groups, $context)
     {
         $valuesName = 'values';
         $valueCountName = 'values_count';
@@ -35,10 +37,19 @@ trait ExecutesGroupyBy
         $env = $this->makeEnvironment();
         $env->setData($context);
 
-        if (count($groups->values) == 1) {
-            $expression = $groups->values[0];
+        if (count($groups->fields) == 1) {
+            $field = $groups->fields[0];
+
+            $expression = $field->field;
+
             $keyName = 'key';
             $scopeName = null;
+
+            if ($field->alias instanceof StringValueNode) {
+                if ($field->alias->startPosition != $field->field->startPosition && $field->alias->endPosition != $field->field->endPosition) {
+                    $keyName = $field->alias->value;
+                }
+            }
 
             if ($expression instanceof AliasedScopeLogicGroup) {
                 $keyName = $expression->alias->value;
@@ -47,6 +58,10 @@ trait ExecutesGroupyBy
 
             if ($expression  instanceof ScopedLogicGroup) {
                 $scopeName = $expression->scope->name;
+            }
+
+            if ($expression instanceof SemanticGroup) {
+                $expression = $expression->nodes;
             }
 
             if ($expression instanceof LogicGroup || $expression instanceof ScopedLogicGroup || $expression instanceof AliasedScopeLogicGroup) {
@@ -96,7 +111,7 @@ trait ExecutesGroupyBy
 
             return $returnValues;
         } else {
-            $groupProps = $groups->values;
+            $groupProps = $groups->fields;
 
             $keyValues = [];
             $returnValues = [];
@@ -113,14 +128,20 @@ trait ExecutesGroupyBy
                 $values = [];
                 $dynamicKeyCount = 0;
 
-                foreach ($groupProps as $prop) {
+                foreach ($groupProps as $groupByField) {
                     $propName = '';
                     $expression = [];
                     $scopeName = null;
 
+                    $prop = $groupByField->field;
+
                     if ($prop instanceof VariableNode && $prop->variableReference != null) {
                         $propName = $prop->name;
                         $expression = [$prop];
+
+                        if ($groupByField->alias instanceof StringValueNode) {
+                            $propName = $groupByField->alias->value;
+                        }
                     } elseif ($prop instanceof AliasedScopeLogicGroup) {
                         $propName = $prop->alias->value;
                         $scopedDetails = $prop->extract();
@@ -143,12 +164,22 @@ trait ExecutesGroupyBy
                                 $propName = 'key_'.$dynamicKeyCount;
                             }
                         } else {
+                            if ($groupByField->alias instanceof StringValueNode) {
+                                $propName = $groupByField->alias->value;
+                            } else {
+                                $dynamicKeyCount += 1;
+                                $propName = 'key_'.$dynamicKeyCount;
+                            }
+                        }
+                    } else {
+                        $expression = [$groupByField->field];
+
+                        if ($groupByField->alias instanceof StringValueNode) {
+                            $propName = $groupByField->alias->value;
+                        } else {
                             $dynamicKeyCount += 1;
                             $propName = 'key_'.$dynamicKeyCount;
                         }
-                    } else {
-                        $dynamicKeyCount += 1;
-                        $propName = 'key_'.$dynamicKeyCount;
                     }
 
                     if ($scopeName == null) {

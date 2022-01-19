@@ -24,6 +24,14 @@ class GroupByOperatorTest extends ParserTestCase
         ];
     }
 
+    public function test_groupby_with_single_custom_key_works()
+    {
+        $template = <<<'EOT'
+{{ grouped = products groupby (category 'my_name') }}{{ my_name }}{{ values | length }}{{ /grouped }}
+EOT;
+        $this->assertSame('Office3Home2', $this->renderString($template, $this->groupByData));
+    }
+
     public function test_basic_group_by_information()
     {
         $template = <<<'EOT'
@@ -400,6 +408,619 @@ EOT;
             trim(StringUtilities::normalizeLineEndings($expected)),
             trim(StringUtilities::normalizeLineEndings($this->renderString($template, $this->groupByData))));
     }
+
+    public function test_group_by_with_multiple_group_conditions_aliased()
+    {
+        $template = <<<'EOT'
+{{ grouped = products groupby (category 'my_category', sale) }}
+==========================================
+Key1: {{ key:my_category }}
+Key2: {{ key:sale }}
+{{ if key:sale }}On Sale!{{ else }}No sale.{{ /if }}
+Value Count: {{ values_count }}
+Calculated Count {{ values | length }}
+Total Results: {{ total_results }}
+First: {{ first }}
+Last: {{ last }}
+Loop Count: {{ count }}
+Loop Index: {{ index }}
+
+===============ARRAY RESULT===============
+{{ values }}
+ID: {{ id }}
+Name: {{ name }}
+Category: {{ category }}
+First: {{ first }}
+Last: {{ last }}
+Loop Count: {{ count }}
+Loop Index: {{ index }}
+{{ /values }}
+
+==============SCOPED RESULT===============
+{{ values scope="test" }}
+ID: {{ test:id }}
+Name: {{ test:name }}
+Category: {{ test:category }}
+First: {{ test:first }}
+Last: {{ test:last }}
+Loop Count: {{ test:count }}
+Loop Index: {{ test:index }}
+{{ /values }}
+==========================================
+{{ /grouped }}
+EOT;
+
+        $expected = <<<'EOT'
+==========================================
+Key1: Office
+Key2: 1
+On Sale!
+Value Count: 2
+Calculated Count 2
+Total Results: 4
+First: 1
+Last: 
+Loop Count: 1
+Loop Index: 0
+
+===============ARRAY RESULT===============
+
+ID: 1
+Name: Desk
+Category: Office
+First: 1
+Last: 
+Loop Count: 1
+Loop Index: 0
+
+ID: 3
+Name: Stapler
+Category: Office
+First: 
+Last: 1
+Loop Count: 2
+Loop Index: 1
+
+
+==============SCOPED RESULT===============
+
+ID: 1
+Name: Desk
+Category: Office
+First: 1
+Last: 
+Loop Count: 1
+Loop Index: 0
+
+ID: 3
+Name: Stapler
+Category: Office
+First: 
+Last: 1
+Loop Count: 2
+Loop Index: 1
+
+==========================================
+
+==========================================
+Key1: Home
+Key2: 1
+On Sale!
+Value Count: 1
+Calculated Count 1
+Total Results: 4
+First: 
+Last: 
+Loop Count: 2
+Loop Index: 1
+
+===============ARRAY RESULT===============
+
+ID: 2
+Name: Plant
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+
+==============SCOPED RESULT===============
+
+ID: 2
+Name: Plant
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+==========================================
+
+==========================================
+Key1: Office
+Key2: 
+No sale.
+Value Count: 1
+Calculated Count 1
+Total Results: 4
+First: 
+Last: 
+Loop Count: 3
+Loop Index: 2
+
+===============ARRAY RESULT===============
+
+ID: 4
+Name: Pen
+Category: Office
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+
+==============SCOPED RESULT===============
+
+ID: 4
+Name: Pen
+Category: Office
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+==========================================
+
+==========================================
+Key1: Home
+Key2: 
+No sale.
+Value Count: 1
+Calculated Count 1
+Total Results: 4
+First: 
+Last: 1
+Loop Count: 4
+Loop Index: 3
+
+===============ARRAY RESULT===============
+
+ID: 5
+Name: Table
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+
+==============SCOPED RESULT===============
+
+ID: 5
+Name: Table
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+==========================================
+EOT;
+
+        $this->assertSame(
+            trim(StringUtilities::normalizeLineEndings($expected)),
+            trim(StringUtilities::normalizeLineEndings($this->renderString($template, $this->groupByData))));
+    }
+
+    public function test_group_by_with_multiple_group_conditions_only_last_aliased()
+    {
+        $template = <<<'EOT'
+{{ grouped = products groupby (category, sale 'my_sale') }}
+==========================================
+Key1: {{ key:category }}
+Key2: {{ key:my_sale }}
+{{ if key:my_sale }}On Sale!{{ else }}No sale.{{ /if }}
+Value Count: {{ values_count }}
+Calculated Count {{ values | length }}
+Total Results: {{ total_results }}
+First: {{ first }}
+Last: {{ last }}
+Loop Count: {{ count }}
+Loop Index: {{ index }}
+
+===============ARRAY RESULT===============
+{{ values }}
+ID: {{ id }}
+Name: {{ name }}
+Category: {{ category }}
+First: {{ first }}
+Last: {{ last }}
+Loop Count: {{ count }}
+Loop Index: {{ index }}
+{{ /values }}
+
+==============SCOPED RESULT===============
+{{ values scope="test" }}
+ID: {{ test:id }}
+Name: {{ test:name }}
+Category: {{ test:category }}
+First: {{ test:first }}
+Last: {{ test:last }}
+Loop Count: {{ test:count }}
+Loop Index: {{ test:index }}
+{{ /values }}
+==========================================
+{{ /grouped }}
+EOT;
+
+        $expected = <<<'EOT'
+==========================================
+Key1: Office
+Key2: 1
+On Sale!
+Value Count: 2
+Calculated Count 2
+Total Results: 4
+First: 1
+Last: 
+Loop Count: 1
+Loop Index: 0
+
+===============ARRAY RESULT===============
+
+ID: 1
+Name: Desk
+Category: Office
+First: 1
+Last: 
+Loop Count: 1
+Loop Index: 0
+
+ID: 3
+Name: Stapler
+Category: Office
+First: 
+Last: 1
+Loop Count: 2
+Loop Index: 1
+
+
+==============SCOPED RESULT===============
+
+ID: 1
+Name: Desk
+Category: Office
+First: 1
+Last: 
+Loop Count: 1
+Loop Index: 0
+
+ID: 3
+Name: Stapler
+Category: Office
+First: 
+Last: 1
+Loop Count: 2
+Loop Index: 1
+
+==========================================
+
+==========================================
+Key1: Home
+Key2: 1
+On Sale!
+Value Count: 1
+Calculated Count 1
+Total Results: 4
+First: 
+Last: 
+Loop Count: 2
+Loop Index: 1
+
+===============ARRAY RESULT===============
+
+ID: 2
+Name: Plant
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+
+==============SCOPED RESULT===============
+
+ID: 2
+Name: Plant
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+==========================================
+
+==========================================
+Key1: Office
+Key2: 
+No sale.
+Value Count: 1
+Calculated Count 1
+Total Results: 4
+First: 
+Last: 
+Loop Count: 3
+Loop Index: 2
+
+===============ARRAY RESULT===============
+
+ID: 4
+Name: Pen
+Category: Office
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+
+==============SCOPED RESULT===============
+
+ID: 4
+Name: Pen
+Category: Office
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+==========================================
+
+==========================================
+Key1: Home
+Key2: 
+No sale.
+Value Count: 1
+Calculated Count 1
+Total Results: 4
+First: 
+Last: 1
+Loop Count: 4
+Loop Index: 3
+
+===============ARRAY RESULT===============
+
+ID: 5
+Name: Table
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+
+==============SCOPED RESULT===============
+
+ID: 5
+Name: Table
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+==========================================
+EOT;
+
+        $this->assertSame(
+            trim(StringUtilities::normalizeLineEndings($expected)),
+            trim(StringUtilities::normalizeLineEndings($this->renderString($template, $this->groupByData))));
+    }
+
+    public function test_group_by_with_multiple_group_both_conditions_aliased()
+    {
+        $template = <<<'EOT'
+{{ grouped = products groupby (category 'my_category', sale 'my_sale') }}
+==========================================
+Key1: {{ key:my_category }}
+Key2: {{ key:my_sale }}
+{{ if key:my_sale }}On Sale!{{ else }}No sale.{{ /if }}
+Value Count: {{ values_count }}
+Calculated Count {{ values | length }}
+Total Results: {{ total_results }}
+First: {{ first }}
+Last: {{ last }}
+Loop Count: {{ count }}
+Loop Index: {{ index }}
+
+===============ARRAY RESULT===============
+{{ values }}
+ID: {{ id }}
+Name: {{ name }}
+Category: {{ category }}
+First: {{ first }}
+Last: {{ last }}
+Loop Count: {{ count }}
+Loop Index: {{ index }}
+{{ /values }}
+
+==============SCOPED RESULT===============
+{{ values scope="test" }}
+ID: {{ test:id }}
+Name: {{ test:name }}
+Category: {{ test:category }}
+First: {{ test:first }}
+Last: {{ test:last }}
+Loop Count: {{ test:count }}
+Loop Index: {{ test:index }}
+{{ /values }}
+==========================================
+{{ /grouped }}
+EOT;
+
+        $expected = <<<'EOT'
+==========================================
+Key1: Office
+Key2: 1
+On Sale!
+Value Count: 2
+Calculated Count 2
+Total Results: 4
+First: 1
+Last: 
+Loop Count: 1
+Loop Index: 0
+
+===============ARRAY RESULT===============
+
+ID: 1
+Name: Desk
+Category: Office
+First: 1
+Last: 
+Loop Count: 1
+Loop Index: 0
+
+ID: 3
+Name: Stapler
+Category: Office
+First: 
+Last: 1
+Loop Count: 2
+Loop Index: 1
+
+
+==============SCOPED RESULT===============
+
+ID: 1
+Name: Desk
+Category: Office
+First: 1
+Last: 
+Loop Count: 1
+Loop Index: 0
+
+ID: 3
+Name: Stapler
+Category: Office
+First: 
+Last: 1
+Loop Count: 2
+Loop Index: 1
+
+==========================================
+
+==========================================
+Key1: Home
+Key2: 1
+On Sale!
+Value Count: 1
+Calculated Count 1
+Total Results: 4
+First: 
+Last: 
+Loop Count: 2
+Loop Index: 1
+
+===============ARRAY RESULT===============
+
+ID: 2
+Name: Plant
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+
+==============SCOPED RESULT===============
+
+ID: 2
+Name: Plant
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+==========================================
+
+==========================================
+Key1: Office
+Key2: 
+No sale.
+Value Count: 1
+Calculated Count 1
+Total Results: 4
+First: 
+Last: 
+Loop Count: 3
+Loop Index: 2
+
+===============ARRAY RESULT===============
+
+ID: 4
+Name: Pen
+Category: Office
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+
+==============SCOPED RESULT===============
+
+ID: 4
+Name: Pen
+Category: Office
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+==========================================
+
+==========================================
+Key1: Home
+Key2: 
+No sale.
+Value Count: 1
+Calculated Count 1
+Total Results: 4
+First: 
+Last: 1
+Loop Count: 4
+Loop Index: 3
+
+===============ARRAY RESULT===============
+
+ID: 5
+Name: Table
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+
+==============SCOPED RESULT===============
+
+ID: 5
+Name: Table
+Category: Home
+First: 1
+Last: 1
+Loop Count: 1
+Loop Index: 0
+
+==========================================
+EOT;
+
+        $this->assertSame(
+            trim(StringUtilities::normalizeLineEndings($expected)),
+            trim(StringUtilities::normalizeLineEndings($this->renderString($template, $this->groupByData))));
+    }
+
 
     public function test_group_by_with_renamed_group()
     {

@@ -20,7 +20,7 @@ use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\PathDataManager;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesGroupyBy;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesGroupBy;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesOrderBy;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesPluckInto;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesWhere;
@@ -28,7 +28,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesWhere;
 class LanguageOperatorManager
 {
     use ExecutesPluckInto, ExecutesOrderBy,
-        ExecutesGroupyBy, ExecutesWhere;
+        ExecutesGroupBy, ExecutesWhere;
 
     /**
      * @var NodeProcessor|null

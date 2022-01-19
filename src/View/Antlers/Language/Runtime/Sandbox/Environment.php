@@ -65,6 +65,7 @@ use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Nodes\StringValueNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\ArrayNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\DirectionGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\FieldsNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\ListValueNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroupEnd;
@@ -1364,7 +1365,7 @@ class Environment
      */
     public function getValue($val)
     {
-        if ($val instanceof DirectionGroup || $val instanceof ListValueNode) {
+        if ($val instanceof DirectionGroup || $val instanceof ListValueNode || $val instanceof FieldsNode) {
             return $val;
         }
 
