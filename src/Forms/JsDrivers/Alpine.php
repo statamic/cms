@@ -24,7 +24,7 @@ class Alpine extends AbstractJsDriver
     public function addToFormAttributes()
     {
         return [
-            'x-data' => $this->renderAlpineXData($this->form->blueprint()->fields(), $this->scope),
+            'x-data' => $this->renderAlpineXData($this->getInitialFormData(), $this->scope),
         ];
     }
 
@@ -58,22 +58,12 @@ class Alpine extends AbstractJsDriver
     /**
      * Render alpine x-data string for fields, with scope if necessary.
      *
-     * @param  \Statamic\Fields\Fields  $fields
+     * @param  array  $xData
      * @param  bool|string  $alpineScope
      * @return string
      */
-    protected function renderAlpineXData($fields, $alpineScope)
+    protected function renderAlpineXData($xData, $alpineScope)
     {
-        $oldValues = collect(old());
-
-        $xData = $fields->preProcess()->values()
-            ->map(function ($defaultProcessedValue, $handle) use ($oldValues) {
-                return $oldValues->has($handle)
-                    ? $oldValues->get($handle)
-                    : $defaultProcessedValue;
-            })
-            ->all();
-
         if (is_string($alpineScope)) {
             $xData = [
                 $alpineScope => $xData,

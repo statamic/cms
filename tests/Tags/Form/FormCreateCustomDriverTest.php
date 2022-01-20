@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Form;
 
+use Statamic\Facades\Form;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
 
 class FormCreateCustomDriverTest extends FormTestCase
@@ -140,6 +141,45 @@ EOT
 
         $this->tag('{{ form:contact js="custom_driver_with_bad_render_method" }}{{ /form:contact }}');
     }
+
+    /** @test */
+    public function custom_driver_can_get_initial_form_data()
+    {
+        $driver = new CustomDriver(Form::find('contact'));
+
+        $initialData = $driver->runProtectedGetInitialFormDataHelper();
+
+        $expected = [
+            'name' => null,
+            'email' => null,
+            'message' => null,
+        ];
+
+        $this->assertEquals($expected, $initialData);
+    }
+
+    /** @test */
+    public function custom_driver_getting_initial_data_respects_old_data()
+    {
+        $this
+            ->post('/!/forms/contact', [
+                'name' => 'San Holo',
+            ])
+            ->assertSessionHasErrors(['email'], null, 'form.contact')
+            ->assertLocation('/');
+
+        $driver = new CustomDriver(Form::find('contact'));
+
+        $initialData = $driver->runProtectedGetInitialFormDataHelper();
+
+        $expected = [
+            'name' => 'San Holo',
+            'email' => null,
+            'message' => null,
+        ];
+
+        $this->assertEquals($expected, $initialData);
+    }
 }
 
 class CustomDriver extends AbstractJsDriver
@@ -178,6 +218,11 @@ class CustomDriver extends AbstractJsDriver
     public function render($html)
     {
         return "<custom-form-wrapper-component>{$html}</custom-form-wrapper-component>";
+    }
+
+    public function runProtectedGetInitialFormDataHelper()
+    {
+        return $this->getInitialFormData();
     }
 }
 

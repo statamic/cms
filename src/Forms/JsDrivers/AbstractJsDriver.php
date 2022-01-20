@@ -135,6 +135,28 @@ abstract class AbstractJsDriver implements JsDriver
     }
 
     /**
+     * Get initial form data.
+     *
+     * @return array
+     */
+    protected function getInitialFormData()
+    {
+        $oldValues = collect(old());
+
+        return $this->form
+            ->blueprint()
+            ->fields()
+            ->preProcess()
+            ->values()
+            ->map(function ($defaultProcessedValue, $handle) use ($oldValues) {
+                return $oldValues->has($handle)
+                    ? $oldValues->get($handle)
+                    : $defaultProcessedValue;
+            })
+            ->all();
+    }
+
+    /**
      * Get JS driver handle from class name.
      *
      * @return string
