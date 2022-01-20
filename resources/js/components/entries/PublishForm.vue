@@ -418,6 +418,12 @@ export default {
             return this.getPreference('after_save');
         },
 
+        visibleValues() {
+            return _.omit(this.values, (_, handle) => {
+                return this.$store.state.publish.base.hiddenFields[handle];
+            });
+        },
+
     },
 
     watch: {
@@ -464,7 +470,7 @@ export default {
         performSaveRequest() {
             // Once the hook has completed, we need to make the actual request.
             // We build the payload here because the before hook may have modified values.
-            const payload = { ...this.values, ...{
+            const payload = { ...this.visibleValues, ...{
                 _blueprint: this.fieldset.handle,
                 _localized: this.localizedFields,
             }};
