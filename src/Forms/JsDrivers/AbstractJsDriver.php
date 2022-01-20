@@ -2,19 +2,23 @@
 
 namespace Statamic\Forms\JsDrivers;
 
+use Statamic\Forms\Form;
 use Statamic\Support\Str;
 
 abstract class AbstractJsDriver implements JsDriver
 {
+    protected $form;
     protected $options;
 
     /**
      * Instantiate JS driver.
      *
+     * @param  Form  $form
      * @param  array  $options
      */
-    public function __construct($options = [])
+    public function __construct(Form $form, $options = [])
     {
+        $this->form = $form;
         $this->options = $options;
 
         if (method_exists($this, 'parseOptions')) {
@@ -39,11 +43,10 @@ abstract class AbstractJsDriver implements JsDriver
     /**
      * Add to form view data.
      *
-     * @param  \Statamic\Forms\Form  $form
      * @param  array  $data
      * @return array
      */
-    public function addToFormData($form, $data)
+    public function addToFormData($data)
     {
         return [];
     }
@@ -51,10 +54,9 @@ abstract class AbstractJsDriver implements JsDriver
     /**
      * Add to form html tag attributes.
      *
-     * @param  \Statamic\Forms\Form  $form
      * @return array
      */
-    public function addToFormAttributes($form)
+    public function addToFormAttributes()
     {
         return [];
     }
@@ -153,7 +155,7 @@ abstract class AbstractJsDriver implements JsDriver
             return;
         }
 
-        $handle = (new static)->handle();
+        $handle = (new static(new Form))->handle();
 
         app('statamic.form-js-drivers')[$handle] = static::class;
     }

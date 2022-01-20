@@ -60,7 +60,7 @@ class Tags extends BaseTags
 
         $data = $this->getFormSession($this->sessionHandle());
 
-        $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'));
+        $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
         $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver);
         $data['honeypot'] = $form->honeypot();
@@ -242,9 +242,10 @@ class Tags extends BaseTags
      * Parse JS param to get driver and related options.
      *
      * @param  null|string  $value
+     * @param  \Statamic\Forms\Form  $form
      * @return bool|JsDriver
      */
-    protected function parseJsParamDriverAndOptions($value)
+    protected function parseJsParamDriverAndOptions($value, $form)
     {
         if (! $value) {
             return false;
@@ -264,7 +265,7 @@ class Tags extends BaseTags
             throw new \Exception("Cannot find JS driver class for [{$handle}]!");
         }
 
-        $instance = new $class($options);
+        $instance = new $class($form, $options);
 
         if (! $instance instanceof JsDriver) {
             throw new \Exception("JS driver must implement [Statamic\Forms\JsDrivers\JsDriver] interface!");

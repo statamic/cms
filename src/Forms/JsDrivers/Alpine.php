@@ -19,13 +19,12 @@ class Alpine extends AbstractJsDriver
     /**
      * Add to form html tag attributes.
      *
-     * @param  \Statamic\Forms\Form  $form
      * @return array
      */
-    public function addToFormAttributes($form)
+    public function addToFormAttributes()
     {
         return [
-            'x-data' => $this->renderAlpineXData($form->blueprint()->fields(), $this->scope),
+            'x-data' => $this->renderAlpineXData($this->form->blueprint()->fields(), $this->scope),
         ];
     }
 

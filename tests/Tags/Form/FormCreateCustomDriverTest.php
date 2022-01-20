@@ -144,17 +144,17 @@ EOT
 
 class CustomDriver extends AbstractJsDriver
 {
-    public function addToFormData($form, $data)
+    public function addToFormData($data)
     {
         return [
             'custom_form_js' => "alert('the authorities')",
         ];
     }
 
-    public function addToFormAttributes($form)
+    public function addToFormAttributes()
     {
         return [
-            'z-data' => $this->jsonEncodeForHtmlAttribute(['lol' => 'catz', 'handle' => $form->handle()]),
+            'z-data' => $this->jsonEncodeForHtmlAttribute(['lol' => 'catz', 'handle' => $this->form->handle()]),
             'z-rad' => 'absolutely',
         ];
     }
