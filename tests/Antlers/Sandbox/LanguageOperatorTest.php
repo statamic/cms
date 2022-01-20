@@ -14,7 +14,7 @@ class LanguageOperatorTest extends ParserTestCase
                 ['name' => 'Dave'],
                 ['name' => 'Alice'],
                 ['name' => 'Bob'],
-            ]
+            ],
         ];
 
         $template = <<<'EOT'
@@ -31,7 +31,7 @@ EOT;
                 ['name' => 'Test'],
                 ['name' => 'Test2'],
                 ['name' => 'Test3'],
-            ]
+            ],
         ];
 
         $this->assertSame('Test, Test2, and Test3', $this->renderString('{{ (test pluck "name") | sentence_list }}', $data));

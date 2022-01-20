@@ -6,7 +6,6 @@ use Tests\Antlers\ParserTestCase;
 
 class AutomaticStatementTerminatorsTest extends ParserTestCase
 {
-
     public function test_automatic_statement_terminators_are_added_after_the_righthand_side_of_an_assignment()
     {
         $template = <<<'EOT'
