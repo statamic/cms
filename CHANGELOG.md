@@ -1,5 +1,27 @@
 # Release Notes
 
+## 3.2.31 (2022-01-14)
+
+### What's new
+- Ability to exclude certain fields from displaying in the REST API. [#5041](https://github.com/statamic/cms/issues/5041) by @arthurperton
+- Ability to `select` fields in `nav`, `locales`, and `collection` tags. [#5068](https://github.com/statamic/cms/issues/5068) by @jasonvarga
+- Add search to the user listing in the CP. [#4084](https://github.com/statamic/cms/issues/4084) by @arthurperton
+- Support `whereColumn` in the query builder. [#4754](https://github.com/statamic/cms/issues/4754) by @ryanmitchell
+
+### What's fixed
+- The `static:warm` command visits taxonomy URLs, excludes taxonomy URLs with no views, includes multisite taxonomy URLs, displays the URL count, and excludes excluded URLs. [#5065](https://github.com/statamic/cms/issues/5065) by @arthurperton
+- Fix how localized terms and globals save their data and fall back to origin values. [#4884](https://github.com/statamic/cms/issues/4884) by @aerni
+- Prevent nested Bard fields from going into fullscreen mode. [#5059](https://github.com/statamic/cms/issues/5059) by @jonassiewertsen
+- Fix infinite loop when using nested Replicator fields. [#5055](https://github.com/statamic/cms/issues/5055) by @jasonvarga
+- Replaced a hardcoded `lang` directory reference. [#5054](https://github.com/statamic/cms/issues/5054) by @Konafets
+- Fix incorrect redirect when saving a taxonomy term. [#5053](https://github.com/statamic/cms/issues/5053) by @arthurperton
+- Fix SVGs not displaying in private asset containers. [#4991](https://github.com/statamic/cms/issues/4991) by @arthurperton
+- Fix saving not using the latest state when you hit save too quickly after typing. [#5039](https://github.com/statamic/cms/issues/5039) by @jackmcdade
+- Fix some PHP 8.1 deprecation messages. [#5063](https://github.com/statamic/cms/issues/5063) by @edalzell
+- Add allowed composer plugins. [#5069](https://github.com/statamic/cms/issues/5069) by @jasonvarga
+
+
+
 ## 3.2.30 (2022-01-07)
 
 ### What's new

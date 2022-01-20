@@ -87,4 +87,48 @@ class TermTest extends TestCase
         $this->assertEquals(7, $term->entriesCount());
         $this->assertEquals(7, $term->entriesCount());
     }
+
+    /** @test */
+    public function it_gets_file_contents_for_saving()
+    {
+        tap(Taxonomy::make('tags')->sites(['en', 'fr']))->save();
+
+        $term = (new Term)
+            ->taxonomy('tags')
+            ->slug('test');
+
+        $term->dataForLocale('en', [
+            'title' => 'The title',
+            'array' => ['first one', 'second one'],
+            'null' => null, // this...
+            'empty' => [],  // and this should get stripped out because it's the root. there's no origin to fall back to.
+            'content' => 'The content',
+        ]);
+
+        $term->dataForLocale('fr', [
+            'title' => 'Le titre',
+            'array' => ['premier', 'deuxième'],
+            'null' => null, // this...
+            'empty' => [],  // and this should not get stripped out, otherwise it would fall back to the origin.
+            'content' => 'Le contenu',
+        ]);
+
+        $this->assertEquals([
+            'title' => 'The title',
+            'array' => [
+                'first one',
+                'second one',
+            ],
+            'content' => 'The content',
+            'localizations' => [
+                'fr' => [
+                    'title' => 'Le titre',
+                    'array' => ['premier', 'deuxième'],
+                    'null' => null,
+                    'empty' => [],
+                    'content' => 'Le contenu',
+                ],
+            ],
+        ], $term->fileData());
+    }
 }

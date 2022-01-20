@@ -108,4 +108,15 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
     {
         return AssetCollection::make($items);
     }
+
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        $container = $this->getContainer()->handle();
+
+        $items = collect([$container])->flatMap(function ($collection) use ($column) {
+            return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
+        });
+
+        return $items;
+    }
 }
