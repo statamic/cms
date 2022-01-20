@@ -4,8 +4,6 @@ namespace Statamic\Forms\JsDrivers;
 
 interface JsDriver
 {
-    public function handle();
-
     public function addToFormData($data);
 
     public function addToFormAttributes();

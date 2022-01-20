@@ -29,18 +29,6 @@ abstract class AbstractJsDriver implements JsDriver
     }
 
     /**
-     * Get JS driver handle from class name.
-     *
-     * @return string
-     */
-    public function handle()
-    {
-        $className = (new \ReflectionClass($this))->getShortName();
-
-        return Str::snake($className);
-    }
-
-    /**
      * Add to form view data.
      *
      * @param  array  $data
@@ -147,6 +135,18 @@ abstract class AbstractJsDriver implements JsDriver
     }
 
     /**
+     * Get JS driver handle from class name.
+     *
+     * @return string
+     */
+    public static function handle()
+    {
+        $className = collect(explode('\\', static::class))->last();
+
+        return Str::snake($className);
+    }
+
+    /**
      * Register driver with Statamic.
      */
     public static function register()
@@ -155,7 +155,7 @@ abstract class AbstractJsDriver implements JsDriver
             return;
         }
 
-        $handle = (new static(new Form))->handle();
+        $handle = static::handle();
 
         app('statamic.form-js-drivers')[$handle] = static::class;
     }
