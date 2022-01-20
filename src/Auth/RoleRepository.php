@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\RoleRepository as RepositoryContract;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
@@ -13,7 +14,6 @@ use Statamic\Support\Arr;
 abstract class RoleRepository implements RepositoryContract
 {
     protected $path;
-    protected $roles = [];
 
     public function path($path)
     {
@@ -24,26 +24,20 @@ abstract class RoleRepository implements RepositoryContract
 
     public function all(): Collection
     {
-        return $this->raw()->map(function ($role, $handle) {
-            return Facades\Role::make()
-                ->handle($handle)
-                ->title(array_get($role, 'title'))
-                ->addPermission(array_get($role, 'permissions', []))
-                ->preferences(array_get($role, 'preferences', []));
+        return Blink::once('user-roles', function() {
+            return $this->raw()->map(function ($role, $handle) {
+                return Facades\Role::make()
+                    ->handle($handle)
+                    ->title(array_get($role, 'title'))
+                    ->addPermission(array_get($role, 'permissions', []))
+                    ->preferences(array_get($role, 'preferences', []));
+            });
         });
     }
 
     public function find(string $id): ?Role
     {
-        if ($cached = array_get($this->roles, $id)) {
-            return $cached;
-        }
-
-        $role = $this->all()->get($id);
-
-        $this->roles[$id] = $role;
-
-        return $role;
+        return $this->all()->get($id);
     }
 
     public function exists(string $id): bool
@@ -66,6 +60,8 @@ abstract class RoleRepository implements RepositoryContract
         }
 
         $this->write($roles);
+
+        Blink::forget('user-roles');
     }
 
     public function delete(Role $role)
@@ -75,6 +71,8 @@ abstract class RoleRepository implements RepositoryContract
         $roles->forget($role->handle());
 
         $this->write($roles);
+
+        Blink::forget('user-roles');
     }
 
     protected function raw()
