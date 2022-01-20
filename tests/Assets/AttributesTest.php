@@ -88,7 +88,7 @@ class AttributesTest extends TestCase
 
         $attributes = $this->attributes->asset($asset);
 
-        $this->assertEquals(['length' => 11], $attributes->get());
+        $this->assertEquals(['duration' => 11], $attributes->get());
         $this->assertEquals(0, $attributes->width());
         $this->assertEquals(0, $attributes->height());
     }

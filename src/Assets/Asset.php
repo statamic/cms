@@ -163,7 +163,7 @@ class Asset implements AssetContract, Augmentable
             $otherMeta = [
                 'height' => Arr::get($attributes, 'height'),
                 'last_modified' => $this->disk()->lastModified($this->path()),
-                'length' => Arr::get($attributes, 'length'),
+                'duration' => Arr::get($attributes, 'duration'),
                 'mime_type' => $this->disk()->mimeType($this->path()),
                 'size' => $this->disk()->size($this->path()),
                 'width' => Arr::get($attributes, 'width'),

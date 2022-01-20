@@ -90,7 +90,7 @@ class Attributes
 
         $length = Arr::get($id3, 'playtime_seconds', 0);
 
-        return ['length' => $length];
+        return ['duration' => $length];
     }
 
     /**
@@ -181,7 +181,7 @@ class Attributes
         return [
             'width' => Arr::get($id3, 'video.resolution_x'),
             'height' => Arr::get($id3, 'video.resolution_y'),
-            'length' => Arr::get($id3, 'playtime_seconds'),
+            'duration' => Arr::get($id3, 'playtime_seconds'),
         ];
     }
 
