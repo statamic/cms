@@ -8,9 +8,12 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 use Tests\Factories\EntryFactory;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class PhpEnabledTest extends ParserTestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     public function test_php_has_access_to_scope_data()
     {
         $data = [

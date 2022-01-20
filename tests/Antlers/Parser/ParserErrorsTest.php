@@ -73,46 +73,6 @@ class ParserErrorsTest extends ParserTestCase
         $this->assertThrowsParserError('{{ articles groupby (x => x.name) as "group_name" }}');
     }
 
-    public function test_missing_pluck_into_target_throws_exception()
-    {
-        $this->assertThrowsParserError('{{ test = topics pluck_into  }}{{ /test }}');
-    }
-
-    public function test_invalid_pluck_into_variable_reference_throws_exception()
-    {
-        $this->assertThrowsParserError('{{ test = topics pluck_into "string" }}{{ /test }}');
-    }
-
-    public function test_invalid_eoi_pluck_into_throw_exception()
-    {
-        $this->assertThrowsParserError('{{ test = topics pluck_into articles }}{{ /test }}');
-    }
-
-    public function test_pluck_into_empty_logic_group_throws_exception()
-    {
-        $this->assertThrowsParserError('{{ test = topics pluck_into articles () }}{{ /test }}');
-    }
-
-    public function test_too_many_temp_vars_in_pluck_into_throws_exception()
-    {
-        $this->assertThrowsParserError('{{ test = topics pluck_into articles (x, y, z => x.id) }}{{ /test }}');
-    }
-
-    public function test_invalid_as_keyword_throws_exception_for_pluck_into()
-    {
-        $this->assertThrowsParserError('{{ test = topics pluck_into articles (x, y => x.id) asdf "new_name" }}{{ /test }}');
-    }
-
-    public function test_pluck_into_ambiguous_variable_name_throws_exception_one()
-    {
-        $this->assertThrowsParserError('{{ test = topics pluck_into articles (x, x => x.id) as "new_name" }}{{ /test }}');
-    }
-
-    public function test_pluck_into_ambiguous_variable_name_throws_exception_two()
-    {
-        $this->assertThrowsParserError('{{ test = articles pluck_into articles (articles.id arr_contains articles.id) as "new_name" }}{{ /test }}');
-    }
-
     public function test_assignment_to_scalar_throws_exception()
     {
         $this->assertThrowsParserError('{{ 25 %= 5 }}');

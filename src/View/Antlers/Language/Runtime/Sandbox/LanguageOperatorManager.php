@@ -4,7 +4,6 @@ namespace Statamic\View\Antlers\Language\Runtime\Sandbox;
 
 use Exception;
 use Illuminate\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Nodes\Constants\FalseConstant;
@@ -22,13 +21,11 @@ use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\PathDataManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesGroupBy;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesOrderBy;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesPluckInto;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesWhere;
 
 class LanguageOperatorManager
 {
-    use ExecutesPluckInto, ExecutesOrderBy,
-        ExecutesGroupBy, ExecutesWhere;
+    use ExecutesOrderBy, ExecutesGroupBy, ExecutesWhere;
 
     /**
      * @var NodeProcessor|null
@@ -74,118 +71,23 @@ class LanguageOperatorManager
         return $this;
     }
 
-    private function unwrapValueArrays($array)
-    {
-        if ($array == null) {
-            return [];
-        }
-
-        if (count($array) == 0) {
-            return $array;
-        }
-
-        if (is_array($array[0])) {
-            if (array_key_exists('value', $array[0])) {
-                $values = [];
-
-                foreach ($array as $item) {
-                    $values[] = $item['value'];
-                }
-
-                return $values;
-            }
-        }
-
-        return $array;
-    }
-
     public function evaluateOperator($operator, $a, $b, $rawA, $rawB, $context)
     {
         $value = null;
 
-        if ($operator == LanguageOperatorRegistry::STR_STARTS_WITH) {
-            $value = Str::startsWith($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::STR_ENDS_WITH) {
-            $value = Str::endsWith($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::STR_IS) {
-            $value = Str::is($b, $a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_IS_URL) {
-            $value = Str::isUrl($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_CONTAINS) {
-            $value = Str::contains($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::STR_CONTAINS_ALL) {
-            $value = Str::containsAll($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::ARR_HAS_ANY) {
-            $value = Arr::hasAny(self::unwrapValueArrays($a), $b);
-        } elseif ($operator == LanguageOperatorRegistry::ARR_HAS) {
-            $value = Arr::has(self::unwrapValueArrays($a), $b);
-        } elseif ($operator == LanguageOperatorRegistry::ARR_CONTAINS) {
-            $value = in_array($b, self::unwrapValueArrays($a));
-        } elseif ($operator == LanguageOperatorRegistry::ARR_CONTAINS_ANY) {
-            if ($a === null) {
-                $value = false;
-            } else {
-                $a = self::unwrapValueArrays($a);
-
-                $value = ! empty(array_intersect($a, $b));
-            }
-        } elseif ($operator == LanguageOperatorRegistry::ARR_PLUCK) {
+        if ($operator == LanguageOperatorRegistry::ARR_PLUCK) {
             $tmpValue = Arr::pluck($a, $b);
             $value = [];
 
             foreach ($tmpValue as $pluckedItem) {
-                $value[] = ['value' => $pluckedItem];
+                $value[] = $pluckedItem;
             }
-        } elseif ($operator == LanguageOperatorRegistry::ARR_GET) {
-            $value = Arr::pluck($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::ARR_SORT) {
-            $value = Arr::sort($a);
         } elseif ($operator == LanguageOperatorRegistry::ARR_TAKE) {
             $value = collect($a)->take($b)->toArray();
-        } elseif ($operator == LanguageOperatorRegistry::ARR_RECURSIVE_SORT) {
-            $value = Arr::sortRecursive($a);
-        } elseif ($operator == LanguageOperatorRegistry::ARR_WRAP) {
-            $value = Arr::wrap($a);
+        } elseif ($operator == LanguageOperatorRegistry::ARR_SKIP) {
+            $value = collect($a)->skip($b)->toArray();
         } elseif ($operator == LanguageOperatorRegistry::ARR_MERGE) {
             $value = array_merge($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::ARR_CONCAT) {
-            $value = $a + $b;
-        } elseif ($operator == LanguageOperatorRegistry::DATA_GET) {
-            $value = data_get($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::STR_AFTER) {
-            $value = Str::after($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::STR_AFTER_LAST) {
-            $value = Str::after($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::STR_ASCII) {
-            $value = Str::ascii($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_BEFORE_LAST) {
-            $value = Str::beforeLast($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::STR_BEFORE) {
-            $value = Str::before($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::STR_CAMEL) {
-            $value = Str::camel($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_FINISH) {
-            $value = Str::finish($a, $b);
-        } elseif ($operator == LanguageOperatorRegistry::STR_KEBAB) {
-            $value = Str::kebab($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_LENGTH) {
-            $value = Str::length($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_LOWER) {
-            $value = Str::lower($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_UPPER) {
-            $value = Str::upper($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_SNAKE) {
-            $value = Str::snake($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_STUDLY) {
-            $value = Str::studly($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_TITLE) {
-            $value = Str::title($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_UCFIRST) {
-            $value = Str::ucfirst($a);
-        } elseif ($operator == LanguageOperatorRegistry::STR_WORD_COUNT) {
-            $value = \str_word_count($a);
-        } elseif ($operator == LanguageOperatorRegistry::ARR_PLUCK_INTO) {
-            $value = $this->executePluckInto($a, $rawB, $rawA, $context);
         } elseif ($operator == LanguageOperatorRegistry::QUERY_WHERE) {
             $predicate = $this->unpackQueryLogicGroup($rawB);
             $value = $this->executeWhere($a, $predicate, $rawB, $context);

@@ -68,13 +68,16 @@ class ParserTestCase extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        GlobalRuntimeState::$environmentId = StringUtilities::uuidv4();
 
-        $this->setupTestBlueprintAndFields();
+        $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
             $this->preventSavingStacheItemsToDisk();
         }
+
+        GlobalRuntimeState::$environmentId = StringUtilities::uuidv4();
+
+        $this->setupTestBlueprintAndFields();
 
         NodeTypeAnalyzer::$environmentDetails = new EnvironmentDetails();
         NodeTypeAnalyzer::$environmentDetails->setModifierNames(['upper', 'lower']);

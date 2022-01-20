@@ -2,122 +2,39 @@
 
 namespace Tests\Antlers\Sandbox;
 
-use Illuminate\Support\Str;
 use Tests\Antlers\ParserTestCase;
 
 class LanguageOperatorTest extends ParserTestCase
 {
-    public function test_str_operators_work()
+    public function test_arr_skip()
     {
-        $this->assertSame('UPPER', $this->evaluateRaw('str_upper "upper"'));
-        $this->assertSame('lower', $this->evaluateRaw('str_lower "LOWER"'));
-        $this->assertSame(true, $this->evaluateRaw('"abc" startswith "a"'));
-        $this->assertSame(true, $this->evaluateRaw('"abc" endswith "c"'));
-        $this->assertSame(true, $this->evaluateRaw('"teststring" str_is "test*" '));
-    }
-
-    public function test_op_str_ascii()
-    {
-        $this->assertSame('u', $this->evaluateRaw('str_ascii "ü"'));
-    }
-
-    public function test_str_is_url()
-    {
-        $this->assertFalse($this->evaluateRaw('is_url "test"'));
-        $this->assertTrue($this->evaluateRaw('is_url "https://statamic.com"'));
-    }
-
-    public function test_str_finish()
-    {
-        $this->assertSame('test/', $this->evaluateRaw('"test" str_finish "/"'));
-        $this->assertSame('test/', $this->evaluateRaw('"test/" str_finish "/"'));
-    }
-
-    public function test_str_after()
-    {
-        $this->assertSame('nah', $this->evaluateRaw('"hannah" str_after "han"'));
-    }
-
-    public function test_str_lower()
-    {
-        $this->assertSame('lower', $this->evaluateRaw(" str_lower 'LOWER'"));
-    }
-
-    public function test_str_upper()
-    {
-        $this->assertSame('UPPER', $this->evaluateRaw(" str_upper 'upper'"));
-    }
-
-    public function test_str_ucfirst()
-    {
-        $this->assertSame('Ucfirst', $this->evaluateRaw(" str_ucfirst 'ucfirst'"));
-    }
-
-    public function test_str_len()
-    {
-        $this->assertSame(4, $this->evaluateRaw('str_len "four"'));
-    }
-
-    public function test_str_after_last()
-    {
-        $this->assertSame('tte', $this->evaluateRaw('"yvette" str_after_last "yve"'));
-    }
-
-    public function test_str_before()
-    {
-        $this->assertSame('han', $this->evaluateRaw('"hannah" str_before "nah"'));
-    }
-
-    public function test_str_before_last()
-    {
-        $this->assertSame('yve', $this->evaluateRaw('"yvette" str_before_last "tte"'));
-    }
-
-    public function test_str_contains_all()
-    {
-        $this->assertTrue($this->evaluateRaw('"test string" str_contains_all check', ['check' => ['test', 'string']]));
-        $this->assertTrue($this->evaluateRaw('"test string" str_contains_all check', ['check' => ['test']]));
-        $this->assertFalse($this->evaluateRaw('"test string" str_contains_all check', ['check' => ['test', 'xxx']]));
-    }
-
-    public function test_str_camel()
-    {
-        $this->assertSame(Str::camel('test-value'), $this->evaluateRaw('str_camel "test-value"'));
-    }
-
-    public function test_str_word_count()
-    {
-        $this->assertSame(\str_word_count('test value for word count'), $this->evaluateRaw('str_word_count "testtest value for word count"'));
-    }
-
-    public function test_str_studly()
-    {
-        $this->assertSame(Str::studly('test-value'), $this->evaluateRaw('str_studly "test-value"'));
-    }
-
-    public function test_str_kebab()
-    {
-        $this->assertSame(Str::kebab('test value'), $this->evaluateRaw('str_kebab "test value"'));
-    }
-
-    public function test_array_pluck_and_contains()
-    {
-        $vars = [
-            'test' => [
-                [
-                    'locale' => 'en_US',
-                ],
-                [
-                    'locale' => 'en_UK',
-                ],
-            ],
+        $data = [
+            'people' => [
+                ['name' => 'Charlie'],
+                ['name' => 'Dave'],
+                ['name' => 'Alice'],
+                ['name' => 'Bob'],
+            ]
         ];
 
-        $has = "{{ if test pluck 'locale' arr_contains 'en_US' }}yes{{ else }}no{{ /if }}";
-        $does_not_have = "{{ if test pluck 'locale' arr_has 'en_ES' }}yes{{ else }}no{{ /if }}";
+        $template = <<<'EOT'
+{{ (people orderby (name 'asc') skip (2) take (2) pluck 'name') | sentence_list }}
+EOT;
 
-        $this->assertSame('no', $this->renderString($does_not_have, $vars));
-        $this->assertSame('yes', $this->renderString($has, $vars));
+        $this->assertSame('Charlie and Dave', $this->renderString($template, $data));
+    }
+
+    public function test_modifiers_can_be_used_on_plucked_values()
+    {
+        $data = [
+            'test' => [
+                ['name' => 'Test'],
+                ['name' => 'Test2'],
+                ['name' => 'Test3'],
+            ]
+        ];
+
+        $this->assertSame('Test, Test2, and Test3', $this->renderString('{{ (test pluck "name") | sentence_list }}', $data));
     }
 
     public function test_take_operator()

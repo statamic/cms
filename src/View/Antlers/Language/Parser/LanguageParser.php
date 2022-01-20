@@ -80,7 +80,6 @@ use Statamic\View\Antlers\Language\Nodes\Structures\SwitchCase;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\TernaryCondition;
 use Statamic\View\Antlers\Language\Nodes\Structures\TupleListStart;
-use Statamic\View\Antlers\Language\Nodes\Structures\TupleScopedLogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\ValueDirectionNode;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\LanguageOperatorRegistry;
@@ -95,6 +94,8 @@ class LanguageParser
     private $pathParser = null;
 
     protected $tokens = [];
+
+    private $isRoot = true;
 
     public function __construct()
     {
@@ -131,9 +132,19 @@ class LanguageParser
         $this->tokens = $this->createLogicGroupsToRemoveMethodInvocationAmbiguity($this->tokens);
         $this->tokens = $this->createLogicGroupsToResolveOperatorAmbiguity($this->tokens);
         $this->validateNoDanglingLogicGroupEnds($this->tokens);
-        $this->tokens = $this->insertAutomaticStatementSeparators($this->tokens);
+
+        if ($this->isRoot) {
+            $this->tokens = $this->insertAutomaticStatementSeparators($this->tokens);
+        }
 
         return $this->createSemanticGroups($this->tokens);
+    }
+
+    public function setIsRoot($isRoot)
+    {
+        $this->isRoot = $isRoot;
+
+        return $this;
     }
 
     private function rewriteImplicitArraysToKeywordForm($nodes)
@@ -1058,130 +1069,6 @@ class LanguageParser
                     $newTokens[] = $switchGroup;
 
                     $i += 1;
-                    continue;
-                } elseif ($token->content == LanguageOperatorRegistry::ARR_PLUCK_INTO) {
-                    if ($i + 1 >= $tokenCount) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_PLUCK_INTO_MISSING_VARIABLE_TARGET,
-                            $token,
-                            'Missing target variable for pluck_into operator.'
-                        );
-                    }
-
-                    $next = $tokens[$i + 1];
-
-                    if ($next instanceof VariableNode == false) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_PLUCK_INTO_INVALID_VARIABLE_TARGET,
-                            $next,
-                            'Unexpected ['.TypeLabeler::getPrettyTypeName($next).']. Expecting [T_VAR].'
-                        );
-                    }
-
-                    if ($i + 2 >= $tokenCount) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_PLUCK_INTO_NO_PREDICATE,
-                            $next,
-                            'Unexpected end of input while parsing pluck_into operator.'
-                        );
-                    }
-
-                    $predicateWrapper = $tokens[$i + 2];
-
-                    if ($predicateWrapper instanceof  LogicGroup == false) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_PLUCK_INTO_INVALID_PREDICATE_VALUE,
-                            $next,
-                            'Unexpected ['.TypeLabeler::getPrettyTypeName($predicateWrapper).'] while parsing pluck_into; expecting [T_LOGIC_GROUP].'
-                        );
-                    }
-
-                    if (count($predicateWrapper->nodes) == 0) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_PLUCK_INTO_EMPTY_LOGIC_GROUP,
-                            $next,
-                            'Unexpected empty [T_LOGIC_GROUP].'
-                        );
-                    }
-
-                    $innerWrapperNode = $predicateWrapper->nodes[0];
-
-                    if ($innerWrapperNode instanceof SemanticGroup == false) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_PLUCK_INTO_EMPTY_LOGIC_GROUP,
-                            $next,
-                            'Unexpected empty [T_LOGIC_GROUP].'
-                        );
-                    }
-
-                    $innerNodes = $innerWrapperNode->nodes;
-
-                    if (count($innerNodes) == 0) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_PLUCK_INTO_EMPTY_LOGIC_GROUP,
-                            $next,
-                            'Unexpected empty [T_LOGIC_GROUP].'
-                        );
-                    }
-
-                    $isDynamicNames = true;
-
-                    $innerNodeCount = count($innerNodes);
-                    for ($c = 0; $c < $innerNodeCount; $c++) {
-                        if ($innerNodes[$c] instanceof ScopeAssignmentOperator) {
-                            $isDynamicNames = false;
-
-                            if ($c != 3) {
-                                throw ErrorFactory::makeSyntaxError(
-                                    AntlersErrorCodes::TYPE_PLUCK_INTO_INVALID_NUMBER_OF_TUPLE_VARIABLES,
-                                    $next,
-                                    'Invalid number of temporary variables within [T_LOGIC_GROUP]'
-                                );
-                            }
-                            break;
-                        }
-                    }
-
-                    $tupleScopedGroup = new TupleScopedLogicGroup();
-                    $tupleScopedGroup->target = $next;
-
-                    if (! $isDynamicNames) {
-                        $tupleScopedGroup->item1 = $innerNodes[0];
-                        $tupleScopedGroup->item2 = $innerNodes[2];
-                        $tupleScopedGroup->nodes = [array_pop($innerNodes)];
-                        $tupleScopedGroup->isDynamicNames = false;
-                    } else {
-                        if ($innerNodeCount == 0 || $innerNodes[0] instanceof LogicGroup == false) {
-                            throw ErrorFactory::makeSyntaxError(
-                                AntlersErrorCodes::TYPE_PLUCK_INTO_UNEXPECTED_EMPTY_T_LOGIC_GROUP,
-                                $next,
-                                'Unexpected empty [T_LOGIC_GROUP] while parsing pluck_into predicate.'
-                            );
-                        }
-
-                        $tupleScopedGroup->isDynamicNames = true;
-                        $tupleScopedGroup->nodes = $innerNodes[0]->nodes;
-                    }
-
-                    $newTokens[] = $token;
-                    $newTokens[] = $tupleScopedGroup;
-                    if ($i + 3 < $tokenCount && $i + 4 < $tokenCount && $tokens[$i + 3] instanceof VariableNode) {
-                        /** @var VariableNode $varName */
-                        $varName = $tokens[$i + 3];
-
-                        if ($varName->name != LanguageKeywords::ScopeAs) {
-                            throw ErrorFactory::makeSyntaxError(
-                                AntlersErrorCodes::TYPE_PLUCK_INTO_UNKNOWN_ALIAS_VARNAME,
-                                $varName,
-                                'Unknown alias keyword "'.$varName->name.'".'
-                            );
-                        }
-
-                        $tupleScopedGroup->name = $tokens[$i + 4];
-                        $i += 2;
-                    }
-
-                    $i += 2;
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::ARR_MAKE) {
                     if ($i + 1 >= $tokenCount) {
@@ -2360,33 +2247,31 @@ class LanguageParser
         for ($i = 0; $i < $tokenCount; $i++) {
             $thisToken = $tokens[$i];
 
-            if ($thisToken instanceof AssignmentOperatorNodeContract && $i > 1) {
-                $check = $tokens[$i - 2];
+            if ($thisToken instanceof AssignmentOperatorNodeContract) {
+                if ($i + 2 < $tokenCount) {
+                    $peek = $tokens[$i + 2];
 
-                if ($check instanceof StatementSeparatorNode == false) {
-                    $replace = array_pop($adjustedTokens);
-                    $adjustedTokens[] = new StatementSeparatorNode();
-                    $adjustedTokens[] = $replace;
-                    $adjustedTokens[] = $thisToken;
-                    if ($i + 1 >= $tokenCount) {
+                    if ($peek instanceof StatementSeparatorNode == false) {
+                        $adjustedTokens[] = $thisToken;
+                        $adjustedTokens[] = $tokens[$i + 1];
                         $adjustedTokens[] = new StatementSeparatorNode();
+                        $i += 1;
+                        continue;
+                    } else {
+                        $adjustedTokens[] = $thisToken;
+                        $adjustedTokens[] = $tokens[$i + 1];
+                        $adjustedTokens[] = $tokens[$i + 2];
+                        $i += 2;
+                        continue;
                     }
-                    continue;
                 } else {
                     $adjustedTokens[] = $thisToken;
-
-                    if ($i + 1 >= $tokenCount) {
-                        $adjustedTokens[] = new StatementSeparatorNode();
-                    }
-                    continue;
+                    $adjustedTokens[] = $tokens[$i + 1];
+                    $adjustedTokens[] = new StatementSeparatorNode();
+                    break;
                 }
             } else {
                 $adjustedTokens[] = $thisToken;
-
-                if ($i + 1 >= $tokenCount) {
-                    $adjustedTokens[] = new StatementSeparatorNode();
-                }
-                continue;
             }
         }
 
@@ -2476,6 +2361,7 @@ class LanguageParser
 
         if (count($collectedTokens) >= 3) {
             $parser = new LanguageParser();
+            $parser->setIsRoot(false);
 
             return $this->unpack($parser->parse($collectedTokens));
         }
@@ -2801,6 +2687,7 @@ class LanguageParser
         }
 
         $parser = new LanguageParser();
+        $parser->setIsRoot(false);
 
         $logicalGroup = new LogicGroup();
 
