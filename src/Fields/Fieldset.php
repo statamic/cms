@@ -47,7 +47,7 @@ class Fieldset
 
         $contents['fields'] = $fields;
 
-        if (! array_key_exists('meta', $contents) && $this->contents && array_key_exists('meta', $this->contents)) {
+        if (! array_key_exists('meta', $contents) && isset($this->contents['meta'])) {
             $contents['meta'] = $this->contents['meta'];
         }
 

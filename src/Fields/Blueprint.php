@@ -112,7 +112,7 @@ class Blueprint implements Augmentable
 
     public function setContents(array $contents)
     {
-        if (! array_key_exists('meta', $contents) && $this->contents && array_key_exists('meta', $this->contents)) {
+        if (! array_key_exists('meta', $contents) && isset($this->contents['meta'])) {
             $contents['meta'] = $this->contents['meta'];
         }
 
