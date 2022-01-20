@@ -64,6 +64,17 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_meta()
+    {
+        $blueprint = (new Blueprint)->setContents([
+            'title' => 'Test',
+            'meta' => 'abc',
+        ]);
+
+        $this->assertEquals('abc', $blueprint->meta());
+    }
+
+    /** @test */
     public function it_gets_the_hidden_property_which_is_false_by_default()
     {
         $blueprint = new Blueprint;

@@ -112,6 +112,10 @@ class Blueprint implements Augmentable
 
     public function setContents(array $contents)
     {
+        if (isset($this->contents['meta'])) {
+            $contents['meta'] = $this->contents['meta'];
+        }
+
         $this->contents = $contents;
 
         return $this
@@ -344,6 +348,11 @@ class Blueprint implements Augmentable
     public function title()
     {
         return array_get($this->contents, 'title', Str::humanize($this->handle));
+    }
+
+    public function meta()
+    {
+        return array_get($this->contents, 'meta');
     }
 
     public function toPublishArray()

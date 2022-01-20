@@ -51,6 +51,17 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_meta()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'title' => 'Test',
+            'meta' => 'abc',
+        ]);
+
+        $this->assertEquals('abc', $fieldset->meta());
+    }
+
+    /** @test */
     public function the_title_falls_back_to_a_humanized_handle()
     {
         $fieldset = (new Fieldset)->setHandle('the_blueprint_handle');

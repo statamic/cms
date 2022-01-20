@@ -47,6 +47,10 @@ class Fieldset
 
         $contents['fields'] = $fields;
 
+        if (isset($this->contents['meta'])) {
+            $contents['meta'] = $this->contents['meta'];
+        }
+
         $this->contents = $contents;
 
         return $this;
@@ -60,6 +64,11 @@ class Fieldset
     public function title()
     {
         return array_get($this->contents, 'title', Str::humanize($this->handle));
+    }
+
+    public function meta()
+    {
+        return array_get($this->contents, 'meta');
     }
 
     public function fields(): Fields
