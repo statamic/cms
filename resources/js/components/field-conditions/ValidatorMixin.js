@@ -11,7 +11,7 @@ export default {
         showField(field) {
             let passes = new Validator(field, this.values, this.$store, this.storeName).passesConditions();
 
-            Statamic.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
                 handle: field.handle,
                 hidden: ! passes,
             });
