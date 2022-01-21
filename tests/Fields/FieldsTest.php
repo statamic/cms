@@ -536,6 +536,32 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
+    public function adding_values_sets_filled_status_on_fields_for_validation()
+    {
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', []);
+        });
+
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', []);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two'],
+        ]);
+
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
+
+        $fields = $fields->addValues(['one' => 'foo']);
+
+        $this->assertTrue($fields->get('one')->isFilled());
+        $this->assertFalse($fields->get('two')->isFilled());
+        $this->assertEquals(['one' => 'foo', 'two' => null], $fields->values()->all());
+        $this->assertEquals(['one' => 'foo'], $fields->validatableValues()->all());
+    }
+
+    /** @test */
     public function it_processes_each_fields_values_by_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
