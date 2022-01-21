@@ -105,6 +105,42 @@ class APITest extends TestCase
         $this->assertEndpointDataCount('/api/navs/footer/tree', 1);
     }
 
+    /** @test */
+    public function it_excludes_keys()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Config::set('statamic.api.cache', false);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(true)->save();
+
+        $apiUrl = 'http://localhost/api/collections/pages/entries/dance';
+        $editUrl = 'http://localhost/cp/collections/pages/entries/dance';
+
+        $this
+            ->get('/api/collections/pages/entries')
+            ->assertJsonPath('data.0.api_url', $apiUrl)
+            ->assertJsonPath('data.0.edit_url', $editUrl);
+
+        $this
+            ->get('/api/collections/pages/entries/dance')
+            ->assertJsonPath('data.api_url', $apiUrl)
+            ->assertJsonPath('data.edit_url', $editUrl);
+
+        Facades\Config::set('statamic.api.excluded_keys', ['api_url', 'edit_url']);
+
+        $this
+            ->get('/api/collections/pages/entries')
+            ->assertJsonPath('data.0.api_url', null)
+            ->assertJsonPath('data.0.edit_url', null);
+
+        $this
+            ->get('/api/collections/pages/entries/dance')
+            ->assertJsonPath('data.api_url', null)
+            ->assertJsonPath('data.edit_url', null);
+    }
+
     private function assertEndpointDataCount($endpoint, $count)
     {
         $response = $this

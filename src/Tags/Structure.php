@@ -11,9 +11,21 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Str;
+use Statamic\Tags\Concerns\GetsQuerySelectKeys;
 
 class Structure extends Tags
 {
+    use GetsQuerySelectKeys;
+
+    protected $currentUrl;
+    protected $siteAbsoluteUrl;
+
+    public function __construct()
+    {
+        $this->currentUrl = URL::getCurrent();
+        $this->siteAbsoluteUrl = Site::current()->absoluteUrl();
+    }
+
     public function wildcard($tag)
     {
         $handle = $this->context->value($tag, $tag);
@@ -67,8 +79,12 @@ class Structure extends Tags
     {
         $pages = collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
-            $data = $page->toAugmentedArray();
+            $keys = $this->getQuerySelectKeys($page);
+            $data = $page->toAugmentedArray($keys);
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
+
+            $url = $page->urlWithoutRedirect();
+            $absoluteUrl = $page->absoluteUrl();
 
             return array_merge($data, [
                 'children'    => $children,
@@ -78,8 +94,9 @@ class Structure extends Tags
                 'count'       => $index + 1,
                 'first'       => $index === 0,
                 'last'        => $index === count($tree) - 1,
-                'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->urlWithoutRedirect(), '/'),
-                'is_external' => URL::isExternal($page->absoluteUrl()),
+                'is_current'  => rtrim($this->currentUrl, '/') === rtrim($url, '/'),
+                'is_parent'   => $this->siteAbsoluteUrl === $absoluteUrl ? false : URL::isAncestorOf($this->currentUrl, $url),
+                'is_external' => URL::isExternal($absoluteUrl),
             ]);
         })->filter()->values();
 

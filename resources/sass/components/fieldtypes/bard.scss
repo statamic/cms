@@ -178,6 +178,9 @@
     }
 }
 
+.bard-set.has-error > .replicator-set-header label {
+    color: $color_red;
+}
 
 /* The set selection options for each text block
   ========================================================================== */
@@ -225,6 +228,11 @@
 
         > p > code, > pre code {
             @apply bg-grey-30;
+        }
+        
+        // To remove min height from nested bard fields inside bard in fullscreen mode.
+        * > .ProseMirror { 
+            min-height: auto;
         }
     }
 

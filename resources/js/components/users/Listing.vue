@@ -15,13 +15,23 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
+                    <div class="data-list-header">
+                        <data-list-search v-model="searchQuery" />
+                    </div>
+
+                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+
                     <data-list-bulk-actions
                         class="rounded"
                         :url="actionUrl"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
-                    <data-list-table :allow-bulk-actions="true" @sorted="sorted">
+                    <data-list-table 
+                        v-show="items.length"
+                        :allow-bulk-actions="true"
+                        @sorted="sorted"
+                    >
                         <template slot="cell-email" slot-scope="{ row: user, value }">
                             <a :href="user.edit_url" class="flex items-center">
                                 <avatar :user="user" class="w-8 h-8 rounded-full mr-1" />
