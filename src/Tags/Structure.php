@@ -17,12 +17,12 @@ class Structure extends Tags
 {
     use GetsQuerySelectKeys;
 
-    protected $siteCurrentUrl;
+    protected $currentUrl;
     protected $siteAbsoluteUrl;
 
     public function __construct()
     {
-        $this->siteCurrentUrl = URL::getCurrent();
+        $this->currentUrl = URL::getCurrent();
         $this->siteAbsoluteUrl = Site::current()->absoluteUrl();
     }
 
@@ -83,7 +83,7 @@ class Structure extends Tags
             $data = $page->toAugmentedArray($keys);
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
-            $currentUrl = $page->urlWithoutRedirect();
+            $url = $page->urlWithoutRedirect();
             $absoluteUrl = $page->absoluteUrl();
 
             return array_merge($data, [
@@ -94,8 +94,8 @@ class Structure extends Tags
                 'count'       => $index + 1,
                 'first'       => $index === 0,
                 'last'        => $index === count($tree) - 1,
-                'is_current'  => rtrim($this->siteCurrentUrl, '/') === rtrim($currentUrl, '/'),
-                'is_parent'   => $this->siteAbsoluteUrl === $absoluteUrl ? false : URL::isAncestorOf($this->siteCurrentUrl, $currentUrl),
+                'is_current'  => rtrim($this->currentUrl, '/') === rtrim($url, '/'),
+                'is_parent'   => $this->siteAbsoluteUrl === $absoluteUrl ? false : URL::isAncestorOf($this->currentUrl, $url),
                 'is_external' => URL::isExternal($absoluteUrl),
             ]);
         })->filter()->values()->all();
