@@ -47,14 +47,16 @@ class SubstitutesEntryForLivePreviewTest extends TestCase
 
         $this->assertEquals('Bravo', Entry::find('2')->get('title')); // Check that the test didn't somehow override the real entry accidentally.
 
-        $this->get('/test?token=test-token')->assertSeeInOrder([
-            'Alfa',
-            'Alfa foo',
-            'Substituted title',
-            'Substituted foo',
-            'Charlie',
-            'Charlie foo',
-        ]);
+        $this->get('/test?token=test-token')
+            ->assertSeeInOrder([
+                'Alfa',
+                'Alfa foo',
+                'Substituted title',
+                'Substituted foo',
+                'Charlie',
+                'Charlie foo',
+            ])
+            ->assertHeader('X-Statamic-Live-Preview', true);
     }
 
     /** @test */
