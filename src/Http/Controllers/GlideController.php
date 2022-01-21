@@ -96,9 +96,9 @@ class GlideController extends Controller
         $decoded = base64_decode($encoded);
 
         // The string before the first slash is the container
-        [$handle, $path] = explode('/', $decoded, 2);
+        [$container, $path] = explode('/', $decoded, 2);
 
-        throw_unless($container = AssetContainer::find($handle), new NotFoundHttpException);
+        throw_unless($container = AssetContainer::find($container), new NotFoundHttpException);
 
         throw_unless($asset = $container->asset($path), new NotFoundHttpException);
 
