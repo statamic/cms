@@ -17,4 +17,9 @@ class LivePreview
 
         return $token;
     }
+
+    public function item(TokenContract $token)
+    {
+        return Cache::get('statamic.live-preview.'.$token->token());
+    }
 }

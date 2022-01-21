@@ -2,17 +2,14 @@
 
 namespace Statamic\Tokens\Handlers;
 
+use Facades\Statamic\CP\LivePreview;
 use Statamic\Facades\Entry;
 
 class LivePreviewEntry
 {
     public function handle($token)
     {
-        $entry = Entry::find($token->get('entry'));
-
-        foreach ($token->get('data') as $key => $value) {
-            $entry->setSupplement($key, $value);
-        }
+        $entry = LivePreview::item($token);
 
         Entry::substitute($entry);
     }

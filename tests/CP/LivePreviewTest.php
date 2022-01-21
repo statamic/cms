@@ -37,5 +37,6 @@ class LivePreviewTest extends TestCase
         $this->assertEquals(LivePreviewEntry::class, $token->handler());
 
         $this->assertSame('item', Cache::get('statamic.live-preview.test-token'));
+        $this->assertSame('item', LivePreview::item($token));
     }
 }
