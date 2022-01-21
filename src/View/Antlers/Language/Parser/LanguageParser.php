@@ -833,6 +833,14 @@ class LanguageParser
 
                     $subNodes = $nextToken->nodes;
 
+                    if (count($subNodes) == 0) {
+                        throw ErrorFactory::makeSyntaxError(
+                            AntlersErrorCodes::TYPE_UNEXPECTED_EMPTY_DIRECTION_GROUP,
+                            $nextToken,
+                            'Unexpected empty [T_DIRECTION_GROUP]. Must have at least one order clause, and each property must have a direction specified.'
+                        );
+                    }
+
                     if ($subNodes[0] instanceof SemanticGroup) {
                         $subNodes = $subNodes[0]->nodes;
                     }

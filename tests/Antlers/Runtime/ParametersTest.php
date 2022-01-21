@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Carbon\Carbon;
+use Statamic\Tags\Tags;
 use Tests\Antlers\Fixtures\Addon\Tags\EchoMethod;
 use Tests\Antlers\Fixtures\Addon\Tags\Test;
 use Tests\Antlers\Fixtures\MethodClasses\ClassTwo;
@@ -137,5 +138,72 @@ EOT;
         ];
 
         $this->assertSame('2012-10-01', $this->renderString('{{ one:two format="Y-m-d" }}', $data, true));
+    }
+
+    public function test_tags_are_invoked_within_interpolated_contexts()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'test';
+
+            public function __call($method, $args)
+            {
+                return '<'.$method.'>';
+            }
+        })::register();
+
+
+        (new class extends Tags
+        {
+            public static $handle = 'anothertag';
+
+            public function index()
+            {
+                $src = $this->params->get('src');
+
+                return 'The source is: '.$src;
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ anothertag src="{test:anything}" }}
+EOT;
+        $this->assertSame('The source is: <anything>', $this->renderString($template, [], true));
+    }
+
+    public function test_tags_are_invoked_within_interpolated_contexts_and_conflicting_string_variable()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'test';
+
+            public function __call($method, $args)
+            {
+                return '<'.$method.'>';
+            }
+        })::register();
+
+
+        (new class extends Tags
+        {
+            public static $handle = 'anothertag';
+
+            public function index()
+            {
+                $src = $this->params->get('src');
+
+                return 'The source is: '.$src;
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ anothertag src="{%test:anything}/{test:anything}/{test:anything}/{%test:anything}" }}
+EOT;
+
+        // This inversion of logic is to keep the behavior of "{collection:handle}"/etc. consistent in parameters.
+        $this->assertSame(
+            'The source is: <anything>/string var/string var/<anything>',
+            $this->renderString($template, ['test' => ['anything' => 'string var']], true)
+        );
     }
 }

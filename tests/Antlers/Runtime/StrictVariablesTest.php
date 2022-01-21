@@ -43,6 +43,6 @@ class StrictVariablesTest extends ParserTestCase
 
         $this->assertSame('onetwothree', $this->renderString('{{ $$test }}{{ value }}{{ /$$test }}', $vars));
         $this->assertSame('onetwothree', $this->renderString('{{ test }}{{ value }}{{ /test }}', $vars));
-        $this->assertSame('fourfivesix', $this->renderString('{{ ^test }}{{ value }}{{ /^test }}', $vars, true));
+        $this->assertSame('fourfivesix', $this->renderString('{{ %test }}{{ value }}{{ /%test }}', $vars, true));
     }
 }

@@ -81,7 +81,7 @@ class PathParser
             $content = StringUtilities::substr($content, 1);
         }
 
-        if (Str::startsWith($content, DocumentParser::Punctuation_Caret)) {
+        if (Str::startsWith($content, DocumentParser::Punctuation_Percent)) {
             $isStrictTagReference = true;
             $content = StringUtilities::substr($content, 1);
         } else {

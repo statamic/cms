@@ -108,11 +108,6 @@ Root: {{ image | class_name }}
 {{ partial:example :image="image" }}
 EOT;
 
-        // The partials will call out to two library methods.
-        // {{ convert:className(value) }} - returns the class name of an object.
-        // {{ convert:typeOf(value) }} - returns a variable's type.
-        // If the asset gets convert to an array, className() will fail since it's expecting an object.
-
         // Inside the nested partial three, image is being overwritten to an integer to ensure
         // that overrides like that work, and it is set back to image for nested_four.
 

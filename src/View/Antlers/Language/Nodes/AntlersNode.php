@@ -392,6 +392,14 @@ class AntlersNode extends AbstractNode
      */
     private function canSafelyUseFullParserContext(AntlersNode $node)
     {
+        if ($node->isTagNode) {
+            return false;
+        }
+
+        if ($node->pathReference != null && $node->pathReference->isStrictTagReference) {
+            return false;
+        }
+
         if (empty($node->processedInterpolationRegions)) {
             return true;
         }

@@ -208,6 +208,41 @@ EOT;
         $this->assertSame(3, $this->evaluateRaw('arr(1,2,3,) | length'));
     }
 
+    public function test_array_push()
+    {
+        $data = [
+            'simple' => [
+                'Alice',
+                'Bob',
+                'Charlie'
+            ],
+            'map' => [
+                ['name' => 'Alice'],
+                ['name' => 'Bob'],
+                ['name' => 'Charlie'],
+            ]
+        ];
+
+        // The evluate test method adds {{ }} already.
+        $template = <<<'EOT'
+simple += 'Daniel'; map += ['name' => 'Daniel']
+EOT;
+
+        $results = $this->evaluate($template, $data);
+
+        $expectedSimple = ['Alice', 'Bob', 'Charlie', 'Daniel'];
+        $expectedMap = [
+            ['name' => 'Alice'],
+            ['name' => 'Bob'],
+            ['name' => 'Charlie'],
+            ['name' => 'Daniel'],
+        ];
+
+        $this->assertSame($expectedSimple, $results['simple']);
+        $this->assertSame($expectedMap, $results['map']);
+    }
+
+
     public function test_nested_arrays()
     {
         $result = $this->evaluateRaw('arr("one" => 1, "two" => 2, "three" => arr(1,2,3, 4 => arr(1,2)))');

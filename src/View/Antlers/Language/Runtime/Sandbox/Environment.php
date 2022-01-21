@@ -888,13 +888,17 @@ class Environment
                 return null;
             } elseif ($operand instanceof AdditionAssignmentOperator) {
                 $varName = $this->nameOf($left);
-                $curVal = $this->scopeValue($varName);
+                $curVal = $this->checkForFieldValue($this->scopeValue($varName));
+                $right = $this->checkForFieldValue($right);
 
                 if (is_string($curVal) && is_string($right)) {
                     // Allows for addition assignment to act
                     // like string concatenation when both
                     // the left and right are string types.
                     $newVal = $curVal.$right;
+                } elseif (is_array($curVal)) {
+                    $newVal = $curVal;
+                    $newVal[] = $right;
                 } else {
                     $curVal = $this->convertToRuntimeNumeric($curVal, $varName);
 
@@ -917,7 +921,8 @@ class Environment
                 return null;
             } elseif ($operand instanceof DivisionAssignmentOperator) {
                 $varName = $this->nameOf($left);
-                $curVal = $this->numericScopeValue($varName);
+                $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
+                $right = $this->checkForFieldValue($right);
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -935,7 +940,8 @@ class Environment
                 return null;
             } elseif ($operand instanceof ModulusAssignmentOperator) {
                 $varName = $this->nameOf($left);
-                $curVal = $this->numericScopeValue($varName);
+                $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
+                $right = $this->checkForFieldValue($right);
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -952,7 +958,8 @@ class Environment
                 return null;
             } elseif ($operand instanceof MultiplicationAssignmentOperator) {
                 $varName = $this->nameOf($left);
-                $curVal = $this->numericScopeValue($varName);
+                $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
+                $right = $this->checkForFieldValue($right);
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -969,7 +976,8 @@ class Environment
                 return null;
             } elseif ($operand instanceof SubtractionAssignmentOperator) {
                 $varName = $this->nameOf($left);
-                $curVal = $this->numericScopeValue($varName);
+                $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
+                $right = $this->checkForFieldValue($right);
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
