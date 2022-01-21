@@ -188,12 +188,7 @@ class ValidatorTest extends TestCase
                 'replicator_set' => [
                     'fields' => [
                         ['handle' => 'must_fill', 'field' => ['type' => 'toggle']],
-                        [
-                            'handle' => 'text',
-                            'field' => [
-                                'validate' => ['required_if:{this}.must_fill,true'],
-                            ],
-                        ],
+                        ['handle' => 'text', 'field' => ['validate' => ['required_if:{this}.must_fill,true']]],
                     ],
                 ],
             ],
@@ -203,10 +198,17 @@ class ValidatorTest extends TestCase
             'type' => 'grid',
             'fields' => [
                 ['handle' => 'must_fill', 'field' => ['type' => 'toggle']],
-                [
-                    'handle' => 'text',
-                    'field' => [
-                        'validate' => ['required_if:{this}.must_fill,true'],
+                ['handle' => 'text', 'field' => ['validate' => ['required_if:{this}.must_fill,true']]],
+            ],
+        ];
+
+        $bard = [
+            'type' => 'bard',
+            'sets' => [
+                'bard_set' => [
+                    'fields' => [
+                        ['handle' => 'must_fill', 'field' => ['type' => 'toggle']],
+                        ['handle' => 'text', 'field' => ['validate' => ['required_if:{this}.must_fill,true']]],
                     ],
                 ],
             ],
@@ -215,9 +217,20 @@ class ValidatorTest extends TestCase
         $replicatorWithNestedReplicator = [
             'type' => 'replicator',
             'sets' => [
-                'parent_replicator_set' => [
+                'replicator_set' => [
                     'fields' => [
                         ['handle' => 'nested_replicator', 'field' => $replicator],
+                    ],
+                ],
+            ],
+        ];
+
+        $replicatorWithDoubleNestedReplicator = [
+            'type' => 'replicator',
+            'sets' => [
+                'replicator_set' => [
+                    'fields' => [
+                        ['handle' => 'nested_replicator', 'field' => $replicatorWithNestedReplicator],
                     ],
                 ],
             ],
@@ -226,7 +239,7 @@ class ValidatorTest extends TestCase
         $replicatorWithNestedGrid = [
             'type' => 'replicator',
             'sets' => [
-                'parent_replicator_set' => [
+                'replicator_set' => [
                     'fields' => [
                         ['handle' => 'nested_grid', 'field' => $grid],
                     ],
@@ -234,17 +247,45 @@ class ValidatorTest extends TestCase
             ],
         ];
 
+        $replicatorWithNestedBard = [
+            'type' => 'replicator',
+            'sets' => [
+                'replicator_set' => [
+                    'fields' => [
+                        ['handle' => 'nested_bard', 'field' => $bard],
+                    ]
+                ]
+            ],
+        ];
+
         $gridWithNestedReplicator = [
             'type' => 'grid',
-            'fields' => ['handle' => 'nested_replicator', 'field' => $replicator],
+            'fields' => [
+                ['handle' => 'nested_replicator', 'field' => $replicator],
+            ],
+        ];
+
+        $bardWithNestedReplicator = [
+            'type' => 'bard',
+            'sets' => [
+                'bard_set' => [
+                    'fields' => [
+                        ['handle' => 'nested_replicator', 'field' => $replicator],
+                    ],
+                ],
+            ],
         ];
 
         $fields = new Fields([
             ['handle' => 'replicator', 'field' => $replicator],
             ['handle' => 'replicator_with_nested_replicator', 'field' => $replicatorWithNestedReplicator],
+            ['handle' => 'replicator_with_double_nested_replicator', 'field' => $replicatorWithDoubleNestedReplicator],
             ['handle' => 'replicator_with_nested_grid', 'field' => $replicatorWithNestedGrid],
+            ['handle' => 'replicator_with_nested_bard', 'field' => $replicatorWithNestedBard],
             ['handle' => 'grid', 'field' => $grid],
             ['handle' => 'grid_with_nested_replicator', 'field' => $gridWithNestedReplicator],
+            ['handle' => 'bard', 'field' => $bard],
+            ['handle' => 'bard_with_nested_replicator', 'field' => $bardWithNestedReplicator],
         ]);
 
         $fields = $fields->addValues([
@@ -252,36 +293,85 @@ class ValidatorTest extends TestCase
                 ['type' => 'replicator_set'],
             ],
             'replicator_with_nested_replicator' => [
-                ['type' => 'parent_replicator_set', 'nested_replicator' => [['type' => 'replicator_set']]],
+                ['type' => 'replicator_set', 'nested_replicator' => [['type' => 'replicator_set']]],
+            ],
+            'replicator_with_double_nested_replicator' => [
+                ['type' => 'replicator_set', 'nested_replicator' => [['type' => 'replicator_set', 'nested_replicator' => [['type' => 'replicator_set']]]]],
             ],
             'replicator_with_nested_grid' => [
-                ['type' => 'parent_replicator_set', 'nested_grid' => [['text' => 'null']]],
+                ['type' => 'replicator_set', 'nested_grid' => [[]]],
+            ],
+            'replicator_with_nested_bard' => [
+                ['type' => 'replicator_set', 'nested_bard' => [['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set']]]]],
             ],
             'grid' => [
                 ['text' => null],
             ],
             'grid_with_nested_replicator' => [
-                // TODO
+                ['nested_replicator' => [['type' => 'replicator_set']]],
             ],
+            'bard' => [
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set']]],
+            ],
+            'bard_with_nested_replicator' => [
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'nested_replicator' => [['type' => 'replicator_set']]]]],
+            ]
         ]);
 
-        $validation = (new Validator)->fields($fields);
-
-        // print_r($validation->rules());
+        $rules = (new Validator)->fields($fields)->rules();
 
         $this->assertArraySubset([
             'replicator.0.text' => [
                 'required_if:replicator.0.must_fill,true',
-            ],
-            'grid.0.text' => [
-                'required_if:grid.0.must_fill,true',
-            ],
+            ]
+        ], $rules);
+
+        $this->assertArraySubset([
             'replicator_with_nested_replicator.0.nested_replicator.0.text' => [
                 'required_if:replicator_with_nested_replicator.0.nested_replicator.0.must_fill,true',
             ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'replicator_with_double_nested_replicator.0.nested_replicator.0.nested_replicator.0.text' => [
+                'required_if:replicator_with_double_nested_replicator.0.nested_replicator.0.nested_replicator.0.must_fill,true',
+            ]
+        ], $rules);
+
+        $this->assertArraySubset([
             'replicator_with_nested_grid.0.nested_grid.0.text' => [
                 'required_if:replicator_with_nested_grid.0.nested_grid.0.must_fill,true',
             ],
-        ], $validation->rules());
+        ], $rules);
+
+        $this->assertArraySubset([
+            'replicator_with_nested_bard.0.nested_bard.0.attrs.values.text' => [
+                'required_if:replicator_with_nested_bard.0.nested_bard.0.attrs.values.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'grid.0.text' => [
+                'required_if:grid.0.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'grid_with_nested_replicator.0.nested_replicator.0.text' => [
+                'required_if:grid_with_nested_replicator.0.nested_replicator.0.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'bard.0.attrs.values.text' => [
+                'required_if:bard.0.attrs.values.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'bard_with_nested_replicator.0.attrs.values.nested_replicator.0.text' => [
+                'required_if:bard_with_nested_replicator.0.attrs.values.nested_replicator.0.must_fill,true',
+            ],
+        ], $rules);
     }
 }
