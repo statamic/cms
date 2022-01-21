@@ -2,10 +2,11 @@
 
 namespace Tests\Feature\Entries;
 
+use Facades\Statamic\CP\LivePreview;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Token;
-use Statamic\Tokens\Handlers\LivePreviewEntry;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -41,8 +42,10 @@ class SubstitutesEntryForLivePreviewTest extends TestCase
     /** @test */
     public function it_substitutes()
     {
-        $token = Token::make('test-token', LivePreviewEntry::class, ['entry' => '2', 'data' => ['title' => 'Substituted title', 'foo' => 'Substituted foo']]);
-        Token::shouldReceive('find')->with('test-token')->andReturn($token)->once();
+        $substitute = EntryFactory::collection('test')->id('2')->slug('charlie')->data(['title' => 'Substituted title', 'foo' => 'Substituted foo'])->make();
+        LivePreview::tokenize('test-token', $substitute);
+
+        $this->assertEquals('Bravo', Entry::find('2')->get('title')); // Check that the test didn't somehow override the real entry accidentally.
 
         $this->get('/test?token=test-token')->assertSeeInOrder([
             'Alfa',
