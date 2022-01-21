@@ -420,7 +420,7 @@ export default {
 
         visibleValues() {
             return _.omit(this.values, (_, handle) => {
-                return this.$store.state.publish.base.hiddenFields[handle];
+                return this.$store.state.publish[this.publishContainer].hiddenFields[handle];
             });
         },
 
