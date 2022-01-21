@@ -64,14 +64,13 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_meta()
+    public function it_gets_custom()
     {
         $blueprint = (new Blueprint)->setContents([
-            'title' => 'Test',
-            'meta' => 'abc',
+            'custom' => 'abc',
         ]);
 
-        $this->assertEquals('abc', $blueprint->meta());
+        $this->assertEquals('abc', $blueprint->custom());
     }
 
     /** @test */

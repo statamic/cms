@@ -47,8 +47,8 @@ class Fieldset
 
         $contents['fields'] = $fields;
 
-        if (! array_key_exists('meta', $contents) && isset($this->contents['meta'])) {
-            $contents['meta'] = $this->contents['meta'];
+        if (! array_key_exists('custom', $contents) && isset($this->contents['custom'])) {
+            $contents['custom'] = $this->contents['custom'];
         }
 
         $this->contents = $contents;
@@ -66,9 +66,9 @@ class Fieldset
         return array_get($this->contents, 'title', Str::humanize($this->handle));
     }
 
-    public function meta()
+    public function custom()
     {
-        return array_get($this->contents, 'meta');
+        return array_get($this->contents, 'custom');
     }
 
     public function fields(): Fields

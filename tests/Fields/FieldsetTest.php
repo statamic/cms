@@ -51,14 +51,13 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_meta()
+    public function it_gets_custom()
     {
         $fieldset = (new Fieldset)->setContents([
-            'title' => 'Test',
-            'meta' => 'abc',
+            'custom' => 'abc',
         ]);
 
-        $this->assertEquals('abc', $fieldset->meta());
+        $this->assertEquals('abc', $fieldset->custom());
     }
 
     /** @test */
