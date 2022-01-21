@@ -253,8 +253,8 @@ class ValidatorTest extends TestCase
                 'replicator_set' => [
                     'fields' => [
                         ['handle' => 'nested_bard', 'field' => $bard],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 
@@ -315,7 +315,7 @@ class ValidatorTest extends TestCase
             ],
             'bard_with_nested_replicator' => [
                 ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'nested_replicator' => [['type' => 'replicator_set']]]]],
-            ]
+            ],
         ]);
 
         $rules = (new Validator)->fields($fields)->rules();
@@ -323,7 +323,7 @@ class ValidatorTest extends TestCase
         $this->assertArraySubset([
             'replicator.0.text' => [
                 'required_if:replicator.0.must_fill,true',
-            ]
+            ],
         ], $rules);
 
         $this->assertArraySubset([
@@ -335,7 +335,7 @@ class ValidatorTest extends TestCase
         $this->assertArraySubset([
             'replicator_with_double_nested_replicator.0.nested_replicator.0.nested_replicator.0.text' => [
                 'required_if:replicator_with_double_nested_replicator.0.nested_replicator.0.nested_replicator.0.must_fill,true',
-            ]
+            ],
         ], $rules);
 
         $this->assertArraySubset([
