@@ -6,6 +6,48 @@ use Tests\Antlers\ParserTestCase;
 
 class ConditionalsTest extends ParserTestCase
 {
+    public function test_sandbox_will_defer_collapsing_arrays()
+    {
+        $data = [
+            'people' => [
+                ['name' => 'Charlie'],
+                ['name' => 'Dave'],
+                ['name' => 'Alice'],
+                ['name' => 'Bob'],
+            ],
+            'houses' => [],
+        ];
+
+        $template = <<<'EOT'
+{{ if ( (people pluck 'name')|contains('Alice') ) }}yes{{ else }}no{{ /if }}
+EOT;
+        $this->assertSame('yes', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ if houses }}yes{{ else }}no{{ /if }}
+EOT;
+        $this->assertSame('no', $this->renderString($template, $data))
+
+            $template = <<<'EOT'
+{{ if people }}yes{{ else }}no{{ /if }}
+EOT;
+
+        $this->assertSame('yes', $this->renderString($template, $data));
+
+
+        $template = <<<'EOT'
+{{ if houses == false }}yes{{ else }}no{{ /if }}
+EOT;
+
+        $this->assertSame('yes', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ if houses === false }}yes{{ else }}no{{ /if }}
+EOT;
+
+        $this->assertSame('no', $this->renderString($template, $data));
+    }
+
     public function test_sandbox_evaluates_simple_boolean_expressions()
     {
         $result = $this->getBoolResult('true == false', []);

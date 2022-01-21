@@ -1387,9 +1387,15 @@ class Environment
         if ($val instanceof NumberNode) {
             $returnVal = $val->value;
         } elseif ($val instanceof LogicGroup) {
+            $condRestore = $this->isEvaluatingTruthValue;
+            $this->isEvaluatingTruthValue = false;
             $returnVal = $this->process($val->nodes);
+            $this->isEvaluatingTruthValue = $condRestore;
         } elseif ($val instanceof SemanticGroup) {
+            $condRestore = $this->isEvaluatingTruthValue;
+            $this->isEvaluatingTruthValue = false;
             $returnVal = $this->process($val->nodes);
+            $this->isEvaluatingTruthValue = $condRestore;
         } elseif ($val instanceof VariableNode) {
             $varName = $this->nameOf($val);
 
