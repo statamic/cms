@@ -77,7 +77,7 @@ class Structure extends Tags
 
     public function toArray($tree, $parent = null, $depth = 1)
     {
-        return collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
+        $pages = collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
             $keys = $this->getQuerySelectKeys($page);
             $data = $page->toAugmentedArray($keys);
@@ -98,6 +98,25 @@ class Structure extends Tags
                 'is_parent'   => $this->siteAbsoluteUrl === $absoluteUrl ? false : URL::isAncestorOf($this->currentUrl, $url),
                 'is_external' => URL::isExternal($absoluteUrl),
             ]);
-        })->filter()->values()->all();
+        })->filter()->values();
+
+        $this->addIsParent($pages);
+
+        return $pages->all();
+    }
+
+    protected function addIsParent($pages, &$parent = null)
+    {
+        $pages->transform(function ($page) use (&$parent) {
+            $page['is_parent'] = false;
+
+            $this->addIsParent(collect($page['children'] ?? []), $page);
+
+            if ($parent && ($page['is_current'] || $page['is_parent'])) {
+                $parent['is_parent'] = true;
+            }
+
+            return $page;
+        });
     }
 }
