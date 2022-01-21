@@ -120,7 +120,7 @@ class ValidatorTest extends TestCase
         ], $validation->rules());
     }
 
-     /** @test */
+    /** @test */
     public function it_compiles_field_attributes()
     {
         $fieldWithNoExtraAttributes = Mockery::mock(Field::class);
@@ -246,7 +246,7 @@ class ValidatorTest extends TestCase
             ['handle' => 'grid', 'field' => $grid],
             ['handle' => 'grid_with_nested_replicator', 'field' => $gridWithNestedReplicator],
         ]);
-        
+
         $fields = $fields->addValues([
             'replicator' => [
                 ['type' => 'replicator_set'],
@@ -261,7 +261,7 @@ class ValidatorTest extends TestCase
                 ['text' => null],
             ],
             'grid_with_nested_replicator' => [
-                // TODO 
+                // TODO
             ],
         ]);
 

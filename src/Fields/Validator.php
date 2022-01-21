@@ -95,7 +95,6 @@ class Validator
 
     public function validate()
     {
-        print_r($this->rules());
         return LaravelValidator::validate(
             $this->fields->preProcessValidatables()->values()->all(),
             $this->rules(),
