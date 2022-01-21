@@ -2,6 +2,7 @@
 
 namespace Tests\Tokens;
 
+use Illuminate\Http\Request;
 use Statamic\Facades;
 use Statamic\Tokens\Token;
 use Tests\TestCase;
@@ -51,20 +52,24 @@ class TokenTest extends TestCase
         $this->app->bind('TestTokenHandler', function () {
             return new class()
             {
-                public function handle($token)
+                public function handle($token, $request, $next)
                 {
                     app()->bind('handler-data', function () use ($token) {
                         return $token->data()->all();
                     });
+
+                    return $next($request);
                 }
             };
         });
 
         $token = new Token('test', 'TestTokenHandler', ['foo' => 'bar']);
 
-        $return = $token->handle();
+        $return = $token->handle(new Request, function () {
+            return 'response';
+        });
 
         $this->assertEquals(['foo' => 'bar'], app('handler-data'));
-        $this->assertTrue($return);
+        $this->assertEquals('response', $return);
     }
 }

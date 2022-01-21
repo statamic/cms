@@ -2,6 +2,7 @@
 
 namespace Statamic\Tokens;
 
+use Closure;
 use Facades\Statamic\Tokens\Generator;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Tokens\Token as Contract;
@@ -50,10 +51,8 @@ class AbstractToken implements Contract
         return Token::delete($this);
     }
 
-    public function handle(): bool
+    public function handle($request, Closure $next)
     {
-        app($this->handler)->handle($this);
-
-        return true;
+        return app($this->handler)->handle($this, $request, $next);
     }
 }

@@ -2,11 +2,12 @@
 
 namespace Tests\Tokens;
 
+use Closure;
 use Illuminate\Http\Request;
-use Mockery;
+use Illuminate\Http\Response;
+use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\Token as Tokens;
 use Statamic\Http\Middleware\HandleToken;
-use Statamic\Tokens\Token;
 use Tests\TestCase;
 
 class HandleTokenMiddlewareTest extends TestCase
@@ -26,17 +27,20 @@ class HandleTokenMiddlewareTest extends TestCase
      **/
     public function it_should_handle_valid_tokens($paramToken, $headerToken)
     {
-        $token = Mockery::spy(Token::class);
-        Tokens::shouldReceive('find')->with('valid-token')->andReturn($token);
-
         $request = $this->request($paramToken, $headerToken);
 
-        $return = (new HandleToken)->handle($request, function () {
-            return 'ok';
-        });
+        $next = function () {
+            return new Response;
+        };
 
-        $this->assertEquals('ok', $return);
-        $token->shouldHaveReceived('handle')->once();
+        $token = Tokens::make('valid-token', TestMiddlewareTokenHandler::class, ['foo' => 'bar']);
+
+        Tokens::shouldReceive('find')->with('valid-token')->andReturn($token);
+
+        $response = (new HandleToken)->handle($request, $next);
+
+        $this->assertEquals('bar', $request->get('foo'));
+        $this->assertEquals('valid-token', $response->headers->get('X-Test-Middleware'));
     }
 
     public function validTokenProvider()
@@ -86,5 +90,19 @@ class HandleTokenMiddlewareTest extends TestCase
         });
 
         $this->assertEquals('ok', $return);
+    }
+}
+
+class TestMiddlewareTokenHandler
+{
+    public function handle(Token $token, $request, Closure $next)
+    {
+        $request->query->replace(['foo' => 'bar']);
+
+        $response = $next($request);
+
+        $response->headers->set('X-Test-Middleware', $token->token());
+
+        return $response;
     }
 }

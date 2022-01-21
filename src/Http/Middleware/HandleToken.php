@@ -9,11 +9,11 @@ class HandleToken
 {
     public function handle($request, Closure $next)
     {
-        if ($token = $this->getToken($request)) {
-            $token->handle();
+        if (! $token = $this->getToken($request)) {
+            return $next($request);
         }
 
-        return $next($request);
+        return $token->handle($request, $next);
     }
 
     private function getToken($request)

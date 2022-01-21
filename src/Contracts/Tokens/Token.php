@@ -2,6 +2,7 @@
 
 namespace Statamic\Contracts\Tokens;
 
+use Closure;
 use Illuminate\Support\Collection;
 
 interface Token
@@ -10,7 +11,7 @@ interface Token
 
     public function handler(): string;
 
-    public function handle(): bool;
+    public function handle($request, Closure $next);
 
     public function data(): Collection;
 
