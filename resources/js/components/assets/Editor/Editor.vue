@@ -117,7 +117,7 @@
 
                 <publish-container
                     v-if="fields"
-                    name="publishContainer"
+                    :name="publishContainer"
                     :blueprint="fieldset"
                     :values="values"
                     :meta="meta"
