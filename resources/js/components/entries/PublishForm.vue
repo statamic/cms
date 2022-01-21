@@ -257,11 +257,13 @@ import PublishActions from './PublishActions';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History';
 import HasPreferences from '../data-list/HasPreferences';
+import HasHiddenFields from '../data-list/HasHiddenFields';
 
 export default {
 
     mixins: [
         HasPreferences,
+        HasHiddenFields,
     ],
 
     components: {
@@ -416,12 +418,6 @@ export default {
 
         afterSaveOption() {
             return this.getPreference('after_save');
-        },
-
-        visibleValues() {
-            return _.omit(this.values, (_, handle) => {
-                return this.$store.state.publish[this.publishContainer].hiddenFields[handle];
-            });
         },
 
     },
