@@ -214,13 +214,13 @@ EOT;
             'simple' => [
                 'Alice',
                 'Bob',
-                'Charlie'
+                'Charlie',
             ],
             'map' => [
                 ['name' => 'Alice'],
                 ['name' => 'Bob'],
                 ['name' => 'Charlie'],
-            ]
+            ],
         ];
 
         // The evluate test method adds {{ }} already.
@@ -241,7 +241,6 @@ EOT;
         $this->assertSame($expectedSimple, $results['simple']);
         $this->assertSame($expectedMap, $results['map']);
     }
-
 
     public function test_nested_arrays()
     {

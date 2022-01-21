@@ -152,7 +152,6 @@ EOT;
             }
         })::register();
 
-
         (new class extends Tags
         {
             public static $handle = 'anothertag';
@@ -182,7 +181,6 @@ EOT;
                 return '<'.$method.'>';
             }
         })::register();
-
 
         (new class extends Tags
         {
