@@ -788,6 +788,33 @@ class FieldsTest extends TestCase
         $fields->validate(['foo' => 'bar']);
     }
 
+    /** @test */
+    public function it_validates_properly_against_filled_fields_with_sometimes_rule()
+    {
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'text']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'text']);
+        });
+
+        $fields = (new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two'],
+        ]))->addValues(['one' => 'filled']);
+
+        Validator::fields($fields)->withRules([])->validate();
+        Validator::fields($fields)->withRules(['two' => ['sometimes', 'required']])->validate();
+
+        try {
+            Validator::fields($fields)->withRules(['two' => ['required']])->validate();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            //
+        }
+
+        $this->assertInstanceOf(\Illuminate\Validation\ValidationException::class, $e);
+    }
+
     /**
      * @test
      * @group graphql
