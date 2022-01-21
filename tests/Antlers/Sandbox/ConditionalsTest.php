@@ -26,7 +26,7 @@ EOT;
         $template = <<<'EOT'
 {{ if houses }}yes{{ else }}no{{ /if }}
 EOT;
-        $this->assertSame('no', $this->renderString($template, $data))
+        $this->assertSame('no', $this->renderString($template, $data));
 
             $template = <<<'EOT'
 {{ if people }}yes{{ else }}no{{ /if }}
