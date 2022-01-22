@@ -1563,6 +1563,10 @@ class NodeProcessor
                                 }
                             }
                             $executedParamModifiers = true;
+
+                            if (is_array($val) && !Arr::isAssoc($val)) {
+                                $val = $this->addLoopIterationVariables($val);
+                            }
                         }
 
                         if ($this->guardRuntime($node, $val) == false) {

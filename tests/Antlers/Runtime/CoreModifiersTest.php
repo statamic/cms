@@ -389,4 +389,75 @@ EOT;
         $this->assertSame('TEST!', $this->renderString('{{ variable }}', ['variable' => $value]));
         $this->assertSame('test', $this->renderString('{{ variable | raw }}', ['variable' => $value], true));
     }
+
+    public function test_explode_on_tag_pairs()
+    {
+        // Issue: https://github.com/statamic/cms/issues/4979
+
+        // Shorthand from context.
+        $template = <<<'EOT'
+Start:{{ string | explode:, }}<{{ value }}>{{ /string }}:End
+EOT;
+
+        $this->assertSame(
+            'Start:<testing><explode><modifiers>:End',
+            $this->renderString($template, [
+                'string' => 'testing,explode,modifiers'
+            ], true)
+        );
+
+        // Shorthand from literal.
+        $template = <<<'EOT'
+{{#
+    Test from string literal. The self-closing here
+    is important since it removes this from the
+    tag-pairing algorithm's list. Tag matching
+    prefers non-modifier start tags.
+#}}
+{{ string = 'testing,explode,modifiers'; /}}
+
+{{ string | explode:, }}<{{ value }}>{{ /string }}
+EOT;
+
+        $this->assertSame(
+            '<testing><explode><modifiers>',
+            trim($this->renderString($template, [], true))
+        );
+
+        // Param-style from context.
+        $template = <<<'EOT'
+Start:{{ string explode="," }}<{{ value }}>{{ /string }}:End
+EOT;
+
+        $this->assertSame(
+            'Start:<testing><explode><modifiers>:End',
+            $this->renderString($template, [
+                'string' => 'testing,explode,modifiers'
+            ], true)
+        );
+
+        // Param-style space delimited.
+        $template = <<<'EOT'
+Start:{{ string explode=" " }}<{{ value }}>{{ /string }}:End
+EOT;
+
+        $this->assertSame(
+            'Start:<testing><explode><modifiers>:End',
+            $this->renderString($template, [
+                'string' => 'testing explode modifiers'
+            ], true)
+        );
+
+        // Method-style space delimited.
+        $template = <<<'EOT'
+Start:{{ string | explode(' ') }}<{{ value }}>{{ /string }}:End
+EOT;
+
+        $this->assertSame(
+            'Start:<testing><explode><modifiers>:End',
+            $this->renderString($template, [
+                'string' => 'testing explode modifiers'
+            ], true)
+        );
+    }
 }
