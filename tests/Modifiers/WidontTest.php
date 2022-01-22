@@ -95,4 +95,16 @@ EOD;
     {
         return Modify::value($value)->widont($params)->fetch();
     }
+
+    /** @test */
+    public function it_doesnt_add_nbsp_to_nested_list()
+    {
+        $eol = PHP_EOL;
+        $value = "<ul>$eol<li>Lorem ipsum dolor sit amet.$eol<ul>$eol<li>Consectetur adipiscing elit.</li>$eol</ul>$eol</li>$eol<li>Lorem ipsum dolor sit amet.</li>$eol</ul>$eol";
+
+        $this->assertEquals(
+            "<ul>$eol<li>Lorem ipsum dolor sit&nbsp;amet.$eol<ul>$eol<li>Consectetur adipiscing&nbsp;elit.</li>$eol</ul>$eol</li>$eol<li>Lorem ipsum dolor sit&nbsp;amet.</li>$eol</ul>$eol",
+            $this->modify($value)
+        );
+    }
 }
