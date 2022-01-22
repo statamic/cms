@@ -1252,12 +1252,12 @@ class NodeProcessor
 
                         array_pop(GlobalRuntimeState::$globalTagEnterStack);
 
-                        if (!$currentProcessorCanHandleTagValue) {
+                        if (! $currentProcessorCanHandleTagValue) {
                             $buffer .= $this->measureBufferAppend($node, $output);
                         }
 
                         $this->data = $lockData;
-                        if (!$currentProcessorCanHandleTagValue) {
+                        if (! $currentProcessorCanHandleTagValue) {
                             continue;
                         }
                     }
@@ -1673,7 +1673,7 @@ class NodeProcessor
                                     $dataCount = count($this->data);
                                     $loopBuffer = '';
 
-                                    $tChildren  = $node->children;
+                                    $tChildren = $node->children;
 
                                     if ($tagCallbackResult != null) {
                                         array_pop($tChildren);
