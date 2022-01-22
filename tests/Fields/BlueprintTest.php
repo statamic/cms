@@ -64,6 +64,16 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_arbitrary_data()
+    {
+        $blueprint = (new Blueprint)->setContents([
+            'example' => 'abc',
+        ]);
+
+        $this->assertEquals('abc', $blueprint->contents()['example']);
+    }
+
+    /** @test */
     public function it_gets_the_hidden_property_which_is_false_by_default()
     {
         $blueprint = new Blueprint;

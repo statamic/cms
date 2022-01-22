@@ -47,7 +47,7 @@ class Fieldset
 
         $contents['fields'] = $fields;
 
-        $this->contents = $contents;
+        $this->contents = array_merge($this->contents ?? [], $contents);
 
         return $this;
     }

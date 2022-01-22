@@ -112,7 +112,7 @@ class Blueprint implements Augmentable
 
     public function setContents(array $contents)
     {
-        $this->contents = $contents;
+        $this->contents = array_merge($this->contents ?? [], $contents);
 
         return $this
             ->normalizeSections()

@@ -51,6 +51,16 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_arbitrary_data()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'example' => 'abc',
+        ]);
+
+        $this->assertEquals('abc', $fieldset->contents()['example']);
+    }
+
+    /** @test */
     public function the_title_falls_back_to_a_humanized_handle()
     {
         $fieldset = (new Fieldset)->setHandle('the_blueprint_handle');
