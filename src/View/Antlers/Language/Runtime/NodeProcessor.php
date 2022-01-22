@@ -356,6 +356,13 @@ class NodeProcessor
         }
     }
 
+    private function replaceData($data)
+    {
+        $this->data = [$data];
+
+        return $this;
+    }
+
     /**
      * Sets the active scope data.
      *
@@ -1070,6 +1077,9 @@ class NodeProcessor
                         continue;
                     }
 
+                    $currentProcessorCanHandleTagValue = false;
+                    $tagCallbackResult = null;
+
                     if ($this->shouldProcessAsTag($node)) {
                         $tagName = $node->name->getCompoundTagName();
                         $tagMethod = $node->name->getMethodName();
@@ -1212,12 +1222,20 @@ class NodeProcessor
                         if (is_array($output)) {
                             if (empty($output)) {
                                 $output = $tag->parseNoResults();
+                                $currentProcessorCanHandleTagValue = false;
                             } else {
                                 GlobalRuntimeState::$traceTagAssignments = true;
                                 GlobalRuntimeState::$activeTracerCount += 1;
                                 GlobalRuntimeState::$traceTagAssignments = $this->runtimeAssignments;
 
-                                $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
+                                if ($node->hasModifierParameters()) {
+                                    $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
+                                    $tagCallbackResult = null;
+                                    $currentProcessorCanHandleTagValue = false;
+                                } else {
+                                    $tagCallbackResult = $output;
+                                    $currentProcessorCanHandleTagValue = true;
+                                }
 
                                 GlobalRuntimeState::$activeTracerCount -= 1;
 
@@ -1231,30 +1249,37 @@ class NodeProcessor
                                 }
                             }
                         }
+
                         array_pop(GlobalRuntimeState::$globalTagEnterStack);
 
-                        $buffer .= $this->measureBufferAppend($node, $output);
-
-                        $this->data = $lockData;
-                        continue;
-                    } else {
-                        if ($node->name->name == 'once') {
-                            $node->isNodeAbandoned = true;
-
-                            $results = $this->cloneProcessor()->setData($this->getActiveData())->reduce($node->children);
-
-                            $buffer .= $this->measureBufferAppend($node, $results);
-
-                            if ($this->isTracingEnabled()) {
-                                $this->runtimeConfiguration->traceManager->traceOnExit($node, $results);
-                            }
-                            continue;
+                        if (!$currentProcessorCanHandleTagValue) {
+                            $buffer .= $this->measureBufferAppend($node, $output);
                         }
 
-                        $val = null;
-                        $runtimeResolveLoopVar = false;
-                        $runtimeResolveModifiedValue = false;
+                        $this->data = $lockData;
+                        if (!$currentProcessorCanHandleTagValue) {
+                            continue;
+                        }
+                    }
 
+                    if ($node->name->name == 'once') {
+                        $node->isNodeAbandoned = true;
+
+                        $results = $this->cloneProcessor()->setData($this->getActiveData())->reduce($node->children);
+
+                        $buffer .= $this->measureBufferAppend($node, $results);
+
+                        if ($this->isTracingEnabled()) {
+                            $this->runtimeConfiguration->traceManager->traceOnExit($node, $results);
+                        }
+                        continue;
+                    }
+
+                    $val = null;
+                    $runtimeResolveLoopVar = false;
+                    $runtimeResolveModifiedValue = false;
+
+                    if ($tagCallbackResult == null) {
                         if (count($node->parameters) == 0 && ! empty($node->runtimeNodes)) {
                             $environmentData = $this->getActiveData();
 
@@ -1430,277 +1455,297 @@ class NodeProcessor
                             }
                             continue;
                         }
+                    } else {
+                        $val = $tagCallbackResult;
+                        $runtimeResolveLoopVar = true;
+                        $runtimeResolveModifiedValue = true;
+                    }
 
-                        $runLoopMagic = true;
+                    $runLoopMagic = true;
 
-                        if ($node->isClosedBy == null && $this->runtimeConfiguration != null && $this->runtimeConfiguration->fatalErrorOnUnpairedLoop) {
-                            throw ErrorFactory::makeRuntimeError(
-                                AntlersErrorCodes::TYPE_RUNTIME_FATAL_UNPAIRED_LOOP_END,
-                                $node,
-                                'Fatal Error: Unpaired loop tag detected during iteration.'
-                            );
-                        }
+                    if ($node->isClosedBy == null && $this->runtimeConfiguration != null && $this->runtimeConfiguration->fatalErrorOnUnpairedLoop) {
+                        throw ErrorFactory::makeRuntimeError(
+                            AntlersErrorCodes::TYPE_RUNTIME_FATAL_UNPAIRED_LOOP_END,
+                            $node,
+                            'Fatal Error: Unpaired loop tag detected during iteration.'
+                        );
+                    }
 
-                        if ($runtimeResolveLoopVar == false || $runtimeResolveModifiedValue == false) {
-                            if ($node->pathReference != null) {
-                                $dataRetriever = new PathDataManager();
-                                $dataRetriever->cascade($this->cascade);
+                    if ($runtimeResolveLoopVar == false || $runtimeResolveModifiedValue == false) {
+                        if ($node->pathReference != null) {
+                            $dataRetriever = new PathDataManager();
+                            $dataRetriever->cascade($this->cascade);
 
-                                if ($this->antlersParser != null) {
-                                    $dataRetriever->setAntlersParser($this->antlersParser);
-                                }
-
-                                $dataRetriever->setIsPaired($node->isClosedBy != null);
-                                $valDetails = $dataRetriever->getDataWithExistence($node->pathReference, $this->getActiveData());
-
-                                if ($node->pathReference->isStrictVariableReference && $node->pathReference->isExplicitVariableReference) {
-                                    $runLoopMagic = true;
-                                } elseif ($node->pathReference->isStrictVariableReference && $node->pathReference->isExplicitVariableReference == false) {
-                                    $runLoopMagic = false;
-                                }
-
-                                if ($valDetails[0] == false) {
-                                    if ($this->isTracingEnabled()) {
-                                        $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
-                                    }
-
-                                    continue;
-                                }
-
-                                $val = $valDetails[1];
-                            }
-                        }
-
-                        if ($val instanceof Builder) {
-                            $val = $val->get()->all();
-                        }
-
-                        $executedParamModifiers = false;
-
-                        if ($node->hasParameters) {
-                            $this->pathDataManager->setIsPaired(false);
-                            $this->pathDataManager->setReduceFinal(false);
-                            $val = $this->pathDataManager->getData($node->pathReference, $this->getActiveData());
-
-                            if (! $this->shouldProcessAsTag($node)) {
-                                foreach ($node->parameters as $param) {
-                                    if (ModifierManager::isModifier($param)) {
-                                        $activeData = $this->getActiveData();
-
-                                        $tempValues = $node->getModifierParameterValuesForParameter($param, $activeData);
-                                        $paramValues = [];
-
-                                        foreach ($tempValues as $paramName => $value) {
-                                            $containedInterpolation = false;
-
-                                            foreach ($node->interpolationRegions as $regionName => $region) {
-                                                if (Str::contains($value, $regionName)) {
-                                                    $containedInterpolation = true;
-                                                    if (array_key_exists($regionName, $this->canHandleInterpolations) == false) {
-                                                        $this->canHandleInterpolations[$regionName] = $node->processedInterpolationRegions[$regionName];
-                                                    }
-
-                                                    $interpolationResult = $this->evaluateDeferredInterpolation($regionName);
-
-                                                    $resolvedValue = null;
-
-                                                    if ($value == $regionName) {
-                                                        $resolvedValue = $interpolationResult;
-                                                    } else {
-                                                        $resolvedValue = str_replace($regionName, (string) $interpolationResult, $val);
-                                                    }
-
-                                                    $paramValues[$paramName] = $resolvedValue;
-                                                }
-                                            }
-
-                                            if (! $containedInterpolation) {
-                                                $paramValues[$paramName] = $value;
-                                            }
-                                        }
-
-                                        if ($val instanceof  Value) {
-                                            if ($val->shouldParseAntlers()) {
-                                                GlobalRuntimeState::$isEvaluatingUserData = true;
-                                                $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
-                                                GlobalRuntimeState::$isEvaluatingUserData = false;
-                                            } else {
-                                                $val = $val->value();
-                                            }
-                                        }
-
-                                        if ($val instanceof Collection) {
-                                            $val = $val->values()->all();
-                                        }
-
-                                        if ($val instanceof AntlersString) {
-                                            $val = (string) $val;
-                                        }
-
-                                        if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
-                                            $val = $this->addLoopIterationVariables($val);
-                                        }
-
-                                        $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
-                                    } else {
-                                        if ($param->name === 'raw') {
-                                            if ($val instanceof Value) {
-                                                $val = $val->raw();
-                                            }
-                                        } elseif ($param->name === 'noparse') {
-                                            if ($val instanceof Value) {
-                                                $val = $val->value();
-                                            }
-                                        } else {
-                                            // Throw an exception here to maintain consistent behavior with the regex parser.
-                                            throw new ModifierNotFoundException($param->name);
-                                        }
-                                    }
-                                }
-
-                                if ($val instanceof Collection) {
-                                    $val = $val->toArray();
-                                }
-                            }
-                            $executedParamModifiers = true;
-
-                            if (is_array($val) && ! Arr::isAssoc($val)) {
-                                $val = $this->addLoopIterationVariables($val);
-                            }
-                        }
-
-                        if ($this->guardRuntime($node, $val) == false) {
-                            if ($this->isTracingEnabled()) {
-                                $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
+                            if ($this->antlersParser != null) {
+                                $dataRetriever->setAntlersParser($this->antlersParser);
                             }
 
-                            continue;
-                        }
+                            $dataRetriever->setIsPaired($node->isClosedBy != null);
+                            $valDetails = $dataRetriever->getDataWithExistence($node->pathReference, $this->getActiveData());
 
-                        if ($runLoopMagic) {
-                            if ($node->hasRecursiveNode) {
-                                RecursiveNodeManager::incrementDepth($node->recursiveReference);
+                            if ($node->pathReference->isStrictVariableReference && $node->pathReference->isExplicitVariableReference) {
+                                $runLoopMagic = true;
+                            } elseif ($node->pathReference->isStrictVariableReference && $node->pathReference->isExplicitVariableReference == false) {
+                                $runLoopMagic = false;
                             }
-                            $lockData = $this->data;
 
-                            if ($this->isLoopable($val)) {
-                                if (! empty($val)) {
-                                    $val = $this->massageKeys($val);
-
-                                    if (is_array($val) && Arr::isAssoc($val)) {
-                                        $tmpArrayData = $this->getActiveData();
-
-                                        if ($node->hasRecursiveNode) {
-                                            $namedDepthMappings = RecursiveNodeManager::getNamedMappings();
-                                            $recursiveKey = $node->recursiveReference->name->name.'_depth';
-                                            $tmpArrayData = $namedDepthMappings + $tmpArrayData;
-
-                                            if (array_key_exists($recursiveKey, $tmpArrayData)) {
-                                                $tmpArrayData['depth'] = $tmpArrayData[$recursiveKey];
-                                            }
-                                        }
-
-                                        $evalData = $val + $tmpArrayData;
-                                        $this->pushScope($node, $evalData);
-
-                                        $childNodes = $node->children;
-
-                                        $processor = new NodeProcessor($this->loader, $this->envDetails);
-
-                                        $processor->allowPhp($this->allowPhp);
-                                        $processor->setAntlersParserInstance($this->antlersParser);
-                                        $processor->setData($evalData);
-                                        $processor->cascade($this->cascade);
-
-                                        if ($this->runtimeConfiguration != null) {
-                                            $processor->setRuntimeConfiguration($this->runtimeConfiguration);
-                                        }
-
-                                        $assocOutput = $processor->reduce($childNodes);
-
-                                        $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($assocOutput));
-
-                                        $this->popScope($node->refId);
-                                    } else {
-                                        if (! $executedParamModifiers) {
-                                            $val = $this->addLoopIterationVariables($val);
-                                        }
-
-                                        $runtimeData = $this->getActiveData();
-                                        $childNodes = $node->children;
-                                        $processor = new NodeProcessor($this->loader, $this->envDetails);
-                                        $processor->allowPhp($this->allowPhp);
-                                        $processor->cascade($this->cascade);
-                                        $processor->setAntlersParserInstance($this->antlersParser);
-
-                                        if ($this->runtimeConfiguration != null) {
-                                            $processor->setRuntimeConfiguration($this->runtimeConfiguration);
-                                        }
-
-                                        $dataCount = count($this->data);
-                                        $loopBuffer = '';
-
-                                        foreach ($val as $procVal) {
-                                            $processor->setData(PathDataManager::reduce($procVal) + $runtimeData);
-
-                                            $loopBuffer .= $this->modifyBufferAppend($processor->reduce($childNodes));
-
-                                            $runtimeAssignments = $processor->getRuntimeAssignments();
-
-                                            if (! empty($runtimeAssignments)) {
-                                                $runtimeAssignmentsToProcess = [];
-
-                                                foreach ($runtimeAssignments as $assignmentVar => $assignmentValue) {
-                                                    if (array_key_exists($assignmentVar, $this->runtimeAssignments)) {
-                                                        $runtimeAssignmentsToProcess[$assignmentVar] = $assignmentValue;
-                                                    }
-                                                }
-
-                                                $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
-                                                $runtimeData = $runtimeAssignments + $runtimeData;
-                                            }
-
-                                            if (count($this->data) > $dataCount) {
-                                                $this->popLoopScope();
-                                            }
-                                        }
-
-                                        $buffer .= $this->measureBufferAppend($node, $loopBuffer);
-                                    }
-                                }
-
+                            if ($valDetails[0] == false) {
                                 if ($this->isTracingEnabled()) {
                                     $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                                 }
 
-                                $this->data = $lockData;
                                 continue;
                             }
+
+                            $val = $valDetails[1];
                         }
+                    }
 
-                        if ($executedParamModifiers == false && $node->hasParameters) {
-                            $curActiveData = [];
+                    if ($val instanceof Builder) {
+                        $val = $val->get()->all();
+                    }
 
-                            if (! empty($node->interpolationRegions)) {
-                                $curActiveData = $this->getActiveData();
-                            }
+                    $executedParamModifiers = false;
 
+                    if ($tagCallbackResult != null) {
+                        $executedParamModifiers = true;
+                    }
+
+                    if ($node->hasParameters && $tagCallbackResult == null) {
+                        $this->pathDataManager->setIsPaired(false);
+                        $this->pathDataManager->setReduceFinal(false);
+                        $val = $this->pathDataManager->getData($node->pathReference, $this->getActiveData());
+
+                        if (! $this->shouldProcessAsTag($node)) {
                             foreach ($node->parameters as $param) {
                                 if (ModifierManager::isModifier($param)) {
-                                    $val = $this->runModifier($param->name, array_values($node->getParameterValues($this, $curActiveData)), $val, $this->getActiveData());
+                                    $activeData = $this->getActiveData();
+
+                                    $tempValues = $node->getModifierParameterValuesForParameter($param, $activeData);
+                                    $paramValues = [];
+
+                                    foreach ($tempValues as $paramName => $value) {
+                                        $containedInterpolation = false;
+
+                                        foreach ($node->interpolationRegions as $regionName => $region) {
+                                            if (Str::contains($value, $regionName)) {
+                                                $containedInterpolation = true;
+                                                if (array_key_exists($regionName, $this->canHandleInterpolations) == false) {
+                                                    $this->canHandleInterpolations[$regionName] = $node->processedInterpolationRegions[$regionName];
+                                                }
+
+                                                $interpolationResult = $this->evaluateDeferredInterpolation($regionName);
+
+                                                $resolvedValue = null;
+
+                                                if ($value == $regionName) {
+                                                    $resolvedValue = $interpolationResult;
+                                                } else {
+                                                    $resolvedValue = str_replace($regionName, (string) $interpolationResult, $val);
+                                                }
+
+                                                $paramValues[$paramName] = $resolvedValue;
+                                            }
+                                        }
+
+                                        if (! $containedInterpolation) {
+                                            $paramValues[$paramName] = $value;
+                                        }
+                                    }
+
+                                    if ($val instanceof  Value) {
+                                        if ($val->shouldParseAntlers()) {
+                                            GlobalRuntimeState::$isEvaluatingUserData = true;
+                                            $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
+                                            GlobalRuntimeState::$isEvaluatingUserData = false;
+                                        } else {
+                                            $val = $val->value();
+                                        }
+                                    }
+
+                                    if ($val instanceof Collection) {
+                                        $val = $val->values()->all();
+                                    }
+
+                                    if ($val instanceof AntlersString) {
+                                        $val = (string) $val;
+                                    }
+
+                                    if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
+                                        $val = $this->addLoopIterationVariables($val);
+                                    }
+
+                                    $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
+                                } else {
+                                    if ($param->name === 'raw') {
+                                        if ($val instanceof Value) {
+                                            $val = $val->raw();
+                                        }
+                                    } elseif ($param->name === 'noparse') {
+                                        if ($val instanceof Value) {
+                                            $val = $val->value();
+                                        }
+                                    } else {
+                                        // Throw an exception here to maintain consistent behavior with the regex parser.
+                                        throw new ModifierNotFoundException($param->name);
+                                    }
                                 }
                             }
+
+                            if ($val instanceof Collection) {
+                                $val = $val->toArray();
+                            }
                         }
+                        $executedParamModifiers = true;
 
-                        $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($val));
+                        if (is_array($val) && ! Arr::isAssoc($val)) {
+                            $val = $this->addLoopIterationVariables($val);
+                        }
+                    }
 
+                    if ($this->guardRuntime($node, $val) == false) {
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
-                        $this->data = $lockData;
 
                         continue;
                     }
+
+                    if ($runLoopMagic) {
+                        if ($node->hasRecursiveNode) {
+                            RecursiveNodeManager::incrementDepth($node->recursiveReference);
+                        }
+                        $lockData = $this->data;
+
+                        if ($this->isLoopable($val)) {
+                            if (! empty($val)) {
+                                $val = $this->massageKeys($val);
+
+                                if (is_array($val) && Arr::isAssoc($val)) {
+                                    $tmpArrayData = $this->getActiveData();
+
+                                    if ($node->hasRecursiveNode) {
+                                        $namedDepthMappings = RecursiveNodeManager::getNamedMappings();
+                                        $recursiveKey = $node->recursiveReference->name->name.'_depth';
+                                        $tmpArrayData = $namedDepthMappings + $tmpArrayData;
+
+                                        if (array_key_exists($recursiveKey, $tmpArrayData)) {
+                                            $tmpArrayData['depth'] = $tmpArrayData[$recursiveKey];
+                                        }
+                                    }
+
+                                    $evalData = $val + $tmpArrayData;
+                                    $this->pushScope($node, $evalData);
+
+                                    $childNodes = $node->children;
+
+                                    $processor = new NodeProcessor($this->loader, $this->envDetails);
+
+                                    $processor->allowPhp($this->allowPhp);
+                                    $processor->setAntlersParserInstance($this->antlersParser);
+                                    $processor->setData($evalData);
+                                    $processor->cascade($this->cascade);
+
+                                    if ($this->runtimeConfiguration != null) {
+                                        $processor->setRuntimeConfiguration($this->runtimeConfiguration);
+                                    }
+                                    $assocOutput = $processor->reduce($childNodes);
+
+                                    $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($assocOutput));
+
+                                    $this->popScope($node->refId);
+                                } else {
+                                    if (! $executedParamModifiers || $tagCallbackResult != null) {
+                                        $val = $this->addLoopIterationVariables($val);
+                                    }
+
+                                    $runtimeData = $this->getActiveData();
+                                    $childNodes = $node->children;
+                                    $processor = new NodeProcessor($this->loader, $this->envDetails);
+                                    $processor->allowPhp($this->allowPhp);
+                                    $processor->cascade($this->cascade);
+                                    $processor->setAntlersParserInstance($this->antlersParser);
+
+                                    if ($this->runtimeConfiguration != null) {
+                                        $processor->setRuntimeConfiguration($this->runtimeConfiguration);
+                                    }
+
+                                    $dataCount = count($this->data);
+                                    $loopBuffer = '';
+
+                                    $tChildren  = $node->children;
+
+                                    if ($tagCallbackResult != null) {
+                                        array_pop($tChildren);
+                                        GlobalRuntimeState::$traceTagAssignments = true;
+                                    }
+
+                                    foreach ($val as $procVal) {
+                                        if ($tagCallbackResult != null) {
+                                            $runtimeData = array_merge($runtimeData, GlobalRuntimeState::$tracedRuntimeAssignments);
+                                        }
+                                        $processor->replaceData(PathDataManager::reduce($procVal) + $runtimeData);
+                                        $loopBuffer .= $this->modifyBufferAppend($processor->reduce($tChildren));
+
+                                        $runtimeAssignments = $processor->getRuntimeAssignments();
+
+                                        if ($tagCallbackResult != null) {
+                                            $runtimeAssignments = array_merge($runtimeAssignments, GlobalRuntimeState::$tracedRuntimeAssignments);
+                                        }
+
+                                        if (! empty($runtimeAssignments)) {
+                                            $runtimeAssignmentsToProcess = [];
+
+                                            foreach ($runtimeAssignments as $assignmentVar => $assignmentValue) {
+                                                if (array_key_exists($assignmentVar, $this->runtimeAssignments)) {
+                                                    $runtimeAssignmentsToProcess[$assignmentVar] = $assignmentValue;
+                                                }
+                                            }
+
+                                            $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
+                                            $runtimeData = array_merge($runtimeData, $runtimeAssignmentsToProcess);
+                                        }
+
+                                        if (count($this->data) > $dataCount) {
+                                            $this->popLoopScope();
+                                        }
+                                    }
+
+                                    $buffer .= $this->measureBufferAppend($node, $loopBuffer);
+                                }
+                            }
+
+                            if ($this->isTracingEnabled()) {
+                                $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
+                            }
+
+                            $this->data = $lockData;
+                            continue;
+                        }
+                    }
+
+                    if ($executedParamModifiers == false && $node->hasParameters) {
+                        $curActiveData = [];
+
+                        if (! empty($node->interpolationRegions)) {
+                            $curActiveData = $this->getActiveData();
+                        }
+
+                        foreach ($node->parameters as $param) {
+                            if (ModifierManager::isModifier($param)) {
+                                $val = $this->runModifier($param->name, array_values($node->getParameterValues($this, $curActiveData)), $val, $this->getActiveData());
+                            }
+                        }
+                    }
+
+                    $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($val));
+
+                    if ($this->isTracingEnabled()) {
+                        $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
+                    }
+                    $this->data = $lockData;
+
+                    continue;
                 }
             }
         }

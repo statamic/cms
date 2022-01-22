@@ -11,6 +11,7 @@ use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
+use Statamic\View\Antlers\Language\Runtime\ModifierManager;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\PathDataManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -277,6 +278,13 @@ class AntlersNode extends AbstractNode
     public $ref = 0;
 
     /**
+     * Indicates if the node has param-style modifiers.
+     *
+     * @var bool|null
+     */
+    private $hasModifierParametersCache = null;
+
+    /**
      * Returns a new AntlersNode with basic details copied.
      *
      * @return AntlersNode
@@ -317,6 +325,24 @@ class AntlersNode extends AbstractNode
         }
 
         return $this->cachedInnerContent;
+    }
+
+    public function hasModifierParameters()
+    {
+        if ($this->hasModifierParametersCache == null) {
+            $this->hasModifierParametersCache = false;
+
+            if ($this->hasParameters) {
+                foreach ($this->parameters as $parameter) {
+                    if (ModifierManager::isModifier($parameter)) {
+                        $this->hasModifierParametersCache = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $this->hasModifierParametersCache;
     }
 
     /**

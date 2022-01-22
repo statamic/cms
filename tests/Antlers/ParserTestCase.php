@@ -69,6 +69,8 @@ class ParserTestCase extends TestCase
     {
         parent::setUp();
 
+        GlobalRuntimeState::$tracedRuntimeAssignments = [];
+        GlobalRuntimeState::$traceTagAssignments = false;
         $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[PreventSavingStacheItemsToDisk::class])) {

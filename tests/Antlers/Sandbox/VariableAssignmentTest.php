@@ -116,12 +116,9 @@ EOT;
             ],
         ];
 
-        // another_var will remain in scope throughout the {{ products }}{{ /products }} loop.
-        // However, since it was never introduced in the parent scope, it's result will
-        // be discarded immediately after the final inner loop element is evaluated.
         $template = <<<'EOT'
-{{ my_var = 0; }}{{ products }}{{ my_var += 1; }}{{ another_var += 1; another_var }}{{ /products }}{{ my_var }}{{ another_var }}
+{{ my_var = 0; }}{{ products }}{{ my_var += 1; }}{{ another_var += 1; another_var }}{{ /products }}<my_var {{ my_var }}><another_var: {{ another_var ?? 0 }}>
 EOT;
-        $this->assertSame('123455', $this->renderString($template, $data));
+        $this->assertSame('11111<my_var 5><another_var: 0>', $this->renderString($template, $data));
     }
 }
