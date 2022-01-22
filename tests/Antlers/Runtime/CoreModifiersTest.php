@@ -402,7 +402,7 @@ EOT;
         $this->assertSame(
             'Start:<testing><explode><modifiers>:End',
             $this->renderString($template, [
-                'string' => 'testing,explode,modifiers'
+                'string' => 'testing,explode,modifiers',
             ], true)
         );
 
@@ -432,7 +432,7 @@ EOT;
         $this->assertSame(
             'Start:<testing><explode><modifiers>:End',
             $this->renderString($template, [
-                'string' => 'testing,explode,modifiers'
+                'string' => 'testing,explode,modifiers',
             ], true)
         );
 
@@ -444,7 +444,7 @@ EOT;
         $this->assertSame(
             'Start:<testing><explode><modifiers>:End',
             $this->renderString($template, [
-                'string' => 'testing explode modifiers'
+                'string' => 'testing explode modifiers',
             ], true)
         );
 
@@ -456,7 +456,7 @@ EOT;
         $this->assertSame(
             'Start:<testing><explode><modifiers>:End',
             $this->renderString($template, [
-                'string' => 'testing explode modifiers'
+                'string' => 'testing explode modifiers',
             ], true)
         );
     }
