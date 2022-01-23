@@ -1138,6 +1138,8 @@ class NodeProcessor
 
                         $output = call_user_func([$tag, $node->name->getRuntimeMethodName()]);
 
+                        RuntimeParser::pushNodeCache($node->runtimeContent, $node->children);
+
                         if ($node->name->name == 'yield') {
                             GlobalRuntimeState::$yieldCount += 1;
                             // Wrap it in a partial thing.
@@ -1611,11 +1613,12 @@ class NodeProcessor
                         continue;
                     }
 
+                    $lockData = $this->data;
+
                     if ($runLoopMagic) {
                         if ($node->hasRecursiveNode) {
                             RecursiveNodeManager::incrementDepth($node->recursiveReference);
                         }
-                        $lockData = $this->data;
 
                         if ($this->isLoopable($val)) {
                             if (! empty($val)) {
@@ -1660,7 +1663,6 @@ class NodeProcessor
                                     }
 
                                     $runtimeData = $this->getActiveData();
-                                    $childNodes = $node->children;
                                     $processor = new NodeProcessor($this->loader, $this->envDetails);
                                     $processor->allowPhp($this->allowPhp);
                                     $processor->cascade($this->cascade);
@@ -1676,7 +1678,6 @@ class NodeProcessor
                                     $tChildren = $node->children;
 
                                     if ($tagCallbackResult != null) {
-                                        array_pop($tChildren);
                                         GlobalRuntimeState::$traceTagAssignments = true;
                                     }
 

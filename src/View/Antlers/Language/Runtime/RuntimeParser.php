@@ -256,6 +256,22 @@ class RuntimeParser implements ParserContract
     }
 
     /**
+     * Adds a list of nodes to the internal node cache.
+     *
+     * @param string $text The source content.
+     * @param AbstractNode[] $nodes The parsed nodes.
+     */
+    public static function pushNodeCache($text, $nodes)
+    {
+        self::$standardRenderNodeCache[md5($text)] = $nodes;
+    }
+
+    public static function getNodeCache()
+    {
+        return self::$standardRenderNodeCache;
+    }
+
+    /**
      * Parses and renders the input text, with the provided runtime data.
      *
      * @param  string  $text  The text to parse and render.
