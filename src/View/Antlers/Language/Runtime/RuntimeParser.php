@@ -266,9 +266,25 @@ class RuntimeParser implements ParserContract
         self::$standardRenderNodeCache[md5($text)] = $nodes;
     }
 
+    /**
+     * Returns all node cache entries.
+     *
+     * @return array
+     */
     public static function getNodeCache()
     {
         return self::$standardRenderNodeCache;
+    }
+
+    /**
+     * Restores a previous cache entry.
+     *
+     * @param  string  $entry  The cache slug.
+     * @param  AbstractNode[]  $nodes  The parsed nodes.
+     */
+    public static function setCacheEntry($entry, $nodes)
+    {
+        self::$standardRenderNodeCache[$entry] = $nodes;
     }
 
     /**
