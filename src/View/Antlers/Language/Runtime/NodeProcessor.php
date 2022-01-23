@@ -1697,7 +1697,6 @@ class NodeProcessor
                                         }
 
                                         if (! empty($runtimeAssignments)) {
-
                                             foreach ($runtimeAssignments as $assignmentVar => $assignmentValue) {
                                                 if (array_key_exists($assignmentVar, $this->runtimeAssignments)) {
                                                     $runtimeAssignmentsToProcess[$assignmentVar] = $assignmentValue;
