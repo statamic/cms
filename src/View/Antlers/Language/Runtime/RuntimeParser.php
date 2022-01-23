@@ -258,8 +258,8 @@ class RuntimeParser implements ParserContract
     /**
      * Adds a list of nodes to the internal node cache.
      *
-     * @param string $text The source content.
-     * @param AbstractNode[] $nodes The parsed nodes.
+     * @param  string  $text  The source content.
+     * @param  AbstractNode[]  $nodes  The parsed nodes.
      */
     public static function pushNodeCache($text, $nodes)
     {
