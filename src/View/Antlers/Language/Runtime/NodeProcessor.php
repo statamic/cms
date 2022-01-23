@@ -1681,6 +1681,8 @@ class NodeProcessor
                                         GlobalRuntimeState::$traceTagAssignments = true;
                                     }
 
+                                    $runtimeAssignmentsToProcess = [];
+
                                     foreach ($val as $procVal) {
                                         if ($tagCallbackResult != null) {
                                             $runtimeData = array_merge($runtimeData, GlobalRuntimeState::$tracedRuntimeAssignments);
@@ -1695,7 +1697,6 @@ class NodeProcessor
                                         }
 
                                         if (! empty($runtimeAssignments)) {
-                                            $runtimeAssignmentsToProcess = [];
 
                                             foreach ($runtimeAssignments as $assignmentVar => $assignmentValue) {
                                                 if (array_key_exists($assignmentVar, $this->runtimeAssignments)) {
@@ -1703,14 +1704,14 @@ class NodeProcessor
                                                 }
                                             }
 
-                                            $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
                                             $runtimeData = array_merge($runtimeData, $runtimeAssignmentsToProcess);
                                         }
-
                                         if (count($this->data) > $dataCount) {
                                             $this->popLoopScope();
                                         }
                                     }
+
+                                    $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
 
                                     $buffer .= $this->measureBufferAppend($node, $loopBuffer);
                                 }
