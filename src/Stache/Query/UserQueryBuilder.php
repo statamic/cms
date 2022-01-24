@@ -50,11 +50,4 @@ class UserQueryBuilder extends Builder
             return [$orderBy->sort => $items];
         });
     }
-
-    protected function getWhereColumnKeyValuesByIndex($column)
-    {
-        return app('stache')
-                ->store('users')
-                ->index($column)->items();
-    }
 }
