@@ -81,6 +81,10 @@ class Value implements IteratorAggregate, JsonSerializable
     {
         $value = $this->value();
 
+        if ($value instanceof ArrayableString) {
+            $value = $value->value();
+        }
+
         if (! is_string($value)) {
             return $value;
         }
