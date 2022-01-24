@@ -24,7 +24,7 @@ abstract class RoleRepository implements RepositoryContract
 
     public function all(): Collection
     {
-        return Blink::once('user-roles', function() {
+        return Blink::once('user-roles', function () {
             return $this->raw()->map(function ($role, $handle) {
                 return Facades\Role::make()
                     ->handle($handle)
