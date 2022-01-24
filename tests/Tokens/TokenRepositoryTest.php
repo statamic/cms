@@ -73,7 +73,7 @@ YAML;
         $return = $this->tokens->delete($token);
 
         $this->assertNull($this->tokens->find('test-token'));
-        $this->assertFileDoesNotExist(storage_path('statamic/tokens/test-token.yaml'));
+        $this->assertFalse(file_exists(storage_path('statamic/tokens/test-token.yaml')));
         $this->assertTrue($return);
     }
 
