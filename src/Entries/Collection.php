@@ -53,6 +53,7 @@ class Collection implements Contract, AugmentableContract
     protected $taxonomies = [];
     protected $requiresSlugs = true;
     protected $titleFormats = [];
+    protected $previewTargets = [];
 
     public function __construct()
     {
@@ -696,6 +697,20 @@ class Collection implements Contract, AugmentableContract
                         return Taxonomy::findByHandle($taxonomy);
                     })->filter();
                 });
+            })
+            ->args(func_get_args());
+    }
+
+    public function previewTargets($targets = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('previewTargets')
+            ->getter(function ($targets) {
+                if (empty($targets)) {
+                    $targets = [['label' => 'Entry', 'format' => '{permalink}']];
+                }
+
+                return collect($targets);
             })
             ->args(func_get_args());
     }

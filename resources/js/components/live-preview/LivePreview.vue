@@ -18,6 +18,7 @@
                             <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>
                             <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="ml-2" />
+                            <select-input :options="targetSelectOptions" v-model="target" class="ml-2" v-if="targets.length > 1" />
 
                             <component
                                 v-for="(component, handle) in inputs"
@@ -96,6 +97,7 @@ export default {
     props: {
         url: String,
         previewing: Boolean,
+        targets: Array,
         values: Object,
         name: String,
         blueprint: String,
@@ -122,6 +124,7 @@ export default {
             extras: {},
             keybinding: null,
             token: null,
+            target: 0,
         }
     },
 
@@ -134,6 +137,12 @@ export default {
                 preview: this.values,
                 extras: this.extras
             }
+        },
+
+        targetSelectOptions() {
+            return Object.values(_.mapObject(this.targets, (target, key) => {
+                return { value: key, label: __(target.label) };
+            }));
         },
 
         deviceSelectOptions() {
@@ -171,10 +180,9 @@ export default {
         tokenizedUrl() {
             let url = this.url;
 
-            if (this.token) {
-                url += url.includes('?') ? '&' : '?';
-                url += `token=${this.token}`;
-            }
+            url += (url.includes('?') ? '&' : '?') + `target=${this.target}`;
+
+            if (this.token) url += `&token=${this.token}`;
 
             return url;
         }
@@ -195,6 +203,10 @@ export default {
             handler(payload) {
                 if (this.previewing) this.update();
             }
+        },
+
+        target() {
+            this.update();
         }
 
     },

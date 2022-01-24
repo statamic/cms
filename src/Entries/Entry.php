@@ -800,4 +800,26 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         // the slug which could result in an infinite loop in some cases.
         return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
     }
+
+    public function previewTargets()
+    {
+        return $this->collection()->previewTargets()->map(function ($target) {
+            return [
+                'label' => $target['label'],
+                'format' => $target['format'],
+                'url' => $this->resolvePreviewTargetUrl($target['format']),
+            ];
+        });
+    }
+
+    private function resolvePreviewTargetUrl($format)
+    {
+        if (! Str::contains($format, '{{')) {
+            $format = preg_replace_callback('/{\s*([a-zA-Z0-9_\-\:\.]+)\s*}/', function ($match) {
+                return "{{ {$match[1]} }}";
+            }, $format);
+        }
+
+        return (string) Antlers::parse($format, $this->augmented()->all());
+    }
 }

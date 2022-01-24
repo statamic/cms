@@ -55,7 +55,8 @@ class CollectionsStore extends BasicStore
             ->sortField(array_get($data, 'sort_by'))
             ->sortDirection(array_get($data, 'sort_dir'))
             ->taxonomies(array_get($data, 'taxonomies'))
-            ->propagate(array_get($data, 'propagate'));
+            ->propagate(array_get($data, 'propagate'))
+            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection
@@ -108,5 +109,15 @@ class CollectionsStore extends BasicStore
                 Stache::store('entries')->store($collection->handle())->index('order')->update();
             }
         }
+    }
+
+    private function normalizePreviewTargets($targets)
+    {
+        return collect($targets)->map(function ($target) {
+            return [
+                'format' => $target['url'],
+                'label' => $target['label'],
+            ];
+        })->all();
     }
 }

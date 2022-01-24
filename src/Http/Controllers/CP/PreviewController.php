@@ -32,13 +32,13 @@ class PreviewController extends CpController
     {
         return [
             'token' => $token = LivePreview::tokenize($request->token, $data)->token(),
-            'url' => $this->getPreviewUrl($data, $token),
+            'url' => $this->getPreviewUrl($data, $request->target, $token),
         ];
     }
 
-    private function getPreviewUrl($data, $token)
+    private function getPreviewUrl($data, $target, $token)
     {
-        $url = $data->url();
+        $url = $data->previewTargets()[$target]['url'];
 
         return $url.(strpos($url, '?') === false ? '?' : '&').'token='.$token;
     }
