@@ -128,24 +128,49 @@ EOT;
     {
         $this->createNav();
 
-        $template = '{{ nav:test }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
-
-        $this->assertEquals('[1][1-1][2][3][3-1][3-2]', (string) Antlers::parse($template));
+        $this->assertEquals('[1][1-1][2][3][3-1][3-2]', $this->parseBarebonesTemplate());
     }
 
     /** @test */
-    public function it_hides_and_shows_unpublished_entries_on_demand()
+    public function it_shows_or_hides_unpublished_entries_using_the_show_unpublished_parameter()
     {
         $this->createNav();
 
-        $template = '{{ nav:test show_unpublished="false" }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
-
-        $this->assertEquals('[1][1-1][2][3][3-1][3-2]', (string) Antlers::parse($template));
-
-        $template = '{{ nav:test show_unpublished="true" }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
-
-        $this->assertEquals('[1][1-1][2][3][3-1][3-2][3-3][4][4-1]', (string) Antlers::parse($template));
+        $this->assertEquals('[1][1-1][2][3][3-1][3-2]', $this->parseBarebonesTemplate('show_unpublished="false"'));
+        $this->assertEquals('[1][1-1][2][3][3-1][3-2][3-3][4][4-1]', $this->parseBarebonesTemplate('show_unpublished="true"'));
     }
+
+    /** @test */
+    public function it_filters_by_status()
+    {
+        $this->createNav();
+
+        $this->assertEquals('[1][1-1][2][3][3-1][3-2]', $this->parseBarebonesTemplate('status:is="published"'));
+        $this->assertEquals('[4]', $this->parseBarebonesTemplate('status:not="published"'));
+        $this->assertEquals('[4]', $this->parseBarebonesTemplate('status:is="draft"'));
+        $this->assertEquals('[1][1-1][2][3][3-1][3-2][3-3][4][4-1]', $this->parseBarebonesTemplate('status:in="draft|published"'));
+    }
+
+    /** @test */
+    public function it_filters_by_published_boolean()
+    {
+        $this->createNav();
+
+        $this->assertEquals('[1][1-1][2][3][3-1][3-2]', $this->parseBarebonesTemplate('published:is="true"'));
+        $this->assertEquals('[4]', $this->parseBarebonesTemplate('published:is="false"'));
+    }
+
+    /** @test */
+    public function it_filters_by_entry_data()
+    {
+        $this->createNav();
+
+        $this->assertEquals('[3][3-1][3-2]', $this->parseBarebonesTemplate('title:contains="Three"'));
+        $this->assertEquals('[2]', $this->parseBarebonesTemplate('foo:is="notbar"'));
+        $this->assertEquals('[1][1-1][3][3-1]', $this->parseBarebonesTemplate('foo:isnt="notbar"'));
+        $this->assertEquals('[1]', $this->parseBarebonesTemplate('nav_title:in="Grapes|Navtitle Four|Bananas|Navtitle One"'));
+        $this->assertEquals('[]', $this->parseBarebonesTemplate('never:is="true"'));
+    } 
 
     private function makeNav($tree)
     {
@@ -154,6 +179,16 @@ EOT;
         $nav->makeTree('en', $tree)->save();
 
         $nav->save();
+    }
+
+    private function parseBarebonesTemplate($params = null)
+    {
+        return (string) Antlers::parse($this->createBarebonesTemplate($params));
+    }
+
+    private function createBarebonesTemplate($params = null)
+    {
+        return "{{ nav:test $params }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}";
     }
 
     private function createNav()
@@ -166,7 +201,7 @@ EOT;
         $threeTwo = EntryFactory::collection('pages')->id('3-2')->data(['title' => 'Three Two', 'foo' => 'notbar'])->create();
         $threeThree = EntryFactory::collection('pages')->id('3-3')->data(['title' => 'Three Three', 'nav_title' => 'Navtitle Three Three'])->published(false)->create();
         $four = EntryFactory::collection('pages')->id('4')->data(['title' => 'Four', 'nav_title' => 'Navtitle Four'])->published(false)->create();
-        $fourOne = EntryFactory::collection('pages')->id('4-1')->data(['title' => 'Four One', 'nav_title' => 'Navtitle Four One'])->published(false)->create();
+        $fourOne = EntryFactory::collection('pages')->id('4-1')->data(['title' => 'Four One', 'nav_title' => 'Navtitle Four One'])->published(true)->create();
 
         $builder = $this->mock(QueryBuilder::class);
         $builder->shouldReceive('whereIn')->with('id', ['1', '1-1', '2', '3', '3-1', '3-2', '3-3', '4', '4-1'])->andReturnSelf();
