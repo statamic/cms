@@ -2,6 +2,7 @@
 
 namespace Tests\Assets;
 
+use Facades\Statamic\Assets\ExtractInfo;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -71,26 +72,39 @@ class AttributesTest extends TestCase
     /** @test */
     public function it_gets_the_attributes_of_audio_file()
     {
-        $this->markTestSkipped();
-        Carbon::setTestNow(now());
-
         $asset = (new Asset)
-                ->container(AssetContainer::make('test-container')->disk('test'))
-                ->path('path/to/asset.mp3');
+            ->container(AssetContainer::make('test-container')->disk('test'))
+            ->path('path/to/asset.mp3');
 
-        $file = UploadedFile::fake()->createWithContent('asset.mp3', 'Hello World');
-
-        Storage::disk('test')->putFileAs('path/to', $file, 'asset.mp3');
-
-        // Test about the actual file, for good measure.
-        $realpath = Storage::disk('test')->getAdapter()->getPathPrefix().'path/to/asset.mp3';
-        $this->assertFileExists($realpath);
+        ExtractInfo::shouldReceive('fromAsset')->with($asset)->andReturn(['playtime_seconds' => 13]);
 
         $attributes = $this->attributes->asset($asset);
 
-        $this->assertEquals(['duration' => 11], $attributes->get());
-        $this->assertEquals(0, $attributes->width());
-        $this->assertEquals(0, $attributes->height());
+        $this->assertEquals(['duration' => 13], $attributes->get());
+        $this->assertNull($attributes->width());
+        $this->assertNull($attributes->height());
+    }
+
+    /** @test */
+    public function it_gets_the_attributes_of_video_file()
+    {
+        $asset = (new Asset)
+            ->container(AssetContainer::make('test-container')->disk('test'))
+            ->path('path/to/asset.mp4');
+
+        ExtractInfo::shouldReceive('fromAsset')->with($asset)->andReturn([
+            'playtime_seconds' => 13,
+            'video' => [
+                'resolution_x' => 1920,
+                'resolution_y' => 1080,
+            ],
+        ]);
+
+        $attributes = $this->attributes->asset($asset);
+
+        $this->assertEquals(['duration' => 13, 'width' => 1920, 'height' => 1080], $attributes->get());
+        $this->assertEquals(1920, $attributes->width());
+        $this->assertEquals(1080, $attributes->height());
     }
 
     /** @test */

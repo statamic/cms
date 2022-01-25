@@ -2,9 +2,9 @@
 
 namespace Statamic\Assets;
 
+use Facades\Statamic\Assets\ExtractInfo;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\MountManager;
-use Owenoj\LaravelGetId3\GetId3;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Arr;
 
@@ -83,10 +83,7 @@ class Attributes
      */
     private function getAudioAttributes()
     {
-        $id3 = GetId3::fromDiskAndPath(
-            $this->asset->container()->diskHandle(),
-            $this->asset->basename()
-        )->extractInfo();
+        $id3 = ExtractInfo::fromAsset($this->asset);
 
         $length = Arr::get($id3, 'playtime_seconds', 0);
 
@@ -173,10 +170,7 @@ class Attributes
      */
     private function getVideoAttributes()
     {
-        $id3 = GetId3::fromDiskAndPath(
-            $this->asset->container()->diskHandle(),
-            $this->asset->basename()
-        )->extractInfo();
+        $id3 = ExtractInfo::fromAsset($this->asset);
 
         return [
             'width' => Arr::get($id3, 'video.resolution_x'),
