@@ -7,9 +7,12 @@ use Illuminate\Support\Collection;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
+use Statamic\Tags\Concerns\GetsQuerySelectKeys;
 
 class Locales extends Tags
 {
+    use GetsQuerySelectKeys;
+
     /**
      * @var \Statamic\Contracts\Data\Content\Content
      */
@@ -138,7 +141,9 @@ class Locales extends Tags
             return null;
         }
 
-        return $localized->toAugmentedArray();
+        $keys = $this->getQuerySelectKeys($localized);
+
+        return $localized->toAugmentedArray($keys);
     }
 
     /**

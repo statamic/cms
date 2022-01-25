@@ -379,7 +379,7 @@ class EntriesController extends CpController
         };
     }
 
-    public function destroy($collection, $entry)
+    public function destroy($entry)
     {
         if (! $entry = Entry::find($entry)) {
             return $this->pageNotFound();

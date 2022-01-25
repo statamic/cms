@@ -4,7 +4,7 @@
         <div v-if="showSvg" class="rounded flex items-center justify-center asset-thumbnail h-full w-full">
             <img
                 class="w-full h-full max-w-full max-h-full mx-auto"
-                :src="asset.url"
+                :src="asset.thumbnail"
             />
         </div>
 

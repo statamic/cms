@@ -98,9 +98,9 @@ class GlideController extends Controller
         // The string before the first slash is the container
         [$container, $path] = explode('/', $decoded, 2);
 
-        $asset = AssetContainer::find($container)->asset($path);
+        throw_unless($container = AssetContainer::find($container), new NotFoundHttpException);
 
-        throw_unless($asset, new NotFoundHttpException);
+        throw_unless($asset = $container->asset($path), new NotFoundHttpException);
 
         return $this->createResponse($this->generateBy('asset', $asset));
     }
