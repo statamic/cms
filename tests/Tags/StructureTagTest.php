@@ -170,7 +170,7 @@ EOT;
         $this->assertEquals('[1][1-1][3][3-1]', $this->parseBarebonesTemplate('foo:isnt="notbar"'));
         $this->assertEquals('[1]', $this->parseBarebonesTemplate('nav_title:in="Grapes|Navtitle Four|Bananas|Navtitle One"'));
         $this->assertEquals('[]', $this->parseBarebonesTemplate('never:is="true"'));
-    } 
+    }
 
     private function makeNav($tree)
     {
