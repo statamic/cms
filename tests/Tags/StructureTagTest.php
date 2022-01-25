@@ -130,7 +130,7 @@ EOT;
         $this->createNav();
 
         $template = '{{ nav:test }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
-        
+
         $this->assertEquals('[1][1-1][2][3][3-1][3-2]', (string) Antlers::parse($template));
     }
 
@@ -140,11 +140,11 @@ EOT;
         $this->createNav();
 
         $template = '{{ nav:test show_unpublished="false" }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
-        
+
         $this->assertEquals('[1][1-1][2][3][3-1][3-2]', (string) Antlers::parse($template));
 
         $template = '{{ nav:test show_unpublished="true" }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
-        
+
         $this->assertEquals('[1][1-1][2][3][3-1][3-2][3-3][4][4-1]', (string) Antlers::parse($template));
     }
 
