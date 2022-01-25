@@ -272,7 +272,7 @@ class Str extends \Illuminate\Support\Str
             return parent::$studlyCache[$key];
         }
 
-        $words = explode(' ', \Illuminate\Support\Str::replace(['-', '_'], ' ', $value));
+        $words = explode(' ', str_replace(['-', '_'], ' ', $value));
 
         $studlyWords = array_map(function ($word) {
             return parent::ucfirst($word);
