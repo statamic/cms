@@ -74,12 +74,21 @@ class CoreModifiersTest extends ParserTestCase
                 ],
             ],
             'remove_left_var' => 'https://',
+            'test_currency_symbol' => '£32.00',
         ];
     }
 
     protected function result($text)
     {
         return $this->renderString($text, $this->data, true);
+    }
+
+    public function test_starts_with_accepts_special_characters()
+    {
+        // Issue: https://github.com/statamic/cms/issues/5128
+        $this->assertSame('yes', $this->result('{{ if test_currency_symbol|starts_with:£ }}yes{{else}}no{{/if}}'));
+        $this->assertSame('yes', $this->result('{{ if test_currency_symbol|starts_with("£") }}yes{{else}}no{{/if}}'));
+        $this->assertSame('no', $this->result('{{ if remove_left_var|starts_with:£ }}yes{{else}}no{{/if}}'));
     }
 
     public function test_math_add()
