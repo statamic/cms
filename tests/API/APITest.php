@@ -47,15 +47,16 @@ class APITest extends TestCase
         Facades\Config::set('statamic.api.resources.collections', true);
 
         Facades\Collection::make('pages')->structureContents(['root' => true])->save();
+
+        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
+        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
+
         Facades\Collection::find('pages')->structure()->makeTree('en', [
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
         ])->save();
-
-        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
-        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
-        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
 
         $this->assertEndpointDataCount('/api/collections/pages/tree', 1);
         $this->assertEndpointDataCount('/api/collections/pages/tree?filter[status:is]=published', 1);
