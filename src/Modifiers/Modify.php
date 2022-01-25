@@ -23,6 +23,11 @@ class Modify implements \IteratorAggregate
      */
     private $loader;
 
+    /**
+     * Instantiate fluent modifier helper.
+     *
+     * @param  Loader  $loader
+     */
     public function __construct(Loader $loader)
     {
         $this->loader = $loader;
