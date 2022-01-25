@@ -39,7 +39,7 @@ class FormController extends Controller
             return Str::startsWith($key, '_');
         })->all();
 
-        $fields = $fields->setTrackMissingValues(true)->addValues($values);
+        $fields = $fields->addValues($values);
 
         $submission = $form->makeSubmission()->data($values);
 

@@ -15,7 +15,6 @@ class Fields
     protected $fields;
     protected $parent;
     protected $parentField;
-    protected $trackMissingValues = false;
 
     public function __construct($items = [], $parent = null, $parentField = null)
     {
@@ -59,13 +58,6 @@ class Fields
         return $this;
     }
 
-    public function setTrackMissingValues($trackMissingValues)
-    {
-        $this->trackMissingValues = $trackMissingValues;
-
-        return $this;
-    }
-
     public function items()
     {
         return $this->items;
@@ -92,8 +84,7 @@ class Fields
             ->setParent($this->parent)
             ->setParentField($this->parentField)
             ->setItems($this->items)
-            ->setFields($this->fields)
-            ->setTrackMissingValues($this->trackMissingValues);
+            ->setFields($this->fields);
     }
 
     public function localizable()
@@ -128,9 +119,9 @@ class Fields
     public function addValues(array $values)
     {
         $fields = $this->fields->map(function ($field) use ($values) {
-            return $field->newInstance()->setValue(
-                Arr::get($values, $field->handle(), $this->trackMissingValues ? new MissingValue : null)
-            );
+            return Arr::has($values, $field->handle())
+                ? $field->newInstance()->fillValue(Arr::get($values, $field->handle()))
+                : $field->newInstance();
         });
 
         return $this->newInstance()->setFields($fields);
@@ -139,28 +130,15 @@ class Fields
     public function values()
     {
         return $this->fields->mapWithKeys(function ($field) {
-            return [$field->handle() => $this->getFieldValue($field)];
+            return [$field->handle() => $field->value()];
         });
     }
 
     public function validatableValues()
     {
-        $values = $this->values();
-
-        if ($this->trackMissingValues) {
-            return $values->reject(function ($value, $handle) {
-                return $this->fields->get($handle)->value() instanceof MissingValue;
-            });
-        }
-
-        return $values;
-    }
-
-    protected function getFieldValue($field)
-    {
-        return $field->value() instanceof MissingValue
-            ? null
-            : $field->value();
+        return $this->values()->filter(function ($value, $handle) {
+            return $this->fields->get($handle)->isFilled();
+        });
     }
 
     public function process()
