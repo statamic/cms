@@ -187,6 +187,27 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals(['c', 'b', 'e', 'a', 'd'], $terms->map->slug()->all());
     }
 
+    /** @test **/
+    public function terms_are_found_using_where_column()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Post 1', 'other_title' => 'Not Post 1'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Post 2', 'other_title' => 'Not Post 2'])->save();
+        Term::make('c')->taxonomy('tags')->data(['title' => 'Post 3', 'other_title' => 'Post 3'])->save();
+        Term::make('d')->taxonomy('tags')->data(['title' => 'Post 4', 'other_title' => 'Post 4'])->save();
+        Term::make('e')->taxonomy('tags')->data(['title' => 'Post 5', 'other_title' => 'Not Post 5'])->save();
+
+        $terms = Term::query()->whereColumn('title', 'other_title')->get();
+
+        $this->assertCount(2, $terms);
+        $this->assertEquals(['c', 'd'], $terms->map->slug()->all());
+
+        $terms = Term::query()->whereColumn('title', '!=', 'other_title')->get();
+
+        $this->assertCount(3, $terms);
+        $this->assertEquals(['a', 'b', 'e'], $terms->map->slug()->all());
+    }
+
     /** @test */
     public function it_filters_usage_in_collections()
     {

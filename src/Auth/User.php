@@ -225,7 +225,7 @@ abstract class User implements
         return $this->selectedQueryColumns;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'name', 'email', 'api_url'];
     }

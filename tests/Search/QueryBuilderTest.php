@@ -215,6 +215,33 @@ class QueryBuilderTest extends TestCase
         $this->assertCount(4, $results);
         $this->assertEquals(['b', 'c', 'e', 'f'], $results->map->reference->all());
     }
+
+    /** @test **/
+    public function results_are_found_using_where_column()
+    {
+        $items = collect([
+            ['reference' => 'a', 'foo' => 'Post 1', 'other_foo' => 'Not Post 1'],
+            ['reference' => 'b', 'foo' => 'Post 2', 'other_foo' => 'Not Post 2'],
+            ['reference' => 'c', 'foo' => 'Post 3', 'other_foo' => 'Post 3'],
+            ['reference' => 'd', 'foo' => 'Post 4', 'other_foo' => 'Post 4'],
+            ['reference' => 'e', 'foo' => 'Post 5', 'other_foo' => 'Not Post 5'],
+            ['reference' => 'f', 'foo' => 'Post 6', 'other_foo' => 'Not Post 6'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->whereColumn('foo', 'other_foo')
+            ->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['Post 3', 'Post 4'], $results->map->foo->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->whereColumn('foo', '!=', 'other_foo')
+            ->get();
+
+        $this->assertCount(4, $results);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 5', 'Post 6'], $results->map->foo->all());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder

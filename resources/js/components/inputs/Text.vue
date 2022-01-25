@@ -15,6 +15,7 @@
                 :readonly="isReadOnly"
                 :placeholder="placeholder"
                 :autofocus="focus"
+                :min="min"
                 @input="$emit('input', $event.target.value)"
                 @keydown="$emit('keydown', $event)"
                 @focus="$emit('focus')"
@@ -46,7 +47,8 @@ export default {
         prepend: { default: null },
         append: { default: null },
         focus: { type: Boolean },
-        autoselect: { type: Boolean }
+        autoselect: { type: Boolean },
+        min: { type: Number, default: undefined }
     },
     mounted() {
         if (this.autoselect) {
