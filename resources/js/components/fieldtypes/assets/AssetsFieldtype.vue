@@ -466,14 +466,14 @@ export default {
             });
         },
 
+        loading(loading) {
+            this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
+        },
+
         value(value) {
             if (_.isEqual(value, this.assetIds)) return;
 
             this.loadAssets(value);
-        },
-
-        loading(loading) {
-            this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
         },
 
         showSelector(selecting) {
