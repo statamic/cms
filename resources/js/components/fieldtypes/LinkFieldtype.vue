@@ -82,6 +82,12 @@ export default {
 
         urlValue(url) {
             this.update(url);
+        },
+        
+        meta (meta, oldMeta) {
+            if (meta.initialUrl !== oldMeta.initialUrl) {
+                this.urlValue = meta.initialUrl
+            }
         }
 
     },
