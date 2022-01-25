@@ -2,16 +2,15 @@
 
 namespace Statamic\Assets;
 
-use Owenoj\LaravelGetId3\GetId3;
 use Statamic\Contracts\Assets\Asset;
 
 class ExtractInfo
 {
     public function fromAsset(Asset $asset): array
     {
-        return GetId3::fromDiskAndPath(
-            $asset->container()->diskHandle(),
-            $asset->path()
-        )->extractInfo();
+        $disk = $asset->disk()->filesystem();
+        $path = $asset->path();
+
+        return (new \getID3)->analyze($path, $disk->getSize($path), '', $disk->readStream($path));
     }
 }
