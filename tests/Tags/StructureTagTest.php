@@ -7,6 +7,7 @@ use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Nav;
+use Statamic\Tags\Structure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -123,6 +124,30 @@ EOT;
         ]));
     }
 
+    /** @test */
+    public function it_hides_unpublished_entries_by_default()
+    {
+        $this->createNav();
+
+        $template = '{{ nav:test }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+        
+        $this->assertEquals('[1][1-1][2][3][3-1][3-2]', (string) Antlers::parse($template));
+    }
+
+    /** @test */
+    public function it_hides_and_shows_unpublished_entries_on_demand()
+    {
+        $this->createNav();
+
+        $template = '{{ nav:test show_unpublished="false" }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+        
+        $this->assertEquals('[1][1-1][2][3][3-1][3-2]', (string) Antlers::parse($template));
+
+        $template = '{{ nav:test show_unpublished="true" }}[{{ entry_id }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+        
+        $this->assertEquals('[1][1-1][2][3][3-1][3-2][3-3][4][4-1]', (string) Antlers::parse($template));
+    }
+
     private function makeNav($tree)
     {
         $nav = Nav::make('test');
@@ -140,10 +165,13 @@ EOT;
         $three = EntryFactory::collection('pages')->id('3')->data(['title' => 'Three'])->create();
         $threeOne = EntryFactory::collection('pages')->id('3-1')->data(['title' => 'Three One', 'nav_title' => 'Navtitle Three One'])->create();
         $threeTwo = EntryFactory::collection('pages')->id('3-2')->data(['title' => 'Three Two', 'foo' => 'notbar'])->create();
+        $threeThree = EntryFactory::collection('pages')->id('3-3')->data(['title' => 'Three Three', 'nav_title' => 'Navtitle Three Three'])->published(false)->create();
+        $four = EntryFactory::collection('pages')->id('4')->data(['title' => 'Four', 'nav_title' => 'Navtitle Four'])->published(false)->create();
+        $fourOne = EntryFactory::collection('pages')->id('4-1')->data(['title' => 'Four One', 'nav_title' => 'Navtitle Four One'])->published(false)->create();
 
         $builder = $this->mock(QueryBuilder::class);
-        $builder->shouldReceive('whereIn')->with('id', ['1', '1-1', '2', '3', '3-1', '3-2'])->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([$one, $oneOne, $two, $three, $threeOne, $threeTwo]));
+        $builder->shouldReceive('whereIn')->with('id', ['1', '1-1', '2', '3', '3-1', '3-2', '3-3', '4', '4-1'])->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(collect([$one, $oneOne, $two, $three, $threeOne, $threeTwo, $threeThree, $four, $fourOne]));
         Entry::shouldReceive('query')->andReturn($builder);
 
         $this->makeNav([
@@ -154,6 +182,10 @@ EOT;
             ['entry' => '3', 'children' => [
                 ['entry' => '3-1'],
                 ['entry' => '3-2'],
+                ['entry' => '3-3'],
+            ]],
+            ['entry' => '4', 'children' => [
+                ['entry' => '4-1'],
             ]],
         ]);
     }
