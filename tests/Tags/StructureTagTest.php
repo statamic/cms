@@ -7,7 +7,6 @@ use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Nav;
-use Statamic\Tags\Structure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 

@@ -63,7 +63,7 @@ class TreeBuilder
             if ($page->reference() && ! $page->referenceExists()) {
                 return null;
             }
-    
+
             return [
                 'page' => $page->selectedQueryColumns($fields),
                 'depth' => $depth,
