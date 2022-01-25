@@ -46,13 +46,13 @@ class Structure extends Tags
         $this->ensureStructureExists($handle);
 
         $query = new PageQueryBuilder();
+        $this->queryStatus($query);
         $this->queryConditions($query);
 
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
             'query' => $query,
             'include_home' => $this->params->get('include_home'),
-            'show_unpublished' => $this->params->get('show_unpublished', false),
             'site' => $this->params->get('site', Site::current()->handle()),
             'from' => $this->params->get('from'),
             'max_depth' => $this->params->get('max_depth'),
@@ -71,6 +71,19 @@ class Structure extends Tags
         }
 
         throw_unless(Nav::findByHandle($handle), new NavigationNotFoundException($handle));
+    }
+
+    protected function queryStatus($query)
+    {
+        if ($this->isQueryingCondition('status') || $this->isQueryingCondition('published')) {
+            return;
+        }
+
+        if (! $this->params->get('show_unpublished')) {
+            $query->where('status', 'published');
+        }
+
+        return $query;
     }
 
     public function toArray($tree, $parent = null, $depth = 1)
