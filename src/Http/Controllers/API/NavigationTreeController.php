@@ -11,6 +11,7 @@ class NavigationTreeController extends ApiController
 {
     protected $resourceConfigKey = 'navs';
     protected $routeResourceKey = 'nav';
+    protected $filterPublished = true;
 
     public function show($handle)
     {

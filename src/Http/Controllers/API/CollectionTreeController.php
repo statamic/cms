@@ -10,6 +10,7 @@ class CollectionTreeController extends ApiController
 {
     protected $resourceConfigKey = 'collections';
     protected $routeResourceKey = 'collection';
+    protected $filterPublished = true;
 
     public function show($collection)
     {
