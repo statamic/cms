@@ -31,7 +31,7 @@ abstract class Builder extends BaseBuilder
 
         $items = $this->getItems($keys);
 
-        $items->each->selectedQueryColumns($columns);
+        $items->each->selectedQueryColumns($this->columns ?? $columns);
 
         return $this->collect($items);
     }
@@ -164,5 +164,21 @@ abstract class Builder extends BaseBuilder
         return $values->filter(function ($value) {
             return $value !== null;
         });
+    }
+
+    protected function filterWhereColumn($values, $where)
+    {
+        $whereColumnKeys = $this->getWhereColumnKeyValuesByIndex($where['value']);
+
+        return $values->filter(function ($value, $key) use ($where, $whereColumnKeys) {
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
+            return $this->{$method}($value, $whereColumnKeys->get($key));
+        });
+    }
+
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        return $this->store->index($column)->items();
     }
 }

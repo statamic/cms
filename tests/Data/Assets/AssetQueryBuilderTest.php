@@ -205,4 +205,25 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertCount(4, $assets);
         $this->assertEquals(['b', 'd', 'e', 'f'], $assets->map->filename()->all());
     }
+
+    /** @test **/
+    public function assets_are_found_using_where_column()
+    {
+        Asset::find('test::a.jpg')->data(['foo' => 'Post 1', 'other_foo' => 'Not Post 1'])->save();
+        Asset::find('test::b.txt')->data(['foo' => 'Post 2', 'other_foo' => 'Not Post 2'])->save();
+        Asset::find('test::c.txt')->data(['foo' => 'Post 3', 'other_foo' => 'Post 3'])->save();
+        Asset::find('test::d.jpg')->data(['foo' => 'Post 4', 'other_foo' => 'Post 4'])->save();
+        Asset::find('test::e.jpg')->data(['foo' => 'Post 5', 'other_foo' => 'Not Post 5'])->save();
+        Asset::find('test::f.jpg')->data(['foo' => 'Post 6', 'other_foo' => 'Not Post 6'])->save();
+
+        $entries = $this->container->queryAssets()->whereColumn('foo', 'other_foo')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 3', 'Post 4'], $entries->map->foo->all());
+
+        $entries = $this->container->queryAssets()->whereColumn('foo', '!=', 'other_foo')->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 5', 'Post 6'], $entries->map->foo->all());
+    }
 }

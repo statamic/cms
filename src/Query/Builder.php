@@ -10,6 +10,7 @@ use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 abstract class Builder implements Contract
 {
+    protected $columns;
     protected $limit;
     protected $offset = 0;
     protected $wheres = [];
@@ -27,6 +28,13 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+
+    public function select($columns = ['*'])
+    {
+        $this->columns = $columns;
+
+        return $this;
+    }
 
     public function limit($value)
     {
@@ -230,6 +238,26 @@ abstract class Builder implements Contract
     public function orWhereNotNull($column)
     {
         return $this->whereNotNull($column, 'or');
+    }
+
+    public function whereColumn($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        // If the given operator is not found in the list of valid operators we will
+        // assume that the developer is just short-cutting the '=' operators and
+        // we will set the operators to '=' and set the values appropriately.
+        if ($this->invalidOperator($operator)) {
+            [$value, $operator] = [$operator, '='];
+        }
+
+        $type = 'Column';
+        $this->wheres[] = compact('type', 'column', 'value', 'operator', 'boolean');
+
+        return $this;
+    }
+
+    public function orWhereColumn($column, $operator = null, $value = null)
+    {
+        return $this->whereColumn($column, $operator, $value, 'or');
     }
 
     public function find($id, $columns = ['*'])

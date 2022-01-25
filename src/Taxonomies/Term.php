@@ -95,7 +95,9 @@ class Term implements TermContract
     {
         $localizations = clone $this->data;
 
-        $array = $localizations->pull($this->defaultLocale());
+        $array = Arr::removeNullValues(
+            $localizations->pull($this->defaultLocale())->all()
+        );
 
         // todo: add published bool (for each locale?)
 
@@ -104,12 +106,10 @@ class Term implements TermContract
         }
 
         if (! $localizations->isEmpty()) {
-            $array['localizations'] = $localizations->map(function ($item) {
-                return Arr::removeNullValues($item->all());
-            })->all();
+            $array['localizations'] = $localizations->map->all()->all();
         }
 
-        return $array->all();
+        return $array;
     }
 
     public function in($site)

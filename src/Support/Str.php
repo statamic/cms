@@ -263,4 +263,21 @@ class Str extends \Illuminate\Support\Str
     {
         return StaticStringy::replace($string, $search, $replace);
     }
+
+    public static function studly($value)
+    {
+        $key = $value;
+
+        if (isset(parent::$studlyCache[$key])) {
+            return parent::$studlyCache[$key];
+        }
+
+        $words = explode(' ', str_replace(['-', '_'], ' ', $value));
+
+        $studlyWords = array_map(function ($word) {
+            return parent::ucfirst($word);
+        }, $words);
+
+        return parent::$studlyCache[$key] = implode($studlyWords);
+    }
 }
