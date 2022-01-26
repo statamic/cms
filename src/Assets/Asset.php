@@ -2,6 +2,7 @@
 
 namespace Statamic\Assets;
 
+use Facades\Statamic\Assets\Attributes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -158,7 +159,7 @@ class Asset implements AssetContract, Augmentable
         $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
-            $attributes = app(Attributes::class)->asset($this)->get();
+            $attributes = Attributes::asset($this)->get();
 
             $meta = array_merge($meta, [
                 'size' => $this->disk()->size($this->path()),
