@@ -280,6 +280,13 @@ export default {
         },
 
         /**
+         * The IDs of the assets.
+         */
+        assetIds() {
+            return _.pluck(this.assets, 'id');
+        },
+
+        /**
          * Whether the fieldtype is in the expanded UI state.
          */
         expanded() {
@@ -451,7 +458,7 @@ export default {
 
             // The components deal with passing around asset objects, however
             // our fieldtype is only concerned with their respective IDs.
-            this.update(_.pluck(assets, 'id'));
+            this.update(this.assetIds);
 
             this.updateMeta({
                 ...this.meta,
@@ -463,10 +470,10 @@ export default {
             this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
         },
 
-        value(value, oldValue) {
-            if (JSON.stringify(value) !== JSON.stringify(oldValue)) {
-                this.loadAssets(value);
-            }
+        value(value) {
+            if (_.isEqual(value, this.assetIds)) return;
+
+            this.loadAssets(value);
         },
 
         showSelector(selecting) {
