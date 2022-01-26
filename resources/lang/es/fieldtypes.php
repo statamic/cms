@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Si deseas que Antlers analice este campo.',
     'any.config.cast_booleans' => 'Las opciones con valores de verdadero y falso se guardarán como booleanos.',
-    'any.config.default' => 'Establece el valor predeterminado.',
     'array.config.keys' => 'Establece las llaves del arreglo (variables) y las etiquetas opcionales.',
     'array.config.mode' => 'El modo dinámico le da al usuario el control de los datos mientras que el modo con llaves no lo hace.',
     'array.title' => 'Array',

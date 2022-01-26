@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Ali želite, da to polje razčleni Antlers.',
     'any.config.cast_booleans' => 'Možnosti z vrednostmi true in false bodo shranjene kot logične vrednosti.',
-    'any.config.default' => 'Nastavite privzeto vrednost.',
     'array.config.keys' => 'Nastavite matrične tipke (spremenljivke) in izbirne oznake.',
     'array.config.mode' => 'Dinamični način uporabniku omogoča nadzor nad podatki, medtem ko način s tipkami ne.',
     'array.title' => 'Array',
