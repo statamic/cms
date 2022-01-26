@@ -160,16 +160,14 @@ class Asset implements AssetContract, Augmentable
         if ($this->exists()) {
             $attributes = app(Attributes::class)->asset($this)->get();
 
-            $otherMeta = [
+            $meta = array_merge($meta, [
                 'height' => Arr::get($attributes, 'height'),
                 'last_modified' => $this->disk()->lastModified($this->path()),
                 'duration' => Arr::get($attributes, 'duration'),
                 'mime_type' => $this->disk()->mimeType($this->path()),
                 'size' => $this->disk()->size($this->path()),
                 'width' => Arr::get($attributes, 'width'),
-            ];
-
-            $meta = array_merge($meta, $otherMeta);
+            ]);
         }
 
         return $meta;
