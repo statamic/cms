@@ -550,7 +550,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        if (! $this->isImage() && ! $this->isSvg()) {
+        if (! $this->hasDimensions()) {
             return [null, null];
         }
 
@@ -602,7 +602,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function ratio()
     {
-        if (! $this->isImage() && ! $this->isSvg()) {
+        if (! $this->hasDimensions()) {
             return null;
         }
 
@@ -786,5 +786,10 @@ class Asset implements AssetContract, Augmentable
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
+    }
+
+    private function hasDimensions()
+    {
+        return $this->isImage() || $this->isSvg() || $this->isVideo();
     }
 }
