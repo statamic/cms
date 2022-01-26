@@ -39,8 +39,6 @@ class AttributesTest extends TestCase
         $attributes = $this->attributes->asset($asset);
 
         $this->assertEquals([], $attributes->get());
-        $this->assertEquals(null, $attributes->width());
-        $this->assertEquals(null, $attributes->height());
     }
 
     /** @test */
@@ -65,8 +63,6 @@ class AttributesTest extends TestCase
         $attributes = $this->attributes->asset($asset);
 
         $this->assertEquals(['width' => 30, 'height' => 60], $attributes->get());
-        $this->assertEquals(30, $attributes->width());
-        $this->assertEquals(60, $attributes->height());
     }
 
     /** @test */
@@ -81,8 +77,6 @@ class AttributesTest extends TestCase
         $attributes = $this->attributes->asset($asset);
 
         $this->assertEquals(['duration' => 13], $attributes->get());
-        $this->assertNull($attributes->width());
-        $this->assertNull($attributes->height());
     }
 
     /** @test */
@@ -103,8 +97,6 @@ class AttributesTest extends TestCase
         $attributes = $this->attributes->asset($asset);
 
         $this->assertEquals(['duration' => 13, 'width' => 1920, 'height' => 1080], $attributes->get());
-        $this->assertEquals(1920, $attributes->width());
-        $this->assertEquals(1080, $attributes->height());
     }
 
     /** @test */

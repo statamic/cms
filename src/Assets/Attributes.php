@@ -57,26 +57,6 @@ class Attributes
     }
 
     /**
-     * Get the width of the asset.
-     *
-     * @return int
-     */
-    public function width()
-    {
-        return array_get($this->get(), 'width');
-    }
-
-    /**
-     * Get the height of the asset.
-     *
-     * @return int
-     */
-    public function height()
-    {
-        return array_get($this->get(), 'height');
-    }
-
-    /**
      * Get the attributes of a sound.
      *
      * @return array
