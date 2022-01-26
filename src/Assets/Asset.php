@@ -161,12 +161,12 @@ class Asset implements AssetContract, Augmentable
             $attributes = app(Attributes::class)->asset($this)->get();
 
             $meta = array_merge($meta, [
-                'height' => Arr::get($attributes, 'height'),
-                'last_modified' => $this->disk()->lastModified($this->path()),
-                'duration' => Arr::get($attributes, 'duration'),
-                'mime_type' => $this->disk()->mimeType($this->path()),
                 'size' => $this->disk()->size($this->path()),
+                'last_modified' => $this->disk()->lastModified($this->path()),
                 'width' => Arr::get($attributes, 'width'),
+                'height' => Arr::get($attributes, 'height'),
+                'mime_type' => $this->disk()->mimeType($this->path()),
+                'duration' => Arr::get($attributes, 'duration'),
             ]);
         }
 
