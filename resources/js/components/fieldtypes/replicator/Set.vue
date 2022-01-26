@@ -1,6 +1,6 @@
 <template>
 
-    <div :class="sortableItemClass" class="replicator-set">
+    <div :class="classes" class="replicator-set">
 
         <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
@@ -108,6 +108,10 @@ export default {
             type: String,
             required: true
         },
+        hasError: {
+            type: Boolean,
+            default: false
+        },
         sortableItemClass: {
             type: String
         },
@@ -138,6 +142,13 @@ export default {
 
         isHidden() {
             return this.values['#hidden'] === true;
+        },
+
+        classes() {
+            return [
+                this.sortableItemClass,
+                { 'has-error': this.hasError }
+            ];
         }
 
     },
@@ -145,21 +156,17 @@ export default {
     methods: {
 
         updated(handle, value) {
-            let set = JSON.parse(JSON.stringify(this.values));
-            set[handle] = value;
-            this.$emit('updated', this.index, set);
+            this.$emit('updated', this.index, {...this.values, [handle]: value });
         },
 
         metaUpdated(handle, value) {
-            let meta = clone(this.meta);
-            meta[handle] = value;
-            this.$emit('meta-updated', meta);
+            this.$emit('meta-updated', { ...this.meta, [handle]: value });
         },
 
         previewUpdated(handle, value) {
-            let previews = this.previews;
-            previews[handle] = value;
-            this.$emit('previews-updated', previews);
+            setTimeout(() => {
+                this.$emit('previews-updated', { ...this.previews, [handle]: value });
+            }, 0);
         },
 
         destroy() {

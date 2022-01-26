@@ -77,6 +77,7 @@ class FieldsController extends CpController
             'length',
             'reference',
             'resource',
+            'type',
             'unless',
             'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
         ];
@@ -87,6 +88,7 @@ class FieldsController extends CpController
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'text',
                 'width' => 50,
+                'autoselect' => true,
             ],
             'handle' => [
                 'display' => __('Handle'),

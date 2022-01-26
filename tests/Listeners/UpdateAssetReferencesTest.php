@@ -4,6 +4,7 @@ namespace Tests\Listeners;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Statamic\Assets\AssetFolder;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -1026,6 +1027,78 @@ EOT;
         Facades\Entry::makePartial();
 
         $this->assetHoff->path('hoff-new.jpg')->save();
+    }
+
+    /** @test */
+    public function it_updates_references_when_moving_an_asset_folder()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assetHoff->path('folder/hoff.jpg')->save();
+        $this->container->disk()->filesystem()->put('folder/hoff.jpg', '');
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'folder/hoff.jpg',
+        ]))->save();
+
+        $folder = (new AssetFolder)
+            ->container($this->container)
+            ->path('folder');
+
+        $this->assertEquals('folder/hoff.jpg', $entry->get('avatar'));
+
+        $folder->move('destination');
+
+        $this->assertEquals('destination/folder/hoff.jpg', $entry->fresh()->get('avatar'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_renaming_an_asset_folder()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assetHoff->path('folder/hoff.jpg')->save();
+        $this->container->disk()->filesystem()->put('folder/hoff.jpg', '');
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'folder/hoff.jpg',
+        ]))->save();
+
+        $folder = (new AssetFolder)
+            ->container($this->container)
+            ->path('folder');
+
+        $this->assertEquals('folder/hoff.jpg', $entry->get('avatar'));
+
+        $folder->rename('folder-new');
+
+        $this->assertEquals('folder-new/hoff.jpg', $entry->fresh()->get('avatar'));
     }
 
     protected function setSingleBlueprint($namespace, $blueprintContents)

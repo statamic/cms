@@ -8,6 +8,7 @@ class Select extends Fieldtype
 {
     use HasSelectOptions;
 
+    protected $categories = ['controls'];
     protected $selectableInForms = true;
     protected $indexComponent = 'tags';
 
@@ -39,6 +40,7 @@ class Select extends Fieldtype
             'max_items' => [
                 'display' => __('Max Items'),
                 'instructions' => __('statamic::messages.max_items_instructions'),
+                'min' => 1,
                 'type' => 'integer',
                 'width' => 50,
             ],

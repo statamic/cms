@@ -11,9 +11,21 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Str;
+use Statamic\Tags\Concerns\GetsQuerySelectKeys;
 
 class Structure extends Tags
 {
+    use GetsQuerySelectKeys;
+
+    protected $currentUrl;
+    protected $siteAbsoluteUrl;
+
+    public function __construct()
+    {
+        $this->currentUrl = URL::getCurrent();
+        $this->siteAbsoluteUrl = Site::current()->absoluteUrl();
+    }
+
     public function wildcard($tag)
     {
         $handle = $this->context->value($tag, $tag);
@@ -65,10 +77,14 @@ class Structure extends Tags
 
     public function toArray($tree, $parent = null, $depth = 1)
     {
-        return collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
+        $pages = collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
-            $data = $page->toAugmentedArray();
+            $keys = $this->getQuerySelectKeys($page);
+            $data = $page->toAugmentedArray($keys);
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
+
+            $url = $page->urlWithoutRedirect();
+            $absoluteUrl = $page->absoluteUrl();
 
             return array_merge($data, [
                 'children'    => $children,
@@ -78,10 +94,29 @@ class Structure extends Tags
                 'count'       => $index + 1,
                 'first'       => $index === 0,
                 'last'        => $index === count($tree) - 1,
-                'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->urlWithoutRedirect(), '/'),
-                'is_parent'   => Site::current()->absoluteUrl() === $page->absoluteUrl() ? false : URL::isAncestorOf(URL::getCurrent(), $page->urlWithoutRedirect()),
-                'is_external' => URL::isExternal($page->absoluteUrl()),
+                'is_current'  => rtrim($this->currentUrl, '/') === rtrim($url, '/'),
+                'is_parent'   => $this->siteAbsoluteUrl === $absoluteUrl ? false : URL::isAncestorOf($this->currentUrl, $url),
+                'is_external' => URL::isExternal($absoluteUrl),
             ]);
-        })->filter()->values()->all();
+        })->filter()->values();
+
+        $this->addIsParent($pages);
+
+        return $pages->all();
+    }
+
+    protected function addIsParent($pages, &$parent = null)
+    {
+        $pages->transform(function ($page) use (&$parent) {
+            $page['is_parent'] = false;
+
+            $this->addIsParent(collect($page['children'] ?? []), $page);
+
+            if ($parent && ($page['is_current'] || $page['is_parent'])) {
+                $parent['is_parent'] = true;
+            }
+
+            return $page;
+        });
     }
 }

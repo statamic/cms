@@ -100,6 +100,54 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
+    public function if_slugs_are_not_required_the_filename_still_becomes_the_slug()
+    {
+        Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
+            (new \Statamic\Entries\Collection)->requiresSlugs(false)
+        );
+
+        $item = $this->parent->store('blog')->makeItemFromFile(
+            Path::tidy($this->directory).'/blog/the-slug.md',
+            "id: 123\ntitle: Example\nfoo: bar"
+        );
+
+        $this->assertEquals('123', $item->id());
+        $this->assertEquals('the-slug', $item->slug());
+    }
+
+    /** @test */
+    public function if_slugs_are_not_required_and_the_filename_is_the_same_as_the_id_then_slug_is_null()
+    {
+        Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
+            (new \Statamic\Entries\Collection)->requiresSlugs(false)
+        );
+
+        $item = $this->parent->store('blog')->makeItemFromFile(
+            Path::tidy($this->directory).'/blog/123.md',
+            "id: 123\ntitle: Example\nfoo: bar"
+        );
+
+        $this->assertEquals('123', $item->id());
+        $this->assertNull($item->slug());
+    }
+
+    /** @test */
+    public function if_slugs_are_required_and_the_filename_is_the_same_as_the_id_then_slug_is_the_id()
+    {
+        Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
+            (new \Statamic\Entries\Collection)->requiresSlugs(true)
+        );
+
+        $item = $this->parent->store('blog')->makeItemFromFile(
+            Path::tidy($this->directory).'/blog/123.md',
+            "id: 123\ntitle: Example\nfoo: bar"
+        );
+
+        $this->assertEquals('123', $item->id());
+        $this->assertEquals('123', $item->slug());
+    }
+
+    /** @test */
     public function it_uses_the_id_of_the_entry_as_the_item_key()
     {
         $entry = Mockery::mock();
