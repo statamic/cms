@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Se você deseja que este campo seja analisado pelo Antlers.',
     'any.config.cast_booleans' => 'Opções com valores de verdadeiro e falso serão salvas como booleans.',
-    'any.config.default' => 'Definir o valor padrão',
     'array.config.keys' => 'O modo dinâmico dá ao utilizador o controlo dos dados enquanto que o modo com chave não o faz.',
     'array.config.mode' => 'Defina as chaves da matriz (variáveis) e as etiquetas opcionais.',
     'array.title' => 'Array',
