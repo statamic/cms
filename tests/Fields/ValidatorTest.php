@@ -50,9 +50,11 @@ class ValidatorTest extends TestCase
     public function it_compiles_field_rules()
     {
         $fieldWithItsOwnRules = Mockery::mock(Field::class);
+        $fieldWithItsOwnRules->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $fieldWithItsOwnRules->shouldReceive('rules')->andReturn(['one' => ['required']]);
 
         $fieldWithExtraRules = Mockery::mock(Field::class);
+        $fieldWithExtraRules->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $fieldWithExtraRules->shouldReceive('rules')->andReturn([
             'two' => ['required', 'array'],
             'another' => ['min:2'],
@@ -96,6 +98,7 @@ class ValidatorTest extends TestCase
     public function it_merges_additional_rules_into_field_rules()
     {
         $field = Mockery::mock(Field::class);
+        $field->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $field->shouldReceive('rules')->andReturn([
             'one' => ['required', 'array'],
             'extra' => ['min:2'],
@@ -118,9 +121,40 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
+    public function it_compiles_field_attributes()
+    {
+        $fieldWithNoExtraAttributes = Mockery::mock(Field::class);
+        $fieldWithNoExtraAttributes->shouldReceive('validationAttributes')->andReturn(['one' => 'One']);
+
+        $fieldWithExtraAttributes = Mockery::mock(Field::class);
+        $fieldWithExtraAttributes->shouldReceive('validationAttributes')->andReturn([
+            'two' => 'Two',
+            'extra_one' => 'Extra One',
+            'extra_two' => 'Extra Two',
+        ]);
+
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([
+            $fieldWithNoExtraAttributes,
+            $fieldWithExtraAttributes,
+        ]));
+        $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
+
+        $validation = (new Validator)->fields($fields);
+
+        $this->assertEquals([
+            'one' => 'One',
+            'two' => 'Two',
+            'extra_one' => 'Extra One',
+            'extra_two' => 'Extra Two',
+        ], $validation->attributes());
+    }
+
+    /** @test */
     public function it_makes_replacements()
     {
         $field = Mockery::mock(Field::class);
+        $field->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $field->shouldReceive('rules')->andReturn([
             'one' => ['required', 'test:{foo}'],
         ]);
@@ -143,5 +177,201 @@ class ValidatorTest extends TestCase
             'one' => ['required', 'test:FOO', 'test:BAR'],
             'two' => ['another:BAZ,NULL,QUUX'],
         ], $validation->rules());
+    }
+
+    /** @test */
+    public function it_replaces_this()
+    {
+        $replicator = [
+            'type' => 'replicator',
+            'sets' => [
+                'replicator_set' => [
+                    'fields' => [
+                        ['handle' => 'must_fill', 'field' => ['type' => 'toggle']],
+                        ['handle' => 'text', 'field' => ['validate' => ['required_if:{this}.must_fill,true']]],
+                    ],
+                ],
+            ],
+        ];
+
+        $grid = [
+            'type' => 'grid',
+            'fields' => [
+                ['handle' => 'must_fill', 'field' => ['type' => 'toggle']],
+                ['handle' => 'text', 'field' => ['validate' => ['required_if:{this}.must_fill,true']]],
+            ],
+        ];
+
+        $bard = [
+            'type' => 'bard',
+            'sets' => [
+                'bard_set' => [
+                    'fields' => [
+                        ['handle' => 'must_fill', 'field' => ['type' => 'toggle']],
+                        ['handle' => 'text', 'field' => ['validate' => ['required_if:{this}.must_fill,true']]],
+                    ],
+                ],
+            ],
+        ];
+
+        $replicatorWithNestedReplicator = [
+            'type' => 'replicator',
+            'sets' => [
+                'replicator_set' => [
+                    'fields' => [
+                        ['handle' => 'nested_replicator', 'field' => $replicator],
+                    ],
+                ],
+            ],
+        ];
+
+        $replicatorWithDoubleNestedReplicator = [
+            'type' => 'replicator',
+            'sets' => [
+                'replicator_set' => [
+                    'fields' => [
+                        ['handle' => 'nested_replicator', 'field' => $replicatorWithNestedReplicator],
+                    ],
+                ],
+            ],
+        ];
+
+        $replicatorWithNestedGrid = [
+            'type' => 'replicator',
+            'sets' => [
+                'replicator_set' => [
+                    'fields' => [
+                        ['handle' => 'nested_grid', 'field' => $grid],
+                    ],
+                ],
+            ],
+        ];
+
+        $replicatorWithNestedBard = [
+            'type' => 'replicator',
+            'sets' => [
+                'replicator_set' => [
+                    'fields' => [
+                        ['handle' => 'nested_bard', 'field' => $bard],
+                    ],
+                ],
+            ],
+        ];
+
+        $gridWithNestedReplicator = [
+            'type' => 'grid',
+            'fields' => [
+                ['handle' => 'nested_replicator', 'field' => $replicator],
+            ],
+        ];
+
+        $bardWithNestedReplicator = [
+            'type' => 'bard',
+            'sets' => [
+                'bard_set' => [
+                    'fields' => [
+                        ['handle' => 'nested_replicator', 'field' => $replicator],
+                    ],
+                ],
+            ],
+        ];
+
+        $fields = new Fields([
+            ['handle' => 'replicator', 'field' => $replicator],
+            ['handle' => 'replicator_with_nested_replicator', 'field' => $replicatorWithNestedReplicator],
+            ['handle' => 'replicator_with_double_nested_replicator', 'field' => $replicatorWithDoubleNestedReplicator],
+            ['handle' => 'replicator_with_nested_grid', 'field' => $replicatorWithNestedGrid],
+            ['handle' => 'replicator_with_nested_bard', 'field' => $replicatorWithNestedBard],
+            ['handle' => 'grid', 'field' => $grid],
+            ['handle' => 'grid_with_nested_replicator', 'field' => $gridWithNestedReplicator],
+            ['handle' => 'bard', 'field' => $bard],
+            ['handle' => 'bard_with_nested_replicator', 'field' => $bardWithNestedReplicator],
+        ]);
+
+        $fields = $fields->addValues([
+            'replicator' => [
+                ['type' => 'replicator_set'],
+            ],
+            'replicator_with_nested_replicator' => [
+                ['type' => 'replicator_set', 'nested_replicator' => [['type' => 'replicator_set']]],
+            ],
+            'replicator_with_double_nested_replicator' => [
+                ['type' => 'replicator_set', 'nested_replicator' => [['type' => 'replicator_set', 'nested_replicator' => [['type' => 'replicator_set']]]]],
+            ],
+            'replicator_with_nested_grid' => [
+                ['type' => 'replicator_set', 'nested_grid' => [[]]],
+            ],
+            'replicator_with_nested_bard' => [
+                ['type' => 'replicator_set', 'nested_bard' => [['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set']]]]],
+            ],
+            'grid' => [
+                ['text' => null],
+            ],
+            'grid_with_nested_replicator' => [
+                ['nested_replicator' => [['type' => 'replicator_set']]],
+            ],
+            'bard' => [
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set']]],
+            ],
+            'bard_with_nested_replicator' => [
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'nested_replicator' => [['type' => 'replicator_set']]]]],
+            ],
+        ]);
+
+        $rules = (new Validator)->fields($fields)->rules();
+
+        $this->assertArraySubset([
+            'replicator.0.text' => [
+                'required_if:replicator.0.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'replicator_with_nested_replicator.0.nested_replicator.0.text' => [
+                'required_if:replicator_with_nested_replicator.0.nested_replicator.0.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'replicator_with_double_nested_replicator.0.nested_replicator.0.nested_replicator.0.text' => [
+                'required_if:replicator_with_double_nested_replicator.0.nested_replicator.0.nested_replicator.0.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'replicator_with_nested_grid.0.nested_grid.0.text' => [
+                'required_if:replicator_with_nested_grid.0.nested_grid.0.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'replicator_with_nested_bard.0.nested_bard.0.attrs.values.text' => [
+                'required_if:replicator_with_nested_bard.0.nested_bard.0.attrs.values.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'grid.0.text' => [
+                'required_if:grid.0.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'grid_with_nested_replicator.0.nested_replicator.0.text' => [
+                'required_if:grid_with_nested_replicator.0.nested_replicator.0.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'bard.0.attrs.values.text' => [
+                'required_if:bard.0.attrs.values.must_fill,true',
+            ],
+        ], $rules);
+
+        $this->assertArraySubset([
+            'bard_with_nested_replicator.0.attrs.values.nested_replicator.0.text' => [
+                'required_if:bard_with_nested_replicator.0.attrs.values.nested_replicator.0.must_fill,true',
+            ],
+        ], $rules);
     }
 }

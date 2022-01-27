@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => "Enable Antlers parsing in this field's content.",
     'any.config.cast_booleans' => 'Options with values of true and false will be saved as booleans.',
-    'any.config.default' => 'Set the default value.',
     'array.config.keys' => 'Set the array keys (variables) and optional labels.',
     'array.config.mode' => 'Dynamic mode gives the user control of the data while keyed mode does not.',
     'array.title' => 'Array',

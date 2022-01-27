@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Si vous souhaitez que ce champ soit analysé par Antlers.',
     'any.config.cast_booleans' => 'Les options avec des valeurs true (vrai) et false (faux) seront enregistrées en tant que booléens.',
-    'any.config.default' => 'Définissez la valeur par défaut.',
     'array.config.keys' => 'Définissez les clés du tableau (les variables) et leurs étiquettes facultatives.',
     'array.config.mode' => 'Le mode dynamique donne à l’utilisateur le contrôle des données, contrairement au mode à clé.',
     'array.title' => 'Array',

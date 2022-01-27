@@ -1,4 +1,4 @@
-import marked from 'marked';
+import { marked } from 'marked';
 import { translate, translateChoice } from '../translations/translator';
 
 export function cp_url(url) {
