@@ -316,10 +316,16 @@ class FieldtypeTest extends TestCase
     /** @test */
     public function it_will_only_append_config_fields_to_the_intended_fieldtype()
     {
-        TestAppendConfigFields::appendConfigField('group', ['type' => 'text']);
+        $fieldtype = new class extends Fieldtype {
+        };
 
-        $this->assertCount(0, (new TestFieldtype())->configFields()->all());
-        $this->assertCount(3, (new TestAppendConfigFields())->configFields()->all());
+        $fieldtypeWithAppendedConfig = new class extends Fieldtype {
+        };
+
+        $fieldtypeWithAppendedConfig::appendConfigField('group', ['type' => 'text']);
+
+        $this->assertCount(0, $fieldtype->configFields()->all());
+        $this->assertCount(1, $fieldtypeWithAppendedConfig->configFields()->all());
     }
 
     /** @test */
