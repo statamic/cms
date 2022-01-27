@@ -15,7 +15,9 @@
                                 <ul>
                                     @foreach ($item->children() as $child)
                                         <li class="{{ $child->isActive() ? 'current' : '' }}">
-                                            <a href="{{ $child->url() }}">{{ __($child->name()) }}</a>
+                                            <a href="{{ $child->url() }}">
+                                                {{ is_array(__($child->name())) ? $child->name() : __($child->name()) }}
+                                            </a>
                                         </li>
                                     @endforeach
                                 </ul>
