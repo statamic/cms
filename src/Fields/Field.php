@@ -19,6 +19,7 @@ class Field implements Arrayable
     protected $value;
     protected $parent;
     protected $parentField;
+    protected $filled = false;
     protected $validationContext;
 
     public function __construct($handle, array $config)
@@ -32,7 +33,8 @@ class Field implements Arrayable
         return (new static($this->handle, $this->config))
             ->setParent($this->parent)
             ->setParentField($this->parentField)
-            ->setValue($this->value);
+            ->setValue($this->value)
+            ->setFilled($this->filled);
     }
 
     public function setHandle(string $handle)
@@ -199,6 +201,11 @@ class Field implements Arrayable
         return (bool) $this->get('filterable');
     }
 
+    public function isFilled()
+    {
+        return (bool) $this->filled;
+    }
+
     public function toPublishArray()
     {
         return array_merge($this->preProcessedConfig(), [
@@ -225,9 +232,24 @@ class Field implements Arrayable
         ];
     }
 
+    public function setFilled($filled)
+    {
+        $this->filled = $filled;
+
+        return $this;
+    }
+
     public function setValue($value)
     {
         $this->value = $value;
+
+        return $this;
+    }
+
+    public function fillValue($value)
+    {
+        $this->value = $value;
+        $this->filled = true;
 
         return $this;
     }
@@ -333,6 +355,20 @@ class Field implements Arrayable
     public function config(): array
     {
         return $this->config;
+    }
+
+    public function conditions(): array
+    {
+        return collect($this->config)->only([
+            'if',
+            'if_any',
+            'show_when',
+            'show_when_any',
+            'unless',
+            'unless_any',
+            'hide_when',
+            'hide_when_any',
+        ])->all();
     }
 
     public function get(string $key, $fallback = null)

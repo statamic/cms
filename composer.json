@@ -51,7 +51,7 @@
     "extra": {
         "download-dist": {
             "url": "https://github.com/statamic/cms/releases/download/{$version}/dist.tar.gz",
-            "path": "resources/dist"
+            "path": "resources"
         },
         "laravel": {
             "providers": [
