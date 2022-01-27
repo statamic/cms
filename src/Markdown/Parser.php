@@ -24,7 +24,7 @@ class Parser
 
     public function parse(string $markdown): string
     {
-        return $this->converter()->convertToHtml($markdown);
+        return $this->converter()->convert($markdown);
     }
 
     public function converter(): MarkdownConverter
