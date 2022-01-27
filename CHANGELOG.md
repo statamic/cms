@@ -1,5 +1,28 @@
 # Release Notes
 
+## 3.2.32 (2022-01-26)
+
+### What's improved
+- Improve performance of the `nav` tag. [#4925](https://github.com/statamic/cms/issues/4925) by @FrittenKeeZ
+- Prevent entering negative values into `max_items`/`max_files` configs. [#5044](https://github.com/statamic/cms/issues/5044) by @edalzell
+- Prevent using `type` as a field handle. [#5088](https://github.com/statamic/cms/issues/5088) by @arthurperton
+- Default field names are suffixed to help prevent tag/variable collisions. [#5084](https://github.com/statamic/cms/issues/5084) by @arthurperton
+
+### What's fixed
+- Fix infinite loop in UI when removing assets from `asset` fieldtype. [#5070](https://github.com/statamic/cms/issues/5070) by @arthurperton
+- Fix `widont` inserting spaces into nested lists. [#5115](https://github.com/statamic/cms/issues/5115) by @benfreke
+- Fix Replicator preview text generation. [#5096](https://github.com/statamic/cms/issues/5096) by @arthurperton
+- Fix Eloquent query builder column selects. [#5125](https://github.com/statamic/cms/issues/5125) by @jasonvarga
+- Fix "passed value cannot be an array" error. [#5127](https://github.com/statamic/cms/issues/5127) by @jasonvarga
+- Fix unintentionally added new abstract query builder method. [#5123](https://github.com/statamic/cms/issues/5123) by @jasonvarga
+- Fix `nav` tag's `is_parent` logic so it works better for Navs. [#4969](https://github.com/statamic/cms/issues/4969) by @arthurperton
+- Throw a 404 instead of 500 on Glide asset URLs when there's an invalid container. [#5094](https://github.com/statamic/cms/issues/5094) by @edalzell
+- Fix Replicator's "add set" button not inserting at the right position. [#5107](https://github.com/statamic/cms/issues/5107) by @arthurperton
+- Fix the "delete" action confirmation translations. [#5074](https://github.com/statamic/cms/issues/5074) by @zsoltjanes
+- Bump `marked` from 0.7.0 to 4.0.10 [#5075](https://github.com/statamic/cms/issues/5075) by @dependabot
+
+
+
 ## 3.2.31 (2022-01-14)
 
 ### What's new

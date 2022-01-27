@@ -177,5 +177,8 @@ abstract class Builder extends BaseBuilder
         });
     }
 
-    abstract protected function getWhereColumnKeyValuesByIndex($column);
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        return $this->store->index($column)->items();
+    }
 }
