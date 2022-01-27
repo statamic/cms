@@ -2,11 +2,13 @@
 
 namespace Tests\Markdown;
 
-use League\CommonMark\ConfigurableEnvironmentInterface;
+use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
-use League\CommonMark\Inline\Element\Text;
-use League\CommonMark\Inline\Parser\InlineParserInterface;
-use League\CommonMark\InlineParserContext;
+use League\CommonMark\Node\Inline\Text;
+use League\CommonMark\Parser\Inline\InlineParserInterface;
+use League\CommonMark\Parser\Inline\InlineParserMatch;
+use League\CommonMark\Parser\InlineParserContext;
+use League\CommonMark\Util\HtmlFilter;
 use PHPUnit\Framework\TestCase;
 use Statamic\Markdown\Parser;
 
@@ -80,7 +82,7 @@ class ParserTest extends TestCase
 
 class SmileyExtension implements ExtensionInterface
 {
-    public function register(ConfigurableEnvironmentInterface $environment)
+    public function register(EnvironmentBuilderInterface $environment): void
     {
         $environment->addInlineParser(new SmileyParser);
     }
@@ -88,23 +90,23 @@ class SmileyExtension implements ExtensionInterface
 
 class FrownyExtension implements ExtensionInterface
 {
-    public function register(ConfigurableEnvironmentInterface $environment)
+    public function register(EnvironmentBuilderInterface $environment): void
     {
         $environment->addInlineParser(new FrownyParser);
     }
 }
 
 /**
- * Inspired by https://commonmark.thephpleague.com/1.0/customization/inline-parsing/.
+ * Inspired by https://commonmark.thephpleague.com/2.0/customization/inline-parsing/.
  */
 class SmileyParser implements InlineParserInterface
 {
     protected $emoji = '😀';
     protected $char = ')';
 
-    public function getCharacters(): array
+    public function getMatchDefinition(): InlineParserMatch
     {
-        return [':'];
+        return InlineParserMatch::string(':');
     }
 
     public function parse(InlineParserContext $inlineContext): bool
@@ -112,6 +114,7 @@ class SmileyParser implements InlineParserInterface
         $cursor = $inlineContext->getCursor();
 
         $nextChar = $cursor->peek();
+
         if ($nextChar !== $this->char) {
             return false;
         }
