@@ -196,7 +196,9 @@ abstract class Fieldtype implements Arrayable
 
     public static function extendConfigFields(array $config): void
     {
-        self::$extraConfigFields[get_called_class()] = $config;
+        $existingConfig = Arr::get(self::$extraConfigFields, get_called_class(), []);
+
+        self::$extraConfigFields[get_called_class()] = array_merge($existingConfig, $config);
     }
 
     public function icon()
