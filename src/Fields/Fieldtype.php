@@ -201,6 +201,11 @@ abstract class Fieldtype implements Arrayable
         self::$extraConfigFields[get_called_class()] = array_merge($existingConfig, $config);
     }
 
+    public static function appendConfigField(string $field, array $config): void
+    {
+        self::appendConfigFields([$field => $config]);
+    }
+
     public function icon()
     {
         return $this->icon ?? $this->handle();
