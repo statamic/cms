@@ -9,7 +9,6 @@ use Statamic\Extend\RegistersItself;
 use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 abstract class Fieldtype implements Arrayable
@@ -191,12 +190,12 @@ abstract class Fieldtype implements Arrayable
 
     protected function extraConfigFieldItems(): array
     {
-        return Arr::get(self::$extraConfigFields, get_called_class(), []);
+        return self::$extraConfigFields[get_called_class()] ?? [];
     }
 
     public static function appendConfigFields(array $config): void
     {
-        $existingConfig = Arr::get(self::$extraConfigFields, get_called_class(), []);
+        $existingConfig = self::$extraConfigFields[get_called_class()] ?? [];
 
         self::$extraConfigFields[get_called_class()] = array_merge($existingConfig, $config);
     }
