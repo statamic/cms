@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Uanset om du vil have, at dette felt skal tages af Antlers.',
     'any.config.cast_booleans' => 'Valgmuligheder med værdierne sandt og falsk gemmes som booleanske.',
-    'any.config.default' => 'Indstil standardværdien.',
     'array.config.keys' => 'Indstil matrixnøgler (variabler) og valgfri etiketter.',
     'array.config.mode' => 'Dynamisk tilstand giver brugeren kontrol over dataene, mens tastetilstand ikke gør det.',
     'array.title' => 'Array',
