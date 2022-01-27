@@ -3,10 +3,11 @@
 namespace Statamic\Markdown;
 
 use Closure;
-use League\CommonMark\CommonMarkConverter;
-use League\CommonMark\Environment;
+use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\Autolink\AutolinkExtension;
+use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\SmartPunct\SmartPunctExtension;
+use League\CommonMark\MarkdownConverter;
 use Statamic\Support\Arr;
 
 class Parser
@@ -25,21 +26,21 @@ class Parser
         return $this->converter()->convertToHtml($markdown);
     }
 
-    public function converter(): CommonMarkConverter
+    public function converter(): MarkdownConverter
     {
         if ($this->converter) {
             return $this->converter;
         }
 
-        $env = Environment::createCommonMarkEnvironment();
+        $env = new Environment($this->config);
 
-        $env->mergeConfig($this->config);
+        $env->addExtension(new CommonMarkCoreExtension);
 
         foreach ($this->extensions() as $ext) {
             $env->addExtension($ext);
         }
 
-        return $this->converter = new CommonMarkConverter([], $env);
+        return $this->converter = new MarkdownConverter($env);
     }
 
     public function environment(): Environment
