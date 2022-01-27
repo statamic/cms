@@ -16,7 +16,7 @@ class ParserTest extends TestCase
 {
     public function setUp(): void
     {
-        $this->parser = new Parser(['foo' => 'bar']);
+        $this->parser = new Parser;
     }
 
     /** @test */
@@ -57,13 +57,18 @@ class ParserTest extends TestCase
         });
 
         $config = $this->parser->config();
-        $this->assertEquals('bar', $config['foo']);
-        $this->assertArrayNotHasKey('hello', $config);
+
+        $this->assertEquals("\n", $config->get('renderer/block_separator'));
+        $this->assertEquals("\n", $config->get('renderer/inner_separator'));
+        $this->assertEquals(HtmlFilter::ALLOW, $config->get('html_input'));
+
         $this->assertCount(1, $this->parser->extensions());
 
         $newParser = $this->parser->newInstance([
-            'foo' => 'baz',
-            'hello' => 'world',
+            'html_input' => HtmlFilter::STRIP,
+            'renderer' => [
+                'inner_separator' => 'foo',
+            ],
         ]);
 
         $newParser->addExtension(function () {
@@ -72,9 +77,9 @@ class ParserTest extends TestCase
 
         $this->assertNotSame($this->parser, $newParser);
         $newConfig = $newParser->config();
-        $this->assertEquals('baz', $newConfig['foo']);
-        $this->assertEquals('world', $newConfig['hello']);
-        $this->assertArrayNotHasKey('hello', $this->parser->config());
+        $this->assertEquals("\n", $newConfig->get('renderer/block_separator'));
+        $this->assertEquals('foo', $newConfig->get('renderer/inner_separator'));
+        $this->assertEquals(HtmlFilter::STRIP, $newConfig->get('html_input'));
         $this->assertCount(2, $newParser->extensions());
         $this->assertCount(1, $this->parser->extensions());
     }

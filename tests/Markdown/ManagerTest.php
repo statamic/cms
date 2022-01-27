@@ -31,11 +31,17 @@ class ManagerTest extends TestCase
     public function it_makes_a_new_parser_instance()
     {
         $manager = new Manager;
-        $parser = $manager->makeParser($config = ['foo' => 'bar']);
+        $parser = $manager->makeParser([
+            'renderer' => [
+                'inner_separator' => 'foo',
+            ],
+            'max_nesting_level' => 3,
+        ]);
 
         $this->assertInstanceOf(Parser::class, $parser);
-        $this->assertNotSame($parser, $manager->parser('default'));
-        $this->assertEquals('bar', $parser->environment()->getConfig('foo'));
+        $this->assertEquals("\n", $parser->config()->get('renderer/block_separator'));
+        $this->assertEquals('foo', $parser->config()->get('renderer/inner_separator'));
+        $this->assertEquals(3, $parser->config()->get('max_nesting_level'));
     }
 
     /** @test */
