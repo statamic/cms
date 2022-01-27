@@ -8,6 +8,7 @@ use League\CommonMark\Extension\Autolink\AutolinkExtension;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\SmartPunct\SmartPunctExtension;
 use League\CommonMark\MarkdownConverter;
+use League\Config\ReadOnlyConfiguration;
 use Statamic\Support\Arr;
 
 class Parser
@@ -114,9 +115,9 @@ class Parser
         });
     }
 
-    public function config(): array
+    public function config(): ReadOnlyConfiguration
     {
-        return $this->environment()->getConfig();
+        return $this->environment()->getConfiguration();
     }
 
     public function newInstance(array $config = [])
