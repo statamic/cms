@@ -1,5 +1,17 @@
 # Release Notes
 
+## Unreleased
+
+### What's new
+- Frontend form field conditions. [#4949](https://github.com/statamic/cms/issues/4949) by @jesseleite
+- Antlers wrapper for Blade. [#5058](https://github.com/statamic/cms/issues/5058) by @jesseleite
+- Support Blade section yields in Antlers layouts. [#5056](https://github.com/statamic/cms/issues/5056) by @jasonvarga
+
+### What's fixed
+- CP forms only submit visible fields, in order to fix sometimes/required_if/etc validation rules. [#5101](https://github.com/statamic/cms/issues/5101) by @jesseleite
+
+
+
 ## 3.2.32 (2022-01-26)
 
 ### What's improved
