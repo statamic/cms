@@ -4,7 +4,7 @@ namespace Statamic\Http\Controllers\API;
 
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Resources\API\TreeResource;
-use Statamic\Structures\PageQueryBuilder;
+use Statamic\Query\ItemQueryBuilder;
 
 class CollectionTreeController extends ApiController
 {
@@ -18,7 +18,7 @@ class CollectionTreeController extends ApiController
 
         $site = $this->queryParam('site');
 
-        $query = new PageQueryBuilder();
+        $query = new ItemQueryBuilder();
         $this->filter($query);
 
         return app(TreeResource::class)::make($this->getCollectionTree($collection, $site))

@@ -9,7 +9,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
-use Statamic\Structures\PageQueryBuilder;
+use Statamic\Query\ItemQueryBuilder;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\GetsQuerySelectKeys;
@@ -54,7 +54,7 @@ class Structure extends Tags
 
         $this->ensureStructureExists($handle);
 
-        $query = new PageQueryBuilder();
+        $query = new ItemQueryBuilder();
         $this->queryStatus($query);
         $this->queryConditions($query);
 

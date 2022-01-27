@@ -55,7 +55,7 @@ class TreeBuilder
             return [];
         }
 
-        if ($query && empty($pages = $query->withPages($pages)->get())) {
+        if ($query && empty($pages = $query->withItems($pages)->get())) {
             return [];
         }
 

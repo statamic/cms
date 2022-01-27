@@ -4,7 +4,7 @@ namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Site;
-use Statamic\Structures\PageQueryBuilder;
+use Statamic\Query\ItemQueryBuilder;
 use Statamic\Structures\TreeBuilder;
 
 class TreeResource extends JsonResource
@@ -56,7 +56,7 @@ class TreeResource extends JsonResource
     /**
      * Set query.
      *
-     * @param  \Statamic\Structures\PageQueryBuilder|null  $query
+     * @param  \Statamic\Structures\ItemQueryBuilder|null  $query
      * @return $this
      */
     public function query($query = null)
@@ -76,7 +76,7 @@ class TreeResource extends JsonResource
     {
         return (new TreeBuilder)->build([
             'structure' => $this->resource->structure(),
-            'query' => $this->query ?? (new PageQueryBuilder)->where('status', 'published'),
+            'query' => $this->query ?? (new ItemQueryBuilder)->where('status', 'published'),
             'include_home' => true,
             'site' => $this->site ?? Site::default()->handle(),
             'fields' => $this->fields,
