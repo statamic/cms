@@ -3,7 +3,6 @@
 namespace Statamic\Query;
 
 use Illuminate\Support\Collection;
-use Statamic\Query\IteratorBuilder;
 
 class ItemQueryBuilder extends IteratorBuilder
 {
