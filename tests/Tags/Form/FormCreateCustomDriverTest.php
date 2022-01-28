@@ -4,6 +4,7 @@ namespace Tests\Tags\Form;
 
 use Statamic\Facades\Form;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
+use Statamic\Statamic;
 
 class FormCreateCustomDriverTest extends FormTestCase
 {
@@ -43,7 +44,9 @@ EOT
     {
         $output = $this->tag('{{ form:contact js="custom_driver" }}{{ /form:contact }}');
 
-        $expected = '<form method="POST" action="http://localhost/!/forms/contact" z-data="{\'lol\':\'catz\',\'handle\':\'contact\'}" z-rad="absolutely">';
+        $expectedZData = Statamic::modify(['lol' => 'catz', 'handle' => 'contact'])->toJson()->entities();
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" z-data="'.$expectedZData.'" z-rad="absolutely">';
 
         $this->assertStringContainsString($expected, $output);
     }
@@ -194,7 +197,7 @@ class CustomDriver extends AbstractJsDriver
     public function addToFormAttributes()
     {
         return [
-            'z-data' => $this->jsonEncodeForHtmlAttribute(['lol' => 'catz', 'handle' => $this->form->handle()]),
+            'z-data' => Statamic::modify(['lol' => 'catz', 'handle' => $this->form->handle()])->toJson()->entities(),
             'z-rad' => 'absolutely',
         ];
     }
