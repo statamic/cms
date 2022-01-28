@@ -135,16 +135,39 @@ class Grid extends Fieldtype
 
     protected function rowRules($data, $index)
     {
-        $rules = $this->fields()->addValues($data)->validator()->rules();
+        $rules = $this
+            ->fields()
+            ->addValues($data)
+            ->validator()
+            ->withContext([
+                'prefix' => $this->field->validationContext('prefix').$this->rowRuleFieldPrefix($index).'.',
+            ])
+            ->withReplacements([
+                'this' => $this->field->validationContext('prefix').$this->rowRuleFieldPrefix($index),
+            ])
+            ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
-            return [$this->setRuleFieldKey($handle, $index) => $rules];
+            return [$this->rowRuleFieldPrefix($index).'.'.$handle => $rules];
         })->all();
     }
 
-    protected function setRuleFieldKey($handle, $index)
+    protected function rowRuleFieldPrefix($index)
     {
-        return "{$this->field->handle()}.{$index}.{$handle}";
+        return "{$this->field->handle()}.{$index}";
+    }
+
+    public function extraValidationAttributes(): array
+    {
+        $attributes = $this->fields()->validator()->attributes();
+
+        return collect($this->field->value())->map(function ($row, $index) use ($attributes) {
+            return collect($row)->except('_id')->mapWithKeys(function ($value, $handle) use ($attributes, $index) {
+                return [$this->rowRuleFieldPrefix($index).'.'.$handle => $attributes[$handle]];
+            });
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
     }
 
     public function preload()

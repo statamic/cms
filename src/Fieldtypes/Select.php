@@ -40,6 +40,7 @@ class Select extends Fieldtype
             'max_items' => [
                 'display' => __('Max Items'),
                 'instructions' => __('statamic::messages.max_items_instructions'),
+                'min' => 1,
                 'type' => 'integer',
                 'width' => 50,
             ],
