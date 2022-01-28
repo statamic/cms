@@ -2,8 +2,6 @@
 
 namespace Statamic\Query;
 
-use Illuminate\Support\Carbon;
-
 abstract class IteratorBuilder extends Builder
 {
     protected $randomize = false;
@@ -177,10 +175,7 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            $value = Carbon::parse($value);
-            $value = Carbon::parse($value->format('Y-m-d'));
-
-            return $value->$method($where['value']);
+            return $value->copy()->startOfDay()->$method($where['value']);
         });
     }
 
@@ -195,7 +190,7 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            return $this->{$method}(Carbon::parse($value)->format('m'), $where['value']);
+            return $this->{$method}($value->format('m'), $where['value']);
         });
     }
 
@@ -210,7 +205,7 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            return $this->{$method}(Carbon::parse($value)->format('j'), $where['value']);
+            return $this->{$method}($value->format('j'), $where['value']);
         });
     }
 
@@ -225,7 +220,7 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            return $this->{$method}(Carbon::parse($value)->format('Y'), $where['value']);
+            return $this->{$method}($value->format('Y'), $where['value']);
         });
     }
 
@@ -240,7 +235,6 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            $value = Carbon::parse($value);
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
 
             return $value->$method($compareValue);
