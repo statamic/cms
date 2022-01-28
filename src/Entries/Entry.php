@@ -800,4 +800,19 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         // the slug which could result in an infinite loop in some cases.
         return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
     }
+
+    public function getQueryableValue($field)
+    {
+        if (method_exists($this, $method = Str::camel($field))) {
+            return $this->{$method}();
+        }
+
+        $value = $this->value($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
+    }
 }

@@ -32,6 +32,10 @@ class ResolveValue
             return null;
         }
 
+        if (method_exists($item, 'getQueryableValue')) {
+            return $item->getQueryableValue($name);
+        }
+
         if (method_exists($item, $method = Str::camel($name))) {
             return $item->{$method}();
         }

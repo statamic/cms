@@ -279,4 +279,9 @@ abstract class Fieldtype implements Arrayable
     {
         //
     }
+
+    public function toQueryableValue($value)
+    {
+        return $value;
+    }
 }

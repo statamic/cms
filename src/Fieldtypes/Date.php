@@ -277,4 +277,9 @@ class Date extends Fieldtype
 
         return new DateField;
     }
+
+    public function toQueryableValue($value)
+    {
+        return $this->augment($value);
+    }
 }
