@@ -2,6 +2,8 @@
 
 namespace Statamic\Forms\JsDrivers;
 
+use Statamic\Statamic;
+
 class Alpine extends AbstractJsDriver
 {
     protected $scope;
@@ -70,7 +72,7 @@ class Alpine extends AbstractJsDriver
             ];
         }
 
-        return $this->jsonEncodeForHtmlAttribute($xData);
+        return Statamic::modify($xData)->toJson()->entities();
     }
 
     /**
@@ -96,14 +98,14 @@ class Alpine extends AbstractJsDriver
      */
     protected function renderAlpineShowFieldJs($conditions, $alpineScope)
     {
-        $attrFriendlyConditions = $this->jsonEncodeForHtmlAttribute($conditions);
+        $conditionsObject = Statamic::modify($conditions)->toJson()->entities();
 
-        $data = '$data';
+        $dataObject = '$data';
 
         if (is_string($alpineScope)) {
-            $data .= ".{$alpineScope}";
+            $dataObject .= ".{$alpineScope}";
         }
 
-        return 'Statamic.$conditions.showField('.$attrFriendlyConditions.', '.$data.')';
+        return 'Statamic.$conditions.showField('.$conditionsObject.', '.$dataObject.')';
     }
 }

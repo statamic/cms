@@ -124,17 +124,6 @@ abstract class AbstractJsDriver implements JsDriver
     }
 
     /**
-     * Json encode for html attribute.
-     *
-     * @param  mixed  $value
-     * @return string
-     */
-    protected function jsonEncodeForHtmlAttribute($value)
-    {
-        return str_replace('"', '\'', json_encode($value));
-    }
-
-    /**
      * Get initial form data.
      *
      * @return array
