@@ -2,7 +2,6 @@
 
 namespace Tests\Markdown;
 
-use Statamic\Console\Composer\Lock;
 use Statamic\Markdown;
 use Statamic\Support\Arr;
 use Tests\TestCase;
@@ -26,9 +25,7 @@ class ParserTest extends TestCase
 
     public function isLegacyCommonmark()
     {
-        $version = Lock::file(__DIR__.'/../../composer.lock')->getNormalizedInstalledVersion('league/commonmark');
-
-        return version_compare($version, '2', '<');
+        return class_exists('League\CommonMark\Inline\Element\Text');
     }
 
     /** @test */
