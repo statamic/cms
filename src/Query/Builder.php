@@ -244,7 +244,6 @@ abstract class Builder implements Contract
     public function whereBetween($column, $values, $boolean = 'and', $not = false)
     {
         $values = array_slice(Arr::flatten($values), 0, 2);
-        sort($values);
 
         if (count($values) != 2) {
             throw new InvalidArgumentException('Values should be an array of length 2');
