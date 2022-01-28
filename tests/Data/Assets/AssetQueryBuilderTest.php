@@ -71,6 +71,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['d', 'e'], $assets->map->filename()->all());
     }
 
+    /** @test */
     public function assets_are_found_using_where_null()
     {
         Asset::find('test::a.jpg')->data(['text' => 'Text 1'])->save();
