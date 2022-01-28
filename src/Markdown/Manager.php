@@ -23,7 +23,7 @@ class Manager
         return $this->parser('default')->$method(...$args);
     }
 
-    public function makeParser(array $config = []): ParserContract
+    public function makeParser(array $config = []): Parser
     {
         return new $this->parserClass($config);
     }
@@ -50,7 +50,7 @@ class Manager
     {
         $parser = $closure($this->makeParser());
 
-        if (! $parser instanceof ParserContract) {
+        if (! $parser instanceof Parser) {
             throw new UnexpectedValueException('A '.$this->parserClass.' instance is expected.');
         }
 

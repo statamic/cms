@@ -4,13 +4,11 @@ namespace Statamic\Markdown;
 
 use Closure;
 use League\CommonMark\CommonMarkConverter;
-use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\Autolink\AutolinkExtension;
 use League\CommonMark\Extension\SmartPunct\SmartPunctExtension;
-use League\Config\ReadOnlyConfiguration;
 use Statamic\Support\Arr;
 
-class Parser implements ParserContract
+class Parser
 {
     protected $converter;
     protected $extensions = [];
@@ -43,7 +41,7 @@ class Parser implements ParserContract
         return $this->converter = $converter;
     }
 
-    public function environment(): Environment
+    public function environment()
     {
         return $this->converter()->getEnvironment();
     }
@@ -114,9 +112,15 @@ class Parser implements ParserContract
         });
     }
 
-    public function config(): ReadOnlyConfiguration
+    public function config($key = null)
     {
-        return $this->environment()->getConfiguration();
+        $config = $this->environment()->getConfiguration();
+
+        if (! is_null($key)) {
+            return $config->get($key);
+        }
+
+        return $config;
     }
 
     public function newInstance(array $config = [])

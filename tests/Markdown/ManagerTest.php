@@ -5,7 +5,6 @@ namespace Tests\Markdown;
 use InvalidArgumentException;
 use Mockery;
 use Statamic\Markdown;
-use Statamic\Support\Arr;
 use Tests\TestCase;
 use UnexpectedValueException;
 
@@ -56,9 +55,9 @@ class ManagerTest extends TestCase
         ]);
 
         $this->assertInstanceOf($this->parserClass, $parser);
-        $this->assertEquals("\n", $this->getFromConfig($parser->config(), 'renderer/block_separator'));
-        $this->assertEquals('foo', $this->getFromConfig($parser->config(), 'renderer/inner_separator'));
-        $this->assertEquals(3, $this->getFromConfig($parser->config(), 'max_nesting_level'));
+        $this->assertEquals("\n", $parser->config('renderer/block_separator'));
+        $this->assertEquals('foo', $parser->config('renderer/inner_separator'));
+        $this->assertEquals(3, $parser->config('max_nesting_level'));
     }
 
     /** @test */
@@ -95,14 +94,5 @@ class ManagerTest extends TestCase
         (new Markdown\Manager)->extend('a', function ($parser) {
             //
         });
-    }
-
-    protected function getFromConfig($config, $key)
-    {
-        if ($this->isLegacyCommonmark()) {
-            return Arr::dot($config)[str_replace('/', '.', $key)];
-        }
-
-        return $config->get($key);
     }
 }

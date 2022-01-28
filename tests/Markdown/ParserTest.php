@@ -3,7 +3,6 @@
 namespace Tests\Markdown;
 
 use Statamic\Markdown;
-use Statamic\Support\Arr;
 use Tests\TestCase;
 
 class ParserTest extends TestCase
@@ -65,11 +64,9 @@ class ParserTest extends TestCase
             return new $this->smileyExtension;
         });
 
-        $config = $this->parser->config();
-
-        $this->assertEquals("\n", $this->getFromConfig($config, 'renderer/block_separator'));
-        $this->assertEquals("\n", $this->getFromConfig($config, 'renderer/inner_separator'));
-        $this->assertEquals('allow', $this->getFromConfig($config, 'html_input'));
+        $this->assertEquals("\n", $this->parser->config('renderer/block_separator'));
+        $this->assertEquals("\n", $this->parser->config('renderer/inner_separator'));
+        $this->assertEquals('allow', $this->parser->config('html_input'));
 
         $this->assertCount(1, $this->parser->extensions());
 
@@ -85,20 +82,10 @@ class ParserTest extends TestCase
         });
 
         $this->assertNotSame($this->parser, $newParser);
-        $newConfig = $newParser->config();
-        $this->assertEquals("\n", $this->getFromConfig($newConfig, 'renderer/block_separator'));
-        $this->assertEquals('foo', $this->getFromConfig($newConfig, 'renderer/inner_separator'));
-        $this->assertEquals('strip', $this->getFromConfig($newConfig, 'html_input'));
+        $this->assertEquals("\n", $newParser->config('renderer/block_separator'));
+        $this->assertEquals('foo', $newParser->config('renderer/inner_separator'));
+        $this->assertEquals('strip', $newParser->config('html_input'));
         $this->assertCount(2, $newParser->extensions());
         $this->assertCount(1, $this->parser->extensions());
-    }
-
-    protected function getFromConfig($config, $key)
-    {
-        if ($this->isLegacyCommonmark()) {
-            return Arr::dot($config)[str_replace('/', '.', $key)];
-        }
-
-        return $config->get($key);
     }
 }
