@@ -4,13 +4,12 @@ namespace Statamic\Markdown;
 
 use Closure;
 use League\CommonMark\CommonMarkConverter;
-use League\CommonMark\Environment\Environment;
+use League\CommonMark\Environment;
 use League\CommonMark\Extension\Autolink\AutolinkExtension;
 use League\CommonMark\Extension\SmartPunct\SmartPunctExtension;
-use League\Config\ReadOnlyConfiguration;
 use Statamic\Support\Arr;
 
-class Parser implements ParserContract
+class LegacyParser implements ParserContract
 {
     protected $converter;
     protected $extensions = [];
@@ -23,7 +22,7 @@ class Parser implements ParserContract
 
     public function parse(string $markdown): string
     {
-        return $this->converter()->convert($markdown);
+        return $this->converter()->convertToHtml($markdown);
     }
 
     public function converter(): CommonMarkConverter
@@ -32,15 +31,15 @@ class Parser implements ParserContract
             return $this->converter;
         }
 
-        $converter = new CommonMarkConverter($this->config);
+        $env = Environment::createCommonMarkEnvironment();
 
-        $env = $converter->getEnvironment();
+        $env->mergeConfig($this->config);
 
         foreach ($this->extensions() as $ext) {
             $env->addExtension($ext);
         }
 
-        return $this->converter = $converter;
+        return $this->converter = new CommonMarkConverter([], $env);
     }
 
     public function environment(): Environment
@@ -114,14 +113,14 @@ class Parser implements ParserContract
         });
     }
 
-    public function config(): ReadOnlyConfiguration
+    public function config(): array
     {
-        return $this->environment()->getConfiguration();
+        return $this->environment()->getConfig();
     }
 
     public function newInstance(array $config = [])
     {
-        $parser = new self(array_replace_recursive($this->config, $config));
+        $parser = new self(array_replace_recursive($this->config(), $config));
 
         foreach ($this->extensions as $ext) {
             $parser->addExtensions($ext);
