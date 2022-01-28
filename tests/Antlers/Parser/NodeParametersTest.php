@@ -20,6 +20,31 @@ class NodeParametersTest extends ParserTestCase
         $this->assertSame($value, $parameter->value);
     }
 
+    public function test_at_params_can_be_supplied()
+    {
+        $template = <<<'EOT'
+{{ form:create test="test-value" @submit.prevent="sendForm()" }}
+EOT;
+
+        $nodes = $this->parseNodes($template);
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+
+        /** @var AntlersNode $node */
+        $node = $nodes[0];
+
+        $this->assertCount(2, $node->parameters);
+
+        $param1 = $node->parameters[0];
+        $param2 = $node->parameters[1];
+
+        $this->assertSame('test', $param1->name);
+        $this->assertSame('test-value', $param1->value);
+
+        $this->assertSame('@submit.prevent', $param2->name);
+        $this->assertSame('sendForm()', $param2->value);
+    }
+
     public function test_node_parameter_escape_consistent_behavior()
     {
         // Ensure that the escape sequence behavior

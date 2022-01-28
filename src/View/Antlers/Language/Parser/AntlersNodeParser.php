@@ -439,7 +439,7 @@ class AntlersNodeParser
 
             if ($hasFoundName == false && $current == DocumentParser::Punctuation_Equals) {
                 if (! empty($currentChars)) {
-                    if ((ctype_alpha($currentChars[0]) || $currentChars[0] == DocumentParser::Punctuation_Colon) == false) {
+                    if ((ctype_alpha($currentChars[0]) || $currentChars[0] == DocumentParser::Punctuation_Colon || $currentChars[0] == DocumentParser::AtChar) == false) {
                         $currentChars = [];
                         continue;
                     }
