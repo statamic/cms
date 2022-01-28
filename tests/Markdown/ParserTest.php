@@ -2,21 +2,33 @@
 
 namespace Tests\Markdown;
 
-use League\CommonMark\Environment\EnvironmentBuilderInterface;
-use League\CommonMark\Extension\ExtensionInterface;
-use League\CommonMark\Node\Inline\Text;
-use League\CommonMark\Parser\Inline\InlineParserInterface;
-use League\CommonMark\Parser\Inline\InlineParserMatch;
-use League\CommonMark\Parser\InlineParserContext;
-use League\CommonMark\Util\HtmlFilter;
-use PHPUnit\Framework\TestCase;
-use Statamic\Markdown\Parser;
+use Statamic\Console\Composer\Lock;
+use Statamic\Markdown;
+use Statamic\Support\Arr;
+use Tests\TestCase;
 
 class ParserTest extends TestCase
 {
     public function setUp(): void
     {
-        $this->parser = new Parser;
+        parent::setUp();
+
+        if ($this->isLegacyCommonmark()) {
+            $this->parser = new Markdown\LegacyParser;
+            $this->smileyExtension = Fixtures\Legacy\SmileyExtension::class;
+            $this->frownyExtension = Fixtures\Legacy\FrownyExtension::class;
+        } else {
+            $this->parser = new Markdown\Parser;
+            $this->smileyExtension = Fixtures\SmileyExtension::class;
+            $this->frownyExtension = Fixtures\FrownyExtension::class;
+        }
+    }
+
+    public function isLegacyCommonmark()
+    {
+        $version = Lock::file(__DIR__.'/../../composer.lock')->getNormalizedInstalledVersion('league/commonmark');
+
+        return version_compare($version, '2', '<');
     }
 
     /** @test */
@@ -31,7 +43,7 @@ class ParserTest extends TestCase
         $this->assertEquals("<p>smile :)</p>\n", $this->parser->parse('smile :)'));
 
         $this->parser->addExtension(function () {
-            return new SmileyExtension;
+            return new $this->smileyExtension;
         });
 
         $this->assertEquals("<p>smile 😀</p>\n", $this->parser->parse('smile :)'));
@@ -43,7 +55,7 @@ class ParserTest extends TestCase
         $this->assertEquals("<p>smile :) frown :(</p>\n", $this->parser->parse('smile :) frown :('));
 
         $this->parser->addExtensions(function () {
-            return [new SmileyExtension, new FrownyExtension];
+            return [new $this->smileyExtension, new $this->frownyExtension];
         });
 
         $this->assertEquals("<p>smile 😀 frown 🙁</p>\n", $this->parser->parse('smile :) frown :('));
@@ -53,89 +65,43 @@ class ParserTest extends TestCase
     public function it_creates_a_new_instance_based_on_the_current_instance()
     {
         $this->parser->addExtension(function () {
-            return new SmileyExtension;
+            return new $this->smileyExtension;
         });
 
         $config = $this->parser->config();
 
-        $this->assertEquals("\n", $config->get('renderer/block_separator'));
-        $this->assertEquals("\n", $config->get('renderer/inner_separator'));
-        $this->assertEquals(HtmlFilter::ALLOW, $config->get('html_input'));
+        $this->assertEquals("\n", $this->getFromConfig($config, 'renderer/block_separator'));
+        $this->assertEquals("\n", $this->getFromConfig($config, 'renderer/inner_separator'));
+        $this->assertEquals('allow', $this->getFromConfig($config, 'html_input'));
 
         $this->assertCount(1, $this->parser->extensions());
 
         $newParser = $this->parser->newInstance([
-            'html_input' => HtmlFilter::STRIP,
+            'html_input' => 'strip',
             'renderer' => [
                 'inner_separator' => 'foo',
             ],
         ]);
 
         $newParser->addExtension(function () {
-            return new FrownyExtension;
+            return new $this->frownyExtension;
         });
 
         $this->assertNotSame($this->parser, $newParser);
         $newConfig = $newParser->config();
-        $this->assertEquals("\n", $newConfig->get('renderer/block_separator'));
-        $this->assertEquals('foo', $newConfig->get('renderer/inner_separator'));
-        $this->assertEquals(HtmlFilter::STRIP, $newConfig->get('html_input'));
+        $this->assertEquals("\n", $this->getFromConfig($newConfig, 'renderer/block_separator'));
+        $this->assertEquals('foo', $this->getFromConfig($newConfig, 'renderer/inner_separator'));
+        $this->assertEquals('strip', $this->getFromConfig($newConfig, 'html_input'));
         $this->assertCount(2, $newParser->extensions());
         $this->assertCount(1, $this->parser->extensions());
     }
-}
 
-class SmileyExtension implements ExtensionInterface
-{
-    public function register(EnvironmentBuilderInterface $environment): void
+    protected function getFromConfig($config, $key)
     {
-        $environment->addInlineParser(new SmileyParser);
-    }
-}
-
-class FrownyExtension implements ExtensionInterface
-{
-    public function register(EnvironmentBuilderInterface $environment): void
-    {
-        $environment->addInlineParser(new FrownyParser);
-    }
-}
-
-/**
- * Inspired by https://commonmark.thephpleague.com/2.0/customization/inline-parsing/.
- */
-class SmileyParser implements InlineParserInterface
-{
-    protected $emoji = '😀';
-    protected $char = ')';
-
-    public function getMatchDefinition(): InlineParserMatch
-    {
-        return InlineParserMatch::string(':');
-    }
-
-    public function parse(InlineParserContext $inlineContext): bool
-    {
-        $cursor = $inlineContext->getCursor();
-
-        $nextChar = $cursor->peek();
-
-        if ($nextChar !== $this->char) {
-            return false;
+        if ($this->isLegacyCommonmark()) {
+            return Arr::dot($config)[str_replace('/', '.', $key)];
         }
 
-        $cursor->advanceBy(2);
-
-        if ($nextChar === $this->char) {
-            $inlineContext->getContainer()->appendChild(new Text($this->emoji));
-        }
-
-        return true;
+        return $config->get($key);
     }
-}
-
-class FrownyParser extends SmileyParser
-{
-    protected $emoji = '🙁';
-    protected $char = '(';
 }
