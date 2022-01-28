@@ -99,6 +99,52 @@ class QueryBuilderTest extends TestCase
         $this->markTestSkipped();
     }
 
+    /** @test */
+    public function results_are_found_using_where_between()
+    {
+        $items = collect([
+            ['reference' => 'a', 'number_field' => 8],
+            ['reference' => 'b', 'number_field' => 9],
+            ['reference' => 'c', 'number_field' => 10],
+            ['reference' => 'd', 'number_field' => 11],
+            ['reference' => 'e', 'number_field' => 12],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereBetween('number_field', [9, 11])->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals(['b', 'c', 'd'], $results->map->reference->all());
+    }
+
+    /** @test */
+    public function results_are_found_using_where_not_between()
+    {
+        $items = collect([
+            ['reference' => 'a', 'number_field' => 8],
+            ['reference' => 'b', 'number_field' => 9],
+            ['reference' => 'c', 'number_field' => 10],
+            ['reference' => 'd', 'number_field' => 11],
+            ['reference' => 'e', 'number_field' => 12],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereNotBetween('number_field', [9, 11])->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'e'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_or_where_between()
+    {
+        $this->markTestSkipped();
+    }
+
+    /** @test **/
+    public function results_are_found_using_or_where_not_between()
+    {
+        $this->markTestSkipped();
+    }
+
     /** @test **/
     public function results_are_found_using_nested_where()
     {
