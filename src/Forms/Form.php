@@ -342,7 +342,7 @@ class Form implements FormContract, Augmentable
         return new AugmentedForm($this);
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['handle', 'title', 'api_url'];
     }

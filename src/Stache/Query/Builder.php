@@ -31,7 +31,7 @@ abstract class Builder extends BaseBuilder
 
         $items = $this->getItems($keys);
 
-        $items->each->selectedQueryColumns($columns);
+        $items->each->selectedQueryColumns($this->columns ?? $columns);
 
         return $this->collect($items);
     }
@@ -191,5 +191,8 @@ abstract class Builder extends BaseBuilder
         });
     }
 
-    abstract protected function getWhereColumnKeyValuesByIndex($column);
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        return $this->store->index($column)->items();
+    }
 }

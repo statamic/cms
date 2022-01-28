@@ -438,7 +438,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
         return $this->selectedQueryColumns;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'slug', 'url', 'permalink', 'api_url'];
     }
