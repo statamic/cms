@@ -2,6 +2,8 @@
 
 namespace Tests\Tags\Form;
 
+use Statamic\Statamic;
+
 class FormCreateAlpineTest extends FormTestCase
 {
     protected $defaultFields = [
@@ -88,7 +90,15 @@ class FormCreateAlpineTest extends FormTestCase
     {
         $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
 
-        $expectedXData = "{'name':null,'email':null,'message':null,'fav_animals':[],'fav_colour':null,'fav_subject':null}";
+        $expectedXData = $this->jsonEncode([
+            'name' => null,
+            'email' => null,
+            'message' => null,
+            'fav_animals' => [],
+            'fav_colour' => null,
+            'fav_subject' => null,
+        ]);
+
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -105,7 +115,15 @@ class FormCreateAlpineTest extends FormTestCase
 
         $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
 
-        $expectedXData = "{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':[],'fav_colour':null,'fav_subject':null}";
+        $expectedXData = $this->jsonEncode([
+            'name' => 'Frodo Braggins',
+            'email' => null,
+            'message' => null,
+            'fav_animals' => [],
+            'fav_colour' => null,
+            'fav_subject' => null,
+        ]);
+
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -116,7 +134,17 @@ class FormCreateAlpineTest extends FormTestCase
     {
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
 
-        $expectedXData = "{'my_form':{'name':null,'email':null,'message':null,'fav_animals':[],'fav_colour':null,'fav_subject':null}}";
+        $expectedXData = $this->jsonEncode([
+            'my_form' => [
+                'name' => null,
+                'email' => null,
+                'message' => null,
+                'fav_animals' => [],
+                'fav_colour' => null,
+                'fav_subject' => null,
+            ],
+        ]);
+
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -134,7 +162,17 @@ class FormCreateAlpineTest extends FormTestCase
 
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
 
-        $expectedXData = "{'my_form':{'name':'Frodo Braggins','email':null,'message':null,'fav_animals':['cat'],'fav_colour':null,'fav_subject':null}}";
+        $expectedXData = $this->jsonEncode([
+            'my_form' => [
+                'name' => 'Frodo Braggins',
+                'email' => null,
+                'message' => null,
+                'fav_animals' => ['cat'],
+                'fav_colour' => null,
+                'fav_subject' => null,
+            ],
+        ]);
+
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
@@ -156,9 +194,9 @@ class FormCreateAlpineTest extends FormTestCase
             ],
         ];
 
-        $expectedXData = "x-data=\"{'favourite_animals':[]}\"";
+        $expected = 'x-data="'.$this->jsonEncode(['favourite_animals' => []]).'"';
 
-        $this->assertFieldRendersHtml($expectedXData, $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
     }
 
     /** @test */
@@ -173,9 +211,9 @@ class FormCreateAlpineTest extends FormTestCase
             ],
         ];
 
-        $expectedXData = "x-data=\"{'selfies':[]}\"";
+        $expected = 'x-data="'.$this->jsonEncode(['selfies' => []]).'"';
 
-        $this->assertFieldRendersHtml($expectedXData, $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
     }
 
     /** @test */
@@ -198,10 +236,10 @@ EOT
 
         $expected = [
             'Statamic.$conditions.showField([], $data)',
-            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data)',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data)',
             'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField([], $data)',
-            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data)',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data)',
             'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField([], $data)',
             'Statamic.$conditions.showField([], $data)',
@@ -231,10 +269,10 @@ EOT
 
         $expected = [
             'Statamic.$conditions.showField([], $data.my_form)',
-            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data.my_form)',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data.my_form)',
             'Statamic.$conditions.showField([], $data.my_form)',
             'Statamic.$conditions.showField([], $data.my_form)',
-            'Statamic.$conditions.showField({\'if\':{\'email\':\'not empty\'}}, $data.my_form)',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data.my_form)',
             'Statamic.$conditions.showField([], $data.my_form)',
             'Statamic.$conditions.showField([], $data.my_form)',
             'Statamic.$conditions.showField([], $data.my_form)',
@@ -386,5 +424,10 @@ EOT
 
         $this->assertFieldRendersHtml('<input type="text" name="custom" value="" x-model="custom">', $config, [], ['js' => 'alpine']);
         $this->assertFieldRendersHtml('<input type="text" name="custom" value="" x-model="my_form.custom">', $config, [], ['js' => 'alpine:my_form']);
+    }
+
+    private function jsonEncode($data)
+    {
+        return Statamic::modify($data)->toJson()->entities();
     }
 }
