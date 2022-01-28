@@ -8,7 +8,6 @@ use Statamic\Fields\Fieldtype;
 class Integer extends Fieldtype
 {
     protected $categories = ['number'];
-    protected $rules = ['integer'];
     protected $selectableInForms = true;
 
     protected function configFieldItems(): array
@@ -49,5 +48,16 @@ class Integer extends Fieldtype
     public function toGqlType()
     {
         return GraphQL::int();
+    }
+
+    public function rules(): array
+    {
+        $rules = ['integer'];
+
+        if ($min = $this->config('min')) {
+            $rules[] = 'min:'.$min;
+        }
+
+        return $rules;
     }
 }

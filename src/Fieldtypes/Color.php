@@ -48,13 +48,13 @@ class Color extends Fieldtype
                 'type' => 'checkboxes',
                 'inline' => 'true',
                 'options' => [
-                    'hex' => 'HEX',
+                    'hex' => 'HEXA',
                     'rgba' => 'RGBA',
                     'hsla' => 'HSLA',
                     'hsva' => 'HSVA',
                     'cmyk' => 'CMYK',
                 ],
-                'default' => ['HEXA'],
+                'default' => 'hex',
                 'width' => 50,
             ],
         ];

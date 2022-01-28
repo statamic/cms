@@ -32,7 +32,7 @@ abstract class Builder extends BaseBuilder
 
         $items = $this->getItems($keys);
 
-        $items->each->selectedQueryColumns($columns);
+        $items->each->selectedQueryColumns($this->columns ?? $columns);
 
         return $this->collect($items);
     }
@@ -268,6 +268,20 @@ abstract class Builder extends BaseBuilder
         return $method;
     }
 
+    protected function filterWhereBetween($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            return $value >= $where['values'][0] && $value <= $where['values'][1];
+        });
+    }
+
+    protected function filterWhereNotBetween($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            return $value < $where['values'][0] || $value > $where['values'][1];
+        });
+    }
+
     protected function filterWhereColumn($values, $where)
     {
         $whereColumnKeys = $this->getWhereColumnKeyValuesByIndex($where['value']);
@@ -279,5 +293,8 @@ abstract class Builder extends BaseBuilder
         });
     }
 
-    abstract protected function getWhereColumnKeyValuesByIndex($column);
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        return $this->store->index($column)->items();
+    }
 }
