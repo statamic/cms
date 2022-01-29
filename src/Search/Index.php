@@ -71,7 +71,8 @@ abstract class Index
     public function insertMultiple($documents)
     {
         $documents = (new Documents($documents))->mapWithKeys(function ($item) {
-            return [$item->reference() => $this->searchables()->fields($item)];
+            $reference = method_exists($item, 'reference') ? $item->reference() : $item->getKey();
+            return [$reference => $this->searchables()->fields($item)];
         });
 
         $this->insertDocuments($documents);

@@ -18,6 +18,7 @@ use Statamic\Support\Str;
 class Searchables
 {
     protected $index;
+    protected static $registered = [];
 
     public function __construct(Index $index)
     {
@@ -27,16 +28,23 @@ class Searchables
     public function all(): Collection
     {
         $searchables = $this->getConfiguredSearchables();
+        $config = $this->index->config();
 
         if ($searchables->contains('all')) {
-            return collect()
+            $allSearchables = collect()
                 ->merge(Entry::all())
                 ->merge(Term::all())
                 ->merge(Asset::all())
                 ->merge(User::all());
+
+            foreach (self::$registered as $key => $searchable) {
+                $allSearchables->merge($searchable(str_after($key, ':')) ?? [], $config);
+            }
+
+            return $allSearchables;
         }
 
-        return $searchables->flatMap(function ($item) {
+        return $searchables->flatMap(function ($item) use ($config) {
             if (starts_with($item, 'collection:')) {
                 $collection = str_after($item, 'collection:');
 
@@ -57,6 +65,10 @@ class Searchables
 
             if ($item === 'users') {
                 return User::all();
+            }
+
+            foreach (self::$registered as $key => $searchable) {
+                return $searchable(str_after($key, ':'), $config);
             }
 
             throw new \LogicException("Unknown searchable [$item].");
@@ -179,5 +191,14 @@ class Searchables
 
             return [$field => $transformedValue];
         })->all();
+    }
+
+    public static function register($key, $callback): void
+    {
+        if (array_key_exists($key, self::$registered)) {
+            throw new \Exception("Custom searchable [$key] is already defined.");
+        }
+
+        self::$registered[$key] = $callback;
     }
 }
