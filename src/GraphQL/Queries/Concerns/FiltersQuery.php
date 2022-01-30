@@ -15,12 +15,12 @@ trait FiltersQuery
      */
     private function filterQuery($query, $filters)
     {
-        if (!isset($filters['status']) && !isset($filters['published'])) {
+        if (! isset($filters['status']) && ! isset($filters['published'])) {
             $filters['status'] = 'published';
         }
 
         foreach ($filters as $field => $definitions) {
-            if (!is_array($definitions)) {
+            if (! is_array($definitions)) {
                 $definitions = [['equals' => $definitions]];
             }
 
