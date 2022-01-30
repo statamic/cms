@@ -38,7 +38,7 @@ class Searchables
                 ->merge(User::all());
 
             foreach (self::$registered as $key => $searchable) {
-                $allSearchables->merge($this->getCustomSearchableData(str_before($key, ':'), str_after($key, ':') ?? '*', $searchable, $config));
+                $allSearchables->merge($this->getCustomSearchableData(str_after($key, ':') ?? '*', $searchable, $config));
             }
 
             return $allSearchables;
@@ -69,7 +69,7 @@ class Searchables
 
             foreach (self::$registered as $key => $searchable) {
                 if (starts_with($item, $key.':')) {
-                    return $this->getCustomSearchableData(str_before($key, ':'), str_after($item, ':') ?? '*', $searchable, $config);
+                    return $this->getCustomSearchableData(str_after($item, ':') ?? '*', $searchable, $config);
                 }
             }
 
@@ -122,7 +122,7 @@ class Searchables
         return collect(Arr::wrap($this->index->config()['searchables']));
     }
 
-    private function getCustomSearchableData($type, $key, $callback, $config)
+    private function getCustomSearchableData($key, $callback, $config)
     {
         return $callback($key, $config);
     }
