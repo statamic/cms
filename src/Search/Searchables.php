@@ -38,7 +38,7 @@ class Searchables
                 ->merge(User::all());
 
             foreach (self::$registered as $key => $searchable) {
-                $allSearchables->merge($searchable(str_after($key, ':')) ?? [], $config);
+                $allSearchables->merge($this->getCustomSearchableData(str_before($key, ':'), str_after($key, ':') ?? '*', $searchable, $config));
             }
 
             return $allSearchables;
@@ -68,7 +68,9 @@ class Searchables
             }
 
             foreach (self::$registered as $key => $searchable) {
-                return $searchable(str_after($key, ':'), $config);
+                if (starts_with($item, $key.':')) {
+                    return $this->getCustomSearchableData(str_before($key, ':'), str_after($item, ':') ?? '*', $searchable, $config);
+                }
             }
 
             throw new \LogicException("Unknown searchable [$item].");
@@ -118,6 +120,11 @@ class Searchables
     private function getConfiguredSearchables()
     {
         return collect(Arr::wrap($this->index->config()['searchables']));
+    }
+
+    private function getCustomSearchableData($type, $key, $callback, $config)
+    {
+        return $callback($key, $config);
     }
 
     private function searchableCollections()
