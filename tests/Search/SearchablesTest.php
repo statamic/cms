@@ -329,6 +329,35 @@ class SearchablesTest extends TestCase
         ], $searchables->fields($searchable));
     }
 
+    /** @test */
+    public function can_register_a_custom_searchable_and_get_results()
+    {
+        config()->set('statamic.search.indexes.default', [
+            'fields' => [
+                'title',
+            ],
+            'searchables' => 'custom:*'
+        ]);
+
+        $index = app(\Statamic\Search\Comb\Index::class, [
+            'name' => 'default',
+            'config' => config('statamic.search.indexes.default'),
+        ]);
+
+        $customCollection = collect([
+            ['title' => 'Custom 1'],
+            ['title' => 'Custom 2'],
+        ]);
+
+        Searchables::register('custom', function ($resource, $config) use ($customCollection) {
+            return $customCollection;
+        });
+
+        $searchables = new Searchables($index);
+
+        $this->assertEquals($customCollection, $searchables->all());
+    }
+
     private function makeSearchables($config)
     {
         $index = $this->mock(\Statamic\Search\Index::class);
