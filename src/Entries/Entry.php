@@ -803,6 +803,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function getQueryableValue($field)
     {
+        // Avoid using the authors() method.
+        if ($field === 'authors') {
+            return $this->value('authors');
+        }
+
         if (method_exists($this, $method = Str::camel($field))) {
             return $this->{$method}();
         }
