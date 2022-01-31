@@ -22,10 +22,6 @@ class Value extends Index
             return $item->blueprint()->handle();
         }
 
-        if ($method === 'entriesCount') {
-            return $item->entriesCount();
-        }
-
         return (new ResolveValue)($item, $this->name);
     }
 }
