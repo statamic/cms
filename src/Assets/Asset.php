@@ -2,7 +2,7 @@
 
 namespace Statamic\Assets;
 
-use Facades\Statamic\Assets\Dimensions;
+use Facades\Statamic\Assets\Attributes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -159,14 +159,15 @@ class Asset implements AssetContract, Augmentable
         $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
-            $dimensions = Dimensions::asset($this)->get();
+            $attributes = Attributes::asset($this)->get();
 
             $meta = array_merge($meta, [
                 'size' => $this->disk()->size($this->path()),
                 'last_modified' => $this->disk()->lastModified($this->path()),
-                'width' => $dimensions[0],
-                'height' => $dimensions[1],
+                'width' => Arr::get($attributes, 'width'),
+                'height' => Arr::get($attributes, 'height'),
                 'mime_type' => $this->disk()->mimeType($this->path()),
+                'duration' => Arr::get($attributes, 'duration'),
             ]);
         }
 
@@ -548,7 +549,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        if (! $this->isImage() && ! $this->isSvg()) {
+        if (! $this->hasDimensions()) {
             return [null, null];
         }
 
@@ -600,7 +601,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function ratio()
     {
-        if (! $this->isImage() && ! $this->isSvg()) {
+        if (! $this->hasDimensions()) {
             return null;
         }
 
@@ -784,5 +785,10 @@ class Asset implements AssetContract, Augmentable
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
+    }
+
+    private function hasDimensions()
+    {
+        return $this->isImage() || $this->isSvg() || $this->isVideo();
     }
 }

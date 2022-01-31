@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Antlers-Parsing für den Inhalt dieses Feldes aktivieren.',
     'any.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
-    'any.config.default' => 'Standardwert festlegen.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
     'array.config.mode' => 'Der dynamische Modus gibt der Benutzer*in die Kontrolle über die Daten, während der geschlossene Modus dies nicht tut.',
     'array.title' => 'Array',

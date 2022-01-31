@@ -166,6 +166,20 @@ abstract class Builder extends BaseBuilder
         });
     }
 
+    protected function filterWhereBetween($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            return $value >= $where['values'][0] && $value <= $where['values'][1];
+        });
+    }
+
+    protected function filterWhereNotBetween($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            return $value < $where['values'][0] || $value > $where['values'][1];
+        });
+    }
+
     protected function filterWhereColumn($values, $where)
     {
         $whereColumnKeys = $this->getWhereColumnKeyValuesByIndex($where['value']);
