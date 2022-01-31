@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -36,7 +37,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues
 {
     use Routable {
         uri as routableUri;
@@ -801,7 +802,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
     }
 
-    public function getQueryableValue($field)
+    public function getQueryableValue(string $field)
     {
         // Avoid using the authors() method.
         if ($field === 'authors') {

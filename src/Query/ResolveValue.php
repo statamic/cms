@@ -2,6 +2,7 @@
 
 namespace Statamic\Query;
 
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Support\Str;
 
 class ResolveValue
@@ -32,7 +33,7 @@ class ResolveValue
             return null;
         }
 
-        if (method_exists($item, 'getQueryableValue')) {
+        if ($item instanceof ContainsQueryableValues) {
             return $item->getQueryableValue($name);
         }
 

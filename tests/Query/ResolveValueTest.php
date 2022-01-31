@@ -2,6 +2,7 @@
 
 namespace Tests\Query;
 
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Query\ResolveValue;
 use Tests\TestCase;
 
@@ -101,6 +102,32 @@ class ResolveValueTest extends TestCase
             'method' => [new ContainsMethod($data, $values)],
         ];
     }
+
+    /**
+     * @test
+     * @dataProvider delegatesToClassProvider
+     **/
+    public function it_delegates_resolving_to_the_queryable_class($field, $expected)
+    {
+        $item = new ItemThatContainsQueryableValues([
+            'foo' => 'bar',
+            'nested' => ['baz' => 'qux'],
+        ]);
+
+        $value = (new ResolveValue)($item, $field);
+
+        $this->assertEquals($expected, $value);
+    }
+
+    public function delegatesToClassProvider()
+    {
+        return [
+            'standard' => ['foo', 'bar'],
+            'nested' => ['nested->baz', 'qux'],
+            'nested missing' => ['nested->missing', null],
+            'nested string' => ['foo->bar', null],
+        ];
+    }
 }
 
 class ContainsData
@@ -139,5 +166,20 @@ class ContainsMethod extends ContainsValues
     public function theFooField()
     {
         return 'theFooField method';
+    }
+}
+
+class ItemThatContainsQueryableValues implements ContainsQueryableValues
+{
+    protected $data;
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        return $this->data[$field];
     }
 }
