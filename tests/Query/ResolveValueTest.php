@@ -12,94 +12,45 @@ class ResolveValueTest extends TestCase
      * @test
      * @dataProvider resolvesValueProvider
      **/
-    public function it_resolves_values($item, $expected)
+    public function it_resolves_values($item, $field, $expected)
     {
-        $value = (new ResolveValue)($item, 'the_foo_field');
+        $value = (new ResolveValue)($item, $field);
 
         $this->assertEquals($expected, $value);
     }
 
     public function resolvesValueProvider()
     {
-        $data = ['the_foo_field' => 'getfoo'];
-        $values = ['the_foo_field' => 'valuefoo'];
-
-        return [
-            'get' => [new ContainsData($data), 'getfoo'],
-            'value' => [new ContainsValues($data, $values), 'valuefoo'],
-            'method' => [new ContainsMethod($data, $values), 'theFooField method'],
+        $data = [
+            'the_foo_field' => 'getfoo',
+            'the_nested_field' => ['the_foo_field' => 'getfoo'],
         ];
-    }
 
-    /**
-     * @test
-     * @dataProvider resolvesNestedJsonValueProvider
-     **/
-    public function it_resolves_nested_json_values($item, $expected)
-    {
-        $value = (new ResolveValue)($item, 'the_nested_field->the_foo_field');
-
-        $this->assertEquals($expected, $value);
-    }
-
-    public function resolvesNestedJsonValueProvider()
-    {
-        $data = ['the_nested_field' => ['the_foo_field' => 'getfoo']];
-        $values = ['the_nested_field' => ['the_foo_field' => 'valuefoo']];
-
-        return [
-            'get' => [new ContainsData($data), 'getfoo'],
-            'value' => [new ContainsValues($data, $values), 'valuefoo'],
-            'method' => [new ContainsMethod($data, $values), 'valuefoo'], // because there's no "theNestedField" method.
+        $values = [
+            'the_foo_field' => 'valuefoo',
+            'the_nested_field' => ['the_foo_field' => 'valuefoo'],
         ];
-    }
 
-    /**
-     * @test
-     * @dataProvider resolvesMissingNestedJsonValueProvider
-     **/
-    public function it_resolves_missing_nested_json_values_to_null($item)
-    {
-        $value = (new ResolveValue)($item, 'the_nested_field->missing');
-
-        $this->assertNull($value);
-    }
-
-    public function resolvesMissingNestedJsonValueProvider()
-    {
-        $data = ['the_nested_field' => ['the_foo_field' => 'getfoo']];
-        $values = ['the_nested_field' => ['the_foo_field' => 'valuefoo']];
+        $dataItem = new ContainsData($data);
+        $valueItem = new ContainsValues($data, $values);
+        $methodItem = new ContainsMethod($data, $values);
 
         return [
-            'get' => [new ContainsData($data)],
-            'value' => [new ContainsValues($data, $values)],
-            'method' => [new ContainsMethod($data, $values)],
-        ];
-    }
+            'get' => [$dataItem, 'the_foo_field', 'getfoo'],
+            'value' => [$valueItem, 'the_foo_field', 'valuefoo'],
+            'method' => [$methodItem, 'the_foo_field', 'theFooField method'],
 
-    /**
-     * @test
-     * @dataProvider resolvesScalarNestedJsonValueProvider
-     **/
-    public function it_resolves_scalar_nested_json_values_to_null($item)
-    {
-        // When you try to query a json value like 'foo->bar', 'foo' should be an array, but since
-        // it's a scalar we'll just return null.
+            'nested get' => [$dataItem, 'the_nested_field->the_foo_field', 'getfoo'],
+            'nested value' => [$valueItem, 'the_nested_field->the_foo_field', 'valuefoo'],
+            'nested method' => [$methodItem, 'the_nested_field->the_foo_field', 'valuefoo'], // because there's no "theNestedField" method.
 
-        $value = (new ResolveValue)($item, 'the_foo_field->test');
+            'missing nested get' => [$dataItem, 'the_nested_field->missing', null],
+            'missing nested value' => [$valueItem, 'the_nested_field->missing', null],
+            'missing nested method' => [$methodItem, 'the_nested_field->missing', null],
 
-        $this->assertNull($value);
-    }
-
-    public function resolvesScalarNestedJsonValueProvider()
-    {
-        $data = ['the_foo_field' => 'getfoo'];
-        $values = ['the_foo_field' => 'valuefoo'];
-
-        return [
-            'get' => [new ContainsData($data)],
-            'value' => [new ContainsValues($data, $values)],
-            'method' => [new ContainsMethod($data, $values)],
+            'scalar nested get' => [$dataItem, 'the_foo_field->test', null],
+            'scalar nested value' => [$valueItem, 'the_foo_field->test', null],
+            'scalar nested method' => [$methodItem, 'the_foo_field->test', null],
         ];
     }
 
