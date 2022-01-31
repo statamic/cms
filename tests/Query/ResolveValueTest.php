@@ -3,6 +3,7 @@
 namespace Tests\Query;
 
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Query\ResolveValue;
 use Tests\TestCase;
 
@@ -79,6 +80,18 @@ class ResolveValueTest extends TestCase
             'nested string' => ['foo->bar', null],
         ];
     }
+
+    /** @test */
+    public function self_resolving_values_will_resolve_themselves()
+    {
+        $item = new ContainsData([
+            'queryable' => new ResolvedQueryableValue('test'),
+        ]);
+
+        $value = (new ResolveValue)($item, 'queryable');
+
+        $this->assertEquals('test', $value);
+    }
 }
 
 class ContainsData
@@ -132,5 +145,20 @@ class ItemThatContainsQueryableValues implements ContainsQueryableValues
     public function getQueryableValue(string $field)
     {
         return $this->data[$field];
+    }
+}
+
+class ResolvedQueryableValue implements QueryableValue
+{
+    protected $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function toQueryableValue()
+    {
+        return $this->value;
     }
 }

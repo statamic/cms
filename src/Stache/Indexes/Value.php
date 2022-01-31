@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Indexes;
 
 use Statamic\Query\ResolveValue;
-use Statamic\Support\Str;
 
 class Value extends Index
 {
@@ -16,12 +15,6 @@ class Value extends Index
 
     public function getItemValue($item)
     {
-        $method = Str::camel($this->name);
-
-        if ($method === 'blueprint') {
-            return $item->blueprint()->handle();
-        }
-
         return (new ResolveValue)($item, $this->name);
     }
 }
