@@ -336,7 +336,7 @@ class SearchablesTest extends TestCase
             'fields' => [
                 'title',
             ],
-            'searchables' => 'custom:*'
+            'searchables' => 'custom:*',
         ]);
 
         $index = app(\Statamic\Search\Comb\Index::class, [
