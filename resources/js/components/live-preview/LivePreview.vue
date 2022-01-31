@@ -14,7 +14,6 @@
                     <div v-show="headerVisible" class="live-preview-header">
                         <div class="text-base text-grey-70 font-medium mr-2">{{ __('Live Preview') }}</div>
                         <div class="flex items-center">
-                            <label v-if="amp" class="mr-2"><input type="checkbox" v-model="previewAmp" /> AMP</label>
                             <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>
                             <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="ml-2" />
@@ -101,7 +100,6 @@ export default {
         values: Object,
         name: String,
         blueprint: String,
-        amp: Boolean
     },
 
     data() {
@@ -112,7 +110,6 @@ export default {
             editorResizing: false,
             editorCollapsed: false,
             previewDevice: null,
-            previewAmp: false,
             provides: {
                 storeName: this.name
             },
@@ -132,7 +129,6 @@ export default {
 
         payload() {
             return {
-                amp: this.previewAmp,
                 blueprint: this.blueprint,
                 preview: this.values,
                 extras: this.extras

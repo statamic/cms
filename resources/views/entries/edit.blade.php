@@ -26,7 +26,6 @@
         :initial-is-working-copy="{{ $str::bool($hasWorkingCopy) }}"
         :initial-is-root="{{ $str::bool($isRoot) }}"
         :revisions-enabled="{{ $str::bool($revisionsEnabled) }}"
-        :amp="{{ $str::bool($entry->ampable()) }}"
         :initial-read-only="{{ $str::bool($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"

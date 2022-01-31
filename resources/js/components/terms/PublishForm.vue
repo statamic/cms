@@ -67,7 +67,6 @@
                 :previewing="isPreviewing"
                 :values="values"
                 :blueprint="fieldset.handle"
-                :amp="amp"
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
