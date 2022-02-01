@@ -26,8 +26,46 @@ class AssetContainerContents
                 // and will let us perform more efficient filtering and caching.
                 $files = $this->filesystem()->listContents('/', true);
 
+                // If Flysystem 3.x, re-apply sorting and return a backwards compatible result set.
+                // See: https://flysystem.thephpleague.com/v2/docs/usage/directory-listings/
+                if (! is_array($files)) {
+                    return collect($files->sortByPath()->toArray())->keyBy('path')->map(function ($file) {
+                        return $this->normalizeFlysystemAttributes($file);
+                    });
+                }
+
                 return collect($files)->keyBy('path');
             });
+    }
+
+    /**
+     * Normalize flysystem 3.x `FileAttributes` and `DirectoryAttributes` payloads back to the 1.x array style.
+     *
+     * @param  mixed  $attributes
+     * @return array
+     */
+    private function normalizeFlysystemAttributes($attributes)
+    {
+        $pathinfo = pathinfo($attributes['path']);
+
+        $normalized = [
+            'type' => $attributes->type(),
+            'path' => $attributes->path(),
+            'timestamp' => $attributes->lastModified(),
+            'dirname' => $pathinfo['dirname'] === '.' ? '' : $pathinfo['dirname'],
+            'basename' => $pathinfo['basename'],
+            'filename' => $pathinfo['filename'],
+        ];
+
+        if (isset($pathinfo['extension'])) {
+            $normalized['extension'] = $pathinfo['extension'];
+        }
+
+        if ($attributes->type() === 'file') {
+            $normalized['size'] = $attributes->fileSize();
+        }
+
+        return $normalized;
     }
 
     public function cached()
