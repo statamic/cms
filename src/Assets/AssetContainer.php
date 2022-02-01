@@ -18,6 +18,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
@@ -211,6 +212,11 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $this->disk;
     }
 
+    public function diskConfig()
+    {
+        return config("filesystems.disks.{$this->disk}");
+    }
+
     public function listContents()
     {
         return $this->contents()->all();
@@ -361,7 +367,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function accessible()
     {
-        return $this->disk()->filesystem()->getDriver()->getConfig()->get('url') !== null;
+        return Arr::get($this->diskConfig(), 'url') !== null;
     }
 
     /**
