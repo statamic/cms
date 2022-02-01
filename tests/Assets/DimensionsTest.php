@@ -17,11 +17,6 @@ namespace Tests\Assets;
      {
          parent::setUp();
 
-         config(['filesystems.disks.test' => [
-             'driver' => 'local',
-             'root' => __DIR__.'/doesnt-matter-itll-get-faked-anyway',
-         ]]);
-
          Storage::fake('test');
 
          $this->dimensions = new Dimensions(app(ImageGenerator::class));

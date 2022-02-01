@@ -17,11 +17,6 @@ class AttributesTest extends TestCase
     {
         parent::setUp();
 
-        config(['filesystems.disks.test' => [
-            'driver' => 'local',
-            'root' => __DIR__.'/doesnt-matter-itll-get-faked-anyway',
-        ]]);
-
         Storage::fake('test');
 
         $this->attributes = app(Attributes::class);
