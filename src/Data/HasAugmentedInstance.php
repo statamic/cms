@@ -47,4 +47,9 @@ trait HasAugmentedInstance
     {
         return ['id', 'title', 'api_url'];
     }
+
+    public function toEvaluatedAugmentedArray($keys = null)
+    {
+        return $this->toAugmentedCollection($keys)->withEvaluation()->toArray();
+    }
 }

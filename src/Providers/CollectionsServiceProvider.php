@@ -172,5 +172,15 @@ class CollectionsServiceProvider extends ServiceProvider
                 return $value instanceof Arrayable ? $value->toArray() : $value;
             }, $this->items);
         });
+
+        Collection::macro('toEvaluatedAugmentedArray', function ($keys = null) {
+            return array_map(function ($value) use ($keys) {
+                if ($value instanceof Augmentable) {
+                    return $value->toAugmentedCollection($keys)->withEvaluation()->toArray();
+                }
+
+                return $value instanceof Arrayable ? $value->toArray() : $value;
+            }, $this->items);
+        });
     }
 }

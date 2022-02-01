@@ -804,6 +804,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function toArray()
     {
-        return $this->toAugmentedCollection()->withEvaluation()->toArray();
+        return $this->toEvaluatedAugmentedArray();
     }
 }
