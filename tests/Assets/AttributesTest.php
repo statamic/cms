@@ -54,7 +54,7 @@ class AttributesTest extends TestCase
         Storage::disk('test')->putFileAs('path/to', $file, 'asset.jpg');
 
         // Test about the actual file, for good measure.
-        $realpath = Storage::disk('test')->getAdapter()->getPathPrefix().'path/to/asset.jpg';
+        $realpath = Storage::disk('test')->path('path/to/asset.jpg');
         $this->assertFileExists($realpath);
         [$width, $height] = getimagesize($realpath);
         $this->assertEquals(30, $width);
