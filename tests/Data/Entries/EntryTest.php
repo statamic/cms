@@ -473,7 +473,8 @@ class EntryTest extends TestCase
     /** @test */
     public function it_converts_to_an_array()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)
