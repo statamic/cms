@@ -37,6 +37,11 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
     protected $augmentation = true;
 
     /**
+     * @var bool
+     */
+    protected $evaluation = true;
+
+    /**
      * Instantiate fluent tag helper.
      *
      * @param  Loader  $loader
@@ -98,6 +103,18 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     * Disables converting Value classes to their underlying augmented values.
+     *
+     * @return $this
+     */
+    public function withoutEvaluation()
+    {
+        $this->evaluation = false;
+
+        return $this;
+    }
+
+    /**
      * Fetch result of a tag.
      *
      * @return mixed
@@ -125,12 +142,14 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
 
         $output = $tag->$method();
 
+        $method = $this->evaluation ? 'toEvaluatedAugmentedArray' : 'toAugmentedArray';
+
         if ($this->augmentation && $output instanceof Collection) {
-            $output = $output->toAugmentedArray();
+            $output = $output->$method();
         }
 
         if ($this->augmentation && $output instanceof Augmentable) {
-            $output = $output->toAugmentedArray();
+            $output = $output->$method();
         }
 
         return $output;

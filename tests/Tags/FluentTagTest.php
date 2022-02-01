@@ -3,7 +3,10 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
+use Statamic\Fields\Value;
+use Statamic\Tags\Collection\Collection;
 use Statamic\Tags\FluentTag;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -15,6 +18,8 @@ class FluentTagTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        (new FluentTagCollectionTag)::register();
 
         Facades\Collection::make('pages')->save();
 
@@ -75,31 +80,80 @@ class FluentTagTest extends TestCase
     }
 
     /** @test */
-    public function it_augments_by_default()
+    public function it_augments_to_evaluated_values_by_default_when_returning_single_augmentable()
     {
-        $slugs = [];
+        $page = FluentTag::make('collection:pages')
+            ->sort('slug:desc')->limit(3)
+            ->first() // custom param added to test version of collection tag to return single augmentable
+            ->fetch();
 
-        foreach (FluentTag::make('collection:pages')->sort('slug:desc')->limit(3) as $page) {
-            $slugs[] = (string) trim($page['content']);
-        }
+        $this->assertIsArray($page);
+        $this->assertIsString($page['content']);
+    }
 
-        $expected = ['<h1>two</h1>', '<h1>three</h1>', '<h1>one</h1>'];
+    /** @test */
+    public function it_can_disable_evaluation_when_returning_single_augmentable()
+    {
+        $page = FluentTag::make('collection:pages')
+            ->sort('slug:desc')->limit(3)
+            ->withoutEvaluation()
+            ->first() // custom param added to test version of collection tag to return single augmentable
+            ->fetch();
 
-        $this->assertEquals($expected, $slugs);
+        $this->assertIsArray($page);
+        $this->assertInstanceOf(Value::class, $page['content']);
+    }
+
+    /** @test */
+    public function it_can_disable_augmentation_when_returning_single_augmentable()
+    {
+        $page = FluentTag::make('collection:pages')
+            ->sort('slug:desc')->limit(3)
+            ->withoutAugmentation()
+            ->first() // custom param added to test version of collection tag to return single augmentable
+            ->fetch();
+
+        $this->assertInstanceOf(Entry::class, $page);
+    }
+
+    /** @test */
+    public function it_augments_to_evaluated_values_by_default()
+    {
+        $results = FluentTag::make('collection:pages')
+            ->sort('slug:desc')->limit(3)
+            ->fetch();
+
+        $page = $results[0];
+
+        $this->assertIsArray($page);
+        $this->assertIsString($page['content']);
+    }
+
+    /** @test */
+    public function it_can_disable_evaluation()
+    {
+        $results = FluentTag::make('collection:pages')
+            ->sort('slug:desc')->limit(3)
+            ->withoutEvaluation()
+            ->fetch();
+
+        $page = $results[0];
+
+        $this->assertIsArray($page);
+        $this->assertInstanceOf(Value::class, $page['content']);
     }
 
     /** @test */
     public function it_can_disable_augmentation()
     {
-        $slugs = [];
+        $results = FluentTag::make('collection:pages')
+            ->sort('slug:desc')->limit(3)
+            ->withoutAugmentation()
+            ->fetch();
 
-        foreach (FluentTag::make('collection:pages')->sort('slug:desc')->limit(3)->withoutAugmentation() as $page) {
-            $slugs[] = (string) $page->content;
-        }
+        $page = $results[0];
 
-        $expected = ['# two', '# three', '# one'];
-
-        $this->assertEquals($expected, $slugs);
+        $this->assertInstanceOf(Entry::class, $page);
     }
 
     /** @test */
@@ -120,5 +174,21 @@ class FluentTagTest extends TestCase
 
         $this->assertInstanceOf(FluentTag::class, $result);
         $this->assertEquals('/fanny-packs', (string) $result);
+    }
+}
+
+class FluentTagCollectionTag extends Collection
+{
+    protected static $handle = 'collection';
+
+    public function __call($method, $args)
+    {
+        $results = parent::__call($method, $args);
+
+        if ($this->params->bool('first')) {
+            return $results->first();
+        }
+
+        return $results;
     }
 }
