@@ -87,7 +87,7 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($container, $return);
         $this->assertInstanceOf(FlysystemAdapter::class, $container->disk());
         $this->assertEquals('test', $container->diskHandle());
-        $this->assertEquals('/the-url', $container->disk()->filesystem()->getDriver()->getConfig()->get('url'));
+        $this->assertEquals('/the-url', $container->diskConfig()['url']);
     }
 
     /** @test */
@@ -129,7 +129,7 @@ class AssetContainerTest extends TestCase
         $this->assertTrue($container->private());
         $this->assertFalse($container->accessible());
 
-        Storage::disk('test')->getDriver()->getConfig()->set('url', '/url');
+        config(['filesystems.disks.test.url' => '/url']);
 
         $this->assertFalse($container->private());
         $this->assertTrue($container->accessible());
