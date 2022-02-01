@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => '調整是否讓 Antlers 剖析此欄位。',
     'any.config.cast_booleans' => '該欄位中的 true 與 false 值會被保存為布林。',
-    'any.config.default' => '設定預設值。',
     'array.config.keys' => '設定陣列索引鍵 (變數) 與可選的標籤。',
     'array.config.mode' => '動態模式可讓使用者控制資料，而鍵值模式則不行。',
     'array.title' => '陣列',

@@ -284,6 +284,10 @@ export default [
         example: 'size:value'
     },
     {
+        label: 'Sometimes',
+        value: 'sometimes',
+    },
+    {
         label: 'Starts With',
         value: 'starts_with:',
         example: 'starts_with:foo,bar,...',

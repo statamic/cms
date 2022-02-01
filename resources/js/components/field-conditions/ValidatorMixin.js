@@ -9,9 +9,14 @@ export default {
 
     methods: {
         showField(field) {
-            let validator = new Validator(field, this.values, this.$store, this.storeName);
+            let passes = new Validator(field, this.values, this.$store, this.storeName).passesConditions();
 
-            return validator.passesConditions();
+            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                handle: field.handle,
+                hidden: ! passes,
+            });
+
+            return passes;
         }
     }
 }

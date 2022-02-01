@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Aktivera Antlers-tolkning i detta fälts innehåll.',
     'any.config.cast_booleans' => 'Alternativ med värdena sant och falskt kommer att sparas som booleaner.',
-    'any.config.default' => 'Ställ in standardvärdet.',
     'array.config.keys' => 'Ställ in array-nycklarna (variabler) och valfria etiketter.',
     'array.config.mode' => 'Dynamiskt läge ger användaren kontroll över data medan nyckelläge inte gör det.',
     'array.title' => 'Array',

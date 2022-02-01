@@ -14,6 +14,7 @@
         "composer/composer": "^1.10.22 || ^2.0.13",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
+        "james-heinrich/getid3": "^1.9",
         "laravel/framework": "9.x-dev",
         "laravel/helpers": "^1.1",
         "league/commonmark": "^1.5 || ^2.0",
@@ -50,7 +51,7 @@
     "extra": {
         "download-dist": {
             "url": "https://github.com/statamic/cms/releases/download/{$version}/dist.tar.gz",
-            "path": "resources/dist"
+            "path": "resources"
         },
         "laravel": {
             "providers": [

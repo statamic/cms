@@ -8,7 +8,11 @@ class FormErrorsTest extends FormTestCase
     public function it_renders_errors()
     {
         $this
-            ->post('/!/forms/contact')
+            ->post('/!/forms/contact', [
+                'name' => null,
+                'email' => null,
+                'message' => null,
+            ])
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
@@ -27,5 +31,19 @@ EOT
         ];
 
         $this->assertEquals($expected, $errors[1]);
+    }
+
+    /** @test */
+    public function it_allows_use_of_sometimes_rule_for_conditionally_hidden_fields()
+    {
+        $this
+            ->post('/!/forms/contact', [
+                'name' => null,
+                'email' => null,
+                // 'message' => 'Has both the `sometimes` and `required` rule, so it should only validate if in then request.',
+            ])
+            ->assertSessionHasErrors(['email'], null, 'form.contact')
+            ->assertSessionDoesntHaveErrors(['message'], null, 'form.contact')
+            ->assertLocation('/');
     }
 }

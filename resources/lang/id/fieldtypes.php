@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Apakah Anda ingin bidang ini diurai oleh Antlers.',
     'any.config.cast_booleans' => 'Opsi dengan nilai benar dan salah akan disimpan sebagai boolean.',
-    'any.config.default' => 'Tetapkan nilai default.',
     'array.config.keys' => 'Setel kunci array (variabel) dan label opsional.',
     'array.config.mode' => 'Mode dinamis memberi pengguna kontrol atas data sementara mode kunci tidak.',
     'array.title' => 'Array',
