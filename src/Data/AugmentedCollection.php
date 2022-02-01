@@ -12,6 +12,7 @@ use Statamic\Fields\Value;
 class AugmentedCollection extends Collection
 {
     protected $shallowNesting = false;
+    protected $shouldEvaluate = false;
 
     /**
      * Enables shallow augmentation on nested values when
@@ -29,6 +30,20 @@ class AugmentedCollection extends Collection
         return $this->shallowNesting;
     }
 
+    public function withEvaluation()
+    {
+        $this->shouldEvaluate = true;
+
+        return $this;
+    }
+
+    public function withoutEvaluation()
+    {
+        $this->shouldEvaluate = false;
+
+        return $this;
+    }
+
     public function toArray()
     {
         return $this->map(function ($value) {
@@ -40,7 +55,17 @@ class AugmentedCollection extends Collection
                 return $value->toShallowAugmentedArray();
             }
 
-            return $value instanceof Arrayable ? $value->toArray() : $value;
+            if ($this->shouldEvaluate && $value instanceof Value) {
+                $value = $value->value();
+            }
+
+            $value = $value instanceof Arrayable ? $value->toArray() : $value;
+
+            if (is_array($value) || $value instanceof Collection) {
+                $value = (new self($value))->withEvaluation()->toArray();
+            }
+
+            return $value;
         })->all();
     }
 

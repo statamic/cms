@@ -69,6 +69,60 @@ class AugmentedCollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_converts_value_objects_to_their_augmented_values_with_flag()
+    {
+        $a = new Value('alfa');
+        $b = new Value('bravo');
+        $c = new Value([
+            'charlie',
+            new Value(collect([
+                'delta',
+                new Value([
+                    'echo',
+                    'foxtrot',
+                ]),
+            ])),
+        ]);
+
+        $c = new AugmentedCollection([$a, $b, $c, 'golf']);
+
+        $results = $c->withEvaluation()->toArray();
+
+        $this->assertEquals([
+            'alfa',
+            'bravo',
+            [
+                'charlie',
+                [
+                    'delta',
+                    [
+                        'echo',
+                        'foxtrot',
+                    ],
+                ],
+            ],
+            'golf',
+        ], $results);
+    }
+
+    /** @test */
+    public function it_does_not_convert_value_objects_to_their_augmented_values_with_explicit_flag_or_without_any_flag()
+    {
+        $item1 = m::mock(Value::class);
+        $item1->shouldReceive('value')->never();
+        $item2 = m::mock(Value::class);
+        $item2->shouldReceive('value')->never();
+
+        $c = new AugmentedCollection([$item1, $item2, 'baz']);
+
+        $results = $c->toArray();
+        $this->assertEquals([$item1, $item2, 'baz'], $results);
+
+        $results = $c->withoutEvaluation()->toArray();
+        $this->assertEquals([$item1, $item2, 'baz'], $results);
+    }
+
+    /** @test */
     public function it_json_serializes()
     {
         $value = m::mock(Value::class);
