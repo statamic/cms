@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use Facades\Statamic\View\Cascade;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
@@ -36,7 +37,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, Arrayable
 {
     use Routable {
         uri as routableUri;
@@ -799,5 +800,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
         return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+    }
+
+    public function toArray()
+    {
+        return $this->toAugmentedCollection()->withEvaluation()->toArray();
     }
 }
