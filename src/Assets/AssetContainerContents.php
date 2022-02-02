@@ -3,7 +3,6 @@
 namespace Statamic\Assets;
 
 use Illuminate\Support\Facades\Cache;
-use League\Flysystem\Util;
 use Statamic\Support\Str;
 
 class AssetContainerContents
@@ -63,6 +62,55 @@ class AssetContainerContents
 
         if ($attributes->type() === 'file') {
             $normalized['size'] = $attributes->fileSize();
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Normalize flysystem 3.x meta data to match 1.x payloads.
+     *
+     * @param  string  $path
+     * @return array
+     */
+    private function getNormalizedFlysystemMetadata($path)
+    {
+        // If Flysystem 1.x, use old method of getting meta data.
+        if (class_exists('\League\Flysystem\Util')) {
+            try {
+                // If the file doesn't exist, this will either throw an exception or return
+                // false depending on the adapter and whether or not asserts are enabled.
+                return $this->filesystem()->getMetadata($path) + \League\Flysystem\Util::pathinfo($path);
+            } catch (\Exception $exception) {
+                return false;
+            }
+        }
+
+        if (! $this->filesystem()->has($path)) {
+            return false;
+        }
+
+        $type = $this->filesystem()->directoryExists($path)
+            ? 'dir'
+            : 'file';
+
+        $pathinfo = pathinfo($path);
+
+        $normalized = [
+            'type' => $type,
+            'path' => $path,
+            'timestamp' => $this->filesystem()->lastModified($path),
+            'dirname' => $pathinfo['dirname'] === '.' ? '' : $pathinfo['dirname'],
+            'basename' => $pathinfo['basename'],
+            'filename' => $pathinfo['filename'],
+        ];
+
+        if (isset($pathinfo['extension'])) {
+            $normalized['extension'] = $pathinfo['extension'];
+        }
+
+        if ($type === 'file') {
+            $normalized['size'] = $this->filesystem()->fileSize($path);
         }
 
         return $normalized;
@@ -162,25 +210,21 @@ class AssetContainerContents
 
     public function add($path)
     {
-        try {
-            // If the file doesn't exist, this will either throw an exception or return
-            // false depending on the adapter and whether or not asserts are enabled.
-            if (! $metadata = $this->filesystem()->getMetadata($path)) {
-                return $this;
-            }
-
-            // Add parent directories
-            if (($dir = dirname($path)) !== '.') {
-                $this->add($dir);
-            }
-
-            $this->all()->put($path, $metadata + Util::pathinfo($path));
-
-            $this->filteredFiles = null;
-            $this->filteredDirectories = null;
-        } finally {
+        if (! $metadata = $this->getNormalizedFlysystemMetadata($path)) {
             return $this;
         }
+
+        // Add parent directories
+        if (($dir = dirname($path)) !== '.') {
+            $this->add($dir);
+        }
+
+        $this->all()->put($path, $metadata);
+
+        $this->filteredFiles = null;
+        $this->filteredDirectories = null;
+
+        return $this;
     }
 
     private function key()
