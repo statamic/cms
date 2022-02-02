@@ -37,20 +37,6 @@ class Date extends Fieldtype
                     'range' => __('Range'),
                 ],
             ],
-            'time_enabled'  => [
-                'display' => __('Time Enabled'),
-                'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'time_seconds_enabled'  => [
-                'display' => __('Show Seconds'),
-                'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
             'format' => [
                 'display' => __('Format'),
                 'instructions' => __('statamic::fieldtypes.date.config.format'),
@@ -67,6 +53,20 @@ class Date extends Fieldtype
                 'display' => __('Latest Date'),
                 'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
                 'type' => 'date',
+                'width' => 50,
+            ],
+            'time_enabled'  => [
+                'display' => __('Time Enabled'),
+                'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'time_seconds_enabled'  => [
+                'display' => __('Show Seconds'),
+                'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
+                'type' => 'toggle',
+                'default' => false,
                 'width' => 50,
             ],
             'full_width' => [
