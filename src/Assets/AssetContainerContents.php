@@ -80,7 +80,9 @@ class AssetContainerContents
             try {
                 // If the file doesn't exist, this will either throw an exception or return
                 // false depending on the adapter and whether or not asserts are enabled.
-                return $this->filesystem()->getMetadata($path) + \League\Flysystem\Util::pathinfo($path);
+                $meta = $this->filesystem()->getMetadata($path);
+
+                return $meta ? $meta + \League\Flysystem\Util::pathinfo($path) : false;
             } catch (\Exception $exception) {
                 return false;
             }
