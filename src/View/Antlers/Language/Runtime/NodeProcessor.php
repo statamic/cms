@@ -1830,7 +1830,7 @@ class NodeProcessor
             throw new SyntaxError("{$e->getMessage()} on line {$e->getLine()} of:\n\n{$phpBuffer}");
         }
 
-        if (!$node->isEchoNode && ! empty($phpRuntimeAssignments)) {
+        if (! $node->isEchoNode && ! empty($phpRuntimeAssignments)) {
             $this->processAssignments($phpRuntimeAssignments);
         }
 
