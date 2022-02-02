@@ -228,6 +228,7 @@ EOT;
 
 
 
+
 ================ Blog ================
 36
 Count: 1
@@ -318,7 +319,7 @@ EOT;
         $this->assertSame($expected, $results);
     }
 
-    public function test_antlers_php_node()
+    public function test_antlers_php_node_can_return_assignments()
     {
         $template = <<<'EOT'
 {{ var_1 = 'blog'; var_2 = 'news'; }}
@@ -328,7 +329,6 @@ EOT;
 $articles = \Statamic\Facades\Entry::query()->where('collection', $var_1)->limit(3)->get();
 $news = \Statamic\Facades\Entry::query()->where('collection', $var_2)->limit(5)->get();
 ?>?}}
-
 
 {{ articles }}
 ================ Blog ================
