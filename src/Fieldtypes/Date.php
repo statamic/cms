@@ -287,7 +287,7 @@ class Date extends Fieldtype
     {
         try {
             return Carbon::createFromFormat($this->saveFormat(), $value);
-        } catch (InvalidFormatException | InvalidArgumentException $e) {
+        } catch (InvalidFormatException|InvalidArgumentException $e) {
             return Carbon::parse($value);
         }
     }
