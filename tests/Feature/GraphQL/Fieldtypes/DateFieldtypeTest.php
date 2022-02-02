@@ -17,11 +17,11 @@ class DateFieldtypeTest extends FieldtypeTestCase
         $this->createEntryWithFields([
             'filled' => [
                 'value' => '2017-12-25 13:29',
-                'field' => ['type' => 'date'],
+                'field' => ['type' => 'date', 'time_enabled' => true],
             ],
             'undefined' => [
                 'value' => null,
-                'field' => ['type' => 'date'],
+                'field' => ['type' => 'date', 'time_enabled' => true],
             ],
         ]);
 
