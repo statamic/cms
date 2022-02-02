@@ -45,22 +45,20 @@ class AssetContainerContents
      */
     private function normalizeFlysystemAttributes($attributes)
     {
-        $pathinfo = pathinfo($attributes['path']);
-
-        $normalized = [
+        // Merge attributes with `pathinfo()`, since Flysystem 3.x removed `Util::pathinfo()`.
+        $normalized = array_merge([
             'type' => $attributes->type(),
             'path' => $attributes->path(),
             'timestamp' => $attributes->lastModified(),
-            'dirname' => $pathinfo['dirname'] === '.' ? '' : $pathinfo['dirname'],
-            'basename' => $pathinfo['basename'],
-            'filename' => $pathinfo['filename'],
-        ];
+        ], pathinfo($attributes['path']));
 
-        if (isset($pathinfo['extension'])) {
-            $normalized['extension'] = $pathinfo['extension'];
+        // Flysystem 1.x never returned `.` dirnames.
+        if (isset($normalized['dirname']) && $normalized['dirname'] === '.') {
+            $normalized['dirname'] = '';
         }
 
-        if ($attributes->type() === 'file') {
+        // Only return `size` if type is file.
+        if ($normalized['type'] === 'file') {
             $normalized['size'] = $attributes->fileSize();
         }
 
@@ -77,29 +75,36 @@ class AssetContainerContents
     {
         $isFlysystemV1 = method_exists($this->filesystem(), 'getTimestamp');
 
+        // Determine whether or not to use Flysystem 1.x or 3.x getter methods.
         $lastModifiedMethod = $isFlysystemV1 ? 'getTimestamp' : 'lastModified';
         $fileSizeMethod = $isFlysystemV1 ? 'getSize' : 'fileSize';
 
+        // Use exception handling to avoid another `has()` API method call.
         try {
             $timestamp = $this->filesystem()->{$lastModifiedMethod}($path);
         } catch (\Exception $exception) {
             return false;
         }
 
+        // Use exception handling to normalize file size output.
         try {
             $size = $this->filesystem()->{$fileSizeMethod}($path);
         } catch (\Exception $exception) {
             $size = false;
         }
 
+        // Determine `type` off returned size to avoid another API method call.
         $type = $size === false ? 'dir' : 'file';
 
+        // Merge `pathinfo()` in, since Flysystem 3.x removed `Util::pathinfo()`.
         $normalized = array_merge(compact('type', 'path', 'timestamp'), pathinfo($path));
 
+        // Flysystem 1.x never returned `.` dirnames.
         if (isset($normalized['dirname']) && $normalized['dirname'] === '.') {
             $normalized['dirname'] = '';
         }
 
+        // Only return `size` if type is file.
         if ($type === 'file') {
             $normalized['size'] = $size;
         }
