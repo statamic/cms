@@ -10,12 +10,8 @@
 
         <div
             class="help-block"
-            v-if="field.instructions"
-            v-html="$options.filters.markdown(field.instructions)" />
-
-        <div v-if="hasError">
-            <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
-        </div>
+            v-if="instructions && field.instructions_position !== 'below'"
+            v-html="instructions" />
 
         <component
             :is="fieldtypeComponent"
@@ -25,6 +21,7 @@
             :handle="field.handle"
             :name-prefix="namePrefix"
             :error-key-prefix="errorKey"
+            :has-error="hasError || hasNestedError"
             :read-only="isReadOnly"
             @input="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"
@@ -32,6 +29,15 @@
             @blur="$emit('blur')"
             @replicator-preview-updated="$emit('replicator-preview-updated', $event)"
         />
+
+        <div
+            class="help-block mt-1"
+            v-if="instructions && field.instructions_position === 'below'"
+            v-html="instructions" />
+
+        <div v-if="hasError">
+            <small class="help-block text-red mt-1" v-for="(error, i) in errors" :key="i" v-text="error" />
+        </div>
 
     </div>
 
@@ -81,14 +87,28 @@ export default {
             return this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1)
         },
 
+        instructions() {
+            return this.field.instructions
+                ? this.$options.filters.markdown(this.field.instructions)
+                : null
+        },
+
+        storeState() {
+            return this.$store.state.publish[this.storeName] || [];
+        },
+
+        errors() {
+            return this.storeState.errors[this.errorKey] || [];
+        },
+
         hasError() {
             return this.errors.length > 0;
         },
 
-        errors() {
-            const state = this.$store.state.publish[this.storeName];
-            if (! state) return [];
-            return state.errors[this.errorKey] || [];
+        hasNestedError() {
+            const prefix = `${this.errorKey}.`;
+
+            return Object.keys(this.storeState.errors).some(handle => handle.startsWith(prefix));
         },
 
         isReadOnly() {
@@ -102,7 +122,7 @@ export default {
                 `field-${tailwind_width_class(this.field.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.field.classes || '',
-                { 'has-error': this.hasError }
+                { 'has-error': this.hasError || this.hasNestedError }
             ];
         }
 

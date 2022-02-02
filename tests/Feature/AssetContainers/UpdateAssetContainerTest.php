@@ -52,10 +52,9 @@ class UpdateAssetContainerTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->update($container, ['title' => '', 'handle' => '', 'disk' => ''])
+            ->update($container, ['title' => '', 'disk' => ''])
             ->assertJsonValidationErrors([
                 'title' => trans('statamic::validation.required'),
-                'handle' => trans('statamic::validation.required'),
                 'disk' => trans('statamic::validation.required'),
             ]);
 
@@ -69,7 +68,6 @@ class UpdateAssetContainerTest extends TestCase
             cp_route('asset-containers.update', $container->handle()),
             array_merge([
                 'title' => 'Title',
-                'handle' => 'test',
                 'disk' => 'local',
             ], $payload)
         );

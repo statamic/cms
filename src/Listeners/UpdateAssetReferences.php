@@ -13,7 +13,7 @@ class UpdateAssetReferences implements ShouldQueue
     /**
      * Register the listeners for the subscriber.
      *
-     * @param \Illuminate\Events\Dispatcher $events
+     * @param  \Illuminate\Events\Dispatcher  $events
      */
     public function subscribe($events)
     {
@@ -23,7 +23,7 @@ class UpdateAssetReferences implements ShouldQueue
     /**
      * Handle the events.
      *
-     * @param AssetSaved $event
+     * @param  AssetSaved  $event
      */
     public function handle(AssetSaved $event)
     {

@@ -23,6 +23,8 @@
                     :is-required="config.required"
                     :locale="$config.get('locale').replace('_', '-')"
                     :masks="{ input: [displayFormat] }"
+                    :min-date="config.earliest_date"
+                    :max-date="config.latest_date"
                     :model-config="modelConfig"
                     :popover="{ visibility: 'focus' }"
                     :rows="$screens({ default: 1, lg: config.rows })"

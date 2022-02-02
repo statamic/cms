@@ -31,6 +31,7 @@ abstract class Relationship extends Fieldtype
             'max_items' => [
                 'display' => __('Max Items'),
                 'instructions' => __('statamic::messages.max_items_instructions'),
+                'min' => 1,
                 'type' => 'integer',
                 'width' => 50,
             ],
@@ -109,6 +110,7 @@ abstract class Relationship extends Fieldtype
     {
         return [
             'data' => $this->getItemData($this->field->value())->all(),
+            'columns' => $this->getColumns(),
             'itemDataUrl' => $this->getItemDataUrl(),
             'filtersUrl' => $this->getFiltersUrl(),
             'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),

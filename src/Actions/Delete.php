@@ -46,7 +46,7 @@ class Delete extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Are you sure you want to want to delete this?|Are you sure you want to delete these :count items?';
+        return 'Are you sure you want to delete this?|Are you sure you want to delete these :count items?';
     }
 
     public function run($items, $values)

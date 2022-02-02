@@ -95,7 +95,9 @@ class Term implements TermContract
     {
         $localizations = clone $this->data;
 
-        $array = $localizations->pull($this->defaultLocale());
+        $array = Arr::removeNullValues(
+            $localizations->pull($this->defaultLocale())->all()
+        );
 
         // todo: add published bool (for each locale?)
 
@@ -104,12 +106,10 @@ class Term implements TermContract
         }
 
         if (! $localizations->isEmpty()) {
-            $array['localizations'] = $localizations->map(function ($item) {
-                return Arr::removeNullValues($item->all());
-            })->all();
+            $array['localizations'] = $localizations->map->all()->all();
         }
 
-        return $array->all();
+        return $array;
     }
 
     public function in($site)
@@ -146,7 +146,12 @@ class Term implements TermContract
 
     public function entriesCount()
     {
-        return Blink::once('term-entries-count-'.$this->id(), function () {
+        $key = vsprintf('term-entries-count-%s-%s', [
+            $this->id(),
+            optional($this->collection())->handle(),
+        ]);
+
+        return Blink::once($key, function () {
             return Facades\Term::entriesCount($this);
         });
     }

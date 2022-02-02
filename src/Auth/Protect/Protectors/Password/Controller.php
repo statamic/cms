@@ -3,6 +3,7 @@
 namespace Statamic\Auth\Protect\Protectors\Password;
 
 use Statamic\Http\Controllers\Controller as BaseController;
+use Statamic\View\View;
 
 class Controller extends BaseController
 {
@@ -10,7 +11,7 @@ class Controller extends BaseController
 
     public function show()
     {
-        return view('statamic::auth.protect.password');
+        return View::make('statamic::auth.protect.password');
     }
 
     public function store()
@@ -19,13 +20,13 @@ class Controller extends BaseController
         $this->tokenData = session('statamic:protect:password.tokens.'.request('token'));
 
         if (! $this->tokenData) {
-            return back()->withErrors(['token' => 'Invalid or expired token.'], 'passwordProtect');
+            return back()->withErrors(['token' => __('statamic::messages.password_protect_token_invalid')], 'passwordProtect');
         }
 
         $guard = new Guard($this->getScheme());
 
         if (! $guard->check($this->password)) {
-            return back()->withErrors(['password' => 'Incorrect password.'], 'passwordProtect');
+            return back()->withErrors(['password' => __('statamic::messages.password_protect_incorrect_password')], 'passwordProtect');
         }
 
         return $this

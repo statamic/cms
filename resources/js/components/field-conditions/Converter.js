@@ -1,15 +1,22 @@
 import { OPERATORS, ALIASES } from './Constants.js';
+import map from 'underscore/modules/map.js'
+import each from 'underscore/modules/each.js'
+import filter from 'underscore/modules/filter.js'
+import chain from 'underscore/modules/chain.js'
+import chainable from 'underscore/modules/mixin.js'
+
+chainable({ chain, filter, each });
 
 export default class {
 
     fromBlueprint(conditions, prefix=null) {
-        return _.map(conditions, (condition, field) => this.splitRhs(field, condition, prefix));
+        return map(conditions, (condition, field) => this.splitRhs(field, condition, prefix));
     }
 
     toBlueprint(conditions) {
         let converted = {};
 
-        _.each(conditions, condition => {
+        each(conditions, condition => {
             converted[condition.field] = this.combineRhs(condition);
         });
 
@@ -35,8 +42,8 @@ export default class {
     getOperatorFromRhs(condition) {
         let operator = '==';
 
-        _.chain(this.getOperatorsAndAliases())
-            .filter(value => new RegExp(`^${value} [^=]`).test(condition.toString()))
+        chain(this.getOperatorsAndAliases())
+            .filter(value => new RegExp(`^${value} [^=]`).test(this.normalizeConditionString(condition)))
             .each(value => operator = value);
 
         return this.normalizeOperator(operator);
@@ -49,9 +56,9 @@ export default class {
     }
 
     getValueFromRhs(condition) {
-        let rhs = condition.toString();
+        let rhs = this.normalizeConditionString(condition);
 
-        _.chain(this.getOperatorsAndAliases())
+        chain(this.getOperatorsAndAliases())
             .filter(value => new RegExp(`^${value} [^=]`).test(rhs))
             .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
 
@@ -67,5 +74,17 @@ export default class {
 
     getOperatorsAndAliases() {
         return OPERATORS.concat(Object.keys(ALIASES));
+    }
+
+    normalizeConditionString(value) {
+        // You cannot `null.toString()`, so we'll manually cast it here to prevent error.
+        if (value === null) return 'null';
+
+        // Note: We don't document the use of an '' empty string in the yaml,
+        // but for the people that manually add this to their yaml, we'll
+        // treat it as an `empty` check so that it doesn't feel broken.
+        if (value === '') return 'empty';
+
+        return value.toString();
     }
 }

@@ -33,7 +33,9 @@ class Assets extends Tags
         $value = Arr::get($this->context, $this->method);
 
         if ($this->isAssetsFieldValue($value)) {
-            return $value->value();
+            $this->assets = (new AssetCollection([$value->value()]))->flatten();
+
+            return $this->output();
         }
 
         if ($value instanceof Value) {
@@ -152,7 +154,7 @@ class Assets extends Tags
     /**
      * Perform the asset lookups.
      *
-     * @param string|array $urls  One URL, or array of URLs.
+     * @param  string|array  $urls  One URL, or array of URLs.
      * @return string
      */
     protected function assets($urls)

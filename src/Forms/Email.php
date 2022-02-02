@@ -26,7 +26,7 @@ class Email extends Mailable
         $this->submission = $submission;
         $this->config = $this->parseConfig($config);
         $this->site = $site;
-        $this->locale($site->shortLocale());
+        $this->locale($site->lang());
     }
 
     public function build()
@@ -35,6 +35,7 @@ class Email extends Mailable
             ->subject(isset($this->config['subject']) ? __($this->config['subject']) : __('Form Submission'))
             ->addAddresses()
             ->addViews()
+            ->addAttachments()
             ->addData();
     }
 
@@ -78,6 +79,33 @@ class Email extends Mailable
             $method = array_get($this->config, 'markdown') ? 'markdown' : 'view';
             $this->$method($html);
         }
+
+        return $this;
+    }
+
+    protected function addAttachments()
+    {
+        if (! array_get($this->config, 'attachments')) {
+            return $this;
+        }
+
+        $augmented = $this->submission->toAugmentedArray();
+
+        $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
+            ->filter(function ($field) {
+                return $field['fieldtype'] === 'assets';
+            })
+            ->each(function ($field) {
+                $value = $field['value']->value();
+
+                if (array_get($field, 'config.max_files') === 1) {
+                    $value = collect([$value])->filter();
+                }
+
+                foreach ($value as $file) {
+                    $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
+                }
+            });
 
         return $this;
     }

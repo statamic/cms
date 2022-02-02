@@ -10,11 +10,12 @@ class TreeResource extends JsonResource
 {
     protected $fields;
     protected $depth;
+    protected $site;
 
     /**
      * Set selected fields.
      *
-     * @param array|null $fields
+     * @param  array|null  $fields
      * @return $this
      */
     public function fields($fields = null)
@@ -27,12 +28,25 @@ class TreeResource extends JsonResource
     /**
      * Set max depth.
      *
-     * @param int|null $depth
+     * @param  int|null  $depth
      * @return $this
      */
     public function maxDepth($depth = null)
     {
         $this->maxDepth = $depth;
+
+        return $this;
+    }
+
+    /**
+     * Set site.
+     *
+     * @param  string|null  $site
+     * @return $this
+     */
+    public function site($site = null)
+    {
+        $this->site = $site;
 
         return $this;
     }
@@ -49,7 +63,7 @@ class TreeResource extends JsonResource
             'structure' => $this->resource->structure(),
             'include_home' => true,
             'show_unpublished' => false,
-            'site' => Site::default()->handle(),
+            'site' => $this->site ?? Site::default()->handle(),
             'fields' => $this->fields,
             'max_depth' => $this->maxDepth,
         ]);

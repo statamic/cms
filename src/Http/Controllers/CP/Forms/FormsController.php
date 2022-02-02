@@ -56,7 +56,7 @@ class FormsController extends CpController
     /**
      * Get the metrics array ready to be injected into a Grid field.
      *
-     * @param  Form $form
+     * @param  Form  $form
      * @return array
      */
     private function preProcessMetrics($form)
@@ -271,6 +271,14 @@ class FormsController extends CpController
                                     'type' => 'toggle',
                                     'display' => __('Markdown'),
                                     'instructions' => __('statamic::messages.form_configure_email_markdown_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'attachments',
+                                'field' => [
+                                    'type' => 'toggle',
+                                    'display' => __('Attachments'),
+                                    'instructions' => __('statamic::messages.form_configure_email_attachments_instructions'),
                                 ],
                             ],
                         ],

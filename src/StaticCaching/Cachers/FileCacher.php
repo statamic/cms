@@ -17,9 +17,9 @@ class FileCacher extends AbstractCacher
     private $writer;
 
     /**
-     * @param Writer $writer
-     * @param Repository $cache
-     * @param array $config
+     * @param  Writer  $writer
+     * @param  Repository  $cache
+     * @param  array  $config
      */
     public function __construct(Writer $writer, Repository $cache, $config)
     {
@@ -31,8 +31,8 @@ class FileCacher extends AbstractCacher
     /**
      * Cache a page.
      *
-     * @param \Illuminate\Http\Request $request     Request associated with the page to be cached
-     * @param string                   $content     The response content to be cached
+     * @param  \Illuminate\Http\Request  $request  Request associated with the page to be cached
+     * @param  string  $content  The response content to be cached
      */
     public function cachePage(Request $request, $content)
     {
@@ -54,7 +54,7 @@ class FileCacher extends AbstractCacher
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     public function getCachedPage(Request $request)
@@ -94,7 +94,7 @@ class FileCacher extends AbstractCacher
     /**
      * Invalidate a URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return void
      */
     public function invalidateUrl($url)
@@ -123,7 +123,7 @@ class FileCacher extends AbstractCacher
     /**
      * Get the path where static files are stored.
      *
-     * @param string|null $locale  A specific locale's path.
+     * @param  string|null  $locale  A specific locale's path.
      * @return string
      */
     public function getCachePath($locale = null)

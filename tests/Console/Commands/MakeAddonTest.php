@@ -14,9 +14,7 @@ class MakeAddonTest extends TestCase
     {
         parent::setUp();
 
-        if ($this->isRunningWindows()) {
-            $this->markTestSkipped();
-        }
+        $this->markTestSkippedInWindows();
 
         $this->files = app(Filesystem::class);
     }

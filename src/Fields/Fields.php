@@ -7,6 +7,7 @@ use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
+use Statamic\Support\Arr;
 
 class Fields
 {
@@ -118,7 +119,9 @@ class Fields
     public function addValues(array $values)
     {
         $fields = $this->fields->map(function ($field) use ($values) {
-            return $field->newInstance()->setValue(array_get($values, $field->handle()));
+            return Arr::has($values, $field->handle())
+                ? $field->newInstance()->fillValue(Arr::get($values, $field->handle()))
+                : $field->newInstance();
         });
 
         return $this->newInstance()->setFields($fields);
@@ -128,6 +131,13 @@ class Fields
     {
         return $this->fields->mapWithKeys(function ($field) {
             return [$field->handle() => $field->value()];
+        });
+    }
+
+    public function validatableValues()
+    {
+        return $this->values()->filter(function ($value, $handle) {
+            return $this->fields->get($handle)->isFilled();
         });
     }
 
@@ -217,37 +227,31 @@ class Fields
     {
         $blink = 'blueprint-imported-fields-'.md5(json_encode($config));
 
-        if (Blink::has($blink)) {
-            return Blink::get($blink);
-        }
+        return Blink::once($blink, function () use ($config) {
+            if (! $fieldset = FieldsetRepository::find($config['import'])) {
+                throw new \Exception("Fieldset {$config['import']} not found.");
+            }
 
-        if (! $fieldset = FieldsetRepository::find($config['import'])) {
-            throw new \Exception("Fieldset {$config['import']} not found.");
-        }
+            $fields = $fieldset->fields()->all();
 
-        $fields = $fieldset->fields()->all()->each->setParent($this->parent);
+            if ($overrides = $config['config'] ?? null) {
+                $fields = $fields->map(function ($field, $handle) use ($overrides) {
+                    return $field->setConfig(array_merge($field->config(), $overrides[$handle] ?? []));
+                });
+            }
 
-        if ($overrides = $config['config'] ?? null) {
-            $fields = $fields->map(function ($field, $handle) use ($overrides) {
-                return $field->setConfig(array_merge($field->config(), $overrides[$handle] ?? []));
-            });
-        }
+            if ($prefix = array_get($config, 'prefix')) {
+                $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
+                    $field = clone $field;
+                    $handle = $prefix.$field->handle();
+                    $prefix = $prefix.$field->prefix();
 
-        if ($prefix = array_get($config, 'prefix')) {
-            $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
-                $field = clone $field;
-                $handle = $prefix.$field->handle();
-                $prefix = $prefix.$field->prefix();
+                    return [$handle => $field->setHandle($handle)->setPrefix($prefix)];
+                });
+            }
 
-                return [$handle => $field->setHandle($handle)->setPrefix($prefix)];
-            });
-        }
-
-        $result = $fields->all();
-
-        Blink::put($blink, $result);
-
-        return $result;
+            return $fields;
+        })->each->setParent($this->parent)->all();
     }
 
     public function meta()

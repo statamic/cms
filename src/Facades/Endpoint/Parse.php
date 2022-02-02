@@ -14,10 +14,10 @@ class Parse
     /**
      * Parse a string/template.
      *
-     * @param       $str        String to parse
-     * @param array $variables  Variables to use
-     * @param array $context    Contextual variables to also use
-     * @param bool  $php        Whether PHP should be allowed
+     * @param  $str  String to parse
+     * @param  array  $variables  Variables to use
+     * @param  array  $context  Contextual variables to also use
+     * @param  bool  $php  Whether PHP should be allowed
      * @return string
      */
     public function template($str, $variables = [], $context = [], $php = false)
@@ -28,11 +28,11 @@ class Parse
     /**
      * Iterate over an array and parse the string/template for each.
      *
-     * @param string  $content     String to parse
-     * @param array   $data        Variables to use, in a multidimensional array
-     * @param bool    $supplement  Whether to supplement with contextual values
-     * @param array   $context     Contextual variables to also use
-     * @param bool    $php         Whether PHP should be allowed
+     * @param  string  $content  String to parse
+     * @param  array  $data  Variables to use, in a multidimensional array
+     * @param  bool  $supplement  Whether to supplement with contextual values
+     * @param  array  $context  Contextual variables to also use
+     * @param  bool  $php  Whether PHP should be allowed
      * @return string
      */
     public function templateLoop($content, $data, $supplement = true, $context = [], $php = false)
@@ -43,7 +43,7 @@ class Parse
     /**
      * Parse a string of raw YAML into an array.
      *
-     * @param string $str  The YAML string
+     * @param  string  $str  The YAML string
      * @return array
      */
     public function YAML($str)
@@ -54,7 +54,7 @@ class Parse
     /**
      * Checks for and parses front matter.
      *
-     * @param string  $string  Content to parse
+     * @param  string  $string  Content to parse
      * @return array
      */
     public function frontMatter($string)
@@ -74,8 +74,8 @@ class Parse
     /**
      * Parse environment variable placeholders with the actual values.
      *
-     * @param   mixed  $val  The value to parse
-     * @return  mixed
+     * @param  mixed  $val  The value to parse
+     * @return mixed
      */
     public function env($val)
     {

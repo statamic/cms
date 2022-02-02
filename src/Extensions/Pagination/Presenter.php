@@ -77,7 +77,7 @@ class Presenter
     /**
      * Convert an array to an associative version.
      *
-     * @param array $array
+     * @param  array  $array
      * @return array
      */
     private function associative($array)

@@ -59,6 +59,7 @@ class EntryTest extends TestCase
         status
         date
         last_modified
+        blueprint
         collection {
             title
             handle
@@ -83,13 +84,14 @@ GQL;
                     'slug' => 'event-one',
                     'url' => '/events/event-one',
                     'uri' => '/events/event-one',
-                    'edit_url' => 'http://localhost/cp/collections/events/entries/3/event-one',
+                    'edit_url' => 'http://localhost/cp/collections/events/entries/3',
                     'permalink' => 'http://localhost/events/event-one',
                     'published' => true,
                     'private' => false,
                     'status' => 'published',
                     'date' => 'November 3rd, 2017',
                     'last_modified' => 'December 25th, 2017',
+                    'blueprint' => 'event',
                     'collection' => [
                         'title' => 'Events',
                         'handle' => 'events',

@@ -3,6 +3,7 @@
 namespace Tests\StarterKits\Concerns;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\Path;
 
 trait BacksUpSite
 {
@@ -10,8 +11,10 @@ trait BacksUpSite
     {
         $files = app(Filesystem::class);
 
-        if (! $files->exists(base_path('../site-backup'))) {
-            $files->copyDirectory(base_path(), base_path('../site-backup'));
+        $backupPath = Path::resolve(base_path('../site-backup'));
+
+        if (! $files->exists($backupPath)) {
+            $files->copyDirectory(base_path(), $backupPath);
         }
     }
 
@@ -19,12 +22,13 @@ trait BacksUpSite
     {
         $files = app(Filesystem::class);
 
+        $backupPath = Path::resolve(base_path('../site-backup'));
         $basePath = base_path();
 
-        if ($files->exists(base_path('../site-backup'))) {
+        if ($files->exists($backupPath)) {
             $files->cleanDirectory($basePath);
-            $files->copyDirectory($basePath.'/../site-backup', $basePath, true);
-            $files->deleteDirectory($basePath.'/../site-backup');
+            $files->copyDirectory($backupPath, $basePath, true);
+            $files->deleteDirectory($backupPath);
         }
     }
 }

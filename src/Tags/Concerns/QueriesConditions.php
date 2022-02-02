@@ -125,22 +125,22 @@ trait QueriesConditions
 
     protected function queryIsCondition($query, $field, $value)
     {
-        $query->where($field, $value);
+        return $query->where($field, $value);
     }
 
     protected function queryNotCondition($query, $field, $value)
     {
-        $query->where($field, '!=', $value);
+        return $query->where($field, '!=', $value);
     }
 
     protected function queryContainsCondition($query, $field, $value)
     {
-        $query->where($field, 'like', "%{$value}%");
+        return $query->where($field, 'like', "%{$value}%");
     }
 
     protected function queryDoesntContainCondition($query, $field, $value)
     {
-        $query->where($field, 'not like', "%{$value}%");
+        return $query->where($field, 'not like', "%{$value}%");
     }
 
     protected function queryInCondition($query, $field, $value)
@@ -149,7 +149,7 @@ trait QueriesConditions
             $value = $this->getPipedValues($value);
         }
 
-        $query->whereIn($field, $value);
+        return $query->whereIn($field, $value);
     }
 
     protected function queryNotInCondition($query, $field, $value)
@@ -158,47 +158,47 @@ trait QueriesConditions
             $value = $this->getPipedValues($value);
         }
 
-        $query->whereNotIn($field, $value);
+        return $query->whereNotIn($field, $value);
     }
 
     protected function queryStartsWithCondition($query, $field, $value)
     {
-        $query->where($field, 'like', "{$value}%");
+        return $query->where($field, 'like', "{$value}%");
     }
 
     protected function queryDoesntStartWithCondition($query, $field, $value)
     {
-        $query->where($field, 'not like', "{$value}%");
+        return $query->where($field, 'not like', "{$value}%");
     }
 
     protected function queryEndsWithCondition($query, $field, $value)
     {
-        $query->where($field, 'like', "%{$value}");
+        return $query->where($field, 'like', "%{$value}");
     }
 
     protected function queryDoesntEndWithCondition($query, $field, $value)
     {
-        $query->where($field, 'not like', "%{$value}");
+        return $query->where($field, 'not like', "%{$value}");
     }
 
     protected function queryGreaterThanCondition($query, $field, $value)
     {
-        $query->where($field, '>', $value);
+        return $query->where($field, '>', $value);
     }
 
     protected function queryLessThanCondition($query, $field, $value)
     {
-        $query->where($field, '<', $value);
+        return $query->where($field, '<', $value);
     }
 
     protected function queryGreaterThanOrEqualToCondition($query, $field, $value)
     {
-        $query->where($field, '>=', $value);
+        return $query->where($field, '>=', $value);
     }
 
     protected function queryLessThanOrEqualToCondition($query, $field, $value)
     {
-        $query->where($field, '<=', $value);
+        return $query->where($field, '<=', $value);
     }
 
     protected function queryMatchesRegexCondition($query, $field, $pattern)
@@ -207,7 +207,7 @@ trait QueriesConditions
             $pattern = $this->removeRegexDelimitersAndModifiers($pattern);
         }
 
-        $query->where($field, 'regexp', $pattern);
+        return $query->where($field, 'regexp', $pattern);
     }
 
     protected function queryDoesntMatchRegexCondition($query, $field, $pattern)
@@ -216,27 +216,27 @@ trait QueriesConditions
             $pattern = $this->removeRegexDelimitersAndModifiers($pattern);
         }
 
-        $query->where($field, 'not regexp', $pattern);
+        return $query->where($field, 'not regexp', $pattern);
     }
 
     protected function queryIsAlphaCondition($query, $field, $regexOperator)
     {
-        $query->where($field, $regexOperator, '^[a-z]+$');
+        return $query->where($field, $regexOperator, '^[a-z]+$');
     }
 
     protected function queryIsAlphaNumericCondition($query, $field, $regexOperator)
     {
-        $query->where($field, $regexOperator, '^[a-z0-9]+$');
+        return $query->where($field, $regexOperator, '^[a-z0-9]+$');
     }
 
     protected function queryIsNumericCondition($query, $field, $regexOperator)
     {
-        $query->where($field, $regexOperator, '^[0-9]*(\.[0-9]+)?$');
+        return $query->where($field, $regexOperator, '^[0-9]*(\.[0-9]+)?$');
     }
 
     protected function queryIsUrlCondition($query, $field, $regexOperator)
     {
-        $query->where($field, $regexOperator, '^(https|http):\/\/[^\ ]+$');
+        return $query->where($field, $regexOperator, '^(https|http):\/\/[^\ ]+$');
     }
 
     protected function queryIsEmbeddableCondition($query, $field, $regexOperator)
@@ -247,18 +247,17 @@ trait QueriesConditions
             'youtu.be',
         ])->implode('|');
 
-        $query->where($field, $regexOperator, "^(https|http):\/\/[^\ ]*({$domainPatterns})[^\/]*\/[^\ ]+$");
+        return $query->where($field, $regexOperator, "^(https|http):\/\/[^\ ]*({$domainPatterns})[^\/]*\/[^\ ]+$");
     }
 
     protected function queryIsEmailCondition($query, $field, $regexOperator)
     {
-        $query->where($field, $regexOperator, '^[^\ ]+@[^\ ]+\.[^\ ]+$');
+        return $query->where($field, $regexOperator, '^[^\ ]+@[^\ ]+\.[^\ ]+$');
     }
 
     protected function queryIsEmptyCondition($query, $field, $boolean)
     {
-        // TODO: Add `whereNull()` and `whereNotNull()` to our query builder so that this can be Eloquent compatible.
-        $query->where($field, $boolean ? '=' : '!=', null);
+        return $query->where($field, $boolean ? '=' : '!=', null);
     }
 
     protected function queryIsAfterCondition($query, $field, $value)
@@ -283,7 +282,7 @@ trait QueriesConditions
 
     protected function queryIsNumberwangCondition($query, $field, $regexOperator)
     {
-        $query->where($field, $regexOperator, "^(1|22|7|9|1002|2\.3|15|109876567|31)$");
+        return $query->where($field, $regexOperator, "^(1|22|7|9|1002|2\.3|15|109876567|31)$");
     }
 
     /**
@@ -291,7 +290,7 @@ trait QueriesConditions
      * Passing delimiters doesn't work with Eloquent and `regexp`, so we remove them from
      * the user's pattern if passed, so that regex conditions will work as expected.
      *
-     * @param string $pattern
+     * @param  string  $pattern
      * @return string
      */
     protected function removeRegexDelimitersAndModifiers($pattern)

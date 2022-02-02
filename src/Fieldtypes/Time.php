@@ -6,6 +6,8 @@ use Statamic\Fields\Fieldtype;
 
 class Time extends Fieldtype
 {
+    protected $categories = ['special'];
+
     protected function configFieldItems(): array
     {
         return [

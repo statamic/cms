@@ -62,7 +62,7 @@
                     </div>
                 </popover>
                 <button v-if="isDirty" class="input-group-item px-1.5" @click="reset">{{ __('Reset') }}</button>
-                <button v-if="activePreset" class="input-group-item px-1.5" @click="deleting = true"><svg-icon name="trash" /></button>
+                <button v-if="activePreset" class="flex items-center input-group-item px-1.5" @click="deleting = true"><svg-icon name="trash" class="w-4 h-4" /></button>
                 <confirmation-modal
                     v-if="deleting"
                     :title="__('Delete Preset')"

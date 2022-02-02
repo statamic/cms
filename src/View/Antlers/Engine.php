@@ -47,8 +47,8 @@ class Engine implements EngineInterface
     /**
      * Create a new AntlersEngine instance.
      *
-     * @param Filesystem $filesystem
-     * @param Parser $parser
+     * @param  Filesystem  $filesystem
+     * @param  Parser  $parser
      */
     public function __construct(Filesystem $filesystem, Parser $parser)
     {
@@ -72,7 +72,7 @@ class Engine implements EngineInterface
      * Get the evaluated contents of the view.
      *
      * @param  string  $path
-     * @param  array   $data
+     * @param  array  $data
      * @return string
      */
     public function get($path, array $data = [])
@@ -109,7 +109,7 @@ class Engine implements EngineInterface
     /**
      * Get the YAML front matter and contents from a view.
      *
-     * @param string $contents
+     * @param  string  $contents
      * @return array
      */
     private function extractFrontMatter($contents)
@@ -123,11 +123,12 @@ class Engine implements EngineInterface
      * Render tags
      * If the Parser comes across any plugin tags, this method will be called.
      *
-     * @param string $name        Plugin tag name
-     * @param array  $parameters  Tag parameters
-     * @param string $content     If its a tag pair, this is what's between them
-     * @param array  $context     The tag's surrounding context variables
+     * @param  string  $name  Plugin tag name
+     * @param  array  $parameters  Tag parameters
+     * @param  string  $content  If its a tag pair, this is what's between them
+     * @param  array  $context  The tag's surrounding context variables
      * @return mixed|string
+     *
      * @throws Exceptions\FatalException
      * @throws \Exception
      */

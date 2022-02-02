@@ -113,7 +113,7 @@
                                             v-if="permalink"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="external-link" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="external-link" class="w-4 h-4 mr-1" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
@@ -257,11 +257,13 @@ import PublishActions from './PublishActions';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History';
 import HasPreferences from '../data-list/HasPreferences';
+import HasHiddenFields from '../data-list/HasHiddenFields';
 
 export default {
 
     mixins: [
         HasPreferences,
+        HasHiddenFields,
     ],
 
     components: {
@@ -444,7 +446,7 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            this.runBeforeSaveHook();
+            setTimeout(() => this.runBeforeSaveHook(), 151); // 150ms is the debounce time for fieldtype updates
         },
 
         runBeforeSaveHook() {
@@ -464,14 +466,14 @@ export default {
         performSaveRequest() {
             // Once the hook has completed, we need to make the actual request.
             // We build the payload here because the before hook may have modified values.
-            const payload = { ...this.values, ...{
+            const payload = { ...this.visibleValues, ...{
                 _blueprint: this.fieldset.handle,
                 _localized: this.localizedFields,
             }};
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                this.title = this.values.title;
+                this.title = response.data.data.title;
                 this.isWorkingCopy = true;
                 if (this.isBase) {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
@@ -570,7 +572,7 @@ export default {
         },
 
         editLocalization(localization) {
-            this.$axios.get(localization.url).then(response => {
+            return this.$axios.get(localization.url).then(response => {
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
@@ -588,7 +590,7 @@ export default {
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.clearDirtyState());
+                setTimeout(() => this.$refs.container.clearDirtyState(), 150); // after any fieldtypes do a debounced update
             })
         },
 
@@ -600,7 +602,13 @@ export default {
 
             const url = this.activeLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
-                this.editLocalization(response.data);
+                this.editLocalization(response.data).then(() => {
+                    this.$events.$emit('localization.created', {store: this.publishContainer});
+
+                    if (this.originValues.published) {
+                        this.setFieldValue('published', true);
+                    }
+                });
             });
         },
 

@@ -18,6 +18,7 @@ class AugmentedPageTest extends AugmentedTestCase
         $page = Mockery::mock(Page::class);
         $page->shouldReceive('reference')->andReturnFalse();
         $page->shouldReceive('data')->andReturn(collect(['one' => 'two', 'three' => 'four']));
+        $page->shouldReceive('supplements')->andReturn(collect(['five' => 'six']));
 
         $augmented = new AugmentedPage($page);
 
@@ -30,6 +31,7 @@ class AugmentedPageTest extends AugmentedTestCase
             'permalink',
             'one',
             'three',
+            'five',
         ];
 
         $actual = $augmented->keys();
@@ -74,6 +76,10 @@ class AugmentedPageTest extends AugmentedTestCase
             'jane' => 'doe',
             'three' => 'four',
         ]));
+        $page->shouldReceive('supplements')->andReturn(collect([
+            'echo' => 'foxtrot',
+            'golf' => 'hotel',
+        ]));
 
         $augmented = new AugmentedPage($page);
 
@@ -92,6 +98,8 @@ class AugmentedPageTest extends AugmentedTestCase
             'jane',
             // page data
             'john',
+            // page augmente
+            'echo', 'golf',
             // page keys
             'entry_id',
         ];
@@ -121,9 +129,14 @@ class AugmentedPageTest extends AugmentedTestCase
         $page->shouldReceive('uri')->andReturn('/the-uri');
         $page->shouldReceive('absoluteUrl')->andReturn('https://site.com/the-permalink');
         $page->shouldReceive('data')->andReturn(collect(['one' => 'two', 'three' => 'four', 'five' => 'six']));
+        $page->shouldReceive('supplements')->andReturn(collect(['seven' => 'eight']));
         $page->shouldReceive('value')->with('one')->andReturn('two');
         $page->shouldReceive('value')->with('three')->andReturn('four');
         $page->shouldReceive('value')->with('five')->andReturn('six');
+        $page->shouldReceive('getSupplement')->with('one')->andReturnNull();
+        $page->shouldReceive('getSupplement')->with('three')->andReturnNull();
+        $page->shouldReceive('getSupplement')->with('five')->andReturnNull();
+        $page->shouldReceive('getSupplement')->with('seven')->andReturn('eight');
 
         $augmented = new AugmentedPage($page);
 
@@ -135,6 +148,7 @@ class AugmentedPageTest extends AugmentedTestCase
             'one' => ['type' => Value::class, 'value' => 'two'],
             'three' => ['type' => Value::class, 'value' => 'four'],
             'five' => ['type' => 'string', 'value' => 'six'],
+            'seven' => ['type' => 'string', 'value' => 'eight'],
             'id' => ['type' => 'string', 'value' => 'page-id'],
             'entry_id' => ['type' => 'string', 'value' => null],
         ];
@@ -184,10 +198,15 @@ class AugmentedPageTest extends AugmentedTestCase
         $page->shouldReceive('entry')->andReturn($entry);
         $page->shouldReceive('blueprint')->andReturn($pageBlueprint);
         $page->shouldReceive('data')->andReturn(collect(['one' => 'dos', 'three' => 'quatro', 'five' => 'seis']));
+        $page->shouldReceive('supplements')->andReturn(collect(['seven' => 'ocho']));
         $page->shouldReceive('title')->andReturn('The Page Title');
         $page->shouldReceive('value')->with('one')->andReturn('dos');
         $page->shouldReceive('value')->with('three')->andReturn('quatro');
         $page->shouldReceive('value')->with('five')->andReturn('seis');
+        $page->shouldReceive('getSupplement')->with('one')->andReturnNull();
+        $page->shouldReceive('getSupplement')->with('three')->andReturnNull();
+        $page->shouldReceive('getSupplement')->with('five')->andReturnNull();
+        $page->shouldReceive('getSupplement')->with('seven')->andReturn('ocho');
 
         $augmented = new AugmentedPage($page);
 
@@ -199,6 +218,7 @@ class AugmentedPageTest extends AugmentedTestCase
             'one' => ['type' => Value::class, 'value' => 'dos', 'fieldtype' => 'textarea'], // assert fieldtype to ensure the field from the page blueprint wins
             'three' => ['type' => Value::class, 'value' => 'quatro'],
             'five' => ['type' => 'string', 'value' => 'seis'],
+            'seven' => ['type' => 'string', 'value' => 'ocho'],
             'id' => ['type' => 'string', 'value' => 'page-id'],
             'entry_id' => ['type' => 'string', 'value' => '123'],
         ];

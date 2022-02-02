@@ -87,7 +87,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'slug'          => ['type' => Value::class, 'value' => 'entry-slug'],
             'uri'           => ['type' => 'string', 'value' => '/test/entry-slug'],
             'url'           => ['type' => 'string', 'value' => '/test/entry-slug'],
-            'edit_url'      => ['type' => 'string', 'value' => 'http://localhost/cp/collections/test/entries/entry-id/entry-slug'],
+            'edit_url'      => ['type' => 'string', 'value' => 'http://localhost/cp/collections/test/entries/entry-id'],
             'permalink'     => ['type' => 'string', 'value' => 'http://localhost/test/entry-slug'],
             'amp_url'       => ['type' => 'string', 'value' => 'http://localhost/amp/test/entry-slug'],
             'api_url'       => ['type' => 'string', 'value' => 'http://localhost/api/collections/test/entries/entry-id'],
