@@ -48,8 +48,17 @@ EOT;
     /** @test */
     public function it_resolves_the_correct_disk_from_similar_names()
     {
-        Storage::fake('disk_long', ['url' => 'test_long_url_same_beginning']);
-        Storage::fake('disk_short', ['url' => 'test']);
+        config(['filesystems.disks.disk_long' => $diskLongConfig = [
+            'url' => 'test_long_url_same_beginning',
+        ]]);
+
+        config(['filesystems.disks.disk_short' => $diskShortConfig = [
+            'url' => 'test',
+        ]]);
+
+        Storage::fake('disk_long', $diskLongConfig);
+        Storage::fake('disk_short', $diskShortConfig);
+
         $assetRepository = new AssetRepository;
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
