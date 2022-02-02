@@ -1796,10 +1796,16 @@ class NodeProcessor
             return StringUtilities::sanitizePhp($node->content);
         }
 
-        $phpBuffer = $node->content;
+        $phpBuffer = '';
 
-        if (! Str::contains($node->content, $this->validPhpOpenTags)) {
-            $phpBuffer = '<?php '.$node->content.' ?>';
+        if ($node->isEchoNode == false) {
+            $phpBuffer = $node->content;
+
+            if (! Str::contains($node->content, $this->validPhpOpenTags)) {
+                $phpBuffer = '<?php '.$node->content.' ?>';
+            }
+        } else {
+            $phpBuffer = '<?php echo '.$node->content.'; ?>';
         }
 
         $phpRuntimeAssignments = [];
@@ -1811,18 +1817,20 @@ class NodeProcessor
             eval('?>'.$phpBuffer.'<?php ');
             $___antlersPhpExecutionResult = ob_get_clean();
 
-            $___antlersVarAfter = get_defined_vars();
+            if (! $node->isEchoNode) {
+                $___antlersVarAfter = get_defined_vars();
 
-            foreach ($___antlersVarAfter as $varKey => $varValue) {
-                if (! array_key_exists($varKey, $___antlersVarBefore)) {
-                    $phpRuntimeAssignments[$varKey] = $varValue;
+                foreach ($___antlersVarAfter as $varKey => $varValue) {
+                    if (! array_key_exists($varKey, $___antlersVarBefore)) {
+                        $phpRuntimeAssignments[$varKey] = $varValue;
+                    }
                 }
             }
         } catch (ParseError $e) {
             throw new SyntaxError("{$e->getMessage()} on line {$e->getLine()} of:\n\n{$phpBuffer}");
         }
 
-        if (! empty($phpRuntimeAssignments)) {
+        if (!$node->isEchoNode && ! empty($phpRuntimeAssignments)) {
             $this->processAssignments($phpRuntimeAssignments);
         }
 

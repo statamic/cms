@@ -201,10 +201,18 @@ class DocumentParser
                     $peek = $this->peek($this->currentIndex + 2);
                 }
 
+                if ($peek == self::Punctuation_Question) {
+                    $this->isDoubleBrace = true;
+                    $this->currentIndex += 3;
+                    $this->scanToEndOfPhpRegion(self::Punctuation_Question);
+                    $this->isDoubleBrace = false;
+                    break;
+                }
+
                 if ($peek == self::Punctuation_Dollar) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
-                    $this->scanToEndOfPhpRegion();
+                    $this->scanToEndOfPhpRegion(self::Punctuation_Dollar);
                     $this->isDoubleBrace = false;
                     break;
                 }
@@ -529,6 +537,12 @@ class DocumentParser
                             }
 
                             $thisOffset = $this->currentChunkOffset;
+
+                            if ($this->lastAntlersNode instanceof PhpExecutionNode) {
+                                $literalStartIndex -= 1;
+                                $literalLength += 1;
+                            }
+
                             $content = StringUtilities::substr($this->content, $literalStartIndex, $literalLength);
 
                             $node = new LiteralNode();
@@ -646,20 +660,20 @@ class DocumentParser
         $this->visitors = [];
     }
 
-    private function scanToEndOfPhpRegion()
+    private function scanToEndOfPhpRegion($checkChar)
     {
         for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
             $this->checkCurrentOffsets();
 
-            if ($this->cur == self::Punctuation_Dollar && $this->next != null && $this->next == self::RightBrace) {
+            if ($this->cur == $checkChar && $this->next != null && $this->next == self::RightBrace) {
                 $peek = $this->peek($this->currentIndex + 2);
 
                 if ($peek == self::RightBrace) {
-                    $node = $this->makeAntlersPhpNode($this->currentIndex);
+                    $node = $this->makeAntlersPhpNode($this->currentIndex, $checkChar == self::Punctuation_Dollar);
 
                     $this->currentContent = [];
 
-                    // Advance over the  $}}.
+                    // Advance over the  $}} or ?}}.
                     $this->currentIndex += 3;
 
                     // Indicate our next "start".
@@ -842,12 +856,19 @@ class DocumentParser
         }
     }
 
-    private function makeAntlersPhpNode($index)
+    private function makeAntlersPhpNode($index, $isEcho)
     {
         $node = new PhpExecutionNode();
 
-        $node->rawStart = '{{$';
-        $node->rawEnd = '$}}';
+        $node->isEchoNode = $isEcho;
+
+        if ($isEcho) {
+            $node->rawStart = '{{$';
+            $node->rawEnd = '$}}';
+        } else {
+            $node->rawStart = '{{?';
+            $node->rawEnd = '?}}';
+        }
 
         $node->content = implode('', $this->currentContent); // Add back the final PHP closing tag.
         $node->startPosition = $this->positionFromOffset(

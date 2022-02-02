@@ -6,4 +6,5 @@ use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 
 class PhpExecutionNode extends AbstractNode
 {
+    public $isEchoNode = false;
 }

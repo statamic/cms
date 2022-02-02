@@ -194,10 +194,10 @@ EOT;
 {{ var_1 = 'blog'; var_2 = 'news'; }}
 <p>{{ title }}</p>
 
-{{$
+{{?
 $articles = \Statamic\Facades\Entry::query()->where('collection', $var_1)->limit(3)->get();
 $news = \Statamic\Facades\Entry::query()->where('collection', $var_2)->limit(5)->get();
-$}}
+?}}
 
 
 {{ articles }}
@@ -324,10 +324,10 @@ EOT;
 {{ var_1 = 'blog'; var_2 = 'news'; }}
 <p>{{ title }}</p>
 
-{{$<?php
+{{?<?php
 $articles = \Statamic\Facades\Entry::query()->where('collection', $var_1)->limit(3)->get();
 $news = \Statamic\Facades\Entry::query()->where('collection', $var_2)->limit(5)->get();
-?>$}}
+?>?}}
 
 
 {{ articles }}
@@ -446,5 +446,24 @@ EOT;
         $expected = StringUtilities::normalizeLineEndings($expected);
 
         $this->assertSame($expected, $results);
+    }
+
+    public function test_antlers_php_node_does_not_remove_literal()
+    {
+        $template = <<<'EOT'
+{{? $var_1 = 'blog'; $var_2 = 'news'; ?}}ABC{{ var_2 }}
+EOT;
+
+        $this->assertSame('ABCnews', $this->renderString($template));
+    }
+
+    public function test_antlers_php_echo_node()
+    {
+        $template = <<<'EOT'
+{{? $var = 'hi!'; ?}}
+<p>Literal Content. {{$ $var $}}<END></p>
+EOT;
+
+        $this->assertSame('<p>Literal Content. hi!<END></p>', trim($this->renderString($template)));
     }
 }
