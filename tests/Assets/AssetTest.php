@@ -415,7 +415,7 @@ class AssetTest extends TestCase
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
-        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
+        $realFilePath = Storage::disk('test')->path('foo/image.jpg');
         touch($realFilePath, $timestamp = Carbon::parse('2021-02-22 09:41:42')->timestamp);
 
         $container = Facades\AssetContainer::make('test')->disk('test');
