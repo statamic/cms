@@ -16,9 +16,7 @@ class AssetQueryBuilderTest extends TestCase
     {
         parent::setUp();
 
-        config(['filesystems.disks.test.url' => '/assets']);
-
-        Storage::fake('test');
+        Storage::fake('test', ['url' => '/assets']);
 
         Storage::disk('test')->put('a.jpg', '');
         Storage::disk('test')->put('b.txt', '');
