@@ -173,6 +173,6 @@ class Attributes
 
     private function prefixPath($path)
     {
-        return storage_path('statamic/attributes-cache').'/'.$path;
+        return Storage::disk('attributes-cache')->path($path);
     }
 }
