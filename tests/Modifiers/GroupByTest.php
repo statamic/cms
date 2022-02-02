@@ -207,7 +207,7 @@ class GroupByTest extends TestCase
     /** @test */
     public function it_groups_by_date_with_custom_group_format()
     {
-        Carbon::setTestNow('September 15');
+        Carbon::setTestNow(Carbon::parse('2022-09-01'));
 
         $items = [
             ['when' => now()->setHour(14), 'title' => '2pm'],
