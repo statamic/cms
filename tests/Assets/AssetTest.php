@@ -298,7 +298,7 @@ class AssetTest extends TestCase
         Carbon::setTestNow('2017-01-02 14:35:00');
         Storage::disk('test')->put('test.txt', '');
         touch(
-            Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt',
+            Storage::disk('test')->path('test.txt'),
             Carbon::now()->timestamp
         );
 
@@ -363,7 +363,7 @@ class AssetTest extends TestCase
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
-        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
+        $realFilePath = Storage::disk('test')->path('foo/image.jpg');
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
 
         $container = Facades\AssetContainer::make('test')->disk('test');
@@ -758,7 +758,7 @@ class AssetTest extends TestCase
     {
         $container = $this->container;
         $size = filesize($fixture = __DIR__.'/__fixtures__/container/a.txt');
-        copy($fixture, Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt');
+        copy($fixture, Storage::disk('test')->path('test.txt'));
 
         $asset = (new Asset)
             ->container($this->container)
