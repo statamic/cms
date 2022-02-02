@@ -75,44 +75,33 @@ class AssetContainerContents
      */
     private function getNormalizedFlysystemMetadata($path)
     {
-        // If Flysystem 1.x, use old method of getting meta data.
-        if (class_exists('\League\Flysystem\Util')) {
-            try {
-                // If the file doesn't exist, this will either throw an exception or return
-                // false depending on the adapter and whether or not asserts are enabled.
-                $meta = $this->filesystem()->getMetadata($path);
+        $isFlysystemV1 = method_exists($this->filesystem(), 'getTimestamp');
 
-                return $meta ? $meta + \League\Flysystem\Util::pathinfo($path) : false;
-            } catch (\Exception $exception) {
-                return false;
-            }
-        }
+        $lastModifiedMethod = $isFlysystemV1 ? 'getTimestamp' : 'lastModified';
+        $fileSizeMethod = $isFlysystemV1 ? 'getSize' : 'fileSize';
 
-        if (! $this->filesystem()->has($path)) {
+        try {
+            $timestamp = $this->filesystem()->{$lastModifiedMethod}($path);
+        } catch (\Exception $exception) {
             return false;
         }
 
-        $type = $this->filesystem()->directoryExists($path)
-            ? 'dir'
-            : 'file';
+        try {
+            $size = $this->filesystem()->{$fileSizeMethod}($path);
+        } catch (\Exception $exception) {
+            $size = false;
+        }
 
-        $pathinfo = pathinfo($path);
+        $type = $size === false ? 'dir' : 'file';
 
-        $normalized = [
-            'type' => $type,
-            'path' => $path,
-            'timestamp' => $this->filesystem()->lastModified($path),
-            'dirname' => $pathinfo['dirname'] === '.' ? '' : $pathinfo['dirname'],
-            'basename' => $pathinfo['basename'],
-            'filename' => $pathinfo['filename'],
-        ];
+        $normalized = array_merge(compact('type', 'path', 'timestamp'), pathinfo($path));
 
-        if (isset($pathinfo['extension'])) {
-            $normalized['extension'] = $pathinfo['extension'];
+        if (isset($normalized['dirname']) && $normalized['dirname'] === '.') {
+            $normalized['dirname'] = '';
         }
 
         if ($type === 'file') {
-            $normalized['size'] = $this->filesystem()->fileSize($path);
+            $normalized['size'] = $size;
         }
 
         return $normalized;
