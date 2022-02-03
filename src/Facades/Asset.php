@@ -10,8 +10,8 @@ use Statamic\Contracts\Assets\QueryBuilder;
 
 /**
  * @method static AssetCollection all()
- * @method static AssetContract|null whereContainer(string $container)
- * @method static AssetContract|null whereFolder(string $folder, string $container)
+ * @method static AssetCollection whereContainer(string $container)
+ * @method static AssetCollection whereFolder(string $folder, string $container)
  * @method static AssetContract|null find(string $asset)
  * @method static AssetContract|null findByUrl(string $url)
  * @method static AssetContract|null findById(string $id)
