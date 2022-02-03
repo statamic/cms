@@ -18,7 +18,7 @@ use Statamic\Contracts\Assets\QueryBuilder;
  * @method static AssetContract|null findByPath(string $path)
  * @method static AssetContract make()
  * @method static QueryBuilder query()
- * @method static AssetContract save($asset)
+ * @method static void save($asset)
  *
  * @see \Statamic\Contracts\Assets\AssetRepository
  */
