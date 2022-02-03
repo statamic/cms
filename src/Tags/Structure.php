@@ -105,7 +105,7 @@ class Structure extends Tags
     protected function queryStatus($query)
     {
         if (! $this->params->get('show_unpublished')) {
-            $query->where('status', 'published');
+            $query->whereIn('status', ['published', null]);
         }
 
         return $query;
