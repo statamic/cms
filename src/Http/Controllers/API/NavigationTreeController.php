@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\API;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Nav;
 use Statamic\Http\Resources\API\TreeResource;
-use Statamic\Query\ItemQueryBuilder;
 
 class NavigationTreeController extends ApiController
 {
