@@ -407,7 +407,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function status()
     {
-        return $this->entry()->status();
+        return optional($this->entry())->status();
     }
 
     public function blueprint()
