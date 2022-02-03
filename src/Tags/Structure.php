@@ -113,7 +113,7 @@ class Structure extends Tags
 
     protected function isQueryingStatus()
     {
-        return 
+        return
             $this->isQueryingCondition('status') ||
             $this->isQueryingCondition('published') ||
             $this->isQueryingCondition('private');
