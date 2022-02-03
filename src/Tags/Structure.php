@@ -115,8 +115,7 @@ class Structure extends Tags
     {
         return
             $this->isQueryingCondition('status') ||
-            $this->isQueryingCondition('published') ||
-            $this->isQueryingCondition('private');
+            $this->isQueryingCondition('published');
     }
 
     public function toArray($tree, $parent = null, $depth = 1)
