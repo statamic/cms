@@ -19,11 +19,7 @@ class NavigationTreeController extends ApiController
 
         $site = $this->queryParam('site');
 
-        $query = new ItemQueryBuilder();
-        $this->filter($query);
-
         return app(TreeResource::class)::make($this->getNavTree($handle, $site))
-            ->query($query)
             ->fields($this->queryParam('fields'))
             ->maxDepth($this->queryParam('max_depth'))
             ->site($site);

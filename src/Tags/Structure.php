@@ -54,13 +54,9 @@ class Structure extends Tags
 
         $this->ensureStructureExists($handle);
 
-        $query = new ItemQueryBuilder();
-        $this->queryStatus($query);
-        $this->queryConditions($query);
-
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
-            'query' => $query,
+            'query' => $this->query($handle),
             'include_home' => $this->params->get('include_home'),
             'site' => $this->params->get('site', Site::current()->handle()),
             'from' => $this->params->get('from'),
@@ -82,17 +78,45 @@ class Structure extends Tags
         throw_unless(Nav::findByHandle($handle), new NavigationNotFoundException($handle));
     }
 
+    protected function query($handle)
+    {
+        $query = new ItemQueryBuilder();
+
+        return Str::startsWith($handle, 'collection::')
+            ? $this->queryForCollection($query)
+            : $this->queryForNav($query);
+    }
+
+    protected function queryForCollection($query)
+    {
+        if (! $this->isQueryingStatus()) {
+            $this->queryStatus($query);
+        }
+        $this->queryConditions($query);
+
+        return $query;
+    }
+
+    protected function queryForNav($query)
+    {
+        return $this->queryStatus($query);
+    }
+
     protected function queryStatus($query)
     {
-        if ($this->isQueryingCondition('status') || $this->isQueryingCondition('published')) {
-            return;
-        }
-
         if (! $this->params->get('show_unpublished')) {
             $query->where('status', 'published');
         }
 
         return $query;
+    }
+
+    protected function isQueryingStatus()
+    {
+        return 
+            $this->isQueryingCondition('status') || 
+            $this->isQueryingCondition('published') ||
+            $this->isQueryingCondition('private');
     }
 
     public function toArray($tree, $parent = null, $depth = 1)
