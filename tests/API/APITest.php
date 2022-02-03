@@ -108,10 +108,6 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
 
         $this->assertEndpointDataCount('/api/navs/footer/tree', 1);
-        $this->assertEndpointDataCount('/api/navs/footer/tree?filter[status:is]=published', 1);
-        $this->assertEndpointDataCount('/api/navs/footer/tree?filter[status:is]=draft', 2);
-        $this->assertEndpointDataCount('/api/navs/footer/tree?filter[published:is]=true', 1);
-        $this->assertEndpointDataCount('/api/navs/footer/tree?filter[published:is]=false', 2);
     }
 
     /** @test */
