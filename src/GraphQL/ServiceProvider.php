@@ -25,7 +25,7 @@ class ServiceProvider extends LaravelProvider
                 return;
             }
 
-            if (! config('statamic.graphql.enabled')) {
+            if ($this->isLegacyRebingGraphql() && ! config('statamic.graphql.enabled')) {
                 config(['graphql.routes' => false]);
             }
 
