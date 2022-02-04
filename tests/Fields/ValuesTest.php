@@ -16,7 +16,8 @@ class ValuesTest extends TestCase
     {
         parent::setUp();
 
-        $this->fieldtype = new class extends Fieldtype {
+        $this->fieldtype = new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)
