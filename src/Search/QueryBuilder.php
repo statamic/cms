@@ -55,7 +55,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
         })->filter()->values();
     }
 
-    protected function collect($items = [])
+    public function collect($items = [])
     {
         return new DataCollection($items);
     }

@@ -37,7 +37,7 @@ class UserQueryBuilder extends Builder
         return $this->{$method}($items, $where)->keys();
     }
 
-    protected function collect($items = [])
+    public function collect($items = [])
     {
         return new UserCollection($items);
     }

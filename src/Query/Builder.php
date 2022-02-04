@@ -295,7 +295,7 @@ abstract class Builder implements Contract
         ));
     }
 
-    protected function collect($items = [])
+    public function collect($items = [])
     {
         return collect($items);
     }

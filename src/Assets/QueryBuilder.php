@@ -104,7 +104,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
         return parent::where($column, $operator, $value, $boolean);
     }
 
-    protected function collect($items = [])
+    public function collect($items = [])
     {
         return AssetCollection::make($items);
     }

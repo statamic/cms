@@ -44,7 +44,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return $this->whereIn($column, $values, 'or');
     }
 
-    protected function collect($items = [])
+    public function collect($items = [])
     {
         return EntryCollection::make($items);
     }
