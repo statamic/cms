@@ -5,6 +5,7 @@ namespace Tests\Tags\Collection;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
 use Statamic\Facades;
 use Statamic\Facades\Site;
@@ -125,7 +126,7 @@ class EntriesTest extends TestCase
     /** @test */
     public function it_gets_localized_site_entries_in_a_collection()
     {
-        $this->withoutEvents();
+        Event::fake();
 
         $this->collection->sites(['en', 'fr'])->save();
 
