@@ -65,13 +65,6 @@ class Values implements ArrayAccess
         throw new Exception('Cannot set values by property access.');
     }
 
-    public function __call($method, $args)
-    {
-        $this->instance = $this->instance->$method(...$args);
-
-        return $this;
-    }
-
     private function getProxiedCollection()
     {
         if (

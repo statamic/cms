@@ -171,18 +171,4 @@ class ValuesTest extends TestCase
         $this->assertEquals('bravo', $values->alfa);
         $this->assertEquals('delta', $values->charlie);
     }
-
-    /** @test */
-    public function delegates_methods()
-    {
-        $proxied = Mockery::mock(Collection::class);
-        $proxied->shouldReceive('hello')->once()->andReturn('world');
-
-        $values = new Values($proxied);
-
-        $return = $values->hello();
-
-        $this->assertSame($values, $return);
-        $this->assertEquals('world', $values->getProxiedInstance());
-    }
 }
