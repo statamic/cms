@@ -2,16 +2,26 @@
 
 namespace Tests\Fields;
 
+use BadMethodCallException;
 use Exception;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
 use Mockery;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\HasAugmentedData;
+use Statamic\Entries\EntryCollection;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Fields\ValuesCollection;
+use Statamic\Fields\ValuesQueryBuilder;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ValuesTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -45,17 +55,6 @@ class ValuesTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $collection = $values->getProxiedInstance());
         $this->assertEquals(['foo' => 'bar'], $collection->all());
-    }
-
-    /**
-     * @test
-     * @dataProvider queryBuilderProvider
-     **/
-    public function query_builder_is_not_converted($builder)
-    {
-        $values = new Values($builder);
-
-        $this->assertSame($builder, $values->getProxiedInstance());
     }
 
     public function queryBuilderProvider()
@@ -156,19 +155,171 @@ class ValuesTest extends TestCase
     /**
      * @test
      * @dataProvider queryBuilderProvider
-     */
-    public function completes_a_query($builder)
+     **/
+    public function it_gets_a_query($builder)
     {
-        $builder->shouldReceive('get')->once()->andReturn(collect([
-            'alfa' => 'bravo',
-            'charlie' => 'delta',
+        $values = new Values(['the_query_field' => $builder]);
+
+        $this->assertInstanceOf(ValuesQueryBuilder::class, $values->the_query_field());
+    }
+
+    /** @test */
+    public function it_throws_exception_if_trying_to_get_query_for_field_that_isnt_a_query()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Statamic\Fields\Values::not_a_query does not exist.');
+
+        $values = new Values(['not_a_query' => 'test']);
+
+        $this->assertInstanceOf(ValuesCollection::class, $values->not_a_query());
+    }
+
+    /** @test */
+    public function it_throws_exception_if_trying_to_get_query_for_missing_field()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Statamic\Fields\Values::missing does not exist.');
+
+        $values = new Values(['not_a_query' => 'test']);
+
+        $this->assertInstanceOf(ValuesCollection::class, $values->missing());
+    }
+
+    /**
+     * @test
+     * @dataProvider queryBuilderProvider
+     */
+    public function completes_a_query_that_ends_up_with_results($builder)
+    {
+        $builder->shouldReceive('get')->once()->andReturn(EntryCollection::make([
+            EntryFactory::collection('test')->slug('a')->data(['foo' => 'alfa', 'bar' => 'bravo'])->create(),
+            EntryFactory::collection('test')->slug('b')->data(['foo' => 'charlie', 'bar' => 'delta'])->create(),
         ]));
 
-        $values = new Values($builder);
+        $fieldtype = new FakeFieldtypeThatAugmentsToMockedBuilder($builder);
 
-        $this->assertEquals('bravo', $values['alfa']);
-        $this->assertEquals('delta', $values['charlie']);
-        $this->assertEquals('bravo', $values->alfa);
-        $this->assertEquals('delta', $values->charlie);
+        $values = new Values([
+            'related_entries' => new Value('irrelevant, mocking the augment method', null, $fieldtype),
+        ]);
+
+        $this->assertInstanceOf(ValuesCollection::class, $values->related_entries);
+        $this->assertInstanceOf(Collection::class, $values->related_entries->getProxiedInstance());
+        $this->assertEveryItemIsInstanceOf(Values::class, $values->related_entries->getProxiedInstance());
+
+        $this->assertInstanceOf(ValuesCollection::class, $values['related_entries']);
+        $this->assertInstanceOf(Collection::class, $values['related_entries']->getProxiedInstance());
+        $this->assertEveryItemIsInstanceOf(Values::class, $values['related_entries']->getProxiedInstance());
+
+        $this->assertInstanceOf(ValuesQueryBuilder::class, $values->related_entries());
+        $this->assertSame($builder, $values->related_entries()->getProxiedInstance());
+
+        $this->assertFalse($values->related_entries->isEmpty());
+        $this->assertCount(2, $values->related_entries);
+
+        $echos = [];
+        foreach ($values->related_entries as $entry) {
+            $this->assertInstanceOf(Values::class, $entry);
+            $echos[] = $entry->slug;
+            $echos[] = $entry->foo;
+            $echos[] = $entry->bar;
+        }
+        $this->assertSame(['a', 'alfa', 'bravo', 'b', 'charlie', 'delta'], $echos);
+    }
+
+    /**
+     * @test
+     * @dataProvider queryBuilderProvider
+     */
+    public function completes_a_query_that_ends_up_with_no_results($builder)
+    {
+        $builder->shouldReceive('get')->once()->andReturn(EntryCollection::make());
+
+        $fieldtype = new FakeFieldtypeThatAugmentsToMockedBuilder($builder);
+
+        $values = new Values([
+            'related_entries' => new Value('irrelevant, mocking the augment method', null, $fieldtype),
+        ]);
+
+        $this->assertInstanceOf(ValuesCollection::class, $values->related_entries);
+        $this->assertInstanceOf(Collection::class, $values->related_entries->getProxiedInstance());
+        $this->assertEveryItemIsInstanceOf(Values::class, $values->related_entries->getProxiedInstance());
+
+        $this->assertInstanceOf(ValuesCollection::class, $values['related_entries']);
+        $this->assertInstanceOf(Collection::class, $values['related_entries']->getProxiedInstance());
+        $this->assertEveryItemIsInstanceOf(Values::class, $values['related_entries']->getProxiedInstance());
+
+        $this->assertInstanceOf(ValuesQueryBuilder::class, $values->related_entries());
+        $this->assertSame($builder, $values->related_entries()->getProxiedInstance());
+
+        $this->assertTrue($values->related_entries->isEmpty());
+        $this->assertCount(0, $values->related_entries);
+    }
+
+    /**
+     * @test
+     * @dataProvider queryBuilderProvider
+     **/
+    public function it_calls_query_builder_methods($builder)
+    {
+        $builder->shouldReceive('get')->once()->andReturn(EntryCollection::make([
+            EntryFactory::collection('test')->slug('a')->data(['foo' => 'alfa', 'bar' => 'bravo'])->create(),
+            EntryFactory::collection('test')->slug('b')->data(['foo' => 'charlie', 'bar' => 'delta'])->create(),
+        ]));
+
+        $builder->shouldReceive('foo')->with(1, 2)->andReturnSelf();
+        $builder->shouldReceive('bar')->with(3, 4)->andReturnSelf();
+
+        $fieldtype = new FakeFieldtypeThatAugmentsToMockedBuilder($builder);
+
+        $values = new Values([
+            'related_entries' => new Value(['id1', 'id2'], null, $fieldtype),
+        ]);
+
+        $valuesQueryBuilder = $values->related_entries()->foo(1, 2)->bar(3, 4);
+
+        $this->assertInstanceOf(ValuesQueryBuilder::class, $valuesQueryBuilder);
+        $this->assertInstanceOf(ValuesCollection::class, $valuesCollection = $valuesQueryBuilder->get());
+        $this->assertInstanceOf(Collection::class, $valuesCollection->getProxiedInstance());
+        $this->assertEveryItemIsInstanceOf(Values::class, $valuesCollection->getProxiedInstance());
+
+        $echos = [];
+        foreach ($valuesCollection as $entry) {
+            $this->assertInstanceOf(Values::class, $entry);
+            $echos[] = $entry->slug;
+            $echos[] = $entry->foo;
+            $echos[] = $entry->bar;
+        }
+        $this->assertSame(['a', 'alfa', 'bravo', 'b', 'charlie', 'delta'], $echos);
+    }
+}
+
+class FakeFieldtypeThatAugmentsToMockedBuilder extends Fieldtype
+{
+    protected static $handle = 'test';
+
+    public function __construct($builder)
+    {
+        $this->builder = $builder;
+    }
+
+    public function augment($ids)
+    {
+        return $this->builder;
+    }
+}
+
+class TestAugmentableObject implements Augmentable
+{
+    use HasAugmentedData;
+    protected $data = [];
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
+
+    public function augmentedArrayData()
+    {
+        return $this->data;
     }
 }
