@@ -47,7 +47,11 @@ class ServiceProvider extends LaravelProvider
 
     private function addMiddleware()
     {
-        config(['graphql.middleware' => [
+        $configKey = $this->isLegacyRebingGraphql()
+            ? 'graphql.middleware'
+            : 'graphql.route.middleware';
+
+        config([$configKey => [
             SwapExceptionHandler::class,
             RequireStatamicPro::class,
         ]]);
@@ -61,5 +65,10 @@ class ServiceProvider extends LaravelProvider
     private function setDefaultSchema()
     {
         config(['graphql.schemas.default' => DefaultSchema::class]);
+    }
+
+    protected function isLegacyRebingGraphql()
+    {
+        return class_exists('\Rebing\GraphQL\Support\ResolveInfoFieldsAndArguments');
     }
 }
