@@ -35,6 +35,7 @@ class FlysystemAdapter extends AbstractAdapter
                 throw new \LogicException('Cannot use absolute paths on non-local adapters.');
             }
 
+            // TODO: Figure out how to `getPathPrefix()` here
             if (! Str::startsWith($path, $root = Path::tidy($adapter->getPathPrefix()))) {
                 throw new \LogicException("Cannot reference path [{$path}] outside the root [{$root}]");
             }

@@ -103,6 +103,7 @@ class Glide extends Tags
             if ($this->isResizable($item)) {
                 $path = $this->generateImage($item);
 
+                // TODO: Write test coverage and refactor `getPathPrefix()` here
                 [$width, $height] = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
 
                 $data['width'] = $width;
