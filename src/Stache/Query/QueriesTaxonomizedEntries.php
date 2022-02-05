@@ -28,6 +28,16 @@ trait QueriesTaxonomizedEntries
         return $this;
     }
 
+    public function whereTaxonomyNotIn($term)
+    {
+        $this->taxonomyWheres[] = [
+            'type' => 'NotIn',
+            'values' => $term,
+        ];
+
+        return $this;
+    }
+
     protected function addTaxonomyWheres()
     {
         if (empty($this->taxonomyWheres)) {
@@ -56,12 +66,12 @@ trait QueriesTaxonomizedEntries
             ->pluck('entry');
     }
 
-    private function getKeysForTaxonomyWhereIn($where)
+    // Get the terms grouped by taxonomy.
+    // [tags::foo, categories::baz, tags::bar]
+    // becomes [tags => [foo, bar], categories => [baz]]
+    private function getTaxonomies($where)
     {
-        // Get the terms grouped by taxonomy.
-        // [tags::foo, categories::baz, tags::bar]
-        // becomes [tags => [foo, bar], categories => [baz]]
-        $taxonomies = collect($where['values'])
+        return collect($where['values'])
             ->map(function ($value) {
                 [$taxonomy, $term] = explode('::', $value);
 
@@ -71,11 +81,27 @@ trait QueriesTaxonomizedEntries
             ->map(function ($group) {
                 return collect($group)->map->term;
             });
+    }
+
+    private function getKeysForTaxonomyWhereIn($where)
+    {
+        $taxonomies = $this->getTaxonomies($where);
 
         return $taxonomies->flatMap(function ($terms, $taxonomy) {
             return Stache::store('terms')->store($taxonomy)
                 ->index('associations')
                 ->items()->whereIn('slug', $terms->all())
+                ->pluck('entry');
+        });
+    }
+    private function getKeysForTaxonomyWhereNotIn($where)
+    {
+        $taxonomies = $this->getTaxonomies($where);
+
+        return $taxonomies->flatMap(function ($terms, $taxonomy) {
+            return Stache::store('terms')->store($taxonomy)
+                ->index('associations')
+                ->items()->whereNotIn('slug', $terms->all())
                 ->pluck('entry');
         });
     }
