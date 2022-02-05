@@ -15,6 +15,15 @@ class TransTagTest extends TestCase
         $this->copyLangFile('fr/messages.php');
     }
 
+    public function tearDown(): void
+    {
+        if (app('files')->exists($langFolder = resource_path('lang'))) {
+            app('files')->deleteDirectory($langFolder);
+        }
+
+        parent::tearDown();
+    }
+
     private function parse($tag)
     {
         return (string) Parse::template($tag, []);
