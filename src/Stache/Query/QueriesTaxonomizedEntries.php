@@ -94,6 +94,7 @@ trait QueriesTaxonomizedEntries
                 ->pluck('entry');
         });
     }
+
     private function getKeysForTaxonomyWhereNotIn($where)
     {
         $taxonomies = $this->getTaxonomies($where);
