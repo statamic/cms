@@ -38,7 +38,7 @@ class Searchables
                 ->merge(User::all());
 
             foreach (self::$registered as $key => $searchable) {
-                $allSearchables->merge($this->getCustomSearchableData(str_after($key, ':') ?? '*', $searchable, $config));
+                $allSearchables = $allSearchables->merge($this->getCustomSearchableData(str_after($key, ':') ?? '*', $searchable, $config));
             }
 
             return $allSearchables;
