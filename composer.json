@@ -15,11 +15,11 @@
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9",
-        "laravel/framework": "^6.20.14 || ^7.30.4 || ^8.24.0",
+        "laravel/framework": "^6.20.14 || ^7.30.4 || ^8.24.0|^9.0",
         "laravel/helpers": "^1.1",
-        "league/commonmark": "^1.5",
+        "league/commonmark": "^1.5|^2.2",
         "league/csv": "^9.0",
-        "league/glide": "^1.1",
+        "league/glide": "^1.1|^2.2",
         "michelf/php-smartypants": "^1.8",
         "pixelfear/composer-dist-plugin": "^0.1.4",
         "rebing/graphql-laravel": "^6.5",
@@ -34,10 +34,10 @@
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
-        "fakerphp/faker": "~1.10",
+        "fakerphp/faker": "~1.10|^1.9.1",
         "google/cloud-translate": "^1.6",
         "mockery/mockery": "^1.2.3",
-        "orchestra/testbench": "^4.0 || ^5.0 || ^6.0"
+        "orchestra/testbench": "^4.0 || ^5.0 || ^6.0|^7.0"
     },
     "config": {
         "optimize-autoloader": true,
