@@ -2256,6 +2256,34 @@ EOT;
             'my_query' => new Value($builder),
         ]));
     }
+
+    /** @test */
+    public function it_can_reach_into_query_builders()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->times(2)->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Bar'],
+        ]));
+
+        $this->assertEquals('<Bar><Foo>', $this->parse('<{{ my_query:1:title }}><{{ my_query:0:title }}>', [
+            'my_query' => $builder,
+        ]));
+    }
+
+    /** @test */
+    public function it_can_reach_into_query_builders_through_values()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->times(2)->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Bar'],
+        ]));
+
+        $this->assertEquals('<Bar><Foo>', $this->parse('<{{ my_query:1:title }}><{{ my_query:0:title }}>', [
+            'my_query' => new Value($builder),
+        ]));
+    }
 }
 
 class NonArrayableObject
