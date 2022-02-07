@@ -3,8 +3,7 @@
 namespace Tests\Filesystem;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Filesystem\FilesystemAdapter as IlluminateFilesystemAdapter;
-use League\Flysystem\Filesystem as Flysystem;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Filesystem\FlysystemAdapter;
 use Tests\TestCase;
 
@@ -31,16 +30,10 @@ class FlysystemAdapterTest extends TestCase
 
     protected function makeAdapter()
     {
-        // Determine which adapter to use for Flysystem 1.x or 3.x.
-        $localClass = class_exists($legacyAdapter = '\League\Flysystem\Adapter\Local')
-            ? $legacyAdapter
-            : '\League\Flysystem\Local\LocalFilesystemAdapter';
-
-        // Equivalent to `Storage::disk()`
-        $this->filesystem = new IlluminateFilesystemAdapter(
-            new Flysystem($adapter = new $localClass($this->tempDir)),
-            $adapter
-        );
+        $this->filesystem = Storage::build([
+            'driver' => 'local',
+            'root' => $this->tempDir,
+        ]);
 
         return new FlysystemAdapter($this->filesystem);
     }
