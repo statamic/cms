@@ -15,7 +15,7 @@ class FlysystemAdapterTest extends TestCase
     {
         parent::setUp();
 
-        if (version_compare(app()->version(), '8', '<')) {
+        if (version_compare(app()->version(), '8.48.0', '<')) {
             $this->markTestSkipped();
         }
 
