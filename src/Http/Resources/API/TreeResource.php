@@ -76,7 +76,7 @@ class TreeResource extends JsonResource
     {
         return (new TreeBuilder)->build([
             'structure' => $this->resource->structure(),
-            'query' => $this->query ?? (new ItemQueryBuilder)->where('status', 'published'),
+            'query' => $this->query ?? (new ItemQueryBuilder)->whereIn('status', ['published', null]),
             'include_home' => true,
             'site' => $this->site ?? Site::default()->handle(),
             'fields' => $this->fields,

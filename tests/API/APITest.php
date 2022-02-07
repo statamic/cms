@@ -100,6 +100,7 @@ class APITest extends TestCase
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
+            ['title' => 'Balki Bartokomous'],
         ])->save();
         $nav->save();
 
@@ -107,7 +108,7 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
         Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
 
-        $this->assertEndpointDataCount('/api/navs/footer/tree', 1);
+        $this->assertEndpointDataCount('/api/navs/footer/tree', 2);
     }
 
     /** @test */
