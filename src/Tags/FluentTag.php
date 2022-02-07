@@ -5,6 +5,7 @@ namespace Statamic\Tags;
 use ArrayIterator;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Fields\Values;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Parser;
 use Traversable;
@@ -126,7 +127,7 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
         $output = $tag->$method();
 
         if ($this->augmentation && $output instanceof Collection) {
-            $output = $output->toAugmentedArray();
+            $output = collect($output->toAugmentedCollection())->mapInto(Values::class);
         }
 
         if ($this->augmentation && $output instanceof Augmentable) {

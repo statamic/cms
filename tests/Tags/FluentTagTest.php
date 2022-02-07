@@ -7,7 +7,7 @@ use Mockery;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades;
 use Statamic\Facades\Entry;
-use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Support\Arr;
 use Statamic\Tags\FluentTag;
 use Statamic\Tags\Loader;
@@ -112,10 +112,10 @@ class FluentTagTest extends TestCase
         $slugs = [];
 
         foreach (FluentTag::make('test') as $entry) {
-            $this->assertIsArray($entry);
+            $this->assertInstanceOf(Values::class, $entry);
             $this->assertIsString($entry['id']);
-            $this->assertInstanceOf(Value::class, $entry['content']);
-            $slugs[] = (string) trim($entry['content']);
+            $this->assertIsString($entry['content']);
+            $slugs[] = trim($entry['content']);
         }
 
         $expected = ['<h1>one</h1>', '<h1>two</h1>', '<h1>three</h1>'];
