@@ -641,7 +641,6 @@ class Asset implements AssetContract, Augmentable
     {
         $ext = $file->getClientOriginalExtension();
         $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-        $basename = $filename.'.'.$ext;
 
         $directory = $this->folder();
         $directory = ($directory === '.') ? '/' : $directory;
