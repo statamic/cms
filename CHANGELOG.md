@@ -10,6 +10,9 @@
 ### What's fixed
 - CP forms only submit visible fields, in order to fix sometimes/required_if/etc validation rules. [#5101](https://github.com/statamic/cms/issues/5101) by @jesseleite
 
+### What's changed
+- PHP 7.2 and 7.3 are no longer supported.
+- Laravel 6 and 7 are no longer supported.
 
 
 ## 3.2.32 (2022-01-26)
