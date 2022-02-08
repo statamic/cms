@@ -2,7 +2,6 @@
 
 namespace Statamic\Imaging;
 
-use League\Flysystem\FilesystemInterface;
 use League\Glide\Responses\ResponseFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -33,7 +32,7 @@ class ResponseFactory implements ResponseFactoryInterface
      * @param  string  $path  The cached file path.
      * @return StreamedResponse The response object.
      */
-    public function create(FilesystemInterface $cache, $path)
+    public function create($cache, $path)
     {
         $stream = $cache->readStream($path);
 

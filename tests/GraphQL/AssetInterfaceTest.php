@@ -22,7 +22,8 @@ class AssetInterfaceTest extends TestCase
     {
         GraphQL::spy();
 
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
+
         AssetContainer::make('one')->disk('test')->save();
         AssetContainer::make('two')->disk('test')->save();
         $one = tap($this->partialMock(Blueprint::class), function ($m) {

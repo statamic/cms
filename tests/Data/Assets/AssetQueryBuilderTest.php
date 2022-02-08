@@ -16,7 +16,7 @@ class AssetQueryBuilderTest extends TestCase
     {
         parent::setUp();
 
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
 
         Storage::disk('test')->put('a.jpg', '');
         Storage::disk('test')->put('b.txt', '');

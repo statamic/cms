@@ -8,7 +8,7 @@ use Wilderborn\Partyline\Facade as Partyline;
 
 trait EnhancesCommands
 {
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         Partyline::bind($this);
 
