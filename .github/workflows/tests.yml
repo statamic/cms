@@ -20,6 +20,10 @@ jobs:
         include:
           - laravel: 8.*
             framework: ^8.24.0
+        exclude:
+          - laravel: 9.*
+            php: 7.4
+
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ubuntu-latest
 
