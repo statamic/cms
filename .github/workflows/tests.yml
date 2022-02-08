@@ -24,6 +24,10 @@ jobs:
             framework: ^7.30.4
           - laravel: 6.*
             framework: ^6.20.14
+          - os: windows-latest
+            php: 8.0
+            laravel: 8.*
+            stability: prefer-stable
         exclude:
           - laravel: 8.*
             php: 7.2
