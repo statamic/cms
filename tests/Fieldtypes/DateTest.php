@@ -31,7 +31,7 @@ class DateTest extends TestCase
     /** @test */
     public function it_augments_a_datetime()
     {
-        $augmented = $this->fieldtype()->augment('2012-01-04 15:32');
+        $augmented = $this->fieldtype(['time_enabled' => true])->augment('2012-01-04 15:32');
 
         $this->assertInstanceOf(Carbon::class, $augmented);
         $this->assertEquals('2012 Jan 04 15:32', $augmented->format('Y M d H:i'));
@@ -306,20 +306,10 @@ class DateTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_the_display_format_when_time_is_enabled_but_theres_no_time_selected()
+    public function it_gets_the_display_format_when_time_is_enabled()
     {
         $fieldtype = $this->fieldtype(['time_enabled' => true]);
         $fieldtype->field()->setValue('2013-04-01');
-
-        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
-        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
-    }
-
-    /** @test */
-    public function it_gets_the_display_format_when_time_is_enabled_and_a_time_has_been_selected()
-    {
-        $fieldtype = $this->fieldtype(['time_enabled' => true]);
-        $fieldtype->field()->setValue('2013-04-01 19:45');
 
         $this->assertEquals('Y-m-d H:i', $fieldtype->indexDisplayFormat());
         $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
@@ -363,8 +353,9 @@ class DateTest extends TestCase
 
     public function fieldtype($config = [])
     {
-        $field = new Field('test', array_merge([
+        $field = new Field('test', array_replace([
             'type' => 'date',
+            'mode' => 'single',
         ], $config));
 
         return (new Date)->setField($field);
