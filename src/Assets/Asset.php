@@ -424,7 +424,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Save the asset.
      *
-     * @return void
+     * @return bool
      */
     public function save()
     {
@@ -442,7 +442,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Delete the asset.
      *
-     * @return mixed
+     * @return $this
      */
     public function delete()
     {
@@ -507,7 +507,7 @@ class Asset implements AssetContract, Augmentable
      * Rename the asset.
      *
      * @param  string  $filename
-     * @return void
+     * @return self
      */
     public function rename($filename, $unique = false)
     {
@@ -521,7 +521,7 @@ class Asset implements AssetContract, Augmentable
      *
      * @param  string  $folder  The folder relative to the container.
      * @param  string|null  $filename  The new filename, if renaming.
-     * @return void
+     * @return $this
      */
     public function move($folder, $filename = null)
     {
@@ -635,7 +635,7 @@ class Asset implements AssetContract, Augmentable
      * Upload a file.
      *
      * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
-     * @return void
+     * @return $this
      */
     public function upload(UploadedFile $file)
     {
