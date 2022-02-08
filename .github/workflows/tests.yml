@@ -20,6 +20,8 @@ jobs:
         include:
           - laravel: 8.*
             framework: ^8.24.0
+          - laravel: 9.*
+            framework: ^9.0
         exclude:
           - laravel: 9.*
             php: 7.4
