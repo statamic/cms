@@ -224,8 +224,8 @@ class Entries extends Relationship
         $ids = Entry::query()
             ->whereIn('id', Arr::wrap($values))
             ->get()
-            ->map(function ($entry) {
-                return optional($entry->in($site))->id());
+            ->map(function ($entry) use ($site) {
+                return optional($entry->in($site))->id();
             })
             ->filter()
             ->all();
