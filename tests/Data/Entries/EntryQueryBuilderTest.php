@@ -216,6 +216,66 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     /** @test **/
+    public function entries_are_found_using_where_between()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'number_field' => 8])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'number_field' => 9])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'number_field' => 10])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'number_field' => 11])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'number_field' => 12])->create();
+
+        $entries = Entry::query()->whereBetween('number_field', [9, 11])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 3', 'Post 4'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_where_not_between()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'number_field' => 8])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'number_field' => 9])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'number_field' => 10])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'number_field' => 11])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'number_field' => 12])->create();
+
+        $entries = Entry::query()->whereNotBetween('number_field', [9, 11])->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 5'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_or_where_between()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'number_field' => 8])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'number_field' => 9])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'number_field' => 10])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'number_field' => 11])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'number_field' => 12])->create();
+
+        $entries = Entry::query()->whereBetween('number_field', [9, 10])->orWhereBetween('number_field', [11, 12])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 2', 'Post 3', 'Post 4', 'Post 5'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_or_where_not_between()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'number_field' => 8])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'number_field' => 9])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'number_field' => 10])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'number_field' => 11])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'number_field' => 12])->create();
+
+        $entries = Entry::query()->where('slug', 'post-5')->orWhereNotBetween('number_field', [10, 12])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 5', 'Post 1', 'Post 2'], $entries->map->title->all());
+    }
+
+    /** @test **/
     public function entries_are_found_using_array_of_wheres()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'content' => 'Test'])->create();

@@ -23,7 +23,7 @@ return [
     'bard.config.reading_time' => 'Mostra il tempo di lettura stimato nella parte inferiore del campo.',
     'bard.config.save_html' => 'Salva HTML invece di dati strutturati. Questo semplifica ma limita il controllo del markup nel template.',
     'bard.config.sets' => 'I set sono blocchi configurabili di campi che possono essere inseriti ovunque nel contenuto del Bard.',
-    'bard.config.target_blank' => 'Imposta `target="_ blank"` su tutti i link.',
+    'bard.config.target_blank' => 'Imposta `target="_blank"` su tutti i link.',
     'bard.config.toolbar_mode' => 'Scegli quale stile di barra degli strumenti preferisci.',
     'bard.title' => 'Bard',
     'button_group.title' => 'Button Group',

@@ -39,7 +39,7 @@ class Tags extends BaseTags
      *
      * Allows you to inject the formset into the context so child tags can use it.
      *
-     * @return string
+     * @return array
      */
     public function set()
     {
@@ -118,7 +118,7 @@ class Tags extends BaseTags
     /**
      * Maps to {{ form:errors }}.
      *
-     * @return string
+     * @return bool|string
      */
     public function errors()
     {
@@ -152,7 +152,7 @@ class Tags extends BaseTags
     /**
      * Maps to {{ form:submission }}.
      *
-     * @return array
+     * @return array|void
      */
     public function submission()
     {
