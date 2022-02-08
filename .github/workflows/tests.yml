@@ -13,9 +13,9 @@ jobs:
 
     strategy:
       matrix:
-        php: [7.4, 7.3, 7.2, 8.0, 8.1]
-        laravel: [8.*, 7.*, 6.*]
-        stability: [prefer-lowest, prefer-stable]
+        php: [8.0]
+        laravel: [8.*]
+        stability: [prefer-stable]
         os: [ubuntu-20.04]
         include:
           - laravel: 8.*
