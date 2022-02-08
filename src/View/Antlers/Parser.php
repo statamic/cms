@@ -1237,6 +1237,10 @@ class Parser
             $context = $context->value();
         }
 
+        if ($context instanceof Builder) {
+            $context = $context->get();
+        }
+
         if ($context instanceof Augmentable) {
             $context = $context->toAugmentedArray();
         }
