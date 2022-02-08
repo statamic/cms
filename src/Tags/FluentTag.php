@@ -43,6 +43,11 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
     protected $conversion = true;
 
     /**
+     * @var mixed
+     */
+    protected $fetched;
+
+    /**
      * Instantiate fluent tag helper.
      *
      * @param  Loader  $loader
@@ -122,6 +127,10 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
      */
     public function fetch()
     {
+        if ($this->fetched) {
+            return $this->fetched;
+        }
+
         $name = $this->name;
 
         if ($pos = strpos($name, ':')) {
@@ -157,7 +166,7 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
             }
         }
 
-        return $output;
+        return $this->fetched = $output;
     }
 
     /**

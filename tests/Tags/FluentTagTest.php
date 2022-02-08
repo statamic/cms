@@ -292,7 +292,7 @@ class FluentTagTest extends TestCase
     private function mockTagThatReturns($return)
     {
         $tag = Mockery::mock(Tags::class);
-        $tag->shouldReceive('index')->andReturn($return);
+        $tag->shouldReceive('index')->once()->andReturn($return);
         $this->mock(Loader::class)->shouldReceive('load')->andReturn($tag);
     }
 }
