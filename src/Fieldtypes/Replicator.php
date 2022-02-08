@@ -147,7 +147,7 @@ class Replicator extends Fieldtype
 
     protected function setConfig($handle)
     {
-        return array_get($this->getFieldConfig('sets'), $handle);
+        return array_get($this->config('sets'), $handle);
     }
 
     public function augment($values)
