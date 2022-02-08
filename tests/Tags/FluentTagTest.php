@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Collection;
 use Mockery;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades;
@@ -81,13 +82,13 @@ class FluentTagTest extends TestCase
     /** @test */
     public function it_can_iterate_over_tag_results()
     {
-        $this->mockTagThatReturns([
+        $this->mockTagThatReturns(collect([
             ['slug' => 'one'],
             ['slug' => 'two'],
             ['slug' => 'three'],
             ['slug' => 'four'],
             ['slug' => 'five'],
-        ]);
+        ]));
 
         $slugs = [];
 
@@ -98,6 +99,104 @@ class FluentTagTest extends TestCase
         $expected = ['one', 'two', 'three', 'four', 'five'];
 
         $this->assertEquals($expected, $slugs);
+    }
+
+    /** @test */
+    public function it_converts_nested_arrays_to_values_classes()
+    {
+        $this->mockTagThatReturns(collect([
+            ['slug' => 'one', 'content' => '# one'],
+            ['slug' => 'two', 'content' => '# two'],
+            Entry::find('three'),
+        ]));
+
+        $results = FluentTag::make('test')->fetch();
+
+        $this->assertInstanceOf(Collection::class, $results);
+        $this->assertCount(3, $results);
+        $this->assertEveryItemIsInstanceOf(Values::class, $results);
+
+        $items = [];
+        foreach ($results as $result) {
+            $items[] = trim($result['content']);
+            $items[] = trim($result->content);
+        }
+        $this->assertEquals([
+            '# one',
+            '# one',
+            '# two',
+            '# two',
+            '<h1>three</h1>',
+            '<h1>three</h1>',
+        ], $items);
+    }
+
+    /** @test */
+    public function it_converts_a_single_array_to_a_values_class()
+    {
+        $this->mockTagThatReturns([
+            'slug' => 'one',
+            'content' => '# one',
+        ]);
+
+        $results = FluentTag::make('test')->fetch();
+
+        $this->assertInstanceOf(Values::class, $results);
+        $this->assertEquals('one', $results['slug']);
+        $this->assertEquals('one', $results->slug);
+        $this->assertEquals('# one', $results['content']);
+        $this->assertEquals('# one', $results->content);
+    }
+
+    /** @test */
+    public function it_converts_a_single_augmentable_to_a_values_class()
+    {
+        $this->mockTagThatReturns(Entry::find('one'));
+
+        $results = FluentTag::make('test')->fetch();
+
+        $this->assertInstanceOf(Values::class, $results);
+        $this->assertEquals('one', $results['slug']);
+        $this->assertEquals('one', $results->slug);
+        $this->assertEquals('<h1>one</h1>', trim($results['content']));
+        $this->assertEquals('<h1>one</h1>', trim($results->content));
+    }
+
+    /** @test */
+    public function it_can_disable_converting_nested_array_to_values_classes()
+    {
+        $this->mockTagThatReturns($rawTagReturnValue = collect([
+            ['slug' => 'one', 'content' => '# one'],
+            ['slug' => 'two', 'content' => '# two'],
+            Entry::find('three'),
+        ]));
+
+        $results = FluentTag::make('test')->withoutConvertingValues()->fetch();
+
+        $this->assertSame($rawTagReturnValue, $results);
+    }
+
+    /** @test */
+    public function it_can_disable_converting_a_single_array_to_a_values_class()
+    {
+        $this->mockTagThatReturns($rawTagReturnValue = [
+            'slug' => 'one',
+            'content' => '# one',
+        ]);
+
+        $results = FluentTag::make('test')->withoutConvertingValues()->fetch();
+
+        $this->assertSame($rawTagReturnValue, $results);
+    }
+
+    /** @test */
+    public function it_can_disable_converting_a_single_augmentable_to_a_values_class()
+    {
+        $this->mockTagThatReturns($rawTagReturnValue = Entry::find('one'));
+
+        $results = FluentTag::make('test')->withoutConvertingValues()->fetch();
+
+        $this->assertSame($rawTagReturnValue, $results);
     }
 
     /** @test */
@@ -148,10 +247,24 @@ class FluentTagTest extends TestCase
     public function it_allows_array_access()
     {
         $this->mockTagThatReturns([
+            'foo' => 'bar',
+        ]);
+
+        $result = FluentTag::make('test');
+
+        $this->assertInstanceOf(FluentTag::class, $result);
+        $this->assertEquals('bar', $result['foo']);
+        $this->assertEquals('bar', $result->foo);
+    }
+
+    /** @test */
+    public function it_allows_array_access_on_nested_arrays()
+    {
+        $this->mockTagThatReturns(collect([
             ['slug' => 'one'],
             ['slug' => 'two'],
             ['slug' => 'three'],
-        ]);
+        ]));
 
         $result = FluentTag::make('test');
 
@@ -159,6 +272,10 @@ class FluentTagTest extends TestCase
         $this->assertEquals('one', $result[0]['slug']);
         $this->assertEquals('two', $result[1]['slug']);
         $this->assertEquals('three', $result[2]['slug']);
+
+        $this->assertEquals('one', $result[0]->slug);
+        $this->assertEquals('two', $result[1]->slug);
+        $this->assertEquals('three', $result[2]->slug);
     }
 
     /** @test */
