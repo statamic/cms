@@ -797,7 +797,6 @@ class Comb
      * Tests for a valid query.
      *
      * @param  string  $query  Query to test
-     * @return bool
      *
      * @throws NoQuery
      * @throws NotEnoughCharacters
