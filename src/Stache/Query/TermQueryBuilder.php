@@ -55,7 +55,7 @@ class TermQueryBuilder extends Builder
         return $this->whereIn($column, $values, 'or');
     }
 
-    public function collect($items = [])
+    protected function collect($items = [])
     {
         return TermCollection::make($items);
     }
