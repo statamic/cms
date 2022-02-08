@@ -703,17 +703,17 @@ class Comb
                 // check for disallowed
                 if (count($params['disallowed']) && preg_match($disallowed, $record)) {
                     // a disallowed was found, we don't want this
-                    throw new Exception('');
+                    throw new CombException('');
                 }
 
                 // check for disallowed
                 if (count($params['required']) && ! preg_match($required, $record)) {
                     // a disallowed was found, we don't want this
-                    throw new Exception('');
+                    throw new CombException('');
                 }
 
                 array_push($new_data, $item);
-            } catch (Exception $e) {
+            } catch (CombException $e) {
                 continue;
             }
         }
