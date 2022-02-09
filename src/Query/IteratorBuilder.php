@@ -73,6 +73,15 @@ abstract class IteratorBuilder extends Builder
         return $this->{$method}($entries, $where);
     }
 
+    protected function filterWhereColumn($entries, $where)
+    {
+        return $entries->filter(function ($value, $key) use ($where) {
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
+            return $this->{$method}($value[$where['column']] ?? '', $value[$where['value']] ?? '');
+        });
+    }
+
     protected function intersectFromWhereClause($entries, $filteredEntries, $where)
     {
         // On the first iteration, there's nothing to intersect;
@@ -134,6 +143,24 @@ abstract class IteratorBuilder extends Builder
     {
         return $entries->filter(function ($entry) use ($where) {
             return $this->getFilterItemValue($entry, $where['column']) !== null;
+        });
+    }
+
+    protected function filterWhereBetween($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            return $value >= $where['values'][0] && $value <= $where['values'][1];
+        });
+    }
+
+    protected function filterWhereNotBetween($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            return $value < $where['values'][0] || $value > $where['values'][1];
         });
     }
 

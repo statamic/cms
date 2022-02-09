@@ -109,6 +109,18 @@ class StatamicTest extends TestCase
         $this->assertEquals($format, Statamic::cpDateTimeFormat());
     }
 
+    /** @test */
+    public function it_wraps_fluent_tag_helper()
+    {
+        $this->assertInstanceOf(\Statamic\Tags\FluentTag::class, Statamic::tag('some_tag'));
+    }
+
+    /** @test */
+    public function it_wraps_fluent_modifier_helper()
+    {
+        $this->assertInstanceOf(\Statamic\Modifiers\Modify::class, Statamic::modify('some_value'));
+    }
+
     public function formatsWithTime()
     {
         return [

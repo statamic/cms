@@ -43,7 +43,7 @@ trait HasAugmentedInstance
         return null;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'api_url'];
     }

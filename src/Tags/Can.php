@@ -12,7 +12,7 @@ class Can extends Tags
      *
      * @param  string  $method
      * @param  array  $args
-     * @return string
+     * @return string|void
      */
     public function wildcard($method)
     {

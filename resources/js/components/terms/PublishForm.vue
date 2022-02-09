@@ -235,11 +235,13 @@ import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
+import HasHiddenFields from '../data-list/HasHiddenFields';
 
 export default {
 
     mixins: [
         HasPreferences,
+        HasHiddenFields,
     ],
 
     components: {
@@ -419,7 +421,7 @@ export default {
         },
 
         performSaveRequest() {
-            const payload = { ...this.values, ...{
+            const payload = { ...this.visibleValues, ...{
                 _blueprint: this.fieldset.handle,
                 published: this.published,
                 _localized: this.localizedFields,

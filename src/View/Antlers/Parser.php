@@ -388,7 +388,7 @@ class Parser implements ParserContract
      *                        {{ var or anothervar }}
      *                        {{ var | modifier or anothervar }}
      * @param  array|object  $data  The data
-     * @return string
+     * @return string|void
      */
     protected function parseStringVariableTag($var, $text, $data)
     {
@@ -570,8 +570,10 @@ class Parser implements ParserContract
             // a callback. If it's a query builder instance, we want to use the Query tag's index
             // method to handle the logic. We'll pass the builder into the builder parameter.
             if (isset($data[$name])) {
-                if ($data[$name] instanceof Builder) {
-                    $parameters['builder'] = $data[$name];
+                $value = $data[$name];
+                $value = $value instanceof Value ? $value->value() : $value;
+                if ($value instanceof Builder) {
+                    $parameters['builder'] = $value;
                     $name = 'query';
                 }
             }
@@ -1239,6 +1241,10 @@ class Parser implements ParserContract
 
         if ($context instanceof Value) {
             $context = $context->value();
+        }
+
+        if ($context instanceof Builder) {
+            $context = $context->get();
         }
 
         if ($context instanceof Augmentable) {

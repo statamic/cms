@@ -22,7 +22,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:variable_name }}
      *
-     * @return string
+     * @return void|\Statamic\Contracts\Auth\User
      */
     public function __call($method, $args)
     {
@@ -281,7 +281,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:can }}
      *
-     * @return string
+     * @return string|void
      */
     public function can()
     {
@@ -330,7 +330,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:is }}
      *
-     * @return string
+     * @return string|void
      */
     public function is()
     {
@@ -379,7 +379,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:in }}
      *
-     * @return string
+     * @return string|void
      */
     public function in()
     {

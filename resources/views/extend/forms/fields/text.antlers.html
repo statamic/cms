@@ -1,1 +1,9 @@
-<input type="{{ input_type ?? 'text' }}" name="{{ handle }}"{{ if placeholder }} placeholder="{{ placeholder }}"{{ /if }} value="{{ old ?? default}}"{{ if validate|contains:required }} required{{ /if }}{{ if character_limit }} maxlength="{{ character_limit }}"{{ /if }}>
+<input
+    type="{{ input_type ?? 'text' }}"
+    name="{{ handle }}"
+    value="{{ old ?? default }}"
+    {{ if placeholder }}placeholder="{{ placeholder }}"{{ /if }}
+    {{ if character_limit }}maxlength="{{ character_limit }}"{{ /if }}
+    {{ if js_driver }}{{ js_attributes }}{{ /if }}
+    {{ if validate|contains:required }}required{{ /if }}
+>
