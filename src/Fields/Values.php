@@ -28,12 +28,14 @@ class Values implements ArrayAccess
         return $this->instance;
     }
 
-    public function offsetExists(mixed $offset): bool
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset)
     {
         return $this->getProxiedCollection()->has($offset);
     }
 
-    public function offsetGet(mixed $offset): mixed
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
     {
         $value = $this->getNormalizedValueFromProxiedCollection($offset);
 
@@ -63,12 +65,14 @@ class Values implements ArrayAccess
         return $value instanceof Value ? $value->value() : $value;
     }
 
-    public function offsetSet(mixed $offset, mixed $value): void
+    #[\ReturnTypeWillChange]
+    public function offsetSet($offset, $value)
     {
         throw new Exception('Cannot set values by array access.');
     }
 
-    public function offsetUnset(mixed $offset): void
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($offset)
     {
         throw new Exception('Cannot unset values by array access.');
     }
