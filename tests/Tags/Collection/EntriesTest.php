@@ -445,6 +445,31 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
+    public function it_filters_out_a_single_taxonomy_term()
+    {
+        $this->makeEntry('1')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('2')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('3')->data(['tags' => ['meh']])->save();
+
+        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags:not' => 'meh'])->map->slug()->all());
+        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags:not' => TermCollection::make([Term::make('meh')->taxonomy('tags')])])->map->slug()->all());
+    }
+
+    /** @test */
+    public function it_filters_out_multiple_taxonomy_terms()
+    {
+        $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
+        $this->makeEntry('2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
+        $this->makeEntry('3')->data(['tags' => ['rad', 'awesome']])->save();
+        $this->makeEntry('4')->data(['tags' => ['meh']])->save();
+
+        $this->assertEquals([4], $this->getEntries(['taxonomy:tags:not' => 'rad|awesome'])->map->slug()->all());
+        $this->assertEquals([4], $this->getEntries(['taxonomy:tags:not' => ['rad', 'awesome']])->map->slug()->all());
+        // $this->assertEquals([2], $this->getEntries(['taxonomy:tags:not' => 'rad|meh'])->map->slug()->all());
+        // $this->assertEquals([2], $this->getEntries(['taxonomy:tags:not' => ['rad', 'meh']])->map->slug()->all());
+    }
+
+    /** @test */
     public function it_filters_by_in_multiple_taxonomy_terms()
     {
         $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
