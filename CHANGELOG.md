@@ -10,6 +10,8 @@
 ### What's fixed
 - CP forms only submit visible fields, in order to fix sometimes/required_if/etc validation rules. [#5101](https://github.com/statamic/cms/issues/5101) by @jesseleite
 
+### What's changed
+- Entries fieldtypes augment to query builders instead of collections. [#5238](https://github.com/statamic/cms/issues/5238) by @jasonvarga
 
 
 ## 3.2.32 (2022-01-26)

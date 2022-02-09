@@ -8,7 +8,9 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use Mockery;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Entry;
@@ -2225,6 +2227,62 @@ EOT;
 
         $this->assertEquals('<one><two>3', $this->parse('{{ items limit="2" }}<{{ value }}>{{ /items }}{{ items | count }}', $data));
         $this->assertEquals('3<one><two>', $this->parse('{{ items | count }}{{ items limit="2" }}<{{ value }}>{{ /items }}', $data));
+    }
+
+    /** @test */
+    public function it_passes_along_query_builder_values_to_the_query_tag()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->once()->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Bar'],
+        ]));
+
+        $this->assertEquals('<Foo><Bar>', $this->parse('{{ my_query }}<{{ title }}>{{ /my_query }}', [
+            'my_query' => $builder,
+        ]));
+    }
+
+    /** @test */
+    public function it_passes_along_query_builder_augmented_values_to_the_query_tag()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->once()->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Bar'],
+        ]));
+
+        $this->assertEquals('<Foo><Bar>', $this->parse('{{ my_query }}<{{ title }}>{{ /my_query }}', [
+            'my_query' => new Value($builder),
+        ]));
+    }
+
+    /** @test */
+    public function it_can_reach_into_query_builders()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->times(2)->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Bar'],
+        ]));
+
+        $this->assertEquals('<Bar><Foo>', $this->parse('<{{ my_query:1:title }}><{{ my_query:0:title }}>', [
+            'my_query' => $builder,
+        ]));
+    }
+
+    /** @test */
+    public function it_can_reach_into_query_builders_through_values()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->times(2)->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Bar'],
+        ]));
+
+        $this->assertEquals('<Bar><Foo>', $this->parse('<{{ my_query:1:title }}><{{ my_query:0:title }}>', [
+            'my_query' => new Value($builder),
+        ]));
     }
 }
 
