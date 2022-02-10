@@ -22,11 +22,11 @@ class CompactTest extends TestCase
 
     private function tag($tag, $data = [])
     {
-        return (string) Parse::template($tag, $data);
+        return Parse::template($tag, $data);
     }
 
     /** @test */
-    public function compact_coverts_variables_to_array()
+    public function compact_converts_variables_to_array()
     {
         $template = <<<'EOT'
 {{ foreach :array="'view:var_one, view:var_two, title, nested:variable:path'|compact" }}<{{ value }}>{{ /foreach }}

@@ -21,7 +21,21 @@ class HtmlTest extends TestCase
         $this->assertEquals('<dl class="example"><dt>foo</dt><dd>bar</dd><dt>bing</dt><dd>baz</dd></dl>', $result);
     }
 
-    public function testOl()
+    /**
+     * @test
+     */
+    public function call_to_nested_listing_fails()
+    {
+        $list = ['foo', 'bar', 'baz' => ['foo', 'bar', 'baz']];
+
+        $attributes = ['class' => 'example'];
+
+        $ol = Html::ol($list, $attributes);
+
+        $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>&amp;</li></ol>', $ol);
+    }
+
+    public function test()
     {
         $list = ['foo', 'bar', '&amp;'];
 
@@ -30,6 +44,29 @@ class HtmlTest extends TestCase
         $ol = Html::ol($list, $attributes);
 
         $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>&amp;</li></ol>', $ol);
+
+        $list = ['foo', 'bar', 'baz' => ['foo', 'bar', 'baz']];
+
+        $attributes = ['class' => 'example'];
+
+        $ol = Html::ol($list, $attributes);
+
+        $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>&amp;</li></ol>', $ol);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_empty_string_when_no_list_items_given(): void
+    {
+        $list = [];
+        $attributes = ['class' => 'example'];
+
+        $ol = Html::ol($list, $attributes);
+        $this->assertEquals('', $ol);
+
+        $ul = Html::ul($list, $attributes);
+        $this->assertEquals('', $ul);
     }
 
     public function testUl()
