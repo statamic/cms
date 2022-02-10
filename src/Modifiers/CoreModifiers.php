@@ -883,7 +883,7 @@ class CoreModifiers extends Modifier
         }
 
         if ($value instanceof Collection) {
-            $value = $value->toArray();
+            $value = $value->all();
         }
 
         return implode(Arr::get($params, 0, ', '), $value);
