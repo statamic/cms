@@ -882,6 +882,10 @@ class CoreModifiers extends Modifier
             $params = [implode('|', $params)];
         }
 
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         return implode(Arr::get($params, 0, ', '), $value);
     }
 
