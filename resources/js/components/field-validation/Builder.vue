@@ -16,9 +16,9 @@
                 <p>
                     {{ __('messages.field_validation_advanced_instructions') }}
                     <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
-                    <span v-if="helpBlock" class="italic text-grey-50 float-right">
+                    <span v-if="example" class="italic text-grey-50 float-right">
                         {{ __('Example') }}:
-                        <span class="italic text-blue-lighter">{{ helpBlock }}</span>
+                        <span class="italic text-blue-lighter">{{ example }}</span>
                     </span>
                 </p>
             </div>
@@ -61,6 +61,8 @@
                 @keydown.enter.prevent="add(customRule)"
                 @blur="add(customRule)"
             />
+
+            <span class="help-block mt-1" v-if="instructions">{{ instructions }}</span>
 
             <div class="v-select">
                 <sortable-list
@@ -138,7 +140,7 @@ export default {
                 .value();
         },
 
-        helpBlock() {
+        example() {
             if (! this.selectedLaravelRule) {
                 return false;
             }
@@ -150,6 +152,32 @@ export default {
 
             return rule.example || false;
         },
+
+        instructions() {
+            if (! this.selectedLaravelRule) {
+                return false;
+            }
+
+            let rule = _.chain(RULES)
+                .filter(rule => rule.value === this.selectedLaravelRule)
+                .first()
+                .value();
+
+            return rule.instructions || false;
+        },
+
+        appendToValue() {
+            if (! this.selectedLaravelRule) {
+                return '';
+            }
+
+            let rule = _.chain(RULES)
+                .filter(rule => rule.value === this.selectedLaravelRule)
+                .first()
+                .value();
+
+            return rule.appendToValue || '';
+        }
     },
 
     watch: {
@@ -219,7 +247,7 @@ export default {
             if (this.hasUnfinishedParameters(rule)) {
                 this.resetState();
                 this.selectedLaravelRule = rule;
-                this.customRule = rule;
+                this.customRule = rule + this.appendToValue;
                 this.$nextTick(() => this.$refs.customRuleInput.$refs.input.focus());
             } else {
                 this.ensure(rule);
