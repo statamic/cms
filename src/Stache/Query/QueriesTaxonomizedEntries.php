@@ -45,13 +45,33 @@ trait QueriesTaxonomizedEntries
         }
 
         $entryIds = collect($this->taxonomyWheres)->reduce(function ($ids, $where) {
+            if ($where['type'] === 'NotIn') {
+                return $ids;
+            }
+
             $method = 'getKeysForTaxonomyWhere'.$where['type'];
             $keys = $this->$method($where);
 
             return $ids ? $ids->intersect($keys)->values() : $keys;
         });
 
-        $this->whereIn('id', $entryIds->all());
+        $excludedEntryIds = collect($this->taxonomyWheres)->reduce(function ($ids, $where) {
+            if ($where['type'] !== 'NotIn') {
+                return $ids;
+            }
+
+            $keys = $this->getKeysForTaxonomyWhereIn($where);
+
+            return $ids ? $ids->intersect($keys)->values() : $keys;
+        });
+
+        if ($entryIds) {
+            $this->whereIn('id', $entryIds->all());
+        }
+
+        if ($excludedEntryIds) {
+            $this->whereNotIn('id', $excludedEntryIds->all());
+        }
     }
 
     private function getKeysForTaxonomyWhereBasic($where)
@@ -66,12 +86,12 @@ trait QueriesTaxonomizedEntries
             ->pluck('entry');
     }
 
-    // Get the terms grouped by taxonomy.
-    // [tags::foo, categories::baz, tags::bar]
-    // becomes [tags => [foo, bar], categories => [baz]]
-    private function getTaxonomies($where)
+    private function getKeysForTaxonomyWhereIn($where)
     {
-        return collect($where['values'])
+        // Get the terms grouped by taxonomy.
+        // [tags::foo, categories::baz, tags::bar]
+        // becomes [tags => [foo, bar], categories => [baz]]
+        $taxonomies = collect($where['values'])
             ->map(function ($value) {
                 [$taxonomy, $term] = explode('::', $value);
 
@@ -81,28 +101,11 @@ trait QueriesTaxonomizedEntries
             ->map(function ($group) {
                 return collect($group)->map->term;
             });
-    }
-
-    private function getKeysForTaxonomyWhereIn($where)
-    {
-        $taxonomies = $this->getTaxonomies($where);
 
         return $taxonomies->flatMap(function ($terms, $taxonomy) {
             return Stache::store('terms')->store($taxonomy)
                 ->index('associations')
                 ->items()->whereIn('slug', $terms->all())
-                ->pluck('entry');
-        });
-    }
-
-    private function getKeysForTaxonomyWhereNotIn($where)
-    {
-        $taxonomies = $this->getTaxonomies($where);
-
-        return $taxonomies->flatMap(function ($terms, $taxonomy) {
-            return Stache::store('terms')->store($taxonomy)
-                ->index('associations')
-                ->items()->whereNotIn('slug', $terms->all())
                 ->pluck('entry');
         });
     }

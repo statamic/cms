@@ -462,11 +462,15 @@ class EntriesTest extends TestCase
         $this->makeEntry('2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
         $this->makeEntry('3')->data(['tags' => ['rad', 'awesome']])->save();
         $this->makeEntry('4')->data(['tags' => ['meh']])->save();
+        $this->makeEntry('5')->data([])->save();
 
-        $this->assertEquals([4], $this->getEntries(['taxonomy:tags:not' => 'rad|awesome'])->map->slug()->all());
-        $this->assertEquals([4], $this->getEntries(['taxonomy:tags:not' => ['rad', 'awesome']])->map->slug()->all());
-        // $this->assertEquals([2], $this->getEntries(['taxonomy:tags:not' => 'rad|meh'])->map->slug()->all());
-        // $this->assertEquals([2], $this->getEntries(['taxonomy:tags:not' => ['rad', 'meh']])->map->slug()->all());
+        $this->assertEquals([4, 5], $this->getEntries(['taxonomy:tags:not' => 'rad|awesome'])->map->slug()->all());
+        $this->assertEquals([4, 5], $this->getEntries(['taxonomy:tags:not' => ['rad', 'awesome']])->map->slug()->all());
+        $this->assertEquals([2, 5], $this->getEntries(['taxonomy:tags:not' => 'rad|meh'])->map->slug()->all());
+        $this->assertEquals([2, 5], $this->getEntries(['taxonomy:tags:not' => ['rad', 'meh']])->map->slug()->all());
+
+        // Ensure `whereIn` and `whereNot` logic intersect results properly.
+        $this->assertEquals([1, 3], $this->getEntries(['taxonomy:tags' => ['rad', 'meh'], 'taxonomy:tags:not' => ['meh']])->map->slug()->all());
     }
 
     /** @test */
