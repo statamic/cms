@@ -247,8 +247,7 @@ export default [
         label: 'Required If',
         value: 'required_if:',
         example: 'required_if:anotherfield,value,...',
-        instructions: 'Use {this} to refer to the current context',
-        appendToValue: '{this}.'
+        appendThis: true,
     },
     {
         label: 'Required Unless',

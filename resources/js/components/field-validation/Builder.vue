@@ -154,6 +154,12 @@ export default {
         },
 
         instructions() {
+            if (this.appendThis) {
+                return 'Use {this} to refer to the current context';
+            }
+        },
+
+        appendThis() {
             if (! this.selectedLaravelRule) {
                 return false;
             }
@@ -163,20 +169,7 @@ export default {
                 .first()
                 .value();
 
-            return rule.instructions || false;
-        },
-
-        appendToValue() {
-            if (! this.selectedLaravelRule) {
-                return '';
-            }
-
-            let rule = _.chain(RULES)
-                .filter(rule => rule.value === this.selectedLaravelRule)
-                .first()
-                .value();
-
-            return rule.appendToValue || '';
+            return !! rule.appendThis;
         }
     },
 
@@ -247,7 +240,8 @@ export default {
             if (this.hasUnfinishedParameters(rule)) {
                 this.resetState();
                 this.selectedLaravelRule = rule;
-                this.customRule = rule + this.appendToValue;
+                this.customRule = rule;
+                if (this.appendThis) this.customRule = `${this.customRule}{this}.`;
                 this.$nextTick(() => this.$refs.customRuleInput.$refs.input.focus());
             } else {
                 this.ensure(rule);
