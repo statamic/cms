@@ -180,7 +180,7 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_replaces_this()
+    public function it_replaces_this_in_sets()
     {
         $replicator = [
             'type' => 'replicator',
@@ -371,6 +371,23 @@ class ValidatorTest extends TestCase
         $this->assertArraySubset([
             'bard_with_nested_replicator.0.attrs.values.nested_replicator.0.text' => [
                 'required_if:bard_with_nested_replicator.0.attrs.values.nested_replicator.0.must_fill,true',
+            ],
+        ], $rules);
+    }
+
+    /** @test */
+    public function it_discards_this_at_top_level()
+    {
+        $fields = new Fields([
+            ['handle' => 'must_fill', 'field' => ['type' => 'toggle']],
+            ['handle' => 'text', 'field' => ['validate' => ['required_if:{this}.must_fill,true']]],
+        ]);
+
+        $rules = (new Validator)->fields($fields)->rules();
+
+        $this->assertArraySubset([
+            'text' => [
+                'required_if:must_fill,true',
             ],
         ], $rules);
     }
