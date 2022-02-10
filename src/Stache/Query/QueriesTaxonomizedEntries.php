@@ -44,26 +44,26 @@ trait QueriesTaxonomizedEntries
             return;
         }
 
-        $entryIds = collect($this->taxonomyWheres)->reduce(function ($ids, $where) {
-            if ($where['type'] === 'NotIn') {
-                return $ids;
-            }
+        $entryIds = collect($this->taxonomyWheres)
+            ->reject(function ($where) {
+                return $where['type'] === 'NotIn';
+            })
+            ->reduce(function ($ids, $where) {
+                $method = 'getKeysForTaxonomyWhere'.$where['type'];
+                $keys = $this->$method($where);
 
-            $method = 'getKeysForTaxonomyWhere'.$where['type'];
-            $keys = $this->$method($where);
+                return $ids ? $ids->intersect($keys)->values() : $keys;
+            });
 
-            return $ids ? $ids->intersect($keys)->values() : $keys;
-        });
+        $excludedEntryIds = collect($this->taxonomyWheres)
+            ->filter(function ($where) {
+                return $where['type'] === 'NotIn';
+            })
+            ->reduce(function ($ids, $where) {
+                $keys = $this->getKeysForTaxonomyWhereIn($where);
 
-        $excludedEntryIds = collect($this->taxonomyWheres)->reduce(function ($ids, $where) {
-            if ($where['type'] !== 'NotIn') {
-                return $ids;
-            }
-
-            $keys = $this->getKeysForTaxonomyWhereIn($where);
-
-            return $ids ? $ids->intersect($keys)->values() : $keys;
-        });
+                return $ids ? $ids->intersect($keys)->values() : $keys;
+            });
 
         if ($entryIds) {
             $this->whereIn('id', $entryIds->all());
