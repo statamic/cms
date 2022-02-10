@@ -84,7 +84,8 @@ export default [
     {
         label: 'Different',
         value: 'different:',
-        example: 'different:field'
+        example: 'different:field',
+        appendThis: true
     },
     {
         label: 'Digits',
@@ -131,12 +132,14 @@ export default [
     {
         label: 'Greater Than',
         value: 'gt:',
-        example: 'gt:field'
+        example: 'gt:field',
+        appendThis: true
     },
     {
         label: 'Greater Than Or Equal',
         value: 'gte:',
-        example: 'gte:field'
+        example: 'gte:field',
+        appendThis: true
     },
     {
         label: 'Image (File)',
@@ -175,12 +178,14 @@ export default [
     {
         label: 'Less Than',
         value: 'lt:',
-        example: 'lt:field'
+        example: 'lt:field',
+        appendThis: true
     },
     {
         label: 'Less Than Or Equal',
         value: 'lte:',
-        example: 'lte:field'
+        example: 'lte:field',
+        appendThis: true
     },
     {
         label: 'Max',
@@ -252,32 +257,38 @@ export default [
     {
         label: 'Required Unless',
         value: 'required_unless:',
-        example: 'required_unless:anotherfield,value,...'
+        example: 'required_unless:anotherfield,value,...',
+        appendThis: true
     },
     {
         label: 'Required With',
         value: 'required_with:',
-        example: 'required_with:foo,bar,...'
+        example: 'required_with:foo,bar,...',
+        appendThis: true
     },
     {
         label: 'Required With All',
         value: 'required_with_all:',
-        example: 'required_with_all:foo,bar,...'
+        example: 'required_with_all:foo,bar,...',
+        appendThis: true
     },
     {
         label: 'Required Without',
         value: 'required_without:',
-        example: 'required_without:foo,bar,...'
+        example: 'required_without:foo,bar,...',
+        appendThis: true
     },
     {
         label: 'Required Without All',
         value: 'required_without_all:',
-        example: 'required_without_all:foo,bar,...'
+        example: 'required_without_all:foo,bar,...',
+        appendThis: true
     },
     {
         label: 'Same',
         value: 'same:',
-        example: 'same:field'
+        example: 'same:field',
+        appendThis: true
     },
     {
         label: 'Size',
