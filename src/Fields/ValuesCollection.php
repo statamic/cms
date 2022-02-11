@@ -4,9 +4,10 @@ namespace Statamic\Fields;
 
 use Countable;
 use IteratorAggregate;
+use JsonSerializable;
 use Traversable;
 
-class ValuesCollection implements Countable, IteratorAggregate
+class ValuesCollection implements Countable, IteratorAggregate, JsonSerializable
 {
     protected $instance;
 
@@ -33,5 +34,15 @@ class ValuesCollection implements Countable, IteratorAggregate
     public function count(): int
     {
         return $this->instance->count();
+    }
+
+    public function __toString()
+    {
+        return (string) $this->instance;
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->instance->jsonSerialize();
     }
 }
