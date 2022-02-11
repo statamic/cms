@@ -33,9 +33,8 @@
     "jquery": "^3.5.0",
     "jquery-ui": "file:resources/js/vendor/jquery-ui",
     "laravel-echo": "^1.6.1",
-    "lazysizes": "^5.2.2",
     "luminous-lightbox": "^0.2.0",
-    "marked": "^0.7.0",
+    "marked": "^4.0.10",
     "marked-plaintext": "0.0.2",
     "moment": "^2.24.0",
     "mousetrap": "~1.5.3",
@@ -76,7 +75,7 @@
     "laravel-mix": "^5.0.9",
     "sass": "^1.26.2",
     "sass-loader": "^8.0.2",
-    "tailwindcss": "^1.2.0",
+    "tailwindcss": "^1.9.0",
     "vue-template-compiler": "^2.6.11"
   },
   "jest": {

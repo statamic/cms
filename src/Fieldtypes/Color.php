@@ -6,6 +6,8 @@ use Statamic\Fields\Fieldtype;
 
 class Color extends Fieldtype
 {
+    protected $categories = ['special'];
+
     protected function configFieldItems(): array
     {
         return [
@@ -46,13 +48,13 @@ class Color extends Fieldtype
                 'type' => 'checkboxes',
                 'inline' => 'true',
                 'options' => [
-                    'hex' => 'HEX',
+                    'hex' => 'HEXA',
                     'rgba' => 'RGBA',
                     'hsla' => 'HSLA',
                     'hsva' => 'HSVA',
                     'cmyk' => 'CMYK',
                 ],
-                'default' => ['HEXA'],
+                'default' => 'hex',
                 'width' => 50,
             ],
         ];

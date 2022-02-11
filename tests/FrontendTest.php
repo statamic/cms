@@ -348,7 +348,7 @@ class FrontendTest extends TestCase
         $keys = [
             'site', 'homepage', 'current_url', 'current_uri', 'current_date', 'now', 'today',
             'get', 'post', 'get_post', 'old', 'response_code',
-            'logged_in', 'logged_out', 'environment', 'xml_header', 'csrf_token', 'csrf_field', 'config',
+            'logged_in', 'logged_out', 'current_user', 'environment', 'xml_header', 'csrf_token', 'csrf_field', 'config',
         ];
 
         $cascade = $this->app['Statamic\View\Cascade']->toArray();

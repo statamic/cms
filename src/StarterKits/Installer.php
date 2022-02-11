@@ -269,10 +269,11 @@ final class Installer
      */
     protected function ensureExportPathsExist()
     {
-        $this->exportPaths()
-             ->reject(function ($path) {
-                 return $this->files->exists($this->starterKitPath($path));
-             })
+        $this
+            ->exportPaths()
+            ->reject(function ($path) {
+                return $this->files->exists($this->starterKitPath($path));
+            })
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");
             });
@@ -676,8 +677,8 @@ final class Installer
      */
     protected function expandConfigExportPaths($to, $from = null)
     {
-        $to = $this->starterKitPath($to);
-        $from = $from ? $this->starterKitPath($from) : $to;
+        $to = Path::tidy($this->starterKitPath($to));
+        $from = Path::tidy($from ? $this->starterKitPath($from) : $to);
 
         $paths = collect([$from => $to]);
 
@@ -704,13 +705,13 @@ final class Installer
     {
         $directory = $this->files->isDirectory($path)
             ? $path
-            : preg_replace('/(.*)\/[^\/]*/', '$1', $path);
+            : preg_replace('/(.*)\/[^\/]*/', '$1', Path::tidy($path));
 
         if (! $this->files->exists($directory)) {
             $this->files->makeDirectory($directory, 0755, true);
         }
 
-        return $path;
+        return Path::tidy($path);
     }
 
     /**
