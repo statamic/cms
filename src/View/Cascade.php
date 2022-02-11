@@ -8,6 +8,7 @@ use Statamic\Facades;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
+use Statamic\Fields\Values;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 
@@ -170,7 +171,7 @@ class Cascade
             $this->set($key, $value);
         }
 
-        $this->set('page', $variables);
+        $this->set('page', new Values($variables));
 
         return $this;
     }
