@@ -2,18 +2,18 @@
 
 ## 3.2.33 (2022-02-11)
 
-## What's new
+### What's new
 - Support `whereBetween` and `whereNotBetween` in the query builder. [#4752](https://github.com/statamic/cms/issues/4752) by @ryanmitchell
 - Ability to add config fields to existing fieldtypes. [#5077](https://github.com/statamic/cms/issues/5077) by @aerni
 - Add Polish translation. [#5146](https://github.com/statamic/cms/issues/5146) by @damianchojnacki
 - Replicator/Bard/Grid fields can be validated against fields in the same set/row. [#5047](https://github.com/statamic/cms/issues/5047) by @arthurperton
 - Add audio and video attributes to assets. [#5045](https://github.com/statamic/cms/issues/5045) by @edalzell
 
-## What's improved
+### What's improved
 - Improve performance of fetching user roles. [#5120](https://github.com/statamic/cms/issues/5120) by @jonassiewertsen
 - The password protection page is translatable. [#4894](https://github.com/statamic/cms/issues/4894) by @jelleroorda
 
-## What's fixed
+### What's fixed
 - Fix toggle fieldtype alignment issues. [#5251](https://github.com/statamic/cms/issues/5251) by @arthurperton
 - Fix the `list` modifier not working with Collections. [#5255](https://github.com/statamic/cms/issues/5255) by @ryanmitchell
 - Fix incorrect exception usage in Comb. [#5223](https://github.com/statamic/cms/issues/5223) by @Konafets
