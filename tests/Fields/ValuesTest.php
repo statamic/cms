@@ -311,6 +311,19 @@ class ValuesTest extends TestCase
         }
         $this->assertSame(['a', 'alfa', 'bravo', 'b', 'charlie', 'delta'], $echos);
     }
+
+    /** @test */
+    public function its_iterable()
+    {
+        $values = new Values(['foo' => 'bar', 'baz' => 'qux']);
+
+        $results = [];
+        foreach ($values as $key => $value) {
+            $results[] = $key;
+            $results[] = $value;
+        }
+        $this->assertEquals(['foo', 'bar', 'baz', 'qux'], $results);
+    }
 }
 
 class FakeFieldtypeThatAugmentsToMockedBuilder extends Fieldtype

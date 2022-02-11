@@ -8,9 +8,11 @@ use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder as EloquentQueryBuilder;
 use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
+use IteratorAggregate;
 use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
+use Traversable;
 
-class Values implements ArrayAccess, Arrayable
+class Values implements ArrayAccess, Arrayable, IteratorAggregate
 {
     protected $instance;
     protected $builders = [];
@@ -76,6 +78,11 @@ class Values implements ArrayAccess, Arrayable
     public function offsetUnset($offset)
     {
         throw new Exception('Cannot unset values by array access.');
+    }
+
+    public function getIterator(): Traversable
+    {
+        return $this->getProxiedInstance();
     }
 
     public function raw($key)
