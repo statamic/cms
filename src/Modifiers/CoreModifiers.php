@@ -921,7 +921,7 @@ class CoreModifiers extends Modifier
             return false;
         }
 
-        $needle = $this->getFromContext($context, $params);;
+        $needle = $this->getFromContext($context, $params);
 
         if (is_array($needle) && count($needle) === 1) {
             $needle = $needle[0];
@@ -1005,7 +1005,7 @@ class CoreModifiers extends Modifier
      */
     public function isBefore($value, $params, $context)
     {
-         return $this->carbon($value)->lt($this->carbon($this->getFromContext($context, $params)));
+        return $this->carbon($value)->lt($this->carbon($this->getFromContext($context, $params)));
     }
 
     /**
