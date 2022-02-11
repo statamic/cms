@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Tests\View\Antlers;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
@@ -19,7 +18,6 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Tags\Tags;
-use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 use Tests\Antlers\Fixtures\Addon\Tags\RecursiveChildren;
 use Tests\Factories\EntryFactory;
@@ -416,6 +414,7 @@ EOT;
 
         $this->assertEquals('Pass', $this->renderString($template, $this->variables));
     }
+
     /** @test */
     public function ternary_escapes_quotes_properly()
     {
@@ -502,7 +501,6 @@ EOT;
         $this->assertEquals('Pass', $this->renderString('{{ ! missing:thing ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', $this->renderString('{{ ! missing[thing] ?= "Pass" }}', $this->variables));
     }
-
 
     /** @test */
     public function truth_coalescing_inside_loop()
@@ -726,7 +724,6 @@ EOT;
             $this->renderString('{{ loop }}{{ one }}{{ two }}{{ /loop }}', $variables)
         );
     }
-
 
     /** @test */
     public function empty_values_are_not_overridden_by_previous_iteration_with_parsing()

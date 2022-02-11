@@ -123,6 +123,7 @@ class PathDataManager
 
     /**
      * Indicates if the data manager should check for special values and intercept them.
+     *
      * @var bool
      */
     private $shouldDoValueIntercept = true;
@@ -140,7 +141,7 @@ class PathDataManager
     /**
      * Sets the internal node processor reference.
      *
-     * @param NodeProcessor $processor
+     * @param  NodeProcessor  $processor
      */
     public function setNodeProcessor($processor)
     {
@@ -179,7 +180,7 @@ class PathDataManager
      *
      * @param  VariableReference  $path  The variable path.
      * @param  array  $data  The data to search.
-     * @param bool $disableIntercept Indicates if variable interception should be disabled.
+     * @param  bool  $disableIntercept  Indicates if variable interception should be disabled.
      * @return array
      *
      * @throws RuntimeException
@@ -346,7 +347,8 @@ class PathDataManager
      *
      * Builder instances will be sent to the Query tag to be resolved when they are encountered.
      *
-     * @param PathNode $pathItem
+     * @param  PathNode  $pathItem
+     *
      * @throws RuntimeException
      */
     private function checkForValueIntercept($pathItem)
@@ -358,7 +360,6 @@ class PathDataManager
         $builderCheckValue = $this->reducedVar instanceof Value ? $this->reducedVar->value() : $this->reducedVar;
 
         if ($builderCheckValue instanceof Builder) {
-
             $nodeProcessor = $this->getNodeProcessor();
             $activeNode = $nodeProcessor->getActiveNode();
 
@@ -366,7 +367,7 @@ class PathDataManager
                 $interceptResult = $nodeProcessor->evaluateDeferredNodeAsTag(
                     $activeNode,
                     'query',
-                    $pathItem->name, [ 'builder' => $builderCheckValue, ]
+                    $pathItem->name, ['builder' => $builderCheckValue]
                 );
 
                 $this->reducedVar = $interceptResult;
@@ -673,7 +674,7 @@ class PathDataManager
      *
      * @param  mixed  $value  The value to reduce.
      * @param  bool  $isPair  Indicates if the path belongs to a node pair.
-     * @param bool $reduceBuildersAndAugmentables Indicates if Builder and Augmentable instances should be resolved.
+     * @param  bool  $reduceBuildersAndAugmentables  Indicates if Builder and Augmentable instances should be resolved.
      * @return array|string
      */
     public static function reduce($value, $isPair = true, $reduceBuildersAndAugmentables = true)

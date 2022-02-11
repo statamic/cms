@@ -10,12 +10,12 @@ use InvalidArgumentException;
 use ParseError;
 use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\ModifierNotFoundException;
 use Statamic\Modifiers\Modify;
-use Statamic\Contracts\Query\Builder;
 use Statamic\Support\Arr;
 use Statamic\Tags\Loader;
 use Statamic\Tags\TagNotFoundException;
@@ -180,6 +180,7 @@ class NodeProcessor
 
     /**
      * Indicates if the runtime resolved a Builder instance.
+     *
      * @var bool
      */
     private $encounteredBuilder = false;
@@ -771,11 +772,12 @@ class NodeProcessor
     /**
      * Executes the requested tag within the context of the current processor and provided node.
      *
-     * @param AntlersNode|ConditionNode $node The node.
-     * @param string $tagName The tag name.
-     * @param string $tagMethod The tag method to invoke.
-     * @param array $additionalData Any additional data to be supplied to the tag.
+     * @param  AntlersNode|ConditionNode  $node  The node.
+     * @param  string  $tagName  The tag name.
+     * @param  string  $tagMethod  The tag method to invoke.
+     * @param  array  $additionalData  Any additional data to be supplied to the tag.
      * @return false|mixed
+     *
      * @throws RuntimeException
      * @throws SyntaxErrorException
      * @throws TagNotFoundException
@@ -800,7 +802,7 @@ class NodeProcessor
             'content' => $runtimeContent,
             'context' => $tagData,
             'tag' => $tagName,
-            'tag_method' => $tagMethod
+            'tag_method' => $tagMethod,
         ]);
 
         return call_user_func([$tag, $tagMethod]);
@@ -1259,7 +1261,7 @@ class NodeProcessor
                             }
 
                             $newData = [
-                                $dataSetName => $output->all()
+                                $dataSetName => $output->all(),
                             ];
 
                             $builderScope = array_merge($activeLockFrame, $newData);
