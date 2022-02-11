@@ -15,7 +15,7 @@ use Statamic\Fields\Value;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\ModifierNotFoundException;
 use Statamic\Modifiers\Modify;
-use Statamic\Query\Builder;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Support\Arr;
 use Statamic\Tags\Loader;
 use Statamic\Tags\TagNotFoundException;
@@ -179,6 +179,24 @@ class NodeProcessor
     private $conditionProcessor = null;
 
     /**
+     * Indicates if the runtime resolved a Builder instance.
+     * @var bool
+     */
+    private $encounteredBuilder = false;
+
+    /**
+     * A reference to the last resolved Builder instance.
+     *
+     * @var Builder|null
+     */
+    private $resolvedBuilder = null;
+
+    /**
+     * @var AbstractNode|AntlersNode
+     */
+    private $activeNode = null;
+
+    /**
      * A list of all valid PHP opening tags.
      *
      * @var string[]
@@ -190,6 +208,7 @@ class NodeProcessor
         $this->loader = $loader;
         $this->envDetails = $envDetails;
         $this->pathDataManager = new PathDataManager();
+        $this->pathDataManager->setNodeProcessor($this);
         $this->languageParser = new LanguageParser();
         $this->conditionProcessor = new ConditionProcessor();
         $this->conditionProcessor->setProcessor($this);
@@ -197,6 +216,16 @@ class NodeProcessor
         if (ini_get('short_open_tag')) {
             $this->validPhpOpenTags[] = '<?';
         }
+    }
+
+    /**
+     * Returns the current active node.
+     *
+     * @return AbstractNode|AntlersNode|null
+     */
+    public function getActiveNode()
+    {
+        return $this->activeNode;
     }
 
     public function registerInterpolations(AntlersNode $node)
@@ -448,15 +477,38 @@ class NodeProcessor
             }
         }
 
-        if ($node->isTagNode == false) {
-            return false;
-        }
-
         $activeData = $this->getActiveData();
 
-        $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $activeData);
+        // The third argument "true" disables the data managers value interception mechanism.
+        // This is to prevent it from resolving expensive items like Builders too many
+        // times when all we are interested in is if the data value actually exists.
+        $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $activeData, true);
 
-        if ($managerResults[0] === true && is_string($managerResults[1])) {
+        if ($managerResults[0] === true) {
+            if (is_object($managerResults[1])) {
+                $value = $managerResults[1];
+                $resolvedValue = $value instanceof Value ? $value->value() : $value;
+
+                if ($resolvedValue instanceof Builder) {
+                    $this->encounteredBuilder = true;
+                    $this->resolvedBuilder = $resolvedValue;
+
+                    // If the path reference has more than one part,
+                    // it is something like {{ products.0.name }}
+                    if ($node->pathReference != null && count($node->pathReference->pathParts) > 1) {
+                        return false;
+                    }
+
+                    return true;
+                }
+            }
+
+            if (is_string($managerResults[1]) && $node->isTagNode === true) {
+                return false;
+            }
+        }
+
+        if ($node->isTagNode === false) {
             return false;
         }
 
@@ -717,6 +769,44 @@ class NodeProcessor
     }
 
     /**
+     * Executes the requested tag within the context of the current processor and provided node.
+     *
+     * @param AntlersNode|ConditionNode $node The node.
+     * @param string $tagName The tag name.
+     * @param string $tagMethod The tag method to invoke.
+     * @param array $additionalData Any additional data to be supplied to the tag.
+     * @return false|mixed
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     * @throws TagNotFoundException
+     * @throws Throwable
+     */
+    public function evaluateDeferredNodeAsTag($node, $tagName, $tagMethod, $additionalData = [])
+    {
+        $tagData = array_merge($this->getActiveData(), $additionalData);
+
+        $parameters = [];
+        $runtimeContent = '';
+
+        if ($node instanceof AntlersNode) {
+            $parameters = $node->getParameterValues($this, $this->getActiveData());
+            $runtimeContent = $node->runtimeContent;
+        }
+
+        /** @var Tags $tag */
+        $tag = $this->loader->load($tagName, [
+            'parser' => $this->antlersParser,
+            'params' => $parameters,
+            'content' => $runtimeContent,
+            'context' => $tagData,
+            'tag' => $tagName,
+            'tag_method' => $tagMethod
+        ]);
+
+        return call_user_func([$tag, $tagMethod]);
+    }
+
+    /**
      * Lazily evaluates an interpolation region, by name.
      *
      * @param  string  $regionName  The interpolation region name.
@@ -861,6 +951,8 @@ class NodeProcessor
 
             for ($i = $startIndex; $i < $nodeCount; $i += 1) {
                 $node = $nodes[$i];
+
+                $this->activeNode = $node;
 
                 if ($this->isTracingEnabled()) {
                     $this->runtimeConfiguration->traceManager->traceOnEnter($node);
@@ -1095,6 +1187,11 @@ class NodeProcessor
                             $tagName = $node->name->name.':'.$tagMethod;
                         }
 
+                        if ($this->encounteredBuilder) {
+                            $tagName = 'query';
+                            $tagMethod = $node->name->name;
+                        }
+
                         $guardCheck = $tagName.':'.$tagMethod;
 
                         if (! $this->guardRuntimeTag($guardCheck)) {
@@ -1126,10 +1223,19 @@ class NodeProcessor
 
                         $lockData = $this->data;
                         GlobalRuntimeState::$globalTagEnterStack[] = $node;
+
+                        $tagParameters = $node->getParameterValues($this, $this->getActiveData());
+                        $tagToLoad = $node->name->name;
+
+                        if ($this->encounteredBuilder) {
+                            $tagToLoad = 'query';
+                            $tagParameters['builder'] = $this->resolvedBuilder;
+                        }
+
                         /** @var Tags $tag */
-                        $tag = $this->loader->load($node->name->name, [
+                        $tag = $this->loader->load($tagToLoad, [
                             'parser' => $this->antlersParser,
-                            'params' => $node->getParameterValues($this, $this->getActiveData()),
+                            'params' => $tagParameters,
                             'content' => $node->runtimeContent,
                             'context' => $tagActiveData,
                             'tag' => $tagName,
@@ -1137,6 +1243,32 @@ class NodeProcessor
                         ]);
 
                         $output = call_user_func([$tag, $node->name->getRuntimeMethodName()]);
+
+                        // While the PathDataManager can resolve builder instances,
+                        // we will handle this case here so that the values can
+                        // "fall through" to the rest of the Runtime process
+                        // and avoid multiple lookups of the same data.
+                        if ($this->encounteredBuilder) {
+                            $dataSetName = $node->name->name;
+
+                            $tempLockData = $lockData;
+                            $activeLockFrame = [];
+
+                            if (count($tempLockData) > 0) {
+                                $activeLockFrame = $tempLockData[count($tempLockData) - 1];
+                            }
+
+                            $newData = [
+                                $dataSetName => $output->all()
+                            ];
+
+                            $builderScope = array_merge($activeLockFrame, $newData);
+                            $lockData[] = $builderScope;
+
+                            // It is important to reset these so builder instances do not leak.
+                            $this->encounteredBuilder = false;
+                            $this->resolvedBuilder = null;
+                        }
 
                         RuntimeParser::pushNodeCache($node->runtimeContent, $node->children);
 
@@ -1440,6 +1572,7 @@ class NodeProcessor
                             }
                         } elseif (count($node->runtimeNodes) == 0 && $node->isTagNode) {
                             $dataRetriever = new PathDataManager();
+                            $dataRetriever->setNodeProcessor($this);
                             $dataRetriever->cascade($this->cascade);
 
                             if ($this->antlersParser != null) {
@@ -1476,6 +1609,7 @@ class NodeProcessor
                     if ($runtimeResolveLoopVar == false || $runtimeResolveModifiedValue == false) {
                         if ($node->pathReference != null) {
                             $dataRetriever = new PathDataManager();
+                            $dataRetriever->setNodeProcessor($this);
                             $dataRetriever->cascade($this->cascade);
 
                             if ($this->antlersParser != null) {

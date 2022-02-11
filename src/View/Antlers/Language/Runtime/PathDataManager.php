@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Antlers\ParserContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\AntlersString;
@@ -16,6 +17,8 @@ use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\VariableAccessException;
+use Statamic\View\Antlers\Language\Nodes\AntlersNode;
+use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
@@ -107,11 +110,22 @@ class PathDataManager
     private $environment = null;
 
     /**
+     * @var NodeProcessor|null
+     */
+    private $nodeProcessor = null;
+
+    /**
      * A collection of internal interpolation references.
      *
      * @var array
      */
     private $interpolations = [];
+
+    /**
+     * Indicates if the data manager should check for special values and intercept them.
+     * @var bool
+     */
+    private $shouldDoValueIntercept = true;
 
     /**
      * Sets the internal environment reference.
@@ -121,6 +135,30 @@ class PathDataManager
     public function setEnvironment($environment)
     {
         $this->environment = $environment;
+    }
+
+    /**
+     * Sets the internal node processor reference.
+     *
+     * @param NodeProcessor $processor
+     */
+    public function setNodeProcessor($processor)
+    {
+        $this->nodeProcessor = $processor;
+    }
+
+    /**
+     * Returns a NodeProcessor reference based on the current configuration.
+     *
+     * @return NodeProcessor|null
+     */
+    private function getNodeProcessor()
+    {
+        if ($this->environment != null) {
+            return $this->environment->_getNodeProcessor();
+        }
+
+        return $this->nodeProcessor;
     }
 
     /**
@@ -141,13 +179,20 @@ class PathDataManager
      *
      * @param  VariableReference  $path  The variable path.
      * @param  array  $data  The data to search.
+     * @param bool $disableIntercept Indicates if variable interception should be disabled.
      * @return array
      *
      * @throws RuntimeException
      */
-    public function getDataWithExistence(VariableReference $path, $data)
+    public function getDataWithExistence(VariableReference $path, $data, $disableIntercept = false)
     {
+        $currentValue = $this->shouldDoValueIntercept;
+        if ($disableIntercept) {
+            $this->shouldDoValueIntercept = false;
+        }
+
         $value = $this->getData($path, $data);
+        $this->shouldDoValueIntercept = $currentValue;
 
         return [$this->didFind, $value];
     }
@@ -297,6 +342,41 @@ class PathDataManager
     }
 
     /**
+     * Checks the current path item and data to see if the resolved value should be intercepted.
+     *
+     * Builder instances will be sent to the Query tag to be resolved when they are encountered.
+     *
+     * @param PathNode $pathItem
+     * @throws RuntimeException
+     */
+    private function checkForValueIntercept($pathItem)
+    {
+        if (! $this->shouldDoValueIntercept) {
+            return;
+        }
+
+        $builderCheckValue = $this->reducedVar instanceof Value ? $this->reducedVar->value() : $this->reducedVar;
+
+        if ($builderCheckValue instanceof Builder) {
+
+            $nodeProcessor = $this->getNodeProcessor();
+            $activeNode = $nodeProcessor->getActiveNode();
+
+            if ($activeNode instanceof AntlersNode || $activeNode instanceof ConditionNode) {
+                $interceptResult = $nodeProcessor->evaluateDeferredNodeAsTag(
+                    $activeNode,
+                    'query',
+                    $pathItem->name, [ 'builder' => $builderCheckValue, ]
+                );
+
+                $this->reducedVar = $interceptResult;
+            } else {
+                throw new RuntimeException('Not enough context to resolve: '.$pathItem->name);
+            }
+        }
+    }
+
+    /**
      * Attempts to locate a value within the provided data.
      *
      * @param  VariableReference  $path  The variable path.
@@ -351,10 +431,10 @@ class PathDataManager
                 }
 
                 if (array_key_exists($pathItem->name, $this->interpolations) && $this->environment != null) {
-                    $nodeProcessor = $this->environment->_getNodeProcessor();
+                    $nodeProcessor = $this->getNodeProcessor();
 
                     if ($nodeProcessor != null) {
-                        $varResult = $this->environment->_getNodeProcessor()->reduce($this->interpolations[$pathItem->name]);
+                        $varResult = $nodeProcessor->reduce($this->interpolations[$pathItem->name]);
                         $this->resolvedPath[] = $pathItem->name;
                         $this->reducedVar = $varResult;
 
@@ -375,6 +455,8 @@ class PathDataManager
                         $this->resolvedPath[] = $pathItem->name;
                         $this->reducedVar = $data[$pathItem->name];
 
+                        $this->checkForValueIntercept($pathItem);
+
                         $didScanSourceData = true;
 
                         if ($pathItem->isFinal == false || $this->reduceFinal) {
@@ -390,7 +472,7 @@ class PathDataManager
                             // If we have more steps in the path to take, but we are
                             // not a tag pair, we need to reduce anyway so we
                             // can descend further into the nested values.
-                            $this->reducedVar = self::reduce($this->reducedVar, true);
+                            $this->reducedVar = self::reduce($this->reducedVar, true, $this->shouldDoValueIntercept);
                         }
 
                         continue;
@@ -413,7 +495,7 @@ class PathDataManager
                                     // not a tag pair, we need to reduce anyway so we
                                     // can descend further into the nested values.
                                     if (! $pathItem->isFinal) {
-                                        $this->reducedVar = self::reduce($this->reducedVar, true);
+                                        $this->reducedVar = self::reduce($this->reducedVar, true, $this->shouldDoValueIntercept);
                                     }
                                 }
 
@@ -563,7 +645,7 @@ class PathDataManager
     private function compact($isFinal)
     {
         if ($this->antlersParser == null) {
-            $this->reducedVar = self::reduce($this->reducedVar, $this->isPair);
+            $this->reducedVar = self::reduce($this->reducedVar, $this->isPair, $this->shouldDoValueIntercept);
         } else {
             $isActualPair = $this->isPair;
 
@@ -591,9 +673,10 @@ class PathDataManager
      *
      * @param  mixed  $value  The value to reduce.
      * @param  bool  $isPair  Indicates if the path belongs to a node pair.
+     * @param bool $reduceBuildersAndAugmentables Indicates if Builder and Augmentable instances should be resolved.
      * @return array|string
      */
-    public static function reduce($value, $isPair = true)
+    public static function reduce($value, $isPair = true, $reduceBuildersAndAugmentables = true)
     {
         $reductionStack = [$value];
         $returnValue = $value;
@@ -620,18 +703,26 @@ class PathDataManager
                 $reductionStack[] = $reductionValue->toArray();
                 continue;
             } elseif ($reductionValue instanceof Augmentable) {
-                GlobalRuntimeState::$isEvaluatingUserData = true;
-                $augmented = RuntimeValueCache::getAugmentableValue($reductionValue);
-                $augmented = self::guardRuntimeReturnValue($augmented);
-                GlobalRuntimeState::$isEvaluatingUserData = false;
+                // Avoids resolving augmented data "too early".
+                if ($reduceBuildersAndAugmentables) {
+                    GlobalRuntimeState::$isEvaluatingUserData = true;
+                    $augmented = RuntimeValueCache::getAugmentableValue($reductionValue);
+                    $augmented = self::guardRuntimeReturnValue($augmented);
+                    GlobalRuntimeState::$isEvaluatingUserData = false;
+                    $reductionStack[] = $augmented;
+                } else {
+                    return $reductionValue;
+                }
 
-                $reductionStack[] = $augmented;
                 continue;
             } elseif ($reductionValue instanceof Collection) {
                 $reductionStack[] = $reductionValue->all();
                 continue;
             } elseif ($reductionValue instanceof Arrayable) {
                 $reductionStack[] = $reductionValue->toArray();
+                continue;
+            } elseif ($reductionValue instanceof Builder && $reduceBuildersAndAugmentables) {
+                $reductionStack[] = $reductionValue->get();
                 continue;
             }
 
