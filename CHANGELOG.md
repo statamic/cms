@@ -13,6 +13,7 @@
 ### What's changed
 - PHP 7.2 and 7.3 are no longer supported.
 - Laravel 6 and 7 are no longer supported.
+- Entries fieldtypes augment to query builders instead of collections. [#5238](https://github.com/statamic/cms/issues/5238) by @jasonvarga
 
 
 ## 3.2.32 (2022-01-26)

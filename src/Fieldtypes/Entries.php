@@ -214,23 +214,44 @@ class Entries extends Relationship
         return new \Statamic\Entries\EntryCollection($value);
     }
 
-    protected function augmentValue($value)
+    public function augment($values)
     {
-        if (! is_object($value)) {
-            $value = Entry::find($value);
+        $site = Site::current()->handle();
+        if (($parent = $this->field()->parent()) && $parent instanceof Localization) {
+            $site = $parent->locale();
         }
 
-        if ($value != null && $parent = $this->field()->parent()) {
-            $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
-            $value = $value->in($site);
-        }
+        $ids = Entry::query()
+            ->whereIn('id', Arr::wrap($values))
+            ->get()
+            ->map(function ($entry) use ($site) {
+                return optional($entry->in($site))->id();
+            })
+            ->filter()
+            ->all();
 
-        return ($value && $value->status() === 'published') ? $value : null;
+        $query = Entry::query()
+            ->whereIn('id', $ids)
+            ->where('status', 'published');
+
+        return $this->config('max_items') === 1 ? $query->first() : $query;
     }
 
-    protected function shallowAugmentValue($value)
+    public function shallowAugment($values)
     {
-        return $value->toShallowAugmentedCollection();
+        $items = $this->augment($values);
+
+        if ($this->config('max_items') === 1) {
+            $items = collect([$items]);
+        } else {
+            $items = $items->get();
+        }
+
+        $items = $items->filter()->map(function ($item) {
+            return $item->toShallowAugmentedCollection();
+        });
+
+        return $this->config('max_items') === 1 ? $items->first() : $items;
     }
 
     public function getSelectionFilters()

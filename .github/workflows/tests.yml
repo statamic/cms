@@ -31,7 +31,6 @@ jobs:
           - laravel: 9.*
             php: 7.4
 
-
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
