@@ -246,7 +246,7 @@ class ParserTestCase extends TestCase
         return $documentParser->getRenderNodes();
     }
 
-    protected function parser($data, $withCoreTagsAndModifiers = false)
+    protected function parser($data = [], $withCoreTagsAndModifiers = false)
     {
         GlobalRuntimeState::$yieldCount = 0;
         GlobalRuntimeState::$yieldStacks = [];
