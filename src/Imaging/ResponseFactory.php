@@ -34,17 +34,24 @@ class ResponseFactory implements ResponseFactoryInterface
      */
     public function create($cache, $path)
     {
+        $isFlysystemV1 = method_exists($cache, 'getTimestamp');
+
+        // Determine whether or not to use Flysystem 1.x or 3.x getter methods.
+        $mimeTypeMethod = $isFlysystemV1 ? 'getMimetype' : 'mimeType';
+        $fileSizeMethod = $isFlysystemV1 ? 'getSize' : 'fileSize';
+        $lastModifiedMethod = $isFlysystemV1 ? 'getTimestamp' : 'lastModified';
+
         $stream = $cache->readStream($path);
 
         $response = new StreamedResponse();
-        $response->headers->set('Content-Type', $cache->getMimetype($path));
-        $response->headers->set('Content-Length', $cache->getSize($path));
+        $response->headers->set('Content-Type', $cache->{$mimeTypeMethod}($path));
+        $response->headers->set('Content-Length', $cache->{$fileSizeMethod}($path));
         $response->setPublic();
         $response->setMaxAge(31536000);
         $response->setExpires(date_create()->modify('+1 years'));
 
         if ($this->request) {
-            $response->setLastModified(date_create()->setTimestamp($cache->getTimestamp($path)));
+            $response->setLastModified(date_create()->setTimestamp($cache->{$lastModifiedMethod}($path)));
             $response->isNotModified($this->request);
         }
 
