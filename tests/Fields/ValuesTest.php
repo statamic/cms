@@ -5,6 +5,7 @@ namespace Tests\Fields;
 use BadMethodCallException;
 use Exception;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Mockery;
 use Statamic\Contracts\Data\Augmentable;
@@ -55,6 +56,25 @@ class ValuesTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $collection = $values->getProxiedInstance());
         $this->assertEquals(['foo' => 'bar'], $collection->all());
+    }
+
+    /** @test */
+    public function its_arrayable()
+    {
+        $mockOne = Mockery::mock(Collection::class)->shouldReceive('toArray')->andReturn(['title' => 'first'])->getMock();
+        $mockTwo = Mockery::mock(Collection::class)->shouldReceive('toArray')->andReturn(['title' => 'second'])->getMock();
+
+        $values = new Values(collect([
+            'one' => $mockOne,
+            'two' => $mockTwo,
+        ]));
+
+        $this->assertInstanceOf(Arrayable::class, $values);
+
+        $this->assertEquals([
+            'one' => ['title' => 'first'],
+            'two' => ['title' => 'second'],
+        ], $values->toArray());
     }
 
     public function queryBuilderProvider()

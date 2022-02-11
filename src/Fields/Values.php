@@ -5,11 +5,12 @@ namespace Statamic\Fields;
 use ArrayAccess;
 use BadMethodCallException;
 use Exception;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder as EloquentQueryBuilder;
 use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
 use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 
-class Values implements ArrayAccess
+class Values implements ArrayAccess, Arrayable
 {
     protected $instance;
     protected $builders = [];
@@ -117,5 +118,10 @@ class Values implements ArrayAccess
     private function getProxiedCollection()
     {
         return $this->instance;
+    }
+
+    public function toArray()
+    {
+        return $this->getProxiedInstance()->toArray();
     }
 }
