@@ -157,11 +157,11 @@ class AugmentedAsset extends AbstractAugmented
 
     protected function durationMinutes()
     {
-        if(!$seconds = $this->duration()) {
+        if (! $seconds = $this->duration()) {
             return null;
         }
 
-        return floor($seconds / 60) . ":" . $seconds % 60;
+        return floor($seconds / 60).':'.$seconds % 60;
     }
 
     protected function durationMin()
