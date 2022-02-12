@@ -21,12 +21,10 @@ class Structure extends Tags
     use QueriesConditions;
 
     protected $currentUrl;
-    protected $siteAbsoluteUrl;
 
     public function __construct()
     {
         $this->currentUrl = URL::getCurrent();
-        $this->siteAbsoluteUrl = Site::current()->absoluteUrl();
     }
 
     public function wildcard($tag)
@@ -138,7 +136,6 @@ class Structure extends Tags
                 'first'       => $index === 0,
                 'last'        => $index === count($tree) - 1,
                 'is_current'  => rtrim($this->currentUrl, '/') === rtrim($url, '/'),
-                'is_parent'   => $this->siteAbsoluteUrl === $absoluteUrl ? false : URL::isAncestorOf($this->currentUrl, $url),
                 'is_external' => URL::isExternal($absoluteUrl),
             ]);
         })->filter()->values();

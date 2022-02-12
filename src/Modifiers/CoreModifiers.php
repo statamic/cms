@@ -882,6 +882,10 @@ class CoreModifiers extends Modifier
             $params = [implode('|', $params)];
         }
 
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         return implode(Arr::get($params, 0, ', '), $value);
     }
 
@@ -1567,7 +1571,7 @@ class CoreModifiers extends Modifier
      * Get the output of an Asset, useful for SVGs.
      *
      * @param $value
-     * @return array
+     * @return array|mixed|null|void
      */
     public function output($value)
     {

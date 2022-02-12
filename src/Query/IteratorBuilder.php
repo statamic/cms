@@ -146,6 +146,24 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function filterWhereBetween($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            return $value >= $where['values'][0] && $value <= $where['values'][1];
+        });
+    }
+
+    protected function filterWhereNotBetween($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            return $value < $where['values'][0] || $value > $where['values'][1];
+        });
+    }
+
     protected function getFilterItemValue($item, $column)
     {
         return (new ResolveValue)($item, $column);
