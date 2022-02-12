@@ -579,7 +579,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Get the asset's duration.
      *
-     * @return int|null
+     * @return float|null
      */
     public function duration()
     {
