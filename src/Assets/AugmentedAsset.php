@@ -166,6 +166,6 @@ class AugmentedAsset extends AbstractAugmented
 
     protected function durationMin()
     {
-        return $this->duration_minutes();
+        return $this->durationMinutes();
     }
 }
