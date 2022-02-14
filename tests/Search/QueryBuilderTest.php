@@ -288,6 +288,74 @@ class QueryBuilderTest extends TestCase
         $this->assertCount(4, $results);
         $this->assertEquals(['Post 1', 'Post 2', 'Post 5', 'Post 6'], $results->map->foo->all());
     }
+
+    /** @test **/
+    public function results_are_found_using_when()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->when(true, function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->when(false, function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
+
+        $this->assertCount(4, $results);
+        $this->assertEquals(['a', 'b', 'c', 'd'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_unless()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->unless(true, function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
+
+        $this->assertCount(4, $results);
+        $this->assertEquals(['a', 'b', 'c', 'd'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->unless(false, function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_tap()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->tap(function ($query) {
+            $query->where('title', 'like', '%Frodo%');
+        })->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder

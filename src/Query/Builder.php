@@ -338,6 +338,37 @@ abstract class Builder implements Contract
 
     abstract public function get($columns = ['*']);
 
+    public function when($value, $callback, $default = null)
+    {
+        if ($value) {
+            return $callback($this, $value) ?: $this;
+        }
+
+        if ($default) {
+            return $default($this, $value) ?: $this;
+        }
+
+        return $this;
+    }
+
+    public function tap($callback)
+    {
+        return $this->when(true, $callback);
+    }
+
+    public function unless($value, $callback, $default = null)
+    {
+        if (! $value) {
+            return $callback($this, $value) ?: $this;
+        }
+
+        if ($default) {
+            return $default($this, $value) ?: $this;
+        }
+
+        return $this;
+    }
+
     protected function filterTestEquals($item, $value)
     {
         return strtolower($item) === strtolower($value);
