@@ -79,7 +79,9 @@ class Grid extends Fieldtype
 
         $fields = $this->fields()->addValues($row)->process()->values()->all();
 
-        return array_merge($row, $fields);
+        $row = array_merge($row, $fields);
+
+        return Arr::removeNullValues($row);
     }
 
     public function preProcess($data)
