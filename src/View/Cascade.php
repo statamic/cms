@@ -145,7 +145,7 @@ class Cascade
 
             $global = $global->in($this->site->handle());
 
-            $this->set($global->handle(), $global->toAugmentedArray());
+            $this->set($global->handle(), new Values($global->toAugmentedCollection()));
         }
 
         $mainGlobal = $this->get('global') ?? [];

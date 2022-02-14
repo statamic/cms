@@ -414,10 +414,12 @@ class CascadeTest extends TestCase
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) use ($globals, $scopedGlobals) {
             $this->assertArrayHasKey('global', $cascade);
-            $this->assertEquals($globals, $cascade['global']);
+            $this->assertInstanceOf(Values::class, $cascade['global']);
+            $this->assertEquals($globals, $cascade['global']->toArray());
 
             $this->assertArrayHasKey('scoped_globals', $cascade);
-            $this->assertEquals($scopedGlobals, $cascade['scoped_globals']);
+            $this->assertInstanceOf(Values::class, $cascade['scoped_globals']);
+            $this->assertEquals($scopedGlobals, $cascade['scoped_globals']->toArray());
 
             // Everything inside the 'global' array should also be in the top level.
             foreach ($cascade['global'] as $key => $value) {
