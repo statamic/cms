@@ -7,6 +7,7 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\GridItemType;
 use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Grid extends Fieldtype
