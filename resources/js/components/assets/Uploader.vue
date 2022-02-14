@@ -111,7 +111,7 @@ export default {
                 },
 
                 onUploadProgress: (id, percent) => {
-                    let upload = _(this.uploads).findWhere({ id });
+                    let upload = _.findWhere(this.uploads, { id });
                     upload.percent = percent;
                     this.$emit('progress', upload, this.uploads);
                 },
@@ -119,12 +119,12 @@ export default {
                 onUploadSuccess: (id, response) => {
                     this.$emit('upload-complete', response.data, this.uploads);
 
-                    let index = _(this.uploads).findIndex({ id });
+                    let index = _.findIndex(this.uploads, { id });
                     this.uploads.splice(index, 1);
                 },
 
                 onUploadError: (id, errMsg, response) => {
-                    let upload = _(this.uploads).findWhere({ id });
+                    let upload = _.findWhere(this.uploads, { id });
 
                     if (response.responseJSON) {
                         errMsg = response.responseJSON.message;

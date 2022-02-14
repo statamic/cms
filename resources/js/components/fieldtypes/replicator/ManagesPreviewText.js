@@ -2,7 +2,7 @@ export default {
 
     computed: {
         previewText() {
-            const previews = _(this.previews).filter((value, handle) => {
+            const previews = _.filter(this.previews, (value, handle) => {
                 const config = _.findWhere(this.config.fields, { handle }) || {};
                 return config.replicator_preview === undefined ? true : config.replicator_preview;
             });

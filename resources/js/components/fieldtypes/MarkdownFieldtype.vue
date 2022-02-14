@@ -469,7 +469,7 @@ export default {
             this.selectedAssets = [];
 
             this.$axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
-                _(response.data).each((asset) => {
+                _.each(response.data, (asset) => {
                     var alt = asset.values.alt || '';
                     var url = encodeURI('statamic://'+asset.reference);
                     if (asset.isImage) {

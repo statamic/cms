@@ -399,7 +399,7 @@ export default {
          * When an asset is updated in the editor
          */
         assetUpdated(asset) {
-            const index = _(this.assets).findIndex({ id: asset.id });
+            const index = _.findIndex(this.assets, { id: asset.id });
             this.assets.splice(index, 1, asset);
         },
 
@@ -407,7 +407,7 @@ export default {
          * When an asset remove button was clicked.
          */
         assetRemoved(asset) {
-            const index = _(this.assets).findIndex({ id: asset.id });
+            const index = _.findIndex(this.assets, { id: asset.id });
             this.assets.splice(index, 1);
         },
 

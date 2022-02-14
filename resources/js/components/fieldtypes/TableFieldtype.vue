@@ -151,9 +151,10 @@ export default {
 
         replicatorPreview() {
             // Join all values with commas. Exclude any empties.
-            return _(this.data)
+            return _.chain(this.data)
                 .map(row => row.value.cells.filter(cell => !!cell).join(', '))
-                .filter(row => !!row).join(', ');
+                .filter(row => !!row).join(', ')
+                .value();
         }
     },
 
