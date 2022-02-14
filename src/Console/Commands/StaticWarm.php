@@ -29,8 +29,11 @@ class StaticWarm extends Command
     use RunsInPlease;
     use EnhancesCommands;
 
-    protected $name = 'statamic:static:warm';
+    protected $signature = 'statamic:static:warm {--queue : Queue the requests}';
+
     protected $description = 'Warms the static cache by visiting all URLs';
+
+    protected $shouldQueue = false;
 
     private $uris;
 
@@ -42,12 +45,22 @@ class StaticWarm extends Command
             return 1;
         }
 
+        $this->shouldQueue = $this->option('queue');
+
+        if ($this->shouldQueue && config('queue.default') === 'sync') {
+            $this->error('The queue connection is set to "sync". Queueing will be disabled.');
+            $this->shouldQueue = false;
+        }
+
         $this->comment('Please wait. This may take a while if you have a lot of content.');
 
         $this->warm();
 
         $this->output->newLine();
-        $this->info('The static cache has been warmed.');
+        $this->info($this->shouldQueue
+            ? 'All requests to warm the static cache have been added to the queue.'
+            : 'The static cache has been warmed.'
+        );
 
         return 0;
     }
@@ -59,18 +72,29 @@ class StaticWarm extends Command
         $this->output->newLine();
         $this->line('Compiling URLs...');
 
-        $pool = new Pool($client, $this->requests(), [
-            'concurrency' => $this->concurrency(),
-            'fulfilled' => [$this, 'outputSuccessLine'],
-            'rejected' => [$this, 'outputFailureLine'],
-        ]);
-
-        $promise = $pool->promise();
+        $requests = $this->requests();
 
         $this->output->newLine();
-        $this->line('Visiting '.$this->uris()->count().' URLs...');
 
-        $promise->wait();
+        if ($this->shouldQueue) {
+            $this->line('Queueing '.count($requests).' requests...');
+
+            foreach ($requests as $request) {
+                StaticWarmJob::dispatch($request);
+            }
+        } else {
+            $this->line('Visiting '.count($requests).' URLs...');
+
+            $pool = new Pool($client, $requests, [
+                'concurrency' => $this->concurrency(),
+                'fulfilled' => [$this, 'outputSuccessLine'],
+                'rejected' => [$this, 'outputFailureLine'],
+            ]);
+
+            $promise = $pool->promise();
+
+            $promise->wait();
+        }
     }
 
     private function concurrency(): int
