@@ -1507,12 +1507,11 @@ class CoreModifiers extends Modifier
      * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function obfuscateEmail($value, $params)
+    public function obfuscateEmail($value)
     {
-        return Html::email($value, null, $this->buildAttributesFromParameters($params));
+        return Html::email($value);
     }
 
     /**
