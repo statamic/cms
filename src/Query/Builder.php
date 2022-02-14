@@ -5,12 +5,15 @@ namespace Statamic\Query;
 use Closure;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 abstract class Builder implements Contract
 {
+    use Conditionable;
+
     protected $columns;
     protected $limit;
     protected $offset = 0;
@@ -338,35 +341,9 @@ abstract class Builder implements Contract
 
     abstract public function get($columns = ['*']);
 
-    public function when($value, $callback, $default = null)
-    {
-        if ($value) {
-            return $callback($this, $value) ?: $this;
-        }
-
-        if ($default) {
-            return $default($this, $value) ?: $this;
-        }
-
-        return $this;
-    }
-
     public function tap($callback)
     {
         return $this->when(true, $callback);
-    }
-
-    public function unless($value, $callback, $default = null)
-    {
-        if (! $value) {
-            return $callback($this, $value) ?: $this;
-        }
-
-        if ($default) {
-            return $default($this, $value) ?: $this;
-        }
-
-        return $this;
     }
 
     protected function filterTestEquals($item, $value)
