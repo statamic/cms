@@ -221,7 +221,9 @@ class Entries
 
     protected function querySelect($query)
     {
-        $query->select($this->getQuerySelectKeys(Entry::make()));
+        if ($keys = $this->getQuerySelectKeys(Entry::make())) {
+            $query->select($keys);
+        }
     }
 
     protected function querySite($query)
