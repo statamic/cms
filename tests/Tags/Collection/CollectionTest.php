@@ -526,7 +526,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_orders_using_the_blueprint_sort_direction()
+    public function it_orders_using_the_collection_sort_direction()
     {
         $this->foods->sortField('title')->sortDirection('asc')->save();
 
