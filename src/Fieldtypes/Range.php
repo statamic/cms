@@ -38,8 +38,8 @@ class Range extends Fieldtype
                 'width' => 50,
             ],
             'default' => [
-                'display' => __('Default'),
-                'instructions' => __('statamic::fieldtypes.any.config.default'),
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
                 'type' => 'integer',
                 'default' => null,
                 'width' => 50,
@@ -53,12 +53,6 @@ class Range extends Fieldtype
             'append' => [
                 'display' => __('Append'),
                 'instructions' => __('statamic::fieldtypes.range.config.append'),
-                'type' => 'text',
-                'width' => 50,
-            ],
-            'default' => [
-                'display' => __('Default Value'),
-                'instructions' => __('statamic::messages.fields_default_instructions'),
                 'type' => 'text',
                 'width' => 50,
             ],

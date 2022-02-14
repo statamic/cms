@@ -1,5 +1,57 @@
 # Release Notes
 
+## 3.2.33 (2022-02-11)
+
+### What's new
+- Support `whereBetween` and `whereNotBetween` in the query builder. [#4752](https://github.com/statamic/cms/issues/4752) by @ryanmitchell
+- Ability to add config fields to existing fieldtypes. [#5077](https://github.com/statamic/cms/issues/5077) by @aerni
+- Add Polish translation. [#5146](https://github.com/statamic/cms/issues/5146) by @damianchojnacki
+- Replicator/Bard/Grid fields can be validated against fields in the same set/row. [#5047](https://github.com/statamic/cms/issues/5047) by @arthurperton
+- Add audio and video attributes to assets. [#5045](https://github.com/statamic/cms/issues/5045) by @edalzell
+
+### What's improved
+- Improve performance of fetching user roles. [#5120](https://github.com/statamic/cms/issues/5120) by @jonassiewertsen
+- The password protection page is translatable. [#4894](https://github.com/statamic/cms/issues/4894) by @jelleroorda
+
+### What's fixed
+- Fix toggle fieldtype alignment issues. [#5251](https://github.com/statamic/cms/issues/5251) by @arthurperton
+- Fix the `list` modifier not working with Collections. [#5255](https://github.com/statamic/cms/issues/5255) by @ryanmitchell
+- Fix incorrect exception usage in Comb. [#5223](https://github.com/statamic/cms/issues/5223) by @Konafets
+- Fix incorrect exception usage in the Agolia index. [#5224](https://github.com/statamic/cms/issues/5224) by @Konafets
+- Fix the `structures` icon not inheriting color. [#5230](https://github.com/statamic/cms/issues/5230) by @aerni
+- Removed duplicated logic in `nav` tag. [#5210](https://github.com/statamic/cms/issues/5210) by @arthurperton
+- Revert `type` being a reserved word for field handles. [#5184](https://github.com/statamic/cms/issues/5184) by @jasonvarga
+- Fix static caching not invalidating when a collection tree is deleted. [#5170](https://github.com/statamic/cms/issues/5170) by @Konafets
+- Fix HTML snippet in Bard fieldtype related messages. [#5145](https://github.com/statamic/cms/issues/5145) by @Konafets
+- Set the `color` fieldtype's `color_modes` default value correctly. [#5137](https://github.com/statamic/cms/issues/5137) by @Konafets
+- Prevent additional data in blueprint YAML files being removed when saving. [#5129](https://github.com/statamic/cms/issues/5129) by @jasonvarga
+- A bunch of code formatting fixes. [#5218](https://github.com/statamic/cms/issues/5218) [#5214](https://github.com/statamic/cms/issues/5214) [#5219](https://github.com/statamic/cms/issues/5219) [#5215](https://github.com/statamic/cms/issues/5215) [#5189](https://github.com/statamic/cms/issues/5189) [#5158](https://github.com/statamic/cms/issues/5158) [#5134](https://github.com/statamic/cms/issues/5134) [#5142](https://github.com/statamic/cms/issues/5142) by @Konafets
+
+
+
+## 3.2.32 (2022-01-26)
+
+### What's improved
+- Improve performance of the `nav` tag. [#4925](https://github.com/statamic/cms/issues/4925) by @FrittenKeeZ
+- Prevent entering negative values into `max_items`/`max_files` configs. [#5044](https://github.com/statamic/cms/issues/5044) by @edalzell
+- Prevent using `type` as a field handle. [#5088](https://github.com/statamic/cms/issues/5088) by @arthurperton
+- Default field names are suffixed to help prevent tag/variable collisions. [#5084](https://github.com/statamic/cms/issues/5084) by @arthurperton
+
+### What's fixed
+- Fix infinite loop in UI when removing assets from `asset` fieldtype. [#5070](https://github.com/statamic/cms/issues/5070) by @arthurperton
+- Fix `widont` inserting spaces into nested lists. [#5115](https://github.com/statamic/cms/issues/5115) by @benfreke
+- Fix Replicator preview text generation. [#5096](https://github.com/statamic/cms/issues/5096) by @arthurperton
+- Fix Eloquent query builder column selects. [#5125](https://github.com/statamic/cms/issues/5125) by @jasonvarga
+- Fix "passed value cannot be an array" error. [#5127](https://github.com/statamic/cms/issues/5127) by @jasonvarga
+- Fix unintentionally added new abstract query builder method. [#5123](https://github.com/statamic/cms/issues/5123) by @jasonvarga
+- Fix `nav` tag's `is_parent` logic so it works better for Navs. [#4969](https://github.com/statamic/cms/issues/4969) by @arthurperton
+- Throw a 404 instead of 500 on Glide asset URLs when there's an invalid container. [#5094](https://github.com/statamic/cms/issues/5094) by @edalzell
+- Fix Replicator's "add set" button not inserting at the right position. [#5107](https://github.com/statamic/cms/issues/5107) by @arthurperton
+- Fix the "delete" action confirmation translations. [#5074](https://github.com/statamic/cms/issues/5074) by @zsoltjanes
+- Bump `marked` from 0.7.0 to 4.0.10 [#5075](https://github.com/statamic/cms/issues/5075) by @dependabot
+
+
+
 ## 3.2.31 (2022-01-14)
 
 ### What's new
