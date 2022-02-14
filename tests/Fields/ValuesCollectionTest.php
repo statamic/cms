@@ -89,7 +89,8 @@ class ValuesCollectionTest extends TestCase
     /** @test */
     public function macro_is_registered_with_augmentables()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             public function augment($value)
             {
                 return str_replace('raw', 'augmented', $value);
