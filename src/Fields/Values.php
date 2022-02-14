@@ -34,7 +34,7 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate
     #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
-        return $this->getProxiedCollection()->has($offset);
+        return $this->getProxiedInstance()->has($offset);
     }
 
     #[\ReturnTypeWillChange]
@@ -63,7 +63,7 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate
 
     private function getNormalizedValueFromProxiedCollection($key)
     {
-        $value = $this->getProxiedCollection()->get($key);
+        $value = $this->getProxiedInstance()->get($key);
 
         return $value instanceof Value ? $value->value() : $value;
     }
@@ -87,7 +87,7 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate
 
     public function raw($key)
     {
-        $value = $this->getProxiedCollection()->get($key);
+        $value = $this->getProxiedInstance()->get($key);
 
         return $value instanceof Value ? $value->raw() : $value;
     }
@@ -104,7 +104,7 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate
 
     public function __call($method, $args)
     {
-        if ($this->getProxiedCollection()->has($method)) {
+        if ($this->getProxiedInstance()->has($method)) {
             $value = $this->getNormalizedValueFromProxiedCollection($method);
 
             if ($this->isQueryBuilder($value)) {
@@ -120,11 +120,6 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate
         return $value instanceof StatamicQueryBuilder
             || $value instanceof IlluminateQueryBuilder
             || $value instanceof EloquentQueryBuilder;
-    }
-
-    private function getProxiedCollection()
-    {
-        return $this->instance;
     }
 
     public function toArray()
