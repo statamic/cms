@@ -6,12 +6,14 @@
 - Frontend form field conditions. [#4949](https://github.com/statamic/cms/issues/4949) by @jesseleite
 - Antlers wrapper for Blade. [#5058](https://github.com/statamic/cms/issues/5058) by @jesseleite
 - Support Blade section yields in Antlers layouts. [#5056](https://github.com/statamic/cms/issues/5056) by @jasonvarga
+- Added wrapper classes to make working with values in Blade easier. [#5201](https://github.com/statamic/cms/issues/5201) by @jasonvarga
 
 ### What's fixed
 - CP forms only submit visible fields, in order to fix sometimes/required_if/etc validation rules. [#5101](https://github.com/statamic/cms/issues/5101) by @jesseleite
 
 ### What's changed
 - Entries fieldtypes augment to query builders instead of collections. [#5238](https://github.com/statamic/cms/issues/5238) by @jasonvarga
+- The `page` and each Global Set in the cascade are now `Values` instances. [#5201](https://github.com/statamic/cms/issues/5201) by @jasonvarga
 
 
 ## 3.2.32 (2022-01-26)
