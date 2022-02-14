@@ -210,12 +210,6 @@ class Entries
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
 
-        if ($collection->orderable()) {
-            return 'order:asc';
-        } elseif ($collection->dated()) {
-            return 'date:desc|title:asc';
-        }
-
         return $collection->sortField().':'.$collection->sortDirection();
     }
 
