@@ -3,6 +3,7 @@ import Toast from './mixins/Toast.js';
 import Statamic from './components/Statamic.js';
 import Alpine from 'alpinejs'
 import * as Globals from './bootstrap/globals'
+import { default as underscore } from 'underscore'
 
 let global_functions = Object.keys(Globals)
 global_functions.forEach(fnName => { global[fnName] = Globals[fnName] })
@@ -15,7 +16,7 @@ Vue.config.productionTip = false
 window.Alpine = Alpine
 window.Vue = Vue;
 window.Statamic = Statamic;
-window._ = require('underscore');
+window._ = underscore;
 window.$ = window.jQuery = require('jquery');
 window.rangy = require('rangy');
 
