@@ -2,11 +2,25 @@
 
 namespace Tests\Console\Commands;
 
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Queue;
+use Facades\Tests\Factories\EntryFactory;
+use Statamic\Console\Commands\StaticWarmJob;
+use Statamic\Facades\Collection;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class StaticWarmTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->createPage('about');
+        $this->createPage('contact');
+    }
+
     /** @test */
     public function it_exits_with_error_when_static_caching_is_disabled()
     {
@@ -21,10 +35,8 @@ class StaticWarmTest extends TestCase
         config(['statamic.static_caching.strategy' => 'half']);
 
         $this->artisan('statamic:static:warm')
-            ->expectsOutput('Visiting 0 URLs...')
+            ->expectsOutput('Visiting 2 URLs...')
             ->assertSuccessful();
-        // Artisan::call('statamic:static:warm');
-        // dd(Artisan::output());
     }
 
     /** @test */
@@ -45,8 +57,41 @@ class StaticWarmTest extends TestCase
             'queue.default' => 'redis',
         ]);
 
+        Queue::fake();
+
         $this->artisan('statamic:static:warm', ['--queue' => true])
             ->doesntExpectOutput('The queue connection is set to "sync". Queueing will be disabled.')
+            ->expectsOutput('Queueing 2 requests...')
             ->assertSuccessful();
+
+        Queue::assertPushed(StaticWarmJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/about';
+        });
+        Queue::assertPushed(StaticWarmJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/contact';
+        });
+    }
+
+    private function createPage($slug, $attributes = [])
+    {
+        $this->makeCollection()->save();
+
+        return tap($this->makePage($slug, $attributes))->save();
+    }
+
+    private function makePage($slug, $attributes = [])
+    {
+        return EntryFactory::slug($slug)
+            ->id($slug)
+            ->collection('pages')
+            ->data($attributes['with'] ?? [])
+            ->make();
+    }
+
+    private function makeCollection()
+    {
+        return Collection::make('pages')
+            ->routes('{slug}')
+            ->template('default');
     }
 }
