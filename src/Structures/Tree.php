@@ -45,7 +45,7 @@ abstract class Tree implements Contract, Localization
     {
         return $this->fluentlyGetOrSet('tree')
             ->getter(function ($tree) {
-                $key = "structure-{$this->handle()}-{$this->locale()}-".md5(json_encode($tree));
+                $key = "structure-{$this->handle()}-{$this->locale()}-".md5(json_encode($this->tree));
 
                 return Blink::once($key, function () use ($tree) {
                     return $this->structure()->validateTree($tree, $this->locale());
@@ -269,7 +269,7 @@ abstract class Tree implements Contract, Localization
         foreach ($branches as &$branch) {
             $children = $branch['children'] ?? [];
 
-            if ($branch[$this->idKey()] === $parent) {
+            if ($branch[$this->idKey()] == $parent) {
                 $children[] = $page;
                 $branch['children'] = $children;
                 break;
@@ -320,7 +320,7 @@ abstract class Tree implements Contract, Localization
         $match = null;
 
         foreach ($branches as $key => &$branch) {
-            if ($branch[$this->idKey()] === $entry) {
+            if ($branch[$this->idKey()] == $entry) {
                 $match = $branch;
                 unset($branches[$key]);
                 break;
