@@ -5,6 +5,7 @@ namespace Statamic\Providers;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Facades;
 use Statamic\Facades\Preference;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
@@ -128,6 +129,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function () {
             return (new \Statamic\Fields\FieldsetRepository)
                 ->setDirectory(resource_path('fieldsets'));
+        });
+
+        collect([
+            'entries' => fn () => Facades\Entry::query(),
+            'terms' => fn () => Facades\Term::query(),
+            'assets' => fn () => Facades\Asset::query(),
+            'users' => fn () => Facades\User::query(),
+        ])->each(function ($binding, $alias) {
+            app()->bind('statamic.queries.'.$alias, $binding);
         });
     }
 
