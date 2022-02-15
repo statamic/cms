@@ -4,9 +4,11 @@ namespace Statamic\Data;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
 use Illuminate\Support\Collection;
 use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 use Statamic\Fields\Value;
 
 class AugmentedCollection extends Collection
@@ -59,6 +61,10 @@ class AugmentedCollection extends Collection
                 $value = $value->value();
             }
 
+            if ($this->isQueryBuilder($value)) {
+                $value = $value->get();
+            }
+
             $value = $value instanceof Arrayable ? $value->toArray() : $value;
 
             if (is_array($value) || $value instanceof Collection) {
@@ -86,5 +92,11 @@ class AugmentedCollection extends Collection
 
             return $value;
         }, $this->all());
+    }
+
+    private function isQueryBuilder($value)
+    {
+        return $value instanceof StatamicQueryBuilder
+            || $value instanceof IlluminateQueryBuilder;
     }
 }

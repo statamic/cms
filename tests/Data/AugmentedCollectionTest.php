@@ -4,10 +4,12 @@ namespace Tests\Data;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Query\Builder as LaravelQueryBuilder;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Fields\Value;
@@ -71,6 +73,11 @@ class AugmentedCollectionTest extends TestCase
     /** @test */
     public function it_converts_value_objects_to_their_augmented_values_with_flag()
     {
+        $statamicQuery = m::mock(StatamicQueryBuilder::class);
+        $statamicQuery->shouldReceive('get')->andReturn(collect(['statamic', 'query', 'builder', 'results']));
+        $laravelQuery = m::mock(LaravelQueryBuilder::class);
+        $laravelQuery->shouldReceive('get')->andReturn(collect(['laravel', 'query', 'builder', 'results']));
+
         $a = new Value('alfa');
         $b = new Value('bravo');
         $c = new Value([
@@ -82,6 +89,8 @@ class AugmentedCollectionTest extends TestCase
                     'foxtrot',
                 ]),
             ])),
+            new Value($statamicQuery),
+            new Value($laravelQuery),
         ]);
 
         $c = new AugmentedCollection([$a, $b, $c, 'golf']);
@@ -100,6 +109,8 @@ class AugmentedCollectionTest extends TestCase
                         'foxtrot',
                     ],
                 ],
+                ['statamic', 'query', 'builder', 'results'],
+                ['laravel', 'query', 'builder', 'results'],
             ],
             'golf',
         ], $results);
