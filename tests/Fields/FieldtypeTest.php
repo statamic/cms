@@ -133,7 +133,8 @@ class FieldtypeTest extends TestCase
     {
         $this->assertFalse((new TestFieldtype)->isRelationship());
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected $relationship = true;
         };
 

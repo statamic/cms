@@ -23,12 +23,14 @@ class ValueTest extends TestCase
     public function isRelationshipFieldtypeProvider()
     {
         return [
-            'relationship' => [true, new class extends Fieldtype {
+            'relationship' => [true, new class extends Fieldtype
+            {
                 protected $relationship = true;
-            }],
-            'not a relationship' => [false, new class extends Fieldtype {
+            }, ],
+            'not a relationship' => [false, new class extends Fieldtype
+            {
                 protected $relationship = false;
-            }],
+            }, ],
             'no fieldtype' => [false, null],
         ];
     }

@@ -90,7 +90,8 @@ class HasAugmentedInstanceTest extends TestCase
         $mock->shouldReceive('withRelations')->with(['baz', 'qux'])->andReturnSelf();
         $mock->shouldReceive('select')->with(null)->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
 
-        $thing = new class($mock) {
+        $thing = new class($mock)
+        {
             use HasAugmentedInstance;
 
             public function __construct($mock)

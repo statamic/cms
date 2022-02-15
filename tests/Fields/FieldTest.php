@@ -601,7 +601,8 @@ class FieldTest extends TestCase
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
+            ->andReturn(new class extends Fieldtype
+            {
                 public function isRelationship(): bool
                 {
                     return true;
