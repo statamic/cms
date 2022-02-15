@@ -430,6 +430,8 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
+        // hmmm? ->with() ?
+
         return $this
             ->toAugmentedCollection($this->selectedQueryColumns)
             ->withShallowNesting()

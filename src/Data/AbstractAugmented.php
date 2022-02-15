@@ -12,6 +12,7 @@ abstract class AbstractAugmented implements Augmented
 {
     protected $data;
     protected $blueprintFields;
+    protected $relations = [];
 
     public function __construct($data)
     {
@@ -38,7 +39,7 @@ abstract class AbstractAugmented implements Augmented
             $arr[$key] = $this->get($key);
         }
 
-        return new AugmentedCollection($arr);
+        return (new AugmentedCollection($arr))->withRelations($this->relations);
     }
 
     abstract public function keys();
@@ -111,5 +112,12 @@ abstract class AbstractAugmented implements Augmented
         }
 
         return $this->blueprintFields;
+    }
+
+    public function withRelations($relations)
+    {
+        $this->relations = $relations;
+
+        return $this;
     }
 }

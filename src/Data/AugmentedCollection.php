@@ -15,6 +15,7 @@ class AugmentedCollection extends Collection
 {
     protected $shallowNesting = false;
     protected $shouldEvaluate = false;
+    protected $withRelations = [];
 
     /**
      * Enables shallow augmentation on nested values when
@@ -49,6 +50,12 @@ class AugmentedCollection extends Collection
     public function toArray()
     {
         return $this->map(function ($value) {
+            if ($value instanceof Value && $value->isRelationship()) {
+                $value = in_array($value->handle(), $this->withRelations)
+                    ? ($this->shallowNesting ? $value->shallow() : $value->value())
+                    : (array) $value->raw();
+            }
+
             if ($this->shallowNesting && $value instanceof Value) {
                 $value = $value->shallow();
             }
@@ -98,5 +105,12 @@ class AugmentedCollection extends Collection
     {
         return $value instanceof StatamicQueryBuilder
             || $value instanceof IlluminateQueryBuilder;
+    }
+
+    public function withRelations($relations)
+    {
+        $this->withRelations = $relations;
+
+        return $this;
     }
 }

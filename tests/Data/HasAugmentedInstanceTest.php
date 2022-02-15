@@ -17,6 +17,7 @@ class HasAugmentedInstanceTest extends TestCase
         $shallowFilteredAugmentedCollection = new AugmentedCollection(['id', 'title', 'api_url']);
 
         $mock = $this->mock(Augmented::class);
+        $mock->shouldReceive('withRelations')->with([])->andReturnSelf();
         $mock->shouldReceive('get')->with('foo')->once()->andReturn('bar');
         $mock->shouldReceive('select')->with(null)->times(2)->andReturn($augmentedCollection);
         $mock->shouldReceive('select')->with(['one'])->times(2)->andReturn($filteredAugmentedCollection);
@@ -56,6 +57,7 @@ class HasAugmentedInstanceTest extends TestCase
     public function augmented_thing_can_define_the_default_array_keys()
     {
         $mock = $this->mock(Augmented::class);
+        $mock->shouldReceive('withRelations')->with([])->andReturnSelf();
         $mock->shouldReceive('select')->with(['foo', 'bar'])->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
 
         $thing = new class($mock)
@@ -75,6 +77,35 @@ class HasAugmentedInstanceTest extends TestCase
             protected function defaultAugmentedArrayKeys()
             {
                 return ['foo', 'bar'];
+            }
+        };
+
+        $this->assertEquals(['foo', 'bar'], $thing->toAugmentedArray());
+    }
+
+    /** @test */
+    public function augmented_thing_can_define_the_default_relations()
+    {
+        $mock = $this->mock(Augmented::class);
+        $mock->shouldReceive('withRelations')->with(['baz', 'qux'])->andReturnSelf();
+        $mock->shouldReceive('select')->with(null)->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
+
+        $thing = new class($mock) {
+            use HasAugmentedInstance;
+
+            public function __construct($mock)
+            {
+                $this->mock = $mock;
+            }
+
+            public function newAugmentedInstance(): Augmented
+            {
+                return $this->mock;
+            }
+
+            protected function defaultAugmentedRelations()
+            {
+                return ['baz', 'qux'];
             }
         };
 

@@ -120,4 +120,9 @@ class Value implements IteratorAggregate, JsonSerializable
     {
         return new static($this->raw, $this->handle, $this->fieldtype, $this->augmentable, true);
     }
+
+    public function isRelationship(): bool
+    {
+        return optional($this->fieldtype)->isRelationship() ?? false;
+    }
 }

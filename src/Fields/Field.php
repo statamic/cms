@@ -410,4 +410,9 @@ class Field implements Arrayable
 
         return $type;
     }
+
+    public function isRelationship(): bool
+    {
+        return $this->fieldtype()->isRelationship();
+    }
 }

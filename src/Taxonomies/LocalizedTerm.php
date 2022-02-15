@@ -15,6 +15,7 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -27,7 +28,7 @@ use Statamic\Statamic;
 
 class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified, ContainsSupplementalData, ResolvesValues;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues;
 
     protected $locale;
     protected $term;
@@ -441,6 +442,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'slug', 'url', 'permalink', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
     }
 
     public function lastModified()

@@ -39,6 +39,7 @@ class AugmentedCollectionTest extends TestCase
     {
         $value = m::mock(Value::class);
         // $value->shouldNotReceive('toArray');
+        $value->shouldReceive('isRelationship')->andReturnFalse();
         $value->shouldReceive('shallow')->once()->andReturnSelf();
         $c = new AugmentedCollection([$value]);
         $results = $c->withShallowNesting()->toArray();
@@ -50,6 +51,7 @@ class AugmentedCollectionTest extends TestCase
     public function values_do_not_get_flagged_shallow_when_calling_toArray_without_flag()
     {
         $value = m::mock(Value::class);
+        $value->shouldReceive('isRelationship')->andReturnFalse();
         $value->shouldNotReceive('toArray');
         $value->shouldNotReceive('shallow');
         $c = new AugmentedCollection([$value]);
@@ -121,8 +123,10 @@ class AugmentedCollectionTest extends TestCase
     {
         $item1 = m::mock(Value::class);
         $item1->shouldReceive('value')->never();
+        $item1->shouldReceive('isRelationship')->andReturnFalse();
         $item2 = m::mock(Value::class);
         $item2->shouldReceive('value')->never();
+        $item2->shouldReceive('isRelationship')->andReturnFalse();
 
         $c = new AugmentedCollection([$item1, $item2, 'baz']);
 

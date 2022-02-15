@@ -19,6 +19,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
@@ -43,7 +44,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified;
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
@@ -763,6 +764,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'url', 'permalink', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
     }
 
     public function getProtectionScheme()

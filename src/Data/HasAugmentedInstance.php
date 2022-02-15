@@ -13,7 +13,9 @@ trait HasAugmentedInstance
 
     public function toAugmentedCollection($keys = null)
     {
-        return $this->augmented()->select($keys ?? $this->defaultAugmentedArrayKeys());
+        return $this->augmented()
+            ->withRelations($this->defaultAugmentedRelations())
+            ->select($keys ?? $this->defaultAugmentedArrayKeys());
     }
 
     public function toAugmentedArray($keys = null)
@@ -46,6 +48,11 @@ trait HasAugmentedInstance
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return [];
     }
 
     public function toEvaluatedAugmentedArray($keys = null)
