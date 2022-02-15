@@ -193,6 +193,24 @@ EOT;
         $this->assertEquals('[]', $this->parseBasicTemplate('collection:pages', 'never:is="true"'));
     }
 
+    /** @test */
+    public function it_sets_is_current_and_is_parent()
+    {
+        $this->makeNav([
+            ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
+                ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1', 'children' => [
+                    ['id' => '1-1-1', 'title' => '1.1.1', 'url' => '/1/1/1', 'children' => [
+                        ['id' => '1-1-1-1', 'title' => '1.1.1.1', 'url' => '/1/1/1/1'],
+                    ]],
+                ]],
+            ]],
+        ]);
+
+        $result = (string) Antlers::parse("{{ nav:test }}[{{ id }}{{ is_parent }}=parent{{ /is_parent }}{{ is_current }}=current{{ /is_current }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}");
+
+        $this->assertEquals('Nope', $result);
+    }
+
     private function makeNav($tree)
     {
         $nav = Nav::make('test');
