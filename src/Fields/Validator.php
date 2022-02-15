@@ -116,6 +116,8 @@ class Validator
             return $rule;
         }
 
+        $rule = str_replace('{this}.', $this->context['prefix'] ?? '', $rule);
+
         return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
             return Arr::get($this->replacements, $match[1], 'NULL');
         }, $rule);

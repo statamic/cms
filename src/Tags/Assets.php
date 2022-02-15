@@ -118,6 +118,10 @@ class Assets extends Tags
         return collect($fields);
     }
 
+    /**
+     * @param $value
+     * @return \Illuminate\Support\Collection|mixed|null
+     */
     protected function filterByType($value)
     {
         if (is_null($value)) {
@@ -155,7 +159,7 @@ class Assets extends Tags
      * Perform the asset lookups.
      *
      * @param  string|array  $urls  One URL, or array of URLs.
-     * @return string
+     * @return string|void
      */
     protected function assets($urls)
     {
@@ -200,8 +204,6 @@ class Assets extends Tags
 
     /**
      * Limit and offset the asset collection.
-     *
-     * @return array
      */
     private function limit()
     {
