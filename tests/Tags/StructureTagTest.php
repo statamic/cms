@@ -203,7 +203,7 @@ EOT;
     /** @test */
     public function it_sets_is_current_and_is_parent_for_a_nav()
     {
-        $template = "{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}";
+        $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
 
         $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
         \Statamic\Facades\URL::swap($mock);
@@ -325,7 +325,7 @@ EOT;
         $builder->shouldReceive('get')->andReturn(collect([$page_1, $page_1_1, $page_1_1_1, $page_1_1_1_1, $page_2]));
         Entry::shouldReceive('query')->andReturn($builder);
 
-        $template = "{{ nav }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav }}";
+        $template = '{{ nav }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav }}';
 
         $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
         \Statamic\Facades\URL::swap($mock);
