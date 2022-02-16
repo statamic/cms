@@ -2,6 +2,7 @@
 
 namespace Statamic\Taxonomies;
 
+use BadMethodCallException;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -18,7 +19,9 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Site;
+use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
@@ -463,5 +466,31 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
     public function fresh()
     {
         return Facades\Term::find($this->id())->in($this->locale);
+    }
+
+    public function __get($key)
+    {
+        $value = $this->augmentedValue($key);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
+    }
+
+    public function __call($method, $args)
+    {
+        $value = $this->augmentedValue($method);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            return $value;
+        }
+
+        throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
     }
 }

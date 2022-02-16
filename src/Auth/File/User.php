@@ -64,11 +64,7 @@ class User extends BaseUser
 
     public function __get($key)
     {
-        if ($key == 'email') {
-            return $this->email();
-        }
-
-        return $this->get($key);
+        return parent::__get($key);
     }
 
     public function id($id = null)
