@@ -24,7 +24,7 @@ class Structure extends Tags
 
     public function __construct()
     {
-        $this->currentUrl = URL::getCurrent();
+        $this->currentUrl = rtrim(URL::getCurrent(), '/');
     }
 
     public function wildcard($tag)
@@ -124,7 +124,7 @@ class Structure extends Tags
             $data = $page->toAugmentedArray($keys);
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
-            $url = $page->urlWithoutRedirect();
+            $url = rtrim($page->urlWithoutRedirect(), '/');
             $absoluteUrl = $page->absoluteUrl();
 
             return array_merge($data, [
@@ -135,7 +135,7 @@ class Structure extends Tags
                 'count'       => $index + 1,
                 'first'       => $index === 0,
                 'last'        => $index === count($tree) - 1,
-                'is_current'  => rtrim($this->currentUrl, '/') === rtrim($url, '/'),
+                'is_current'  => Str::length($url) && $url === $this->currentUrl,
                 'is_external' => URL::isExternal($absoluteUrl),
             ]);
         })->filter()->values();
