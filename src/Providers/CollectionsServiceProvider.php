@@ -6,6 +6,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Fields\Values;
+use Statamic\Fields\ValuesCollection;
 
 class CollectionsServiceProvider extends ServiceProvider
 {
@@ -73,7 +75,7 @@ class CollectionsServiceProvider extends ServiceProvider
 
     private function l10n()
     {
-        /**
+        /*
          * Extract the translations from the files and transform them for
          * usage for the javascript helper.
          *
@@ -181,6 +183,12 @@ class CollectionsServiceProvider extends ServiceProvider
 
                 return $value instanceof Arrayable ? $value->toArray() : $value;
             }, $this->items);
+        });
+
+        Collection::macro('toValuesCollection', function () {
+            $items = array_map(fn ($item) => new Values($item), $this->toAugmentedCollection());
+
+            return new ValuesCollection(collect($items));
         });
     }
 }
