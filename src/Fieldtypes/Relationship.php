@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Illuminate\Http\Resources\Json\JsonResource as Resource;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
 
@@ -64,15 +65,7 @@ abstract class Relationship extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        if (! $items = $this->getItemsForPreProcessIndex($data)) {
-            return [];
-        }
-
-        if ($this->config('max_items') === 1) {
-            $items = collect([$items]);
-        }
-
-        return $items->map(function ($item) {
+        return $this->getItemsForPreProcessIndex($data)->map(function ($item) {
             return [
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->get('title'),
@@ -82,9 +75,17 @@ abstract class Relationship extends Fieldtype
         });
     }
 
-    protected function getItemsForPreProcessIndex($values)
+    protected function getItemsForPreProcessIndex($values): Collection
     {
-        return $this->augment($values);
+        if (! $items = $this->augment($values)) {
+            return collect();
+        }
+
+        if ($this->config('max_items') === 1) {
+            $items = collect([$items]);
+        }
+
+        return $items;
     }
 
     public function process($data)
