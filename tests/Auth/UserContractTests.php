@@ -92,7 +92,8 @@ trait UserContractTests
         $builder->shouldReceive('get')->once()->andReturn('query builder results');
         app()->instance('mocked-builder', $builder);
 
-        (new class extends Fieldtype {
+        (new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)
@@ -272,7 +273,8 @@ trait UserContractTests
 
     private function createRole($handle)
     {
-        $class = new class($handle) extends Role {
+        $class = new class($handle) extends Role
+        {
             public function __construct($handle)
             {
                 $this->handle = $handle;
@@ -288,7 +290,8 @@ trait UserContractTests
 
     private function createGroup($handle)
     {
-        $class = new class($handle) extends UserGroup {
+        $class = new class($handle) extends UserGroup
+        {
             public function __construct($handle)
             {
                 $this->handle = $handle;
