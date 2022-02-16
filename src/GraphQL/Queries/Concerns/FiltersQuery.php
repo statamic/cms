@@ -3,9 +3,12 @@
 namespace Statamic\GraphQL\Queries\Concerns;
 
 use Statamic\Support\Arr;
+use Statamic\Tags\Concerns\QueriesConditions;
 
 trait FiltersQuery
 {
+    use QueriesConditions;
+
     /**
      * @param  \Statamic\Contracts\Entries\QueryBuilder  $query
      * @param  array  $filters

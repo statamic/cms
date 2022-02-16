@@ -10,11 +10,10 @@ use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\Support\Str;
-use Statamic\Tags\Concerns\QueriesConditions;
 
 class EntriesQuery extends Query
 {
-    use QueriesConditions, FiltersQuery;
+    use FiltersQuery;
 
     protected $attributes = [
         'name' => 'entries',
