@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Exceptions\CollectionNotFoundException;
@@ -285,5 +286,14 @@ class Entries extends Relationship
     public function getColumns()
     {
         return $this->getBlueprint()->columns()->values()->all();
+    }
+
+    protected function getItemsForPreProcessIndex($values): SupportCollection
+    {
+        if (! $augmented = $this->augment($values)) {
+            return collect();
+        }
+
+        return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
     }
 }
