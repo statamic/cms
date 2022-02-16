@@ -334,7 +334,7 @@ class AntlersNode extends AbstractNode
 
             if ($this->hasParameters) {
                 foreach ($this->parameters as $parameter) {
-                    if (ModifierManager::isModifier($parameter)) {
+                    if (ModifierManager::isModifier($parameter) || $parameter->name == 'handle_prefix') {
                         $this->hasModifierParametersCache = true;
                         break;
                     }

@@ -129,6 +129,13 @@ class PathDataManager
     private $shouldDoValueIntercept = true;
 
     /**
+     * A list of prefixes to check for first.
+     *
+     * @var string[]
+     */
+    private $handlePrefixes = [];
+
+    /**
      * Sets the internal environment reference.
      *
      * @param  Environment  $environment
@@ -136,6 +143,16 @@ class PathDataManager
     public function setEnvironment($environment)
     {
         $this->environment = $environment;
+    }
+
+    /**
+     * Sets a list of handle prefixes that should be checked.
+     *
+     * @param string[] $prefixes The handle prefixes.
+     */
+    public function setHandlePrefixes($prefixes)
+    {
+        $this->handlePrefixes = $prefixes;
     }
 
     /**
@@ -452,9 +469,22 @@ class PathDataManager
                         break;
                     }
 
-                    if (array_key_exists($pathItem->name, $data)) {
-                        $this->resolvedPath[] = $pathItem->name;
-                        $this->reducedVar = $data[$pathItem->name];
+                    $nameToUse = $pathItem->name;
+
+                    if (! empty($this->handlePrefixes)) {
+                        foreach ($this->handlePrefixes as $prefix) {
+                            $prefixedVar = $prefix.$nameToUse;
+
+                            if (array_key_exists($prefixedVar, $data)) {
+                                $nameToUse = $prefixedVar;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (array_key_exists($nameToUse, $data)) {
+                        $this->resolvedPath[] = $nameToUse;
+                        $this->reducedVar = $data[$nameToUse];
 
                         $this->checkForValueIntercept($pathItem);
 

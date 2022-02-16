@@ -1112,6 +1112,10 @@ class Environment
     {
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
+                if (! empty(GlobalRuntimeState::$prefixState)) {
+                    $this->dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
+                }
+
                 $this->dataRetriever->setReduceFinal(false);
             }
 

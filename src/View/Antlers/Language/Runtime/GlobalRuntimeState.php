@@ -174,6 +174,13 @@ class GlobalRuntimeState
      */
     public static $allowPhpInContent = false;
 
+    /**
+     * Maintains a list of all field prefixes that have been encountered.
+     *
+     * @var array
+     */
+    public static $prefixState = [];
+
     public static function createIndicatorVariable($indicator)
     {
         return '__'.self::$environmentId.$indicator;

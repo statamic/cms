@@ -1203,7 +1203,14 @@ class NodeProcessor
                             continue;
                         }
 
+                        $lockData = $this->data;
+                        GlobalRuntimeState::$globalTagEnterStack[] = $node;
+
+                        $tagParameters = $node->getParameterValues($this, $this->getActiveData());
+
                         $tagActiveData = $this->getActiveData();
+
+                        $contributedPrefixHandles = 0;
 
                         if ($node->name->name == 'partial') {
                             $namedSlotResults = $this->checkPartialForNamedSlots($node);
@@ -1223,10 +1230,22 @@ class NodeProcessor
                             }
                         }
 
-                        $lockData = $this->data;
-                        GlobalRuntimeState::$globalTagEnterStack[] = $node;
+                        if ($node->name->name == 'partial' || $node->name->name == 'scope') {
+                            if (array_key_exists('handle_prefix', $tagParameters)) {
+                                $handlePrefixes = $tagParameters['handle_prefix'];
 
-                        $tagParameters = $node->getParameterValues($this, $this->getActiveData());
+                                if (is_array($handlePrefixes)) {
+                                    foreach (array_reverse($handlePrefixes) as $prefix) {
+                                        GlobalRuntimeState::$prefixState[] = $prefix;
+                                        $contributedPrefixHandles += 1;
+                                    }
+                                } else {
+                                    GlobalRuntimeState::$prefixState[] = $tagParameters['handle_prefix'];
+                                    $contributedPrefixHandles = 1;
+                                }
+                            }
+                        }
+
                         $tagToLoad = $node->name->name;
 
                         if ($this->encounteredBuilder) {
@@ -1387,6 +1406,13 @@ class NodeProcessor
                         }
 
                         array_pop(GlobalRuntimeState::$globalTagEnterStack);
+
+                        if ($contributedPrefixHandles > 0) {
+                            while ($contributedPrefixHandles > 0) {
+                                array_pop(GlobalRuntimeState::$prefixState);
+                                $contributedPrefixHandles -= 1;
+                            }
+                        }
 
                         if (! $currentProcessorCanHandleTagValue) {
                             $buffer .= $this->measureBufferAppend($node, $output);
@@ -1574,6 +1600,10 @@ class NodeProcessor
                             }
                         } elseif (count($node->runtimeNodes) == 0 && $node->isTagNode) {
                             $dataRetriever = new PathDataManager();
+                            if (! empty(GlobalRuntimeState::$prefixState)) {
+                                $dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
+                            }
+
                             $dataRetriever->setNodeProcessor($this);
                             $dataRetriever->cascade($this->cascade);
 
@@ -1611,6 +1641,10 @@ class NodeProcessor
                     if ($runtimeResolveLoopVar == false || $runtimeResolveModifiedValue == false) {
                         if ($node->pathReference != null) {
                             $dataRetriever = new PathDataManager();
+                            if (! empty(GlobalRuntimeState::$prefixState)) {
+                                $dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
+                            }
+
                             $dataRetriever->setNodeProcessor($this);
                             $dataRetriever->cascade($this->cascade);
 
