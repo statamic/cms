@@ -19,8 +19,13 @@ class TermResource extends JsonResource
         // Don't want the 'entries' variable in API requests.
         $fields = array_diff($fields, ['entries']);
 
+        $with = $this->blueprint()
+            ->fields()->all()
+            ->filter->isRelationship()->keys()->all();
+
         return $this->resource
             ->toAugmentedCollection($fields)
+            ->withRelations($with)
             ->withShallowNesting()
             ->toArray();
     }
