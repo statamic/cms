@@ -55,6 +55,7 @@ class JavascriptComposer
             return [
                 'name' => $site->name(),
                 'handle' => $site->handle(),
+                'locale' => $site->shortLocale(),
             ];
         })->values();
     }
