@@ -64,7 +64,7 @@ abstract class Relationship extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        if (! $items = $this->augment($data)) {
+        if (! $items = $this->getItemsForPreProcessIndex($data)) {
             return [];
         }
 
@@ -80,6 +80,11 @@ abstract class Relationship extends Fieldtype
                 'published' => $this->statusIcons ? $item->published() : null,
             ];
         });
+    }
+
+    protected function getItemsForPreProcessIndex($values)
+    {
+        return $this->augment($values);
     }
 
     public function process($data)

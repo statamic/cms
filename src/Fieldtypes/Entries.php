@@ -286,4 +286,11 @@ class Entries extends Relationship
     {
         return $this->getBlueprint()->columns()->values()->all();
     }
+
+    protected function getItemsForPreProcessIndex($values)
+    {
+        $augmented = $this->augment($values);
+
+        return $this->config('max_items') === 1 ? $augmented : $augmented->get();
+    }
 }
