@@ -7,8 +7,6 @@ use Statamic\Support\Arr;
 trait FiltersQuery
 {
     /**
-     * Query filters and return active filter badges.
-     *
      * @param  \Statamic\Contracts\Entries\QueryBuilder  $query
      * @param  array  $filters
      * @return void
