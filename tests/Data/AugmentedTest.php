@@ -104,6 +104,23 @@ class AugmentedTest extends TestCase
     }
 
     /** @test */
+    public function if_an_augmented_things_method_returns_a_value_instance_then_use_it()
+    {
+        // An example of this would be the AugmentedEntry::authors() method.
+
+        app()->instance('foo-return-value', $valueInstance = new Value('something completely custom'));
+
+        $augmented = new class($this->thing) extends BaseAugmentedThing {
+            public function foo()
+            {
+                return app('foo-return-value');
+            }
+        };
+
+        $this->assertSame($valueInstance, $augmented->get('foo'));
+    }
+
+    /** @test */
     public function the_value_object_returned_contains_appropriate_fieldtype_if_the_thing_has_a_blueprint_and_theres_a_matching_field()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')

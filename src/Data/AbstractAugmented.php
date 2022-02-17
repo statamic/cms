@@ -48,7 +48,11 @@ abstract class AbstractAugmented implements Augmented
         $method = Str::camel($handle);
 
         if ($this->methodExistsOnThisClass($method)) {
-            return new Value($this->$method(), $method, null, $this->data);
+            $value = $this->$method();
+
+            return $value instanceof Value
+                ? $value
+                : new Value($value, $method, null, $this->data);
         }
 
         if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
