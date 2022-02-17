@@ -148,7 +148,7 @@ class PathDataManager
     /**
      * Sets a list of handle prefixes that should be checked.
      *
-     * @param string[] $prefixes The handle prefixes.
+     * @param  string[]  $prefixes  The handle prefixes.
      */
     public function setHandlePrefixes($prefixes)
     {

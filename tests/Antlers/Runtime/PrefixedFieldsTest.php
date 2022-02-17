@@ -7,7 +7,6 @@ use Tests\Antlers\ParserTestCase;
 
 class PrefixedFieldsTest extends ParserTestCase
 {
-
     protected $data = [];
 
     protected function setUp(): void
@@ -25,7 +24,7 @@ class PrefixedFieldsTest extends ParserTestCase
             'prefix_title' => 'Prefix: Title',
             'prefix_var' => 'Prefix: Value',
             'array' => ['one', 'two', 'three'],
-            'prefix_array' => ['four', 'five', 'six']
+            'prefix_array' => ['four', 'five', 'six'],
         ];
     }
 
@@ -236,7 +235,7 @@ EOT;
         $this->assertSame(
             StringUtilities::normalizeLineEndings($expected),
             $this->renderString($template, array_merge($this->data, [
-                'prefix' => 'test'
+                'prefix' => 'test',
             ]), true)
         );
     }
@@ -278,7 +277,7 @@ EOT;
         $this->assertSame(
             StringUtilities::normalizeLineEndings($expected),
             $this->renderString($template, array_merge($this->data, [
-                'prefix' => 'test_'
+                'prefix' => 'test_',
             ]), true)
         );
 
@@ -301,7 +300,7 @@ EOT;
         $this->assertSame(
             StringUtilities::normalizeLineEndings($expected),
             $this->renderString($template, array_merge($this->data, [
-                'prefix' => 'not_a_valid_prefix_value_'
+                'prefix' => 'not_a_valid_prefix_value_',
             ]), true)
         );
     }
