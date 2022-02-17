@@ -7,7 +7,6 @@ use Tests\Antlers\ParserTestCase;
 
 class VoidParametersTest extends ParserTestCase
 {
-
     public function test_voided_parameters_are_not_sent_to_tag()
     {
         (new class extends Tags
@@ -17,7 +16,7 @@ class VoidParametersTest extends ParserTestCase
             public function index()
             {
                 if ($this->params->has('test')) {
-                    return '<'.(string)$this->params->get('test').'>';
+                    return '<'.(string) $this->params->get('test').'>';
                 }
 
                 return 'No Parameter';
@@ -37,13 +36,11 @@ EOT;
 
         $this->assertSame('<test>', $this->renderString($template, $data, true));
 
-
         $template = <<<'EOT'
 {{ test_void :test="true_value ? void : 'no'" }}
 EOT;
 
         $this->assertSame('No Parameter', $this->renderString($template, $data, true));
-
 
         $template = <<<'EOT'
 {{ test_void test="{true_value ? void : 'no'}" }}
@@ -51,5 +48,4 @@ EOT;
 
         $this->assertSame('No Parameter', $this->renderString($template, $data, true));
     }
-
 }
