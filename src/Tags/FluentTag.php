@@ -192,15 +192,44 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * Allow calls to tag params via method names.
+     * Allow calls to tag params.
      *
-     * @param  string  $method  Param name
+     * @param  string  $param
+     * @param  array  $value
+     * @return $this
+     */
+    public function param($param, $value = true)
+    {
+        $this->params[$param] = $value ?? true;
+
+        return $this;
+    }
+
+    /**
+     * Allow calls to multiple tag params.
+     *
+     * @param  array  $params
+     * @return $this
+     */
+    public function params($params)
+    {
+        foreach ($params as $param => $value) {
+            $this->param($param, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Allow calls to tag params via dynamic method names.
+     *
+     * @param  string  $param  Param name
      * @param  array  $args  First arg will be param value
      * @return $this
      */
-    public function __call($method, $args)
+    public function __call($param, $args)
     {
-        $this->params[$method] = $args[0] ?? true;
+        $this->param($param, $args[0] ?? true);
 
         return $this;
     }

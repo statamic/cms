@@ -53,7 +53,13 @@ class FluentTagTest extends TestCase
                     && is_array($arg2)
                     && $arg2['parser'] instanceof Parser
                     && Arr::except($arg2, 'parser') === [
-                        'params' => ['sort' => 'slug:desc', 'limit' => 3],
+                        'params' => [
+                            'sort' => 'slug:desc',
+                            'limit' => 3,
+                            'title:contains' => 'chewy',
+                            'slug:contains' => 'han',
+                            'description:contains' => 'luke',
+                        ],
                         'content' => '',
                         'context' => [],
                         'tag' => $expectedTag,
@@ -63,7 +69,14 @@ class FluentTagTest extends TestCase
             ->once()
             ->andReturn($tag);
 
-        $fluentTag = FluentTag::make($usedTag)->sort('slug:desc')->limit(3);
+        $fluentTag = FluentTag::make($usedTag)
+            ->sort('slug:desc')
+            ->limit(3)
+            ->param('title:contains', 'chewy')
+            ->params([
+                'slug:contains' => 'han',
+                'description:contains' => 'luke',
+            ]);
 
         $this->assertInstanceOf(FluentTag::class, $fluentTag);
 
