@@ -198,10 +198,10 @@ class Path
     {
         // Replace backslashes with forward slashes for consistency between platforms.
         // PHP is capable of understanding Windows paths that use forward slashes.
-        $path = str_replace('\\', '/', $path);
+        $path = str_replace('\\', '/', (string) $path);
 
         // Remove occurrences of "//" in a $path (except when part of a protocol).
-        return preg_replace('#(^|[^:])//+#', '\\1/', $path);
+        return preg_replace('#(^|[^:])//+#', '\\1/', (string) $path);
     }
 
     /**
