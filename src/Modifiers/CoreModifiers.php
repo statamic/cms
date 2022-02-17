@@ -2088,7 +2088,7 @@ class CoreModifiers extends Modifier
      */
     public function slugify($value)
     {
-        return Stringy::slugify($value, '-', Config::getShortLocale());
+        return Str::slug($value, '-', Config::getShortLocale());
     }
 
     /**
