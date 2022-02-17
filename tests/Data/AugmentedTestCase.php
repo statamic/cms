@@ -34,7 +34,7 @@ class AugmentedTestCase extends TestCase
     private function assertAugmentedAsExpected($expectations, $augmented)
     {
         foreach ($expectations as $key => $expectation) {
-            $actual = $augmented->get($key);
+            $actual = $augmented->get($key)->value();
 
             if (! in_array($expectation['type'], ['string', 'bool', 'array', 'int', 'null'])) {
                 $this->assertInstanceOf($expectation['type'], $actual, "Key '{$key}' is not a {$expectation['type']}");
