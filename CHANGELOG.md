@@ -15,6 +15,8 @@
 ### What's changed
 - Entries fieldtypes augment to query builders instead of collections. [#5238](https://github.com/statamic/cms/issues/5238) by @jasonvarga
 - The `page` and each Global Set in the cascade are now `Values` instances. [#5201](https://github.com/statamic/cms/issues/5201) by @jasonvarga
+- The `Augmented` interface's `get` method now has a return typehint of `Value`. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
+- `$item->augmentedValue()`, `toAugmentedCollection()`, and `toAugmentedArray()` will always return `Value` instances. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
 
 
 ## 3.2.32 (2022-01-26)
