@@ -25,61 +25,68 @@ class AugmentedTest extends TestCase
         $this->blueprintThing = new BlueprintThing($data);
     }
 
+    private function assertEqualsValue($expected, $actual)
+    {
+        $this->assertInstanceOf(Value::class, $actual);
+        $this->assertEquals($expected, $actual->value());
+    }
+
+    private function assertNullValue($actual)
+    {
+        $this->assertInstanceOf(Value::class, $actual);
+        $this->assertNull($actual->value());
+    }
+
     /** @test */
     public function it_gets_a_single_value_by_key()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing
-        {
+        $augmented = new class($this->thing) extends BaseAugmentedThing {
             //
         };
 
-        $this->assertEquals('bar', $augmented->get('foo'));
-        $this->assertNull($augmented->get('unknown'));
+        $this->assertEqualsValue('bar', $augmented->get('foo'));
+        $this->assertNullValue($augmented->get('unknown'));
     }
 
     /** @test */
     public function it_gets_a_single_value_by_key_using_the_value_method_if_it_exists()
     {
-        $thingWithValueMethod = new class($this->thing->data()) extends Thing
-        {
+        $thingWithValueMethod = new class($this->thing->data()) extends Thing {
             public function value($key)
             {
                 return $this->get($key) ? $this->get($key).' (value)' : null;
             }
         };
 
-        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing
-        {
+        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing {
             //
         };
 
-        $this->assertEquals('bar (value)', $augmented->get('foo'));
-        $this->assertNull($augmented->get('unknown'));
+        $this->assertEqualsValue('bar (value)', $augmented->get('foo'));
+        $this->assertNullValue($augmented->get('unknown'));
     }
 
     /** @test */
     public function it_gets_a_value_from_the_thing_if_theres_a_corresponding_method_for_a_key()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing
-        {
+        $augmented = new class($this->thing) extends BaseAugmentedThing {
             public function keys()
             {
                 return ['slug', 'the_slug'];
             }
         };
 
-        $this->assertEquals('the-thing', $augmented->get('slug'));
-        $this->assertEquals('the-thing', $augmented->get('the_slug'));
-        $this->assertEquals('the-thing', $augmented->get('theSlug'));
-        $this->assertNull($augmented->get('cant_call_me'));
-        $this->assertNull($augmented->get('cantCallMe'));
+        $this->assertEqualsValue('the-thing', $augmented->get('slug'));
+        $this->assertEqualsValue('the-thing', $augmented->get('the_slug'));
+        $this->assertEqualsValue('the-thing', $augmented->get('theSlug'));
+        $this->assertNullValue($augmented->get('cant_call_me'));
+        $this->assertNullValue($augmented->get('cantCallMe'));
     }
 
     /** @test */
     public function it_gets_a_value_from_the_augmented_thing_if_theres_a_method()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing
-        {
+        $augmented = new class($this->thing) extends BaseAugmentedThing {
             public function slug()
             {
                 return 'the-augmented-thing';
@@ -91,25 +98,23 @@ class AugmentedTest extends TestCase
             }
         };
 
-        $this->assertEquals('the-augmented-thing', $augmented->get('slug'));
-        $this->assertEquals('the-augmented-thing', $augmented->get('the_slug'));
-        $this->assertEquals('the-augmented-thing', $augmented->get('theSlug'));
+        $this->assertEqualsValue('the-augmented-thing', $augmented->get('slug'));
+        $this->assertEqualsValue('the-augmented-thing', $augmented->get('the_slug'));
+        $this->assertEqualsValue('the-augmented-thing', $augmented->get('theSlug'));
     }
 
     /** @test */
-    public function a_value_object_is_returned_if_the_thing_has_a_blueprint_and_theres_a_matching_field()
+    public function the_value_object_returned_contains_appropriate_fieldtype_if_the_thing_has_a_blueprint_and_theres_a_matching_field()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
-            ->andReturn($fieldtype = new class extends Fieldtype
-            {
+            ->andReturn($fieldtype = new class extends Fieldtype {
                 public function augment($value)
                 {
                     return 'AUGMENTED '.strtoupper($value);
                 }
             });
 
-        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing
-        {
+        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing {
             public function keys()
             {
                 return array_merge(parent::keys(), ['hello', 'slug', 'the_slug']);
@@ -139,26 +144,83 @@ class AugmentedTest extends TestCase
             $this->assertEquals($this->blueprintThing, $value->augmentable());
         });
 
-        $this->assertEquals('qux', $augmented->get('baz'));
-        $this->assertEquals('the-thing', $augmented->get('the_slug'));
-        $this->assertEquals('world', $augmented->get('hello'));
-        $this->assertNull($augmented->get('unknown'));
+        tap($augmented->get('baz'), function ($value) {
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertEquals('qux', $value->raw());
+            $this->assertEquals('qux', $value->value());
+            $this->assertEquals('baz', $value->handle());
+            $this->assertNull($value->fieldtype());
+            $this->assertEquals($this->blueprintThing, $value->augmentable());
+        });
+
+        tap($augmented->get('the_slug'), function ($value) {
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertEquals('the-thing', $value->raw());
+            $this->assertEquals('the-thing', $value->value());
+            $this->assertEquals('the_slug', $value->handle());
+            $this->assertNull($value->fieldtype());
+            $this->assertEquals($this->blueprintThing, $value->augmentable());
+        });
+
+        tap($augmented->get('hello'), function ($value) {
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertEquals('world', $value->raw());
+            $this->assertEquals('world', $value->value());
+            $this->assertEquals('hello', $value->handle());
+            $this->assertNull($value->fieldtype());
+            $this->assertEquals($this->blueprintThing, $value->augmentable());
+        });
+
+        tap($augmented->get('unknown'), function ($value) {
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertNull($value->raw());
+            $this->assertNull($value->value());
+            $this->assertEquals('unknown', $value->handle());
+            $this->assertNull($value->fieldtype());
+            $this->assertEquals($this->blueprintThing, $value->augmentable());
+        });
     }
 
     /** @test */
-    public function it_can_select_multiple_keys()
+    public function if_the_augmented_thing_has_a_method_with_a_corresponding_blueprint_field_it_will_not_use_that_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
-            ->andReturn($fieldtype = new class extends Fieldtype
-            {
+            ->andReturn($fieldtype = new class extends Fieldtype {
                 public function augment($value)
                 {
                     return 'AUGMENTED '.strtoupper($value);
                 }
             });
 
-        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing
-        {
+        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing {
+            public function foo()
+            {
+                return 'bar';
+            }
+        };
+
+        tap($augmented->get('foo'), function ($value) use ($fieldtype) {
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertEquals('bar', $value->raw());
+            $this->assertEquals('bar', $value->value());
+            $this->assertEquals('foo', $value->handle());
+            $this->assertNull($value->fieldtype());
+            $this->assertEquals($this->blueprintThing, $value->augmentable());
+        });
+    }
+
+    /** @test */
+    public function it_can_select_multiple_keys()
+    {
+        FieldtypeRepository::shouldReceive('find')->with('test')
+            ->andReturn($fieldtype = new class extends Fieldtype {
+                public function augment($value)
+                {
+                    return 'AUGMENTED '.strtoupper($value);
+                }
+            });
+
+        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing {
             public function keys()
             {
                 return ['foo', 'slug', 'the_slug', 'hello', 'supplemented'];
@@ -175,16 +237,17 @@ class AugmentedTest extends TestCase
         $this->assertEquals([
             'foo' => $foo = new Value('bar', 'foo', $fieldtype, $this->blueprintThing),
             'slug' => $slug = new Value('the-thing', 'slug', $fieldtype, $this->blueprintThing),
-            'the_slug' => 'the-thing',
-            'hello' => 'world',
-            'supplemented' => 'supplemented value',
+            'the_slug' => $theSlug = new Value('the-thing', 'the_slug', null, $this->blueprintThing),
+            'hello' => $hello = new Value('world', 'hello', null, $this->blueprintThing),
+            'supplemented' => $supplemented = new Value('supplemented value', 'supplemented', null, $this->blueprintThing),
         ], $result->all());
 
         $result = $augmented->select(['foo', 'hello']);
         $this->assertInstanceOf(AugmentedCollection::class, $result);
+        $this->assertEveryItemIsInstanceOf(Value::class, $result);
         $this->assertEquals([
             'foo' => $foo,
-            'hello' => 'world',
+            'hello' => $hello,
         ], $result->all());
 
         $this->assertEquals([
@@ -195,15 +258,15 @@ class AugmentedTest extends TestCase
         $this->assertInstanceOf(AugmentedCollection::class, $result);
         $this->assertEquals([
             'foo' => $foo,
-            'the_slug' => 'the-thing',
-            'supplemented' => 'supplemented value',
+            'the_slug' => $theSlug,
+            'supplemented' => $supplemented,
         ], $result->all());
 
         $this->assertEquals([
             'foo' => $foo,
             'slug' => $slug,
-            'the_slug' => 'the-thing',
-            'supplemented' => 'supplemented value',
+            'the_slug' => $theSlug,
+            'supplemented' => $supplemented,
         ], $augmented->except('hello')->all());
     }
 
@@ -217,8 +280,8 @@ class AugmentedTest extends TestCase
 
         $augmented = new BaseAugmentedThing($thing);
 
-        $this->assertEquals('selected', $augmented->get('select'));
-        $this->assertEquals('excepted', $augmented->get('except'));
+        $this->assertEqualsValue('selected', $augmented->get('select'));
+        $this->assertEqualsValue('excepted', $augmented->get('except'));
     }
 }
 
