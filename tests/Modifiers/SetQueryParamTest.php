@@ -28,8 +28,8 @@ class SetQueryParamTest extends TestCase
     public function it_updates_an_existing_query_param($expected, $input, array $queryParam = [])
     {
         $this->assertSame(
-            $this->baseUrl . $expected,
-            $this->modify($this->baseUrl . $input, $queryParam)
+            $this->baseUrl.$expected,
+            $this->modify($this->baseUrl.$input, $queryParam)
         );
     }
 
@@ -50,8 +50,8 @@ class SetQueryParamTest extends TestCase
     public function it_adds_a_non_existant_query_param($expected, $input, array $queryParam = [])
     {
         $this->assertSame(
-            $this->baseUrl . $expected,
-            $this->modify($this->baseUrl . $input, $queryParam)
+            $this->baseUrl.$expected,
+            $this->modify($this->baseUrl.$input, $queryParam)
         );
     }
 

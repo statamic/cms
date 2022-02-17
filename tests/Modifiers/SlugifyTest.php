@@ -10,9 +10,10 @@ class SlugifyTest extends TestCase
     public function wordsDontComeEasyToMe(): array
     {
         return [
-            ['please-have-some-lemonade', 'Please, have some lemoñade.']
+            ['please-have-some-lemonade', 'Please, have some lemoñade.'],
         ];
     }
+
     /**
      * @test
      * @dataProvider wordsDontComeEasyToMe

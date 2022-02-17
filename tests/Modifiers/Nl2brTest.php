@@ -11,7 +11,7 @@ class Nl2brTest extends TestCase
     {
         return [
             ["This is a summary <br />\n on multiple lines", "This is a summary \n on multiple lines"],
-            ["This is a summary on multiple lines", "This is a summary on multiple lines"],
+            ['This is a summary on multiple lines', 'This is a summary on multiple lines'],
         ];
     }
 

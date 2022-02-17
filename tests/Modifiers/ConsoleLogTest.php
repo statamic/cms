@@ -13,12 +13,12 @@ class ConsoleLogTest extends TestCase
         $arr = [
             'apples',
             'bananas',
-            'bacon'
+            'bacon',
         ];
         $modified = $this->modify($arr);
         $expected = '<script>
             window.log=function(a){if(this.console){console.log(a);}};
-            log(' . json_encode($arr) . ');
+            log('.json_encode($arr).');
         </script>';
         $this->assertEquals($expected, $modified);
     }

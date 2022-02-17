@@ -14,10 +14,11 @@ class SpacelessTest extends TestCase
                 '<p>I copy & pasted <a href="http://goodnightchrome.show">this link </a><strong>for you!</strong></p>',
                 '<p>I copy & pasted
                     <a href="http://goodnightchrome.show">this link
-                    </a>   <strong>for you!</strong>    </p>'
-            ]
+                    </a>   <strong>for you!</strong>    </p>',
+            ],
         ];
     }
+
     /**
      * @test
      * @dataProvider stringsWithSpaces

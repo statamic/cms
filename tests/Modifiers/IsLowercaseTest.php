@@ -13,8 +13,8 @@ class IsLowercaseTest extends TestCase
             'string_with_one_uppercase_char' => [false, "i don't know what we're yellinG about!"],
             'string_with_multiple_uppercase_chars' => [false, "i don't know what we're yellinG About!"],
             'string_with_all_uppercase_chars' => [false, "I DON'T KNOW WHAT WE'RE YELLING ABOUT!"],
-            'string_all_lowercase_with_punctuation' => [false, "fhqwhgads!"],
-            'string_all_lowercase' => [true, "fhqwhgads"],
+            'string_all_lowercase_with_punctuation' => [false, 'fhqwhgads!'],
+            'string_all_lowercase' => [true, 'fhqwhgads'],
         ];
     }
 

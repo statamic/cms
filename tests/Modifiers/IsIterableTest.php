@@ -17,6 +17,7 @@ class IsIterableTest extends TestCase
             'no_iterable' => [false, 'string'],
         ];
     }
+
     /**
      * @test
      * @dataProvider iterables

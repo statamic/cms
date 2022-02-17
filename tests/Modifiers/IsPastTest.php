@@ -25,9 +25,9 @@ class IsPastTest extends TestCase
     }
 
     /**
-         * @test
-         * @dataProvider dates
-         */
+     * @test
+     * @dataProvider dates
+     */
     public function it_returns_true_if_date_is_past($expected, $input): void
     {
         $modified = $this->modify($input);

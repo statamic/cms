@@ -10,8 +10,8 @@ class IsUppercaseTest extends TestCase
     public function strings(): array
     {
         return [
-            'string_all_uppercase' => [true, "NOISES"],
-            'string_with_one_lowercase' => [false, "NOIsES"],
+            'string_all_uppercase' => [true, 'NOISES'],
+            'string_with_one_lowercase' => [false, 'NOIsES'],
             'string_all_uppercase_with_punctuation' => [false, "I DON'T KNOW WHAT WE'RE YELLING ABOUT!"],
             'string_with_one_uppercase_char' => [false, "i don't know what we're yellinG about!"],
             'string_with_multiple_uppercase_chars' => [false, "i don't know what we're yellinG About!"],

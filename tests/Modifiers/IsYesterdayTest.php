@@ -26,9 +26,9 @@ class IsYesterdayTest extends TestCase
     }
 
     /**
-         * @test
-         * @dataProvider dates
-         */
+     * @test
+     * @dataProvider dates
+     */
     public function it_returns_true_if_date_is_yesterday($expected, $input): void
     {
         $modified = $this->modify($input);

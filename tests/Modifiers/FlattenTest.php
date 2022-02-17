@@ -17,8 +17,8 @@ class FlattenTest extends TestCase
             'ingredients' => [
                 'spices' => ['garlic', 'cumin', 'ginger', 'turmeric', 'paprika', 'curry powder'],
                 'vegetables' => ['tomatoes', 'onion'],
-                'meat' => ['chicken']
-            ]
+                'meat' => ['chicken'],
+            ],
         ];
 
         $expected = [
