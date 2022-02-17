@@ -40,7 +40,8 @@ class AugmentedTest extends TestCase
     /** @test */
     public function it_gets_a_single_value_by_key()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
             //
         };
 
@@ -51,14 +52,16 @@ class AugmentedTest extends TestCase
     /** @test */
     public function it_gets_a_single_value_by_key_using_the_value_method_if_it_exists()
     {
-        $thingWithValueMethod = new class($this->thing->data()) extends Thing {
+        $thingWithValueMethod = new class($this->thing->data()) extends Thing
+        {
             public function value($key)
             {
                 return $this->get($key) ? $this->get($key).' (value)' : null;
             }
         };
 
-        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing {
+        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing
+        {
             //
         };
 
@@ -69,7 +72,8 @@ class AugmentedTest extends TestCase
     /** @test */
     public function it_gets_a_value_from_the_thing_if_theres_a_corresponding_method_for_a_key()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
             public function keys()
             {
                 return ['slug', 'the_slug'];
@@ -86,7 +90,8 @@ class AugmentedTest extends TestCase
     /** @test */
     public function it_gets_a_value_from_the_augmented_thing_if_theres_a_method()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
             public function slug()
             {
                 return 'the-augmented-thing';
@@ -110,7 +115,8 @@ class AugmentedTest extends TestCase
 
         app()->instance('foo-return-value', $valueInstance = new Value('something completely custom'));
 
-        $augmented = new class($this->thing) extends BaseAugmentedThing {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
             public function foo()
             {
                 return app('foo-return-value');
@@ -124,14 +130,16 @@ class AugmentedTest extends TestCase
     public function the_value_object_returned_contains_appropriate_fieldtype_if_the_thing_has_a_blueprint_and_theres_a_matching_field()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
-            ->andReturn($fieldtype = new class extends Fieldtype {
+            ->andReturn($fieldtype = new class extends Fieldtype
+            {
                 public function augment($value)
                 {
                     return 'AUGMENTED '.strtoupper($value);
                 }
             });
 
-        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing {
+        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing
+        {
             public function keys()
             {
                 return array_merge(parent::keys(), ['hello', 'slug', 'the_slug']);
@@ -202,21 +210,23 @@ class AugmentedTest extends TestCase
     public function if_the_augmented_thing_has_a_method_with_a_corresponding_blueprint_field_it_will_not_use_that_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
-            ->andReturn($fieldtype = new class extends Fieldtype {
+            ->andReturn($fieldtype = new class extends Fieldtype
+            {
                 public function augment($value)
                 {
                     return 'AUGMENTED '.strtoupper($value);
                 }
             });
 
-        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing {
+        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing
+        {
             public function foo()
             {
                 return 'bar';
             }
         };
 
-        tap($augmented->get('foo'), function ($value) use ($fieldtype) {
+        tap($augmented->get('foo'), function ($value) {
             $this->assertInstanceOf(Value::class, $value);
             $this->assertEquals('bar', $value->raw());
             $this->assertEquals('bar', $value->value());
@@ -230,14 +240,16 @@ class AugmentedTest extends TestCase
     public function it_can_select_multiple_keys()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
-            ->andReturn($fieldtype = new class extends Fieldtype {
+            ->andReturn($fieldtype = new class extends Fieldtype
+            {
                 public function augment($value)
                 {
                     return 'AUGMENTED '.strtoupper($value);
                 }
             });
 
-        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing {
+        $augmented = new class($this->blueprintThing) extends BaseAugmentedThing
+        {
             public function keys()
             {
                 return ['foo', 'slug', 'the_slug', 'hello', 'supplemented'];
