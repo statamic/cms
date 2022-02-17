@@ -8,7 +8,7 @@ use Tests\TestCase;
 class CollapseTest extends TestCase
 {
     /** @test */
-    public function it_return_emptey_array_when_simple_array_given(): void
+    public function it_return_empty_array_when_simple_array_given(): void
     {
         $actual = ['one', 'two', 'three'];
         $expected = [];
