@@ -11,6 +11,7 @@ use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\ModifierManager;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\PathDataManager;
@@ -398,6 +399,10 @@ class AntlersNode extends AbstractNode
                     // Try and collapse to string.
                     $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
                 }
+            }
+
+            if (is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId) {
+                continue;
             }
 
             $values[$param->name] = $value;

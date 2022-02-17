@@ -448,6 +448,10 @@ class PathDataManager
                     continue;
                 }
 
+                if ($pathItem->name == 'void' && count($path->pathParts) == 1) {
+                    return 'void::'.GlobalRuntimeState::$environmentId;
+                }
+
                 if (array_key_exists($pathItem->name, $this->interpolations) && $this->environment != null) {
                     $nodeProcessor = $this->getNodeProcessor();
 
