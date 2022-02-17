@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class IsIterableTest extends TestCase
 {
-
     public function iterables(): array
     {
         return [

@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class IsJsonTest extends TestCase
 {
-
     public function bourneJsonBourne(): array
     {
         return [

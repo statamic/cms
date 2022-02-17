@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class BackspaceTest extends TestCase
 {
-
     /** @test */
     public function it_removes_1_char_from_the_end(): void
     {

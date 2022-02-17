@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class SlugifyTest extends TestCase
 {
-
     public function wordsDontComeEasyToMe(): array
     {
         return [

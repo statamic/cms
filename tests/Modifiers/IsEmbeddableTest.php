@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class IsEmbeddableTest extends TestCase
 {
-
     public function embeddables(): array
     {
         return [

@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class BackgroundPositionTest extends TestCase
 {
-
     public function backgroundPositions(): array
     {
         return [

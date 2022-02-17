@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class CountTest extends TestCase
 {
-
     public function arraysToCount(): array
     {
         return [

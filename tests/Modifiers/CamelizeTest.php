@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class CamelizeTest extends TestCase
 {
-
     public function camelFarm(): array
     {
         return [

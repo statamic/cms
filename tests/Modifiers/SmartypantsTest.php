@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class SmartypantsTest extends TestCase
 {
-
     public function dumbChars(): array
     {
         return [
