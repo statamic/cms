@@ -741,7 +741,7 @@ class AssetTest extends TestCase
 
         $array = $asset->toAugmentedArray();
 
-        $this->assertArraySubset([
+        $expectedValues = [
             'id' => 'test_container::path/to/asset.jpg',
             'title' => 'asset.jpg',
             'path' => 'path/to/asset.jpg',
@@ -753,7 +753,10 @@ class AssetTest extends TestCase
             'container' => $this->container,
             'blueprint' => $blueprint,
             'foo' => 'bar',
-        ], $array);
+        ];
+        foreach ($expectedValues as $k => $v) {
+            $this->assertEquals($v, $array[$k]->value());
+        }
 
         $keys = ['is_audio', 'is_previewable', 'is_image', 'is_video', 'edit_url', 'url'];
         foreach ($keys as $key) {
@@ -814,7 +817,7 @@ class AssetTest extends TestCase
             ->path('path/to/asset.jpg')
             ->set('focus', '75-25');
 
-        $this->assertSame($asset->augmentedValue('focus_css'), '75% 25%');
+        $this->assertSame($asset->augmentedValue('focus_css')->value(), '75% 25%');
     }
 
     /** @test */
@@ -828,7 +831,7 @@ class AssetTest extends TestCase
             ->container($this->container)
             ->path('path/to/asset.jpg');
 
-        $this->assertSame($asset->augmentedValue('focus_css'), '50% 50%');
+        $this->assertSame($asset->augmentedValue('focus_css')->value(), '50% 50%');
     }
 
     /** @test */
