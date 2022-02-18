@@ -4,8 +4,8 @@ namespace Tests\View\Antlers;
 
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\View\Antlers\Engine;
-use Statamic\View\Antlers\Parser;
 use Tests\TestCase;
 
 class EngineTest extends TestCase
