@@ -5,6 +5,7 @@ namespace Tests\Data;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Fields\Value;
 use Tests\TestCase;
 
 class HasAugmentedInstanceTest extends TestCase
@@ -17,7 +18,7 @@ class HasAugmentedInstanceTest extends TestCase
         $shallowFilteredAugmentedCollection = new AugmentedCollection(['id', 'title', 'api_url']);
 
         $mock = $this->mock(Augmented::class);
-        $mock->shouldReceive('get')->with('foo')->once()->andReturn('bar');
+        $mock->shouldReceive('get')->with('foo')->once()->andReturn(new Value('bar'));
         $mock->shouldReceive('select')->with(null)->times(2)->andReturn($augmentedCollection);
         $mock->shouldReceive('select')->with(['one'])->times(2)->andReturn($filteredAugmentedCollection);
         $mock->shouldReceive('select')->with(['id', 'title', 'api_url'])->times(1)->andReturn($shallowFilteredAugmentedCollection);

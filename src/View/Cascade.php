@@ -216,7 +216,7 @@ class Cascade
 
     protected function hydrateViewModel()
     {
-        if ($class = $this->get('view_model')) {
+        if ($class = optional($this->get('view_model'))->value()) {
             $viewModel = new $class($this);
             $this->data = array_merge($this->data, $viewModel->data());
         }
