@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Statamic\Contracts\Antlers\ParserContract;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
@@ -97,7 +97,7 @@ class Environment
     protected $operatorManager = null;
 
     /**
-     * @var ParserContract|null;
+     * @var Parser|null;
      */
     protected $antlersParser = null;
 
@@ -242,9 +242,9 @@ class Environment
     /**
      * Sets the internal Parser instance.
      *
-     * @param  ParserContract  $parser  The parser instance.
+     * @param  Parser  $parser  The parser instance.
      */
-    public function setParserInstance(ParserContract $parser)
+    public function setParserInstance(Parser $parser)
     {
         $this->antlersParser = $parser;
         $this->dataRetriever->setAntlersParser($this->antlersParser);

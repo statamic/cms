@@ -6,7 +6,7 @@ use ArrayIterator;
 use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
-use Statamic\Contracts\Antlers\ParserContract;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Support\Str;
 
@@ -77,7 +77,7 @@ class Value implements IteratorAggregate, JsonSerializable
         return $this->fieldtype && $this->fieldtype->config('antlers');
     }
 
-    public function antlersValue(ParserContract $parser, $variables)
+    public function antlersValue(Parser $parser, $variables)
     {
         $value = $this->value();
 

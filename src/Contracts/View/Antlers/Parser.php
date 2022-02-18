@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Contracts\Antlers;
+namespace Statamic\Contracts\View\Antlers;
 
 use Statamic\View\Antlers\AntlersString;
 
-interface ParserContract
+interface Parser
 {
     /**
      * Parses the text.
@@ -27,7 +27,7 @@ interface ParserContract
      * Sets whether or not PHP code should be evaluated.
      *
      * @param  bool  $allow  Whether PHP is allowed.
-     * @return ParserContract
+     * @return Parser
      */
     public function allowPhp($allow = true);
 
@@ -70,7 +70,7 @@ interface ParserContract
      * Sets a render callback.
      *
      * @param $callback
-     * @return ParserContract
+     * @return Parser
      */
     public function callback($callback);
 

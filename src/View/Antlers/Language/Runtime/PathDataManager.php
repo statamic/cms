@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Statamic\Contracts\Antlers\ParserContract;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Fields\ArrayableString;
@@ -88,7 +88,7 @@ class PathDataManager
     private $reduceFinal = true;
 
     /**
-     * @var ParserContract|null
+     * @var Parser|null
      */
     private $antlersParser = null;
 
@@ -594,9 +594,9 @@ class PathDataManager
     /**
      * Sets the parser instance to use when reducing content values.
      *
-     * @param  ParserContract  $parser  The parser instance.
+     * @param  Parser  $parser  The parser instance.
      */
-    public function setAntlersParser(ParserContract $parser)
+    public function setAntlersParser(Parser $parser)
     {
         $this->antlersParser = $parser;
     }
@@ -771,12 +771,12 @@ class PathDataManager
      * Reduces an Antlers content value.
      *
      * @param  mixed  $value  The value to reduce.
-     * @param  ParserContract  $parser  The parser instance.
+     * @param  Parser  $parser  The parser instance.
      * @param  array  $data  The contextual data.
      * @param  bool  $isPair  Indicates if the path belongs to a node pair.
      * @return array|AntlersString|string
      */
-    public static function reduceForAntlers($value, ParserContract $parser, $data, $isPair = true)
+    public static function reduceForAntlers($value, Parser $parser, $data, $isPair = true)
     {
         GlobalRuntimeState::$isEvaluatingUserData = true;
 

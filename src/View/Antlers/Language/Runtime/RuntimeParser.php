@@ -7,7 +7,7 @@ use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
 use Facade\IgnitionContracts\ProvidesSolution;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use ReflectionProperty;
-use Statamic\Contracts\Antlers\ParserContract;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Modifiers\ModifierNotFoundException;
 use Statamic\Search\Comb\Exceptions\Exception;
 use Statamic\Support\Str;
@@ -33,7 +33,7 @@ use Statamic\View\Cascade;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-class RuntimeParser implements ParserContract
+class RuntimeParser implements Parser
 {
     /**
      * The current DocumentParser instance.
@@ -728,7 +728,7 @@ class RuntimeParser implements ParserContract
      * Sets a render callback.
      *
      * @param $callback
-     * @return ParserContract
+     * @return Parser
      */
     public function callback($callback)
     {

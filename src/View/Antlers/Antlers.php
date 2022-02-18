@@ -3,7 +3,7 @@
 namespace Statamic\View\Antlers;
 
 use Closure;
-use Statamic\Contracts\Antlers\ParserContract;
+use Statamic\Contracts\View\Antlers\Parser;
 
 class Antlers
 {
@@ -11,10 +11,10 @@ class Antlers
 
     public function parser()
     {
-        return $this->parser ?? app(ParserContract::class);
+        return $this->parser ?? app(Parser::class);
     }
 
-    public function usingParser(ParserContract $parser, Closure $callback)
+    public function usingParser(Parser $parser, Closure $callback)
     {
         $this->parser = $parser;
 

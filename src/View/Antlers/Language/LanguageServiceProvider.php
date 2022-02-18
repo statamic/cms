@@ -3,7 +3,7 @@
 namespace Statamic\View\Antlers\Language;
 
 use Illuminate\Support\ServiceProvider;
-use Statamic\Contracts\Antlers\ParserContract;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
@@ -47,7 +47,7 @@ class LanguageServiceProvider extends ServiceProvider
             return new ModifierManager();
         });
 
-        $this->app->bind(ParserContract::class, function ($app) {
+        $this->app->bind(Parser::class, function ($app) {
             /** @var RuntimeParser $parser */
             $parser = $app->make(RuntimeParser::class)->cascade($app[Cascade::class]);
             $runtimeConfig = new RuntimeConfiguration();

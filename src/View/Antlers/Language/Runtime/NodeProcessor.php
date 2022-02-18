@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ParseError;
-use Statamic\Contracts\Antlers\ParserContract;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Fields\ArrayableString;
@@ -127,7 +127,7 @@ class NodeProcessor
     /**
      * The Antlers parser instance to supply values, and other internal systems.
      *
-     * @var ParserContract|null
+     * @var Parser|null
      */
     private $antlersParser = null;
 
@@ -520,10 +520,10 @@ class NodeProcessor
      * Sets an Antlers ParserContract implementation to be
      * used when evaluating the results of content values.
      *
-     * @param  ParserContract  $parser  The parser instance.
+     * @param  Parser  $parser  The parser instance.
      * @return $this
      */
-    public function setAntlersParserInstance(ParserContract $parser)
+    public function setAntlersParserInstance(Parser $parser)
     {
         $this->antlersParser = $parser;
 

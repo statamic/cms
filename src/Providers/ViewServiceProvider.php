@@ -4,7 +4,7 @@ namespace Statamic\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
-use Statamic\Contracts\Antlers\ParserContract;
+use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Language\LanguageServiceProvider;
