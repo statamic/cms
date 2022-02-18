@@ -250,7 +250,7 @@ class SiteTest extends TestCase
             'permalink' => 'http://absolute-url-resolved-from-request.com/sub',
             'direction' => 'ltr',
             'attributes' => [],
-        ], $values->all());
+        ], $values->map->value()->all());
 
         $this->assertEquals(
             'test Test en_US en /sub http://absolute-url-resolved-from-request.com/sub',

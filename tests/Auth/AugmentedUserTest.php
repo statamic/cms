@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Statamic\Auth\AugmentedUser;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
-use Statamic\Fields\Value;
 use Tests\Data\AugmentedTestCase;
 use Tests\FakesRoles;
 use Tests\FakesUserGroups;
@@ -61,9 +60,9 @@ class AugmentedUserTest extends AugmentedTestCase
 
         $expectations = [
             'id'         => ['type' => 'string', 'value' => 'user-id'],
-            'name'       => ['type' => Value::class, 'value' => 'John Smith'],
+            'name'       => ['type' => 'string', 'value' => 'John Smith'],
             'title'      => ['type' => 'string', 'value' => 'john@example.com'],
-            'email'      => ['type' => Value::class, 'value' => 'john@example.com'],
+            'email'      => ['type' => 'string', 'value' => 'john@example.com'],
             'initials'   => ['type' => 'string', 'value' => 'JS'],
             'edit_url'   => ['type' => 'string', 'value' => 'http://localhost/cp/users/user-id/edit'],
             'is_user'    => ['type' => 'bool', 'value' => true],
@@ -81,10 +80,10 @@ class AugmentedUserTest extends AugmentedTestCase
             'in_group_two' => ['type' => 'bool', 'value' => false],
 
             'one'          => ['type' => 'string', 'value' => 'the "one" value on the user'],
-            'two'          => ['type' => Value::class, 'value' => 'the "two" value on the user and in the blueprint'],
+            'two'          => ['type' => 'string', 'value' => 'the "two" value on the user and in the blueprint'],
             'three'        => ['type' => 'string', 'value' => 'the "three" value supplemented on the user'],
-            'four'         => ['type' => Value::class, 'value' => 'the "four" value supplemented on the user and in the blueprint'],
-            'unused_in_bp' => ['type' => Value::class, 'value' => null],
+            'four'         => ['type' => 'string', 'value' => 'the "four" value supplemented on the user and in the blueprint'],
+            'unused_in_bp' => ['type' => 'string', 'value' => null],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);

@@ -5,6 +5,7 @@ namespace Statamic\Tags;
 use ArrayIterator;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Fields\Values;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Parser;
 use Traversable;
@@ -35,6 +36,16 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
      * @var bool
      */
     protected $augmentation = true;
+
+    /**
+     * @var bool
+     */
+    protected $conversion = true;
+
+    /**
+     * @var mixed
+     */
+    protected $fetched;
 
     /**
      * Instantiate fluent tag helper.
@@ -98,12 +109,28 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     * Disable conversion into Values objects or augmenting.
+     *
+     * @return $this
+     */
+    public function withoutConvertingValues()
+    {
+        $this->conversion = false;
+
+        return $this;
+    }
+
+    /**
      * Fetch result of a tag.
      *
      * @return mixed
      */
     public function fetch()
     {
+        if ($this->fetched) {
+            return $this->fetched;
+        }
+
         $name = $this->name;
 
         if ($pos = strpos($name, ':')) {
@@ -125,15 +152,21 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
 
         $output = $tag->$method();
 
-        if ($this->augmentation && $output instanceof Collection) {
-            $output = $output->toAugmentedArray();
+        if ($this->conversion) {
+            if ($this->augmentation && $output instanceof Collection) {
+                $output = collect($output->toAugmentedCollection())->mapInto(Values::class);
+            }
+
+            if ($this->augmentation && $output instanceof Augmentable) {
+                $output = new Values($output->toAugmentedCollection());
+            }
+
+            if (is_array($output)) {
+                $output = new Values($output);
+            }
         }
 
-        if ($this->augmentation && $output instanceof Augmentable) {
-            $output = $output->toAugmentedArray();
-        }
-
-        return $output;
+        return $this->fetched = $output;
     }
 
     /**
@@ -159,17 +192,51 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * Allow calls to tag params via method names.
+     * Allow calls to tag params.
      *
-     * @param  string  $method  Param name
+     * @param  string  $param
+     * @param  array  $value
+     * @return $this
+     */
+    public function param($param, $value = true)
+    {
+        $this->params[$param] = $value ?? true;
+
+        return $this;
+    }
+
+    /**
+     * Allow calls to multiple tag params.
+     *
+     * @param  array  $params
+     * @return $this
+     */
+    public function params($params)
+    {
+        foreach ($params as $param => $value) {
+            $this->param($param, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Allow calls to tag params via dynamic method names.
+     *
+     * @param  string  $param  Param name
      * @param  array  $args  First arg will be param value
      * @return $this
      */
-    public function __call($method, $args)
+    public function __call($param, $args)
     {
-        $this->params[$method] = $args[0] ?? true;
+        $this->param($param, $args[0] ?? true);
 
         return $this;
+    }
+
+    public function __get($key)
+    {
+        return $this->fetch()[$key];
     }
 
     /**

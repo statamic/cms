@@ -442,7 +442,7 @@ class EntryTest extends TestCase
             ->setSupplement('baz', 'qux')
             ->setSupplement('foo', 'overridden');
 
-        $this->assertArraySubset([
+        $expectedValues = [
             'foo' => 'overridden',
             'bar' => 'baz',
             'baz' => 'qux',
@@ -451,7 +451,13 @@ class EntryTest extends TestCase
             'updated_by' => $user,
             'url' => '/blog/test',
             'permalink' => 'http://localhost/blog/test',
-        ], $entry->toAugmentedArray());
+        ];
+
+        $array = $entry->toAugmentedArray();
+
+        foreach ($expectedValues as $k => $v) {
+            $this->assertEquals($v, $array[$k]->value());
+        }
     }
 
     /** @test */

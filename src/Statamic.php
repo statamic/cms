@@ -358,4 +358,9 @@ class Statamic
     {
         return Modify::value($value);
     }
+
+    public static function query($name)
+    {
+        return app()->make('statamic.queries.'.$name);
+    }
 }
