@@ -7,7 +7,6 @@
 - Antlers wrapper for Blade. [#5058](https://github.com/statamic/cms/issues/5058) by @jesseleite
 - Support Blade section yields in Antlers layouts. [#5056](https://github.com/statamic/cms/issues/5056) by @jasonvarga
 - Added wrapper classes to make working with values in Blade easier. [#5201](https://github.com/statamic/cms/issues/5201) by @jasonvarga
-- Added `toValuesCollection` Collection macro. [#5286](https://github.com/statamic/cms/issues/5286) by @jasonvarga
 - Added `Statamic::query()` aliases. [#5285](https://github.com/statamic/cms/issues/5285) by @jasonvarga
 
 ### What's fixed
@@ -16,6 +15,8 @@
 ### What's changed
 - Entries fieldtypes augment to query builders instead of collections. [#5238](https://github.com/statamic/cms/issues/5238) by @jasonvarga
 - The `page` and each Global Set in the cascade are now `Values` instances. [#5201](https://github.com/statamic/cms/issues/5201) by @jasonvarga
+- The `Augmented` interface's `get` method now has a return typehint of `Value`. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
+- `$item->augmentedValue()`, `toAugmentedCollection()`, and `toAugmentedArray()` will always return `Value` instances. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
 
 
 ## 3.2.32 (2022-01-26)
