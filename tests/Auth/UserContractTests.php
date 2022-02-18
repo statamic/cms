@@ -116,8 +116,8 @@ trait UserContractTests
     {
         return [
             'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],
-            // 'database' => [Mockery::mock(\Illuminate\Database\Query\Builder::class)],
-            // 'eloquent' => [Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)],
+            'database' => [Mockery::mock(\Illuminate\Database\Query\Builder::class)],
+            'eloquent' => [Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)],
         ];
     }
 
