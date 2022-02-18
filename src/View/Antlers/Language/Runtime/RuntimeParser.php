@@ -248,6 +248,14 @@ class RuntimeParser implements Parser
             return false;
         }
 
+        // Check if there may be PHP tags in the document. If
+        // PHP is enabled, we will let the NodeProcessor
+        // handle it so that we do not have to copy
+        // any of its PHP-specific logic here.
+        if ($this->allowPhp && Str::contains($text, '<?')) {
+            return true;
+        }
+
         if (Str::contains($text, DocumentParser::LeftBrace)) {
             return true;
         }
@@ -338,7 +346,6 @@ class RuntimeParser implements Parser
                         $this->documentParser->setStartLineSeed($lastTagNode->endPosition->line);
                     }
                 }
-
                 self::$standardRenderNodeCache[$cacheSlug] = $this->documentParser->parse($parseText);
             }
 
@@ -349,6 +356,7 @@ class RuntimeParser implements Parser
             $this->nodeProcessor->cascade($this->cascade);
 
             $bufferContent = $this->nodeProcessor->render($renderNodes);
+
             $this->nodeProcessor->triggerRenderComplete();
         } catch (AntlersException $antlersException) {
             if (! class_exists(ViewException::class)) {

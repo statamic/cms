@@ -128,7 +128,8 @@ EOT;
 
         $expected = <<<'EOT'
 Hello!Title!
-HISub Title!
+HI
+Sub Title!
 EOT;
 
         $expected = StringUtilities::normalizeLineEndings($expected);

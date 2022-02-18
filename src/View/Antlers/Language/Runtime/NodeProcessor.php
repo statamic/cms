@@ -1940,7 +1940,7 @@ class NodeProcessor
             return $buffer;
         }
 
-        if (! GlobalRuntimeState::$allowPhpInContent == false && GlobalRuntimeState::$isEvaluatingUserData) {
+        if (GlobalRuntimeState::$allowPhpInContent == false && GlobalRuntimeState::$isEvaluatingUserData) {
             return StringUtilities::sanitizePhp($buffer);
         }
 
