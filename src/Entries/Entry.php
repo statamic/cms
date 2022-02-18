@@ -434,6 +434,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         Cascade::hydrated(function ($cascade) use ($extras) {
             $cascade->set('live_preview', $extras);
+            $cascade->set('is_live_previewing', true);
         });
 
         return $this->toResponse($request);
