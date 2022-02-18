@@ -13,7 +13,7 @@ class StaticWarmJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
-    public Request $request;
+    public $request;
 
     public $tries = 1;
 
