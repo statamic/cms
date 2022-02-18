@@ -35,20 +35,13 @@ class ViewServiceProvider extends ServiceProvider
             return new Cascade($app['request'], Site::current());
         });
 
-        $antlersVersion = config('statamic.antlers.version', 'regex');
+        $this->registerRuntimeAntlers();
+        $this->registerRegexAntlers();
 
-        if ($antlersVersion == 'runtime') {
-            $this->registerRuntimeAntlers();
-        } else {
-            $this->registerRegexAntlers();
-        }
-
-        // Ensures all classes currently requiring a Parser instance
-        // continues to receive the same behavior they used to.
-        $this->app->bind(Parser::class, function ($app) {
-            return (new Parser)
-                ->callback([Engine::class, 'renderTag'])
-                ->cascade($app[Cascade::class]);
+        $this->app->bind(ParserContract::class, function ($app) {
+            return config('statamic.antlers.version', 'regex') === 'regex'
+                ? $app->make('antlers.regex')
+                : $app->make('antlers.runtime');
         });
 
         $this->app->singleton(Engine::class, function ($app) {
@@ -58,11 +51,13 @@ class ViewServiceProvider extends ServiceProvider
 
     private function registerRegexAntlers()
     {
-        $this->app->bind(ParserContract::class, function ($app) {
+        $this->app->bind('antlers.regex', function ($app) {
             return (new Parser)
                 ->callback([Engine::class, 'renderTag'])
                 ->cascade($app[Cascade::class]);
         });
+
+        $this->app->bind(Parser::class, fn ($app) => $app['antlers.regex']);
     }
 
     private function registerRuntimeAntlers()
@@ -95,7 +90,7 @@ class ViewServiceProvider extends ServiceProvider
             return new ModifierManager();
         });
 
-        $this->app->bind(ParserContract::class, function ($app) {
+        $this->app->bind('antlers.runtime', function ($app) {
             /** @var RuntimeParser $parser */
             $parser = $app->make(RuntimeParser::class)->cascade($app[Cascade::class]);
             $runtimeConfig = new RuntimeConfiguration();
