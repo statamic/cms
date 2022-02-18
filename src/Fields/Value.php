@@ -6,8 +6,8 @@ use ArrayIterator;
 use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
-use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Support\Str;
 
 class Value implements IteratorAggregate, JsonSerializable
