@@ -113,6 +113,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'file',
             'path' => storage_path('framework/cache/outpost-data'),
         ]);
+
+        $viewPaths = $app['config']->get('view.paths');
+        $viewPaths[] = __DIR__.'/__fixtures__/views/';
+
+        $app['config']->set('view.paths', $viewPaths);
     }
 
     public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void

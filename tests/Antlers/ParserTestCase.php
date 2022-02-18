@@ -2,18 +2,14 @@
 
 namespace Tests\Antlers;
 
-use Orchestra\Testbench\TestCase;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
-use Statamic\Providers\StatamicServiceProvider;
-use Statamic\Statamic;
 use Statamic\Tags\Loader;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
-use Statamic\View\Antlers\Language\LanguageServiceProvider;
 use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
@@ -32,31 +28,11 @@ use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class ParserTestCase extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
-
-    protected function assertThrowsParserError($string)
-    {
-        $this->expectException(AntlersException::class);
-        $this->renderString($string);
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [
-            StatamicServiceProvider::class,
-            LanguageServiceProvider::class,
-        ];
-    }
-
-    protected function getPackageAliases($app)
-    {
-        return [
-            'Statamic' => Statamic::class,
-        ];
-    }
 
     /**
      * @var Blueprint|null
@@ -71,12 +47,6 @@ class ParserTestCase extends TestCase
 
         GlobalRuntimeState::$tracedRuntimeAssignments = [];
         GlobalRuntimeState::$traceTagAssignments = false;
-        $uses = array_flip(class_uses_recursive(static::class));
-
-        if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
-            $this->preventSavingStacheItemsToDisk();
-        }
-
         GlobalRuntimeState::$environmentId = StringUtilities::uuidv4();
 
         $this->setupTestBlueprintAndFields();
@@ -106,73 +76,6 @@ class ParserTestCase extends TestCase
         $value = self::$testFieldValues[$handle];
 
         return new Value($value, $handle, $field->fieldtype());
-    }
-
-    public function tearDown(): void
-    {
-        $uses = array_flip(class_uses_recursive(static::class));
-
-        if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
-            $this->deleteFakeStacheDirectory();
-        }
-
-        parent::tearDown();
-    }
-
-    protected function resolveApplicationConfiguration($app)
-    {
-        parent::resolveApplicationConfiguration($app);
-
-        $configs = [
-            'assets', 'cp', 'forms', 'routes', 'static_caching',
-            'sites', 'stache', 'system', 'users',
-        ];
-
-        foreach ($configs as $config) {
-            $app['config']->set("statamic.$config", require(__DIR__."/../../config/{$config}.php"));
-        }
-    }
-
-    protected function getEnvironmentSetUp($app)
-    {
-        // We changed the default sites setup but the tests assume defaults like the following.
-        $app['config']->set('statamic.sites', [
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
-            ],
-        ]);
-        $app['config']->set('auth.providers.users.driver', 'statamic');
-        $app['config']->set('statamic.stache.watcher', false);
-        $app['config']->set('statamic.users.repository', 'file');
-        $app['config']->set('statamic.stache.stores.users', [
-            'class' => \Statamic\Stache\Stores\UsersStore::class,
-            'directory' => __DIR__.'/__fixtures__/users',
-        ]);
-
-        $app['config']->set('statamic.stache.stores.taxonomies.directory', __DIR__.'/../__fixtures__/content/taxonomies');
-        $app['config']->set('statamic.stache.stores.terms.directory', __DIR__.'/../__fixtures__/content/taxonomies');
-        $app['config']->set('statamic.stache.stores.collections.directory', __DIR__.'/../__fixtures__/content/collections');
-        $app['config']->set('statamic.stache.stores.entries.directory', __DIR__.'/../__fixtures__/content/collections');
-        $app['config']->set('statamic.stache.stores.navigation.directory', __DIR__.'/../__fixtures__/content/navigation');
-        $app['config']->set('statamic.stache.stores.globals.directory', __DIR__.'/../__fixtures__/content/globals');
-        $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/../__fixtures__/content/assets');
-        $app['config']->set('statamic.stache.stores.nav-trees.directory', __DIR__.'/../__fixtures__/content/structures/navigation');
-        $app['config']->set('statamic.stache.stores.collection-trees.directory', __DIR__.'/../__fixtures__/content/structures/collections');
-
-        $app['config']->set('statamic.api.enabled', true);
-        $app['config']->set('statamic.graphql.enabled', true);
-        $app['config']->set('statamic.editions.pro', true);
-
-        $app['config']->set('cache.stores.outpost', [
-            'driver' => 'file',
-            'path' => storage_path('framework/cache/outpost-data'),
-        ]);
-
-        $viewPaths = $app['config']->get('view.paths');
-        $viewPaths[] = __DIR__.'/../__fixtures__/views/';
-
-        $app['config']->set('view.paths', $viewPaths);
     }
 
     protected function setupTestBlueprintAndFields()
@@ -473,5 +376,11 @@ class ParserTestCase extends TestCase
             $this->assertStringContainsString($chain[$i], $branch->head->content);
             $last = $branch->head;
         }
+    }
+
+    protected function assertThrowsParserError($string)
+    {
+        $this->expectException(AntlersException::class);
+        $this->renderString($string);
     }
 }
