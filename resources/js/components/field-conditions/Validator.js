@@ -238,6 +238,7 @@ export default class {
         let passes = customFunction({
             params: condition.params,
             target: condition.target,
+            field: this.field,
             values: this.values,
             root: this.rootValues,
             store: this.store,
