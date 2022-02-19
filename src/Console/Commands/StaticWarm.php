@@ -125,7 +125,7 @@ class StaticWarm extends Command
             $message = $exception->getMessage();
         }
 
-        $this->crossLine("$uri → <fg=cyan>$message</fg=cyan>");
+        $this->crossLine("$uri → <fg=gray>$message</fg=gray>");
     }
 
     private function getRelativeUri(int $index): string
