@@ -60,6 +60,7 @@ class StaticWarmTest extends TestCase
         Queue::fake();
 
         $this->artisan('statamic:static:warm', ['--queue' => true])
+            ->doesntExpectOutput('The queue connection is set to "sync". Queueing will be disabled.')
             ->expectsOutput('Queueing 2 requests...')
             ->assertSuccessful();
 
