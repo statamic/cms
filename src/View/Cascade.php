@@ -8,6 +8,7 @@ use Statamic\Facades;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
+use Statamic\Fields\Values;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 
@@ -144,7 +145,7 @@ class Cascade
 
             $global = $global->in($this->site->handle());
 
-            $this->set($global->handle(), $global->toAugmentedArray());
+            $this->set($global->handle(), new Values($global->toAugmentedCollection()));
         }
 
         $mainGlobal = $this->get('global') ?? [];
@@ -170,7 +171,7 @@ class Cascade
             $this->set($key, $value);
         }
 
-        $this->set('page', $variables);
+        $this->set('page', new Values($variables));
 
         return $this;
     }
@@ -215,7 +216,7 @@ class Cascade
 
     protected function hydrateViewModel()
     {
-        if ($class = $this->get('view_model')) {
+        if ($class = optional($this->get('view_model'))->value()) {
             $viewModel = new $class($this);
             $this->data = array_merge($this->data, $viewModel->data());
         }

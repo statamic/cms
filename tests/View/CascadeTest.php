@@ -8,6 +8,7 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Fields\Values;
 use Statamic\Sites\Site as SiteInstance;
 use Statamic\Support\Arr;
 use Statamic\View\Cascade;
@@ -395,6 +396,7 @@ class CascadeTest extends TestCase
 
         tap($cascade->hydrate()->toArray(), function ($cascade) use ($vars) {
             $this->assertArrayHasKey('page', $cascade);
+            $this->assertInstanceOf(Values::class, $cascade['page']);
             $this->assertArraySubset($vars, $cascade['page']);
 
             // Everything inside the 'page' array should also be in the top level.
@@ -412,10 +414,12 @@ class CascadeTest extends TestCase
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) use ($globals, $scopedGlobals) {
             $this->assertArrayHasKey('global', $cascade);
-            $this->assertEquals($globals, $cascade['global']);
+            $this->assertInstanceOf(Values::class, $cascade['global']);
+            $this->assertEquals($globals, $cascade['global']->toArray());
 
             $this->assertArrayHasKey('scoped_globals', $cascade);
-            $this->assertEquals($scopedGlobals, $cascade['scoped_globals']);
+            $this->assertInstanceOf(Values::class, $cascade['scoped_globals']);
+            $this->assertEquals($scopedGlobals, $cascade['scoped_globals']->toArray());
 
             // Everything inside the 'global' array should also be in the top level.
             foreach ($cascade['global'] as $key => $value) {

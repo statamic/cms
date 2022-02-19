@@ -2,6 +2,12 @@ import Vue from 'vue';
 import Toast from './mixins/Toast.js';
 import Statamic from './components/Statamic.js';
 import Alpine from 'alpinejs'
+import * as Globals from './bootstrap/globals'
+import { default as underscore } from 'underscore'
+
+let global_functions = Object.keys(Globals)
+global_functions.forEach(fnName => { global[fnName] = Globals[fnName] })
+global.Cookies = require('cookies-js');
 
 Vue.config.silent = false;
 Vue.config.devtools = true;
@@ -10,11 +16,10 @@ Vue.config.productionTip = false
 window.Alpine = Alpine
 window.Vue = Vue;
 window.Statamic = Statamic;
-window._ = require('underscore');
+window._ = underscore;
 window.$ = window.jQuery = require('jquery');
 window.rangy = require('rangy');
 
-require('./bootstrap/globals');
 require('./bootstrap/polyfills');
 require('./bootstrap/underscore-mixins');
 require('./bootstrap/jquery-plugins');
