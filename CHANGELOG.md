@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### What's new
+- Brand new Antlers parser. [#4257](https://github.com/statamic/cms/issues/4257) by @JohnathonKoster
+- Laravel 9 support. [#5188](https://github.com/statamic/cms/issues/5188) by @jesseleite
 - Frontend form field conditions. [#4949](https://github.com/statamic/cms/issues/4949) by @jesseleite
 - Antlers wrapper for Blade. [#5058](https://github.com/statamic/cms/issues/5058) by @jesseleite
 - Support Blade section yields in Antlers layouts. [#5056](https://github.com/statamic/cms/issues/5056) by @jasonvarga
