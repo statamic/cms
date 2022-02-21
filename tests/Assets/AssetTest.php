@@ -298,7 +298,7 @@ class AssetTest extends TestCase
         Carbon::setTestNow('2017-01-02 14:35:00');
         Storage::disk('test')->put('test.txt', '');
         touch(
-            Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt',
+            Storage::disk('test')->path('test.txt'),
             Carbon::now()->timestamp
         );
 
@@ -363,7 +363,7 @@ class AssetTest extends TestCase
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
-        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
+        $realFilePath = Storage::disk('test')->path('foo/image.jpg');
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
 
         $container = Facades\AssetContainer::make('test')->disk('test');
@@ -415,7 +415,7 @@ class AssetTest extends TestCase
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
-        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
+        $realFilePath = Storage::disk('test')->path('foo/image.jpg');
         touch($realFilePath, $timestamp = Carbon::parse('2021-02-22 09:41:42')->timestamp);
 
         $container = Facades\AssetContainer::make('test')->disk('test');
@@ -478,47 +478,6 @@ class AssetTest extends TestCase
     /** @test */
     public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist()
     {
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-
-        $this->container->makeAsset('one/two/foo.jpg')->save();
-
-        $this->assertEquals([], $this->container->contents()->cached()->keys()->all());
-    }
-
-    /** @test */
-    public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist_with_asserts_disabled_and_using_local()
-    {
-        // the local adapter doesn't really matter. its just checking that if getMetadata
-        // with asserts disabled returns throws an exception (which local does, but not s3).
-
-        $this->container->disk()->filesystem()->getConfig()->set('disable_asserts', true);
-
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-
-        $this->container->makeAsset('one/two/foo.jpg')->save();
-
-        $this->assertEquals([], $this->container->contents()->cached()->keys()->all());
-    }
-
-    /** @test */
-    public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist_with_asserts_disabled_and_using_s3()
-    {
-        // the s3 adapter doesn't really matter. its just checking that if getMetadata
-        // with asserts disabled returns false (which s3 does, but local doesn't).
-
-        // these mocks are ugly but it was simpler than setting up an s3 driver.
-        // we just want to make sure getMetadata returns false.
-        $driver = $this->mock(\League\Flysystem\Filesystem::class);
-        $driver->shouldReceive('listContents')->andReturn([]);
-        $driver->shouldReceive('getMetadata')->andReturnFalse(); // this is the meaningful line
-        $filesystem = $this->mock(\Illuminate\Filesystem\FilesystemAdapter::class);
-        $filesystem->shouldReceive('getDriver')->andReturn($driver);
-        $disk = $this->mock(\Statamic\Filesystem\Filesystem::class);
-        $disk->shouldReceive('filesystem')->andReturn($filesystem);
-        $disk->shouldReceive('put');
-
-        File::shouldReceive('disk')->with('test')->andReturn($disk);
-
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
 
         $this->container->makeAsset('one/two/foo.jpg')->save();
@@ -758,7 +717,7 @@ class AssetTest extends TestCase
     {
         $container = $this->container;
         $size = filesize($fixture = __DIR__.'/__fixtures__/container/a.txt');
-        copy($fixture, Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt');
+        copy($fixture, Storage::disk('test')->path('test.txt'));
 
         $asset = (new Asset)
             ->container($this->container)

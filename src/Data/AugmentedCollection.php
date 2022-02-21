@@ -44,7 +44,7 @@ class AugmentedCollection extends Collection
         })->all();
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array_map(function ($value) {
             if ($this->shallowNesting && $value instanceof Augmentable) {

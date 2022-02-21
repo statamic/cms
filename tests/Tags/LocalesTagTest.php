@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use Illuminate\Support\Facades\Event;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
@@ -42,7 +43,7 @@ EOT;
     {
         parent::setUp();
 
-        $this->withoutEvents();
+        Event::fake();
 
         Site::setConfig(['sites' => [
             'english' => ['url' => '/en', 'name' => 'English', 'locale' => 'en_US'],

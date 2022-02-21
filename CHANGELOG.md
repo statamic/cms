@@ -13,6 +13,8 @@
 - CP forms only submit visible fields, in order to fix sometimes/required_if/etc validation rules. [#5101](https://github.com/statamic/cms/issues/5101) by @jesseleite
 
 ### What's changed
+- PHP 7.2 and 7.3 are no longer supported.
+- Laravel 6 and 7 are no longer supported.
 - Entries fieldtypes augment to query builders instead of collections. [#5238](https://github.com/statamic/cms/issues/5238) by @jasonvarga
 - The `page` and each Global Set in the cascade are now `Values` instances. [#5201](https://github.com/statamic/cms/issues/5201) by @jasonvarga
 - The `Augmented` interface's `get` method now has a return typehint of `Value`. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
