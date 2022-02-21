@@ -170,6 +170,15 @@ class CoreModifiers extends Modifier
         return substr($value, 0, -$params[0]);
     }
 
+    public function boolString($value)
+    {
+        if ($value == true) {
+            return 'true';
+        }
+
+        return 'false';
+    }
+
     /**
      * Returns a camelCase version of the string. Trims surrounding spaces,
      * capitalizes letters following digits, spaces, dashes and underscores,
@@ -219,6 +228,11 @@ class CoreModifiers extends Modifier
                 return ['chunk' => $chunk];
             })
             ->all();
+    }
+
+    public function className($value)
+    {
+        return get_class($value);
     }
 
     /**
@@ -287,7 +301,7 @@ class CoreModifiers extends Modifier
      */
     public function contains($haystack, $params, $context)
     {
-        $needle = Arr::get($context, $params[0], $params[0]);
+        $needle = $this->getFromContext($context, $params);
 
         if (is_array($haystack)) {
             if (Arr::isAssoc($haystack)) {
@@ -311,7 +325,9 @@ class CoreModifiers extends Modifier
      */
     public function containsAll($value, $params, $context)
     {
-        $needles = Arr::get($context, $params[0], $params);
+        $needles = $this->usingRuntimeMethodSyntax($context) ?
+                $params :
+                Arr::get($context, $params[0], $params);
 
         return Stringy::containsAll($value, $needles);
     }
@@ -779,7 +795,7 @@ class CoreModifiers extends Modifier
     {
         $value = is_object($item)
             ? $this->getGroupByValueFromObject($item, $groupBy)
-            : $item[$groupBy];
+            : $this->getGroupByValueFromArray($item, $groupBy);
 
         if ($value instanceof Value) {
             $value = $value->value();
@@ -795,6 +811,13 @@ class CoreModifiers extends Modifier
         $context = $item->toAugmentedArray($keys);
 
         return Antlers::parser()->getVariable($groupBy, $context);
+    }
+
+    private function getGroupByValueFromArray($item, $groupBy)
+    {
+        $groupBy = str_replace(':', '.', $groupBy);
+
+        return Arr::get($item, $groupBy);
     }
 
     private function handleGroupByDateValue($value, $params, &$groupLabels)
@@ -898,7 +921,7 @@ class CoreModifiers extends Modifier
             return false;
         }
 
-        $needle = Arr::get($context, $params[0], $params);
+        $needle = $this->getFromContext($context, $params);
 
         if (is_array($needle) && count($needle) === 1) {
             $needle = $needle[0];
@@ -936,9 +959,7 @@ class CoreModifiers extends Modifier
      */
     public function isAfter($value, $params, $context)
     {
-        $date = $this->carbon(Arr::get($context, $params[0], $params[0]));
-
-        return $this->carbon($value)->gt($date);
+        return $this->carbon($value)->gt($this->carbon($this->getFromContext($context, $params)));
     }
 
     /**
@@ -984,9 +1005,7 @@ class CoreModifiers extends Modifier
      */
     public function isBefore($value, $params, $context)
     {
-        $date = $this->carbon(Arr::get($context, $params[0], $params[0]));
-
-        return $this->carbon($value)->lt($date);
+        return $this->carbon($value)->lt($this->carbon($this->getFromContext($context, $params)));
     }
 
     /**
@@ -999,10 +1018,10 @@ class CoreModifiers extends Modifier
      */
     public function isBetween($value, $params, $context)
     {
-        $date1 = $this->carbon(Arr::get($context, $params[0], $params[0]));
-        $date2 = $this->carbon(Arr::get($context, $params[1], $params[1]));
-
-        return $this->carbon($value)->between($date1, $date2);
+        return $this->carbon($value)->between(
+                $this->carbon($this->getFromContext($context, $params, 0)),
+                $this->carbon($this->getFromContext($context, $params, 1))
+        );
     }
 
     /**
@@ -1411,13 +1430,13 @@ class CoreModifiers extends Modifier
      */
     public function mod($value, $params, $context)
     {
-        $number = Arr::get($context, $params[0], $params[0]);
+        $number = $this->getFromContext($context, $params);
 
         return $value % $number;
     }
 
     /**
-     * Alters the timestamp by incrementing or decremting in a format acceted by strtotime().
+     * Alters the timestamp by incrementing or decrementing in a format accepted by strtotime().
      *
      * @link http://php.net/manual/en/function.strtotime.php
      *
@@ -1592,7 +1611,7 @@ class CoreModifiers extends Modifier
      */
     public function partial($value, $params, $context)
     {
-        $name = Arr::get($context, $params[0], $params[0]);
+        $name = $this->getFromContext($context, $params);
 
         $partial = 'partials/'.$name.'.html';
 
@@ -1604,10 +1623,9 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @param $context
      * @return string
      */
-    public function pluck($value, $params, $context)
+    public function pluck($value, $params)
     {
         $key = $params[0];
 
@@ -1638,7 +1656,7 @@ class CoreModifiers extends Modifier
     {
         $count = Arr::get($params, 0);
 
-        if (! is_numeric($count)) {
+        if (! is_numeric($count) && ! $this->usingRuntimeMethodSyntax($context)) {
             $count = (int) Arr::get($context, $count);
         }
 
@@ -1815,9 +1833,11 @@ class CoreModifiers extends Modifier
     public function repeat($value, $params, $context)
     {
         $times = Arr::get($params, 0, 1);
-        $times = is_numeric($times) ? $times : Arr::get($context, $times);
 
-        $times = ($times instanceof Value) ? $times->value() : $times;
+        if (! $this->usingRuntimeMethodSyntax($context)) {
+            $times = is_numeric($times) ? $times : Arr::get($context, $times);
+            $times = ($times instanceof Value) ? $times->value() : $times;
+        }
 
         return str_repeat($value, $times);
     }
@@ -1928,7 +1948,7 @@ class CoreModifiers extends Modifier
 
         // Support a variable name
         if (! is_numeric($segment)) {
-            $segment = Arr::get($context, $segment);
+            $segment = $this->getFromContext($context, $params);
         }
 
         $url = parse_url($value);
@@ -2184,15 +2204,10 @@ class CoreModifiers extends Modifier
      */
     public function stripTags($value, $params, $context)
     {
-        $tag_var = Arr::get($params, 0);
+        $tags = Arr::get($params, 0, []);
 
-        // When used in a macro without specifying any tags, the tag list will just be the boolean
-        // value `true`. In that case, we'll use an empty to indicate "all the tags". Otherwise,
-        // we'll get the tag list from the context, and then finally just an array of tags.
-        if ($tag_var === true) {
-            $tags = [];
-        } else {
-            $tags = ($tag_var) ? Arr::get($context, $tag_var, $params) : $params;
+        if (! $this->usingRuntimeMethodSyntax($context)) {
+            $tags = ($tags) ? Arr::get($context, $tags, $params) : $params;
         }
 
         return Str::stripTags($value, (array) $tags);
@@ -2374,6 +2389,11 @@ class CoreModifiers extends Modifier
         return Stringy::toSpaces($value, Arr::get($params, 0, 4));
     }
 
+    public function toString($value)
+    {
+        return (string) $value;
+    }
+
     /**
      * Converts each occurrence of some consecutive number of spaces, as defined by
      * $param[0], to a tab. By default, each 4 consecutive spaces are converted to a tab.
@@ -2408,7 +2428,7 @@ class CoreModifiers extends Modifier
      */
     public function transChoice($value, $params, $context)
     {
-        $count = Arr::get($context, $params[0], $params[0]);
+        $count = $this->getFromContext($context, $params);
 
         return trans_choice($value, $count);
     }
@@ -2465,6 +2485,11 @@ class CoreModifiers extends Modifier
         $timezone = Arr::get($params, 0, Config::get('app.timezone'));
 
         return $this->carbon($value)->tz($timezone);
+    }
+
+    public function typeOf($value)
+    {
+        return gettype($value);
     }
 
     /**
@@ -2780,6 +2805,10 @@ class CoreModifiers extends Modifier
     {
         $number = $params[0];
 
+        if ($this->usingRuntimeMethodSyntax($context)) {
+            return $number;
+        }
+
         // If the number is already a number, use that. Otherwise, attempt to resolve it
         // from a value in the context. This allows users to specify a variable name.
         $number = (is_numeric($number))
@@ -2796,5 +2825,20 @@ class CoreModifiers extends Modifier
         }
 
         return $value;
+    }
+
+    // The Antlers Runtime Engine's method modifier syntax handles
+    // context automatically. Looking for {__method_args} in context
+    // is the best way to know if you're in the Runtime Engine.
+    private function usingRuntimeMethodSyntax($context)
+    {
+        return array_key_exists('{__method_args}', $context);
+    }
+
+    private function getFromContext($context, $params, $key = 0)
+    {
+        return $this->usingRuntimeMethodSyntax($context) ?
+                $params[$key] :
+                Arr::get($context, $params[$key], $params[$key]);
     }
 }

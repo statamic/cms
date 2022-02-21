@@ -1,0 +1,19 @@
+First: true
+Last: false
+Count: 1
+Evaluated Count: 2
+Total_Results: 2
+Index: 0
+Key: key1
+Value: Value One
+===============================
+
+First: false
+Last: true
+Count: 2
+Evaluated Count: 2
+Total_Results: 2
+Index: 1
+Key: key2
+Value: Value Two
+===============================
