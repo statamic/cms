@@ -26,7 +26,7 @@ class StaticWarmTest extends TestCase
     {
         $this->artisan('statamic:static:warm')
             ->expectsOutput('Static caching is not enabled.')
-            ->assertFailed();
+            ->assertExitCode(1);
     }
 
     /** @test */
@@ -36,7 +36,7 @@ class StaticWarmTest extends TestCase
 
         $this->artisan('statamic:static:warm')
             ->expectsOutput('Visiting 2 URLs...')
-            ->assertSuccessful();
+            ->assertExitCode(0);
     }
 
     /** @test */
@@ -46,7 +46,7 @@ class StaticWarmTest extends TestCase
 
         $this->artisan('statamic:static:warm', ['--queue' => true])
             ->expectsOutput('The queue connection is set to "sync". Queueing will be disabled.')
-            ->assertSuccessful();
+            ->assertExitCode(0);
     }
 
     /** @test */
@@ -62,7 +62,7 @@ class StaticWarmTest extends TestCase
         $this->artisan('statamic:static:warm', ['--queue' => true])
             ->doesntExpectOutput('The queue connection is set to "sync". Queueing will be disabled.')
             ->expectsOutput('Queueing 2 requests...')
-            ->assertSuccessful();
+            ->assertExitCode(0);
 
         Queue::assertPushed(StaticWarmJob::class, function ($job) {
             return $job->request->getUri()->getPath() === '/about';
