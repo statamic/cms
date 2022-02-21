@@ -49,11 +49,9 @@ class ServiceProvider extends LaravelProvider
 
     private function disableGraphqlRoutes()
     {
-        if ($this->isLegacyRebingGraphql()) {
-            config(['graphql.routes' => false]);
-        } else {
-            config(['graphql.route' => false]);
-        }
+        $key = $this->isLegacyRebingGraphql() ? 'graphql.routes' : 'graphql.route';
+
+        config([$key => false]);
     }
 
     private function addMiddleware()
