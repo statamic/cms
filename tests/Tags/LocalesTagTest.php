@@ -87,6 +87,7 @@ EOT;
             ->create();
 
         $expected = <<<'HTML'
+
 -1
 -hello
 -/en/1
@@ -102,6 +103,7 @@ EOT;
 -english
 -current
 
+
 -2
 -bonjour
 -/fr/2
@@ -116,6 +118,7 @@ EOT;
 -http://localhost/fr
 -english
 -not current
+
 
 -3
 -hola
@@ -179,6 +182,7 @@ HTML;
             ->create();
 
         $expected = <<<'HTML'
+
 -1
 -hello
 -/en/1
@@ -194,6 +198,7 @@ HTML;
 -english
 -current
 
+
 -
 -
 -/fr
@@ -208,6 +213,7 @@ HTML;
 -http://localhost/fr
 -english
 -not current
+
 
 -3
 -hola
@@ -287,6 +293,7 @@ HTML;
             ->create();
 
         $expected = <<<'HTML'
+
 -1
 -hello
 -/en/1
@@ -302,6 +309,7 @@ HTML;
 -english
 -current
 
+
 -
 -
 -/fr
@@ -316,6 +324,7 @@ HTML;
 -http://localhost/fr
 -english
 -not current
+
 
 -3
 -hola

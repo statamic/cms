@@ -1,0 +1,95 @@
+{{# Bard - bard #}}
+{{ bard }}
+
+    
+    {{ if type == 'new_set' }}
+    
+        {{# Array Dynamic - array #}}
+        {{ foreach:array_dynamic }}
+        
+            {{ key }} - {{ value }}
+        {{ /foreach:array_dynamic }}
+        {{# Array Keyed - array #}}
+        {{ array_keyed }}
+        
+            {{# Label1 #}}
+            {{ key1 }}
+            {{# Label2 #}}
+            {{ key2 }}
+            
+        {{ /array_keyed }}
+        {{# Button Group - button_group #}}
+        {{ button_group }}
+        {{# Checkboxes - checkboxes #}}
+        {{ checkboxes }}
+        {{# Code - code #}}
+        {{ code }}
+        {{# Color - color #}}
+        {{ color }}
+        {{# Float - float #}}
+        {{ float }}
+        {{# Grid - grid #}}
+        {{ grid }}
+        
+            {{# Grid Text 1 - text #}}
+            {{ grid_text_1 }}
+            {{# Grid Text 2 - text #}}
+            {{ grid_text_2 }}
+            
+        {{ /grid }}
+        {{# Stacked Grid - grid #}}
+        {{ stacked_grid }}
+        
+            {{# Stacked Grid Text 1 - text #}}
+            {{ stacked_grid_text_1 }}
+            {{# Stacked Grid Text 2 - text #}}
+            {{ stacked_grid_text_2 }}
+            
+        {{ /stacked_grid }}
+        {{# Hidden Field - hidden #}}
+        {{ hidden_field }}
+        {{# HTML Field - html #}}
+        {{ html_field }}
+        {{# Integer Field - integer #}}
+        {{ integer_field }}
+        {{# Link Field - link #}}
+        {{ link_field }}
+        {{# Markdown - markdown #}}
+        {{ markdown }}
+        {{# Radio - radio #}}
+        {{ radio }}
+        {{# Range Field - range #}}
+        {{ range_field }}
+        {{# Select Field - select #}}
+        {{ select_field }}
+        {{# Table - table #}}
+        {{ table | table }}
+        {{# Textarea - textarea #}}
+        {{ textarea }}
+        {{# Time - time #}}
+        {{ time }}
+        {{# Toggle - toggle #}}
+        {{ if toggle }} Yes. {{ /if }}
+        {{# Video - video #}}
+        {{ video }}
+        {{# Yaml - yaml #}}
+        {{ yaml:stacked_grid }}
+            {{ stacked_grid_text_1 }}
+            {{ stacked_grid_text_2 }}
+        {{ /yaml:stacked_grid }}
+        
+        {{ yaml }}
+            {{ grid }}
+                {{ grid_text_1 }}
+                {{ grid_text_2 }}
+            {{ /grid }}
+        {{ /yaml }}
+        
+        
+        {{ yaml:grid }}
+            {{ grid_text_1 }}
+            {{ grid_text_2 }}
+        {{ /yaml:grid }}
+        
+    {{ /if }}
+{{ /bard }}

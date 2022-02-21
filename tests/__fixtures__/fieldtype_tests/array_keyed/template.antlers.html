@@ -1,0 +1,11 @@
+{{ foreach:array_keyed }}
+First: {{ first | bool_string() }}
+Last: {{ last | bool_string() }}
+Count: {{ count }}
+Evaluated Count: {{ array_keyed | length }}
+Total_Results: {{ total_results }}
+Index: {{ index }}
+Key: {{ key }}
+Value: {{ value }}
+===============================
+{{ /foreach:array_keyed }}
