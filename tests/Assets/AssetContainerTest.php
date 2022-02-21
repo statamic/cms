@@ -84,10 +84,18 @@ class AssetContainerTest extends TestCase
 
         $return = $container->disk('test');
 
+        $config = $container->disk()->filesystem()->getConfig();
+
+        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
+        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
+        if (is_array($config)) {
+            $config = collect($config);
+        }
+
         $this->assertEquals($container, $return);
         $this->assertInstanceOf(FlysystemAdapter::class, $container->disk());
         $this->assertEquals('test', $container->diskHandle());
-        $this->assertEquals('/the-url', $container->disk()->filesystem()->getDriver()->getConfig()->get('url'));
+        $this->assertEquals('/the-url', $config->get('url'));
     }
 
     /** @test */
@@ -129,7 +137,7 @@ class AssetContainerTest extends TestCase
         $this->assertTrue($container->private());
         $this->assertFalse($container->accessible());
 
-        Storage::disk('test')->getDriver()->getConfig()->set('url', '/url');
+        Storage::fake('test', ['url' => '/url']);
 
         $this->assertFalse($container->private());
         $this->assertTrue($container->accessible());

@@ -17,11 +17,6 @@ class AttributesTest extends TestCase
     {
         parent::setUp();
 
-        config(['filesystems.disks.test' => [
-            'driver' => 'local',
-            'root' => __DIR__.'/doesnt-matter-itll-get-faked-anyway',
-        ]]);
-
         Storage::fake('test');
 
         $this->attributes = app(Attributes::class);
@@ -54,7 +49,7 @@ class AttributesTest extends TestCase
         Storage::disk('test')->putFileAs('path/to', $file, 'asset.jpg');
 
         // Test about the actual file, for good measure.
-        $realpath = Storage::disk('test')->getAdapter()->getPathPrefix().'path/to/asset.jpg';
+        $realpath = Storage::disk('test')->path('path/to/asset.jpg');
         $this->assertFileExists($realpath);
         [$width, $height] = getimagesize($realpath);
         $this->assertEquals(30, $width);

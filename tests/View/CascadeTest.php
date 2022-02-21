@@ -4,6 +4,7 @@ namespace Tests\View;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
@@ -449,7 +450,7 @@ class CascadeTest extends TestCase
     /** @test */
     public function page_data_overrides_globals()
     {
-        $this->withoutEvents(); // prevents taxonomy term tracker from kicking in.
+        Event::fake(); // prevents taxonomy term tracker from kicking in.
 
         $page = EntryFactory::id('test')
             ->collection('example')

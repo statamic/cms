@@ -3,7 +3,6 @@
 namespace Statamic\Assets;
 
 use Illuminate\Support\Facades\Cache;
-use League\Flysystem\Util;
 use Statamic\Support\Str;
 
 class AssetContainerContents
@@ -26,8 +25,91 @@ class AssetContainerContents
                 // and will let us perform more efficient filtering and caching.
                 $files = $this->filesystem()->listContents('/', true);
 
+                // If Flysystem 3.x, re-apply sorting and return a backwards compatible result set.
+                // See: https://flysystem.thephpleague.com/v2/docs/usage/directory-listings/
+                if (! is_array($files)) {
+                    return collect($files->sortByPath()->toArray())->keyBy('path')->map(function ($file) {
+                        return $this->normalizeFlysystemAttributes($file);
+                    });
+                }
+
                 return collect($files)->keyBy('path');
             });
+    }
+
+    /**
+     * Normalize flysystem 3.x `FileAttributes` and `DirectoryAttributes` payloads back to the 1.x array style.
+     *
+     * @param  mixed  $attributes
+     * @return array
+     */
+    private function normalizeFlysystemAttributes($attributes)
+    {
+        // Merge attributes with `pathinfo()`, since Flysystem 3.x removed `Util::pathinfo()`.
+        $normalized = array_merge([
+            'type' => $attributes->type(),
+            'path' => $attributes->path(),
+            'timestamp' => $attributes->lastModified(),
+        ], pathinfo($attributes['path']));
+
+        // Flysystem 1.x never returned `.` dirnames.
+        if (isset($normalized['dirname']) && $normalized['dirname'] === '.') {
+            $normalized['dirname'] = '';
+        }
+
+        // Only return `size` if type is file.
+        if ($normalized['type'] === 'file') {
+            $normalized['size'] = $attributes->fileSize();
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Normalize flysystem 3.x meta data to match 1.x payloads.
+     *
+     * @param  string  $path
+     * @return array
+     */
+    private function getNormalizedFlysystemMetadata($path)
+    {
+        $isFlysystemV1 = method_exists($this->filesystem(), 'getTimestamp');
+
+        // Determine whether or not to use Flysystem 1.x or 3.x getter methods.
+        $lastModifiedMethod = $isFlysystemV1 ? 'getTimestamp' : 'lastModified';
+        $fileSizeMethod = $isFlysystemV1 ? 'getSize' : 'fileSize';
+
+        // Use exception handling to avoid another `has()` API method call.
+        try {
+            $timestamp = $this->filesystem()->{$lastModifiedMethod}($path);
+        } catch (\Exception $exception) {
+            return false;
+        }
+
+        // Use exception handling to normalize file size output.
+        try {
+            $size = $this->filesystem()->{$fileSizeMethod}($path);
+        } catch (\Exception $exception) {
+            $size = false;
+        }
+
+        // Determine `type` off returned size to avoid another API method call.
+        $type = $size === false ? 'dir' : 'file';
+
+        // Merge `pathinfo()` in, since Flysystem 3.x removed `Util::pathinfo()`.
+        $normalized = array_merge(compact('type', 'path', 'timestamp'), pathinfo($path));
+
+        // Flysystem 1.x never returned `.` dirnames.
+        if (isset($normalized['dirname']) && $normalized['dirname'] === '.') {
+            $normalized['dirname'] = '';
+        }
+
+        // Only return `size` if type is file.
+        if ($type === 'file') {
+            $normalized['size'] = $size;
+        }
+
+        return $normalized;
     }
 
     public function cached()
@@ -124,25 +206,21 @@ class AssetContainerContents
 
     public function add($path)
     {
-        try {
-            // If the file doesn't exist, this will either throw an exception or return
-            // false depending on the adapter and whether or not asserts are enabled.
-            if (! $metadata = $this->filesystem()->getMetadata($path)) {
-                return $this;
-            }
-
-            // Add parent directories
-            if (($dir = dirname($path)) !== '.') {
-                $this->add($dir);
-            }
-
-            $this->all()->put($path, $metadata + Util::pathinfo($path));
-
-            $this->filteredFiles = null;
-            $this->filteredDirectories = null;
-        } finally {
+        if (! $metadata = $this->getNormalizedFlysystemMetadata($path)) {
             return $this;
         }
+
+        // Add parent directories
+        if (($dir = dirname($path)) !== '.') {
+            $this->add($dir);
+        }
+
+        $this->all()->put($path, $metadata);
+
+        $this->filteredFiles = null;
+        $this->filteredDirectories = null;
+
+        return $this;
     }
 
     private function key()

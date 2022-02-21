@@ -1,0 +1,882 @@
+title: Article
+sections:
+  main:
+    display: Main
+    fields:
+      -
+        handle: title
+        field:
+          type: text
+          required: true
+          display: Title
+          validate:
+            - required
+      -
+        handle: content
+        field:
+          type: markdown
+          display: Content
+          restrict: false
+          automatic_line_breaks: true
+          automatic_links: false
+          escape_markup: false
+          smartypants: false
+          instructions: 'This is the text'
+          listable: hidden
+          antlers: false
+      -
+        handle: excerpt
+        field:
+          type: textarea
+          display: Excerpt
+          character_limit: 160
+      -
+        handle: array_dynamic
+        field:
+          mode: dynamic
+          display: 'Array Dynamic'
+          type: array
+          icon: array
+          listable: hidden
+      -
+        handle: array_keyed
+        field:
+          mode: keyed
+          keys:
+            key1: Label1
+            key2: Label2
+          display: 'Array Keyed'
+          type: array
+          icon: array
+          listable: hidden
+      -
+        handle: button_group
+        field:
+          options:
+            button1: 'Button 1'
+            button2: 'Button 2'
+            button3: 'Button 3'
+          display: 'Button Group'
+          type: button_group
+          icon: button_group
+          listable: hidden
+      -
+        handle: checkboxes
+        field:
+          inline: false
+          options:
+            checkbox1: 'Checkbox 1'
+            checkbox2: 'Checkbox 2'
+            checkbox3: 'Checkbox 3'
+          display: Checkboxes
+          type: checkboxes
+          icon: checkboxes
+          listable: hidden
+      -
+        handle: code
+        field:
+          theme: material
+          mode: htmlmixed
+          indent_type: tabs
+          indent_size: 4
+          key_map: default
+          line_numbers: true
+          line_wrapping: true
+          display: Code
+          type: code
+          icon: code
+          listable: hidden
+      -
+        handle: color
+        field:
+          theme: classic
+          lock_opacity: false
+          default_color_mode: HEXA
+          color_modes:
+            - hex
+            - rgba
+            - hsla
+            - hsva
+            - cmyk
+          display: Color
+          type: color
+          icon: color
+          listable: hidden
+      -
+        handle: float
+        field:
+          display: Float
+          type: float
+          icon: float
+          listable: hidden
+      -
+        handle: grid
+        field:
+          fields:
+            -
+              handle: grid_text_1
+              field:
+                input_type: text
+                antlers: false
+                display: 'Grid Text 1'
+                type: text
+                icon: text
+                listable: hidden
+            -
+              handle: grid_text_2
+              field:
+                input_type: text
+                antlers: false
+                display: 'Grid Text 2'
+                type: text
+                icon: text
+                listable: hidden
+          mode: table
+          reorderable: true
+          display: Grid
+          type: grid
+          icon: grid
+          listable: hidden
+      -
+        handle: stacked_grid
+        field:
+          fields:
+            -
+              handle: stacked_grid_text_1
+              field:
+                input_type: text
+                antlers: false
+                display: 'Stacked Grid Text 1'
+                type: text
+                icon: text
+                listable: hidden
+            -
+              handle: stacked_grid_text_2
+              field:
+                input_type: text
+                antlers: false
+                display: 'Stacked Grid Text 2'
+                type: text
+                icon: text
+                listable: hidden
+          mode: stacked
+          reorderable: true
+          display: 'Stacked Grid'
+          type: grid
+          icon: grid
+          listable: hidden
+      -
+        handle: hidden_field
+        field:
+          display: 'Hidden Field'
+          type: hidden
+          icon: hidden
+          listable: hidden
+      -
+        handle: html_field
+        field:
+          display: 'HTML Field'
+          type: html
+          icon: html
+          listable: hidden
+      -
+        handle: integer_field
+        field:
+          display: 'Integer Field'
+          type: integer
+          icon: integer
+          listable: hidden
+      -
+        handle: link_field
+        field:
+          display: 'Link Field'
+          type: link
+          icon: link
+          listable: hidden
+      -
+        handle: markdown
+        field:
+          restrict: false
+          automatic_line_breaks: true
+          automatic_links: false
+          escape_markup: false
+          smartypants: false
+          antlers: false
+          display: Markdown
+          type: markdown
+          icon: markdown
+          listable: hidden
+      -
+        handle: radio
+        field:
+          options:
+            radio1: 'Option 1'
+            radio2: 'Option 2'
+            radio3: 'Option 3'
+          inline: false
+          cast_booleans: false
+          display: Radio
+          type: radio
+          icon: radio
+          listable: hidden
+      -
+        handle: range_field
+        field:
+          step: 1
+          min: 50
+          max: 100
+          display: 'Range Field'
+          type: range
+          icon: range
+          listable: hidden
+      -
+        handle: select_field
+        field:
+          options:
+            option1: 'Option 1'
+            option2: 'Option 2'
+            option3: 'Option 3'
+          multiple: false
+          clearable: false
+          searchable: true
+          taggable: false
+          push_tags: false
+          cast_booleans: false
+          display: 'Select Field'
+          type: select
+          icon: select
+          listable: hidden
+      -
+        handle: table
+        field:
+          display: Table
+          type: table
+          icon: table
+          listable: hidden
+      -
+        handle: textarea
+        field:
+          antlers: false
+          display: Textarea
+          type: textarea
+          icon: textarea
+          listable: hidden
+      -
+        handle: time
+        field:
+          display: Time
+          type: time
+          icon: time
+          listable: hidden
+      -
+        handle: toggle
+        field:
+          display: Toggle
+          type: toggle
+          icon: toggle
+          listable: hidden
+      -
+        handle: video
+        field:
+          display: Video
+          type: video
+          icon: video
+          listable: hidden
+      -
+        handle: yaml
+        field:
+          display: Yaml
+          type: yaml
+          icon: yaml
+          listable: hidden
+      -
+        handle: bard
+        field:
+          always_show_set_button: false
+          sets:
+            new_set:
+              display: 'New Set'
+              fields:
+                -
+                  handle: array_dynamic
+                  field:
+                    mode: dynamic
+                    display: 'Array Dynamic'
+                    type: array
+                    icon: array
+                    listable: hidden
+                -
+                  handle: array_keyed
+                  field:
+                    mode: keyed
+                    keys:
+                      key1: Label1
+                      key2: Label2
+                    display: 'Array Keyed'
+                    type: array
+                    icon: array
+                    listable: hidden
+                -
+                  handle: button_group
+                  field:
+                    options:
+                      button1: 'Button 1'
+                      button2: 'Button 2'
+                      button3: 'Button 3'
+                    display: 'Button Group'
+                    type: button_group
+                    icon: button_group
+                    listable: hidden
+                -
+                  handle: checkboxes
+                  field:
+                    inline: false
+                    options:
+                      checkbox1: 'Checkbox 1'
+                      checkbox2: 'Checkbox 2'
+                      checkbox3: 'Checkbox 3'
+                    display: Checkboxes
+                    type: checkboxes
+                    icon: checkboxes
+                    listable: hidden
+                -
+                  handle: code
+                  field:
+                    theme: material
+                    mode: htmlmixed
+                    indent_type: tabs
+                    indent_size: 4
+                    key_map: default
+                    line_numbers: true
+                    line_wrapping: true
+                    display: Code
+                    type: code
+                    icon: code
+                    listable: hidden
+                -
+                  handle: color
+                  field:
+                    theme: classic
+                    lock_opacity: false
+                    default_color_mode: HEXA
+                    color_modes:
+                      - hex
+                      - rgba
+                      - hsla
+                      - hsva
+                      - cmyk
+                    display: Color
+                    type: color
+                    icon: color
+                    listable: hidden
+                -
+                  handle: float
+                  field:
+                    display: Float
+                    type: float
+                    icon: float
+                    listable: hidden
+                -
+                  handle: grid
+                  field:
+                    fields:
+                      -
+                        handle: grid_text_1
+                        field:
+                          input_type: text
+                          antlers: false
+                          display: 'Grid Text 1'
+                          type: text
+                          icon: text
+                          listable: hidden
+                      -
+                        handle: grid_text_2
+                        field:
+                          input_type: text
+                          antlers: false
+                          display: 'Grid Text 2'
+                          type: text
+                          icon: text
+                          listable: hidden
+                    mode: table
+                    reorderable: true
+                    display: Grid
+                    type: grid
+                    icon: grid
+                    listable: hidden
+                -
+                  handle: stacked_grid
+                  field:
+                    fields:
+                      -
+                        handle: stacked_grid_text_1
+                        field:
+                          input_type: text
+                          antlers: false
+                          display: 'Stacked Grid Text 1'
+                          type: text
+                          icon: text
+                          listable: hidden
+                      -
+                        handle: stacked_grid_text_2
+                        field:
+                          input_type: text
+                          antlers: false
+                          display: 'Stacked Grid Text 2'
+                          type: text
+                          icon: text
+                          listable: hidden
+                    mode: stacked
+                    reorderable: true
+                    display: 'Stacked Grid'
+                    type: grid
+                    icon: grid
+                    listable: hidden
+                -
+                  handle: hidden_field
+                  field:
+                    display: 'Hidden Field'
+                    type: hidden
+                    icon: hidden
+                    listable: hidden
+                -
+                  handle: html_field
+                  field:
+                    display: 'HTML Field'
+                    type: html
+                    icon: html
+                    listable: hidden
+                -
+                  handle: integer_field
+                  field:
+                    display: 'Integer Field'
+                    type: integer
+                    icon: integer
+                    listable: hidden
+                -
+                  handle: link_field
+                  field:
+                    display: 'Link Field'
+                    type: link
+                    icon: link
+                    listable: hidden
+                -
+                  handle: markdown
+                  field:
+                    restrict: false
+                    automatic_line_breaks: true
+                    automatic_links: false
+                    escape_markup: false
+                    smartypants: false
+                    antlers: false
+                    display: Markdown
+                    type: markdown
+                    icon: markdown
+                    listable: hidden
+                -
+                  handle: radio
+                  field:
+                    options:
+                      radio1: 'Option 1'
+                      radio2: 'Option 2'
+                      radio3: 'Option 3'
+                    inline: false
+                    cast_booleans: false
+                    display: Radio
+                    type: radio
+                    icon: radio
+                    listable: hidden
+                -
+                  handle: range_field
+                  field:
+                    step: 1
+                    min: 50
+                    max: 100
+                    display: 'Range Field'
+                    type: range
+                    icon: range
+                    listable: hidden
+                -
+                  handle: select_field
+                  field:
+                    options:
+                      option1: 'Option 1'
+                      option2: 'Option 2'
+                      option3: 'Option 3'
+                    multiple: false
+                    clearable: false
+                    searchable: true
+                    taggable: false
+                    push_tags: false
+                    cast_booleans: false
+                    display: 'Select Field'
+                    type: select
+                    icon: select
+                    listable: hidden
+                -
+                  handle: table
+                  field:
+                    display: Table
+                    type: table
+                    icon: table
+                    listable: hidden
+                -
+                  handle: textarea
+                  field:
+                    antlers: false
+                    display: Textarea
+                    type: textarea
+                    icon: textarea
+                    listable: hidden
+                -
+                  handle: time
+                  field:
+                    display: Time
+                    type: time
+                    icon: time
+                    listable: hidden
+                -
+                  handle: toggle
+                  field:
+                    display: Toggle
+                    type: toggle
+                    icon: toggle
+                    listable: hidden
+                -
+                  handle: video
+                  field:
+                    display: Video
+                    type: video
+                    icon: video
+                    listable: hidden
+                -
+                  handle: yaml
+                  field:
+                    display: Yaml
+                    type: yaml
+                    icon: yaml
+                    listable: hidden
+          buttons:
+            - h2
+            - h3
+            - bold
+            - italic
+            - unorderedlist
+            - orderedlist
+            - removeformat
+            - quote
+            - anchor
+            - image
+            - table
+          save_html: false
+          toolbar_mode: fixed
+          link_noopener: false
+          link_noreferrer: false
+          target_blank: false
+          reading_time: false
+          fullscreen: true
+          allow_source: true
+          enable_input_rules: true
+          enable_paste_rules: true
+          display: Bard
+          type: bard
+          icon: bard
+          listable: hidden
+      -
+        handle: replicator
+        field:
+          collapse: false
+          sets:
+            new_set:
+              display: 'New Set'
+              fields:
+                -
+                  handle: array_dynamic
+                  field:
+                    mode: dynamic
+                    display: 'Array Dynamic'
+                    type: array
+                    icon: array
+                    listable: hidden
+                -
+                  handle: array_keyed
+                  field:
+                    mode: keyed
+                    keys:
+                      key1: Label1
+                      key2: Label2
+                    display: 'Array Keyed'
+                    type: array
+                    icon: array
+                    listable: hidden
+                -
+                  handle: button_group
+                  field:
+                    options:
+                      button1: 'Button 1'
+                      button2: 'Button 2'
+                      button3: 'Button 3'
+                    display: 'Button Group'
+                    type: button_group
+                    icon: button_group
+                    listable: hidden
+                -
+                  handle: checkboxes
+                  field:
+                    inline: false
+                    options:
+                      checkbox1: 'Checkbox 1'
+                      checkbox2: 'Checkbox 2'
+                      checkbox3: 'Checkbox 3'
+                    display: Checkboxes
+                    type: checkboxes
+                    icon: checkboxes
+                    listable: hidden
+                -
+                  handle: code
+                  field:
+                    theme: material
+                    mode: htmlmixed
+                    indent_type: tabs
+                    indent_size: 4
+                    key_map: default
+                    line_numbers: true
+                    line_wrapping: true
+                    display: Code
+                    type: code
+                    icon: code
+                    listable: hidden
+                -
+                  handle: color
+                  field:
+                    theme: classic
+                    lock_opacity: false
+                    default_color_mode: HEXA
+                    color_modes:
+                      - hex
+                      - rgba
+                      - hsla
+                      - hsva
+                      - cmyk
+                    display: Color
+                    type: color
+                    icon: color
+                    listable: hidden
+                -
+                  handle: float
+                  field:
+                    display: Float
+                    type: float
+                    icon: float
+                    listable: hidden
+                -
+                  handle: grid
+                  field:
+                    fields:
+                      -
+                        handle: grid_text_1
+                        field:
+                          input_type: text
+                          antlers: false
+                          display: 'Grid Text 1'
+                          type: text
+                          icon: text
+                          listable: hidden
+                      -
+                        handle: grid_text_2
+                        field:
+                          input_type: text
+                          antlers: false
+                          display: 'Grid Text 2'
+                          type: text
+                          icon: text
+                          listable: hidden
+                    mode: table
+                    reorderable: true
+                    display: Grid
+                    type: grid
+                    icon: grid
+                    listable: hidden
+                -
+                  handle: stacked_grid
+                  field:
+                    fields:
+                      -
+                        handle: stacked_grid_text_1
+                        field:
+                          input_type: text
+                          antlers: false
+                          display: 'Stacked Grid Text 1'
+                          type: text
+                          icon: text
+                          listable: hidden
+                      -
+                        handle: stacked_grid_text_2
+                        field:
+                          input_type: text
+                          antlers: false
+                          display: 'Stacked Grid Text 2'
+                          type: text
+                          icon: text
+                          listable: hidden
+                    mode: stacked
+                    reorderable: true
+                    display: 'Stacked Grid'
+                    type: grid
+                    icon: grid
+                    listable: hidden
+                -
+                  handle: hidden_field
+                  field:
+                    display: 'Hidden Field'
+                    type: hidden
+                    icon: hidden
+                    listable: hidden
+                -
+                  handle: html_field
+                  field:
+                    display: 'HTML Field'
+                    type: html
+                    icon: html
+                    listable: hidden
+                -
+                  handle: integer_field
+                  field:
+                    display: 'Integer Field'
+                    type: integer
+                    icon: integer
+                    listable: hidden
+                -
+                  handle: link_field
+                  field:
+                    display: 'Link Field'
+                    type: link
+                    icon: link
+                    listable: hidden
+                -
+                  handle: markdown
+                  field:
+                    restrict: false
+                    automatic_line_breaks: true
+                    automatic_links: false
+                    escape_markup: false
+                    smartypants: false
+                    antlers: false
+                    display: Markdown
+                    type: markdown
+                    icon: markdown
+                    listable: hidden
+                -
+                  handle: radio
+                  field:
+                    options:
+                      radio1: 'Option 1'
+                      radio2: 'Option 2'
+                      radio3: 'Option 3'
+                    inline: false
+                    cast_booleans: false
+                    display: Radio
+                    type: radio
+                    icon: radio
+                    listable: hidden
+                -
+                  handle: range_field
+                  field:
+                    step: 1
+                    min: 50
+                    max: 100
+                    display: 'Range Field'
+                    type: range
+                    icon: range
+                    listable: hidden
+                -
+                  handle: select_field
+                  field:
+                    options:
+                      option1: 'Option 1'
+                      option2: 'Option 2'
+                      option3: 'Option 3'
+                    multiple: false
+                    clearable: false
+                    searchable: true
+                    taggable: false
+                    push_tags: false
+                    cast_booleans: false
+                    display: 'Select Field'
+                    type: select
+                    icon: select
+                    listable: hidden
+                -
+                  handle: table
+                  field:
+                    display: Table
+                    type: table
+                    icon: table
+                    listable: hidden
+                -
+                  handle: textarea
+                  field:
+                    antlers: false
+                    display: Textarea
+                    type: textarea
+                    icon: textarea
+                    listable: hidden
+                -
+                  handle: time
+                  field:
+                    display: Time
+                    type: time
+                    icon: time
+                    listable: hidden
+                -
+                  handle: toggle
+                  field:
+                    display: Toggle
+                    type: toggle
+                    icon: toggle
+                    listable: hidden
+                -
+                  handle: video
+                  field:
+                    display: Video
+                    type: video
+                    icon: video
+                    listable: hidden
+                -
+                  handle: yaml
+                  field:
+                    display: Yaml
+                    type: yaml
+                    icon: yaml
+                    listable: hidden
+          display: Replicator
+          type: replicator
+          icon: replicator
+          listable: hidden
+  sidebar:
+    display: Sidebar
+    fields:
+      -
+        handle: slug
+        field:
+          type: slug
+          required: true
+          localizable: true
+          validate:
+            - required
+            - 'unique_entry_value:{collection},{id},{site}'
+      -
+        handle: date
+        field:
+          type: date
+          required: true
+          validate:
+            - required
+      -
+        handle: topics
+        field:
+          type: terms
+          taxonomies:
+            - topics
+          display: Topics
+          mode: select
