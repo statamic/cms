@@ -2,6 +2,7 @@
 
 namespace Statamic\Globals;
 
+use BadMethodCallException;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
@@ -13,8 +14,10 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Facades;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -162,6 +165,11 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         return $this->globalSet()->in($origin);
     }
 
+    public function in($site)
+    {
+        return $this->globalSet()->in($site);
+    }
+
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedVariables($this);
@@ -170,5 +178,31 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
     public function fresh()
     {
         return Facades\GlobalSet::find($this->id())->in($this->locale);
+    }
+
+    public function __get($key)
+    {
+        $value = $this->augmentedValue($key);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
+    }
+
+    public function __call($method, $args)
+    {
+        $value = $this->augmentedValue($method);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            return $value;
+        }
+
+        throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
     }
 }
