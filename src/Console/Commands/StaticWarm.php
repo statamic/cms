@@ -109,7 +109,7 @@ class StaticWarm extends Command
         $this->checkLine($this->getRelativeUri($index));
     }
 
-    public function outputFailureLine(ClientExceptionInterface $exception, $index): void
+    public function outputFailureLine($exception, $index): void
     {
         $uri = $this->getRelativeUri($index);
 
