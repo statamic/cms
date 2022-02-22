@@ -195,7 +195,8 @@ EOT;
     /** @test */
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
-        (new class extends Fieldtype {
+        (new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)
@@ -224,7 +225,8 @@ EOT;
         $builder->shouldReceive('get')->once()->andReturn('query builder results');
         app()->instance('mocked-builder', $builder);
 
-        (new class extends Fieldtype {
+        (new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)

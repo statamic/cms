@@ -19,7 +19,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
-use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 
 class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract
