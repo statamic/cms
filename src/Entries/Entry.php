@@ -2,7 +2,6 @@
 
 namespace Statamic\Entries;
 
-use BadMethodCallException;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -27,7 +26,6 @@ use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Compare;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Value;
@@ -804,18 +802,5 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
         return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
-    }
-
-    public function __call($method, $args)
-    {
-        $value = $this->augmentedValue($method);
-
-        $value = $value instanceof Value ? $value->value() : $value;
-
-        if (Compare::isQueryBuilder($value)) {
-            return $value;
-        }
-
-        throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
     }
 }

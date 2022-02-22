@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use BadMethodCallException;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Facades\Compare;
 use Statamic\Fields\Value;
@@ -61,5 +62,18 @@ trait HasAugmentedInstance
         }
 
         return $value;
+    }
+
+    public function __call($method, $args)
+    {
+        $value = $this->augmentedValue($method);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            return $value;
+        }
+
+        throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
     }
 }

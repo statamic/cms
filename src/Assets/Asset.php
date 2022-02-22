@@ -2,7 +2,6 @@
 
 namespace Statamic\Assets;
 
-use BadMethodCallException;
 use Facades\Statamic\Assets\Attributes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -19,12 +18,10 @@ use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
-use Statamic\Facades\Compare;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
-use Statamic\Fields\Value;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -792,18 +789,5 @@ class Asset implements AssetContract, Augmentable
     private function hasDimensions()
     {
         return $this->isImage() || $this->isSvg() || $this->isVideo();
-    }
-
-    public function __call($method, $args)
-    {
-        $value = $this->augmentedValue($method);
-
-        $value = $value instanceof Value ? $value->value() : $value;
-
-        if (Compare::isQueryBuilder($value)) {
-            return $value;
-        }
-
-        throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
     }
 }

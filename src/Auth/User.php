@@ -2,7 +2,6 @@
 
 namespace Statamic\Auth;
 
-use BadMethodCallException;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -21,7 +20,6 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
 use Statamic\Facades;
-use Statamic\Facades\Compare;
 use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
@@ -241,18 +239,5 @@ abstract class User implements
     public function setPreferredLocale($locale)
     {
         return $this->setPreference('locale', $locale);
-    }
-
-    public function __call($method, $args)
-    {
-        $value = $this->augmentedValue($method);
-
-        $value = $value instanceof Value ? $value->value() : $value;
-
-        if (Compare::isQueryBuilder($value)) {
-            return $value;
-        }
-
-        throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
     }
 }
