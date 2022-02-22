@@ -11,9 +11,11 @@ use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Compare;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\YAML;
+use Statamic\Fields\Value;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -350,5 +352,18 @@ class Form implements FormContract, Augmentable
     public function apiUrl()
     {
         return Statamic::apiRoute('forms.show', $this->handle());
+    }
+
+    public function __get($key)
+    {
+        $value = $this->augmentedValue($key);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
     }
 }

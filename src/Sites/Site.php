@@ -4,6 +4,8 @@ namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Facades\Compare;
+use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
 class Site implements Augmentable
@@ -110,5 +112,18 @@ class Site implements Augmentable
     public function __toString()
     {
         return $this->handle();
+    }
+
+    public function __get($key)
+    {
+        $value = $this->augmentedValue($key);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
     }
 }

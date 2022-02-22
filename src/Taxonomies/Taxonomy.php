@@ -16,10 +16,12 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Fields\Value;
 use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -345,5 +347,18 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
             'url' => $this->url(),
             'permalink' => $this->absoluteUrl(),
         ], $this->supplements->all());
+    }
+
+    public function __get($key)
+    {
+        $value = $this->augmentedValue($key);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
     }
 }

@@ -59,10 +59,10 @@ trait ContainsData
         return $this;
     }
 
-    public function __get($key)
-    {
-        return $this->get($key);
-    }
+    // public function __get($key)
+    // {
+    //     return $this->get($key);
+    // }
 
     public function __set($key, $value)
     {

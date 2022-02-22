@@ -14,12 +14,14 @@ use Statamic\Events\EntryBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Entry;
 use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
+use Statamic\Fields\Value;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
@@ -722,5 +724,18 @@ class Collection implements Contract, AugmentableContract
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+    }
+
+    public function __get($key)
+    {
+        $value = $this->augmentedValue($key);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
     }
 }

@@ -15,6 +15,7 @@ use Statamic\Events\BlueprintSaved;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -545,5 +546,18 @@ class Blueprint implements Augmentable
     public function addGqlTypes()
     {
         $this->fields()->all()->map->fieldtype()->each->addGqlTypes();
+    }
+
+    public function __get($key)
+    {
+        $value = $this->augmentedValue($key);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
     }
 }

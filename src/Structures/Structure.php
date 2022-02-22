@@ -7,6 +7,8 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
+use Statamic\Facades\Compare;
+use Statamic\Fields\Value;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -126,5 +128,18 @@ abstract class Structure implements StructureContract, Augmentable
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+    }
+
+    public function __get($key)
+    {
+        $value = $this->augmentedValue($key);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
     }
 }
