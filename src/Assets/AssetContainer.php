@@ -2,6 +2,7 @@
 
 namespace Statamic\Assets;
 
+use ArrayAccess;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -20,7 +21,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable
+class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -361,7 +362,15 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function accessible()
     {
-        return $this->disk()->filesystem()->getDriver()->getConfig()->get('url') !== null;
+        $config = $this->disk()->filesystem()->getConfig();
+
+        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
+        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
+        if (is_array($config)) {
+            $config = collect($config);
+        }
+
+        return $config->get('url') !== null;
     }
 
     /**

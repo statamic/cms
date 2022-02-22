@@ -2,11 +2,14 @@
 
 namespace Tests\Assets;
 
+use BadMethodCallException;
 use Carbon\Carbon;
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Mockery;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Events\AssetSaved;
@@ -15,6 +18,7 @@ use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Fieldtype;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -77,15 +81,91 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_and_sets_data_values_using_magic_properties()
+    public function it_sets_data_values_using_magic_properties()
     {
         $asset = (new Asset)->container($this->container);
-        $this->assertNull($asset->foo);
+        $this->assertNull($asset->get('foo'));
 
         $asset->foo = 'bar';
 
         $this->assertTrue($asset->has('foo'));
-        $this->assertEquals('bar', $asset->foo);
+        $this->assertEquals('bar', $asset->get('foo'));
+    }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $blueprint = Facades\Blueprint::makeFromFields(['charlie' => ['type' => 'test']]);
+        BlueprintRepository::shouldReceive('find')->with('assets/test_container')->andReturn($blueprint);
+
+        $asset = (new Asset)->container($this->container)->path('test.jpg');
+        $asset->set('alfa', 'bravo');
+        $asset->set('charlie', 'delta');
+
+        $this->assertEquals('test.jpg', $asset->path);
+        $this->assertEquals('test.jpg', $asset['path']);
+        $this->assertEquals('bravo', $asset->alfa);
+        $this->assertEquals('bravo', $asset['alfa']);
+        $this->assertEquals('delta (augmented)', $asset->charlie);
+        $this->assertEquals('delta (augmented)', $asset['charlie']);
+    }
+
+    /**
+     * @test
+     * @dataProvider queryBuilderProvider
+     **/
+    public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
+    {
+        $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
+        app()->instance('mocked-builder', $builder);
+
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return app('mocked-builder');
+            }
+        })::register();
+
+        $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'test']]);
+        BlueprintRepository::shouldReceive('find')->with('assets/test_container')->andReturn($blueprint);
+
+        $asset = (new Asset)->container($this->container);
+        $asset->set('foo', 'delta');
+
+        $this->assertEquals('query builder results', $asset->foo);
+        $this->assertEquals('query builder results', $asset['foo']);
+        $this->assertSame($builder, $asset->foo());
+    }
+
+    public function queryBuilderProvider()
+    {
+        return [
+            'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],
+            'database' => [Mockery::mock(\Illuminate\Database\Query\Builder::class)],
+            'eloquent' => [Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)],
+        ];
+    }
+
+    /** @test */
+    public function calling_unknown_method_throws_exception()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Statamic\Assets\Asset::thisFieldDoesntExist()');
+
+        (new Asset)->container($this->container)->thisFieldDoesntExist();
     }
 
     /** @test */
@@ -298,7 +378,7 @@ class AssetTest extends TestCase
         Carbon::setTestNow('2017-01-02 14:35:00');
         Storage::disk('test')->put('test.txt', '');
         touch(
-            Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt',
+            Storage::disk('test')->path('test.txt'),
             Carbon::now()->timestamp
         );
 
@@ -363,7 +443,7 @@ class AssetTest extends TestCase
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
-        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
+        $realFilePath = Storage::disk('test')->path('foo/image.jpg');
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
 
         $container = Facades\AssetContainer::make('test')->disk('test');
@@ -415,7 +495,7 @@ class AssetTest extends TestCase
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
-        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
+        $realFilePath = Storage::disk('test')->path('foo/image.jpg');
         touch($realFilePath, $timestamp = Carbon::parse('2021-02-22 09:41:42')->timestamp);
 
         $container = Facades\AssetContainer::make('test')->disk('test');
@@ -478,47 +558,6 @@ class AssetTest extends TestCase
     /** @test */
     public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist()
     {
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-
-        $this->container->makeAsset('one/two/foo.jpg')->save();
-
-        $this->assertEquals([], $this->container->contents()->cached()->keys()->all());
-    }
-
-    /** @test */
-    public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist_with_asserts_disabled_and_using_local()
-    {
-        // the local adapter doesn't really matter. its just checking that if getMetadata
-        // with asserts disabled returns throws an exception (which local does, but not s3).
-
-        $this->container->disk()->filesystem()->getConfig()->set('disable_asserts', true);
-
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-
-        $this->container->makeAsset('one/two/foo.jpg')->save();
-
-        $this->assertEquals([], $this->container->contents()->cached()->keys()->all());
-    }
-
-    /** @test */
-    public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist_with_asserts_disabled_and_using_s3()
-    {
-        // the s3 adapter doesn't really matter. its just checking that if getMetadata
-        // with asserts disabled returns false (which s3 does, but local doesn't).
-
-        // these mocks are ugly but it was simpler than setting up an s3 driver.
-        // we just want to make sure getMetadata returns false.
-        $driver = $this->mock(\League\Flysystem\Filesystem::class);
-        $driver->shouldReceive('listContents')->andReturn([]);
-        $driver->shouldReceive('getMetadata')->andReturnFalse(); // this is the meaningful line
-        $filesystem = $this->mock(\Illuminate\Filesystem\FilesystemAdapter::class);
-        $filesystem->shouldReceive('getDriver')->andReturn($driver);
-        $disk = $this->mock(\Statamic\Filesystem\Filesystem::class);
-        $disk->shouldReceive('filesystem')->andReturn($filesystem);
-        $disk->shouldReceive('put');
-
-        File::shouldReceive('disk')->with('test')->andReturn($disk);
-
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
 
         $this->container->makeAsset('one/two/foo.jpg')->save();
@@ -758,7 +797,7 @@ class AssetTest extends TestCase
     {
         $container = $this->container;
         $size = filesize($fixture = __DIR__.'/__fixtures__/container/a.txt');
-        copy($fixture, Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt');
+        copy($fixture, Storage::disk('test')->path('test.txt'));
 
         $asset = (new Asset)
             ->container($this->container)
@@ -782,7 +821,7 @@ class AssetTest extends TestCase
 
         $array = $asset->toAugmentedArray();
 
-        $this->assertArraySubset([
+        $expectedValues = [
             'id' => 'test_container::path/to/asset.jpg',
             'title' => 'asset.jpg',
             'path' => 'path/to/asset.jpg',
@@ -794,7 +833,10 @@ class AssetTest extends TestCase
             'container' => $this->container,
             'blueprint' => $blueprint,
             'foo' => 'bar',
-        ], $array);
+        ];
+        foreach ($expectedValues as $k => $v) {
+            $this->assertEquals($v, $array[$k]->value());
+        }
 
         $keys = ['is_audio', 'is_previewable', 'is_image', 'is_video', 'edit_url', 'url'];
         foreach ($keys as $key) {
@@ -855,7 +897,7 @@ class AssetTest extends TestCase
             ->path('path/to/asset.jpg')
             ->set('focus', '75-25');
 
-        $this->assertSame($asset->augmentedValue('focus_css'), '75% 25%');
+        $this->assertSame($asset->augmentedValue('focus_css')->value(), '75% 25%');
     }
 
     /** @test */
@@ -869,7 +911,7 @@ class AssetTest extends TestCase
             ->container($this->container)
             ->path('path/to/asset.jpg');
 
-        $this->assertSame($asset->augmentedValue('focus_css'), '50% 50%');
+        $this->assertSame($asset->augmentedValue('focus_css')->value(), '50% 50%');
     }
 
     /** @test */

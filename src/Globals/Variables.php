@@ -2,6 +2,7 @@
 
 namespace Statamic\Globals;
 
+use ArrayAccess;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
@@ -18,7 +19,7 @@ use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Variables implements Contract, Localization, Augmentable, ResolvesValuesContract
+class Variables implements Contract, Localization, Augmentable, ResolvesValuesContract, ArrayAccess
 {
     use ExistsAsFile, ContainsData, HasAugmentedInstance, HasOrigin, FluentlyGetsAndSets, ResolvesValues;
 

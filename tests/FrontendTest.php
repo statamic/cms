@@ -10,6 +10,7 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class FrontendTest extends TestCase
 {
@@ -380,7 +381,7 @@ class FrontendTest extends TestCase
 
         $response = $this->get('about');
 
-        $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", trim($response->content()));
+        $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", StringUtilities::normalizeLineEndings(trim($response->content())));
     }
 
     /** @test */

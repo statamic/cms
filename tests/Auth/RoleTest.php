@@ -112,4 +112,15 @@ class RoleTest extends TestCase
     {
         $this->markTestIncomplete();
     }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $role = (new Role)->handle('test')->title('Test');
+
+        $role
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $role->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $role[$key]));
+    }
 }

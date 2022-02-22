@@ -3,19 +3,27 @@
 ## Unreleased
 
 ### What's new
+- Brand new Antlers parser. [#4257](https://github.com/statamic/cms/issues/4257) by @JohnathonKoster
+- Laravel 9 support. [#5188](https://github.com/statamic/cms/issues/5188) by @jesseleite
 - Frontend form field conditions. [#4949](https://github.com/statamic/cms/issues/4949) by @jesseleite
 - Antlers wrapper for Blade. [#5058](https://github.com/statamic/cms/issues/5058) by @jesseleite
 - Support Blade section yields in Antlers layouts. [#5056](https://github.com/statamic/cms/issues/5056) by @jasonvarga
 - Added wrapper classes to make working with values in Blade easier. [#5201](https://github.com/statamic/cms/issues/5201) by @jasonvarga
-- Added `toValuesCollection` Collection macro. [#5286](https://github.com/statamic/cms/issues/5286) by @jasonvarga
 - Added `Statamic::query()` aliases. [#5285](https://github.com/statamic/cms/issues/5285) by @jasonvarga
+- Augmentables (Entry, Term, etc) can retrieve their augmented values via property access. [#5297](https://github.com/statamic/cms/issues/5297) by @jasonvarga
+- Augmentables can retrieve their augmented values via array access. [#5327](https://github.com/statamic/cms/issues/5327) by @jasonvarga
 
 ### What's fixed
 - CP forms only submit visible fields, in order to fix sometimes/required_if/etc validation rules. [#5101](https://github.com/statamic/cms/issues/5101) by @jesseleite
 
 ### What's changed
+- PHP 7.2 and 7.3 are no longer supported.
+- Laravel 6 and 7 are no longer supported.
 - Entries fieldtypes augment to query builders instead of collections. [#5238](https://github.com/statamic/cms/issues/5238) by @jasonvarga
 - The `page` and each Global Set in the cascade are now `Values` instances. [#5201](https://github.com/statamic/cms/issues/5201) by @jasonvarga
+- The `Augmented` interface's `get` method now has a return typehint of `Value`. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
+- `$item->augmentedValue()`, `toAugmentedCollection()`, and `toAugmentedArray()` will always return `Value` instances. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
+- Form submission data will always be an unfiltered Collection. [#5230](https://github.com/statamic/cms/issues/5230) by @jasonvarga
 
 
 ## 3.2.32 (2022-01-26)

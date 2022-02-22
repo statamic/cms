@@ -7,8 +7,8 @@ use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Support\Str;
-use Statamic\View\Antlers\Parser;
 
 class Value implements IteratorAggregate, JsonSerializable
 {
@@ -90,7 +90,7 @@ class Value implements IteratorAggregate, JsonSerializable
         }
 
         if (Str::contains($value, '{')) {
-            return $parser->extractNoparse(str_replace('{{', '@{{', $value));
+            return $parser->valueWithNoparse($value);
         }
 
         return $value;

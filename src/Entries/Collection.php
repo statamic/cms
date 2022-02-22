@@ -2,6 +2,7 @@
 
 namespace Statamic\Entries;
 
+use ArrayAccess;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
@@ -25,7 +26,7 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Collection implements Contract, AugmentableContract
+class Collection implements Contract, AugmentableContract, ArrayAccess
 {
     use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
 

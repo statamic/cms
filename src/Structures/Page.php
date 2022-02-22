@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use ArrayAccess;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
@@ -21,7 +22,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\GraphQL\ResolvesValues;
 
-class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract
+class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract, ArrayAccess
 {
     use HasAugmentedInstance, ForwardsCalls, TracksQueriedColumns, ResolvesValues, ContainsSupplementalData;
 

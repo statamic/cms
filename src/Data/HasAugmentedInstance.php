@@ -2,7 +2,10 @@
 
 namespace Statamic\Data;
 
+use BadMethodCallException;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Facades\Compare;
+use Statamic\Fields\Value;
 
 trait HasAugmentedInstance
 {
@@ -58,5 +61,51 @@ trait HasAugmentedInstance
     public function toEvaluatedAugmentedArray($keys = null)
     {
         return $this->toAugmentedCollection($keys)->withEvaluation()->toArray();
+    }
+
+    public function __get($key)
+    {
+        $value = $this->augmentedValue($key);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
+    }
+
+    public function __call($method, $args)
+    {
+        $value = $this->augmentedValue($method);
+
+        $value = $value instanceof Value ? $value->value() : $value;
+
+        if (Compare::isQueryBuilder($value)) {
+            return $value;
+        }
+
+        throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->__get($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        throw new \Exception('Method offsetSet is not currently supported.');
+    }
+
+    public function offsetExists($key)
+    {
+        throw new \Exception('Method offsetExists is not currently supported.');
+    }
+
+    public function offsetUnset($key)
+    {
+        throw new \Exception('Method offsetUnset is not currently supported.');
     }
 }
