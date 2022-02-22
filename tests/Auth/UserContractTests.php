@@ -138,7 +138,8 @@ trait UserContractTests
     /** @test */
     public function it_converts_to_an_array()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)
@@ -189,7 +190,8 @@ trait UserContractTests
     /** @test */
     public function only_requested_relationship_fields_are_included_in_to_array()
     {
-        $regularFieldtype = new class extends Fieldtype {
+        $regularFieldtype = new class extends Fieldtype
+        {
             protected static $handle = 'regular';
 
             public function augment($value)
@@ -199,7 +201,8 @@ trait UserContractTests
         };
         $regularFieldtype::register();
 
-        $relationshipFieldtype = new class extends Fieldtype {
+        $relationshipFieldtype = new class extends Fieldtype
+        {
             protected static $handle = 'relationship';
             protected $relationship = true;
 
