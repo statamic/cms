@@ -162,11 +162,6 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         return $this->globalSet()->in($origin);
     }
 
-    public function in($site)
-    {
-        return $this->globalSet()->in($site);
-    }
-
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedVariables($this);
