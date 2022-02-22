@@ -4,6 +4,7 @@ namespace Statamic\Assets;
 
 use ArrayAccess;
 use Facades\Statamic\Assets\Attributes;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -32,9 +33,11 @@ use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable, ArrayAccess
+class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations, SyncsOriginalState, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
+    TracksQueriedRelations,
+    SyncsOriginalState, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
