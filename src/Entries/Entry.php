@@ -811,9 +811,4 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         // the slug which could result in an infinite loop in some cases.
         return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
     }
-
-    public function toArray()
-    {
-        return $this->toEvaluatedAugmentedArray();
-    }
 }

@@ -63,6 +63,11 @@ trait HasAugmentedInstance
         return $this->toAugmentedCollection($keys)->withEvaluation()->toArray();
     }
 
+    public function toArray()
+    {
+        return $this->toEvaluatedAugmentedArray();
+    }
+
     public function __get($key)
     {
         $value = $this->augmentedValue($key);
