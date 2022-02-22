@@ -1,9 +1,1 @@
-<svg class="stroke-current" width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15.5004,12.5003 C15.5004,13.0523 15.0524,13.5003 14.5004,13.5003 L3.5004,13.5003 C2.9474,13.5003 2.5004,13.0523 2.5004,12.5003 L2.5004,1.5003 C2.5004,0.9473 2.9474,0.5003 3.5004,0.5003 L14.5004,0.5003 C15.0524,0.5003 15.5004,0.9473 15.5004,1.5003 L15.5004,12.5003 Z" stroke="currentColor"></path>
-        <path d="M13.5004,15.5003 L1.5004,15.5003 C0.9474,15.5003 0.5004,15.0523 0.5004,14.5003 L0.5004,2.5003" stroke="currentColor"></path>
-        <path d="M5.5004,4.5003 L12.5004,4.5003" stroke="currentColor"></path>
-        <path d="M5.5004,6.5003 L12.5004,6.5003" stroke="currentColor"></path>
-        <path d="M5.5004,8.5003 L10.5004,8.5003" stroke="currentColor"></path>
-    </g>
-</svg>
+<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"><path d="M15.667 1A.667.667 0 0015 .333H3A.667.667 0 002.333 1v12a.667.667 0 00.667.667h12a.667.667 0 00.667-.667zM4.997 2.998h8M4.997 5.665h8M4.997 8.331h8M4.997 10.998h3.67" stroke-width=".66667"/><path d="M2.333 3H1a.667.667 0 00-.667.667V15a.667.667 0 00.667.667h11.333A.667.667 0 0013 15v-1.333" stroke-width=".66667"/></g></svg>

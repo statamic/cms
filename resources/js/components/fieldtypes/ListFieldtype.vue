@@ -86,7 +86,7 @@ export default {
             deep: true,
             handler(data) {
                 if (!this.mounted) return;
-                this.update(this.sortableToArray(data));
+                this.updateDebounced(this.sortableToArray(data));
             }
         },
 

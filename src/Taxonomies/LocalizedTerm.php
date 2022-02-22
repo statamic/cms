@@ -17,6 +17,7 @@ use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
@@ -86,8 +87,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
 
     public function value($key)
     {
-        return $this->get($key)
-            ?? $this->inDefaultLocale()->get($key)
+        if ($this->data()->has($key)) {
+            return $this->get($key);
+        }
+
+        return $this->inDefaultLocale()->get($key)
             ?? $this->taxonomy()->cascade($key);
     }
 
@@ -196,12 +200,20 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
 
     public function entries()
     {
-        return $this->term->entries();
+        return $this->queryEntries()->where('site', $this->locale())->get();
     }
 
     public function entriesCount()
     {
-        return $this->term->entriesCount();
+        $key = vsprintf('term-entries-count-%s-%s-%s', [
+            $this->locale(),
+            $this->id(),
+            optional($this->collection())->handle(),
+        ]);
+
+        return Blink::once($key, function () {
+            return Facades\Term::entriesCount($this);
+        });
     }
 
     protected function revisionKey()
@@ -351,7 +363,9 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
 
     public function toLivePreviewResponse($request, $extras)
     {
-        Cascade::set('live_preview', $extras);
+        Cascade::hydrated(function ($cascade) use ($extras) {
+            $cascade->set('live_preview', $extras);
+        });
 
         return $this->toResponse($request);
     }
@@ -424,7 +438,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
         return $this->selectedQueryColumns;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'slug', 'url', 'permalink', 'api_url'];
     }

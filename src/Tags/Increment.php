@@ -6,6 +6,29 @@ class Increment extends Tags
 {
     protected static $arr = [];
 
+    public function reset()
+    {
+        $counter = $this->params->get('counter', null);
+
+        if ($counter == null) {
+            return '';
+        }
+
+        $toValue = $this->params->get('to', null);
+
+        if ($toValue == null) {
+            unset(self::$arr[$counter]);
+        } else {
+            self::$arr[$counter] = $toValue;
+        }
+
+        if ($this->isPair) {
+            return $this->parse();
+        }
+
+        return '';
+    }
+
     public function wildcard($tag)
     {
         if (! isset(self::$arr[$tag])) {

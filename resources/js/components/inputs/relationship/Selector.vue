@@ -116,6 +116,10 @@ export default {
         exclusions: {
             type: Array,
             default: () => []
+        },
+        initialColumns: {
+            type: Array,
+            default: () => []
         }
     },
 
@@ -131,7 +135,8 @@ export default {
             sortDirection: this.initialSortDirection,
             page: 1,
             selections: _.clone(this.initialSelections),
-            columns: [],
+            columns: this.initialColumns,
+            visibleColumns: this.initialColumns.filter(column => column.visible),
         }
     },
 
@@ -145,6 +150,7 @@ export default {
                 site: this.site,
                 exclusions: this.exclusions,
                 filters: utf8btoa(JSON.stringify(this.activeFilters)),
+                columns: this.visibleColumns.map(column => column.field).join(','),
             }
         },
 

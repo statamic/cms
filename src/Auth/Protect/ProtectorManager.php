@@ -60,4 +60,11 @@ class ProtectorManager extends Manager
     {
         return $class->setConfig($config)->setScheme($name);
     }
+
+    protected function callCustomCreator(array $config, string $name)
+    {
+        return $this->protector(
+            parent::callCustomCreator($config, $name), $name, $config
+        );
+    }
 }

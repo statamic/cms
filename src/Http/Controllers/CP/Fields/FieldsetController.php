@@ -63,12 +63,12 @@ class FieldsetController extends CpController
             'fields' => 'array',
         ]);
 
-        $fieldset->setContents([
+        $fieldset->setContents(array_merge($fieldset->contents(), [
             'title' => $request->title,
             'fields' => collect($request->fields)->map(function ($field) {
                 return FieldTransformer::fromVue($field);
             })->all(),
-        ])->save();
+        ]))->save();
 
         return response('', 204);
     }
@@ -110,26 +110,5 @@ class FieldsetController extends CpController
         $fieldset->delete();
 
         return response('');
-    }
-
-    /**
-     * Quickly create a new barebones fieldset from within the fieldtype.
-     *
-     * @return array
-     */
-    public function quickStore(Request $request)
-    {
-        $title = $request->title;
-
-        if (Facades\Fieldset::exists($handle = snake_case($title))) {
-            return ['success' => true];
-        }
-
-        $fieldset = (new Fieldset)->setHandle($handle)->setContents([
-            'title' => $request->title,
-            'fields' => [],
-        ])->save();
-
-        return ['success' => true];
     }
 }

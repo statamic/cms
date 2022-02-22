@@ -121,7 +121,7 @@
 
 <script>
 var CodeMirror = require('codemirror');
-var marked = require('marked');
+var { marked } = require('marked');
 var PlainTextRenderer = require('marked-plaintext');
 
 require('codemirror/addon/edit/closebrackets');
@@ -180,7 +180,7 @@ export default {
     watch: {
 
         data(data) {
-            this.update(data);
+            this.updateDebounced(data);
         },
 
         fullScreenMode: {

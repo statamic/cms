@@ -66,8 +66,14 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootMiddleware()
                 ->bootUpdateScripts()
                 ->bootViews()
-                ->bootPublishAfterInstall();
+                ->bootPublishAfterInstall()
+                ->bootAddon();
         });
+    }
+
+    public function bootAddon()
+    {
+        //
     }
 
     public function bootEvents()
@@ -160,9 +166,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootSchedule()
     {
         if ($this->app->runningInConsole()) {
-            $this->app->booted(function () {
-                $this->schedule($this->app->make(Schedule::class));
-            });
+            $this->schedule($this->app->make(Schedule::class));
         }
 
         return $this;

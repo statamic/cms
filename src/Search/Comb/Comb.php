@@ -366,7 +366,7 @@ class Comb
      */
     private function preformat($raw_query)
     {
-        return trim(mb_ereg_replace("[^\w\d\-\.:+\s&’'‘]", '', $raw_query));
+        return trim(mb_ereg_replace("[^\w\d\-\.:+\s@&’'‘]", '', $raw_query));
     }
 
     /**
@@ -703,17 +703,17 @@ class Comb
                 // check for disallowed
                 if (count($params['disallowed']) && preg_match($disallowed, $record)) {
                     // a disallowed was found, we don't want this
-                    throw new Exception('');
+                    throw new CombException('');
                 }
 
                 // check for disallowed
                 if (count($params['required']) && ! preg_match($required, $record)) {
                     // a disallowed was found, we don't want this
-                    throw new Exception('');
+                    throw new CombException('');
                 }
 
                 array_push($new_data, $item);
-            } catch (Exception $e) {
+            } catch (CombException $e) {
                 continue;
             }
         }
@@ -797,7 +797,6 @@ class Comb
      * Tests for a valid query.
      *
      * @param  string  $query  Query to test
-     * @return bool
      *
      * @throws NoQuery
      * @throws NotEnoughCharacters

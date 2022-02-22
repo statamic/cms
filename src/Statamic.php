@@ -150,7 +150,11 @@ class Statamic
             return false;
         }
 
-        return starts_with(request()->path(), config('statamic.cp.route'));
+        $cp = config('statamic.cp.route');
+        $path = request()->path();
+
+        return $path === $cp
+            || Str::startsWith($path, Str::finish($cp, '/'));
     }
 
     public static function cpRoute($route, $params = [])
@@ -276,6 +280,10 @@ class Statamic
 
         if ($error = session('error')) {
             $messages[] = ['type' => 'error', 'message' => $error];
+        }
+
+        if ($info = session('info')) {
+            $messages[] = ['type' => 'info', 'message' => $info];
         }
 
         return $messages ?? [];

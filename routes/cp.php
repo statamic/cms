@@ -59,7 +59,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
             Route::post('{site}', 'EntriesController@store')->name('collections.entries.store');
 
-            Route::group(['prefix' => '{entry}/{slug}'], function () {
+            Route::group(['prefix' => '{entry}'], function () {
                 Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
                 Route::post('publish', 'PublishedEntriesController@store')->name('collections.entries.published.store');
                 Route::post('unpublish', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
@@ -142,6 +142,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::resource('assets', 'AssetsController')->parameters(['assets' => 'encoded_asset']);
         Route::get('assets/{encoded_asset}/download', 'AssetsController@download')->name('assets.download');
         Route::get('thumbnails/{encoded_asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
+        Route::get('svgs/{encoded_asset}', 'SvgController@show')->name('assets.svgs.show');
     });
 
     Route::group(['prefix' => 'fields', 'namespace' => 'Fields'], function () {
@@ -150,8 +151,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('update', 'FieldsController@update')->name('fields.update');
         Route::get('field-meta', 'MetaController@show');
         Route::resource('fieldsets', 'FieldsetController');
-        Route::post('fieldsets/quick', 'FieldsetController@quickStore');
-        Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
         Route::get('blueprints', 'BlueprintController@index')->name('blueprints.index');
         Route::get('fieldtypes', 'FieldtypesController@index');
     });
@@ -214,7 +213,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');
-        Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
+        Route::post('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
         Route::get('relationship/filters', 'RelationshipFieldtypeController@filters')->name('relationship.filters');
         Route::post('markdown', 'MarkdownFieldtypeController@preview')->name('markdown.preview');
     });

@@ -20,6 +20,7 @@ class Entries extends Relationship
 {
     use QueriesFilters;
 
+    protected $categories = ['relationship'];
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;
@@ -84,9 +85,7 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        $items = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
-
-        return $items->preProcessForIndex();
+        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
     }
 
     public function getResourceCollection($request, $items)
@@ -99,7 +98,7 @@ class Entries extends Relationship
             ]]);
     }
 
-    protected function getBlueprint($request)
+    protected function getBlueprint($request = null)
     {
         return $this->getFirstCollectionFromRequest($request)->entryBlueprint();
     }
@@ -260,5 +259,10 @@ class Entries extends Relationship
         }
 
         return $type;
+    }
+
+    public function getColumns()
+    {
+        return $this->getBlueprint()->columns()->values()->all();
     }
 }

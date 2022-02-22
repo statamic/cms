@@ -112,6 +112,13 @@ final class Addon
     protected $url;
 
     /**
+     * The marketplace URL.
+     *
+     * @var string
+     */
+    protected $marketplaceUrl;
+
+    /**
      * The name of the developer.
      *
      * @var string
@@ -168,7 +175,7 @@ final class Addon
         $instance = self::make($package['id']);
 
         $keys = [
-            'id', 'slug', 'editions', 'marketplaceId', 'marketplaceSlug', 'marketplaceSellerSlug', 'name', 'namespace',
+            'id', 'slug', 'editions', 'marketplaceId', 'marketplaceSlug', 'marketplaceUrl', 'marketplaceSellerSlug', 'name', 'namespace',
             'autoload', 'provider', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
         ];
 
@@ -418,7 +425,7 @@ final class Addon
 
         $dir = Str::removeRight(dirname($reflector->getFileName()), rtrim($this->autoload, '/'));
 
-        return $this->directory = Str::ensureRight($dir, '/');
+        return $this->directory = Path::tidy(Str::ensureRight($dir, '/'));
     }
 
     public function existsOnMarketplace()

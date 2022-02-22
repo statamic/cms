@@ -22,10 +22,12 @@ export default {
     },
 
     mounted() {
-        const pickr = Pickr.create({
+        const pickr = new Pickr ({
             el: this.$el,
             disabled: this.isReadOnly,
             lockOpacity: this.config.lock_opacity,
+            default: this.value ?? this.config.default ?? null,
+            defaultRepresentation: this.config.default_color_mode,
             components: {
 
                 // Main components
@@ -52,13 +54,6 @@ export default {
             },
             swatches: this.config.swatches,
             theme: this.config.theme || 'classic'
-        });
-
-        pickr.setColorRepresentation(this.config.default_color_mode);
-
-        pickr.on('init', (...args) => {
-            pickr.setColorRepresentation(this.config.default_color_mode);
-            pickr.setColor(this.value);
         });
 
         pickr.on('save', (...args) => {

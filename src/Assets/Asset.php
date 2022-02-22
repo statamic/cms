@@ -2,7 +2,7 @@
 
 namespace Statamic\Assets;
 
-use Facades\Statamic\Assets\Dimensions;
+use Facades\Statamic\Assets\Attributes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -76,9 +76,7 @@ class Asset implements AssetContract, Augmentable
 
     public function remove($key)
     {
-        unset($this->meta['data'][$key]);
-
-        return $this;
+        return $this->hydrate()->traitRemove($key);
     }
 
     public function data($data = null)
@@ -161,14 +159,15 @@ class Asset implements AssetContract, Augmentable
         $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
-            $dimensions = Dimensions::asset($this)->get();
+            $attributes = Attributes::asset($this)->get();
 
             $meta = array_merge($meta, [
                 'size' => $this->disk()->size($this->path()),
                 'last_modified' => $this->disk()->lastModified($this->path()),
-                'width' => $dimensions[0],
-                'height' => $dimensions[1],
+                'width' => Arr::get($attributes, 'width'),
+                'height' => Arr::get($attributes, 'height'),
                 'mime_type' => $this->disk()->mimeType($this->path()),
+                'duration' => Arr::get($attributes, 'duration'),
             ]);
         }
 
@@ -288,10 +287,23 @@ class Asset implements AssetContract, Augmentable
 
     public function thumbnailUrl($preset = null)
     {
+        if ($this->isSvg()) {
+            return $this->svgThumbnailUrl();
+        }
+
         return cp_route('assets.thumbnails.show', [
             'encoded_asset' => base64_encode($this->id()),
             'size' => $preset,
         ]);
+    }
+
+    protected function svgThumbnailUrl()
+    {
+        if ($url = $this->url()) {
+            return $url;
+        }
+
+        return cp_route('assets.svgs.show', ['encoded_asset' => base64_encode($this->id())]);
     }
 
     /**
@@ -412,7 +424,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Save the asset.
      *
-     * @return void
+     * @return bool
      */
     public function save()
     {
@@ -430,7 +442,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Delete the asset.
      *
-     * @return mixed
+     * @return $this
      */
     public function delete()
     {
@@ -495,7 +507,7 @@ class Asset implements AssetContract, Augmentable
      * Rename the asset.
      *
      * @param  string  $filename
-     * @return void
+     * @return self
      */
     public function rename($filename, $unique = false)
     {
@@ -509,7 +521,7 @@ class Asset implements AssetContract, Augmentable
      *
      * @param  string  $folder  The folder relative to the container.
      * @param  string|null  $filename  The new filename, if renaming.
-     * @return void
+     * @return $this
      */
     public function move($folder, $filename = null)
     {
@@ -537,7 +549,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        if (! $this->isImage() && ! $this->isSvg()) {
+        if (! $this->hasDimensions()) {
             return [null, null];
         }
 
@@ -589,7 +601,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function ratio()
     {
-        if (! $this->isImage() && ! $this->isSvg()) {
+        if (! $this->hasDimensions()) {
             return null;
         }
 
@@ -623,13 +635,12 @@ class Asset implements AssetContract, Augmentable
      * Upload a file.
      *
      * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
-     * @return void
+     * @return $this
      */
     public function upload(UploadedFile $file)
     {
         $ext = $file->getClientOriginalExtension();
         $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-        $basename = $filename.'.'.$ext;
 
         $directory = $this->folder();
         $directory = ($directory === '.') ? '/' : $directory;
@@ -655,6 +666,16 @@ class Asset implements AssetContract, Augmentable
         AssetUploaded::dispatch($this);
 
         return $this;
+    }
+
+    /**
+     * Download a file.
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function download(string $name = null, array $headers = [])
+    {
+        return $this->disk()->filesystem()->download($this->path(), $name, $headers);
     }
 
     private function getSafeFilename($string)
@@ -760,8 +781,13 @@ class Asset implements AssetContract, Augmentable
         return $this->selectedQueryColumns;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
+    }
+
+    private function hasDimensions()
+    {
+        return $this->isImage() || $this->isSvg() || $this->isVideo();
     }
 }

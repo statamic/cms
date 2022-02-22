@@ -2,6 +2,7 @@
 export default {
     props: {
         name: String,
+        default: String,
         inline: {
             type: Boolean,
             default: true
@@ -16,7 +17,15 @@ export default {
     },
     methods: {
         getInlineIcon() {
-            return require(`!!html-loader!./../../svg/${this.name}.svg`);
+            try {
+                return require(`!!html-loader!./../../svg/${this.name}.svg`);
+            } catch (error) {
+                if (this.default) {
+                    return require(`!!html-loader!./../../svg/${this.default}.svg`);
+                }
+
+                return '';
+            }
         }
     }
 }
