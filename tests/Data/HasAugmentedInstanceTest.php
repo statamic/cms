@@ -24,7 +24,8 @@ class HasAugmentedInstanceTest extends TestCase
         $mock->shouldReceive('select')->with(['one'])->times(2)->andReturn($filteredAugmentedCollection);
         $mock->shouldReceive('select')->with(['id', 'title', 'api_url'])->times(1)->andReturn($shallowFilteredAugmentedCollection);
 
-        $thing = new class($mock) {
+        $thing = new class($mock)
+        {
             use HasAugmentedInstance;
 
             public function __construct($mock)
@@ -60,7 +61,8 @@ class HasAugmentedInstanceTest extends TestCase
         $mock->shouldReceive('withRelations')->with([])->andReturnSelf();
         $mock->shouldReceive('select')->with(['foo', 'bar'])->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
 
-        $thing = new class($mock) {
+        $thing = new class($mock)
+        {
             use HasAugmentedInstance;
 
             public function __construct($mock)
@@ -89,7 +91,8 @@ class HasAugmentedInstanceTest extends TestCase
         $mock->shouldReceive('withRelations')->with(['baz', 'qux'])->andReturnSelf();
         $mock->shouldReceive('select')->with(null)->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
 
-        $thing = new class($mock) {
+        $thing = new class($mock)
+        {
             use HasAugmentedInstance;
 
             public function __construct($mock)

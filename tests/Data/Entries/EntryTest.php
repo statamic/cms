@@ -142,7 +142,8 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
-        (new class extends Fieldtype {
+        (new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)
@@ -176,7 +177,8 @@ class EntryTest extends TestCase
         $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
         app()->instance('mocked-builder', $builder);
 
-        (new class extends Fieldtype {
+        (new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)
@@ -552,7 +554,8 @@ class EntryTest extends TestCase
     /** @test */
     public function it_converts_to_an_array()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)
@@ -609,7 +612,8 @@ class EntryTest extends TestCase
     /** @test */
     public function only_requested_relationship_fields_are_included_in_to_array()
     {
-        $regularFieldtype = new class extends Fieldtype {
+        $regularFieldtype = new class extends Fieldtype
+        {
             protected static $handle = 'regular';
 
             public function augment($value)
@@ -619,7 +623,8 @@ class EntryTest extends TestCase
         };
         $regularFieldtype::register();
 
-        $relationshipFieldtype = new class extends Fieldtype {
+        $relationshipFieldtype = new class extends Fieldtype
+        {
             protected static $handle = 'relationship';
             protected $relationship = true;
 
