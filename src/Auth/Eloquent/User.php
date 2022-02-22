@@ -373,17 +373,4 @@ class User extends BaseUser
 
         return $this->$key = $value;
     }
-
-    public function __get($key)
-    {
-        if ($key === 'timestamps') {
-            return $this->model()->timestamps;
-        }
-
-        if ($key == 'email') {
-            return $this->email();
-        }
-
-        return $this->$key;
-    }
 }

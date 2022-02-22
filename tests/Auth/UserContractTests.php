@@ -2,10 +2,14 @@
 
 namespace Tests\Auth;
 
+use BadMethodCallException;
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Hash;
+use Mockery;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
 use Statamic\Facades;
+use Statamic\Fields\Fieldtype;
 
 trait UserContractTests
 {
@@ -13,7 +17,7 @@ trait UserContractTests
 
     public function user()
     {
-        return $this->makeUser()
+        $user = $this->makeUser()
             ->id(123)
             ->email('john@example.com')
             ->data([
@@ -23,10 +27,15 @@ trait UserContractTests
             ])
             ->setPreferredLocale('en')
             ->setSupplement('supplemented', 'qux')
-            ->assignRole($this->createRole('role_one'))
-            ->assignRole($this->createRole('role_two'))
-            ->addToGroup($this->createGroup('group_one'))
-            ->addToGroup($this->createGroup('group_two'));
+            ->assignRole($roleOne = $this->createRole('role_one'))
+            ->assignRole($roleTwo = $this->createRole('role_two'))
+            ->addToGroup($groupOne = $this->createGroup('group_one'))
+            ->addToGroup($groupTwo = $this->createGroup('group_two'));
+
+        Role::shouldReceive('all')->andReturn(collect([$roleOne, $roleTwo]));
+        UserGroup::shouldReceive('all')->andReturn(collect([$groupOne, $groupTwo]));
+
+        return $user;
     }
 
     /** @test */
@@ -72,6 +81,53 @@ trait UserContractTests
     public function additionalDataValues()
     {
         return [];
+    }
+
+    /**
+     * @test
+     * @dataProvider queryBuilderProvider
+     **/
+    public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
+    {
+        $builder->shouldReceive('get')->once()->andReturn('query builder results');
+        app()->instance('mocked-builder', $builder);
+
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return app('mocked-builder');
+            }
+        })::register();
+
+        $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'test']]);
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $user = $this->user();
+        $user->set('foo', 'delta');
+
+        $this->assertEquals('query builder results', $user->foo);
+        $this->assertSame($builder, $user->foo());
+    }
+
+    public function queryBuilderProvider()
+    {
+        return [
+            'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],
+            'database' => [Mockery::mock(\Illuminate\Database\Query\Builder::class)],
+            'eloquent' => [Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)],
+        ];
+    }
+
+    /** @test */
+    public function calling_unknown_method_throws_exception()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage(sprintf('Call to undefined method %s::thisFieldDoesntExist()', get_class($this->user())));
+
+        $this->user()->thisFieldDoesntExist();
     }
 
     /** @test */

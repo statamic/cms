@@ -263,6 +263,20 @@ class SiteTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $site = new Site('test', [
+            'name' => 'Test',
+            'url' => '/sub',
+            'locale' => 'en_US',
+        ]);
+
+        $site
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $site->{$key}));
+    }
+
+    /** @test */
     public function it_casts_the_handle_to_a_string()
     {
         $site = new Site('test', []);

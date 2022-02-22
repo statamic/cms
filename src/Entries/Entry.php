@@ -28,6 +28,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -59,6 +60,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $template;
+    protected $layout;
 
     public function __construct()
     {
@@ -395,7 +398,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('template')
             ->getter(function ($template) {
-                $template = $template ?? optional($this->origin())->template() ?? $this->collection()->template();
+                $template = $template ?? $this->get('template') ?? optional($this->origin())->template() ?? $this->collection()->template();
 
                 return $template === '@blueprint'
                     ? $this->inferTemplateFromBlueprint()
@@ -420,7 +423,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? optional($this->origin())->layout() ?? $this->collection()->layout();
+                return $layout ?? $this->get('layout') ?? optional($this->origin())->layout() ?? $this->collection()->layout();
             })
             ->args(func_get_args());
     }

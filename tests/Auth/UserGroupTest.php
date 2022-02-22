@@ -308,4 +308,14 @@ class UserGroupTest extends TestCase
         Facades\UserGroup::shouldReceive('delete')->with($group)->once()->andReturnTrue();
         $this->assertTrue($group->delete());
     }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $group = (new UserGroup)->handle('test');
+
+        $group
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $group->{$key}));
+    }
 }

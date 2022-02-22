@@ -1039,4 +1039,14 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals('test Test', Facades\Antlers::parse('{{ blueprint }}{{ handle }} {{ title }}{{ /blueprint }}', ['blueprint' => $blueprint]));
     }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $blueprint
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint->{$key}));
+    }
 }
