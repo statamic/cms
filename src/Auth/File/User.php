@@ -62,11 +62,6 @@ class User extends BaseUser
         return $this->get($key);
     }
 
-    public function __get($key)
-    {
-        return parent::__get($key);
-    }
-
     public function id($id = null)
     {
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
