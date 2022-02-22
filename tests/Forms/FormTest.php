@@ -50,4 +50,14 @@ class FormTest extends TestCase
 
         $this->assertEquals('honeypot', $form->honeypot());
     }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $form = Form::make('contact_us');
+
+        $form
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $form->{$key}));
+    }
 }

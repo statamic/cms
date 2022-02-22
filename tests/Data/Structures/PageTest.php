@@ -434,6 +434,27 @@ class PageTest extends TestCase
         $this->assertEquals('fallback', $page->get('unknown', 'fallback'));
     }
 
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $entry = EntryFactory::id('test-entry')->collection('test')->data([
+            'foo' => 'entry bar',
+            'baz' => 'entry qux',
+        ])->create();
+
+        $tree = $this->mock(Tree::class);
+        $tree->shouldReceive('entry')->with('test-entry')->andReturn($entry);
+        $tree->shouldReceive('structure')->andReturnNull(); // just make the blueprint method quiet for now.
+
+        $page = new Page;
+        $page->setEntry('test-entry');
+        $page->setTree($tree);
+
+        $page
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $page->{$key}));
+    }
+
     protected function newTree()
     {
         return new class extends Tree

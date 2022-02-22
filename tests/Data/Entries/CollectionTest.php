@@ -574,6 +574,16 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $collection
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $collection->{$key}));
+    }
+
+    /** @test */
     public function it_augments_in_the_parser()
     {
         $collection = (new Collection)->handle('test');

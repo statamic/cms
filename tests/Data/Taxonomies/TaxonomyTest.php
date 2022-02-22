@@ -143,4 +143,14 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('/blog/tags', $taxonomy->url());
         $this->assertEquals('http://localhost/blog/tags', $taxonomy->absoluteUrl());
     }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $taxonomy
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $taxonomy->{$key}));
+    }
 }

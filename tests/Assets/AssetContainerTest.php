@@ -542,6 +542,17 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($container, $folder->container());
     }
 
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $container = $this->containerWithDisk();
+
+        $container
+            ->toAugmentedCollection()
+            ->except(['assets'])
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container->{$key}));
+    }
+
     private function containerWithDisk()
     {
         config(['filesystems.disks.test' => [
