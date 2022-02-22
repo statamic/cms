@@ -14,12 +14,10 @@ use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Compare;
 use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
-use Statamic\Fields\Value;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
@@ -509,18 +507,5 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public static function __callStatic($method, $parameters)
     {
         return Facades\AssetContainer::{$method}(...$parameters);
-    }
-
-    public function __get($key)
-    {
-        $value = $this->augmentedValue($key);
-
-        $value = $value instanceof Value ? $value->value() : $value;
-
-        if (Compare::isQueryBuilder($value)) {
-            $value = $value->get();
-        }
-
-        return $value;
     }
 }

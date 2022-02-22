@@ -806,19 +806,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
     }
 
-    public function __get($key)
-    {
-        $value = $this->augmentedValue($key);
-
-        $value = $value instanceof Value ? $value->value() : $value;
-
-        if (Compare::isQueryBuilder($value)) {
-            $value = $value->get();
-        }
-
-        return $value;
-    }
-
     public function __call($method, $args)
     {
         $value = $this->augmentedValue($method);

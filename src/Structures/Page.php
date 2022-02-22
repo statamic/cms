@@ -17,7 +17,6 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Compare;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Fields\Value;
@@ -436,18 +435,5 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
             ->toAugmentedCollection($this->selectedQueryColumns)
             ->withShallowNesting()
             ->toArray();
-    }
-
-    public function __get($key)
-    {
-        $value = $this->augmentedValue($key);
-
-        $value = $value instanceof Value ? $value->value() : $value;
-
-        if (Compare::isQueryBuilder($value)) {
-            $value = $value->get();
-        }
-
-        return $value;
     }
 }

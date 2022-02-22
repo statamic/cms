@@ -9,9 +9,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Events\UserGroupDeleted;
 use Statamic\Events\UserGroupSaved;
 use Statamic\Facades;
-use Statamic\Facades\Compare;
 use Statamic\Facades\Role as RoleAPI;
-use Statamic\Fields\Value;
 
 abstract class UserGroup implements UserGroupContract, Augmentable
 {
@@ -177,18 +175,5 @@ abstract class UserGroup implements UserGroupContract, Augmentable
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
-    }
-
-    public function __get($key)
-    {
-        $value = $this->augmentedValue($key);
-
-        $value = $value instanceof Value ? $value->value() : $value;
-
-        if (Compare::isQueryBuilder($value)) {
-            $value = $value->get();
-        }
-
-        return $value;
     }
 }

@@ -468,19 +468,6 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
         return Facades\Term::find($this->id())->in($this->locale);
     }
 
-    public function __get($key)
-    {
-        $value = $this->augmentedValue($key);
-
-        $value = $value instanceof Value ? $value->value() : $value;
-
-        if (Compare::isQueryBuilder($value)) {
-            $value = $value->get();
-        }
-
-        return $value;
-    }
-
     public function __call($method, $args)
     {
         $value = $this->augmentedValue($method);
