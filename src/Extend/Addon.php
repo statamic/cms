@@ -14,7 +14,7 @@ final class Addon
 {
     /**
      * The identifier.
-     * Typically a composer package name. eg. statamic/bloodhound.
+     * Typically a composer package name. eg. statamic/trapper-keeper.
      *
      * @var string
      */
@@ -42,14 +42,14 @@ final class Addon
     protected $marketplaceSellerSlug;
 
     /**
-     * The addon's namespace. eg. "Statamic\Addons\Bloodhound".
+     * The addon's namespace. eg. "Statamic\Addons\TrapperKeeper".
      *
      * @var string
      */
     protected $namespace;
 
     /**
-     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound".
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/trapper-keeper".
      *
      * @var string
      */
@@ -70,7 +70,7 @@ final class Addon
     protected $provider;
 
     /**
-     * The name of the addon. eg. "Bloodhound Search".
+     * The name of the addon. eg. "Trapper Keeper".
      *
      * @var string
      */
@@ -140,7 +140,7 @@ final class Addon
     protected $editions = [];
 
     /**
-     * @param string $id
+     * @param  string  $id
      */
     public function __construct($id)
     {
@@ -160,7 +160,7 @@ final class Addon
     /**
      * Make an addon instance from package details.
      *
-     * @param array $package
+     * @param  array  $package
      * @return self
      */
     public static function makeFromPackage(array $package)
@@ -182,7 +182,7 @@ final class Addon
 
     /**
      * The ID (in a vendor/package format)
-     * eg. statamic/bloodhound.
+     * eg. statamic/trapper-keeper.
      *
      * @return string
      */
@@ -193,7 +193,7 @@ final class Addon
 
     /**
      * The composer package string
-     * eg. statamic/bloodhound.
+     * eg. statamic/trapper-keeper.
      *
      * @return string
      */
@@ -204,7 +204,7 @@ final class Addon
 
     /**
      * The composer package name string
-     * eg. in statamic/blodhound, it's bloodhound.
+     * eg. in statamic/trapper-keeper, it's trapper-keeper.
      *
      * @return string
      */
@@ -215,7 +215,7 @@ final class Addon
 
     /**
      * The composer vendor name string
-     * eg. in statamic/blodhound, it's statamic.
+     * eg. in statamic/trapper-keeper, it's statamic.
      *
      * @return string
      */
@@ -227,7 +227,7 @@ final class Addon
     /**
      * The marketplace variant ID of the addon.
      *
-     * @param int $id
+     * @param  int  $id
      * @return int
      */
     public function marketplaceId($id = null)
@@ -240,7 +240,7 @@ final class Addon
     /**
      * The marketplace slug of the addon.
      *
-     * @param string $slug
+     * @param  string  $slug
      * @return string
      */
     public function marketplaceSlug($slug = null)
@@ -267,7 +267,7 @@ final class Addon
      *
      * For referencing in URLs.
      *
-     * @param string $slug
+     * @param  string  $slug
      * @return string
      */
     public function slug($slug = null)
@@ -280,7 +280,7 @@ final class Addon
     /**
      * The name of addon.
      *
-     * @param string $name
+     * @param  string  $name
      * @return string|self
      */
     public function name($name = null)
@@ -297,7 +297,7 @@ final class Addon
     /**
      * Whether a given file exists in the addon's directory.
      *
-     * @param string $path
+     * @param  string  $path
      * @return bool
      */
     public function hasFile($path)
@@ -312,7 +312,7 @@ final class Addon
     /**
      * Get the contents of a given file in the addon's directory.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     public function getFile($path)
@@ -327,8 +327,8 @@ final class Addon
     /**
      * Write the given contents to a file.
      *
-     * @param string $path
-     * @param string $contents
+     * @param  string  $path
+     * @param  string  $contents
      */
     public function putFile($path, $contents)
     {
@@ -380,8 +380,8 @@ final class Addon
      * Handle method calls.
      * Typically will get or set property values.
      *
-     * @param string $method
-     * @param array $args
+     * @param  string  $method
+     * @param  array  $args
      * @return mixed
      */
     public function __call($method, $args)
@@ -400,7 +400,7 @@ final class Addon
     }
 
     /**
-     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound/".
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/trapper-keeper/".
      *
      * @return string
      */

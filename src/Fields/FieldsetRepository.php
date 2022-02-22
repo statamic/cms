@@ -19,6 +19,11 @@ class FieldsetRepository
         return $this;
     }
 
+    public function directory()
+    {
+        return $this->directory;
+    }
+
     public function find(string $handle): ?Fieldset
     {
         if ($cached = array_get($this->fieldsets, $handle)) {

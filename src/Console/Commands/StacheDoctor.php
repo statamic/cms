@@ -14,7 +14,7 @@ class StacheDoctor extends Command
     use RunsInPlease, EnhancesCommands;
 
     protected $signature = 'statamic:stache:doctor';
-    protected $description = 'Diagnose any problems with the Stache.';
+    protected $description = 'Diagnose any problems with the Stache';
     protected $stores;
     protected $hasDuplicateIds = false;
 

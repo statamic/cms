@@ -112,6 +112,7 @@
             :max-depth="structureMaxDepth"
             :expects-root="structureExpectsRoot"
             :site="site"
+            :preferences-prefix="preferencesPrefix"
             @edit-page="editPage"
             @changed="markTreeDirty"
             @saved="markTreeClean"
@@ -211,7 +212,8 @@ export default {
             showLocalizationDeleteBehaviorConfirmation: false,
             localizationDeleteBehaviorConfirmCallback: null,
             site: this.initialSite,
-            reordering: false
+            reordering: false,
+            preferencesPrefix: `collections.${this.handle}`,
         }
     },
 

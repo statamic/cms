@@ -14,7 +14,7 @@ class Path
     /**
      * Makes a $path relative to the BASE.
      *
-     * @param string $path  The path to change
+     * @param  string  $path  The path to change
      * @return string
      */
     public function makeRelative($path)
@@ -35,7 +35,7 @@ class Path
      * Performs a simple concatenation with the Flysytem root folder.
      * It doesn't perform any checks for whether a valid relative path was provided.
      *
-     * @param  string $path  The path to change
+     * @param  string  $path  The path to change
      * @return string
      */
     public function makeFull($path)
@@ -50,7 +50,7 @@ class Path
      * Windows based paths beginning with drive letters are absolute: C:\path\to\something
      * Paths without a leading slash are relative: path/to/something
      *
-     * @param string $path
+     * @param  string  $path
      * @return bool
      */
     public function isAbsolute($path)
@@ -61,7 +61,7 @@ class Path
     /**
      * Makes a $path a valid URL.
      *
-     * @param string $path  The path to change
+     * @param  string  $path  The path to change
      * @return string
      */
     public function toUrl($path)
@@ -112,7 +112,7 @@ class Path
     /**
      * Is a given $path a page?
      *
-     * @param string $path  Path to check
+     * @param  string  $path  Path to check
      * @return bool
      */
     public function isPage($path)
@@ -125,7 +125,7 @@ class Path
     /**
      * Is a given $path an entry?
      *
-     * @param string $path  Path to check
+     * @param  string  $path  Path to check
      * @return bool
      */
     public function isEntry($path)
@@ -153,7 +153,7 @@ class Path
     /**
      * Is a given $path a draft?
      *
-     * @param string $path  Path to check
+     * @param  string  $path  Path to check
      * @return bool
      */
     public function isDraft($path)
@@ -170,7 +170,7 @@ class Path
     /**
      * Is a given $path hidden?
      *
-     * @param string $path  Path to check
+     * @param  string  $path  Path to check
      * @return bool
      */
     public function isHidden($path)
@@ -187,7 +187,7 @@ class Path
     /**
      * Tidy a path.
      *
-     * @param string $path  Path to tidy
+     * @param  string  $path  Path to tidy
      * @return string
      */
     public function tidy($path)
@@ -203,7 +203,7 @@ class Path
     /**
      * Get the file extension.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string|null
      */
     public function extension($path)
@@ -216,7 +216,7 @@ class Path
      *
      * eg. `foo/bar/baz/index.md` would return `foo/bar/baz`
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     public function directory($path)
@@ -231,7 +231,7 @@ class Path
      *
      * eg. `foo/bar/baz/index.md` would return `baz`
      *
-     * @param string $path
+     * @param  string  $path
      * @return string mixed
      */
     public function folder($path)
@@ -246,7 +246,7 @@ class Path
      *
      * eg. `foo/bar/baz/` would return `foo/bar`
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     public function popLastSegment($path)
@@ -260,8 +260,8 @@ class Path
     /**
      * Swaps the slug of a $path with the $slug provided.
      *
-     * @param string  $path  Path to modify
-     * @param string  $slug  New slug to use
+     * @param  string  $path  Path to modify
+     * @param  string  $slug  New slug to use
      * @return string
      */
     public function replaceSlug($path, $slug)

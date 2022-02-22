@@ -22,7 +22,7 @@ abstract class AbstractCacher implements Cacher
     private $config;
 
     /**
-     * @param Repository $cache
+     * @param  Repository  $cache
      */
     public function __construct(Repository $cache, $config)
     {
@@ -33,8 +33,8 @@ abstract class AbstractCacher implements Cacher
     /**
      * Get a config value.
      *
-     * @param string $key
-     * @param mixed $default
+     * @param  string  $key
+     * @param  mixed  $default
      * @return mixed
      */
     public function config($key, $default = null)
@@ -62,7 +62,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * @param  mixed $content
+     * @param  mixed  $content
      * @return string
      */
     protected function normalizeContent($content)
@@ -77,7 +77,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Prefix a cache key.
      *
-     * @param string $key
+     * @param  string  $key
      * @return string
      */
     protected function normalizeKey($key)
@@ -88,7 +88,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Get a hashed string representation of a URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string
      */
     protected function makeHash($url)
@@ -125,7 +125,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Get the URL from a request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return string
      */
     public function getUrl(Request $request)
@@ -142,7 +142,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Get all the URLs that have been cached.
      *
-     * @param string|null $domain
+     * @param  string|null  $domain
      * @return \Illuminate\Support\Collection
      */
     public function getUrls($domain = null)
@@ -171,8 +171,8 @@ abstract class AbstractCacher implements Cacher
     /**
      * Save a URL to the cache.
      *
-     * @param string $key
-     * @param string $url
+     * @param  string  $key
+     * @param  string  $url
      * @return void
      */
     public function cacheUrl($key, $url)
@@ -191,7 +191,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Forget / remove a URL from the cache by its key.
      *
-     * @param string $key
+     * @param  string  $key
      * @return void
      */
     public function forgetUrl($key)
@@ -206,7 +206,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Invalidate a wildcard URL.
      *
-     * @param string $wildcard
+     * @param  string  $wildcard
      */
     protected function invalidateWildcardUrl($wildcard)
     {
@@ -223,7 +223,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Invalidate multiple URLs.
      *
-     * @param array $urls
+     * @param  array  $urls
      * @return void
      */
     public function invalidateUrls($urls)
@@ -240,7 +240,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Determine if a given URL should be excluded from caching.
      *
-     * @param string $url
+     * @param  string  $url
      * @return bool
      */
     public function isExcluded($url)
@@ -266,7 +266,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * @param string|null $domain
+     * @param  string|null  $domain
      * @return string
      */
     protected function getUrlsCacheKey($domain = null)

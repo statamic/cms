@@ -4,7 +4,10 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Site;
+use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -173,6 +176,91 @@ GQL;
     }
 
     /** @test */
+    public function it_queries_an_entry_in_a_specific_site()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        Collection::find('events')->routes('/events/{slug}')->sites(['en', 'fr'])->save();
+
+        EntryFactory::collection('events')->locale('fr')->origin('4')->id('44')->slug('event-two')->create();
+
+        $query = <<<'GQL'
+{
+    entry(uri: "/events/event-two", site: "fr") {
+        id
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'id' => '44',
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_queries_an_existing_entry_parent()
+    {
+        $this->createStructuredCollection();
+
+        $query = <<<'GQL'
+{
+    entry(id: "4") {
+        parent {
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'parent' => [
+                        'title' => 'Event One',
+                    ],
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_queries_a_non_existing_entry_parent()
+    {
+        $this->createStructuredCollection();
+
+        $query = <<<'GQL'
+{
+    entry(id: "3") {
+        parent {
+            id
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'parent' => null,
+                ],
+            ]]);
+    }
+
+    /** @test */
     public function it_can_add_custom_fields_to_interface()
     {
         GraphQL::addField('EntryInterface', 'one', function () {
@@ -300,5 +388,18 @@ GQL;
             ->assertJson(['errors' => [[
                 'message' => 'Cannot query field "one" on type "EntryInterface". Did you mean to use an inline fragment on "Entry_Blog_ArtDirected"?',
             ]]]);
+    }
+
+    private function createStructuredCollection()
+    {
+        $collection = Collection::find('events');
+        $structure = (new CollectionStructure)->maxDepth(3);
+        $collection->structure($structure)->save();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => '3', 'children' => [
+                ['entry' => '4'],
+            ]],
+        ])->save();
     }
 }

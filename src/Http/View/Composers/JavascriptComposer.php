@@ -17,6 +17,7 @@ class JavascriptComposer
     public function compose(View $view)
     {
         $user = User::current();
+        $licenses = app('Statamic\Licensing\LicenseManager');
 
         Statamic::provideToScript([
             'version' => Statamic::version(),
@@ -42,6 +43,7 @@ class JavascriptComposer
             'livePreview' => config('statamic.live_preview'),
             'locale' => config('app.locale'),
             'permissions' => $this->permissions($user),
+            'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
         ]);
     }
 

@@ -14,8 +14,8 @@ class Controller extends BaseController
     /**
      * Set the successful flash message.
      *
-     * @param string $message
-     * @param null   $text
+     * @param  string  $message
+     * @param  null  $text
      * @return array
      */
     protected function success($message, $text = null)

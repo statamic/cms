@@ -67,6 +67,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns a string with backslashes added before characters that need to be escaped.
+     *
+     * @param $value
+     * @return string
+     */
+    public function addSlashes($value)
+    {
+        return addslashes($value);
+    }
+
+    /**
      * Creates a sentence list from the given array and the ability to set the glue.
      *
      * @param $value
@@ -94,7 +105,7 @@ class CoreModifiers extends Modifier
      */
     public function alias($value, $params)
     {
-        if (! is_array($value)) {
+        if (! (is_array($value) || $value instanceof Collection)) {
             return;
         }
 
@@ -301,6 +312,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Returns the number of items in an array.
+     *
      * @param  $value
      * @param  $params
      * @return int
@@ -339,9 +351,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in days.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function daysAgo($value, $params)
@@ -737,9 +748,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in hours.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function hoursAgo($value, $params)
@@ -1089,6 +1099,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a string to kebab-case.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function kebab($value, $params)
+    {
+        return Str::kebab($value);
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @param $value
@@ -1266,9 +1288,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in minutes.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function minutesAgo($value, $params)
@@ -1308,9 +1329,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in months.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function monthsAgo($value, $params)
@@ -1727,6 +1747,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Rounds a number to a specified precision (number of digits after the decimal point).
+     *
      * @param $value
      * @param $params
      * @return float
@@ -1817,7 +1838,7 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in seconds.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
      * @return int
      */
@@ -1951,6 +1972,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a string to snake_case.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function snake($value, $params)
+    {
+        return Str::snake($value);
+    }
+
+    /**
      * Sort an array by key $params[0] and direction $params[1].
      *
      * @param $value
@@ -2038,6 +2071,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a string to StudlyCase.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function studly($value, $params)
+    {
+        return Str::studly($value);
+    }
+
+    /**
      * Subtracts values with the help of science. Context aware.
      *
      * @param $value
@@ -2066,6 +2111,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Returns the sum of all items in the array, optionally by specific key.
+     *
      * @param $value
      * @param $params
      * @return mixed
@@ -2234,6 +2280,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Returns the trimmed string.
+     *
      * @param $value
      * @return string
      */
@@ -2386,9 +2433,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in weeks.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function weeksAgo($value, $params)
@@ -2399,7 +2445,7 @@ class CoreModifiers extends Modifier
     /**
      * Filters the data by a given key / value pair.
      *
-     * @param array $value
+     * @param  array  $value
      * @param $params
      * @return array
      */
@@ -2469,9 +2515,8 @@ class CoreModifiers extends Modifier
     /**
      * Get the date difference in years.
      *
-     * @param Carbon  $value
+     * @param  Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function yearsAgo($value, $params)
@@ -2483,7 +2528,7 @@ class CoreModifiers extends Modifier
      * Get the embed URL when given a youtube or vimeo link that's
      * direct to the page.
      *
-     * @param string  $url
+     * @param  string  $url
      * @return string
      */
     public function embedUrl($url)
@@ -2523,7 +2568,7 @@ class CoreModifiers extends Modifier
     /**
      * Whether a given video URL is embeddable.
      *
-     * @param string $url
+     * @param  string  $url
      * @return bool
      */
     public function isEmbeddable($url)
@@ -2549,7 +2594,7 @@ class CoreModifiers extends Modifier
      * Takes a modifier array, split on ":", and formats it for HTML attribute key:value pairs.
      *
      * @param $params
-     * @param string $delimiter
+     * @param  string  $delimiter
      * @return array
      */
     private function buildAttributesFromParameters($params, $delimiter = ':')

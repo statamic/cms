@@ -291,7 +291,7 @@ trait QueriesConditions
      * Passing delimiters doesn't work with Eloquent and `regexp`, so we remove them from
      * the user's pattern if passed, so that regex conditions will work as expected.
      *
-     * @param string $pattern
+     * @param  string  $pattern
      * @return string
      */
     protected function removeRegexDelimitersAndModifiers($pattern)

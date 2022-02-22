@@ -107,7 +107,7 @@ class NavTest extends TestCase
     /** @test */
     public function it_can_create_a_nav_item_with_a_bundled_svg_icon()
     {
-        File::put(public_path('vendor/statamic/cp/svg/test.svg'), 'the totally real svg');
+        File::put(statamic_path('resources/svg/test.svg'), 'the totally real svg');
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 

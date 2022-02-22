@@ -22,7 +22,7 @@ class CommitCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Git add and commit tracked content.';
+    protected $description = 'Git add and commit tracked content';
 
     /**
      * Execute the console command.

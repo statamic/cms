@@ -63,7 +63,7 @@ class UserRepository extends BaseRepository
     /**
      * Convert an Eloquent User model to a Statamic User instance.
      *
-     * @param  Model $model
+     * @param  Model  $model
      * @return User
      */
     private function makeUser(Model $model)

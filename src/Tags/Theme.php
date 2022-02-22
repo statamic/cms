@@ -15,8 +15,8 @@ class Theme extends Tags
      * Namespaces the `src` to the specified directory.
      * eg. {{ theme:img }}, {{ theme:svg }}, etc.
      *
-     * @param string $method    Tag part
-     * @param array  $arguments Unused
+     * @param  string  $method  Tag part
+     * @param  array  $arguments  Unused
      * @return string
      */
     public function __call($method, $arguments)
