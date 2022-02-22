@@ -227,7 +227,8 @@ EOT;
         $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
         app()->instance('mocked-builder', $builder);
 
-        (new class extends Fieldtype {
+        (new class extends Fieldtype
+        {
             protected static $handle = 'test';
 
             public function augment($value)
