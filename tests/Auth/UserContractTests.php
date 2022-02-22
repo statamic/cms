@@ -89,7 +89,7 @@ trait UserContractTests
      **/
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
     {
-        $builder->shouldReceive('get')->once()->andReturn('query builder results');
+        $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
         app()->instance('mocked-builder', $builder);
 
         (new class extends Fieldtype
@@ -109,6 +109,7 @@ trait UserContractTests
         $user->set('foo', 'delta');
 
         $this->assertEquals('query builder results', $user->foo);
+        $this->assertEquals('query builder results', $user['foo']);
         $this->assertSame($builder, $user->foo());
     }
 

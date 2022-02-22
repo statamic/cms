@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use ArrayAccess;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Illuminate\Support\Collection;
@@ -19,7 +20,7 @@ use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Blueprint implements Augmentable
+class Blueprint implements Augmentable, ArrayAccess
 {
     use HasAugmentedData, ExistsAsFile;
 

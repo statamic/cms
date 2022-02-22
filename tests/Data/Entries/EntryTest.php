@@ -155,8 +155,11 @@ class EntryTest extends TestCase
         $entry->set('charlie', 'delta');
 
         $this->assertEquals('123', $entry->id);
+        $this->assertEquals('123', $entry['id']);
         $this->assertEquals('bravo', $entry->alfa);
+        $this->assertEquals('bravo', $entry['alfa']);
         $this->assertEquals('delta (augmented)', $entry->charlie);
+        $this->assertEquals('delta (augmented)', $entry['charlie']);
     }
 
     /**
@@ -165,7 +168,7 @@ class EntryTest extends TestCase
      **/
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
     {
-        $builder->shouldReceive('get')->once()->andReturn('query builder results');
+        $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
         app()->instance('mocked-builder', $builder);
 
         (new class extends Fieldtype
@@ -186,6 +189,7 @@ class EntryTest extends TestCase
         $entry->set('foo', 'delta');
 
         $this->assertEquals('query builder results', $entry->foo);
+        $this->assertEquals('query builder results', $entry['foo']);
         $this->assertSame($builder, $entry->foo());
     }
 

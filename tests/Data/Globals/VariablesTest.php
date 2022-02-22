@@ -213,7 +213,9 @@ EOT;
         $variables->set('charlie', 'delta');
 
         $this->assertEquals('bravo', $variables->alfa);
+        $this->assertEquals('bravo', $variables['alfa']);
         $this->assertEquals('delta (augmented)', $variables->charlie);
+        $this->assertEquals('delta (augmented)', $variables['charlie']);
     }
 
     /**
@@ -222,11 +224,10 @@ EOT;
      **/
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
     {
-        $builder->shouldReceive('get')->once()->andReturn('query builder results');
+        $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
         app()->instance('mocked-builder', $builder);
 
-        (new class extends Fieldtype
-        {
+        (new class extends Fieldtype {
             protected static $handle = 'test';
 
             public function augment($value)
@@ -242,6 +243,7 @@ EOT;
         $variables->set('foo', 'delta');
 
         $this->assertEquals('query builder results', $variables->foo);
+        $this->assertEquals('query builder results', $variables['foo']);
         $this->assertSame($builder, $variables->foo());
     }
 
