@@ -452,7 +452,8 @@ class PageTest extends TestCase
 
         $page
             ->toAugmentedCollection()
-            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $page->{$key}));
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $page->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $page[$key]));
     }
 
     protected function newTree()

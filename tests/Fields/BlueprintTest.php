@@ -1047,6 +1047,7 @@ class BlueprintTest extends TestCase
 
         $blueprint
             ->toAugmentedCollection()
-            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint->{$key}));
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint[$key]));
     }
 }

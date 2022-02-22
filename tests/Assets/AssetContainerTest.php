@@ -550,7 +550,8 @@ class AssetContainerTest extends TestCase
         $container
             ->toAugmentedCollection()
             ->except(['assets'])
-            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container->{$key}));
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container[$key]));
     }
 
     private function containerWithDisk()

@@ -2,6 +2,7 @@
 
 namespace Statamic\Assets;
 
+use ArrayAccess;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -20,7 +21,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable
+class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 

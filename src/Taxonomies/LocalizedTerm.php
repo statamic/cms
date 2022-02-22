@@ -2,6 +2,7 @@
 
 namespace Statamic\Taxonomies;
 
+use ArrayAccess;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -25,7 +26,7 @@ use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
 
-class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract
+class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract, ArrayAccess
 {
     use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified, ContainsSupplementalData, ResolvesValues;
 

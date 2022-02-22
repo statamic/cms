@@ -151,6 +151,7 @@ class TaxonomyTest extends TestCase
 
         $taxonomy
             ->toAugmentedCollection()
-            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $taxonomy->{$key}));
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $taxonomy->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $taxonomy[$key]));
     }
 }

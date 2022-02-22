@@ -580,7 +580,8 @@ class CollectionTest extends TestCase
 
         $collection
             ->toAugmentedCollection()
-            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $collection->{$key}));
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $collection->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $collection[$key]));
     }
 
     /** @test */

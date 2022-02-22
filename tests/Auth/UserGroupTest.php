@@ -312,10 +312,11 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
-        $group = (new UserGroup)->handle('test');
+        $group = (new UserGroup)->handle('test')->title('Test');
 
         $group
             ->toAugmentedCollection()
-            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $group->{$key}));
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $group->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $group[$key]));
     }
 }

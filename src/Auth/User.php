@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use ArrayAccess;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -33,7 +34,8 @@ abstract class User implements
     Augmentable,
     AuthorizableContract,
     ResolvesValuesContract,
-    HasLocalePreference
+    HasLocalePreference,
+    ArrayAccess
 {
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar, ResolvesValues;
 
