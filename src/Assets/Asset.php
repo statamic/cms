@@ -4,6 +4,7 @@ namespace Statamic\Assets;
 
 use ArrayAccess;
 use Facades\Statamic\Assets\Attributes;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -14,6 +15,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
@@ -31,9 +33,11 @@ use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable, ArrayAccess
+class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, SyncsOriginalState, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
+    TracksQueriedRelations,
+    SyncsOriginalState, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -785,6 +789,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
     }
 
     private function hasDimensions()

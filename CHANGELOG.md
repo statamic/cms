@@ -12,6 +12,7 @@
 - Added `Statamic::query()` aliases. [#5285](https://github.com/statamic/cms/issues/5285) by @jasonvarga
 - Augmentables (Entry, Term, etc) can retrieve their augmented values via property access. [#5297](https://github.com/statamic/cms/issues/5297) by @jasonvarga
 - Augmentables can retrieve their augmented values via array access. [#5327](https://github.com/statamic/cms/issues/5327) by @jasonvarga
+- Augmentables implement `Arrayable`, and will return all their augmented values via the `toArray` method. [#5186](https://github.com/statamic/cms/issues/5186) by @jasonvarga
 
 ### What's fixed
 - CP forms only submit visible fields, in order to fix sometimes/required_if/etc validation rules. [#5101](https://github.com/statamic/cms/issues/5101) by @jesseleite
@@ -24,6 +25,8 @@
 - The `Augmented` interface's `get` method now has a return typehint of `Value`. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
 - `$item->augmentedValue()`, `toAugmentedCollection()`, and `toAugmentedArray()` will always return `Value` instances. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
 - Form submission data will always be an unfiltered Collection. [#5230](https://github.com/statamic/cms/issues/5230) by @jasonvarga
+- AssetContainer, Collection, Form, and Taxonomy's `toArray` methods return different data. [#5186](https://github.com/statamic/cms/issues/5186) by @jasonvarga
+
 
 
 ## 3.2.32 (2022-01-26)

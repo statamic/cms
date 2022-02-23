@@ -2,6 +2,7 @@
 
 namespace Tests\Forms;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Facades\Form;
 use Statamic\Fields\Blueprint;
 use Tests\TestCase;
@@ -59,5 +60,26 @@ class FormTest extends TestCase
         $form
             ->toAugmentedCollection()
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $form->{$key}));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $form = Form::make('contact_us');
+
+        $this->assertInstanceOf(Arrayable::class, $form);
+
+        $expectedAugmented = $form->toAugmentedCollection();
+
+        $array = $form->toArray();
+
+        $this->assertCount($expectedAugmented->count(), $array);
+
+        collect($array)
+            ->each(function ($value, $key) use ($form) {
+                $expected = $form->{$key};
+                $expected = $expected instanceof Arrayable ? $expected->toArray() : $expected;
+                $this->assertEquals($expected, $value);
+            });
     }
 }

@@ -11,4 +11,6 @@ interface Augmented
     public function all();
 
     public function select($keys = null);
+
+    public function withRelations($relations);
 }

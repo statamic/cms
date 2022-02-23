@@ -6,10 +6,14 @@ use BadMethodCallException;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Mockery;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\AugmentedCollection;
+use Statamic\Entries\AugmentedEntry;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\EntryCreated;
@@ -19,10 +23,12 @@ use Statamic\Facades;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
 use Statamic\Sites\Site;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
+use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -507,38 +513,14 @@ class EntryTest extends TestCase
     /** @test */
     public function it_compiles_augmented_array_data()
     {
-        $user = tap(User::make()->id('user-1'))->save();
+        // The values of the augmented array are tested in AugmentedEntryTest
 
         $entry = (new Entry)
-            ->id('test-id')
-            ->locale('en')
-            ->slug('test')
-            ->collection(Collection::make('blog')->routes('blog/{slug}')->save())
-            ->data([
-                'foo' => 'bar',
-                'bar' => 'baz',
-                'updated_at' => $lastModified = now()->subDays(1)->timestamp,
-                'updated_by' => $user->id(),
-            ])
-            ->setSupplement('baz', 'qux')
-            ->setSupplement('foo', 'overridden');
+            ->collection(Collection::make('blog')->routes('blog/{slug}')->save());
 
-        $expectedValues = [
-            'foo' => 'overridden',
-            'bar' => 'baz',
-            'baz' => 'qux',
-            'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
-            'updated_at' => $carbon,
-            'updated_by' => $user,
-            'url' => '/blog/test',
-            'permalink' => 'http://localhost/blog/test',
-        ];
-
-        $array = $entry->toAugmentedArray();
-
-        foreach ($expectedValues as $k => $v) {
-            $this->assertEquals($v, $array[$k]->value());
-        }
+        $this->assertInstanceOf(Augmentable::class, $entry);
+        $this->assertInstanceOf(AugmentedEntry::class, $entry->newAugmentedInstance());
+        $this->assertInstanceOf(AugmentedCollection::class, $entry->toAugmentedCollection());
     }
 
     /** @test */
@@ -567,6 +549,115 @@ class EntryTest extends TestCase
             'id' => 'test-id',
             'foo' => 'bar',
         ], $entry->toAugmentedArray());
+    }
+
+    /** @test */
+    public function it_converts_to_an_array()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return [
+                    new Value('alfa'),
+                    new Value([
+                        new Value('bravo'),
+                        new Value('charlie'),
+                        'delta',
+                    ]),
+                ];
+            }
+        };
+        $fieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'baz' => [
+                'type' => 'test',
+            ],
+        ]);
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'post' => $blueprint->setHandle('post'),
+        ]));
+
+        $entry = (new Entry)
+            ->id('test-id')
+            ->locale('en')
+            ->slug('test')
+            ->set('foo', 'bar')
+            ->set('baz', 'qux')
+            ->collection(Collection::make('blog')->save());
+
+        $this->assertInstanceOf(Arrayable::class, $entry);
+
+        $array = $entry->toArray();
+        $this->assertEquals($entry->augmented()->keys(), array_keys($array));
+        $this->assertEquals([
+            'alfa',
+            [
+                'bravo',
+                'charlie',
+                'delta',
+            ],
+        ], $array['baz'], 'Value objects are not resolved recursively');
+
+        $array = $entry
+            ->selectedQueryColumns($keys = ['id', 'foo', 'baz'])
+            ->toArray();
+
+        $this->assertEquals($keys, array_keys($array), 'toArray keys differ from selectedQueryColumns');
+    }
+
+    /** @test */
+    public function only_requested_relationship_fields_are_included_in_to_array()
+    {
+        $regularFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'regular';
+
+            public function augment($value)
+            {
+                return 'augmented '.$value;
+            }
+        };
+        $regularFieldtype::register();
+
+        $relationshipFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'relationship';
+            protected $relationship = true;
+
+            public function augment($values)
+            {
+                return collect($values)->map(fn ($value) => 'augmented '.$value)->all();
+            }
+        };
+        $relationshipFieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'alfa' => ['type' => 'regular'],
+            'bravo' => ['type' => 'relationship'],
+            'charlie' => ['type' => 'relationship'],
+        ]);
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'post' => $blueprint->setHandle('post'),
+        ]));
+
+        $entry = (new Entry)
+            ->id('test-id')
+            ->locale('en')
+            ->slug('test')
+            ->set('alfa', 'one')
+            ->set('bravo', ['a', 'b'])
+            ->set('charlie', ['c', 'd'])
+            ->collection(Collection::make('blog')->save());
+
+        $this->assertEquals([
+            'alfa' => 'augmented one',
+            'bravo' => ['a', 'b'],
+            'charlie' => ['augmented c', 'augmented d'],
+        ], Arr::only($entry->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 
     /** @test */

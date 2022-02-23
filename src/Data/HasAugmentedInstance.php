@@ -16,7 +16,9 @@ trait HasAugmentedInstance
 
     public function toAugmentedCollection($keys = null)
     {
-        return $this->augmented()->select($keys ?? $this->defaultAugmentedArrayKeys());
+        return $this->augmented()
+            ->withRelations($this->defaultAugmentedRelations())
+            ->select($keys ?? $this->defaultAugmentedArrayKeys());
     }
 
     public function toAugmentedArray($keys = null)
@@ -49,6 +51,36 @@ trait HasAugmentedInstance
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return [];
+    }
+
+    public function toEvaluatedAugmentedArray($keys = null)
+    {
+        $collection = $this->toAugmentedCollection($keys);
+
+        // Can't just chain ->except() because it would return a new
+        // collection and the existing 'withRelations' would be lost.
+        if ($exceptions = $this->excludedEvaluatedAugmentedArrayKeys()) {
+            $collection = $collection
+                ->except($exceptions)
+                ->withRelations($collection->getRelations());
+        }
+
+        return $collection->withEvaluation()->toArray();
+    }
+
+    protected function excludedEvaluatedAugmentedArrayKeys()
+    {
+        return null;
+    }
+
+    public function toArray()
+    {
+        return $this->toEvaluatedAugmentedArray();
     }
 
     public function __get($key)
