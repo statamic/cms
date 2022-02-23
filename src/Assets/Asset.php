@@ -2,7 +2,9 @@
 
 namespace Statamic\Assets;
 
+use ArrayAccess;
 use Facades\Statamic\Assets\Attributes;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -13,6 +15,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
@@ -30,9 +33,11 @@ use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable
+class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, SyncsOriginalState, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
+    TracksQueriedRelations,
+    SyncsOriginalState, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -424,7 +429,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Save the asset.
      *
-     * @return void
+     * @return bool
      */
     public function save()
     {
@@ -442,7 +447,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Delete the asset.
      *
-     * @return mixed
+     * @return $this
      */
     public function delete()
     {
@@ -507,7 +512,7 @@ class Asset implements AssetContract, Augmentable
      * Rename the asset.
      *
      * @param  string  $filename
-     * @return void
+     * @return self
      */
     public function rename($filename, $unique = false)
     {
@@ -521,7 +526,7 @@ class Asset implements AssetContract, Augmentable
      *
      * @param  string  $folder  The folder relative to the container.
      * @param  string|null  $filename  The new filename, if renaming.
-     * @return void
+     * @return $this
      */
     public function move($folder, $filename = null)
     {
@@ -635,13 +640,12 @@ class Asset implements AssetContract, Augmentable
      * Upload a file.
      *
      * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
-     * @return void
+     * @return $this
      */
     public function upload(UploadedFile $file)
     {
         $ext = $file->getClientOriginalExtension();
         $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-        $basename = $filename.'.'.$ext;
 
         $directory = $this->folder();
         $directory = ($directory === '.') ? '/' : $directory;
@@ -785,6 +789,11 @@ class Asset implements AssetContract, Augmentable
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
     }
 
     private function hasDimensions()

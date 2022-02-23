@@ -247,8 +247,6 @@ class CollectionsController extends CpController
         }
 
         $collection->save();
-
-        return $collection->toArray();
     }
 
     protected function updateLinkBlueprint($shouldExist, $collection)

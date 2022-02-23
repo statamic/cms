@@ -31,10 +31,10 @@ trait WindowsHelpers
         return DIRECTORY_SEPARATOR === '\\';
     }
 
-    protected function markTestSkippedInWindows()
+    protected function markTestSkippedInWindows(string $message = '')
     {
         if (static::isRunningWindows()) {
-            $this->markTestSkipped();
+            $this->markTestSkipped($message);
         }
     }
 }

@@ -14,8 +14,12 @@ class CollectionEntriesController extends ApiController
     {
         $this->abortIfDisabled();
 
+        $with = $collection->entryBlueprints()
+            ->flatMap(fn ($blueprint) => $blueprint->fields()->all())
+            ->filter->isRelationship()->keys()->all();
+
         return app(EntryResource::class)::collection(
-            $this->filterSortAndPaginate($collection->queryEntries())
+            $this->filterSortAndPaginate($collection->queryEntries()->with($with))
         );
     }
 

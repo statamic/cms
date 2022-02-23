@@ -2,7 +2,9 @@
 
 namespace Statamic\Entries;
 
+use ArrayAccess;
 use Facades\Statamic\View\Cascade;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
@@ -18,6 +20,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
@@ -28,6 +31,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -36,13 +40,13 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, Arrayable, ArrayAccess
 {
     use Routable {
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified;
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
@@ -59,6 +63,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $template;
+    protected $layout;
 
     public function __construct()
     {
@@ -395,7 +401,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('template')
             ->getter(function ($template) {
-                $template = $template ?? optional($this->origin())->template() ?? $this->collection()->template();
+                $template = $template ?? $this->get('template') ?? optional($this->origin())->template() ?? $this->collection()->template();
 
                 return $template === '@blueprint'
                     ? $this->inferTemplateFromBlueprint()
@@ -420,7 +426,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? optional($this->origin())->layout() ?? $this->collection()->layout();
+                return $layout ?? $this->get('layout') ?? optional($this->origin())->layout() ?? $this->collection()->layout();
             })
             ->args(func_get_args());
     }
@@ -762,6 +768,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'url', 'permalink', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
     }
 
     public function getProtectionScheme()

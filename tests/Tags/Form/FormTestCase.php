@@ -6,6 +6,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
 use Statamic\Support\Arr;
+use Statamic\Support\Html;
 use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -13,6 +14,34 @@ use Tests\TestCase;
 abstract class FormTestCase extends TestCase
 {
     use PreventSavingStacheItemsToDisk, NormalizesHtml;
+
+    protected $defaultFields = [
+        [
+            'handle' => 'name',
+            'field' => [
+                'type' => 'text',
+                'display' => 'Full Name',
+                'validate' => 'min:3|alpha_num',
+            ],
+        ],
+        [
+            'handle' => 'email',
+            'field' => [
+                'type' => 'text',
+                'input_type' => 'email',
+                'display' => 'Email Address',
+                'validate' => 'required|email',
+            ],
+        ],
+        [
+            'handle' => 'message',
+            'field' => [
+                'type' => 'textarea',
+                'display' => 'Message',
+                'validate' => 'sometimes|required',
+            ],
+        ],
+    ];
 
     public function setUp(): void
     {
@@ -43,36 +72,8 @@ abstract class FormTestCase extends TestCase
 
     protected function createContactForm($fields = null)
     {
-        $defaultFields = [
-            [
-                'handle' => 'name',
-                'field' => [
-                    'type' => 'text',
-                    'display' => 'Full Name',
-                    'validate' => 'min:3|alpha_num',
-                ],
-            ],
-            [
-                'handle' => 'email',
-                'field' => [
-                    'type' => 'text',
-                    'input_type' => 'email',
-                    'display' => 'Email Address',
-                    'validate' => 'required|email',
-                ],
-            ],
-            [
-                'handle' => 'message',
-                'field' => [
-                    'type' => 'textarea',
-                    'display' => 'Message',
-                    'validate' => 'required',
-                ],
-            ],
-        ];
-
         $blueprint = Blueprint::make()->setContents([
-            'fields' => $fields ?? $defaultFields,
+            'fields' => $fields ?? $this->defaultFields,
         ]);
 
         $handle = $fields ? $this->customFieldBlueprintHandle : 'contact';
@@ -86,7 +87,7 @@ abstract class FormTestCase extends TestCase
         Form::makePartial();
     }
 
-    protected function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [])
+    protected function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [], $extraParams = [])
     {
         $randomString = str_shuffle('nobodymesseswiththehoff');
 
@@ -104,8 +105,10 @@ abstract class FormTestCase extends TestCase
                 ->assertLocation('/');
         }
 
+        $extraParams = $extraParams ? Html::attributes($extraParams) : '';
+
         $output = $this->normalizeHtml(
-            $this->tag("{{ form:{$handle} }}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
+            $this->tag("{{ form:{$handle} {$extraParams}}}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
         );
 
         $expected = collect(Arr::wrap($expectedHtmlParts))->implode('');

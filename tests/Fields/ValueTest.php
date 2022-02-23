@@ -9,6 +9,32 @@ use Tests\TestCase;
 
 class ValueTest extends TestCase
 {
+    /**
+     * @test
+     * @dataProvider isRelationshipFieldtypeProvider
+     **/
+    public function it_gets_whether_its_a_relationship_through_the_fieldtype($isRelationship, $fieldtype)
+    {
+        $value = new Value('test', null, $fieldtype);
+
+        $this->assertEquals($isRelationship, $value->isRelationship());
+    }
+
+    public function isRelationshipFieldtypeProvider()
+    {
+        return [
+            'relationship' => [true, new class extends Fieldtype
+            {
+                protected $relationship = true;
+            }, ],
+            'not a relationship' => [false, new class extends Fieldtype
+            {
+                protected $relationship = false;
+            }, ],
+            'no fieldtype' => [false, null],
+        ];
+    }
+
     /** @test */
     public function it_augments_through_the_fieldtype()
     {

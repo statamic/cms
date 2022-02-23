@@ -1,0 +1,33 @@
+---
+test: 'hello'
+test1: 'hello'
+test2: 'hello'
+test3: 'hello'
+test4: 'hello'
+---
+line
+line
+line
+line
+line
+line
+line
+
+{{ collection:articles as="articles" }}
+
+{{ articles }}
+    {{# Will produce a parser error. #}}
+    {{ "test" | remove_right: "test" "test" }}
+{{ /articles  }}
+
+{{ /collection:articles }}
+
+
+
+line
+line
+line
+line
+line
+line
+line

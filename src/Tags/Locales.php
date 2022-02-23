@@ -239,7 +239,7 @@ class Locales extends Tags
             return false;
         }
 
-        if (! $this->params->bool('self', true) && $item['locale']['handle'] === $this->data->locale()) {
+        if (! $this->params->bool('self', true) && $item['locale']['handle']->value() === $this->data->locale()) {
             return false;
         }
 

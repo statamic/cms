@@ -57,7 +57,6 @@ class Code extends Fieldtype
                     'xml' => 'XML',
                     'yaml-frontmatter' => 'YAML',
                 ],
-                'width' => 50,
             ],
             'mode_selectable' => [
                 'display' => __('Selectable Mode'),

@@ -18,8 +18,11 @@ jobs:
       - name: Compile assets
         run: npm run production
 
+      - name: Compile frontend assets
+        run: npm run frontend-prod
+
       - name: Create zip
-        run: cd resources && tar -czvf dist.tar.gz dist
+        run: cd resources && tar -czvf dist.tar.gz dist dist-frontend
 
       - name: Get Changelog
         id: changelog

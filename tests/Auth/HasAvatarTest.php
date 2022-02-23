@@ -19,7 +19,8 @@ class HasAvatarTest extends TestCase
     {
         parent::setUp();
 
-        tap(Storage::fake('avatars'))->getDriver()->getConfig()->set('url', '/avatars');
+        Storage::fake('avatars', ['url' => '/avatars']);
+
         AssetContainer::make('avatars')->disk('avatars')->save();
     }
 

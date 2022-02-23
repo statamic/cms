@@ -2,13 +2,18 @@
 
 namespace Tests\Data\Entries;
 
+use BadMethodCallException;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Mockery;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\AugmentedCollection;
+use Statamic\Entries\AugmentedEntry;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\EntryCreated;
@@ -17,10 +22,13 @@ use Statamic\Events\EntrySaving;
 use Statamic\Facades;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
 use Statamic\Sites\Site;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
+use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -120,15 +128,94 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_and_sets_data_values_using_magic_properties()
+    public function it_sets_data_values_using_magic_properties()
     {
         $entry = new Entry;
-        $this->assertNull($entry->foo);
+        $this->assertNull($entry->get('foo'));
 
         $entry->foo = 'bar';
 
         $this->assertTrue($entry->has('foo'));
-        $this->assertEquals('bar', $entry->foo);
+        $this->assertEquals('bar', $entry->get('foo'));
+    }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $blueprint = Facades\Blueprint::makeFromFields(['charlie' => ['type' => 'test']]);
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect(['blog' => $blueprint]));
+        Collection::make('blog')->save();
+
+        $entry = (new Entry)->collection('blog')->id('123');
+        $entry->set('alfa', 'bravo');
+        $entry->set('charlie', 'delta');
+
+        $this->assertEquals('123', $entry->id);
+        $this->assertEquals('123', $entry['id']);
+        $this->assertEquals('bravo', $entry->alfa);
+        $this->assertEquals('bravo', $entry['alfa']);
+        $this->assertEquals('delta (augmented)', $entry->charlie);
+        $this->assertEquals('delta (augmented)', $entry['charlie']);
+    }
+
+    /**
+     * @test
+     * @dataProvider queryBuilderProvider
+     **/
+    public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
+    {
+        $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
+        app()->instance('mocked-builder', $builder);
+
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return app('mocked-builder');
+            }
+        })::register();
+
+        $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'test']]);
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect(['blog' => $blueprint]));
+        Collection::make('blog')->save();
+
+        $entry = (new Entry)->collection('blog');
+        $entry->set('foo', 'delta');
+
+        $this->assertEquals('query builder results', $entry->foo);
+        $this->assertEquals('query builder results', $entry['foo']);
+        $this->assertSame($builder, $entry->foo());
+    }
+
+    public function queryBuilderProvider()
+    {
+        return [
+            'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],
+            'database' => [Mockery::mock(\Illuminate\Database\Query\Builder::class)],
+            'eloquent' => [Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)],
+        ];
+    }
+
+    /** @test */
+    public function calling_unknown_method_throws_exception()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Statamic\Entries\Entry::thisFieldDoesntExist()');
+
+        Collection::make('blog')->save();
+        (new Entry)->collection('blog')->thisFieldDoesntExist();
     }
 
     /** @test */
@@ -426,32 +513,14 @@ class EntryTest extends TestCase
     /** @test */
     public function it_compiles_augmented_array_data()
     {
-        $user = tap(User::make()->id('user-1'))->save();
+        // The values of the augmented array are tested in AugmentedEntryTest
 
         $entry = (new Entry)
-            ->id('test-id')
-            ->locale('en')
-            ->slug('test')
-            ->collection(Collection::make('blog')->routes('blog/{slug}')->save())
-            ->data([
-                'foo' => 'bar',
-                'bar' => 'baz',
-                'updated_at' => $lastModified = now()->subDays(1)->timestamp,
-                'updated_by' => $user->id(),
-            ])
-            ->setSupplement('baz', 'qux')
-            ->setSupplement('foo', 'overridden');
+            ->collection(Collection::make('blog')->routes('blog/{slug}')->save());
 
-        $this->assertArraySubset([
-            'foo' => 'overridden',
-            'bar' => 'baz',
-            'baz' => 'qux',
-            'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
-            'updated_at' => $carbon,
-            'updated_by' => $user,
-            'url' => '/blog/test',
-            'permalink' => 'http://localhost/blog/test',
-        ], $entry->toAugmentedArray());
+        $this->assertInstanceOf(Augmentable::class, $entry);
+        $this->assertInstanceOf(AugmentedEntry::class, $entry->newAugmentedInstance());
+        $this->assertInstanceOf(AugmentedCollection::class, $entry->toAugmentedCollection());
     }
 
     /** @test */
@@ -480,6 +549,115 @@ class EntryTest extends TestCase
             'id' => 'test-id',
             'foo' => 'bar',
         ], $entry->toAugmentedArray());
+    }
+
+    /** @test */
+    public function it_converts_to_an_array()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return [
+                    new Value('alfa'),
+                    new Value([
+                        new Value('bravo'),
+                        new Value('charlie'),
+                        'delta',
+                    ]),
+                ];
+            }
+        };
+        $fieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'baz' => [
+                'type' => 'test',
+            ],
+        ]);
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'post' => $blueprint->setHandle('post'),
+        ]));
+
+        $entry = (new Entry)
+            ->id('test-id')
+            ->locale('en')
+            ->slug('test')
+            ->set('foo', 'bar')
+            ->set('baz', 'qux')
+            ->collection(Collection::make('blog')->save());
+
+        $this->assertInstanceOf(Arrayable::class, $entry);
+
+        $array = $entry->toArray();
+        $this->assertEquals($entry->augmented()->keys(), array_keys($array));
+        $this->assertEquals([
+            'alfa',
+            [
+                'bravo',
+                'charlie',
+                'delta',
+            ],
+        ], $array['baz'], 'Value objects are not resolved recursively');
+
+        $array = $entry
+            ->selectedQueryColumns($keys = ['id', 'foo', 'baz'])
+            ->toArray();
+
+        $this->assertEquals($keys, array_keys($array), 'toArray keys differ from selectedQueryColumns');
+    }
+
+    /** @test */
+    public function only_requested_relationship_fields_are_included_in_to_array()
+    {
+        $regularFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'regular';
+
+            public function augment($value)
+            {
+                return 'augmented '.$value;
+            }
+        };
+        $regularFieldtype::register();
+
+        $relationshipFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'relationship';
+            protected $relationship = true;
+
+            public function augment($values)
+            {
+                return collect($values)->map(fn ($value) => 'augmented '.$value)->all();
+            }
+        };
+        $relationshipFieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'alfa' => ['type' => 'regular'],
+            'bravo' => ['type' => 'relationship'],
+            'charlie' => ['type' => 'relationship'],
+        ]);
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'post' => $blueprint->setHandle('post'),
+        ]));
+
+        $entry = (new Entry)
+            ->id('test-id')
+            ->locale('en')
+            ->slug('test')
+            ->set('alfa', 'one')
+            ->set('bravo', ['a', 'b'])
+            ->set('charlie', ['c', 'd'])
+            ->collection(Collection::make('blog')->save());
+
+        $this->assertEquals([
+            'alfa' => 'augmented one',
+            'bravo' => ['a', 'b'],
+            'charlie' => ['augmented c', 'augmented d'],
+        ], Arr::only($entry->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 
     /** @test */

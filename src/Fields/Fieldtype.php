@@ -26,6 +26,7 @@ abstract class Fieldtype implements Arrayable
     protected $defaultable = true;
     protected $selectable = true;
     protected $selectableInForms = false;
+    protected $relationship = false;
     protected $categories = [];
     protected $rules = [];
     protected $extraRules = [];
@@ -278,5 +279,10 @@ abstract class Fieldtype implements Arrayable
     public function addGqlTypes()
     {
         //
+    }
+
+    public function isRelationship(): bool
+    {
+        return $this->relationship;
     }
 }

@@ -12,6 +12,7 @@ abstract class AbstractAugmented implements Augmented
 {
     protected $data;
     protected $blueprintFields;
+    protected $relations = [];
 
     public function __construct($data)
     {
@@ -38,17 +39,21 @@ abstract class AbstractAugmented implements Augmented
             $arr[$key] = $this->get($key);
         }
 
-        return new AugmentedCollection($arr);
+        return (new AugmentedCollection($arr))->withRelations($this->relations);
     }
 
     abstract public function keys();
 
-    public function get($handle)
+    public function get($handle): Value
     {
         $method = Str::camel($handle);
 
         if ($this->methodExistsOnThisClass($method)) {
-            return $this->$method();
+            $value = $this->$method();
+
+            return $value instanceof Value
+                ? $value
+                : new Value($value, $method, null, $this->data);
         }
 
         if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
@@ -90,14 +95,10 @@ abstract class AbstractAugmented implements Augmented
     {
         $fields = $this->blueprintFields();
 
-        if (! $fields->has($handle)) {
-            return $value;
-        }
-
         return new Value(
             $value,
             $handle,
-            $fields->get($handle)->fieldtype(),
+            optional($fields->get($handle))->fieldtype(),
             $this->data
         );
     }
@@ -111,5 +112,12 @@ abstract class AbstractAugmented implements Augmented
         }
 
         return $this->blueprintFields;
+    }
+
+    public function withRelations($relations)
+    {
+        $this->relations = $relations;
+
+        return $this;
     }
 }
