@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
@@ -582,6 +583,27 @@ class CollectionTest extends TestCase
             ->toAugmentedCollection()
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $collection->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $collection[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $collection = (new Collection)->handle('tags');
+
+        $this->assertInstanceOf(Arrayable::class, $collection);
+
+        $expectedAugmented = $collection->toAugmentedCollection();
+
+        $array = $collection->toArray();
+
+        $this->assertCount($expectedAugmented->count(), $array);
+
+        collect($array)
+            ->each(function ($value, $key) use ($collection) {
+                $expected = $collection->{$key};
+                $expected = $expected instanceof Arrayable ? $expected->toArray() : $expected;
+                $this->assertEquals($expected, $value);
+            });
     }
 
     /** @test */

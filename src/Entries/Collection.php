@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
@@ -26,7 +27,7 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Collection implements Contract, AugmentableContract, ArrayAccess
+class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayable
 {
     use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
 
@@ -470,7 +471,31 @@ class Collection implements Contract, AugmentableContract, ArrayAccess
 
     public function fileData()
     {
-        $array = Arr::except($this->toArray(), [
+        $formerlyToArray = [
+            'title' => $this->title,
+            'handle' => $this->handle,
+            'routes' => $this->routes,
+            'dated' => $this->dated,
+            'past_date_behavior' => $this->pastDateBehavior(),
+            'future_date_behavior' => $this->futureDateBehavior(),
+            'default_publish_state' => $this->defaultPublishState,
+            'amp' => $this->ampable,
+            'sites' => $this->sites,
+            'propagate' => $this->propagate(),
+            'template' => $this->template,
+            'layout' => $this->layout,
+            'cascade' => $this->cascade->all(),
+            'blueprints' => $this->blueprints,
+            'search_index' => $this->searchIndex,
+            'orderable' => $this->orderable(),
+            'structured' => $this->hasStructure(),
+            'mount' => $this->mount,
+            'taxonomies' => $this->taxonomies,
+            'revisions' => $this->revisions,
+            'title_format' => $this->titleFormats,
+        ];
+
+        $array = Arr::except($formerlyToArray, [
             'handle',
             'past_date_behavior',
             'future_date_behavior',
@@ -532,33 +557,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess
                 return $this->revisionsEnabled() ? false : $state;
             })
             ->args(func_get_args());
-    }
-
-    public function toArray()
-    {
-        return [
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'routes' => $this->routes,
-            'dated' => $this->dated,
-            'past_date_behavior' => $this->pastDateBehavior(),
-            'future_date_behavior' => $this->futureDateBehavior(),
-            'default_publish_state' => $this->defaultPublishState,
-            'amp' => $this->ampable,
-            'sites' => $this->sites,
-            'propagate' => $this->propagate(),
-            'template' => $this->template,
-            'layout' => $this->layout,
-            'cascade' => $this->cascade->all(),
-            'blueprints' => $this->blueprints,
-            'search_index' => $this->searchIndex,
-            'orderable' => $this->orderable(),
-            'structured' => $this->hasStructure(),
-            'mount' => $this->mount,
-            'taxonomies' => $this->taxonomies,
-            'revisions' => $this->revisions,
-            'title_format' => $this->titleFormats,
-        ];
     }
 
     public function pastDateBehavior($behavior = null)
