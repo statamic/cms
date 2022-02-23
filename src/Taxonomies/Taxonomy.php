@@ -3,6 +3,7 @@
 namespace Statamic\Taxonomies;
 
 use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
@@ -24,7 +25,7 @@ use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess
+class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess, Arrayable
 {
     use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
 
@@ -196,15 +197,6 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     public function defaultPublishState($state = null)
     {
         return $this->fluentlyGetOrSet('defaultPublishState')->args(func_get_args());
-    }
-
-    public function toArray()
-    {
-        return [
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'blueprints' => $this->blueprints,
-        ];
     }
 
     public function sites($sites = null)

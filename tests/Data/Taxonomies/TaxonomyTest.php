@@ -3,6 +3,7 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -153,5 +154,17 @@ class TaxonomyTest extends TestCase
             ->toAugmentedCollection()
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $taxonomy->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $taxonomy[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $this->assertInstanceOf(Arrayable::class, $taxonomy);
+
+        collect($taxonomy->toArray())
+            ->each(fn ($value, $key) => $this->assertEquals($value, $taxonomy->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value, $taxonomy[$key]));
     }
 }
