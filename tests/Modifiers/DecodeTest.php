@@ -18,7 +18,7 @@ class DecodeTest extends TestCase
      * @test
      * @dataProvider undecoded
      */
-    public function it_converts_all_HTML_entities_to_applicable_chars($expected, $input): void
+    public function it_converts_all_html_entities_to_applicable_chars($expected, $input): void
     {
         $modified = $this->modify($input);
         $this->assertEquals($expected, $modified);

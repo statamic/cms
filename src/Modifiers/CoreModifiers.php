@@ -51,7 +51,7 @@ class CoreModifiers extends Modifier
             // Remove anchor from the URL.
             $url = strtok($value, '#');
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and prepend it with a "#" if a value is retrieved.
             $fragment = parse_url($value, PHP_URL_FRAGMENT);
             $anchor = is_null($fragment) ? '' : "#{$fragment}";
 
@@ -1799,7 +1799,7 @@ class CoreModifiers extends Modifier
             // Parse the URL to retrieve the possible query string and anchor.
             $parsedUrl = parse_url($value);
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and prepend it with a "#" if a value is retrieved.
             $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
 
             // Build an associative array based on the query string.
@@ -2020,7 +2020,7 @@ class CoreModifiers extends Modifier
             // Parse the URL to retrieve the possible query string and anchor.
             $parsedUrl = parse_url($value);
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and prepend it with a "#" if a value is retrieved.
             $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
 
             // Build an associative array based on the query string.
