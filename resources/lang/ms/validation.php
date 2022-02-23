@@ -125,7 +125,7 @@ return [
     'unique_entry_value' => 'Nilai ini telah pun diambil.',
     'unique_term_value' => 'Nilai ini telah pun diambil.',
     'unique_user_value' => 'Nilai ini telah pun diambil.',
-    'duplicate_field_handle' => 'Medan dengan pemegang :handle tidak boleh digunakan lebih daripada sekali.',
+    'duplicate_field_handle' => 'Bidang dengan pemegang :handle tidak boleh digunakan lebih daripada sekali.',
     'one_site_without_origin' => 'Sekurang-kurangnya satu tapak mestilah tidak mempunyai asal.',
     'origin_cannot_be_disabled' => 'Tidak boleh memilih asal yang dilumpuhkan.',
     'unique_uri' => 'URI ini telah pun diambil.',
