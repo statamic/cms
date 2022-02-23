@@ -3,6 +3,7 @@
 namespace Statamic\Globals;
 
 use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
@@ -12,6 +13,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Site;
@@ -19,9 +21,9 @@ use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Variables implements Contract, Localization, Augmentable, ResolvesValuesContract, ArrayAccess
+class Variables implements Contract, Localization, Augmentable, ResolvesValuesContract, ArrayAccess, Arrayable
 {
-    use ExistsAsFile, ContainsData, HasAugmentedInstance, HasOrigin, FluentlyGetsAndSets, ResolvesValues;
+    use ExistsAsFile, ContainsData, HasAugmentedInstance, HasOrigin, FluentlyGetsAndSets, ResolvesValues, TracksQueriedRelations;
 
     protected $set;
     protected $locale;
@@ -166,6 +168,11 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedVariables($this);
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
     }
 
     public function fresh()
