@@ -11,7 +11,6 @@ use Statamic\Statamic;
 class SiteNotFoundException extends Exception implements ProvidesSolution
 {
     protected $siteHandle;
-    protected $namespace;
 
     public function __construct($siteHandle)
     {
