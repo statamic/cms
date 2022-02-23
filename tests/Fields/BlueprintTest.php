@@ -5,6 +5,7 @@ namespace Tests\Fields;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\CP\Column;
@@ -1049,5 +1050,17 @@ class BlueprintTest extends TestCase
             ->toAugmentedCollection()
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $this->assertInstanceOf(Arrayable::class, $blueprint);
+
+        collect($blueprint->toArray())
+            ->each(fn ($value, $key) => $this->assertEquals($value, $blueprint->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value, $blueprint[$key]));
     }
 }
