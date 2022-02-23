@@ -113,4 +113,9 @@ class AugmentedCollection extends Collection
 
         return $this;
     }
+
+    public function getRelations()
+    {
+        return $this->withRelations;
+    }
 }

@@ -60,7 +60,22 @@ trait HasAugmentedInstance
 
     public function toEvaluatedAugmentedArray($keys = null)
     {
-        return $this->toAugmentedCollection($keys)->withEvaluation()->toArray();
+        $collection = $this->toAugmentedCollection($keys);
+
+        // Can't just chain ->except() because it would return a new
+        // collection and the existing 'withRelations' would be lost.
+        if ($exceptions = $this->excludedEvaluatedAugmentedArrayKeys()) {
+            $collection = $collection
+                ->except($exceptions)
+                ->withRelations($collection->getRelations());
+        }
+
+        return $collection->withEvaluation()->toArray();
+    }
+
+    protected function excludedEvaluatedAugmentedArrayKeys()
+    {
+        return null;
     }
 
     public function toArray()
