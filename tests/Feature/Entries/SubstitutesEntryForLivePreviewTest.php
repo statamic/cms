@@ -7,6 +7,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Token;
+use Statamic\View\View;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -29,14 +30,25 @@ class SubstitutesEntryForLivePreviewTest extends TestCase
         EntryFactory::collection('test')->id('3')->slug('charlie')->data(['title' => 'Charlie', 'foo' => 'Charlie foo'])->create();
 
         $this->withFakeViews();
-        $this->viewShouldReturnRaw('test', '{{ collection:test }}{{ title }} {{ foo }} {{ /collection:test }}');
+
+        $template = <<<'EOT'
+            {{ is_live_preview ? "previewing" : "actual" }}
+            {{ collection:test scope="article" }}
+                {{ title }}
+                {{ foo }}
+                {{ article:is_live_preview ? "previewing": "actual" }}
+            {{ /collection:test }}
+EOT;
+        $this->viewShouldReturnRaw('test', $template);
     }
 
     protected function resolveApplicationConfiguration($app)
     {
         parent::resolveApplicationConfiguration($app);
 
-        Route::view('/test', 'test')->middleware('statamic.web');
+        // Use our View::make() to make sure the Cascade is used.
+        // We'd use Route::statamic() but it isn't available at this point.
+        Route::get('/test', fn () => View::make('test'))->middleware('statamic.web');
     }
 
     /** @test */
@@ -49,12 +61,16 @@ class SubstitutesEntryForLivePreviewTest extends TestCase
 
         $this->get('/test?token=test-token')
             ->assertSeeInOrder([
+                'previewing',
                 'Alfa',
                 'Alfa foo',
+                'actual',
                 'Substituted title',
                 'Substituted foo',
+                'previewing',
                 'Charlie',
                 'Charlie foo',
+                'actual',
             ])
             ->assertHeader('X-Statamic-Live-Preview', true);
     }
