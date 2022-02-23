@@ -5,6 +5,9 @@ namespace Tests\Modifiers;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
+/**
+ * @group array
+ */
 class CompactTest extends TestCase
 {
     protected $data = [

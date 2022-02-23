@@ -5,6 +5,9 @@ namespace Tests\Modifiers;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
+/**
+ * @group array
+ */
 class IsEmptyTest extends TestCase
 {
     /** @test */
