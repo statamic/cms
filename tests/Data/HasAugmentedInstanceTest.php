@@ -2,6 +2,7 @@
 
 namespace Tests\Data;
 
+use ArrayAccess;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedInstance;
@@ -112,5 +113,32 @@ class HasAugmentedInstanceTest extends TestCase
         };
 
         $this->assertEquals(['foo', 'bar'], $thing->toAugmentedArray());
+    }
+
+    /** @test */
+    public function it_can_check_for_array_key_existence()
+    {
+        $mock = $this->mock(Augmented::class);
+
+        $thing = new class($mock) implements ArrayAccess
+        {
+            use HasAugmentedInstance;
+
+            public function __construct($mock)
+            {
+                $this->mock = $mock;
+            }
+
+            public function newAugmentedInstance(): Augmented
+            {
+                return $this->mock;
+            }
+        };
+
+        $mock->shouldReceive('get')->with('foo')->once()->andReturn(new Value('bar'));
+        $mock->shouldReceive('get')->with('baz')->once()->andReturn(new Value(null));
+
+        $this->assertTrue(isset($thing['foo']));
+        $this->assertFalse(isset($thing['baz']));
     }
 }
