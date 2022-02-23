@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'any.config.antlers' => "Dayakan penghuraian Antlers dalam kandungan bidang ini.",
+    'any.config.antlers' => 'Dayakan penghuraian Antlers dalam kandungan bidang ini.',
     'any.config.cast_booleans' => 'Pilihan dengan nilai benar dan salah akan disimpan sebagai boolean.',
     'array.config.keys' => 'Tetapkan kunci tatasusunan (pembolehubah) dan label pilihan.',
     'array.config.mode' => 'Mod dinamik memberikan pengguna kawalan data manakala mod yang dikunci tidak.',
