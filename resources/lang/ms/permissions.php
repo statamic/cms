@@ -24,9 +24,9 @@ return [
     'publish_{collection}_entries_desc' => 'Keupayaan untuk menukar daripada draf kepada diterbitkan dan sebaliknya',
     'reorder_{collection}_entries' => 'Susun semula entri',
     'reorder_{collection}_entries_desc' => 'Mendayakan susunan semula seret dan lepas',
-    'edit_other_authors_{collection}_entries' => "Sunting entri pengarang lain",
-    'publish_other_authors_{collection}_entries' => "Uruskan keadaan penerbitan entri pengarang lain",
-    'delete_other_authors_{collection}_entries' => "Padamkan entri pengarang lain",
+    'edit_other_authors_{collection}_entries' => 'Sunting entri pengarang lain',
+    'publish_other_authors_{collection}_entries' => 'Uruskan keadaan penerbitan entri pengarang lain',
+    'delete_other_authors_{collection}_entries' => 'Padamkan entri pengarang lain',
 
     'group_taxonomies' => 'Taksonomi',
     'configure_taxonomies' => 'Konfigurasikan Taksonomi',
