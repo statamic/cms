@@ -32,11 +32,11 @@ class SubstitutesEntryForLivePreviewTest extends TestCase
         $this->withFakeViews();
 
         $template = <<<'EOT'
-            {{ is_live_preview ? "previewing" : "actual" }}
+            {{ live_preview ? "previewing" : "actual" }}
             {{ collection:test scope="article" }}
                 {{ title }}
                 {{ foo }}
-                {{ article:is_live_preview ? "previewing": "actual" }}
+                {{ article:live_preview ? "previewing": "actual" }}
             {{ /collection:test }}
 EOT;
         $this->viewShouldReturnRaw('test', $template);

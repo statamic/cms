@@ -14,8 +14,8 @@ class LivePreviewEntry
     {
         $entry = LivePreview::item($token);
 
-        $entry->setSupplement('is_live_preview', true);
-        Cascade::hydrated(fn ($cascade) => $cascade->set('is_live_preview', true));
+        $entry->setSupplement('live_preview', true);
+        Cascade::hydrated(fn ($cascade) => $cascade->set('live_preview', true));
 
         Entry::substitute($entry);
 
