@@ -17,6 +17,7 @@ class Token extends AbstractToken
     {
         return [
             'handler' => $this->handler,
+            'expires_at' => $this->expiry->timestamp,
             'data' => $this->data->all(),
         ];
     }

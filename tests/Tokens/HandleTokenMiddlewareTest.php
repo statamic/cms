@@ -36,6 +36,7 @@ class HandleTokenMiddlewareTest extends TestCase
         $token = Tokens::make('valid-token', TestMiddlewareTokenHandler::class, ['foo' => 'bar']);
 
         Tokens::shouldReceive('find')->with('valid-token')->andReturn($token);
+        Tokens::shouldReceive('collectGarbage')->zeroOrMoreTimes();
 
         $response = (new HandleToken)->handle($request, $next);
 

@@ -13,6 +13,8 @@ class HandleToken
             return $next($request);
         }
 
+        $this->collectGarbage();
+
         return $token->handle($request, $next);
     }
 
@@ -20,6 +22,15 @@ class HandleToken
     {
         if ($token = $request->token ?? $request->header('X-Statamic-Token')) {
             return Token::find($token);
+        }
+    }
+
+    private function collectGarbage()
+    {
+        $lottery = [2, 100];
+
+        if (random_int(1, $lottery[1]) <= $lottery[0]) {
+            Token::collectGarbage();
         }
     }
 }

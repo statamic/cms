@@ -2,6 +2,7 @@
 
 namespace Statamic\Tokens;
 
+use Illuminate\Support\Carbon;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 
@@ -20,9 +21,7 @@ class TokenRepository
             return null;
         }
 
-        $yaml = YAML::file($path)->parse();
-
-        return $this->make($token, $yaml['handler'], $yaml['data'] ?? []);
+        return $this->makeFromPath($path);
     }
 
     public function save(Token $token)
@@ -37,5 +36,24 @@ class TokenRepository
         File::delete(storage_path('statamic/tokens/'.$token->token().'.yaml'));
 
         return true;
+    }
+
+    public function collectGarbage()
+    {
+        File::getFilesByType(storage_path('statamic/tokens'), 'yaml')
+            ->map(fn ($path) => $this->makeFromPath($path))
+            ->filter->hasExpired()
+            ->each->delete();
+    }
+
+    private function makeFromPath(string $path): Token
+    {
+        $yaml = YAML::file($path)->parse();
+
+        $token = basename($path, '.yaml');
+
+        return $this
+            ->make($token, $yaml['handler'], $yaml['data'] ?? [])
+            ->expireAt(Carbon::createFromTimestamp($yaml['expires_at']));
     }
 }
