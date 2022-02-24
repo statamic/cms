@@ -140,7 +140,7 @@ class PreviewEntryTest extends TestCase
     }
 
     /** @test */
-    public function it_updates_existing_token_with_entry_for_editing_without_any_extra_data()
+    public function it_sets_live_preview_to_true_if_theres_no_additional_data()
     {
         Collection::make('blog')->routes('/blog/{slug}')->save();
 
