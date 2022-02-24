@@ -38,6 +38,7 @@
                         <td>
                             <div class="flex items-center">
                                 <div class="w-4 h-4 mr-2">@cp_svg('content-writing')</div>
+                                <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-1" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
                                 <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}">{{ $blueprint->title() }}</a>
                             </div>
                         </td>
@@ -61,6 +62,7 @@
                         <td>
                             <div class="flex items-center">
                                 <div class="w-4 h-4 mr-2">@cp_svg('tags')</div>
+                                <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-1" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
                                 <a href="{{ cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]) }}">{{ $blueprint->title() }}</a>
                             </div>
                         </td>
@@ -83,6 +85,7 @@
                     <td>
                         <div class="flex items-center">
                             <div class="w-4 h-4 mr-2">@cp_svg('hierarchy-files')</div>
+                            <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-1" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
                             <a href="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}">{{ $nav->title() }}</a>
                         </div>
                     </td>
@@ -103,6 +106,7 @@
                     <td>
                         <div class="flex items-center">
                             <div class="w-4 h-4 mr-2">@cp_svg('earth')</div>
+                            <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-1" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
                             <a href="{{ cp_route('globals.blueprint.edit', $set->handle()) }}">{{ $set->title() }}</a>
                         </div>
                     </td>
@@ -123,6 +127,7 @@
                     <td>
                         <div class="flex items-center">
                             <div class="w-4 h-4 mr-2">@cp_svg('assets')</div>
+                            <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-1" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
                             <a href="{{ cp_route('asset-containers.blueprint.edit', $container->handle()) }}">{{ $container->title() }}</a>
                         </div>
                     </td>
@@ -143,6 +148,7 @@
                     <td>
                         <div class="flex items-center">
                             <div class="w-4 h-4 mr-2">@cp_svg('drawer-file')</div>
+                            <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-1" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
                             <a href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}">{{ $form->title() }}</a>
                         </div>
                     </td>
@@ -160,6 +166,7 @@
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 mr-2">@cp_svg('users')</div>
+                        <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-1" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
                         <a href="{{ cp_route('users.blueprint.edit') }}">{{ __('User') }}</a>
                     </div>
                 </td>
