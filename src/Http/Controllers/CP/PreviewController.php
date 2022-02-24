@@ -30,9 +30,11 @@ class PreviewController extends CpController
 
     protected function tokenizeAndReturn($request, $data)
     {
+        $data->setSupplement('live_preview', empty($extras = $request->extras) ? true : $extras);
+
         return [
             'token' => $token = LivePreview::tokenize($request->token, $data)->token(),
-            'url' => $this->getPreviewUrl($data, $request->target, $token),
+            'url' => $this->getPreviewUrl($data, $request->target ?? 0, $token),
         ];
     }
 
@@ -40,6 +42,11 @@ class PreviewController extends CpController
     {
         $url = $data->previewTargets()[$target]['url'];
 
-        return $url.(strpos($url, '?') === false ? '?' : '&').'token='.$token;
+        return vsprintf('%s%slive-preview=%s&token=%s', [
+            $url,
+            strpos($url, '?') === false ? '?' : '&',
+            str_random(), // random string to prevent caching
+            $token,
+        ]);
     }
 }

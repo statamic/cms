@@ -32,11 +32,9 @@ class SubstitutesEntryForLivePreviewTest extends TestCase
         $this->withFakeViews();
 
         $template = <<<'EOT'
-            {{ live_preview ? "previewing" : "actual" }}
             {{ collection:test scope="article" }}
                 {{ title }}
                 {{ foo }}
-                {{ article:live_preview ? "previewing": "actual" }}
             {{ /collection:test }}
 EOT;
         $this->viewShouldReturnRaw('test', $template);
@@ -61,16 +59,12 @@ EOT;
 
         $this->get('/test?token=test-token')
             ->assertSeeInOrder([
-                'previewing',
                 'Alfa',
                 'Alfa foo',
-                'actual',
                 'Substituted title',
                 'Substituted foo',
-                'previewing',
                 'Charlie',
                 'Charlie foo',
-                'actual',
             ])
             ->assertHeader('X-Statamic-Live-Preview', true);
     }
