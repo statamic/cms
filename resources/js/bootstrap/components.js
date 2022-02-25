@@ -1,10 +1,8 @@
 import Vue from 'vue'
 import vSelect from 'vue-select'
-import pdf from 'pdfvuer'
 
 // Third Party
 Vue.component('v-select', vSelect)
-Vue.component('pdf', pdf)
 
 // Core
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue').default);
