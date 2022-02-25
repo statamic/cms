@@ -348,6 +348,7 @@ class Asset implements AssetContract, Augmentable
             'dxf', 'xps',
             'zip', 'rar',
             'xls', 'xlsx',
+            'pdf',
         ]);
     }
 
@@ -379,6 +380,16 @@ class Asset implements AssetContract, Augmentable
     public function isVideo()
     {
         return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
+    }
+
+    /**
+     * Is this asset a PDF?
+     *
+     * @return bool
+     */
+    public function isPDF()
+    {
+        return $this->extensionIsOneOf(['pdf']);
     }
 
     /**
