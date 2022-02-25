@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.3.0-beta.2 (2022-02-25)
+
+### What's fixed
+- Fixed issue where the resources directory was deleted during a composer install. [#5350](https://github.com/statamic/cms/issues/5350) by @jasonvarga
+
+
+
 ## 3.3.0-beta.1 (2022-02-25)
 
 ### What's new
