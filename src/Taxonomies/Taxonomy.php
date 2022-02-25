@@ -364,7 +364,6 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     private function previewTargetsForFile()
     {
         $targets = $this->previewTargets;
-        ray($targets);
 
         if ($targets === $this->defaultPreviewTargets()) {
             return null;
