@@ -84,11 +84,7 @@
                     </div>
 
                     <div class="h-full" v-else-if="asset.isPDF">
-                        <pdf :src="asset.pdfUrl">
-                            <template slot="loading">
-                                loading content here...
-                            </template>
-                        </pdf>
+                        <pdf-viewer :src="asset.pdfUrl"></pdf-viewer>
                     </div>
 
                     <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
@@ -187,6 +183,7 @@
 <script>
 import EditorActions from './EditorActions.vue';
 import FocalPointEditor from './FocalPointEditor.vue';
+import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 
 export default {
@@ -194,6 +191,7 @@ export default {
     components: {
         EditorActions,
         FocalPointEditor,
+        PdfViewer,
         PublishFields,
     },
 
