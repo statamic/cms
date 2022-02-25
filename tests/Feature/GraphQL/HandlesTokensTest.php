@@ -13,7 +13,8 @@ class HandlesTokensTest extends TestCase
     /** @test */
     public function it_handles_tokens()
     {
-        $handler = new class {
+        $handler = new class
+        {
             public function handle(Token $token, $request, Closure $next)
             {
                 return ['handled by token' => true];
