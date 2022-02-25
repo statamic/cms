@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="h-full" v-else-if="asset.isPDF">
-                        <pdf :src="$pdfvuer.createLoadingTask(pdf())">
+                        <pdf :src="asset.pdfUrl">
                             <template slot="loading">
                                 loading content here...
                             </template>
@@ -405,12 +405,6 @@ export default {
         actionCompleted(event) {
             this.$events.$emit('editor-action-completed');
             this.close();
-        },
-
-        pdf() {
-            return {
-                data: atob(this.asset.pdf)
-            }
         },
     }
 
