@@ -41,7 +41,7 @@ class Asset extends JsonResource
 
             $this->mergeWhen($this->isPDF(), function () {
                 return [
-                    'pdf' => base64_encode($this->file()),
+                    'pdfUrl' => $this->pdfUrl(),
                 ];
             }),
 

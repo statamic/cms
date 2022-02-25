@@ -306,6 +306,11 @@ class Asset implements AssetContract, Augmentable
         return cp_route('assets.svgs.show', ['encoded_asset' => base64_encode($this->id())]);
     }
 
+    public function pdfUrl()
+    {
+        return cp_route('assets.pdfs.show', ['encoded_asset' => base64_encode($this->id())]);
+    }
+
     /**
      * Get either a image URL builder instance, or a URL if passed params.
      *
