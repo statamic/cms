@@ -156,6 +156,7 @@ class CollectionsController extends CpController
             'title_formats' => $collection->titleFormats()->unique()->count() === 1
                 ? $collection->titleFormats()->first()
                 : $collection->titleFormats()->all(),
+            'preview_targets' => $collection->previewTargets(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))
@@ -231,7 +232,8 @@ class CollectionsController extends CpController
             ->mount(array_get($values, 'mount'))
             ->propagate(array_get($values, 'propagate'))
             ->titleFormats($values['title_formats'])
-            ->requiresSlugs($values['require_slugs']);
+            ->requiresSlugs($values['require_slugs'])
+            ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -483,6 +485,25 @@ class CollectionsController extends CpController
                         'display' => __('Enable AMP'),
                         'instructions' => __('statamic::messages.collections_amp_instructions'),
                         'type' => 'toggle',
+                    ],
+                    'preview_targets' => [
+                        'display' => __('Preview Targets'),
+                        'instructions' => __('statamic::messages.collections_preview_targets_instructions'),
+                        'type' => 'grid',
+                        'fields' => [
+                            [
+                                'handle' => 'label',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                            [
+                                'handle' => 'format',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],

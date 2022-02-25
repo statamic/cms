@@ -5,6 +5,7 @@ namespace Tests\Data\Entries;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -317,5 +318,100 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(5, $entries);
         $this->assertEquals(['Post 2', 'Post 3', 'Post 4', 'Post 6', 'Post 7'], $entries->map->title->all());
+    }
+
+    /** @test */
+    public function it_substitutes_entries_by_id()
+    {
+        Collection::make('posts')->routes('/posts/{slug}')->save();
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create();
+
+        $substitute = EntryFactory::id('2')->slug('replaced-post-2')->collection('posts')->data(['title' => 'Replaced Post 2'])->make();
+
+        $found = Entry::query()->where('id', 2)->first();
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substitute);
+
+        Entry::substitute($substitute);
+
+        $found = Entry::query()->where('id', 2)->first();
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substitute);
+    }
+
+    /** @test */
+    public function it_substitutes_entries_by_uri()
+    {
+        Collection::make('posts')->routes('/posts/{slug}')->save();
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create();
+
+        $substitute = EntryFactory::id('2')->slug('replaced-post-2')->collection('posts')->data(['title' => 'Replaced Post 2'])->make();
+
+        $found = Entry::findByUri('/posts/post-2');
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substitute);
+
+        $this->assertNull(Entry::findByUri('/posts/replaced-post-2'));
+
+        Entry::substitute($substitute);
+
+        $found = Entry::findByUri('/posts/replaced-post-2');
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substitute);
+    }
+
+    /** @test */
+    public function it_substitutes_entries_by_uri_and_site()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        Collection::make('posts')->routes('/posts/{slug}')->sites(['en', 'fr'])->save();
+        EntryFactory::id('en-1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->locale('en')->create();
+        EntryFactory::id('en-2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->locale('en')->create();
+        EntryFactory::id('en-3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->locale('en')->create();
+        EntryFactory::id('fr-1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->locale('fr')->create();
+        EntryFactory::id('fr-2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->locale('fr')->create();
+        EntryFactory::id('fr-3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->locale('fr')->create();
+
+        $substituteEn = EntryFactory::id('en-2')->slug('replaced-post-2')->collection('posts')->data(['title' => 'Replaced Post 2'])->locale('en')->make();
+        $substituteFr = EntryFactory::id('fr-2')->slug('replaced-post-2')->collection('posts')->data(['title' => 'Replaced Post 2'])->locale('fr')->make();
+
+        $found = Entry::findByUri('/posts/post-2');
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substituteEn);
+
+        $found = Entry::findByUri('/posts/post-2', 'en');
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substituteEn);
+
+        $found = Entry::findByUri('/posts/post-2', 'fr');
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substituteFr);
+
+        $this->assertNull(Entry::findByUri('/posts/replaced-post-2'));
+        $this->assertNull(Entry::findByUri('/posts/replaced-post-2', 'en'));
+        $this->assertNull(Entry::findByUri('/posts/replaced-post-2', 'fr'));
+
+        Entry::substitute($substituteEn);
+        Entry::substitute($substituteFr);
+
+        $found = Entry::findByUri('/posts/replaced-post-2');
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substituteEn);
+
+        $found = Entry::findByUri('/posts/replaced-post-2', 'en');
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substituteEn);
+
+        $found = Entry::findByUri('/posts/replaced-post-2', 'fr');
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substituteFr);
     }
 }

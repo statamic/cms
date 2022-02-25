@@ -37,6 +37,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     protected $defaultPublishState = true;
     protected $revisions = false;
     protected $searchIndex;
+    protected $previewTargets = [];
 
     public function __construct()
     {
@@ -183,6 +184,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         $data = [
             'title' => $this->title,
             'blueprints' => $this->blueprints,
+            'preview_targets' => $this->previewTargetsForFile(),
         ];
 
         if (Site::hasMultiple()) {
@@ -338,5 +340,44 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             'url' => $this->url(),
             'permalink' => $this->absoluteUrl(),
         ], $this->supplements->all());
+    }
+
+    public function previewTargets($targets = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('previewTargets')
+            ->getter(function ($targets) {
+                if (empty($targets)) {
+                    $targets = $this->defaultPreviewTargets();
+                }
+
+                return collect($targets);
+            })
+            ->args(func_get_args());
+    }
+
+    private function defaultPreviewTargets()
+    {
+        return [['label' => 'Term', 'format' => '{permalink}']];
+    }
+
+    private function previewTargetsForFile()
+    {
+        $targets = $this->previewTargets;
+
+        if ($targets === $this->defaultPreviewTargets()) {
+            return null;
+        }
+
+        return collect($targets)->map(function ($target) {
+            if (! $target['format']) {
+                return null;
+            }
+
+            return [
+                'label' => $target['label'],
+                'url' => $target['format'],
+            ];
+        })->filter()->values()->all();
     }
 }

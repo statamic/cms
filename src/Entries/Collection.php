@@ -55,6 +55,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $taxonomies = [];
     protected $requiresSlugs = true;
     protected $titleFormats = [];
+    protected $previewTargets = [];
 
     public function __construct()
     {
@@ -520,6 +521,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
             ],
+            'preview_targets' => $this->previewTargetsForFile(),
         ]));
 
         if (! Site::hasMultiple()) {
@@ -697,6 +699,45 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 });
             })
             ->args(func_get_args());
+    }
+
+    public function previewTargets($targets = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('previewTargets')
+            ->getter(function ($targets) {
+                if (empty($targets)) {
+                    $targets = $this->defaultPreviewTargets();
+                }
+
+                return collect($targets);
+            })
+            ->args(func_get_args());
+    }
+
+    private function defaultPreviewTargets()
+    {
+        return [['label' => 'Entry', 'format' => '{permalink}']];
+    }
+
+    private function previewTargetsForFile()
+    {
+        $targets = $this->previewTargets;
+
+        if ($targets === $this->defaultPreviewTargets()) {
+            return null;
+        }
+
+        return collect($targets)->map(function ($target) {
+            if (! $target['format']) {
+                return null;
+            }
+
+            return [
+                'label' => $target['label'],
+                'url' => $target['format'],
+            ];
+        })->filter()->values()->all();
     }
 
     public function deleteFile()

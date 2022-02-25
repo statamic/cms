@@ -3,7 +3,6 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
-use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -12,6 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
+use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
@@ -436,15 +436,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
     }
 
-    public function toLivePreviewResponse($request, $extras)
-    {
-        Cascade::hydrated(function ($cascade) use ($extras) {
-            $cascade->set('live_preview', $extras);
-        });
-
-        return $this->toResponse($request);
-    }
-
     public function date($date = null)
     {
         return $this
@@ -810,5 +801,32 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
         return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+    }
+
+    public function previewTargets()
+    {
+        return $this->collection()->previewTargets()->map(function ($target) {
+            return [
+                'label' => $target['label'],
+                'format' => $target['format'],
+                'url' => $this->resolvePreviewTargetUrl($target['format']),
+            ];
+        });
+    }
+
+    private function resolvePreviewTargetUrl($format)
+    {
+        if (! Str::contains($format, '{{')) {
+            $format = preg_replace_callback('/{\s*([a-zA-Z0-9_\-\:\.]+)\s*}/', function ($match) {
+                return "{{ {$match[1]} }}";
+            }, $format);
+        }
+
+        return (string) Antlers::parse($format, $this->augmented()->all());
+    }
+
+    public function repository()
+    {
+        return app(EntryRepository::class);
     }
 }

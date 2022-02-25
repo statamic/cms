@@ -1749,5 +1749,58 @@ class EntryTest extends TestCase
         ];
     }
 
+    /** @test */
+    public function it_gets_preview_targets()
+    {
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.de/'],
+        ]]);
+
+        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->ampable(true)->routes([
+            'en' => 'blog/{slug}',
+            'fr' => 'le-blog/{slug}',
+            'de' => 'das-blog/{slug}',
+        ]);
+        $collection->save();
+
+        $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo');
+        $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo');
+        $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo');
+
+        $this->assertEquals([
+            ['label' => 'Entry', 'format' => '{permalink}', 'url' => 'http://domain.com/blog/foo'],
+        ], $entryEn->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Entry', 'format' => '{permalink}', 'url' => 'http://domain.com/fr/le-blog/le-foo'],
+        ], $entryFr->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Entry', 'format' => '{permalink}', 'url' => 'http://domain.de/das-blog/das-foo'],
+        ], $entryDe->previewTargets()->all());
+
+        $collection->previewTargets([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true'],
+        ])->save();
+
+        $this->assertEquals([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/en/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/en/blog/foo?preview=true'],
+        ], $entryEn->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/fr/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/fr/blog/le-foo?preview=true'],
+        ], $entryFr->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/de/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/de/blog/das-foo?preview=true'],
+        ], $entryDe->previewTargets()->all());
+    }
+
     // todo: add tests for localization things. in(), descendants(), addLocalization(), etc
 }

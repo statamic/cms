@@ -669,4 +669,28 @@ class CollectionTest extends TestCase
         $collection->updateEntryUris();
         $collection->updateEntryUris(['one', 'two']);
     }
+
+    /** @test */
+    public function it_gets_preview_targets()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->previewTargets());
+
+        $this->assertEquals([
+            ['label' => 'Entry', 'format' => '{permalink}'],
+        ], $collection->previewTargets()->all());
+
+        $return = $collection->previewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ]);
+
+        $this->assertSame($collection, $return);
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $collection->previewTargets()->all());
+    }
 }

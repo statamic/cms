@@ -21,6 +21,7 @@
         :can-manage-publish-state="canManagePublishState"
         :create-another-url="createAnotherUrl"
         :listing-url="listingUrl"
+        :preview-targets="previewTargets"
         @saved="saved"
     ></entry-publish-form>
 
@@ -44,6 +45,7 @@ export default {
         'canManagePublishState',
         'createAnotherUrl',
         'listingUrl',
+        'previewTargets',
     ],
 
     methods: {
