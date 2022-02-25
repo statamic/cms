@@ -436,15 +436,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
     }
 
-    public function toLivePreviewResponse($request, $extras)
-    {
-        Cascade::hydrated(function ($cascade) use ($extras) {
-            $cascade->set('live_preview', $extras);
-        });
-
-        return $this->toResponse($request);
-    }
-
     public function date($date = null)
     {
         return $this

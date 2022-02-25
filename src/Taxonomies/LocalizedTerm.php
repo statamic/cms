@@ -3,7 +3,6 @@
 namespace Statamic\Taxonomies;
 
 use ArrayAccess;
-use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -369,15 +368,6 @@ class LocalizedTerm implements
         }
 
         return (new DataResponse($this))->toResponse($request);
-    }
-
-    public function toLivePreviewResponse($request, $extras)
-    {
-        Cascade::hydrated(function ($cascade) use ($extras) {
-            $cascade->set('live_preview', $extras);
-        });
-
-        return $this->toResponse($request);
     }
 
     public function template($template = null)
