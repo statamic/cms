@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 3.3.0-beta.1 (2022-02-25)
 
 ### What's new
 - Brand new Antlers parser. [#4257](https://github.com/statamic/cms/issues/4257) by @JohnathonKoster
