@@ -37,6 +37,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     protected $defaultPublishState = true;
     protected $revisions = false;
     protected $searchIndex;
+    protected $previewTargets = [];
 
     public function __construct()
     {
@@ -338,5 +339,19 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             'url' => $this->url(),
             'permalink' => $this->absoluteUrl(),
         ], $this->supplements->all());
+    }
+
+    public function previewTargets($targets = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('previewTargets')
+            ->getter(function ($targets) {
+                if (empty($targets)) {
+                    $targets = [['label' => 'Term', 'format' => '{permalink}']];
+                }
+
+                return collect($targets);
+            })
+            ->args(func_get_args());
     }
 }

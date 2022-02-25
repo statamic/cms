@@ -32,6 +32,7 @@
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         create-another-url="{{ cp_route('taxonomies.terms.create', [$taxonomy, $locale]) }}"
         listing-url="{{ cp_route('taxonomies.show', $taxonomy) }}"
+        :preview-targets="{{ json_encode($previewTargets) }}"
     ></term-publish-form>
 
 @endsection

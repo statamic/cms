@@ -3,7 +3,6 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
-use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -12,6 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
+use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
@@ -823,5 +823,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         return (string) Antlers::parse($format, $this->augmented()->all());
+    }
+
+    public function repository()
+    {
+        return app(EntryRepository::class);
     }
 }

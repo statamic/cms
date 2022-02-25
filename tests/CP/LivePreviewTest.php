@@ -6,7 +6,7 @@ use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Tokens\Generator;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Token;
-use Statamic\Tokens\Handlers\LivePreviewEntry;
+use Statamic\Tokens\Handlers\LivePreview as LivePreviewHandler;
 use Tests\TestCase;
 
 class LivePreviewTest extends TestCase
@@ -19,7 +19,7 @@ class LivePreviewTest extends TestCase
         LivePreview::tokenize('test-token', 'item');
 
         $this->assertNotNull($token = Token::find('test-token'));
-        $this->assertEquals(LivePreviewEntry::class, $token->handler());
+        $this->assertEquals(LivePreviewHandler::class, $token->handler());
 
         $this->assertSame('item', Cache::get('statamic.live-preview.test-token'));
     }
@@ -34,7 +34,7 @@ class LivePreviewTest extends TestCase
         LivePreview::tokenize(null, 'item');
 
         $this->assertNotNull($token = Token::find('test-token'));
-        $this->assertEquals(LivePreviewEntry::class, $token->handler());
+        $this->assertEquals(LivePreviewHandler::class, $token->handler());
 
         $this->assertSame('item', Cache::get('statamic.live-preview.test-token'));
         $this->assertSame('item', LivePreview::item($token));

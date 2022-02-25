@@ -167,4 +167,28 @@ class TaxonomyTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value, $taxonomy->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value, $taxonomy[$key]));
     }
+
+    /** @test */
+    public function it_gets_preview_targets()
+    {
+        $taxonomy = (new Taxonomy)->handle('test');
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->previewTargets());
+
+        $this->assertEquals([
+            ['label' => 'Term', 'format' => '{permalink}'],
+        ], $taxonomy->previewTargets()->all());
+
+        $return = $taxonomy->previewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ]);
+
+        $this->assertSame($taxonomy, $return);
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $taxonomy->previewTargets()->all());
+    }
 }

@@ -140,7 +140,7 @@ class EntryRepository implements RepositoryContract
     public function applySubstitutions($items)
     {
         return $items->map(function ($item) {
-            return Arr::get($this->substitutionsById, $item->id(), $item);
+            return $this->substitutionsById[$item->id()] ?? $item;
         });
     }
 }

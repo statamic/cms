@@ -3,17 +3,16 @@
 namespace Statamic\Tokens\Handlers;
 
 use Closure;
-use Facades\Statamic\CP\LivePreview;
+use Facades\Statamic\CP\LivePreview as Facade;
 use Statamic\Contracts\Tokens\Token;
-use Statamic\Facades\Entry;
 
-class LivePreviewEntry
+class LivePreview
 {
     public function handle(Token $token, $request, Closure $next)
     {
-        $entry = LivePreview::item($token);
+        $item = Facade::item($token);
 
-        Entry::substitute($entry);
+        $item->repository()->substitute($item);
 
         $response = $next($request);
 
