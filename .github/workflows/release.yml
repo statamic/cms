@@ -44,7 +44,7 @@ jobs:
           body: ${{ steps.changelog.outputs.text }}
           prerelease: true
 
-      - name: Upload zip to release
+      - name: Upload dist zip to release
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,4 +52,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./resources/dist.tar.gz
           asset_name: dist.tar.gz
+          asset_content_type: application/tar+gz
+
+      - name: Upload dist-frontend zip to release
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./resources/dist-frontend.tar.gz
+          asset_name: dist-frontend.tar.gz
           asset_content_type: application/tar+gz
