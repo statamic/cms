@@ -706,6 +706,16 @@ class Asset implements AssetContract, Augmentable
     }
 
     /**
+     * Get the asset file.
+     *
+     * @return mixed
+     */
+    public function file()
+    {
+        return $this->disk()->get($this->path());
+    }
+
+    /**
      * Get the blueprint.
      *
      * @param  string|null  $blueprint
