@@ -407,6 +407,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return $this->entry()->private();
     }
 
+    public function status()
+    {
+        return optional($this->entry())->status();
+    }
+
     public function blueprint()
     {
         if ($this->structure() instanceof Nav) {

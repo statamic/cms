@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use LogicException;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -85,8 +86,12 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'sites' => $collection->sites()->map(function ($site) {
-                $site = Site::get($site);
+            'sites' => $collection->sites()->map(function ($site_handle) {
+                $site = Site::get($site_handle);
+
+                if (! $site) {
+                    throw new SiteNotFoundException($site_handle);
+                }
 
                 return [
                     'handle' => $site->handle(),

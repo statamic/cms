@@ -49,17 +49,22 @@ class APITest extends TestCase
         Facades\Config::set('statamic.api.resources.collections', true);
 
         Facades\Collection::make('pages')->structureContents(['root' => true])->save();
+
+        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
+        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
+
         Facades\Collection::find('pages')->structure()->makeTree('en', [
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
         ])->save();
 
-        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
-        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
-        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
-
         $this->assertEndpointDataCount('/api/collections/pages/tree', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[status:is]=published', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[status:is]=draft', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[published:is]=true', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[published:is]=false', 2);
     }
 
     /** @test */
@@ -97,6 +102,7 @@ class APITest extends TestCase
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
+            ['title' => 'Balki Bartokomous'],
         ])->save();
         $nav->save();
 
@@ -104,7 +110,7 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
         Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
 
-        $this->assertEndpointDataCount('/api/navs/footer/tree', 1);
+        $this->assertEndpointDataCount('/api/navs/footer/tree', 2);
     }
 
     /** @test */

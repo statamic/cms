@@ -320,6 +320,59 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 2', 'Post 3', 'Post 4', 'Post 6', 'Post 7'], $entries->map->title->all());
     }
 
+    /** @test **/
+    public function entries_are_found_using_when()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $entries = Entry::query()->when(true, function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 1'], $entries->map->title->all());
+
+        $entries = Entry::query()->when(false, function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_unless()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $entries = Entry::query()->unless(true, function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->unless(false, function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 1'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_tap()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $entries = Entry::query()->tap(function ($query) {
+            $query->where('title', 'Post 1');
+        })->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 1'], $entries->map->title->all());
+    }
+
     /** @test */
     public function it_substitutes_entries_by_id()
     {
