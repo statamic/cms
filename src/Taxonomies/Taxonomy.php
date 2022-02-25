@@ -184,6 +184,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         $data = [
             'title' => $this->title,
             'blueprints' => $this->blueprints,
+            'preview_targets' => $this->previewTargetsForFile(),
         ];
 
         if (Site::hasMultiple()) {
@@ -347,11 +348,37 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             ->fluentlyGetOrSet('previewTargets')
             ->getter(function ($targets) {
                 if (empty($targets)) {
-                    $targets = [['label' => 'Term', 'format' => '{permalink}']];
+                    $targets = $this->defaultPreviewTargets();
                 }
 
                 return collect($targets);
             })
             ->args(func_get_args());
+    }
+
+    private function defaultPreviewTargets()
+    {
+        return [['label' => 'Term', 'format' => '{permalink}']];
+    }
+
+    private function previewTargetsForFile()
+    {
+        $targets = $this->previewTargets;
+        ray($targets);
+
+        if ($targets === $this->defaultPreviewTargets()) {
+            return null;
+        }
+
+        return collect($targets)->map(function ($target) {
+            if (! $target['format']) {
+                return null;
+            }
+
+            return [
+                'label' => $target['label'],
+                'url' => $target['format'],
+            ];
+        })->filter()->values()->all();
     }
 }
