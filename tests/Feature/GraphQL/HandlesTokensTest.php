@@ -25,6 +25,7 @@ class HandlesTokensTest extends TestCase
 
         $token = Tokens::make('test-token', 'test-token-handler');
         Tokens::shouldReceive('find')->with('test-token')->andReturn($token);
+        Tokens::shouldReceive('collectGarbage')->zeroOrMoreTimes();
 
         $this
             ->post('/graphql?token=test-token', ['query' => '{ping}'])
