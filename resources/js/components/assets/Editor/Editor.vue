@@ -83,9 +83,12 @@
                         </div>
                     </div>
 
-                    <div class="h-full" v-else-if="asset.extension == 'pdf'">
-                        <object :data="asset.url" type="application/pdf" width="100%" height="100%">
-                        </object>
+                    <div class="h-full" v-else-if="asset.isPDF">
+                        <pdf :src="$pdfvuer.createLoadingTask(pdf())">
+                            <template slot="loading">
+                                loading content here...
+                            </template>
+                        </pdf>
                     </div>
 
                     <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
@@ -402,8 +405,13 @@ export default {
         actionCompleted(event) {
             this.$events.$emit('editor-action-completed');
             this.close();
-        }
+        },
 
+        pdf() {
+            return {
+                data: atob(this.asset.pdf)
+            }
+        },
     }
 
 }
