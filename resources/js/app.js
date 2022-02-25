@@ -35,6 +35,7 @@ import VTooltip from 'v-tooltip'
 import ReactiveProvide from 'vue-reactive-provide';
 import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
+import pdfvuer from 'pdfvuer';
 
 // Customize vSelect UI components
 vSelect.props.components.default = () => ({
@@ -63,6 +64,7 @@ Vue.prototype.$events = new Vue();
 Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
+Vue.prototype.$pdfvuer = pdfvuer;
 
 window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
 
