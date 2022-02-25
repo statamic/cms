@@ -9,20 +9,13 @@ class HandleToken
 {
     public function handle($request, Closure $next)
     {
-        if (! $token = $this->getToken($request)) {
+        if (! $token = $request->statamicToken()) {
             return $next($request);
         }
 
         $this->collectGarbage();
 
         return $token->handle($request, $next);
-    }
-
-    private function getToken($request)
-    {
-        if ($token = $request->token ?? $request->header('X-Statamic-Token')) {
-            return Token::find($token);
-        }
     }
 
     private function collectGarbage()

@@ -2,11 +2,13 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Facades;
 use Statamic\Facades\Preference;
+use Statamic\Facades\Token;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 
@@ -73,6 +75,12 @@ class AppServiceProvider extends ServiceProvider
             return $this->format(
                 Preference::get('date_format', config('statamic.cp.date_format'))
             );
+        });
+
+        Request::macro('statamicToken', function () {
+            if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
+                return Token::find($token);
+            }
         });
     }
 
