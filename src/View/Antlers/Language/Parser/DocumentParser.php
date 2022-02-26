@@ -949,7 +949,7 @@ class DocumentParser
 
         $node->interpolationRegions = $this->interpolationRegions;
 
-        if (!$node->isComment) {
+        if (! $node->isComment) {
             $node = $this->nodeParser->parseNode($node);
         }
 
