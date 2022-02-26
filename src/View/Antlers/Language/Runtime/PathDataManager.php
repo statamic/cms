@@ -137,6 +137,7 @@ class PathDataManager
 
     /**
      * Indicates if the data manager should preferentially cast value objects to a string, for array lookups.
+     *
      * @var bool
      */
     private $isForArrayIndex = false;
@@ -405,7 +406,7 @@ class PathDataManager
      *
      * @param  VariableReference  $path  The variable path.
      * @param  array  $data  The data to search.
-     * @param  bool $isForArrayIndex Indicates if the resolved value will be used for array lookups.
+     * @param  bool  $isForArrayIndex  Indicates if the resolved value will be used for array lookups.
      * @return mixed|null
      *
      * @throws RuntimeException
@@ -694,7 +695,8 @@ class PathDataManager
     private function compact($isFinal)
     {
         if ($this->isForArrayIndex && $isFinal && is_object($this->reducedVar) && method_exists($this->reducedVar, '__toString')) {
-            $this->reducedVar = (string)$this->reducedVar;
+            $this->reducedVar = (string) $this->reducedVar;
+
             return;
         }
 

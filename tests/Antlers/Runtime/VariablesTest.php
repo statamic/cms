@@ -7,7 +7,6 @@ use Tests\Antlers\ParserTestCase;
 
 class VariablesTest extends ParserTestCase
 {
-
     public function test_value_objects_can_be_used_for_array_lookups()
     {
         $template = <<<'EOT'
@@ -21,7 +20,7 @@ EOT;
         $sizes = [
             'md' => '(min-width: 768px) 55vw, 90vw',
             'lg' => '(min-width: 768px) 75vw, 90vw',
-            'xl' => '90vw'
+            'xl' => '90vw',
         ];
 
         $data = [
@@ -31,12 +30,11 @@ EOT;
             ],
             'size' => $value,
             'size_two' => $valueTwo,
-            'size_three' => $valueThree
+            'size_three' => $valueThree,
         ];
 
         $this->assertSame('<90vw><(min-width: 768px) 55vw, 90vw><(min-width: 768px) 75vw, 90vw><90vw><(min-width: 768px) 55vw, 90vw><(min-width: 768px) 75vw, 90vw>', $this->renderString(
             $template, $data
         ));
     }
-
 }
