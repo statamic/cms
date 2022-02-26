@@ -37,4 +37,35 @@ EOT;
             $template, $data
         ));
     }
+
+    public function test_value_objects_can_still_be_augmented_when_used_for_array_lookups()
+    {
+        $template = <<<'EOT'
+<{{ sizes[size.label] }}><{{ sizes[size_two.label] }}><{{ sizes[size_three.label] }}><{{ view:sizes[size:label] }}><{{ view:sizes[size_two:label] }}><{{ view:sizes[size_three:label] }}>
+EOT;
+
+        $value = new LabeledValue('xl', 'extra_large');
+        $valueTwo = new LabeledValue('md', 'medium');
+        $valueThree = new LabeledValue('lg', 'large');
+
+        $sizes = [
+            'medium' => '(min-width: 768px) 55vw, 90vw',
+            'large' => '(min-width: 768px) 75vw, 90vw',
+            'extra_large' => '90vw',
+        ];
+
+        $data = [
+            'sizes' => $sizes,
+            'view' => [
+                'sizes' => $sizes,
+            ],
+            'size' => $value,
+            'size_two' => $valueTwo,
+            'size_three' => $valueThree,
+        ];
+
+        $this->assertSame('<90vw><(min-width: 768px) 55vw, 90vw><(min-width: 768px) 75vw, 90vw><90vw><(min-width: 768px) 55vw, 90vw><(min-width: 768px) 75vw, 90vw>', $this->renderString(
+            $template, $data
+        ));
+    }
 }
