@@ -1354,7 +1354,7 @@ class NodeProcessor
 
                         if (is_object($output)) {
                             if ($output instanceof Collection) {
-                                $output = $output->toArray();
+                                $output = $output->all();
                             }
 
                             $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
@@ -1614,7 +1614,7 @@ class NodeProcessor
                             $val = $dataRetriever->getRuntimeValue($node->pathReference, $this->getActiveData());
                         }
 
-                        if ($this->isInterpolationProcessor) {
+                        if ($this->isInterpolationProcessor && empty($node->parameters)) {
                             $buffer = $val;
 
                             if ($this->isTracingEnabled()) {
@@ -1765,7 +1765,7 @@ class NodeProcessor
                             }
 
                             if ($val instanceof Collection) {
-                                $val = $val->toArray();
+                                $val = $val->all();
                             }
                         }
                         $executedParamModifiers = true;

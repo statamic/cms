@@ -204,4 +204,23 @@ EOT;
             $this->renderString($template, ['test' => ['anything' => 'string var']], true)
         );
     }
+
+    public function test_interpolations_with_parameters_are_cast_to_strings()
+    {
+        $now = Carbon::now();
+        $start = $now->year - 5;
+
+        $data = [
+            'start' => $start,
+            'date_value' => $now
+        ];
+
+        $template = <<<'EOT'
+{{ loop :from="start" to="{ date_value format='Y' }" }}{{ value }}{{ /loop }}
+EOT;
+
+        $expected = implode('', range($start, $now->year));
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
 }
