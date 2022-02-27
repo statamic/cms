@@ -223,4 +223,27 @@ EOT;
 
         $this->assertSame($expected, $this->renderString($template, $data, true));
     }
+
+    public function test_interpolation_with_array_style_parameters_returns_arrays()
+    {
+        $data = [
+            'data' => [
+                'one' => 'One',
+                'two' => 'Two',
+                'three' => 'Three'
+            ]
+        ];
+
+        $template = <<<'EOT'
+{{# Not so nice. #}}{{ foreach array="{ data limit="2" reverse="true" }" }}<{{key}}><{{ value }}>{{ /foreach }}
+{{# Nicer #}}{{ foreach :array="data | limit(2) | reverse" }" }}<{{key}}><{{ value }}>{{ /foreach }}
+EOT;
+
+        $expected = <<<'EOT'
+<two><Two><one><One>
+<two><Two><one><One>
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
 }

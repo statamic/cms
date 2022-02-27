@@ -476,6 +476,10 @@ class AntlersNode extends AbstractNode
                         ->setIsProvidingParameterContent(true)
                         ->render($param->parent->processedInterpolationRegions[$interpolationVar]);
 
+                    if ((is_object($interpolationResult) || is_array($interpolationResult)) && count($param->interpolations) == 1) {
+                        return $interpolationResult;
+                    }
+
                     $mutateVar = str_replace($interpolationVar, $interpolationResult, $mutateVar);
                 }
             }

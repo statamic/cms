@@ -654,7 +654,7 @@ class NodeProcessor
             Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
 
             return false;
-        } elseif ($this->isLoopable($value) && $node->isClosedBy == null) {
+        } elseif ($this->isInterpolationProcessor == false &&  $this->isLoopable($value) && $node->isClosedBy == null) {
             $varName = $node->name->getContent();
             Log::debug("Cannot render an array variable as a string: {{ {$varName} }}");
 
@@ -1773,6 +1773,8 @@ class NodeProcessor
                         if (is_array($val) && ! Arr::isAssoc($val)) {
                             $val = $this->addLoopIterationVariables($val);
                         }
+                        $lockData = $this->data;
+
                     }
 
                     if ($this->guardRuntime($node, $val) == false) {
@@ -1780,6 +1782,11 @@ class NodeProcessor
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
 
+                        continue;
+                    }
+
+                    if ($this->isInterpolationProcessor && is_array($val)) {
+                        $buffer = $val;
                         continue;
                     }
 
