@@ -80,11 +80,11 @@ class RecursiveParentAnalyzer
                         $lastNode->parent->hasRecursiveNode = true;
                         $lastNode->parent->recursiveReference = $node;
                         $node->recursiveParent = $lastNode->parent;
-                    } else {
-                        $lastNode->hasRecursiveNode = true;
-                        $node->recursiveParent = $lastNode;
-                        $lastNode->recursiveReference = $node;
                     }
+
+                    $lastNode->hasRecursiveNode = true;
+                    $node->recursiveParent = $lastNode;
+                    $lastNode->recursiveReference = $node;
                 }
             }
         }
