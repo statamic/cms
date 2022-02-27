@@ -230,8 +230,8 @@ EOT;
             'data' => [
                 'one' => 'One',
                 'two' => 'Two',
-                'three' => 'Three'
-            ]
+                'three' => 'Three',
+            ],
         ];
 
         $template = <<<'EOT'
