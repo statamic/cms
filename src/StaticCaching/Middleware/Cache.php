@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching\Middleware;
 use Closure;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\Tags\NoCache\NoCacheManager;
 
 class Cache
 {
@@ -13,9 +14,15 @@ class Cache
      */
     private $cacher;
 
-    public function __construct(Cacher $cacher)
+    /**
+     * @var NoCacheManager
+     */
+    private $noCacheManager;
+
+    public function __construct(Cacher $cacher, NoCacheManager $noCacheManager)
     {
         $this->cacher = $cacher;
+        $this->noCacheManager = $noCacheManager;
     }
 
     /**
@@ -27,6 +34,16 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
+        $noCacheCanHandle = $this->noCacheManager->canHandle($request);
+
+        if (!$noCacheCanHandle && $this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
+            return response($this->cacher->getCachedPage($request));
+        }
+
+        if ($noCacheCanHandle) {
+            return response($this->noCacheManager->restoreSession($request));
+        }
+
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             return response($this->cacher->getCachedPage($request));
         }
@@ -34,6 +51,7 @@ class Cache
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
+
             $this->cacher->cachePage($request, $response);
         }
 

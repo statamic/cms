@@ -6,6 +6,7 @@ use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Tags\NoCache\NoCacheManager;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
 use Statamic\View\Events\ViewRendered;
@@ -81,7 +82,14 @@ class View
 
     public function render(): string
     {
+        /** @var NoCacheManager $noCacheManager */
+        $noCacheManager = app(NoCacheManager::class);
+
         $cascade = $this->gatherData();
+
+        $noCacheManager->session()
+            ->setId(Arr::get($cascade, 'id', null))
+            ->setViewPath($this->templateViewPath())->setRootData($cascade);
 
         $contents = view($this->templateViewName(), $cascade);
 
@@ -97,7 +105,14 @@ class View
 
         ViewRendered::dispatch($this);
 
-        return $contents->render();
+        $renderedContents = $contents->render();
+
+        if ($noCacheManager->session()->isActive($this->templateViewPath())) {
+            $noCacheManager->writeSession(request(), $renderedContents);
+            $renderedContents = $noCacheManager->session()->prepareContents($renderedContents);
+        }
+
+        return $renderedContents;
     }
 
     private function shouldUseLayout()

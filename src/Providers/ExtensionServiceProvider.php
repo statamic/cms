@@ -149,6 +149,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Member::class,
         Tags\Mix::class,
         Tags\Nav::class,
+        Tags\NoCache\NoCache::class,
         Tags\NotFound::class,
         Tags\Obfuscate::class,
         Tags\ParentTags::class,
