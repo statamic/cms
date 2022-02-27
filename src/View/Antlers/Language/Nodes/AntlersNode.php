@@ -470,7 +470,6 @@ class AntlersNode extends AbstractNode
         if ($param->parent != null && ! empty($param->interpolations)) {
             foreach ($param->interpolations as $interpolationVar) {
                 if (array_key_exists($interpolationVar, $param->parent->processedInterpolationRegions)) {
-
                     $interpolationResult = $processor->cloneProcessor()
                         ->setData($data)
                         ->setIsInterpolationProcessor(true)

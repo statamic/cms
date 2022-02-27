@@ -212,7 +212,7 @@ EOT;
 
         $data = [
             'start' => $start,
-            'date_value' => $now
+            'date_value' => $now,
         ];
 
         $template = <<<'EOT'
