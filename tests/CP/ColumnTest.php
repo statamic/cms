@@ -26,7 +26,8 @@ class ColumnTest extends TestCase
             ->label('Ripped')
             ->visible(false)
             ->defaultVisibility(true)
-            ->defaultOrder(2);
+            ->defaultOrder(2)
+            ->numeric(true);
 
         $json = json_decode(json_encode($column));
 
@@ -36,6 +37,7 @@ class ColumnTest extends TestCase
         $this->assertFalse($json->visible);
         $this->assertTrue($json->defaultVisibility);
         $this->assertEquals(2, $json->defaultOrder);
+        $this->assertEquals(true, $json->numeric);
     }
 
     /** @test */

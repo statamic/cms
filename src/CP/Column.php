@@ -12,7 +12,7 @@ class Column
     public $field;
     public $fieldtype;
     public $label;
-    public $alignment = 'left';
+    public $numeric = false;
     public $listable = true;
     public $defaultOrder;
     public $defaultVisibility = true;
@@ -141,14 +141,14 @@ class Column
     }
 
     /**
-     * Get or set alignment.
+     * Get or set whether the column is numeric.
      *
-     * @param  bool  $alignment
+     * @param  bool  $numeric
      * @return mixed
      */
-    public function alignment($alignment = null)
+    public function numeric($numeric = null)
     {
-        return $this->fluentlyGetOrSet('alignment')->value($alignment);
+        return $this->fluentlyGetOrSet('numeric')->value($numeric);
     }
 
     /**
