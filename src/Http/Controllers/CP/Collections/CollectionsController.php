@@ -43,7 +43,7 @@ class CollectionsController extends CpController
             'collections' => $collections,
             'columns' => [
                 Column::make('title')->label(__('Title')),
-                Column::make('entries')->label(__('Entries'))->align('right'),
+                Column::make('entries')->label(__('Entries'))->alignment('right'),
             ],
         ]);
     }

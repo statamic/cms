@@ -12,7 +12,7 @@
                         'current-column': sharedState.sortColumn === column.field,
                         'sortable-column': column.sortable === true,
                         'cursor-not-allowed': !sortable,
-                        'text-right pr-4': column.align === 'right',
+                        'text-right pr-4': column.alignment === 'right',
                     }"
                     @click.prevent="changeSortColumn(column.field)"
                 >
@@ -48,7 +48,7 @@
                         @click="checkboxClicked(row, index, $event)"
                     />
                 </td>
-                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'text-right pr-4': column.align === 'right'}">
+                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'text-right pr-4': column.alignment === 'right'}">
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"

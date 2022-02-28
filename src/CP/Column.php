@@ -12,7 +12,7 @@ class Column
     public $field;
     public $fieldtype;
     public $label;
-    public $align;
+    public $alignment = 'left';
     public $listable = true;
     public $defaultOrder;
     public $defaultVisibility = true;
@@ -48,10 +48,6 @@ class Column
             ->afterSetter(function ($field) {
                 if (is_null($this->label)) {
                     $this->label(Str::slugToTitle($field), true);
-                }
-
-                if (is_null($this->align)) {
-                    $this->align();
                 }
             })
             ->value($field);
@@ -147,12 +143,12 @@ class Column
     /**
      * Get or set alignment.
      *
-     * @param  bool  $align
+     * @param  bool  $alignment
      * @return mixed
      */
-    public function align($align = 'left')
+    public function alignment($alignment = null)
     {
-        return $this->fluentlyGetOrSet('align')->value($align);
+        return $this->fluentlyGetOrSet('alignment')->value($alignment);
     }
 
     /**
