@@ -27,7 +27,7 @@ class Asset extends JsonResource
             'isSvg' => $this->isSvg(),
             'isAudio' => $this->isAudio(),
             'isVideo' => $this->isVideo(),
-            'isPDF' => $this->isPDF(),
+            'isPdf' => $this->isPdf(),
             'isPreviewable' => $this->isPreviewable(),
 
             $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
@@ -39,7 +39,7 @@ class Asset extends JsonResource
                 ];
             }),
 
-            $this->mergeWhen($this->isPDF(), function () {
+            $this->mergeWhen($this->isPdf(), function () {
                 return [
                     'pdfUrl' => $this->pdfUrl(),
                 ];
