@@ -142,6 +142,9 @@ class Grid extends Fieldtype
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->rowRuleFieldPrefix($index).'.',
             ])
+            ->withReplacements([
+                'this' => $this->field->validationContext('prefix').$this->rowRuleFieldPrefix($index),
+            ])
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {

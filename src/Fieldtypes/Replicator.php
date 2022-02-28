@@ -112,6 +112,9 @@ class Replicator extends Fieldtype
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index).'.',
             ])
+            ->withReplacements([
+                'this' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index),
+            ])
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
