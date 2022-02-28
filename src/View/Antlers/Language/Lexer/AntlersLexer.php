@@ -215,7 +215,8 @@ class AntlersLexer
         }
     }
 
-    private function adjustValueConsideringWhitespace($value) {
+    private function adjustValueConsideringWhitespace($value)
+    {
         if (strlen(trim($value)) == 0) {
             return $value;
         }

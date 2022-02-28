@@ -8,7 +8,6 @@ use Tests\Antlers\ParserTestCase;
 
 class QueryBuilderTest extends ParserTestCase
 {
-
     public function test_query_builder_loops_receive_tag_parameters()
     {
         $builder = Mockery::mock(Builder::class);
@@ -51,5 +50,4 @@ EOT;
 
         $this->assertSame('Foo, Baz, and Bar', $this->renderString($template, $data, true));
     }
-
 }

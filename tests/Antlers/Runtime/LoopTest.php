@@ -45,7 +45,7 @@ EOT;
             'articles' => [
                 ['title' => 'Article One'],
                 ['title' => 'Article Two'],
-                ['title' => 'Article Three']
+                ['title' => 'Article Three'],
             ],
         ];
 
