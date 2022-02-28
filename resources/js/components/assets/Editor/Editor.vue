@@ -83,7 +83,7 @@
                         </div>
                     </div>
 
-                    <div class="h-full" v-else-if="asset.isPDF">
+                    <div class="h-full" v-else-if="asset.isPdf">
                         <pdf-viewer :src="asset.pdfUrl"></pdf-viewer>
                     </div>
 

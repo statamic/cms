@@ -392,7 +392,7 @@ class Asset implements AssetContract, Augmentable
      *
      * @return bool
      */
-    public function isPDF()
+    public function isPdf()
     {
         return $this->extensionIsOneOf(['pdf']);
     }
