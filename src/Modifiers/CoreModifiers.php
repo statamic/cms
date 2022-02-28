@@ -9,6 +9,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
@@ -353,6 +354,10 @@ class CoreModifiers extends Modifier
      */
     public function count($value, $params)
     {
+        if (Compare::isQueryBuilder($value)) {
+            return $value->count();
+        }
+
         return count($value);
     }
 
@@ -1272,6 +1277,10 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            return $value->count();
+        }
+
         if ($value instanceof Arrayable) {
             $value = $value->toArray();
         }
@@ -1634,6 +1643,10 @@ class CoreModifiers extends Modifier
 
         if ($wasArray = is_array($value)) {
             $value = collect($value);
+        }
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
         }
 
         $items = $value->map(function ($item) use ($key) {
