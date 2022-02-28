@@ -40,24 +40,33 @@ class ReplicatorFieldtypeTest extends TestCase
                         'fields' => [
                             ['handle' => 'make', 'field' => ['type' => 'text']],
                             ['handle' => 'model', 'field' => ['type' => 'text']],
+                            ['handle' => 'trims', 'field' => ['type' => 'entries']],
                         ],
                     ],
                 ],
             ],
         ]);
 
+        $trim = Blueprint::makeFromFields([]);
+
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
+        ]));
+
+        BlueprintRepository::shouldReceive('in')->with('collections/trims')->andReturn(collect([
+            'trim' => $trim->setHandle('trim'),
         ]));
 
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'things' => [
                 ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
-                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla', 'trims' => ['trim1']],
                 ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
             ],
         ])->create();
+
+        EntryFactory::collection('trims')->id('trim1')->data(['title' => 'Trim One'])->create();
 
         $query = <<<'GQL'
 {
@@ -74,6 +83,9 @@ class ReplicatorFieldtypeTest extends TestCase
                     type
                     make
                     model
+                    trims {
+                        title
+                    }
                 }
             }
         }
@@ -90,7 +102,7 @@ GQL;
                     'title' => 'Main Post',
                     'things' => [
                         ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
-                        ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                        ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla', 'trims' => [['title' => 'Trim One']]],
                         ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
                     ],
                 ],
