@@ -44,7 +44,7 @@ class CollectionsController extends CpController
             'collections' => $collections,
             'columns' => [
                 Column::make('title')->label(__('Title')),
-                Column::make('entries')->label(__('Entries')),
+                Column::make('entries')->label(__('Entries'))->numeric(true),
             ],
         ]);
     }

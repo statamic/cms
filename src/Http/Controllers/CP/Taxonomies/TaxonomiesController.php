@@ -41,7 +41,7 @@ class TaxonomiesController extends CpController
             'taxonomies' => $taxonomies,
             'columns' => [
                 Column::make('title')->label(__('Title')),
-                Column::make('terms')->label(__('Terms')),
+                Column::make('terms')->label(__('Terms'))->numeric(true),
             ],
         ]);
     }
