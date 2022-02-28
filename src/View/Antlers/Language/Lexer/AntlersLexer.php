@@ -215,6 +215,14 @@ class AntlersLexer
         }
     }
 
+    private function adjustValueConsideringWhitespace($value) {
+        if (strlen(trim($value)) == 0) {
+            return $value;
+        }
+
+        return rtrim($value);
+    }
+
     public function tokenize(AntlersNode $node, $input)
     {
         $this->reset();
@@ -299,7 +307,7 @@ class AntlersLexer
 
                         $modifierValueNode = new ModifierValueNode();
                         $modifierValueNode->name = $parsedValue;
-                        $modifierValueNode->value = rtrim($parsedValue);
+                        $modifierValueNode->value = $this->adjustValueConsideringWhitespace($parsedValue);
                         $modifierValueNode->startPosition = $node->relativeOffset($this->currentIndex - mb_strlen($parsedValue));
                         $modifierValueNode->endPosition = $node->relativeOffset($this->currentIndex);
 
@@ -349,7 +357,7 @@ class AntlersLexer
 
                     $modifierValueNode = new ModifierValueNode();
                     $modifierValueNode->name = $parsedValue;
-                    $modifierValueNode->value = $parsedValue;
+                    $modifierValueNode->value = $this->adjustValueConsideringWhitespace($parsedValue);
                     $modifierValueNode->startPosition = $node->relativeOffset($this->currentIndex - mb_strlen($parsedValue));
                     $modifierValueNode->endPosition = $node->relativeOffset($this->currentIndex);
                     $this->runtimeNodes[] = $modifierValueNode;
@@ -374,7 +382,7 @@ class AntlersLexer
 
                         $modifierValueNode = new ModifierValueNode();
                         $modifierValueNode->name = $parsedValue;
-                        $modifierValueNode->value = $parsedValue;
+                        $modifierValueNode->value = $this->adjustValueConsideringWhitespace($parsedValue);
                         $modifierValueNode->startPosition = $node->relativeOffset($stringStartedOn);
                         $modifierValueNode->endPosition = $node->relativeOffset($this->currentIndex);
 

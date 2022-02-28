@@ -490,7 +490,7 @@ class NodeProcessor
                 $value = $managerResults[1];
                 $resolvedValue = $value instanceof Value ? $value->value() : $value;
 
-                if ($resolvedValue instanceof Builder) {
+                if ($resolvedValue instanceof Builder && $node->isClosedBy != null && $node->isSelfClosing == false) {
                     $this->encounteredBuilder = true;
                     $this->resolvedBuilder = $resolvedValue;
 
