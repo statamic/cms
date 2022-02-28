@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use Rebing\GraphQL\Support\Type;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Fields\Value;
 
 class GridItemType extends Type
@@ -22,7 +23,13 @@ class GridItemType extends Type
                 $field['resolve'] = function ($row, $args, $context, $info) {
                     $value = $row[$info->fieldName];
 
-                    return $value instanceof Value ? $value->value() : $value;
+                    $value = $value instanceof Value ? $value->value() : $value;
+
+                    if ($value instanceof Builder) {
+                        $value = $value->get();
+                    }
+
+                    return $value;
                 };
 
                 return $field;
