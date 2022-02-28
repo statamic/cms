@@ -15,7 +15,7 @@ class PdfController extends Controller
      */
     public function show($encodedAssetId)
     {
-        if (! $contents = $this->asset($encodedAssetId)->file()) {
+        if (! $contents = $this->asset($encodedAssetId)->contents()) {
             abort(500);
         }
 

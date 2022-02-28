@@ -80,9 +80,9 @@ interface Asset
     public function download(string $name = null, array $headers = []);
 
     /**
-     * Get the asset file.
+     * Get the asset file contents.
      *
      * @return mixed
      */
-    public function file();
+    public function contents();
 }
