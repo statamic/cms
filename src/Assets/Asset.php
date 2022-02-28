@@ -306,6 +306,11 @@ class Asset implements AssetContract, Augmentable
         return cp_route('assets.svgs.show', ['encoded_asset' => base64_encode($this->id())]);
     }
 
+    public function pdfUrl()
+    {
+        return cp_route('assets.pdfs.show', ['encoded_asset' => base64_encode($this->id())]);
+    }
+
     /**
      * Get either a image URL builder instance, or a URL if passed params.
      *
@@ -348,6 +353,7 @@ class Asset implements AssetContract, Augmentable
             'dxf', 'xps',
             'zip', 'rar',
             'xls', 'xlsx',
+            'pdf',
         ]);
     }
 
@@ -379,6 +385,16 @@ class Asset implements AssetContract, Augmentable
     public function isVideo()
     {
         return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
+    }
+
+    /**
+     * Is this asset a PDF?
+     *
+     * @return bool
+     */
+    public function isPDF()
+    {
+        return $this->extensionIsOneOf(['pdf']);
     }
 
     /**
@@ -706,6 +722,16 @@ class Asset implements AssetContract, Augmentable
         }
 
         return (string) $str;
+    }
+
+    /**
+     * Get the asset file.
+     *
+     * @return mixed
+     */
+    public function file()
+    {
+        return $this->disk()->get($this->path());
     }
 
     /**
