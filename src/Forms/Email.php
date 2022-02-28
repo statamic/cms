@@ -137,7 +137,7 @@ class Email extends Mailable
             $config = $field->config();
 
             return compact('display', 'handle', 'fieldtype', 'config', 'value');
-        });
+        })->values();
     }
 
     private function getGlobalsData()
