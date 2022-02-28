@@ -2054,6 +2054,20 @@ class NodeProcessor
 
         $this->scopeLock = false;
 
+        $prev = null;
+
+        foreach ($loop as $index => &$data) {
+            $data['prev'] = $prev;
+
+            if ($data['last'] == false) {
+                $data['next'] = $loop[$index + 1];
+            } else {
+                $data['next'] = null;
+            }
+
+            $prev = $data;
+        }
+
         return $loop;
     }
 
