@@ -577,6 +577,20 @@ class Asset implements AssetContract, Augmentable
     }
 
     /**
+     * Get the asset's duration.
+     *
+     * @return float|null
+     */
+    public function duration()
+    {
+        if (! $this->hasDuration()) {
+            return null;
+        }
+
+        return $this->meta('duration');
+    }
+
+    /**
      * Get the asset's orientation.
      *
      * @return string|null
@@ -789,5 +803,10 @@ class Asset implements AssetContract, Augmentable
     private function hasDimensions()
     {
         return $this->isImage() || $this->isSvg() || $this->isVideo();
+    }
+
+    private function hasDuration()
+    {
+        return $this->isAudio() || $this->isVideo();
     }
 }
