@@ -129,7 +129,7 @@ class FieldsController extends CpController
                 ],
             ],
             'read_only' => [
-                'display' => __('Ready Only'),
+                'display' => __('Read Only'),
                 'instructions' => __('statamic::messages.fields_read_only_instructions'),
                 'type' => 'toggle',
                 'validate' => 'boolean',
