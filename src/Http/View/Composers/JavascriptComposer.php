@@ -32,7 +32,6 @@ class JavascriptComposer
             'flash' => Statamic::flash(),
             'toasts' => Toast::toArray(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
-            'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
             'user' => $this->user($user),
             'paginationSize' => config('statamic.cp.pagination_size'),

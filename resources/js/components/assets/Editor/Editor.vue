@@ -87,10 +87,6 @@
                         <pdf-viewer :src="asset.pdfUrl"></pdf-viewer>
                     </div>
 
-                    <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
-                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
-                    </div>
-
                     <div class="editor-file-actions" v-if="!readOnly">
                         <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="btn" @click.prevent="openFocalPointEditor">
                             {{ __('Set Focal Point') }}
@@ -245,11 +241,6 @@ export default {
          */
         hasErrors: function() {
             return this.error || Object.keys(this.errors).length;
-        },
-
-        canUseGoogleDocsViewer()
-        {
-            return Statamic.$config.get('googleDocsViewer');
         },
 
         isFocalPointEditorEnabled()
