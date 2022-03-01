@@ -3,6 +3,8 @@
 namespace Tests\Modifiers;
 
 use Illuminate\Support\Collection;
+use Mockery;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasOrigin;
 use Statamic\Entries\EntryCollection;
@@ -36,6 +38,21 @@ class PluckTest extends TestCase
         $this->assertEquals(['Bread', 'Coffee'], $modified->all());
 
         $modified = $this->modify($items, 'type');
+        $this->assertInstanceOf(Collection::class, $modified);
+        $this->assertEquals(['food', 'drink'], $modified->all());
+    }
+
+    /** @test */
+    public function it_plucks_values_from_query_builder()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->andReturn(Collection::make($this->items()));
+
+        $modified = $this->modify($builder, 'title');
+        $this->assertInstanceOf(Collection::class, $modified);
+        $this->assertEquals(['Bread', 'Coffee'], $modified->all());
+
+        $modified = $this->modify($builder, 'type');
         $this->assertInstanceOf(Collection::class, $modified);
         $this->assertEquals(['food', 'drink'], $modified->all());
     }

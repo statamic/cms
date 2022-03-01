@@ -9,6 +9,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
@@ -354,6 +355,10 @@ class CoreModifiers extends Modifier
      */
     public function count($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            return $value->count();
+        }
+
         return count($value);
     }
 
@@ -1270,6 +1275,10 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            return $value->count();
+        }
+
         if ($value instanceof Arrayable) {
             $value = $value->toArray();
         }
@@ -1525,12 +1534,11 @@ class CoreModifiers extends Modifier
      * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function obfuscateEmail($value, $params)
+    public function obfuscateEmail($value)
     {
-        return Html::email($value, null, $this->buildAttributesFromParameters($params));
+        return Html::email($value);
     }
 
     /**
@@ -1634,6 +1642,10 @@ class CoreModifiers extends Modifier
 
         if ($wasArray = is_array($value)) {
             $value = collect($value);
+        }
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
         }
 
         $items = $value->map(function ($item) use ($key) {
@@ -1866,7 +1878,7 @@ class CoreModifiers extends Modifier
     public function reverse($value)
     {
         if ($value instanceof Collection) {
-            return $value->reverse();
+            return $value->reverse()->values()->all();
         }
 
         if (is_array($value)) {

@@ -4,6 +4,7 @@ namespace Tests\Assets;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -552,6 +553,27 @@ class AssetContainerTest extends TestCase
             ->except(['assets'])
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $container = $this->containerWithDisk();
+
+        $this->assertInstanceOf(Arrayable::class, $container);
+
+        $expectedAugmented = $container->toAugmentedCollection()->except('assets');
+
+        $array = $container->toArray();
+
+        $this->assertCount($expectedAugmented->count(), $array);
+
+        collect($array)
+            ->each(function ($value, $key) use ($container) {
+                $expected = $container->{$key};
+                $expected = $expected instanceof Arrayable ? $expected->toArray() : $expected;
+                $this->assertEquals($expected, $value);
+            });
     }
 
     private function containerWithDisk()

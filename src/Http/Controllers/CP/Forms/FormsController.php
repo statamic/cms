@@ -120,7 +120,13 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
-        $values = $form->toArray();
+        $values = [
+            'handle' => $form->handle(),
+            'title' => $form->title(),
+            'honeypot' => $form->honeypot(),
+            'store' => $form->store(),
+            'email' => $form->email(),
+        ];
 
         $fields = ($blueprint = $this->editFormBlueprint($form))
             ->fields()
@@ -154,8 +160,6 @@ class FormsController extends CpController
         $form->save();
 
         $this->success(__('Saved'));
-
-        return $form->toArray();
     }
 
     public function destroy($form)

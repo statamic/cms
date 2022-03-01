@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use BadMethodCallException;
 use Carbon\Carbon;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
@@ -19,6 +20,8 @@ use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -1068,5 +1071,102 @@ class AssetTest extends TestCase
             'last_modified', 'last_modified_timestamp', 'last_modified_instance',
             'focus', 'focus_css', 'mime_type',
         ];
+    }
+
+    /** @test */
+    public function it_converts_to_an_array()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return [
+                    new Value('alfa'),
+                    new Value([
+                        new Value('bravo'),
+                        new Value('charlie'),
+                        'delta',
+                    ]),
+                ];
+            }
+        };
+        $fieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'baz' => [
+                'type' => 'test',
+            ],
+        ]);
+        BlueprintRepository::shouldReceive('find')->with('assets/test_container')->andReturn($blueprint);
+
+        $asset = (new Asset)->container($this->container)->path('test.jpg');
+        $asset->set('foo', 'bar');
+        $asset->set('baz', 'qux');
+
+        $this->assertInstanceOf(Arrayable::class, $asset);
+
+        $array = $asset->toArray();
+        $this->assertEquals($asset->augmented()->keys(), array_keys($array));
+        $this->assertEquals([
+            'alfa',
+            [
+                'bravo',
+                'charlie',
+                'delta',
+            ],
+        ], $array['baz'], 'Value objects are not resolved recursively');
+
+        $array = $asset
+            ->selectedQueryColumns($keys = ['id', 'foo', 'baz'])
+            ->toArray();
+
+        $this->assertEquals($keys, array_keys($array), 'toArray keys differ from selectedQueryColumns');
+    }
+
+    /** @test */
+    public function only_requested_relationship_fields_are_included_in_to_array()
+    {
+        $regularFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'regular';
+
+            public function augment($value)
+            {
+                return 'augmented '.$value;
+            }
+        };
+        $regularFieldtype::register();
+
+        $relationshipFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'relationship';
+            protected $relationship = true;
+
+            public function augment($values)
+            {
+                return collect($values)->map(fn ($value) => 'augmented '.$value)->all();
+            }
+        };
+        $relationshipFieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'alfa' => ['type' => 'regular'],
+            'bravo' => ['type' => 'relationship'],
+            'charlie' => ['type' => 'relationship'],
+        ]);
+        BlueprintRepository::shouldReceive('find')->with('assets/test_container')->andReturn($blueprint);
+
+        $asset = (new Asset)->container($this->container)->path('test.jpg');
+        $asset->set('alfa', 'one');
+        $asset->set('bravo', ['a', 'b']);
+        $asset->set('charlie', ['c', 'd']);
+
+        $this->assertEquals([
+            'alfa' => 'augmented one',
+            'bravo' => ['a', 'b'],
+            'charlie' => ['augmented c', 'augmented d'],
+        ], Arr::only($asset->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 }

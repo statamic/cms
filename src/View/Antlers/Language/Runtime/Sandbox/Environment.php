@@ -1425,7 +1425,13 @@ class Environment
                 return $interpolationValue;
             }
 
-            return $this->adjustValue($this->scopeValue($varName), $val);
+            $scopeValue = $this->scopeValue($varName);
+
+            if ($scopeValue instanceof Collection) {
+                $scopeValue = $scopeValue->all();
+            }
+
+            return $this->adjustValue($scopeValue, $val);
         } elseif ($val instanceof TrueConstant) {
             $returnVal = true;
         } elseif ($val instanceof FalseConstant) {

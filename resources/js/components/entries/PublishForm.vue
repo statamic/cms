@@ -66,9 +66,9 @@
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
+                :targets="previewTargets"
                 :values="values"
                 :blueprint="fieldset.handle"
-                :amp="amp"
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
@@ -303,6 +303,7 @@ export default {
         createAnotherUrl: String,
         listingUrl: String,
         collectionHasRoutes: Boolean,
+        previewTargets: Array,
     },
 
     data() {
@@ -342,7 +343,8 @@ export default {
 
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
-            quickSave: false
+            quickSave: false,
+            previewTarget: this.previewTargets[0],
         }
     },
 

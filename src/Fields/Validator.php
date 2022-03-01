@@ -112,7 +112,11 @@ class Validator
 
     private function parse($rule)
     {
-        if (! is_string($rule) || ! Str::contains($rule, '{')) {
+        if (! is_string($rule) ||
+            ! Str::contains($rule, '{') ||
+            Str::startsWith($rule, 'regex:') ||
+            Str::startsWith($rule, 'not_regex:')
+        ) {
             return $rule;
         }
 

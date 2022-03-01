@@ -3,9 +3,6 @@
 namespace Statamic\Tags;
 
 use ArrayIterator;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Fields\Values;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Parser;
 use Traversable;
@@ -31,16 +28,6 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
      * @var Loader
      */
     private $loader;
-
-    /**
-     * @var bool
-     */
-    protected $augmentation = true;
-
-    /**
-     * @var bool
-     */
-    protected $conversion = true;
 
     /**
      * @var mixed
@@ -97,30 +84,6 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * Disable augmentation in tag output.
-     *
-     * @return $this
-     */
-    public function withoutAugmentation()
-    {
-        $this->augmentation = false;
-
-        return $this;
-    }
-
-    /**
-     * Disable conversion into Values objects or augmenting.
-     *
-     * @return $this
-     */
-    public function withoutConvertingValues()
-    {
-        $this->conversion = false;
-
-        return $this;
-    }
-
-    /**
      * Fetch result of a tag.
      *
      * @return mixed
@@ -150,23 +113,7 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
             'tag_method' => $originalMethod,
         ]);
 
-        $output = $tag->$method();
-
-        if ($this->conversion) {
-            if ($this->augmentation && $output instanceof Collection) {
-                $output = collect($output->toAugmentedCollection())->mapInto(Values::class);
-            }
-
-            if ($this->augmentation && $output instanceof Augmentable) {
-                $output = new Values($output->toAugmentedCollection());
-            }
-
-            if (is_array($output)) {
-                $output = new Values($output);
-            }
-        }
-
-        return $this->fetched = $output;
+        return $this->fetched = $tag->$method();
     }
 
     /**

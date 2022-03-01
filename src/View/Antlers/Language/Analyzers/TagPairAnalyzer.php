@@ -109,6 +109,9 @@ class TagPairAnalyzer
                         if ($node instanceof RecursiveNode) {
                             continue;
                         }
+                        if ($node->isComment) {
+                            continue;
+                        }
                         if ($node->index >= $lastIndexedNode->index) {
                             break;
                         }
@@ -200,7 +203,9 @@ class TagPairAnalyzer
                     if ($candidateNode->isClosingTag && $candidateNode->isOpenedBy != null) {
                         continue;
                     }
-
+                    if ($candidateNode->isComment) {
+                        continue;
+                    }
                     if ($candidateNode->isSelfClosing) {
                         continue;
                     }
@@ -274,6 +279,9 @@ class TagPairAnalyzer
             $nodes = ConditionPairAnalyzer::pairConditionals($nodes);
 
             foreach ($nodes as $node) {
+                if ($node instanceof AntlersNode && $node->isComment) {
+                    continue;
+                }
                 if ($node instanceof AntlersNode && $this->canPossiblyClose($node)) {
                     if (ConditionPairAnalyzer::isConditionalStructure($node)) {
                         continue;

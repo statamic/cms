@@ -44,7 +44,8 @@ class TaxonomiesStore extends BasicStore
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->searchIndex(array_get($data, 'search_index'))
             ->defaultPublishState($this->getDefaultPublishState($data))
-            ->sites($sites);
+            ->sites($sites)
+            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
     }
 
     protected function getDefaultPublishState($data)
@@ -56,5 +57,15 @@ class TaxonomiesStore extends BasicStore
         }
 
         return $value === 'published';
+    }
+
+    private function normalizePreviewTargets($targets)
+    {
+        return collect($targets)->map(function ($target) {
+            return [
+                'format' => $target['url'],
+                'label' => $target['label'],
+            ];
+        })->all();
     }
 }
