@@ -379,14 +379,13 @@ EOT;
 EOT;
         $this->renderString($template, $data, true);
         $this->assertInstanceOf(LabeledValue::class, VarTest::$var);
-        $this->assertSame('semantic-value', (string)VarTest::$var);
-
+        $this->assertSame('semantic-value', (string) VarTest::$var);
 
         $template = <<<'EOT'
 {{ var_test :variable="visual == 'visual-value' ? visual : semantic" }}
 EOT;
         $this->renderString($template, $data, true);
         $this->assertInstanceOf(LabeledValue::class, VarTest::$var);
-        $this->assertSame('visual-value', (string)VarTest::$var);
+        $this->assertSame('visual-value', (string) VarTest::$var);
     }
 }
