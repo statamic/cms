@@ -39,7 +39,13 @@ class OrderedQueryBuilder implements Builder
 
     public function __call($method, $parameters)
     {
-        return $this->forwardDecoratedCallTo($this->builder, $method, $parameters);
+        $result = $this->forwardCallTo($this->builder, $method, $parameters);
+
+        if ($result === $this->builder) {
+            return $this;
+        }
+
+        return $result;
     }
 
     private function performFallbackOrdering($results)
