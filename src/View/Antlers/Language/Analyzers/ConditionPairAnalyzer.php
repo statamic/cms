@@ -107,6 +107,10 @@ class ConditionPairAnalyzer
             $node = $nodes[$i];
 
             if ($node instanceof AntlersNode) {
+                if ($node->isComment) {
+                    continue;
+                }
+
                 $name = $node->name->name;
 
                 if ($node->isClosingTag && $name == 'if') {

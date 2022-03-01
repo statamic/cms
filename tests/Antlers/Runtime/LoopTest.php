@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 
 class LoopTest extends ParserTestCase
@@ -36,5 +37,34 @@ class LoopTest extends ParserTestCase
 {{ more_data }}{{ hello }}{{ space }}{{ wilderness }}{{ /more_data }}
 EOT;
         $this->assertSame('Hello, wilderness', $this->renderString($template, $data));
+    }
+
+    public function test_lists_can_access_next_prev_variables()
+    {
+        $data = [
+            'articles' => [
+                ['title' => 'Article One'],
+                ['title' => 'Article Two'],
+                ['title' => 'Article Three'],
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{ articles }}
+<{{ prev.title ?? 'No Prev' }}><{{ title }}><{{ next.title ?? 'No Next' }}>
+{{ /articles }}
+EOT;
+
+        $expected = <<<'EOT'
+
+<No Prev><Article One><Article Two>
+
+<Article One><Article Two><Article Three>
+
+<Article Two><Article Three><No Next>
+
+EOT;
+
+        $this->assertSame(StringUtilities::normalizeLineEndings($expected), $this->renderString($template, $data));
     }
 }

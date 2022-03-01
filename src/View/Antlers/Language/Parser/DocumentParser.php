@@ -603,6 +603,7 @@ class DocumentParser
 
         $tagPairAnalyzer = new TagPairAnalyzer();
         $this->renderNodes = $tagPairAnalyzer->associate($this->nodes, $this);
+
         RecursiveParentAnalyzer::associateRecursiveParent($this->nodes);
 
         foreach ($this->nodes as $node) {
@@ -948,7 +949,10 @@ class DocumentParser
 
         $node->interpolationRegions = $this->interpolationRegions;
 
-        $node = $this->nodeParser->parseNode($node);
+        if (! $node->isComment) {
+            $node = $this->nodeParser->parseNode($node);
+        }
+
         $this->interpolationRegions = [];
 
         return $node;

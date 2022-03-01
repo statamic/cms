@@ -2,10 +2,13 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Select;
 use Statamic\Tags\Tags;
 use Statamic\Taxonomies\TermCollection;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
+use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
 use Tests\Antlers\ParserTestCase;
 
 class ConditionLogicTest extends ParserTestCase
@@ -339,5 +342,50 @@ EOT;
         $this->assertSame('no', $this->renderString($template, [
             'topics' => $value,
         ]));
+    }
+
+    public function test_values_are_resolved_in_conditions()
+    {
+        $fieldType = new Select();
+
+        // Values are different from handle here to ensure that it returns the value
+        // and not the name of the variable, and to ensure it's not the handle.
+        $visual = new Value('visual-value', 'visual', $fieldType);
+        $semantic = new Value('semantic-value', 'semantic', $fieldType);
+
+        $data = [
+            'semantic' => $semantic,
+            'visual' => $visual,
+        ];
+
+        VarTest::register();
+
+        $template = <<<'EOT'
+{{ var_test variable="{ visual == 'visual-value' ? visual : semantic }" }}
+EOT;
+
+        $this->renderString($template, $data, true);
+        $this->assertSame('visual-value', VarTest::$var);
+
+        $template = <<<'EOT'
+{{ var_test variable="{ visual == 'not_visual' ? visual : semantic }" }}
+EOT;
+        $this->renderString($template, $data, true);
+        $this->assertSame('semantic-value', VarTest::$var);
+
+        // This, by contrast, should respect the value objects.
+        $template = <<<'EOT'
+{{ var_test :variable="visual == 'not_visual' ? visual : semantic" }}
+EOT;
+        $this->renderString($template, $data, true);
+        $this->assertInstanceOf(LabeledValue::class, VarTest::$var);
+        $this->assertSame('semantic-value', (string) VarTest::$var);
+
+        $template = <<<'EOT'
+{{ var_test :variable="visual == 'visual-value' ? visual : semantic" }}
+EOT;
+        $this->renderString($template, $data, true);
+        $this->assertInstanceOf(LabeledValue::class, VarTest::$var);
+        $this->assertSame('visual-value', (string) VarTest::$var);
     }
 }

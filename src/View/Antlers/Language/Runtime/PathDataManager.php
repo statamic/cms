@@ -136,6 +136,13 @@ class PathDataManager
     private $handlePrefixes = [];
 
     /**
+     * Indicates if the data manager should preferentially cast value objects to a string, for array lookups.
+     *
+     * @var bool
+     */
+    private $isForArrayIndex = false;
+
+    /**
      * Sets the internal environment reference.
      *
      * @param  Environment  $environment
@@ -399,15 +406,18 @@ class PathDataManager
      *
      * @param  VariableReference  $path  The variable path.
      * @param  array  $data  The data to search.
+     * @param  bool  $isForArrayIndex  Indicates if the resolved value will be used for array lookups.
      * @return mixed|null
      *
      * @throws RuntimeException
      */
-    public function getData(VariableReference $path, $data)
+    public function getData(VariableReference $path, $data, $isForArrayIndex = false)
     {
         if (! $this->guardRuntimeAccess($path->normalizedReference)) {
             return null;
         }
+
+        $this->isForArrayIndex = $isForArrayIndex;
 
         if ($path->isVariableVariable) {
             $pathCopy = $path->clone();
@@ -571,7 +581,7 @@ class PathDataManager
                     $retriever->setInterpolations($this->interpolations);
                     $retriever->setEnvironment($this->environment);
                     $retriever->setIsPaired(false);
-                    $referencePath = $retriever->getData($pathItem, $data);
+                    $referencePath = $retriever->getData($pathItem, $data, true);
 
                     $this->reduceVar($referencePath);
 
@@ -622,12 +632,17 @@ class PathDataManager
             return;
         }
 
+        $varPath = '';
+        $doCompact = true;
+
         if (is_string($path)) {
             $varPath = $path;
             $doCompact = true;
         } else {
-            $doCompact = (! $path->isFinal || $this->reduceFinal);
-            $varPath = $path->name;
+            if ($path instanceof PathNode) {
+                $doCompact = (! $path->isFinal || $this->reduceFinal);
+                $varPath = $path->name;
+            }
         }
 
         // Handles some edge-case type values.
@@ -679,6 +694,12 @@ class PathDataManager
      */
     private function compact($isFinal)
     {
+        if ($this->isForArrayIndex && $isFinal && is_object($this->reducedVar) && method_exists($this->reducedVar, '__toString')) {
+            $this->reducedVar = (string) $this->reducedVar;
+
+            return;
+        }
+
         if ($this->antlersParser == null) {
             $this->reducedVar = self::reduce($this->reducedVar, $this->isPair, $this->shouldDoValueIntercept);
         } else {

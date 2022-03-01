@@ -204,4 +204,46 @@ EOT;
             $this->renderString($template, ['test' => ['anything' => 'string var']], true)
         );
     }
+
+    public function test_interpolations_with_parameters_are_cast_to_strings()
+    {
+        $now = Carbon::now();
+        $start = $now->year - 5;
+
+        $data = [
+            'start' => $start,
+            'date_value' => $now,
+        ];
+
+        $template = <<<'EOT'
+{{ loop :from="start" to="{ date_value format='Y' }" }}{{ value }}{{ /loop }}
+EOT;
+
+        $expected = implode('', range($start, $now->year));
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
+
+    public function test_interpolation_with_array_style_parameters_returns_arrays()
+    {
+        $data = [
+            'data' => [
+                'one' => 'One',
+                'two' => 'Two',
+                'three' => 'Three',
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{# Not so nice. #}}{{ foreach array="{ data limit="2" reverse="true" }" }}<{{key}}><{{ value }}>{{ /foreach }}
+{{# Nicer #}}{{ foreach :array="data | limit(2) | reverse" }}<{{key}}><{{ value }}>{{ /foreach }}
+EOT;
+
+        $expected = <<<'EOT'
+<two><Two><one><One>
+<two><Two><one><One>
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
 }
