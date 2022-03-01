@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.2.35 (2022-03-01)
+
+### What's fixed
+- Fixed casing of `pdfobject` import.
+
+
+
 ## 3.2.34 (2022-03-01)
 
 ### What's new
