@@ -180,6 +180,35 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_make_replacements_in_regex_rules()
+    {
+        $field = Mockery::mock(Field::class);
+        $field->shouldReceive('setValidationContext')->with([])->andReturnSelf();
+        $field->shouldReceive('rules')->andReturn([
+            'one' => ['required', 'test:{foo}', 'regex:/^\d{1}$/', 'not_regex:/^\d{2}$/'],
+        ]);
+
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([$field]));
+        $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
+
+        $validation = (new Validator)->fields($fields)->withRules([
+            'one' => 'not_regex:/^\d{3}$/',
+            'two' => 'regex:/^\d{2}$/',
+        ])->withReplacements([
+            'foo' => 'FOO',
+            '1' => 'ONE',
+            '2' => 'TWO',
+            '3' => 'THREE',
+        ]);
+
+        $this->assertEquals([
+            'one' => ['required', 'test:FOO', 'regex:/^\d{1}$/', 'not_regex:/^\d{2}$/', 'not_regex:/^\d{3}$/'],
+            'two' => ['regex:/^\d{2}$/'],
+        ], $validation->rules());
+    }
+
+    /** @test */
     public function it_replaces_this_in_sets()
     {
         $replicator = [

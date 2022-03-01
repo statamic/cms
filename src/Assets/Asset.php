@@ -311,6 +311,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
         return cp_route('assets.svgs.show', ['encoded_asset' => base64_encode($this->id())]);
     }
 
+    public function pdfUrl()
+    {
+        return cp_route('assets.pdfs.show', ['encoded_asset' => base64_encode($this->id())]);
+    }
+
     /**
      * Get either a image URL builder instance, or a URL if passed params.
      *
@@ -353,6 +358,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
             'dxf', 'xps',
             'zip', 'rar',
             'xls', 'xlsx',
+            'pdf',
         ]);
     }
 
@@ -384,6 +390,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
     public function isVideo()
     {
         return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
+    }
+
+    /**
+     * Is this asset a PDF?
+     *
+     * @return bool
+     */
+    public function isPdf()
+    {
+        return $this->extensionIsOneOf(['pdf']);
     }
 
     /**
@@ -582,6 +598,20 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
     }
 
     /**
+     * Get the asset's duration.
+     *
+     * @return float|null
+     */
+    public function duration()
+    {
+        if (! $this->hasDuration()) {
+            return null;
+        }
+
+        return $this->meta('duration');
+    }
+
+    /**
      * Get the asset's orientation.
      *
      * @return string|null
@@ -700,6 +730,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
     }
 
     /**
+     * Get the asset file contents.
+     *
+     * @return mixed
+     */
+    public function contents()
+    {
+        return $this->disk()->get($this->path());
+    }
+
+    /**
      * Get the blueprint.
      *
      * @param  string|null  $blueprint
@@ -799,5 +839,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
     private function hasDimensions()
     {
         return $this->isImage() || $this->isSvg() || $this->isVideo();
+    }
+
+    private function hasDuration()
+    {
+        return $this->isAudio() || $this->isVideo();
     }
 }
