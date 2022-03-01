@@ -236,7 +236,7 @@ EOT;
 
         $template = <<<'EOT'
 {{# Not so nice. #}}{{ foreach array="{ data limit="2" reverse="true" }" }}<{{key}}><{{ value }}>{{ /foreach }}
-{{# Nicer #}}{{ foreach :array="data | limit(2) | reverse"  }}<{{key}}><{{ value }}>{{ /foreach }}
+{{# Nicer #}}{{ foreach :array="data | limit(2) | reverse" }}<{{key}}><{{ value }}>{{ /foreach }}
 EOT;
 
         $expected = <<<'EOT'
