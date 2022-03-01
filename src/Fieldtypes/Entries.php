@@ -14,6 +14,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
 
@@ -222,8 +223,8 @@ class Entries extends Relationship
             $site = $parent->locale();
         }
 
-        $ids = Entry::query()
-            ->whereIn('id', Arr::wrap($values))
+        $ids = (new OrderedQueryBuilder(Entry::query(), $ids = Arr::wrap($values)))
+            ->whereIn('id', $ids)
             ->get()
             ->map(function ($entry) use ($site) {
                 return optional($entry->in($site))->id();
@@ -231,7 +232,7 @@ class Entries extends Relationship
             ->filter()
             ->all();
 
-        $query = Entry::query()
+        $query = (new OrderedQueryBuilder(Entry::query(), $ids))
             ->whereIn('id', $ids)
             ->where('status', 'published');
 
