@@ -43,6 +43,8 @@ class NoCacheManager
      */
     private $cascade;
 
+    public static $isRehydrated = false;
+
     public function __construct($config, $cacheDirectory, Parser $parser, Cascade $cascade)
     {
         $this->config = $config;
@@ -109,7 +111,7 @@ class NoCacheManager
      */
     private function makeEvaluateTag($regionName)
     {
-        return '{{ nocache:evaluate region="'.substr($regionName, 19).'" }}';
+        return '{{ no_cache:evaluate region="'.substr($regionName, 19).'" }}';
     }
 
     /**

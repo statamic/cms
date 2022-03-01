@@ -31,7 +31,7 @@ class Cache
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return mixed
-     */
+*/
     public function handle($request, Closure $next)
     {
         $noCacheCanHandle = $this->noCacheManager->canHandle($request);
@@ -41,6 +41,7 @@ class Cache
         }
 
         if ($noCacheCanHandle) {
+            NoCacheManager::$isRehydrated = true;
             return response($this->noCacheManager->restoreSession($request));
         }
 

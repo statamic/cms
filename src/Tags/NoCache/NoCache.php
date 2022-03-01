@@ -7,9 +7,8 @@ use Statamic\Tags\Tags;
 
 class NoCache extends  Tags
 {
-    protected static $handle = 'nocache';
+    protected static $handle = 'no_cache';
     public static $stack = 0;
-
     /**
      * @var NoCacheManager
      */
@@ -22,6 +21,10 @@ class NoCache extends  Tags
 
     public function index()
     {
+        if (NoCacheManager::$isRehydrated) {
+            return $this->parse();
+        }
+
         self::$stack += 1;
 
         if (self::$stack > 1) {

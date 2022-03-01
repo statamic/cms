@@ -63,7 +63,7 @@ class ViewServiceProvider extends ServiceProvider
 
             $cacheDirectory = Str::finish($cacheDirectory, '/');
 
-            return new NoCacheManager(config()->all(), $cacheDirectory, $app[Parser::class], $app[Cascade::class]);
+            return new NoCacheManager(config()->all(), $cacheDirectory, $app[ParserContract::class], $app[Cascade::class]);
         });
     }
 
