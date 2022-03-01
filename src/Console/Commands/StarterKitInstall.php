@@ -79,9 +79,9 @@ class StarterKitInstall extends Command
         // requests around expired licenses. The newer version of the CLI tool will also notify
         // the user of older CLI tool versions going forward, so we can rip this out later.
         if ($this->oldCliToolInstallationDetected()) {
-            $this->line(PHP_EOL.'<error>We have detected that you may be running an old version of the Statamic CLI Tool!</error>');
-            $this->line('<comment>If you have a global composer installation, you may upgrade by running the following command:</comment>');
-            $this->line('<comment>composer global update statamic/cli</comment>'.PHP_EOL);
+            $this->comment(PHP_EOL.'We have detected that you may be running an old version of the Statamic CLI Tool!');
+            $this->comment('If you have a global composer installation, you may upgrade by running the following command:');
+            $this->comment('composer global update statamic/cli'.PHP_EOL);
         }
 
         $this->info("Starter kit [$package] was successfully installed.");
