@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import PDFObject from 'PDFObject';
+import PDFObject from 'pdfobject';
 
 export default {
 
