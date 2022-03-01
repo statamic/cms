@@ -44,11 +44,11 @@ class EntriesTest extends TestCase
     /** @test */
     public function it_augments_to_a_query_builder()
     {
-        $augmented = $this->fieldtype()->augment(['123', 'invalid', 456, 'draft', 'scheduled', 'expired']);
+        $augmented = $this->fieldtype()->augment([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);
 
         $this->assertInstanceOf(Builder::class, $augmented);
         $this->assertEveryItemIsInstanceOf(Entry::class, $augmented->get());
-        $this->assertEquals(['one', 'two'], $augmented->get()->map->slug()->all());
+        $this->assertEquals(['456', '123'], $augmented->get()->map->id()->all());
     }
 
     /** @test */
