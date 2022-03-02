@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
+use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -130,25 +131,36 @@ class Assets extends Fieldtype
         })->filter()->values();
     }
 
-    public function augment($value)
+    public function augment($values)
     {
-        $assets = $this->getAssetsForAugmentation($value);
+        $values = Arr::wrap($values);
 
-        return $this->config('max_files') === 1 ? $assets->first() : $assets;
+        $ids = collect($values)
+            ->map(fn ($value) => $this->container()->handle().'::'.$value)
+            ->all();
+
+        $query = $this->container()->queryAssets()->whereIn('path', $values);
+
+        $query = new OrderedQueryBuilder($query, $ids);
+
+        return $this->config('max_files') === 1 ? $query->first() : $query;
     }
 
-    public function shallowAugment($value)
+    public function shallowAugment($values)
     {
-        $assets = $this->getAssetsForAugmentation($value)->map->toShallowAugmentedCollection();
+        $items = $this->augment($values);
 
-        return $this->config('max_files') === 1 ? $assets->first() : $assets;
-    }
+        if ($this->config('max_files') === 1) {
+            $items = collect([$items]);
+        } else {
+            $items = $items->get();
+        }
 
-    private function getAssetsForAugmentation($value)
-    {
-        return collect($value)->map(function ($path) {
-            return $this->container()->asset($path);
-        })->filter()->values();
+        $items = $items->filter()->map(function ($item) {
+            return $item->toShallowAugmentedCollection();
+        });
+
+        return $this->config('max_files') === 1 ? $items->first() : $items;
     }
 
     protected function container()
