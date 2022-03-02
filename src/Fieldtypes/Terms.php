@@ -93,7 +93,7 @@ class Terms extends Relationship
             ->whereIn('id', $ids)
             ->where('site', $site);
 
-        if ($parent && $parent instanceof Entry && $this->field->handle() === $this->taxonomies()[0]) {
+        if ($this->usingSingleTaxonomy() && $parent && $parent instanceof Entry && $this->field->handle() === $this->taxonomies()[0]) {
             $query->where('collection', $parent->collectionHandle());
         }
 
