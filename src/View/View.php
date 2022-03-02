@@ -4,10 +4,10 @@ namespace Statamic\View;
 
 use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
+use Statamic\StaticCaching\NoCache\NoCacheManager;
 use Statamic\StaticCaching\ResponseReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\StaticCaching\NoCache\NoCacheManager;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
 use Statamic\View\Events\ViewRendered;

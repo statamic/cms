@@ -37,7 +37,7 @@ EOT;
         view()->composer('*', function ($v) {
             $v->with([
                 'now' => Carbon::now(),
-                'nocache_data' => ['One', 'Two', 'Three']
+                'nocache_data' => ['One', 'Two', 'Three'],
             ]);
         });
 
@@ -98,7 +98,7 @@ EOT;
         view()->composer('*', function ($v) {
             $v->with([
                 'now' => Carbon::now(),
-                'nocache_data' => ['One', 'Two', 'Three']
+                'nocache_data' => ['One', 'Two', 'Three'],
             ]);
         });
 

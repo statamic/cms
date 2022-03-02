@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseReplacer
 {
-
     /**
      * @var string[]
      */
@@ -22,7 +21,9 @@ class ResponseReplacer
         foreach ($this->replacers as $replacer) {
             $instance = app($replacer);
 
-            if (! ($instance instanceof Replacer)) { continue; }
+            if (! ($instance instanceof Replacer)) {
+                continue;
+            }
 
             $instance->prepareForCache($response);
         }
@@ -33,7 +34,9 @@ class ResponseReplacer
         foreach ($this->replacers as $replacer) {
             $instance = app($replacer);
 
-            if (! ($instance instanceof Replacer)) { continue; }
+            if (! ($instance instanceof Replacer)) {
+                continue;
+            }
 
             $instance->replaceInResponse($response);
         }

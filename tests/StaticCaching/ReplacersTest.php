@@ -7,11 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ReplacersTest extends NoCacheTestCase
 {
-
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
-
 
         $app['config']->set('statamic.static_caching.replacers', [
             SimpleReplacer::class,
@@ -79,10 +77,11 @@ class SimpleReplacer implements Replacer
 {
     public static $value = '';
 
-
     public function prepareForCache(Response $response)
     {
-        if (! $response->getContent()) { return; }
+        if (! $response->getContent()) {
+            return;
+        }
 
         $response->setContent(str_replace(
             self::$value,
@@ -93,7 +92,9 @@ class SimpleReplacer implements Replacer
 
     public function replaceInResponse(Response $response)
     {
-        if (! $response->getContent()) { return; }
+        if (! $response->getContent()) {
+            return;
+        }
 
         $response->setContent(str_replace(
             '<statamic:test_replacer>',

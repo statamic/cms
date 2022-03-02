@@ -94,5 +94,5 @@ return [
 
     'replacers' => [
         \Statamic\StaticCaching\Replacers\CsrfTokenReplacer::class,
-    ]
+    ],
 ];

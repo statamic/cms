@@ -11,7 +11,9 @@ class CsrfTokenReplacer implements Replacer
 
     public function prepareForCache(Response $response)
     {
-        if (! $response->getContent()) { return; }
+        if (! $response->getContent()) {
+            return;
+        }
 
         $response->setContent(str_replace(
             csrf_token(),
@@ -22,7 +24,9 @@ class CsrfTokenReplacer implements Replacer
 
     public function replaceInResponse(Response $response)
     {
-        if (! $response->getContent()) { return; }
+        if (! $response->getContent()) {
+            return;
+        }
 
         $response->setContent(str_replace(
             self::REPLACEMENT,
