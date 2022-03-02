@@ -30,7 +30,7 @@ class TermsFieldtypeTest extends TestCase
     {
         $tags = Blueprint::makeFromFields([]);
         $article = Blueprint::makeFromFields([
-            'related_terms' => ['type' => 'terms'],
+            'related_terms' => ['type' => 'terms', 'taxonomies' => 'tags'],
         ]);
 
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
@@ -42,7 +42,7 @@ class TermsFieldtypeTest extends TestCase
 
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
-            'related_terms' => ['tags::foo', 'tags::bar'],
+            'related_terms' => ['foo', 'bar'],
         ])->create();
 
         Taxonomy::make('tags')->save();
@@ -83,7 +83,7 @@ GQL;
     {
         $tags = Blueprint::makeFromFields([]);
         $article = Blueprint::makeFromFields([
-            'related_term' => ['type' => 'terms', 'max_items' => 1],
+            'related_term' => ['type' => 'terms', 'taxonomies' => 'tags', 'max_items' => 1],
         ]);
 
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
@@ -95,7 +95,7 @@ GQL;
 
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
-            'related_term' => 'tags::foo',
+            'related_term' => 'foo',
         ])->create();
         Taxonomy::make('tags')->save();
         Term::make()->taxonomy('tags')->in('en')->slug('foo')->data(['title' => 'Foo'])->save();

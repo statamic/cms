@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades;
 use Statamic\Facades\Site;
@@ -52,25 +53,23 @@ class TermsTest extends TestCase
     }
 
     /** @test */
-    public function it_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
+    public function it_augments_slugs_to_a_query_builder_when_using_a_single_taxonomy()
     {
         $augmented = $this->fieldtype(['taxonomies' => 'tags'])->augment(['one', 'two']);
 
-        $this->assertInstanceOf(TermCollection::class, $augmented);
-        $this->assertCount(2, $augmented);
-        $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $augmented);
-        $this->assertEquals(['tags::one', 'tags::two'], $augmented->map->id()->all());
+        $this->assertInstanceOf(Builder::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $augmented->get());
+        $this->assertEquals(['tags::one', 'tags::two'], $augmented->get()->map->id()->all());
     }
 
     /** @test */
-    public function it_augments_ids_to_a_collection_of_terms_when_using_multiple_taxonomies()
+    public function it_augments_ids_to_a_query_builder_when_using_multiple_taxonomies()
     {
         $augmented = $this->fieldtype(['taxonomies' => ['tags', 'categories']])->augment(['tags::one', 'categories::red']);
 
-        $this->assertInstanceOf(TermCollection::class, $augmented);
-        $this->assertCount(2, $augmented);
-        $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $augmented);
-        $this->assertEquals(['tags::one', 'categories::red'], $augmented->map->id()->all());
+        $this->assertInstanceOf(Builder::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $augmented->get());
+        $this->assertEquals(['tags::one', 'categories::red'], $augmented->get()->map->id()->all());
     }
 
     /** @test */
@@ -97,10 +96,10 @@ class TermsTest extends TestCase
 
         $augmented = $this->fieldtype(['taxonomies' => 'tags'], $parent)->augment(['one', 'two', 'three']);
 
-        // $this->assertInstanceOf(Builder::class, $augmented);
-        $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $augmented); // todo add ->get(), and to the next lines too.
-        $this->assertEquals(['fr', 'fr', 'fr'], $augmented->map->locale->all());
-        $this->assertEquals(['Un', 'Deux', 'Three'], $augmented->map->title->all());
+        $this->assertInstanceOf(Builder::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $augmented->get());
+        $this->assertEquals(['fr', 'fr', 'fr'], $augmented->get()->map->locale->all());
+        $this->assertEquals(['Un', 'Deux', 'Three'], $augmented->get()->map->title->all());
     }
 
     /** @test */
@@ -132,10 +131,10 @@ class TermsTest extends TestCase
 
         $augmented = $this->fieldtype(['taxonomies' => 'tags'], $parent)->augment(['one', 'two', 'three']);
 
-        // $this->assertInstanceOf(Builder::class, $augmented);
-        $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $augmented); // todo add ->get()
-        $this->assertEquals(['fr', 'fr', 'fr'], $augmented->map->locale->all());
-        $this->assertEquals(['Un', 'Deux', 'Three'], $augmented->map->title->all());
+        $this->assertInstanceOf(Builder::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $augmented->get());
+        $this->assertEquals(['fr', 'fr', 'fr'], $augmented->get()->map->locale->all());
+        $this->assertEquals(['Un', 'Deux', 'Three'], $augmented->get()->map->title->all());
     }
 
     /** @test */
