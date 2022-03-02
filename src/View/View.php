@@ -4,9 +4,10 @@ namespace Statamic\View;
 
 use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
+use Statamic\StaticCaching\ResponseReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Tags\NoCache\NoCacheManager;
+use Statamic\StaticCaching\NoCache\NoCacheManager;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
 use Statamic\View\Events\ViewRendered;
@@ -108,7 +109,15 @@ class View
         $renderedContents = $contents->render();
 
         if ($noCacheManager->session()->isActive($this->templateViewPath())) {
-            $noCacheManager->writeSession(request(), $renderedContents);
+            $mockResponse = response($renderedContents);
+
+            /** @var ResponseReplacer $replacer */
+            $replacer = app(ResponseReplacer::class);
+            $replacer->prepareForCache($mockResponse);
+
+            $cacheContents = $mockResponse->getContent();
+
+            $noCacheManager->writeSession(request(), $cacheContents);
             $renderedContents = $noCacheManager->session()->prepareContents($renderedContents);
         }
 

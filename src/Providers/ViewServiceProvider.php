@@ -3,11 +3,9 @@
 namespace Statamic\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
-use Statamic\Tags\NoCache\NoCacheManager;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
@@ -37,7 +35,6 @@ class ViewServiceProvider extends ServiceProvider
             return new Cascade($app['request'], Site::current());
         });
 
-        $this->registerNoCache();
         $this->registerRuntimeAntlers();
         $this->registerRegexAntlers();
 
@@ -49,21 +46,6 @@ class ViewServiceProvider extends ServiceProvider
 
         $this->app->singleton(Engine::class, function ($app) {
             return new Engine($app['files'], $app[ParserContract::class]);
-        });
-    }
-
-    private function registerNoCache()
-    {
-        $this->app->singleton(NoCacheManager::class, function ($app) {
-            $cacheDirectory = storage_path('framework/cache/data/_nocache');
-
-            if (!file_exists($cacheDirectory)) {
-                mkdir($cacheDirectory, 0755, true);
-            }
-
-            $cacheDirectory = Str::finish($cacheDirectory, '/');
-
-            return new NoCacheManager(config()->all(), $cacheDirectory, $app[ParserContract::class], $app[Cascade::class]);
         });
     }
 

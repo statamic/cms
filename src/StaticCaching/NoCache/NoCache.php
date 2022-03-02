@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Tags\NoCache;
+namespace Statamic\StaticCaching\NoCache;
 
 use Statamic\Tags\Context;
 use Statamic\Tags\Tags;

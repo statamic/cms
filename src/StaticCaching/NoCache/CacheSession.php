@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Tags\NoCache;
+namespace Statamic\StaticCaching\NoCache;
 
 use Closure;
 
@@ -205,7 +205,7 @@ class CacheSession
         $data = [];
 
         foreach ($a as $aKey => $aValue) {
-            if (array_key_exists($aKey, $b)) {
+            if (!is_object($aKey) && is_array($b) && array_key_exists($aKey, $b)) {
                 if (is_array($aValue)) {
                     $aRecursiveDiff = $this->arrayRecursiveDiff($aValue, $b[$aKey]);
 

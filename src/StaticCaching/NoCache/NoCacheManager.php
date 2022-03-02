@@ -1,7 +1,8 @@
 <?php
 
-namespace Statamic\Tags\NoCache;
+namespace Statamic\StaticCaching\NoCache;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -36,6 +37,8 @@ class NoCacheManager
      */
     private $parser;
 
+    private $files;
+
     /**
      * The Cascade instance.
      *
@@ -43,14 +46,29 @@ class NoCacheManager
      */
     private $cascade;
 
+    /**
+     * Indicates if the current request is being restored from the no_cache cache.
+     *
+     * @var bool
+     */
     public static $isRehydrated = false;
 
-    public function __construct($config, $cacheDirectory, Parser $parser, Cascade $cascade)
+    public function __construct($config, $cacheDirectory, Parser $parser, Cascade $cascade, Filesystem $files)
     {
+        $this->files = $files;
         $this->config = $config;
         $this->cacheDirectory = $cacheDirectory;
         $this->parser = $parser;
         $this->cascade = $cascade;
+    }
+
+    /**
+     * Resets the shared no_cache state.
+     */
+    public static function reset()
+    {
+        self::$isRehydrated = false;
+        NoCache::$stack = 0;
     }
 
     /**
@@ -78,6 +96,20 @@ class NoCacheManager
         return $this->cacheSession;
     }
 
+    public function flush()
+    {
+        $this->files->deleteDirectory($this->cacheDirectory);
+    }
+
+    public function invalidateUrl($url)
+    {
+        $cacheDirectory = $this->getCacheDirectory($url);
+
+        if ($this->files->exists($cacheDirectory)) {
+            $this->files->deleteDirectory($cacheDirectory);
+        }
+    }
+
     /**
      * Tests if the NoCacheManager can handle the current request.
      *
@@ -100,7 +132,7 @@ class NoCacheManager
         $targetCacheManifest = $this->makeKey($url).'/.nocache.manifest';
         $targetFile = $this->cacheDirectory.$targetCacheManifest;
 
-        return file_exists($targetFile);
+        return $this->files->exists($targetFile);
     }
 
     /**
@@ -114,6 +146,11 @@ class NoCacheManager
         return '{{ no_cache:evaluate region="'.substr($regionName, 19).'" }}';
     }
 
+    private function getCacheDirectory($url)
+    {
+        return $this->cacheDirectory.$this->makeKey($url);
+    }
+
     /**
      * Writes the active nocache session to the cache.
      *
@@ -124,27 +161,12 @@ class NoCacheManager
     {
         $sections = $this->session()->getSections();
         $contexts = $this->session()->getContexts();
-        $sessionId = $this->session()->getId();
 
         $url = $this->getUrl($request);
 
-        $cacheDirectory = $this->cacheDirectory.$this->makeKey($url);
+        $cacheDirectory = $this->getCacheDirectory($url);
 
-        if ($sessionId != null) {
-            $entryIndex = $this->cacheDirectory.'__entryIndex/e_'.$sessionId.'/';
-
-            if (! file_exists($entryIndex)) {
-                mkdir($entryIndex, 0755, true);
-            }
-
-            $indexFile = $entryIndex.'index_'.md5($cacheDirectory);
-
-            file_put_contents($indexFile, $cacheDirectory);
-        }
-
-        if (! file_exists($cacheDirectory)) {
-            mkdir($cacheDirectory, 0755);
-        }
+        $this->files->makeDirectory($cacheDirectory, 0755, true);
 
         $cacheDirectory = Str::finish($cacheDirectory, '/');
 
@@ -160,17 +182,13 @@ class NoCacheManager
         }
 
         $contextFile = $cacheDirectory.'.context';
-        file_put_contents($contextFile, serialize($contexts));
-
-        $currentToken = csrf_token();
+        $this->files->put($contextFile, serialize($contexts));
 
         $manifestFile = $cacheDirectory.'.nocache.manifest';
         $templateFile = $cacheDirectory.'.template.antlers.html';
 
-        $contents = str_replace($currentToken, '__NOCACHE_CSRF_TOKEN', $contents);
-
-        file_put_contents($manifestFile, json_encode($sections));
-        file_put_contents($templateFile, $contents);
+        $this->files->put($manifestFile, json_encode($sections));
+        $this->files->put($templateFile, $contents);
     }
 
     /**
@@ -187,10 +205,11 @@ class NoCacheManager
     }
 
     /**
-     * Restores previous nocache sessions for the provided request.
+     * Restores a previous no_cache session from disk.
      *
-     * @param Request $request The request.
-     * @return string
+     * @param Request $request
+     * @return array|string|string[]
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function restoreSession(Request $request)
     {
@@ -198,7 +217,7 @@ class NoCacheManager
         $cacheDirectory = $this->cacheDirectory.$this->makeKey($url);
         $cacheDirectory = Str::finish($cacheDirectory, '/');
         $manifestFile = $cacheDirectory.'.nocache.manifest';
-        $manifest = json_decode(file_get_contents($manifestFile), true);
+        $manifest = json_decode($this->files->get($manifestFile), true);
 
         $sectionNames = array_keys($manifest);
         $cascade = $this->cascade->instance()->hydrate()->toArray();
@@ -206,8 +225,8 @@ class NoCacheManager
 
         $contextCacheFile = $cacheDirectory.'.context';
 
-        if (file_exists($contextCacheFile)) {
-            $contexts = unserialize(file_get_contents($contextCacheFile));
+        if ($this->files->exists($contextCacheFile)) {
+            $contexts = unserialize($this->files->get($contextCacheFile));
         }
 
         if (! is_array($contexts)) {
@@ -225,7 +244,7 @@ class NoCacheManager
         $this->session()->setSections($manifest)->setContexts($contexts);
         $templateFile = $cacheDirectory.'.template.antlers.html';
 
-        $template = file_get_contents($templateFile);
+        $template = $this->files->get($templateFile);
 
         $result = (string)$this->parser->parse($template);
 
@@ -249,9 +268,8 @@ class NoCacheManager
         }
 
         $result = str_replace('__NOCACHE_LEFT_BRACE', '{', $result);
-        $result = str_replace('__NOCACHE_RIGHT_BRACE', '}', $result);
 
-        return str_replace('__NOCACHE_CSRF_TOKEN', csrf_token(), $result);
+        return str_replace('__NOCACHE_RIGHT_BRACE', '}', $result);
     }
 
     /**

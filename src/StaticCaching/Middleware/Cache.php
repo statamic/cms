@@ -5,7 +5,8 @@ namespace Statamic\StaticCaching\Middleware;
 use Closure;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
-use Statamic\Tags\NoCache\NoCacheManager;
+use Statamic\StaticCaching\ResponseReplacer;
+use Statamic\StaticCaching\NoCache\NoCacheManager;
 
 class Cache
 {
@@ -19,10 +20,21 @@ class Cache
      */
     private $noCacheManager;
 
-    public function __construct(Cacher $cacher, NoCacheManager $noCacheManager)
+    private $replacer;
+
+    public function __construct(Cacher $cacher, NoCacheManager $noCacheManager, ResponseReplacer $replacer)
     {
         $this->cacher = $cacher;
         $this->noCacheManager = $noCacheManager;
+        $this->replacer = $replacer;
+    }
+
+    private function getPreparedResponseFromCache($request)
+    {
+        $responseToReturn = response($this->cacher->getCachedPage($request));
+        $this->replacer->replaceInResponse($responseToReturn);
+
+        return $responseToReturn;
     }
 
     /**
@@ -37,23 +49,33 @@ class Cache
         $noCacheCanHandle = $this->noCacheManager->canHandle($request);
 
         if (!$noCacheCanHandle && $this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return response($this->cacher->getCachedPage($request));
+            return $this->getPreparedResponseFromCache($request);
         }
 
         if ($noCacheCanHandle) {
             NoCacheManager::$isRehydrated = true;
-            return response($this->noCacheManager->restoreSession($request));
+            $noCacheResponse = response($this->noCacheManager->restoreSession($request));
+            NoCacheManager::reset();
+
+            $this->replacer->replaceInResponse($noCacheResponse);
+
+            return $noCacheResponse;
         }
 
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return response($this->cacher->getCachedPage($request));
+            return $this->getPreparedResponseFromCache($request);
         }
 
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
+            // Create a clone to not impact the outgoing response.
+            $responseToCache = clone $response;
 
-            $this->cacher->cachePage($request, $response);
+            $this->replacer->prepareForCache($responseToCache);
+
+            $this->cacher->cachePage($request, $responseToCache);
+            NoCacheManager::reset();
         }
 
         return $response;
