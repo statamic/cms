@@ -209,6 +209,7 @@ EOT;
         \Statamic\Facades\URL::swap($mock);
 
         $this->makeNav([
+            ['id' => 'home', 'title' => 'Home', 'url' => '/'],  
             ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
                 ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1', 'children' => [
                     ['id' => '1-1-1', 'title' => '1.1.1', 'url' => '/1/1/1', 'children' => [
@@ -222,31 +223,31 @@ EOT;
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[1=parent][1-1=current][1-1-1][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home][1=parent][1-1=current][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2][3]', $result);
+        $this->assertEquals('[home][1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2=current][3]', $result);
+        $this->assertEquals('[home][1][1-1][1-1-1][1-1-1-1][2=current][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
         $result = (string) Antlers::parse($template);
-        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+        $this->assertEquals('[home][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         // Only the last child has an URL.
         $this->makeNav([
