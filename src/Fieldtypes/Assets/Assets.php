@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
+use Illuminate\Support\Collection;
 use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
@@ -217,15 +218,7 @@ class Assets extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        if (! $assets = $this->augment($data)) {
-            return [];
-        }
-
-        if ($this->config('max_files') === 1) {
-            $assets = collect([$assets]);
-        }
-
-        return $assets->map(function ($asset) {
+        return $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
                 'is_image' => $isImage = $asset->isImage(),
@@ -242,6 +235,15 @@ class Assets extends Fieldtype
 
             return $arr;
         });
+    }
+
+    protected function getItemsForPreProcessIndex($values): Collection
+    {
+        if (! $augmented = $this->augment($values)) {
+            return collect();
+        }
+
+        return $this->config('max_files') === 1 ? collect([$augmented]) : $augmented->get();
     }
 
     public function toGqlType()

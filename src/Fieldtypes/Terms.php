@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
@@ -390,5 +391,14 @@ class Terms extends Relationship
         }
 
         return $type;
+    }
+
+    protected function getItemsForPreProcessIndex($values): Collection
+    {
+        if (! $augmented = $this->augment($values)) {
+            return collect();
+        }
+
+        return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
     }
 }
