@@ -1,5 +1,28 @@
 # Release Notes
 
+## 3.3.0-beta.3 (2022-03-02)
+
+### What's new
+- Added an "Ordered" Query Builder decorator that will apply a predefined order to the results. [#5381](https://github.com/statamic/cms/issues/5381) by @jasonvarga
+- The `static:warm` command may leverage the queue. [#5272](https://github.com/statamic/cms/issues/5272) by @arthurperton
+- Add hidden blueprint indicators. [#5342](https://github.com/statamic/cms/issues/5342) by @jackmcdade
+- Added `next` and `prev` loop variables in the Antlers runtime parser. [#5351](https://github.com/statamic/cms/issues/5351) by @JohnathonKoster
+
+### What's improved
+- Dutch translations. [#5380](https://github.com/statamic/cms/issues/5380) by @robdekort
+- Align entries/terms count columns to the right. [#5347](https://github.com/statamic/cms/issues/5347) by @jackmcdade
+
+### What's fixed
+- Fix a handful of things in the Antlers runtime parser. [#5351](https://github.com/statamic/cms/issues/5351) by @JohnathonKoster
+- Fix email fields not being loopable. [#5375](https://github.com/statamic/cms/issues/5375) by @jasonvarga
+- Fix typo in preview target help text. [#5373](https://github.com/statamic/cms/issues/5373) by @notnek
+- Fix error when viewing form submission. [#5369](https://github.com/statamic/cms/issues/5369) by @jasonvarga
+- Let `count`, `length`, and `pluck` modifiers handle query builders. [#5368](https://github.com/statamic/cms/issues/5368) by @jasonvarga
+- Fix querying nested entries fields in GraphQL. [#5367](https://github.com/statamic/cms/issues/5367) by @jasonvarga
+- Fix live preview when creating a term. [#5354](https://github.com/statamic/cms/issues/5354) by @jasonvarga
+
+
+
 ## 3.3.0-beta.2 (2022-02-25)
 
 ### What's fixed
