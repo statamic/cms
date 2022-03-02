@@ -39,6 +39,7 @@
     "moment": "^2.24.0",
     "mousetrap": "~1.5.3",
     "nprogress": "^0.2.0",
+    "pdfobject": "^2.2.7",
     "portal-vue": "^1.5.1",
     "pretty": "^2.0.0",
     "pusher-js": "^4.4.0",
