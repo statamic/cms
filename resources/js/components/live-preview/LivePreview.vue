@@ -203,7 +203,11 @@ export default {
 
         target() {
             this.update();
-        }
+        },
+
+        previewDevice() {
+            this.setIframeAttributes(document.getElementById('live-preview-iframe'));
+        },
 
     },
 
