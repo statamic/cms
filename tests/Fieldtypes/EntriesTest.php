@@ -154,6 +154,7 @@ class EntriesTest extends TestCase
         $augmented = $this->fieldtype()->shallowAugment(['123', 'invalid', 456, 'draft', 'scheduled', 'expired']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
+        $this->assertNotInstanceOf(EntryCollection::class, $augmented);
         $this->assertEveryItemIsInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertEquals([
             [
