@@ -20,6 +20,7 @@
 - Let `count`, `length`, and `pluck` modifiers handle query builders. [#5368](https://github.com/statamic/cms/issues/5368) by @jasonvarga
 - Fix querying nested entries fields in GraphQL. [#5367](https://github.com/statamic/cms/issues/5367) by @jasonvarga
 - Fix live preview when creating a term. [#5354](https://github.com/statamic/cms/issues/5354) by @jasonvarga
+- Brought over changes from 3.2
 
 
 
