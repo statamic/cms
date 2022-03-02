@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Support\Collection;
 use IteratorAggregate;
@@ -10,7 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Support\Str;
 
-class Value implements IteratorAggregate, JsonSerializable
+class Value implements IteratorAggregate, JsonSerializable, ArrayAccess
 {
     protected $raw;
     protected $handle;
@@ -70,6 +71,31 @@ class Value implements IteratorAggregate, JsonSerializable
     public function getIterator()
     {
         return new ArrayIterator($this->value());
+    }
+    
+    public function __get($key)
+    {
+        return $this->value()[$key];
+    }
+
+    public function offsetExists(mixed $offset)
+    {
+        return isset($this->value()[$offset]);
+    }
+
+    public function offsetGet(mixed $offset)
+    {
+        return $this->value()[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value)
+    {
+        $this->value()[$offset] = $value;
+    }
+
+    public function offsetUnset(mixed $offset)
+    {
+        unset($this->value()[$offset]);
     }
 
     public function shouldParseAntlers()
