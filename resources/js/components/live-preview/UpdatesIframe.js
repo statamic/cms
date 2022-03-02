@@ -4,6 +4,7 @@ export default {
             const iframe = document.createElement('iframe');
             iframe.setAttribute('frameborder', '0');
             iframe.setAttribute('src', url);
+            iframe.setAttribute('id', 'live-preview-iframe');
             this.setIframeAttributes(iframe);
 
             const container = this.$refs.contents;
