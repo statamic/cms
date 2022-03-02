@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Data\AugmentedCollection;
+use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
@@ -154,6 +155,7 @@ class EntriesTest extends TestCase
         $augmented = $this->fieldtype()->shallowAugment(['123', 'invalid', 456, 'draft', 'scheduled', 'expired']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
+        $this->assertNotInstanceOf(EntryCollection::class, $augmented);
         $this->assertEveryItemIsInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertEquals([
             [

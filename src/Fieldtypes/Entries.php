@@ -251,7 +251,7 @@ class Entries extends Relationship
 
         $items = $items->filter()->map(function ($item) {
             return $item->toShallowAugmentedCollection();
-        });
+        })->collect();
 
         return $this->config('max_items') === 1 ? $items->first() : $items;
     }
