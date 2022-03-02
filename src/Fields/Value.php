@@ -78,22 +78,22 @@ class Value implements IteratorAggregate, JsonSerializable, ArrayAccess
         return $this->value()[$key];
     }
 
-    public function offsetExists(mixed $offset)
+    public function offsetExists($offset)
     {
         return isset($this->value()[$offset]);
     }
 
-    public function offsetGet(mixed $offset)
+    public function offsetGet($offset)
     {
         return $this->value()[$offset];
     }
 
-    public function offsetSet(mixed $offset, mixed $value)
+    public function offsetSet($offset, $value)
     {
         $this->value()[$offset] = $value;
     }
 
-    public function offsetUnset(mixed $offset)
+    public function offsetUnset($offset)
     {
         unset($this->value()[$offset]);
     }
