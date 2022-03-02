@@ -5,7 +5,7 @@ namespace Statamic\StaticCaching\NoCache;
 use Statamic\Tags\Context;
 use Statamic\Tags\Tags;
 
-class NoCache extends  Tags
+class NoCache extends Tags
 {
     protected static $handle = 'no_cache';
     public static $stack = 0;
@@ -28,10 +28,10 @@ class NoCache extends  Tags
         self::$stack += 1;
 
         if (self::$stack > 1) {
-            $cacheManagerResult = (string)$this->parse();
+            $cacheManagerResult = (string) $this->parse();
         } else {
             $cacheManagerResult = $this->noCacheManager->session()
-                ->pushSection($this->content, $this->context->all(), (string)$this->parse());
+                ->pushSection($this->content, $this->context->all(), (string) $this->parse());
         }
 
         self::$stack -= 1;

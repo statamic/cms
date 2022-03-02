@@ -5,8 +5,8 @@ namespace Statamic\StaticCaching\Middleware;
 use Closure;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
-use Statamic\StaticCaching\ResponseReplacer;
 use Statamic\StaticCaching\NoCache\NoCacheManager;
+use Statamic\StaticCaching\ResponseReplacer;
 
 class Cache
 {
@@ -43,12 +43,12 @@ class Cache
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return mixed
-*/
+     */
     public function handle($request, Closure $next)
     {
         $noCacheCanHandle = $this->noCacheManager->canHandle($request);
 
-        if (!$noCacheCanHandle && $this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
+        if (! $noCacheCanHandle && $this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             return $this->getPreparedResponseFromCache($request);
         }
 

@@ -8,8 +8,8 @@ use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Cachers\Writer;
-use Statamic\Support\Manager;
 use Statamic\StaticCaching\NoCache\NoCacheManager;
+use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
 {

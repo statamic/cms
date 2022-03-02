@@ -79,7 +79,7 @@ class CacheSession
     /**
      * Sets the session's root data.
      *
-     * @param array $data The root data.
+     * @param  array  $data  The root data.
      * @return $this
      */
     public function setRootData($data)
@@ -92,7 +92,7 @@ class CacheSession
     /**
      * Seeds the session's sections.
      *
-     * @param array $sections The sections.
+     * @param  array  $sections  The sections.
      * @return $this
      */
     public function setSections($sections)
@@ -105,7 +105,7 @@ class CacheSession
     /**
      * Seeds the session's contexts.
      *
-     * @param array $contexts The data contexts.
+     * @param  array  $contexts  The data contexts.
      * @return $this
      */
     public function setContexts($contexts)
@@ -118,7 +118,7 @@ class CacheSession
     /**
      * Tests if the session has the section.
      *
-     * @param string $region The region name.
+     * @param  string  $region  The region name.
      * @return bool
      */
     public function hasSection($region)
@@ -129,7 +129,7 @@ class CacheSession
     /**
      * Returns the data for the requested nocache region.
      *
-     * @param string $region The region name.
+     * @param  string  $region  The region name.
      * @return array|mixed
      */
     public function getSectionData($region)
@@ -144,7 +144,7 @@ class CacheSession
     /**
      * Retrieves the content for the provided section.
      *
-     * @param string $region The region name.
+     * @param  string  $region  The region name.
      * @return mixed
      */
     public function getSectionContent($region)
@@ -155,7 +155,7 @@ class CacheSession
     /**
      * Sets the session's entry identifier.
      *
-     * @param object|string $id The identifier.
+     * @param  object|string  $id  The identifier.
      * @return $this
      */
     public function setId($id)
@@ -165,7 +165,7 @@ class CacheSession
         }
 
         if (is_object($id) && method_exists($id, '__toString')) {
-            $id = (string)$id;
+            $id = (string) $id;
         }
 
         $this->id = $id;
@@ -176,7 +176,7 @@ class CacheSession
     /**
      * Sets the session's view path.
      *
-     * @param string $viewPath The view path to set.
+     * @param  string  $viewPath  The view path to set.
      * @return $this
      */
     public function setViewPath($viewPath)
@@ -197,19 +197,22 @@ class CacheSession
      *
      * This function will also remove Closures.
      *
-     * @param array $a The starting array.
-     * @param array $b The array to compare it to.
+     * @param  array  $a  The starting array.
+     * @param  array  $b  The array to compare it to.
      * @return array
      */
-    private function arrayRecursiveDiff($a, $b) {
+    private function arrayRecursiveDiff($a, $b)
+    {
         $data = [];
 
         foreach ($a as $aKey => $aValue) {
-            if (!is_object($aKey) && is_array($b) && array_key_exists($aKey, $b)) {
+            if (! is_object($aKey) && is_array($b) && array_key_exists($aKey, $b)) {
                 if (is_array($aValue)) {
                     $aRecursiveDiff = $this->arrayRecursiveDiff($aValue, $b[$aKey]);
 
-                    if (! empty($aRecursiveDiff)) { $data[$aKey] = $aRecursiveDiff; }
+                    if (! empty($aRecursiveDiff)) {
+                        $data[$aKey] = $aRecursiveDiff;
+                    }
                 } else {
                     if ($aValue != $b[$aKey]) {
                         if (($aValue instanceof Closure) == false) {
@@ -230,9 +233,9 @@ class CacheSession
     /**
      * Adds a new section to the nocache session.
      *
-     * @param string $contents The original Antlers template code.
-     * @param array $context The context data required to re-evaluate the Antlers code.
-     * @param string $result The pre-rendered result to render the initial response.
+     * @param  string  $contents  The original Antlers template code.
+     * @param  array  $context  The context data required to re-evaluate the Antlers code.
+     * @param  string  $result  The pre-rendered result to render the initial response.
      * @return string
      */
     public function pushSection($contents, $context, $result)
@@ -288,7 +291,7 @@ class CacheSession
     /**
      * Checks if the provided path is the active session.
      *
-     * @param string $path The view path.
+     * @param  string  $path  The view path.
      * @return bool
      */
     public function isActive($path)
@@ -303,7 +306,7 @@ class CacheSession
     /**
      * Replaces all nocache regions with their evaluated results.
      *
-     * @param string $contents The contents.
+     * @param  string  $contents  The contents.
      * @return string
      */
     public function prepareContents($contents)

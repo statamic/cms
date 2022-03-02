@@ -74,7 +74,7 @@ class NoCacheManager
     /**
      * Constructs a cache key for the request URL.
      *
-     * @param string $url The request URL.
+     * @param  string  $url  The request URL.
      * @return string
      */
     private function makeKey($url)
@@ -113,7 +113,7 @@ class NoCacheManager
     /**
      * Tests if the NoCacheManager can handle the current request.
      *
-     * @param Request $request The request.
+     * @param  Request  $request  The request.
      * @return bool
      */
     public function canHandle(Request $request)
@@ -124,7 +124,7 @@ class NoCacheManager
     /**
      * Checks if a cached file exists for the provided URL.
      *
-     * @param string $url The request URL.
+     * @param  string  $url  The request URL.
      * @return bool
      */
     private function cacheFileExists($url)
@@ -138,7 +138,7 @@ class NoCacheManager
     /**
      * Constructs a dynamic Antlers tag to be evaluated later.
      *
-     * @param string $regionName The nocache region name.
+     * @param  string  $regionName  The nocache region name.
      * @return string
      */
     private function makeEvaluateTag($regionName)
@@ -154,8 +154,8 @@ class NoCacheManager
     /**
      * Writes the active nocache session to the cache.
      *
-     * @param Request $request The request.
-     * @param string $contents The rewritten template contents.
+     * @param  Request  $request  The request.
+     * @param  string  $contents  The rewritten template contents.
      */
     public function writeSession(Request $request, $contents)
     {
@@ -194,7 +194,7 @@ class NoCacheManager
     /**
      * Returns the cacheable URL from the request.
      *
-     * @param Request $request The request.
+     * @param  Request  $request  The request.
      * @return mixed|string
      */
     public function getUrl(Request $request)
@@ -207,8 +207,9 @@ class NoCacheManager
     /**
      * Restores a previous no_cache session from disk.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return array|string|string[]
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function restoreSession(Request $request)
@@ -246,7 +247,7 @@ class NoCacheManager
 
         $template = $this->files->get($templateFile);
 
-        $result = (string)$this->parser->parse($template);
+        $result = (string) $this->parser->parse($template);
 
         if (Str::contains($result, $sectionNames)) {
             while (Str::contains($result, $sectionNames)) {

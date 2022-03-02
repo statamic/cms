@@ -54,7 +54,7 @@ class ServiceProvider extends LaravelServiceProvider
         $this->app->singleton(NoCacheManager::class, function ($app) {
             $cacheDirectory = storage_path('framework/cache/data/_nocache');
 
-            if (!file_exists($cacheDirectory)) {
+            if (! file_exists($cacheDirectory)) {
                 mkdir($cacheDirectory, 0755, true);
             }
 
