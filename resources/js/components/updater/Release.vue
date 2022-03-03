@@ -7,7 +7,7 @@
                 <h5 class="date" v-text="__('Released on :date', { date: release.date })" />
             </div>
             <div v-if="!release.canUpdate">
-                <button class="btn opacity-50" disabled>Manual update required</button>
+                <button class="btn opacity-50" disabled v-text="__('Manual upgrade required')" />
             </div>
             <div v-if="release.canUpdate && showActions">
                 <button v-if="release.type === 'current'" class="btn opacity-50" disabled v-text="__('Current Version')" />
