@@ -807,6 +807,26 @@ class DocumentParser
         return array_key_exists($offsetCheck, $this->interpolationEndOffsets);
     }
 
+    public static function getLeftBraceEscape()
+    {
+        return '__antlers:leftBrace'.GlobalRuntimeState::$environmentId;
+    }
+
+    public static function getRightBraceEscape()
+    {
+        return '__antlers:rightBrace'.GlobalRuntimeState::$environmentId;
+    }
+
+    private function getLeftBrace()
+    {
+        return str_split(self::getLeftBraceEscape());
+    }
+
+    private function getRightBrace()
+    {
+        return str_split(self::getRightBraceEscape());
+    }
+
     private function scanToEndOfAntlersRegion()
     {
         for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
@@ -814,13 +834,19 @@ class DocumentParser
 
             if ($this->cur == self::LeftBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
-                $this->currentContent[] = $this->cur;
+                $this->currentContent = array_merge($this->currentContent, $this->getLeftBrace());
                 continue;
             }
 
             if ($this->isInterpolatedParser && $this->cur == self::RightBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent[] = $this->cur;
+                continue;
+            }
+
+            if ($this->cur == self::RightBrace && $this->prev == self::AtChar) {
+                array_pop($this->currentContent);
+                $this->currentContent = array_merge($this->currentContent, $this->getRightBrace());
                 continue;
             }
 

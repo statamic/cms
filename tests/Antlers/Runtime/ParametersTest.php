@@ -140,6 +140,22 @@ EOT;
         $this->assertSame('2012-10-01', $this->renderString('{{ one:two format="Y-m-d" }}', $data, true));
     }
 
+    public function test_braces_can_be_escaped_inside_parameters()
+    {
+        Test::register();
+        $template = <<<'EOT'
+{{ test variable="@{@{ hello world @}@}" }}
+EOT;
+
+        $this->assertSame('{{ hello world }}', $this->renderString($template, [], true));
+
+        $template = <<<'EOT'
+{{ test variable="@{@{ hello @{{title}@} @}@}" }}
+EOT;
+
+        $this->assertSame('{{ hello {world} }}', $this->renderString($template, ['title' => 'world'], true));
+    }
+
     public function test_tags_are_invoked_within_interpolated_contexts()
     {
         (new class extends Tags

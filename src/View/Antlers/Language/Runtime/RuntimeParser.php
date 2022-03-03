@@ -405,6 +405,9 @@ class RuntimeParser implements Parser
         $bufferContent = LiteralReplacementManager::processReplacements($bufferContent);
         $bufferContent = StackReplacementManager::processReplacements($bufferContent);
 
+        $bufferContent = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $bufferContent);
+        $bufferContent = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $bufferContent);
+
         return new AntlersString($bufferContent, $this);
     }
 
