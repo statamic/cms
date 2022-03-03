@@ -149,7 +149,6 @@ EOT;
 
         $this->assertSame('{{ hello world }}', $this->renderString($template, [], true));
 
-
         $template = <<<'EOT'
 {{ test variable="@{@{ hello @{{title}@} @}@}" }}
 EOT;

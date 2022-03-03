@@ -819,7 +819,7 @@ class DocumentParser
 
     private function getLeftBrace()
     {
-        return str_split( self::getLeftBraceEscape());
+        return str_split(self::getLeftBraceEscape());
     }
 
     private function getRightBrace()
