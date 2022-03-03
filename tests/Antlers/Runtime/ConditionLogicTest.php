@@ -388,4 +388,253 @@ EOT;
         $this->assertInstanceOf(LabeledValue::class, VarTest::$var);
         $this->assertSame('visual-value', (string) VarTest::$var);
     }
+
+    public function test_condition_insanity()
+    {
+        $template = <<<'EOT'
+
+
+<!-- /snippets/_seo.antlers.html -->
+<title>
+    {{ yield:seo_title }}
+    {{ seo_title ? seo_title : title }}
+    {{ seo:title_separator ? seo:title_separator : " &#124; " }}
+    {{ seo:change_page_title where="collection:{collection}" }}
+        {{ if what_to_add == 'collection_title' }}
+            {{ collection:title }}
+        {{ elseif what_to_add == 'custom_text' }}
+            {{ custom_text }}
+        {{ /if }}
+        {{ seo:title_separator ? seo:title_separator : " &#124; " }}
+    {{ /seo:change_page_title }}
+    {{ seo:site_name ? seo:site_name : config:app:name }}
+</title>
+
+{{ if seo_description }}
+    <meta name="description" content="{{ seo_description }}">
+{{ elseif seo:collection_defaults }}
+    <meta name="description" content="{{ partial:snippets/fallback_description }}">
+{{ /if }}
+
+{{ if
+    (environment == 'local' && !seo:noindex_local) or
+    (environment == 'staging' && !seo:noindex_staging) or
+    (environment == 'production' && !seo:noindex_production)
+}}
+    {{ if seo_noindex & seo_nofollow }}
+        <meta name="robots" content="noindex, nofollow">
+    {{ elseif seo_nofollow }}
+        <meta name="robots" content="nofollow">
+    {{ elseif seo_noindex }}
+        <meta name="robots" content="noindex">
+    {{ /if }}
+{{ else }}
+    <meta name="robots" content="noindex, nofollow">
+{{ /if }}
+
+{{ if seo:hreflang_auto }}
+    {{ if not seo_noindex and seo_canonical_type == 'entry' and current_full_url === permalink }}
+        {{ locales all="false" }}
+            <link rel="alternate" hreflang="{{ locale:full | replace('_','-') }}" href="{{ permalink }}">
+        {{ /locales }}
+    {{ /if }}
+{{ /if }}
+
+{{ if not seo_noindex }}
+    {{ if seo_canonical_type == 'current' }}
+        <link rel="canonical" href="{{ config:app:url }}{{ seo_canonical_current | url }}">
+    {{ elseif seo_canonical_type == 'external' }}
+        <link rel="canonical" href="{{ seo_canonical_external }}">
+    {{ elseif seo_canonical_type == 'entry' }}
+        <link rel="canonical" href="{{ permalink }}">
+    {{ /if }}
+{{ /if }}
+
+{{ yield:pagination }}
+
+{{ if seo:json_ld_type && seo:json_ld_type != 'none' }}
+    <script type="application/ld+json" id="schema">
+        {{ if seo:json_ld_type == 'organization'  }}
+            {
+                "@context": "http://schema.org",
+                "@type": "Organization",
+                "name": "{{ seo:organization_name }}",
+                "url": "{{ config:app:url }}{{ homepage }}"{{ if seo:organization_logo }},
+                "logo": "{{ config:app:url }}{{ glide:seo:organization_logo width='336' height='336' fit='contain' }}"{{ /if }}
+            }
+        {{ elseif seo:json_ld_type == 'person' }}
+            {
+                "@context": "http://schema.org",
+                "@type": "Person",
+                "url": "{{ config:app:url }}{{ homepage }}",
+                "name": "{{ seo:person_name }}"
+            }
+        {{ elseif seo:json_ld_type == 'custom' }}
+            {{ seo:json_ld }}
+        {{ /if }}
+    </script>
+{{ /if }}
+
+{{ if schema_jsonld  }}
+    <script type="application/ld+json">{{ schema_jsonld }}</script>
+{{ /if }}
+
+{{ if seo:breadcrumbs && segment_1 }}
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {{ nav:breadcrumbs }}
+                    {
+                        "@type": "ListItem",
+                        "position": {{ count }},
+                        "name": "{{ title }}",
+                        "item": "{{ permalink }}"
+                    } {{ unless last}},{{ /unless}}
+                {{ /nav:breadcrumbs }}
+            ]
+        }
+    </script>
+{{ /if }}
+
+<meta property="og:site_name" content="{{ seo:site_name ? seo:site_name : config:app:name }}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="{{ site:locale }}">
+{{ if og_title }}
+    <meta property="og:title" content="{{ og_title }}">
+{{ else }}
+    <meta property="og:title" content="{{ seo_title ? seo_title : title }}">
+{{ /if }}
+{{ if og_description }}
+    <meta property="og:description" content="{{ og_description }}">
+{{ elseif seo_description }}
+    <meta property="og:description" content="{{ seo_description }}">
+{{ elseif seo:collection_defaults }}
+    <meta property="og:description" content="{{ partial:snippets/fallback_description }}">
+{{ /if }}
+{{ if og_image }}
+    <meta property="og:image" content="{{ glide:og_image width='1200' height='630' fit='crop_focal' absolute="true" }}">
+{{ elseif seo:og_image }}
+    <meta property="og:image" content="{{ glide:seo:og_image width='1200' height='630' fit='crop_focal' absolute="true" }}">
+{{ /if }}
+
+{{ if twitter_image or seo:twitter_image }}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="{{ seo:twitter_handle }}">
+    {{ if og_title }}
+        <meta name="twitter:title" content="{{ og_title }}">
+    {{ else }}
+        <meta name="twitter:title" content="{{ seo_title ? seo_title : title }}">
+    {{ /if }}
+    {{ if og_description }}
+        <meta name="twitter:description" content="{{ og_description }}">
+    {{ elseif seo_description }}
+        <meta name="twitter:description" content="{{ seo_description }}">
+    {{ elseif seo:collection_defaults }}
+        <meta name="twitter:description" content="{{ partial:snippets/fallback_description }}">
+    {{ /if }}
+    {{ if twitter_image }}
+        <meta name="twitter:image" content="{{ glide:twitter_image width='1200' height='600' fit='crop_focal' absolute="true" }}">
+        {{ asset :url="twitter_image" }}
+            {{ if alt }}
+                <meta name="twitter:image:alt" content="{{ alt ensure_right='.' }}">
+            {{ /if }}
+        {{ /asset }}
+    {{ elseif seo:twitter_image }}
+        <meta name="twitter:image" content="{{ glide:seo:twitter_image width='1200' height='600' fit='crop_focal' absolute="true" }}">
+        {{ asset :url="seo:twitter_image" }}
+            {{ if alt }}
+                <meta name="twitter:image:alt" content="{{ alt ensure_right='.' }}">
+            {{ /if }}
+        {{ /asset }}
+    {{ /if }}
+{{ /if }}
+
+{{ if
+    (environment == 'local' && seo:trackers_local) or
+    (environment == 'staging' && seo:trackers_staging) or
+    (environment == 'production' && seo:trackers_production)
+}}
+got this far
+    {{ if seo:tracker_type == 'gtm' }}
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ seo:google_tag_manager }}');function gtag(){dataLayer.push(arguments);}</script>
+    {{ elseif seo:tracker_type == 'gtag' }}
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ seo:google_analytics }}"></script>
+        <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('set', new Date());gtag('config', '{{ seo:google_analytics }}' {{ if seo:anonymize_ip }}, {'anonymize_ip': true}{{ /if }});</script>
+    {{ /if }}
+    {{ if seo:use_cookie_banner }}
+        <script>
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'wait_for_update': 500
+            });
+            dataLayer.push({
+                'event': 'default_consent'
+            });
+        </script>
+    {{ /if }}
+
+    {{ section:seo_body }}
+        {{ if seo:tracker_type == 'gtm' }}
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ seo:google_tag_manager }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        {{ /if }}
+        {{ if seo:use_cookie_banner }}
+            {{ partial:components/cookie_banner }}
+        {{ /if }}
+    {{ /section:seo_body }}
+
+    {{ if seo:use_google_site_verification }}
+        <meta name="google-site-verification" content="{{ seo:google_site_verification }}" />
+    {{ /if }}
+
+    {{ if seo:use_fathom && seo:fathom_use_custom_domain }}
+        <script src="{{ seo:fathom_custom_script_url }}" site="{{ seo:fathom }}" defer></script>
+    {{ elseif seo:use_fathom }}
+        <script src="https://cdn.usefathom.com/script.js" site="{{ seo:fathom }}" defer></script>
+    {{ /if }}
+
+    {{ if seo:use_cloudflare_web_analytics }}
+        <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ seo:cloudflare_web_analytics }}"}'></script>
+    {{ /if }}
+{{ /if }}
+EOT;
+
+        $data = [
+            'environment' => 'local',
+            'seo' => [
+                'trackers_local' => true,
+                'use_fathom' => true,
+                'fathom_use_custom_domain' => true,
+                'fathom_custom_script_url' => 'test url',
+                'fathom' => 'site name',
+                'use_cloudflare_web_analytics' => true
+            ]
+        ];
+
+        $result = $this->renderString($template, $data);
+
+        // If this fails, the pairing algorithm incorrectly associated something along the way.
+        $this->assertStringContainsString('test url', $result);
+        $this->assertStringContainsString('site name', $result);
+        $this->assertStringContainsString('https://static.cloudflareinsights.com/beacon.min.js', $result);
+
+        $data = [
+            'environment' => 'local',
+            'seo' => [
+                'trackers_local' => true,
+                'use_fathom' => true,
+                'fathom_use_custom_domain' => false,
+                'fathom_custom_script_url' => 'test url',
+                'fathom' => 'site name',
+                'use_cloudflare_web_analytics' => true
+            ]
+        ];
+
+        $result = $this->renderString($template, $data);
+
+        $this->assertStringContainsString('https://cdn.usefathom.com/script.js', $result);
+        $this->assertStringContainsString('https://static.cloudflareinsights.com/beacon.min.js', $result);
+    }
 }
