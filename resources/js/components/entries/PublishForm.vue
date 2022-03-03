@@ -344,7 +344,6 @@ export default {
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
-            previewTarget: this.previewTargets[0],
         }
     },
 
