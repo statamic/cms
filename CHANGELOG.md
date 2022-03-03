@@ -1,5 +1,19 @@
 # Release Notes
 
+## 3.3.0-beta.4 (2022-03-03)
+
+### What's new
+- Allow escaped braces inside tag parameters and string literals. [#5394](https://github.com/statamic/cms/issues/5394) by @JohnathonKoster
+
+### What's fixed
+- Update the Live Preview content area size when you change the device dropdown. [#5390](https://github.com/statamic/cms/issues/5390) by @jasonvarga
+- Fix error when opening inline publish form. [#5392](https://github.com/statamic/cms/issues/5392) by @jasonvarga
+
+### What's changed
+- Assets, Terms, and Users fieldtypes augment to query builders. [#5388](https://github.com/statamic/cms/issues/5388) by @jasonvarga
+
+
+
 ## 3.3.0-beta.3 (2022-03-02)
 
 ### What's new
