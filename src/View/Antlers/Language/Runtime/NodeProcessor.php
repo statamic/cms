@@ -1207,12 +1207,14 @@ class NodeProcessor
                         GlobalRuntimeState::$globalTagEnterStack[] = $node;
 
                         $tagParameters = $node->getParameterValues($this, $this->getActiveData());
+                        $this->data = $lockData;
 
                         $tagActiveData = $this->getActiveData();
 
                         $contributedPrefixHandles = 0;
 
                         if ($node->name->name == 'partial') {
+                            $lockData = $this->data;
                             $namedSlotResults = $this->checkPartialForNamedSlots($node);
 
                             if ($namedSlotResults[0] === true) {
@@ -1228,6 +1230,7 @@ class NodeProcessor
 
                                 $tagActiveData[GlobalRuntimeState::createIndicatorVariable(GlobalRuntimeState::INDICATOR_NAMED_SLOTS_AVAILABLE)] = true;
                             }
+                            $this->data = $lockData;
                         }
 
                         if ($node->name->name == 'partial' || $node->name->name == 'scope') {
