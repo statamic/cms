@@ -609,8 +609,8 @@ EOT;
                 'fathom_use_custom_domain' => true,
                 'fathom_custom_script_url' => 'test url',
                 'fathom' => 'site name',
-                'use_cloudflare_web_analytics' => true
-            ]
+                'use_cloudflare_web_analytics' => true,
+            ],
         ];
 
         $result = $this->renderString($template, $data);
@@ -628,8 +628,8 @@ EOT;
                 'fathom_use_custom_domain' => false,
                 'fathom_custom_script_url' => 'test url',
                 'fathom' => 'site name',
-                'use_cloudflare_web_analytics' => true
-            ]
+                'use_cloudflare_web_analytics' => true,
+            ],
         ];
 
         $result = $this->renderString($template, $data);
