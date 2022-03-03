@@ -114,7 +114,9 @@ class ApplicationCacher extends AbstractCacher
      */
     public function invalidateUrl($url)
     {
-        if ($this->noCacheManager != null) { $this->noCacheManager->invalidateUrl($url); }
+        if ($this->noCacheManager != null) {
+            $this->noCacheManager->invalidateUrl($url);
+        }
 
         if (! $key = $this->getUrls()->flip()->get($url)) {
             // URL doesn't exist, nothing to invalidate.
