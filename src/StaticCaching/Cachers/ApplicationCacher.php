@@ -18,9 +18,12 @@ class ApplicationCacher extends AbstractCacher
      */
     private $cached;
 
+    /**
+     * @var NoCacheManager|null
+     */
     private $noCacheManager;
 
-    public function __construct(Repository $cache, $config, NoCacheManager $noCacheManager)
+    public function __construct(Repository $cache, $config, NoCacheManager $noCacheManager = null)
     {
         parent::__construct($cache, $config);
 
@@ -111,7 +114,7 @@ class ApplicationCacher extends AbstractCacher
      */
     public function invalidateUrl($url)
     {
-        $this->noCacheManager->invalidateUrl($url);
+        if ($this->noCacheManager != null) { $this->noCacheManager->invalidateUrl($url); }
 
         if (! $key = $this->getUrls()->flip()->get($url)) {
             // URL doesn't exist, nothing to invalidate.
