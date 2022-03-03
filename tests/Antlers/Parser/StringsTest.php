@@ -38,4 +38,13 @@ EOT;
 
         $this->assertSame('hello, world', $this->renderString($input));
     }
+
+    public function test_braces_can_be_escaped_inside_string_literals()
+    {
+        $input = <<<'EOT'
+{{ var = '@{@{@}@}'; }}{{ var }}
+EOT;
+
+        $this->assertSame('{{}}', $this->renderString($input));
+    }
 }
