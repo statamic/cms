@@ -74,6 +74,7 @@ use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\TernaryCondition;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
+use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\ModifierManager;
@@ -1439,17 +1440,17 @@ class Environment
         } elseif ($val instanceof NullConstant) {
             $returnVal = null;
         } elseif ($val instanceof StringValueNode) {
-            $returnVal = $val->value;
+            $returnVal = $this->applyEscapeSequences($val->value);
         } elseif ($val instanceof NullCoalescenceGroup) {
             $returnVal = $this->evaluateNullCoalescence($val);
         } elseif ($val instanceof TernaryCondition) {
             $returnVal = $this->evaluateTernaryGroup($val);
         } elseif ($val instanceof ModifierValueNode) {
             if (is_string($val->value) && in_array(trim($val->value), GlobalRuntimeState::$interpolatedVariables)) {
-                return $this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value));
+                return $this->applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
             }
 
-            $returnVal = $val->value;
+            $returnVal = $this->applyEscapeSequences($val->value);
         } elseif ($val instanceof ArrayNode) {
             $returnVal = $this->resolveArrayValue($val);
         }
@@ -1483,5 +1484,13 @@ class Environment
         }
 
         return $this->adjustValue($returnVal, $val);
+    }
+
+    private function applyEscapeSequences($string)
+    {
+        $string = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $string);
+        $string = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $string);
+
+        return $string;
     }
 }
