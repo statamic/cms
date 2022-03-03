@@ -56,7 +56,6 @@ EOT;
 
         $this->assertSame('Yes', $this->renderString($input, ['title' => '{The Title}']));
 
-
         $input = <<<'EOT'
 {{ if title | starts_with:'@{' }}Yes{{ else }}No{{ /if }}
 EOT;
