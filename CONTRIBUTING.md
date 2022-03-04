@@ -40,11 +40,11 @@ You can chat and collaborate with other developers in the community — [Discord
 
 ### Which Repo?
 
-Statamic 3 is broken out into a few Github repositories. Here's a quick summary of each.
+Statamic is broken out into a few Github repositories. Here's a quick summary of each.
 
 - [`statamic/cms`](https://github.com/statamic/cms) is the core package. It doesn't run by itself but is instead a dependency consumed by Laravel apps. 99% of the work goes on here.
 - [`statamic/statamic`](https://github.com/statamic/statamic) is the starter Laravel app used to build a new site.
-- [`statamic/docs`](https://github.com/statamic/docs) is the Statamic 3 documentation site that is curently running on [statamic.dev](https://statamic.dev).
+- [`statamic/docs`](https://github.com/statamic/docs) is the Statamic documentation site that is curently running on [statamic.dev](https://statamic.dev).
 
 ### Bug Reports
 
