@@ -4,6 +4,7 @@ namespace Tests\Antlers\Runtime;
 
 use Mockery;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Tags\Tags;
 use Tests\Antlers\ParserTestCase;
 
 class QueryBuilderTest extends ParserTestCase
@@ -49,5 +50,39 @@ EOT;
 EOT;
 
         $this->assertSame('Foo, Baz, and Bar', $this->renderString($template, $data, true));
+    }
+
+    public function test_query_builders_do_not_leak_to_the_next_node()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'thetag';
+
+            public function index()
+            {
+                $src = $this->params->get('src');
+
+                return $src;
+            }
+        })::register();
+
+
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->once()->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Baz'],
+            ['title' => 'Bar'],
+        ]));
+
+        $data = [
+            'data' => $builder,
+        ];
+
+        // If the builder leaks, the runtime will try and call "query:thetag" for the next node.
+        $template = <<<'EOT'
+<{{ data | pluck:title | sentence_list }}><{{ thetag src="source" }}>
+EOT;
+
+        $this->assertSame('<Foo, Baz, and Bar><source>', $this->renderString($template, $data, true));
     }
 }
