@@ -49,16 +49,18 @@ class TreeBuilder
     {
         $maxDepth = $params['max_depth'] ?? null;
         $fields = $params['fields'] ?? null;
-        $showUnpublished = $params['show_unpublished'] ?? true;
+        $query = $params['query'] ?? null;
 
         if ($maxDepth && $depth > $maxDepth) {
             return [];
         }
 
-        return $pages->map(function ($page) use ($fields, $params, $depth, $showUnpublished) {
+        if ($query && empty($pages = $query->withItems($pages)->get())) {
+            return [];
+        }
+
+        return $pages->map(function ($page) use ($fields, $params, $depth) {
             if ($page->reference() && ! $page->referenceExists()) {
-                return null;
-            } elseif (! $showUnpublished && $page->entry() && $page->entry()->status() !== 'published') {
                 return null;
             }
 

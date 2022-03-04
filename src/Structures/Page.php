@@ -2,6 +2,8 @@
 
 namespace Statamic\Structures;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
@@ -21,7 +23,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\GraphQL\ResolvesValues;
 
-class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract
+class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract, ArrayAccess, Arrayable
 {
     use HasAugmentedInstance, ForwardsCalls, TracksQueriedColumns, ResolvesValues, ContainsSupplementalData;
 
@@ -405,6 +407,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return $this->entry()->private();
     }
 
+    public function status()
+    {
+        return optional($this->entry())->status();
+    }
+
     public function blueprint()
     {
         if ($this->structure() instanceof Nav) {
@@ -430,6 +437,8 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
+        // hmmm? ->with() ?
+
         return $this
             ->toAugmentedCollection($this->selectedQueryColumns)
             ->withShallowNesting()

@@ -16,7 +16,6 @@ class Controller extends BaseController
      *
      * @param  string  $message
      * @param  null  $text
-     * @return array
      */
     protected function success($message, $text = null)
     {

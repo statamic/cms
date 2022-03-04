@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
-require('../bootstrap/globals');
-global._ = require('underscore');
 Vue.use(Vuex);
 
 const Store = new Vuex.Store({

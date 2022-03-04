@@ -1,0 +1,5 @@
+{{ bard raw="true" }}
+{{ type }}
+{{ attrs | length }}
+{{ if attrs | length > 0 }}{{ attrs:values:type }}{{ /if }}
+{{ /bard }}

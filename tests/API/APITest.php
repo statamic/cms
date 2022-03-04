@@ -2,7 +2,9 @@
 
 namespace Tests\API;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -47,17 +49,22 @@ class APITest extends TestCase
         Facades\Config::set('statamic.api.resources.collections', true);
 
         Facades\Collection::make('pages')->structureContents(['root' => true])->save();
+
+        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
+        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
+
         Facades\Collection::find('pages')->structure()->makeTree('en', [
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
         ])->save();
 
-        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
-        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
-        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
-
         $this->assertEndpointDataCount('/api/collections/pages/tree', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[status:is]=published', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[status:is]=draft', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[published:is]=true', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[published:is]=false', 2);
     }
 
     /** @test */
@@ -95,6 +102,7 @@ class APITest extends TestCase
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
+            ['title' => 'Balki Bartokomous'],
         ])->save();
         $nav->save();
 
@@ -102,7 +110,7 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
         Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
 
-        $this->assertEndpointDataCount('/api/navs/footer/tree', 1);
+        $this->assertEndpointDataCount('/api/navs/footer/tree', 2);
     }
 
     /** @test */
@@ -139,6 +147,58 @@ class APITest extends TestCase
             ->get('/api/collections/pages/entries/dance')
             ->assertJsonPath('data.api_url', null)
             ->assertJsonPath('data.edit_url', null);
+    }
+
+    /** @test */
+    public function relationships_are_shallow_augmented()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        // use two collections just so the related entries dont show up in the listing.
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('other')->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'foo' => ['type' => 'text'],
+            'bar' => ['type' => 'entries'],
+        ]);
+        $other = Blueprint::makeFromFields([]);
+        BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect([
+            'page' => $blueprint->setHandle('post'),
+        ]));
+        BlueprintRepository::shouldReceive('in')->with('collections/other')->andReturn(collect([
+            'other' => $other->setHandle('other'),
+        ]));
+
+        Facades\Entry::make()->collection('other')->id('two')->slug('two')->published(true)->save();
+        Facades\Entry::make()->collection('other')->id('three')->slug('three')->published(true)->save();
+
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)
+            ->set('foo', 'foo text value')
+            ->set('bar', ['two', 'three'])
+            ->save();
+
+        $this->get('/api/collections/pages/entries')->assertJson([
+            'data' => [
+                [
+                    'foo' => 'foo text value',
+                    'bar' => [
+                        ['id' => 'two'],
+                        ['id' => 'three'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->get('/api/collections/pages/entries/about')->assertJson([
+            'data' => [
+                'foo' => 'foo text value',
+                'bar' => [
+                    ['id' => 'two'],
+                    ['id' => 'three'],
+                ],
+            ],
+        ]);
     }
 
     private function assertEndpointDataCount($endpoint, $count)

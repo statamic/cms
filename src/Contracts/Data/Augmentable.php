@@ -13,4 +13,6 @@ interface Augmentable
     public function toShallowAugmentedArray();
 
     public function toShallowAugmentedCollection();
+
+    public function toEvaluatedAugmentedArray($keys = null);
 }

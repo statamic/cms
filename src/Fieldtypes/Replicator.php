@@ -112,9 +112,6 @@ class Replicator extends Fieldtype
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index).'.',
             ])
-            ->withReplacements([
-                'this' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index),
-            ])
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
@@ -143,11 +140,6 @@ class Replicator extends Fieldtype
         return collect($attributes)->mapWithKeys(function ($attribute, $handle) use ($index) {
             return [$this->setRuleFieldPrefix($index).'.'.$handle => $attribute];
         })->all();
-    }
-
-    protected function setConfig($handle)
-    {
-        return array_get($this->getFieldConfig('sets'), $handle);
     }
 
     public function augment($values)

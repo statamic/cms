@@ -4,10 +4,12 @@ namespace Tests\Data;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Query\Builder as LaravelQueryBuilder;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Fields\Value;
@@ -37,6 +39,7 @@ class AugmentedCollectionTest extends TestCase
     {
         $value = m::mock(Value::class);
         // $value->shouldNotReceive('toArray');
+        $value->shouldReceive('isRelationship')->andReturnFalse();
         $value->shouldReceive('shallow')->once()->andReturnSelf();
         $c = new AugmentedCollection([$value]);
         $results = $c->withShallowNesting()->toArray();
@@ -48,6 +51,7 @@ class AugmentedCollectionTest extends TestCase
     public function values_do_not_get_flagged_shallow_when_calling_toArray_without_flag()
     {
         $value = m::mock(Value::class);
+        $value->shouldReceive('isRelationship')->andReturnFalse();
         $value->shouldNotReceive('toArray');
         $value->shouldNotReceive('shallow');
         $c = new AugmentedCollection([$value]);
@@ -66,6 +70,71 @@ class AugmentedCollectionTest extends TestCase
         $results = $c->withShallowNesting()->toArray();
 
         $this->assertEquals([['augmented array']], $results);
+    }
+
+    /** @test */
+    public function it_converts_value_objects_to_their_augmented_values_with_flag()
+    {
+        $statamicQuery = m::mock(StatamicQueryBuilder::class);
+        $statamicQuery->shouldReceive('get')->andReturn(collect(['statamic', 'query', 'builder', 'results']));
+        $laravelQuery = m::mock(LaravelQueryBuilder::class);
+        $laravelQuery->shouldReceive('get')->andReturn(collect(['laravel', 'query', 'builder', 'results']));
+
+        $a = new Value('alfa');
+        $b = new Value('bravo');
+        $c = new Value([
+            'charlie',
+            new Value(collect([
+                'delta',
+                new Value([
+                    'echo',
+                    'foxtrot',
+                ]),
+            ])),
+            new Value($statamicQuery),
+            new Value($laravelQuery),
+        ]);
+
+        $c = new AugmentedCollection([$a, $b, $c, 'golf']);
+
+        $results = $c->withEvaluation()->toArray();
+
+        $this->assertEquals([
+            'alfa',
+            'bravo',
+            [
+                'charlie',
+                [
+                    'delta',
+                    [
+                        'echo',
+                        'foxtrot',
+                    ],
+                ],
+                ['statamic', 'query', 'builder', 'results'],
+                ['laravel', 'query', 'builder', 'results'],
+            ],
+            'golf',
+        ], $results);
+    }
+
+    /** @test */
+    public function it_does_not_convert_value_objects_to_their_augmented_values_with_explicit_flag_or_without_any_flag()
+    {
+        $item1 = m::mock(Value::class);
+        $item1->shouldReceive('value')->never();
+        $item1->shouldReceive('isRelationship')->andReturnFalse();
+        $item2 = m::mock(Value::class);
+        $item2->shouldReceive('value')->never();
+        $item2->shouldReceive('isRelationship')->andReturnFalse();
+
+        $c = new AugmentedCollection([$item1, $item2, 'baz']);
+
+        $results = $c->toArray();
+        $this->assertEquals([$item1, $item2, 'baz'], $results);
+
+        $results = $c->withoutEvaluation()->toArray();
+        $this->assertEquals([$item1, $item2, 'baz'], $results);
     }
 
     /** @test */

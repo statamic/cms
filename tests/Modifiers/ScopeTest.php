@@ -117,7 +117,7 @@ class AugmentableObject extends ArrayableObject implements Augmentable
 
     public function augmentedArrayData()
     {
-        return $this->toArray();
+        return $this->data;
     }
 
     public function blueprint()

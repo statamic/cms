@@ -10,8 +10,11 @@
     "prod": "npm run production",
     "production": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "svgo": "svgo -f ./resources/svg/  -r",
-    "test": "cross-env NODE_ENV=test jest",
-    "test-watch": "npm run test -- --watch --notify"
+    "test": "cross-env NODE_ENV=test jest --silent",
+    "test-watch": "npm run test -- --watch --notify",
+    "frontend-dev": "npm run development -- --env.mixfile=frontend.mix",
+    "frontend-prod": "npm run production -- --env.mixfile=frontend.mix",
+    "frontend-watch": "npm run watch -- --env.mixfile=frontend.mix"
   },
   "dependencies": {
     "@popperjs/core": "^2.5.3",
@@ -39,6 +42,7 @@
     "moment": "^2.24.0",
     "mousetrap": "~1.5.3",
     "nprogress": "^0.2.0",
+    "pdfobject": "^2.2.7",
     "portal-vue": "^1.5.1",
     "pretty": "^2.0.0",
     "pusher-js": "^4.4.0",
@@ -51,9 +55,9 @@
     "svgo": "^2.6.1",
     "sweetalert": "~1.0.1",
     "tiptap-extensions": "^1.28.6",
-    "underscore": "~1.9.2",
+    "underscore": "~1.13.2",
     "uniqid": "^5.2.0",
-    "v-calendar": "^1.0.1",
+    "v-calendar": "^2.3.0",
     "v-tooltip": "^2.0.3",
     "validator": "^13.7.0",
     "vue": "^2.6.11",

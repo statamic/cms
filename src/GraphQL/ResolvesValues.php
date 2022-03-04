@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL;
 
+use Statamic\Contracts\Query\Builder;
 use Statamic\Fields\Value;
 
 trait ResolvesValues
@@ -12,6 +13,10 @@ trait ResolvesValues
 
         if ($value instanceof Value) {
             $value = $value->value();
+        }
+
+        if ($value instanceof Builder) {
+            $value = $value->get();
         }
 
         return $value;

@@ -2,12 +2,14 @@
 
 namespace Statamic\Auth;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 
-abstract class Role implements RoleContract, Augmentable
+abstract class Role implements RoleContract, Augmentable, ArrayAccess, Arrayable
 {
     use HasAugmentedData;
 

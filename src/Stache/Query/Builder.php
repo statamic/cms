@@ -31,7 +31,9 @@ abstract class Builder extends BaseBuilder
 
         $items = $this->getItems($keys);
 
-        $items->each->selectedQueryColumns($this->columns ?? $columns);
+        $items->each(fn ($item) => $item
+            ->selectedQueryColumns($this->columns ?? $columns)
+            ->selectedQueryRelations($this->with));
 
         return $this->collect($items);
     }

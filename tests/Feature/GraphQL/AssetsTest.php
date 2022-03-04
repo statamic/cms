@@ -39,7 +39,7 @@ class AssetsTest extends TestCase
     /** @test */
     public function it_queries_assets()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('a.txt', '');
         Storage::disk('test')->put('b.txt', '');
         AssetContainer::make('test')->disk('test')->save();
@@ -67,7 +67,7 @@ GQL;
     /** @test */
     public function it_paginates_assets()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('a.txt', '');
         Storage::disk('test')->put('b.txt', '');
         Storage::disk('test')->put('c.txt', '');
@@ -116,7 +116,7 @@ GQL;
     /** @test */
     public function it_queries_blueprint_specific_fields()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('a.txt', '');
         Storage::disk('test')->put('b.txt', '');
         AssetContainer::make('test')->disk('test')->save();
@@ -175,7 +175,7 @@ GQL;
     /** @test */
     public function it_sorts_assets()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('a.txt', '');
         Storage::disk('test')->put('b.txt', '');
         AssetContainer::make('test')->disk('test')->save();
@@ -209,7 +209,7 @@ GQL;
     /** @test */
     public function it_sorts_assets_descending()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('a.txt', '');
         Storage::disk('test')->put('b.txt', '');
         AssetContainer::make('test')->disk('test')->save();
@@ -243,7 +243,7 @@ GQL;
     /** @test */
     public function it_sorts_assets_on_multiple_fields()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('1.txt', '');
         Storage::disk('test')->put('2.txt', '');
         Storage::disk('test')->put('3.txt', '');

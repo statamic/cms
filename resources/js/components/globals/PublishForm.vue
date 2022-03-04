@@ -85,8 +85,13 @@
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
+import HasHiddenFields from '../data-list/HasHiddenFields';
 
 export default {
+
+    mixins: [
+        HasHiddenFields,
+    ],
 
     components: {
         SiteSelector
@@ -193,7 +198,7 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            const payload = { ...this.values, ...{
+            const payload = { ...this.visibleValues, ...{
                 blueprint: this.fieldset.handle,
                 _localized: this.localizedFields,
             }};

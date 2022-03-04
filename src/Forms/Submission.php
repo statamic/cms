@@ -104,25 +104,6 @@ class Submission implements SubmissionContract, Augmentable
     }
 
     /**
-     * Get or set the data.
-     *
-     * @param  array|null  $data
-     * @return array
-     */
-    public function data($data = null)
-    {
-        if (func_num_args() === 0) {
-            return $this->data;
-        }
-
-        $data = collect($data)->intersectByKeys($this->fields())->all();
-
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /**
      * Upload files.
      */
     public function uploadFiles()
@@ -139,44 +120,11 @@ class Submission implements SubmissionContract, Augmentable
     }
 
     /**
-     * Whether the submissin has the given key.
-     *
-     * @return bool
-     */
-    public function has($field)
-    {
-        return array_has($this->data(), $field);
-    }
-
-    /**
-     * Get a value of a field.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function get($field)
-    {
-        return array_get($this->data(), $field);
-    }
-
-    /**
-     * Set a value of a field.
-     *
-     * @param  string  $field
-     * @param  mixed  $value
-     * @return void
-     */
-    public function set($field, $value)
-    {
-        array_set($this->data, $field, $value);
-    }
-
-    /**
      * Save the submission.
      */
     public function save()
     {
-        File::put($this->getPath(), YAML::dump($this->data()));
+        File::put($this->getPath(), YAML::dump($this->data()->all()));
 
         SubmissionSaved::dispatch($this);
     }
@@ -234,5 +182,10 @@ class Submission implements SubmissionContract, Augmentable
     public function blueprint()
     {
         return $this->form->blueprint();
+    }
+
+    public function __get($key)
+    {
+        return $this->get($key);
     }
 }

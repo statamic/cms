@@ -4,6 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 
 class ListCommand extends Command
@@ -31,7 +32,7 @@ class ListCommand extends Command
         ]);
     }
 
-    public function getApplication()
+    public function getApplication(): ?Application
     {
         $app = parent::getApplication();
 

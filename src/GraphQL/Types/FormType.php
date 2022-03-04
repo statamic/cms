@@ -32,6 +32,12 @@ class FormType extends \Rebing\GraphQL\Support\Type
                     return $form->blueprint()->fields()->all();
                 },
             ],
+            'rules' => [
+                'type' => GraphQL::type(ArrayType::NAME),
+                'resolve' => function ($form, $args, $context, $info) {
+                    return $form->blueprint()->fields()->validator()->rules();
+                },
+            ],
         ])
         ->map(function (array $arr) {
             $arr['resolve'] = $arr['resolve'] ?? $this->resolver();

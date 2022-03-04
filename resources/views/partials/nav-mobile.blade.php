@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 <nav class="nav-main nav-mobile" v-cloak>
     <div class="nav-main-inner">
         @foreach ($nav as $section => $items)

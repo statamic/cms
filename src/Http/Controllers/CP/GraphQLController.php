@@ -18,8 +18,17 @@ class GraphQLController extends CpController
 
     public function graphiql()
     {
+        $configKey = $this->isLegacyRebingGraphql()
+            ? 'graphql.prefix'
+            : 'graphql.route.prefix';
+
         return view('statamic::graphql.graphiql', [
-            'url' => '/'.config('graphql.prefix'),
+            'url' => '/'.config($configKey),
         ]);
+    }
+
+    protected function isLegacyRebingGraphql()
+    {
+        return class_exists('\Rebing\GraphQL\Support\ResolveInfoFieldsAndArguments');
     }
 }
