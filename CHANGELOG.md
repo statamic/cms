@@ -1,6 +1,6 @@
 # Release Notes
 
-## 3.3.0-beta.4 (2022-03-03)
+## 3.3.0-beta.4 (2022-03-04)
 
 ### What's new
 - Allow escaped braces inside tag parameters and string literals. [#5394](https://github.com/statamic/cms/issues/5394) by @JohnathonKoster
@@ -11,6 +11,7 @@
 
 ### What's changed
 - Assets, Terms, and Users fieldtypes augment to query builders. [#5388](https://github.com/statamic/cms/issues/5388) by @jasonvarga
+- Change references of `Statamic 3` to just `Statamic`. [#5404](https://github.com/statamic/cms/issues/5404) by @jackmcdade
 
 
 
