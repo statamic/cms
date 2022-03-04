@@ -60,7 +60,7 @@ EOT;
     {
         $data = [
             'title' => 'The title',
-            'subtitle' => 'The subtitle'
+            'subtitle' => 'The subtitle',
         ];
 
         $template = <<<'EOT'
