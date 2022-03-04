@@ -190,6 +190,7 @@ EOT;
 
         $this->assertStringContainsString($checkString, $nodes[2]->content);
     }
+
     public function test_double_braces_inside_a_parameter_emits_final_literal_node_if_no_other_antlers()
     {
         $template = <<<'EOT'
