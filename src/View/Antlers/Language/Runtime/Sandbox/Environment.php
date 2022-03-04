@@ -884,7 +884,12 @@ class Environment
                 $right = $this->checkForFieldValue($right);
 
                 $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
-                $this->assignments[$this->dataRetriever->lastPath()] = $right;
+                $lastPath = $this->dataRetriever->lastPath();
+                $this->assignments[$lastPath] = $right;
+
+                if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                    GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                }
 
                 return null;
             } elseif ($operand instanceof AdditionAssignmentOperator) {
