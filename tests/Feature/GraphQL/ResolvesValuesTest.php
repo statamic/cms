@@ -31,7 +31,8 @@ class ResolvesValuesTest extends TestCase
             }
         };
 
-        FieldtypeRepository::shouldReceive('find')->with('example')->andReturn($fieldtype);
+        $mock = FieldtypeRepository::partialMock();
+        $mock->shouldReceive('find')->with('example')->andReturn($fieldtype);
 
         $this->blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'example']]);
     }

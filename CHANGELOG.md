@@ -1,5 +1,15 @@
 # Release Notes
 
+## Unreleased
+
+### What's new
+- More control over how values should be stored for querying. e.g. `date` fieldtypes store `Carbon` instances. [#5156](https://github.com/statamic/cms/issues/5156) by @jasonvarga
+
+### What's changed
+- Custom `date` fields are stored in the Stache as `Carbon` instances, not strings. [#5156](https://github.com/statamic/cms/issues/5156) by @jasonvarga
+
+
+
 ## 3.3.0-beta.4 (2022-03-04)
 
 ### What's new

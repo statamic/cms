@@ -285,4 +285,9 @@ abstract class Fieldtype implements Arrayable
     {
         return $this->relationship;
     }
+
+    public function toQueryableValue($value)
+    {
+        return $value;
+    }
 }
