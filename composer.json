@@ -73,7 +73,8 @@
             "Statamic\\": "src/"
         },
         "files": [
-            "src/helpers.php"
+            "src/helpers.php",
+            "src/namespaced_helpers.php"
         ]
     },
     "autoload-dev": {
