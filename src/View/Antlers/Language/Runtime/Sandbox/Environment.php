@@ -1450,7 +1450,7 @@ class Environment
 
                 foreach (GlobalRuntimeState::$interpolatedVariables as $region) {
                     if (Str::contains($val->value, $region)) {
-                        $stringValue = str_replace($region, (string)$this->nodeProcessor->evaluateDeferredInterpolation(trim($region)), $stringValue);
+                        $stringValue = str_replace($region, (string) $this->nodeProcessor->evaluateDeferredInterpolation(trim($region)), $stringValue);
                     }
                 }
 
