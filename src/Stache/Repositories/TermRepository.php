@@ -16,6 +16,8 @@ class TermRepository implements RepositoryContract
 {
     protected $stache;
     protected $store;
+    protected $substitutionsById = [];
+    protected $substitutionsByUri = [];
 
     public function __construct(Stache $stache)
     {
@@ -45,6 +47,12 @@ class TermRepository implements RepositoryContract
 
     public function findByUri(string $uri, string $site = null): ?Term
     {
+        $site = $site ?? $this->stache->sites()->first();
+
+        if ($substitute = $this->substitutionsByUri[$site.'@'.$uri] ?? null) {
+            return $substitute;
+        }
+
         $collection = Collection::all()
             ->first(function ($collection) use ($uri, $site) {
                 if (Str::startsWith($uri, $collection->uri($site))) {
@@ -153,5 +161,18 @@ class TermRepository implements RepositoryContract
     private function findTaxonomyHandleByUri($uri)
     {
         return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(Str::ensureLeft($uri, '/'));
+    }
+
+    public function substitute($item)
+    {
+        $this->substitutionsById[$item->id()] = $item;
+        $this->substitutionsByUri[$item->locale().'@'.$item->uri()] = $item;
+    }
+
+    public function applySubstitutions($items)
+    {
+        return $items->map(function ($item) {
+            return $this->substitutionsById[$item->id()] ?? $item;
+        });
     }
 }

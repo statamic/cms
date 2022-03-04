@@ -1,4 +1,4 @@
-require('../bootstrap/globals');
+import { tidy_url } from '../bootstrap/globals'
 
 test('it tidies urls', () => {
     expect(tidy_url('foo/bar')).toBe('foo/bar');

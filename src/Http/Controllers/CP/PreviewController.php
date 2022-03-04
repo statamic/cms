@@ -2,15 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Exception;
-use Facades\Statamic\View\Cascade;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Facades\Statamic\CP\LivePreview;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Facade;
-use Statamic\Facades\Site;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use Throwable;
 
 class PreviewController extends CpController
 {
@@ -32,39 +25,28 @@ class PreviewController extends CpController
             $data->setSupplement($key, $value);
         }
 
-        return $this->getDataResponse($request, $data)->getContent();
+        return $this->tokenizeAndReturn($request, $data);
     }
 
-    protected function getDataResponse($request, $data)
+    protected function tokenizeAndReturn($request, $data)
     {
-        $url = $request->amp ? $data->ampUrl() : $data->absoluteUrl();
+        $data->setSupplement('live_preview', empty($extras = $request->extras) ? true : $extras);
 
-        $subrequest = Request::createFromBase(SymfonyRequest::create($url));
+        return [
+            'token' => $token = LivePreview::tokenize($request->token, $data)->token(),
+            'url' => $this->getPreviewUrl($data, $request->target ?? 0, $token),
+        ];
+    }
 
-        $subrequest->headers->set('X-Statamic-Live-Preview', true);
+    private function getPreviewUrl($data, $target, $token)
+    {
+        $url = $data->previewTargets()[$target]['url'];
 
-        app()->instance('request', $subrequest);
-        Facade::clearResolvedInstance('request');
-        Cascade::withRequest($subrequest);
-        Cascade::withSite(Site::current());
-        app('translator')->setLocale(Site::current()->shortLocale());
-
-        try {
-            $response = $data->toLivePreviewResponse($subrequest, $request->extras);
-        } catch (Exception $e) {
-            app(ExceptionHandler::class)->report($e);
-            $response = app(ExceptionHandler::class)->render($subrequest, $e);
-        } catch (Throwable $e) {
-            app(ExceptionHandler::class)->report($e = new FatalThrowableError($e));
-            $response = app(ExceptionHandler::class)->render($subrequest, $e);
-        }
-
-        app()->instance('request', $request);
-        Facade::clearResolvedInstance('request');
-        Cascade::withRequest($request);
-        Cascade::withSite(Site::current());
-        app('translator')->setLocale(Site::current()->shortLocale());
-
-        return $response;
+        return vsprintf('%s%slive-preview=%s&token=%s', [
+            $url,
+            strpos($url, '?') === false ? '?' : '&',
+            str_random(), // random string to prevent caching
+            $token,
+        ]);
     }
 }

@@ -315,7 +315,7 @@ trait QueriesConditions
         }
 
         if ($value instanceof Augmentable) {
-            $value = $value->augmentedValue($field);
+            $value = $value->augmentedValue($field)->value();
         }
 
         if ($value instanceof LabeledValue) {

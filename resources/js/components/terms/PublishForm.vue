@@ -65,9 +65,9 @@
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
+                :targets="previewTargets"
                 :values="values"
                 :blueprint="fieldset.handle"
-                :amp="amp"
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
@@ -235,11 +235,13 @@ import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
+import HasHiddenFields from '../data-list/HasHiddenFields';
 
 export default {
 
     mixins: [
         HasPreferences,
+        HasHiddenFields,
     ],
 
     components: {
@@ -277,6 +279,7 @@ export default {
         preloadedAssets: Array,
         createAnotherUrl: String,
         listingUrl: String,
+        previewTargets: Array,
     },
 
     data() {
@@ -310,7 +313,7 @@ export default {
             preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
-            quickSave: false
+            quickSave: false,
         }
     },
 
@@ -419,7 +422,7 @@ export default {
         },
 
         performSaveRequest() {
-            const payload = { ...this.values, ...{
+            const payload = { ...this.visibleValues, ...{
                 _blueprint: this.fieldset.handle,
                 published: this.published,
                 _localized: this.localizedFields,

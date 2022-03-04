@@ -144,13 +144,13 @@ class Cascade
 
             $global = $global->in($this->site->handle());
 
-            $this->set($global->handle(), $global->toAugmentedArray());
+            $this->set($global->handle(), $global);
         }
 
-        $mainGlobal = $this->get('global') ?? [];
-
-        foreach ($mainGlobal as $key => $value) {
-            $this->set($key, $value);
+        if ($mainGlobal = $this->get('global')) {
+            foreach ($mainGlobal->toAugmentedCollection() as $key => $value) {
+                $this->set($key, $value);
+            }
         }
 
         return $this;
@@ -170,7 +170,7 @@ class Cascade
             $this->set($key, $value);
         }
 
-        $this->set('page', $variables);
+        $this->set('page', $this->content);
 
         return $this;
     }
@@ -215,7 +215,7 @@ class Cascade
 
     protected function hydrateViewModel()
     {
-        if ($class = $this->get('view_model')) {
+        if ($class = optional($this->get('view_model'))->value()) {
             $viewModel = new $class($this);
             $this->data = array_merge($this->data, $viewModel->data());
         }

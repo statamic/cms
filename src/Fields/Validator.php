@@ -96,7 +96,7 @@ class Validator
     public function validate()
     {
         return LaravelValidator::validate(
-            $this->fields->preProcessValidatables()->values()->all(),
+            $this->fields->preProcessValidatables()->validatableValues()->all(),
             $this->rules(),
             $this->customMessages,
             $this->attributes()
@@ -112,9 +112,15 @@ class Validator
 
     private function parse($rule)
     {
-        if (! is_string($rule) || ! Str::contains($rule, '{')) {
+        if (! is_string($rule) ||
+            ! Str::contains($rule, '{') ||
+            Str::startsWith($rule, 'regex:') ||
+            Str::startsWith($rule, 'not_regex:')
+        ) {
             return $rule;
         }
+
+        $rule = str_replace('{this}.', $this->context['prefix'] ?? '', $rule);
 
         return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
             return Arr::get($this->replacements, $match[1], 'NULL');

@@ -7,8 +7,8 @@ use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Support\Str;
-use Statamic\View\Antlers\Parser;
 
 class Value implements IteratorAggregate, JsonSerializable
 {
@@ -90,7 +90,7 @@ class Value implements IteratorAggregate, JsonSerializable
         }
 
         if (Str::contains($value, '{')) {
-            return $parser->extractNoparse(str_replace('{{', '@{{', $value));
+            return $parser->valueWithNoparse($value);
         }
 
         return $value;
@@ -119,5 +119,10 @@ class Value implements IteratorAggregate, JsonSerializable
     public function shallow()
     {
         return new static($this->raw, $this->handle, $this->fieldtype, $this->augmentable, true);
+    }
+
+    public function isRelationship(): bool
+    {
+        return optional($this->fieldtype)->isRelationship() ?? false;
     }
 }

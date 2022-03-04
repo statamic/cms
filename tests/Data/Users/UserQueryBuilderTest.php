@@ -149,4 +149,63 @@ class UserQueryBuilderTest extends TestCase
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 1', 'Post 2', 'Post 5'], $entries->map->foo->all());
     }
+
+    /** @test **/
+    public function users_are_found_using_when()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
+
+        $users = User::query()->when(true, function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(['Gandalf'], $users->map->name->all());
+
+        $users = User::query()->when(false, function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
+
+        $this->assertCount(3, $users);
+        $this->assertEquals(['Gandalf', 'Smeagol', 'Frodo'], $users->map->name->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_unless()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
+
+        $users = User::query()->unless(true, function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
+
+        $this->assertCount(3, $users);
+        $this->assertEquals(['Gandalf', 'Smeagol', 'Frodo'], $users->map->name->all());
+
+        $users = User::query()->unless(false, function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(['Gandalf'], $users->map->name->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_tap()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
+
+        $users = User::query()->tap(function ($query) {
+            $query->where('email', 'gandalf@precious.com');
+        })->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(['Gandalf'], $users->map->name->all());
+    }
 }

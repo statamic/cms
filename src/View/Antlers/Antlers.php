@@ -3,6 +3,7 @@
 namespace Statamic\View\Antlers;
 
 use Closure;
+use Statamic\Contracts\View\Antlers\Parser;
 
 class Antlers
 {

@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @section('nav-main')
     <nav class="nav-main" v-cloak>
         <div class="nav-main-inner">

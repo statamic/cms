@@ -8,8 +8,8 @@
        }
 
        // Push toggle off to the right
-       .toggle-fieldtype {
-           @apply flex justify-between;
+       > .publish-fields > .toggle-fieldtype {
+           @apply flex justify-between items-center;
            .help-block, .help-block p { @apply mb-0; }
            .field-inner { @apply pr-4; }
        }

@@ -8,11 +8,14 @@ use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
+use Statamic\Support\Arr;
 
 class EntryRepository implements RepositoryContract
 {
     protected $stache;
     protected $store;
+    protected $substitutionsById = [];
+    protected $substitutionsByUri = [];
 
     public function __construct(Stache $stache)
     {
@@ -52,6 +55,10 @@ class EntryRepository implements RepositoryContract
     public function findByUri(string $uri, string $site = null): ?Entry
     {
         $site = $site ?? $this->stache->sites()->first();
+
+        if ($substitute = Arr::get($this->substitutionsByUri, $site.'@'.$uri)) {
+            return $substitute;
+        }
 
         $entry = $this->query()
                 ->where('uri', $uri)
@@ -122,5 +129,18 @@ class EntryRepository implements RepositoryContract
             Entry::class => \Statamic\Entries\Entry::class,
             QueryBuilder::class => EntryQueryBuilder::class,
         ];
+    }
+
+    public function substitute($item)
+    {
+        $this->substitutionsById[$item->id()] = $item;
+        $this->substitutionsByUri[$item->locale().'@'.$item->uri()] = $item;
+    }
+
+    public function applySubstitutions($items)
+    {
+        return $items->map(function ($item) {
+            return $this->substitutionsById[$item->id()] ?? $item;
+        });
     }
 }

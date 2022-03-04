@@ -4,6 +4,7 @@ namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -269,5 +270,111 @@ class TermQueryBuilderTest extends TestCase
                 ->where('taxonomy', 'tags')
                 ->get()->map->id()->sort()->values()->all()
         );
+    }
+
+    /** @test */
+    public function it_substitutes_terms_by_id()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('tag-1')->dataForLocale('en', [])->taxonomy('tags')->save();
+        Term::make('tag-2')->dataForLocale('en', [])->taxonomy('tags')->save();
+        Term::make('tag-3')->dataForLocale('en', [])->taxonomy('tags')->save();
+
+        $substitute = Term::make('tag-2')->taxonomy('tags')->dataForLocale('en', ['title' => 'Replaced'])->in('en');
+
+        $found = Term::query()->where('id', 'tags::tag-2')->first();
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substitute);
+
+        Term::substitute($substitute);
+
+        $found = Term::query()->where('id', 'tags::tag-2')->first();
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substitute);
+    }
+
+    /** @test */
+    public function it_substitutes_terms_by_uri()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('tag-1')->taxonomy('tags')->dataForLocale('en', [])->save();
+        Term::make('tag-2')->taxonomy('tags')->dataForLocale('en', [])->save();
+        Term::make('tag-3')->taxonomy('tags')->dataForLocale('en', [])->save();
+
+        $substitute = Term::make('tag-2')->slug('replaced-tag-2')->taxonomy('tags')->dataForLocale('en', []);
+
+        $found = Term::findByUri('/tags/tag-2');
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substitute);
+
+        $this->assertNull(Term::findByUri('/tags/replaced-tag-2'));
+
+        Term::substitute($substitute);
+
+        $found = Term::findByUri('/tags/replaced-tag-2');
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substitute);
+    }
+
+    /** @test */
+    public function it_substitutes_terms_by_uri_and_site()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+        Term::make('tag-1')->slug('tag-1')->taxonomy('tags')
+            ->dataForlocale('en', [])
+            ->dataForlocale('fr', [])
+            ->save();
+        Term::make('tag-2')->slug('tag-2')->taxonomy('tags')
+            ->dataForlocale('en', [])
+            ->dataForlocale('fr', [])
+            ->save();
+        Term::make('tag-3')->slug('tag-3')->taxonomy('tags')
+            ->dataForlocale('en', [])
+            ->dataForlocale('fr', [])
+            ->save();
+
+        $substitute = Term::make('tag-2')
+            ->slug('replaced-tag-2')
+            ->taxonomy('tags')
+            ->dataForLocale('en', [])
+            ->dataForLocale('fr', []);
+        $substituteEn = $substitute->in('en');
+        $substituteFr = $substitute->in('fr');
+
+        $found = Term::findByUri('/tags/tag-2');
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substituteEn);
+
+        $found = Term::findByUri('/tags/tag-2', 'en');
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substituteEn);
+
+        $found = Term::findByUri('/tags/tag-2', 'fr');
+        $this->assertNotNull($found);
+        $this->assertNotSame($found, $substituteFr);
+
+        $this->assertNull(Term::findByUri('/tags/replaced-tag-2'));
+        $this->assertNull(Term::findByUri('/tags/replaced-tag-2', 'en'));
+        $this->assertNull(Term::findByUri('/tags/replaced-tag-2', 'fr'));
+
+        Term::substitute($substituteEn);
+        Term::substitute($substituteFr);
+
+        $found = Term::findByUri('/tags/replaced-tag-2');
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substituteEn);
+
+        $found = Term::findByUri('/tags/replaced-tag-2', 'en');
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substituteEn);
+
+        $found = Term::findByUri('/tags/replaced-tag-2', 'fr');
+        $this->assertNotNull($found);
+        $this->assertSame($found, $substituteFr);
     }
 }

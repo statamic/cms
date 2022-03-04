@@ -17,11 +17,6 @@ namespace Tests\Assets;
      {
          parent::setUp();
 
-         config(['filesystems.disks.test' => [
-             'driver' => 'local',
-             'root' => __DIR__.'/doesnt-matter-itll-get-faked-anyway',
-         ]]);
-
          Storage::fake('test');
 
          $this->dimensions = new Dimensions(app(ImageGenerator::class));
@@ -56,7 +51,7 @@ namespace Tests\Assets;
          Storage::disk('test')->putFileAs('path/to', $file, 'asset.jpg');
 
          // Test about the actual file, for good measure.
-         $realpath = Storage::disk('test')->getAdapter()->getPathPrefix().'path/to/asset.jpg';
+         $realpath = Storage::disk('test')->path('path/to/asset.jpg');
          $this->assertFileExists($realpath);
          $imagesize = getimagesize($realpath);
          $this->assertEquals([30, 60], array_splice($imagesize, 0, 2));

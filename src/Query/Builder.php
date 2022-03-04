@@ -17,6 +17,7 @@ abstract class Builder implements Contract
     protected $limit;
     protected $offset = 0;
     protected $wheres = [];
+    protected $with = [];
     protected $orderBys = [];
     protected $operators = [
         '=' => 'Equals',
@@ -496,6 +497,37 @@ abstract class Builder implements Contract
 
     abstract public function get($columns = ['*']);
 
+    public function when($value, $callback, $default = null)
+    {
+        if ($value) {
+            return $callback($this, $value) ?: $this;
+        }
+
+        if ($default) {
+            return $default($this, $value) ?: $this;
+        }
+
+        return $this;
+    }
+
+    public function tap($callback)
+    {
+        return $this->when(true, $callback);
+    }
+
+    public function unless($value, $callback, $default = null)
+    {
+        if (! $value) {
+            return $callback($this, $value) ?: $this;
+        }
+
+        if ($default) {
+            return $default($this, $value) ?: $this;
+        }
+
+        return $this;
+    }
+
     protected function filterTestEquals($item, $value)
     {
         return strtolower($item) === strtolower($value);
@@ -554,5 +586,12 @@ abstract class Builder implements Contract
     protected function filterTestNotLikeRegex($item, $pattern)
     {
         return ! $this->filterTestLikeRegex($item, $pattern);
+    }
+
+    public function with($relations)
+    {
+        $this->with = array_merge($this->with, Arr::wrap($relations));
+
+        return $this;
     }
 }

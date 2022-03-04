@@ -52,7 +52,16 @@ class AssetContainersController extends CpController
     {
         $this->authorize('edit', $container, 'You are not authorized to edit asset containers.');
 
-        $values = $container->toArray();
+        $values = [
+            'title' => $container->title(),
+            'handle' => $container->handle(),
+            'disk' => $container->diskHandle(),
+            'allow_uploads' => $container->allowUploads(),
+            'allow_downloading' => $container->allowDownloading(),
+            'allow_renaming' => $container->allowRenaming(),
+            'allow_moving' => $container->allowMoving(),
+            'create_folders' => $container->createFolders(),
+        ];
 
         $fields = ($blueprint = $this->formBlueprint($container))
             ->fields()
@@ -87,8 +96,6 @@ class AssetContainersController extends CpController
             ->createFolders($values['create_folders']);
 
         $container->save();
-
-        // return $container->toArray();
 
         session()->flash('success', __('Asset container updated'));
 
