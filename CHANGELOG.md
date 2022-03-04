@@ -18,9 +18,11 @@
 ### What's fixed
 - Update the Live Preview content area size when you change the device dropdown. [#5390](https://github.com/statamic/cms/issues/5390) by @jasonvarga
 - Fix error when opening inline publish form. [#5392](https://github.com/statamic/cms/issues/5392) by @jasonvarga
+- Brought over changes from 3.2
 
 ### What's changed
 - Assets, Terms, and Users fieldtypes augment to query builders. [#5388](https://github.com/statamic/cms/issues/5388) by @jasonvarga
+- Change references of `Statamic 3` to just `Statamic`. [#5404](https://github.com/statamic/cms/issues/5404) by @jackmcdade
 
 
 
@@ -81,6 +83,18 @@
 - `$item->augmentedValue()`, `toAugmentedCollection()`, and `toAugmentedArray()` will always return `Value` instances. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
 - Form submission data will always be an unfiltered Collection. [#5230](https://github.com/statamic/cms/issues/5230) by @jasonvarga
 - AssetContainer, Collection, Form, and Taxonomy's `toArray` methods return different data. [#5186](https://github.com/statamic/cms/issues/5186) by @jasonvarga
+
+
+
+## 3.2.36 (2022-03-04)
+
+### What's new
+- The `route` tag can be used with a `name` parameter. [#5407](https://github.com/statamic/cms/issues/5407) by @ryanmitchell
+- The CP updater will prevent you upgrading to a version that could require manual changes. [#5401](https://github.com/statamic/cms/issues/5401) by @jasonvarga
+
+### What's fixed
+- Namespaced translation methods [#5144](https://github.com/statamic/cms/issues/5144) by @jasonvarga
+- The `range` fieldtype will save integers. [#5391](https://github.com/statamic/cms/issues/5391) by @jackmcdade
 
 
 
