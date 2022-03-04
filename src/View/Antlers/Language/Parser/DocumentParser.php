@@ -489,7 +489,23 @@ class DocumentParser
                                 $nextAntlersStart = $this->antlersStartIndex[$i + 1];
 
                                 if ($nextAntlersStart < $this->lastAntlersNode->endPosition->offset) {
-                                    continue;
+                                    if ($i + 2 < $indexCount) {
+                                        $nextAntlersStart = $this->antlersStartIndex[$i + 2];
+                                    } else {
+                                        $literalStart = $this->lastAntlersNode->endPosition->offset + 1;
+                                        $finalContent = $this->prepareLiteralContent(StringUtilities::substr($this->content, $literalStart));
+
+                                        if (! strlen($finalContent) == 0) {
+                                            $finalLiteral = new LiteralNode();
+                                            $finalLiteral->content = $finalContent;
+                                            $finalLiteral->startPosition = $this->positionFromOffset($literalStart, $literalStart);
+                                            $finalLiteral->endPosition = $this->positionFromOffset($this->inputLen - 1, $literalStart);
+                                            $this->nodes[] = $finalLiteral;
+                                            break;
+                                        }
+
+                                        continue;
+                                    }
                                 }
                             } else {
                                 if ($i + 1 != $lastIndex) {
