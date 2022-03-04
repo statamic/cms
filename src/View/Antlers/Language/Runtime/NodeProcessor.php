@@ -184,6 +184,7 @@ class NodeProcessor
      * @var bool
      */
     private $encounteredBuilder = false;
+    private $builderNodeId = null;
 
     /**
      * A reference to the last resolved Builder instance.
@@ -493,6 +494,7 @@ class NodeProcessor
                 if ($resolvedValue instanceof Builder && $node->isClosedBy != null && $node->isSelfClosing == false) {
                     $this->encounteredBuilder = true;
                     $this->resolvedBuilder = $resolvedValue;
+                    $this->builderNodeId = $node->refId;
 
                     // If the path reference has more than one part,
                     // it is something like {{ products.0.name }}
@@ -965,6 +967,11 @@ class NodeProcessor
                         if ($node->name->name == 'elseif' || $node->name->name == 'if') {
                             continue;
                         }
+                    }
+
+                    if ($this->encounteredBuilder && $this->builderNodeId != $node->refId) {
+                        $this->encounteredBuilder = false;
+                        $this->builderNodeId = null;
                     }
 
                     GlobalRuntimeState::$lastNode = $node;
