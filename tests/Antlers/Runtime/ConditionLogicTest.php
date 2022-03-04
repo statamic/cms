@@ -5,6 +5,7 @@ namespace Tests\Antlers\Runtime;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Select;
+use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
 use Statamic\Taxonomies\TermCollection;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
@@ -389,7 +390,31 @@ EOT;
         $this->assertSame('visual-value', (string) VarTest::$var);
     }
 
-    public function test_condition_insanity()
+    public function test_conditional_with_not_keyword()
+    {
+        $template = <<<'EOT'
+{{ if not seo_noindex }}
+    {{ if seo_canonical_type == 'current' }}
+        <link rel="canonical" href="{{ config:app:url }}{{ seo_canonical_current | url }}">
+    {{ elseif seo_canonical_type == 'external' }}
+        <link rel="canonical" href="{{ seo_canonical_external }}">
+    {{ elseif seo_canonical_type == 'entry' }}
+        <link rel="canonical" href="{{ permalink }}">
+    {{ /if }}
+{{ else }}
+    Inside else: not seo_noindex
+{{ /if }}
+EOT;
+
+        $this->assertStringContainsString('Inside else: not seo_noindex', $this->renderString($template, ['seo_noindex' => true]));
+        $this->assertStringContainsString('<link rel="canonical" href="The permalink">', $this->renderString($template, [
+            'seo_noindex' => false,
+            'seo_canonical_type' => 'entry',
+            'permalink' => 'The permalink'
+        ]));
+    }
+
+    public function test_templates_with_many_unique_conditions_render_correctly()
     {
         $template = <<<'EOT'
 
@@ -448,6 +473,8 @@ EOT;
     {{ elseif seo_canonical_type == 'entry' }}
         <link rel="canonical" href="{{ permalink }}">
     {{ /if }}
+{{ else }}
+    Inside else: not seo_noindex
 {{ /if }}
 
 {{ yield:pagination }}
@@ -556,7 +583,6 @@ EOT;
     (environment == 'staging' && seo:trackers_staging) or
     (environment == 'production' && seo:trackers_production)
 }}
-got this far
     {{ if seo:tracker_type == 'gtm' }}
         <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ seo:google_tag_manager }}');function gtag(){dataLayer.push(arguments);}</script>
     {{ elseif seo:tracker_type == 'gtag' }}
@@ -603,6 +629,7 @@ EOT;
 
         $data = [
             'environment' => 'local',
+            'title' => 'The Title',
             'seo' => [
                 'trackers_local' => true,
                 'use_fathom' => true,
@@ -611,30 +638,61 @@ EOT;
                 'fathom' => 'site name',
                 'use_cloudflare_web_analytics' => true,
             ],
+            'seo_noindex' => true
         ];
 
         $result = $this->renderString($template, $data);
 
         // If this fails, the pairing algorithm incorrectly associated something along the way.
+        $this->assertStringContainsString('The Title', $result);
         $this->assertStringContainsString('test url', $result);
         $this->assertStringContainsString('site name', $result);
         $this->assertStringContainsString('https://static.cloudflareinsights.com/beacon.min.js', $result);
+        $this->assertStringContainsString('Inside else: not seo_noindex', $result);
 
-        $data = [
-            'environment' => 'local',
-            'seo' => [
-                'trackers_local' => true,
-                'use_fathom' => true,
-                'fathom_use_custom_domain' => false,
-                'fathom_custom_script_url' => 'test url',
-                'fathom' => 'site name',
-                'use_cloudflare_web_analytics' => true,
-            ],
-        ];
+        Arr::set($data, 'seo.fathom_use_custom_domain', false);
+        Arr::set($data, 'seo_title', 'The Seo Title');
+        Arr::set($data, 'seo_description', 'The SEO Description');
 
         $result = $this->renderString($template, $data);
-
+        $this->assertStringContainsString('The Seo Title', $result);
+        $this->assertStringContainsString('<meta name="description" content="The SEO Description">', $result);
         $this->assertStringContainsString('https://cdn.usefathom.com/script.js', $result);
         $this->assertStringContainsString('https://static.cloudflareinsights.com/beacon.min.js', $result);
+        $this->assertStringContainsString('Inside else: not seo_noindex', $result);
+
+        Arr::set($data, 'seo_noindex', false);
+        Arr::set($data, 'seo_canonical_type', 'entry');
+        Arr::set($data, 'permalink', 'The permalink');
+
+        $result = $this->renderString($template, $data);
+        $this->assertStringContainsString('The Seo Title', $result);
+        $this->assertStringContainsString('<meta name="description" content="The SEO Description">', $result);
+        $this->assertStringContainsString('https://cdn.usefathom.com/script.js', $result);
+        $this->assertStringContainsString('https://static.cloudflareinsights.com/beacon.min.js', $result);
+        $this->assertStringContainsString('<link rel="canonical" href="The permalink">', $result);
+
+        Arr::set($data, 'schema_jsonld', 'json_ld');
+
+        $result = $this->renderString($template, $data);
+        $this->assertStringContainsString('The Seo Title', $result);
+        $this->assertStringContainsString('<meta name="description" content="The SEO Description">', $result);
+        $this->assertStringContainsString('https://cdn.usefathom.com/script.js', $result);
+        $this->assertStringContainsString('https://static.cloudflareinsights.com/beacon.min.js', $result);
+        $this->assertStringContainsString('<link rel="canonical" href="The permalink">', $result);
+        $this->assertStringContainsString('<script type="application/ld+json">json_ld</script>', $result);
+
+        Arr::set($data, 'twitter_image', true);
+        Arr::set($data, 'seo.twitter_handle', 'The Twitter handle');
+
+        $result = $this->renderString($template, $data);
+        $this->assertStringContainsString('<meta name="twitter:card" content="summary_large_image">', $result);
+        $this->assertStringContainsString('<meta name="twitter:site" content="The Twitter handle">', $result);
+        $this->assertStringContainsString('The Seo Title', $result);
+        $this->assertStringContainsString('<meta name="description" content="The SEO Description">', $result);
+        $this->assertStringContainsString('https://cdn.usefathom.com/script.js', $result);
+        $this->assertStringContainsString('https://static.cloudflareinsights.com/beacon.min.js', $result);
+        $this->assertStringContainsString('<link rel="canonical" href="The permalink">', $result);
+        $this->assertStringContainsString('<script type="application/ld+json">json_ld</script>', $result);
     }
 }
