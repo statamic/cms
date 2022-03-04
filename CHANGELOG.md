@@ -74,6 +74,18 @@
 
 
 
+## 3.2.36 (2022-03-04)
+
+### What's new
+- The `route` tag can be used with a `name` parameter. [#5407](https://github.com/statamic/cms/issues/5407) by @ryanmitchell
+- The CP updater will prevent you upgrading to a version that could require manual changes. [#5401](https://github.com/statamic/cms/issues/5401) by @jasonvarga
+
+### What's fixed
+- Namespaced translation methods [#5144](https://github.com/statamic/cms/issues/5144) by @jasonvarga
+- The `range` fieldtype will save integers. [#5391](https://github.com/statamic/cms/issues/5391) by @jackmcdade
+
+
+
 ## 3.2.35 (2022-03-01)
 
 ### What's fixed
