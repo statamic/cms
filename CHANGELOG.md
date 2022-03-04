@@ -10,7 +10,7 @@
 
 
 
-## 3.3.0-beta.4 (2022-03-03)
+## 3.3.0-beta.4 (2022-03-04)
 
 ### What's new
 - Allow escaped braces inside tag parameters and string literals. [#5394](https://github.com/statamic/cms/issues/5394) by @JohnathonKoster
