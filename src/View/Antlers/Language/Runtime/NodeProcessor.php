@@ -821,6 +821,10 @@ class NodeProcessor
      */
     public function evaluateDeferredInterpolation($regionName)
     {
+        if (! array_key_exists($regionName, $this->canHandleInterpolations)) {
+            return $regionName;
+        }
+
         if (! array_key_exists($regionName, $this->interpolationCache)) {
             $interpolationScope = $this->getActiveData();
 

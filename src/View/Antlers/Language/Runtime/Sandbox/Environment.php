@@ -1440,7 +1440,19 @@ class Environment
         } elseif ($val instanceof NullConstant) {
             $returnVal = null;
         } elseif ($val instanceof StringValueNode) {
-            $returnVal = $this->applyEscapeSequences($val->value);
+            if (Str::contains($val->value, GlobalRuntimeState::$interpolatedVariables)) {
+                $stringValue = $val->value;
+
+                foreach (GlobalRuntimeState::$interpolatedVariables as $region) {
+                    if (Str::contains($val->value, $region)) {
+                        $stringValue = str_replace($region, (string)$this->nodeProcessor->evaluateDeferredInterpolation(trim($region)), $stringValue);
+                    }
+                }
+
+                $returnVal = $stringValue;
+            } else {
+                $returnVal = $this->applyEscapeSequences($val->value);
+            }
         } elseif ($val instanceof NullCoalescenceGroup) {
             $returnVal = $this->evaluateNullCoalescence($val);
         } elseif ($val instanceof TernaryCondition) {
