@@ -66,7 +66,6 @@ EOT;
             }
         })::register();
 
-
         $builder = Mockery::mock(Builder::class);
         $builder->shouldReceive('get')->once()->andReturn(collect([
             ['title' => 'Foo'],

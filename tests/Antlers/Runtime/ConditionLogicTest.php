@@ -410,7 +410,7 @@ EOT;
         $this->assertStringContainsString('<link rel="canonical" href="The permalink">', $this->renderString($template, [
             'seo_noindex' => false,
             'seo_canonical_type' => 'entry',
-            'permalink' => 'The permalink'
+            'permalink' => 'The permalink',
         ]));
     }
 
@@ -638,7 +638,7 @@ EOT;
                 'fathom' => 'site name',
                 'use_cloudflare_web_analytics' => true,
             ],
-            'seo_noindex' => true
+            'seo_noindex' => true,
         ];
 
         $result = $this->renderString($template, $data);
