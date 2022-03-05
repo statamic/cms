@@ -7,7 +7,7 @@ use Statamic\Contracts\Query\Builder;
 use Statamic\Tags\Tags;
 use Tests\Antlers\ParserTestCase;
 
-class QueryBuilderTest extends ParserTestCase
+class AntlersQueryBuilderTest extends ParserTestCase
 {
     public function test_query_builder_loops_receive_tag_parameters()
     {

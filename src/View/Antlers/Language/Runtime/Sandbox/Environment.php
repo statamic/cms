@@ -1448,9 +1448,12 @@ class Environment
             if (Str::contains($val->value, GlobalRuntimeState::$interpolatedVariables)) {
                 $stringValue = $val->value;
 
-                foreach (GlobalRuntimeState::$interpolatedVariables as $region) {
-                    if (Str::contains($val->value, $region)) {
-                        $stringValue = str_replace($region, (string) $this->nodeProcessor->evaluateDeferredInterpolation(trim($region)), $stringValue);
+                foreach ($this->dataManagerInterpolations as $regionName => $region) {
+                    if (Str::contains($val->value, $regionName)) {
+                        $tempValue = $this->nodeProcessor->evaluateDeferredInterpolation(trim($regionName));
+                        if (is_string($tempValue) || (is_object($tempValue) && method_exists($tempValue, '__toString'))) {
+                            $stringValue = str_replace($regionName, (string) $tempValue, $stringValue);
+                        }
                     }
                 }
 
