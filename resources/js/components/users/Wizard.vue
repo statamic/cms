@@ -46,7 +46,7 @@
                     <label class="font-bold text-base mb-sm" for="first_name">{{ __('First Name') }}</label>
                     <input type="text" v-model="user.first_name" id="first_name" class="input-text" autofocus tabindex="2">
                     <div class="text-2xs text-grey-60 mt-1 flex items-center">
-                        <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                        <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                         {{ __('messages.user_wizard_name_instructions') }}
                     </div>
                 </div>
