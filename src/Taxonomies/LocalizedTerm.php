@@ -10,6 +10,7 @@ use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\Data\ContainsSupplementalData;
@@ -37,7 +38,8 @@ class LocalizedTerm implements
     Protectable,
     ResolvesValuesContract,
     ArrayAccess,
-    Arrayable
+    Arrayable,
+    ContainsQueryableValues
 {
     use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues;
 
@@ -498,5 +500,20 @@ class LocalizedTerm implements
     public function repository()
     {
         return app(TermRepository::class);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (method_exists($this, $method = Str::camel($field))) {
+            return $this->{$method}();
+        }
+
+        $value = $this->value($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
     }
 }

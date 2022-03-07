@@ -3,6 +3,7 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
@@ -376,5 +377,103 @@ class TermQueryBuilderTest extends TestCase
         $found = Term::findByUri('/tags/replaced-tag-2', 'fr');
         $this->assertNotNull($found);
         $this->assertSame($found, $substituteFr);
+    }
+
+    /** @test **/
+    public function entries_are_found_using_where_date()
+    {
+        $this->createWhereDateTestTerms();
+
+        $entries = Term::query()->whereDate('test_date', '2021-11-15')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Term::query()->whereDate('test_date', 1637000264)->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Term::query()->whereDate('test_date', '>=', '2021-11-15')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_where_month()
+    {
+        $this->createWhereDateTestTerms();
+
+        $entries = Term::query()->whereMonth('test_date', 11)->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
+
+        $entries = Term::query()->whereMonth('test_date', '<', 11)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 4'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_where_day()
+    {
+        $this->createWhereDateTestTerms();
+
+        $entries = Term::query()->whereDay('test_date', 15)->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Term::query()->whereDay('test_date', '<', 15)->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 2', 'Post 4'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_where_year()
+    {
+        $this->createWhereDateTestTerms();
+
+        $entries = Term::query()->whereYear('test_date', 2021)->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
+
+        $entries = Term::query()->whereYear('test_date', '<', 2021)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 4'], $entries->map->title->all());
+    }
+
+    /** @test **/
+    public function entries_are_found_using_where_time()
+    {
+        $this->createWhereDateTestTerms();
+
+        $entries = Term::query()->whereTime('test_date', '09:00')->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+
+        $entries = Term::query()->whereTime('test_date', '>', '09:00')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 4'], $entries->map->title->all());
+    }
+
+    private function createWhereDateTestTerms()
+    {
+        $blueprint = Blueprint::makeFromFields(['test_date' => ['type' => 'date', 'time_enabled' => true]]);
+        Blueprint::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
+
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Post 1', 'test_date' => '2021-11-15 20:31:04'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Post 2', 'test_date' => '2021-11-14 09:00:00'])->save();
+        Term::make('c')->taxonomy('tags')->data(['title' => 'Post 3', 'test_date' => '2021-11-15 00:00:00'])->save();
+        Term::make('d')->taxonomy('tags')->data(['title' => 'Post 4', 'test_date' => '2020-09-13 14:44:24'])->save();
+        Term::make('e')->taxonomy('tags')->data(['title' => 'Post 5', 'test_date' => null])->save();
     }
 }
