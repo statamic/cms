@@ -168,6 +168,103 @@ abstract class Builder extends BaseBuilder
         });
     }
 
+    protected function filterWhereDate($values, $where)
+    {
+        $method = $this->operatorToCarbonMethod($where['operator']);
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $value->copy()->startOfDay()->$method($where['value']);
+        });
+    }
+
+    protected function filterWhereMonth($values, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $this->{$method}($value->format('m'), $where['value']);
+        });
+    }
+
+    protected function filterWhereDay($values, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $this->{$method}($value->format('j'), $where['value']);
+        });
+    }
+
+    protected function filterWhereYear($values, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $this->{$method}($value->format('Y'), $where['value']);
+        });
+    }
+
+    protected function filterWhereTime($values, $where)
+    {
+        $method = $this->operatorToCarbonMethod($where['operator']);
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (is_null($value)) {
+                return false;
+            }
+
+            $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
+
+            return $value->$method($compareValue);
+        });
+    }
+
+    protected function operatorToCarbonMethod($operator)
+    {
+        $method = 'eq';
+
+        switch ($operator) {
+            case '<>':
+            case '!=':
+                $method = 'neq';
+            break;
+
+            case '>':
+                $method = 'gt';
+            break;
+
+            case '>=':
+                $method = 'gte';
+            break;
+
+            case '<':
+                $method = 'lt';
+            break;
+
+            case '<=':
+                $method = 'lte';
+            break;
+        }
+
+        return $method;
+    }
+
     protected function filterWhereBetween($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
