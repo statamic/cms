@@ -21,34 +21,9 @@ class HtmlTest extends TestCase
         $this->assertEquals('<dl class="example"><dt>foo</dt><dd>bar</dd><dt>bing</dt><dd>baz</dd></dl>', $result);
     }
 
-    /**
-     * @test
-     */
-    public function call_to_nested_listing_fails()
+    public function testOl()
     {
-        $this->markTestSkipped();
-        $list = ['foo', 'bar', 'baz' => ['foo', 'bar', 'baz']];
-
-        $attributes = ['class' => 'example'];
-
-        $ol = Html::ol($list, $attributes);
-
-        $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>&amp;</li></ol>', $ol);
-    }
-
-    public function test()
-    {
-        $this->markTestSkipped();
-
         $list = ['foo', 'bar', '&amp;'];
-
-        $attributes = ['class' => 'example'];
-
-        $ol = Html::ol($list, $attributes);
-
-        $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>&amp;</li></ol>', $ol);
-
-        $list = ['foo', 'bar', 'baz' => ['foo', 'bar', 'baz']];
 
         $attributes = ['class' => 'example'];
 
