@@ -557,8 +557,8 @@ class CoreModifiers extends Modifier
     /**
      * Just like the PHP method, breaks a string into an array on a specified key, $params[0].
      *
-     * @param $value
-     * @param $params
+     * @param  string  $value
+     * @param  array  $params
      * @return array
      */
     public function explode($value, $params)
@@ -1346,8 +1346,8 @@ class CoreModifiers extends Modifier
      * Rough macro prototype that only uses CoreModifiers.
      *
      * @param $value
-     * @param $params
-     * @param $context
+     * @param  array  $params
+     * @param  array  $context
      * @return mixed
      */
     public function macro($value, $params, $context)
@@ -1544,8 +1544,8 @@ class CoreModifiers extends Modifier
     /**
      * Turn an array into an ordered list.
      *
-     * @param $value
-     * @param $params
+     * @param  array  $value
+     * @param  array  $params
      * @return string
      */
     public function ol($value, $params)
@@ -1615,9 +1615,9 @@ class CoreModifiers extends Modifier
     /**
      * Renders an array variable with a partial, context aware.
      *
-     * @param $value
-     * @param $params
-     * @param $context
+     * @param  array  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return string
      */
     public function partial($value, $params, $context)
@@ -1662,9 +1662,9 @@ class CoreModifiers extends Modifier
     /**
      * Get the plural form of an English word with access to $context.
      *
-     * @param $value
-     * @param $params
-     * @param $context
+     * @param  string  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return string
      */
     public function plural($value, $params, $context)
@@ -1872,7 +1872,7 @@ class CoreModifiers extends Modifier
     /**
      * Reverses the order of a string or list.
      *
-     * @param $value
+     * @param  string|array|Collection  $value
      * @return mixed
      */
     public function reverse($value)
@@ -2059,17 +2059,19 @@ class CoreModifiers extends Modifier
     /**
      * Shuffles arrays or strings. Multibyte friendly.
      *
-     * @param $value
+     * @param  array|string|Collection  $value
      * @return array|string
      */
-    public function shuffle($value)
+    public function shuffle($value, array $params)
     {
+        $seed = Arr::get($params, 0);
+
         if (is_array($value)) {
-            return collect($value)->shuffle()->all();
+            return collect($value)->shuffle($seed)->all();
         }
 
         if ($value instanceof Collection) {
-            return $value->shuffle();
+            return $value->shuffle($seed);
         }
 
         return Stringy::shuffle($value);
@@ -2516,8 +2518,8 @@ class CoreModifiers extends Modifier
     /**
      * Turn an array into an unordered list.
      *
-     * @param $value
-     * @param $params
+     * @param  array  $value
+     * @param  array  $params
      * @return string
      */
     public function ul($value, $params)
@@ -2575,7 +2577,7 @@ class CoreModifiers extends Modifier
      * Returns all of the unique-by-key items in the array.
      *
      * @param $value
-     * @param $params
+     * @param  array  $params
      * @return array
      */
     public function unique($value, $params)
@@ -2616,7 +2618,7 @@ class CoreModifiers extends Modifier
      * Filters the data by a given key / value pair.
      *
      * @param  array  $value
-     * @param $params
+     * @param  array  $params
      * @return array
      */
     public function where($value, $params)
