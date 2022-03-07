@@ -334,7 +334,7 @@ class ValidatorTest extends TestCase
                 ['type' => 'replicator_set', 'nested_bard' => [['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set']]]]],
             ],
             'grid' => [
-                ['text' => null],
+                ['text' => null, 'not_in_blueprint' => 'test'],
             ],
             'grid_with_nested_replicator' => [
                 ['nested_replicator' => [['type' => 'replicator_set']]],
@@ -347,7 +347,8 @@ class ValidatorTest extends TestCase
             ],
         ]);
 
-        $rules = (new Validator)->fields($fields)->rules();
+        $validator = (new Validator)->fields($fields);
+        $rules = $validator->rules();
 
         $this->assertArraySubset([
             'replicator.0.text' => [
@@ -402,6 +403,41 @@ class ValidatorTest extends TestCase
                 'required_if:bard_with_nested_replicator.0.attrs.values.nested_replicator.0.must_fill,true',
             ],
         ], $rules);
+
+        $this->assertEquals([
+            'replicator' => 'Replicator',
+            'replicator.0.must_fill' => 'Must Fill',
+            'replicator.0.text' => 'Text',
+            'replicator_with_nested_replicator' => 'Replicator With Nested Replicator',
+            'replicator_with_nested_replicator.0.nested_replicator' => 'Nested Replicator',
+            'replicator_with_nested_replicator.0.nested_replicator.0.must_fill' => 'Must Fill',
+            'replicator_with_nested_replicator.0.nested_replicator.0.text' => 'Text',
+            'replicator_with_double_nested_replicator' => 'Replicator With Double Nested Replicator',
+            'replicator_with_double_nested_replicator.0.nested_replicator' => 'Nested Replicator',
+            'replicator_with_double_nested_replicator.0.nested_replicator.0.nested_replicator' => 'Nested Replicator',
+            'replicator_with_double_nested_replicator.0.nested_replicator.0.nested_replicator.0.must_fill' => 'Must Fill',
+            'replicator_with_double_nested_replicator.0.nested_replicator.0.nested_replicator.0.text' => 'Text',
+            'replicator_with_nested_grid' => 'Replicator With Nested Grid',
+            'replicator_with_nested_grid.0.nested_grid' => 'Nested Grid',
+            'replicator_with_nested_grid.0.nested_grid.0.must_fill' => 'Must Fill',
+            'replicator_with_nested_grid.0.nested_grid.0.text' => 'Text',
+            'replicator_with_nested_bard' => 'Replicator With Nested Bard',
+            'replicator_with_nested_bard.0.nested_bard' => 'Nested Bard',
+            'replicator_with_nested_bard.0.nested_bard.0.attrs.values.must_fill' => 'Must Fill',
+            'replicator_with_nested_bard.0.nested_bard.0.attrs.values.text' => 'Text',
+            'grid' => 'Grid',
+            'grid.0.text' => 'Text',
+            'grid.0.must_fill' => 'Must Fill',
+            'grid_with_nested_replicator' => 'Grid With Nested Replicator',
+            'grid_with_nested_replicator.0.nested_replicator' => 'Nested Replicator',
+            'bard' => 'Bard',
+            'bard.0.attrs.values.must_fill' => 'Must Fill',
+            'bard.0.attrs.values.text' => 'Text',
+            'bard_with_nested_replicator' => 'Bard With Nested Replicator',
+            'bard_with_nested_replicator.0.attrs.values.nested_replicator' => 'Nested Replicator',
+            'bard_with_nested_replicator.0.attrs.values.nested_replicator.0.must_fill' => 'Must Fill',
+            'bard_with_nested_replicator.0.attrs.values.nested_replicator.0.text' => 'Text',
+        ], $validator->attributes());
     }
 
     /** @test */
