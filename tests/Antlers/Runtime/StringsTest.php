@@ -55,4 +55,18 @@ EOT;
 
         $this->assertSame('hello, world', $this->renderString($template));
     }
+
+    public function test_string_value_resolution_applies_interpolations()
+    {
+        $data = [
+            'title' => 'The title',
+            'subtitle' => 'The subtitle',
+        ];
+
+        $template = <<<'EOT'
+{{ my_string = '<{title}><{subtitle}><@{title}><@{subtitle}><@@{title}><@@{subtitle}>'; }}{{ my_string }}
+EOT;
+
+        $this->assertSame('<The title><The subtitle><{title}><{subtitle}><@{title}><@{subtitle}>', $this->renderString($template, $data));
+    }
 }

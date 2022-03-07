@@ -2,6 +2,7 @@
 
 namespace Tests\Auth;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
@@ -318,5 +319,17 @@ class UserGroupTest extends TestCase
             ->toAugmentedCollection()
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $group->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $group[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $group = (new UserGroup)->handle('test')->title('Test');
+
+        $this->assertInstanceOf(Arrayable::class, $group);
+
+        collect($group->toArray())
+            ->each(fn ($value, $key) => $this->assertEquals($value, $group->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value, $group[$key]));
     }
 }

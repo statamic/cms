@@ -7,6 +7,7 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\GridItemType;
 use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Grid extends Fieldtype
@@ -79,7 +80,9 @@ class Grid extends Fieldtype
 
         $fields = $this->fields()->addValues($row)->process()->values()->all();
 
-        return array_merge($row, $fields);
+        $row = array_merge($row, $fields);
+
+        return Arr::removeNullValues($row);
     }
 
     public function preProcess($data)
@@ -141,9 +144,6 @@ class Grid extends Fieldtype
             ->validator()
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->rowRuleFieldPrefix($index).'.',
-            ])
-            ->withReplacements([
-                'this' => $this->field->validationContext('prefix').$this->rowRuleFieldPrefix($index),
             ])
             ->rules();
 

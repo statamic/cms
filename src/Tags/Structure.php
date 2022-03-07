@@ -9,13 +9,16 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Query\ItemQueryBuilder;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\GetsQuerySelectKeys;
+use Statamic\Tags\Concerns\QueriesConditions;
 
 class Structure extends Tags
 {
     use GetsQuerySelectKeys;
+    use QueriesConditions;
 
     protected $currentUrl;
 
@@ -51,8 +54,8 @@ class Structure extends Tags
 
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
+            'query' => $this->query($handle),
             'include_home' => $this->params->get('include_home'),
-            'show_unpublished' => $this->params->get('show_unpublished', false),
             'site' => $this->params->get('site', Site::current()->handle()),
             'from' => $this->params->get('from'),
             'max_depth' => $this->params->get('max_depth'),
@@ -71,6 +74,46 @@ class Structure extends Tags
         }
 
         throw_unless(Nav::findByHandle($handle), new NavigationNotFoundException($handle));
+    }
+
+    protected function query($handle)
+    {
+        $query = new ItemQueryBuilder();
+
+        return Str::startsWith($handle, 'collection::')
+            ? $this->queryForCollection($query)
+            : $this->queryForNav($query);
+    }
+
+    protected function queryForCollection($query)
+    {
+        if (! $this->isQueryingStatus()) {
+            $this->queryStatus($query);
+        }
+        $this->queryConditions($query);
+
+        return $query;
+    }
+
+    protected function queryForNav($query)
+    {
+        return $this->queryStatus($query);
+    }
+
+    protected function queryStatus($query)
+    {
+        if (! $this->params->get('show_unpublished')) {
+            $query->whereIn('status', ['published', null]);
+        }
+
+        return $query;
+    }
+
+    protected function isQueryingStatus()
+    {
+        return
+            $this->isQueryingCondition('status') ||
+            $this->isQueryingCondition('published');
     }
 
     public function toArray($tree, $parent = null, $depth = 1)

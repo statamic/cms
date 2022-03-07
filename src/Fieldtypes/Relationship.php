@@ -16,6 +16,7 @@ abstract class Relationship extends Fieldtype
     protected $itemComponent = 'related-item';
     protected $formComponent;
     protected $categories = ['relationship'];
+    protected $relationship = true;
     protected $canEdit = false;
     protected $canCreate = false;
     protected $canSearch = false;

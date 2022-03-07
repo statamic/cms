@@ -9,6 +9,7 @@ use Statamic\Contracts\GraphQL\ResponseCache;
 use Statamic\GraphQL\ResponseCache\DefaultCache;
 use Statamic\GraphQL\ResponseCache\NullCache;
 use Statamic\Http\Middleware\API\SwapExceptionHandler;
+use Statamic\Http\Middleware\HandleToken;
 use Statamic\Http\Middleware\RequireStatamicPro;
 
 class ServiceProvider extends LaravelProvider
@@ -61,6 +62,7 @@ class ServiceProvider extends LaravelProvider
             ->each(fn ($route) => $route->middleware([
                 SwapExceptionHandler::class,
                 RequireStatamicPro::class,
+                HandleToken::class,
             ]));
     }
 

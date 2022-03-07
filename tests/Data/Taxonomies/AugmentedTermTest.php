@@ -63,6 +63,7 @@ class AugmentedTermTest extends AugmentedTestCase
             'two'           => ['type' => 'string', 'value' => 'the "two" value on the term and in the blueprint'],
             'three'         => ['type' => 'string', 'value' => 'the "three" value from the taxonomy'],
             'unused_in_bp'  => ['type' => 'string', 'value' => null],
+            'locale'        => ['type' => 'string', 'value' => 'en'],
             'updated_at'    => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_by'    => ['type' => UserContract::class, 'value' => 'test-user'],
         ];

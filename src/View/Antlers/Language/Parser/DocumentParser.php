@@ -489,7 +489,23 @@ class DocumentParser
                                 $nextAntlersStart = $this->antlersStartIndex[$i + 1];
 
                                 if ($nextAntlersStart < $this->lastAntlersNode->endPosition->offset) {
-                                    continue;
+                                    if ($i + 2 < $indexCount) {
+                                        $nextAntlersStart = $this->antlersStartIndex[$i + 2];
+                                    } else {
+                                        $literalStart = $this->lastAntlersNode->endPosition->offset + 1;
+                                        $finalContent = $this->prepareLiteralContent(StringUtilities::substr($this->content, $literalStart));
+
+                                        if (! strlen($finalContent) == 0) {
+                                            $finalLiteral = new LiteralNode();
+                                            $finalLiteral->content = $finalContent;
+                                            $finalLiteral->startPosition = $this->positionFromOffset($literalStart, $literalStart);
+                                            $finalLiteral->endPosition = $this->positionFromOffset($this->inputLen - 1, $literalStart);
+                                            $this->nodes[] = $finalLiteral;
+                                            break;
+                                        }
+
+                                        continue;
+                                    }
                                 }
                             } else {
                                 if ($i + 1 != $lastIndex) {
@@ -603,6 +619,7 @@ class DocumentParser
 
         $tagPairAnalyzer = new TagPairAnalyzer();
         $this->renderNodes = $tagPairAnalyzer->associate($this->nodes, $this);
+
         RecursiveParentAnalyzer::associateRecursiveParent($this->nodes);
 
         foreach ($this->nodes as $node) {
@@ -806,6 +823,26 @@ class DocumentParser
         return array_key_exists($offsetCheck, $this->interpolationEndOffsets);
     }
 
+    public static function getLeftBraceEscape()
+    {
+        return '__antlers:leftBrace'.GlobalRuntimeState::$environmentId;
+    }
+
+    public static function getRightBraceEscape()
+    {
+        return '__antlers:rightBrace'.GlobalRuntimeState::$environmentId;
+    }
+
+    private function getLeftBrace()
+    {
+        return str_split(self::getLeftBraceEscape());
+    }
+
+    private function getRightBrace()
+    {
+        return str_split(self::getRightBraceEscape());
+    }
+
     private function scanToEndOfAntlersRegion()
     {
         for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
@@ -813,13 +850,19 @@ class DocumentParser
 
             if ($this->cur == self::LeftBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
-                $this->currentContent[] = $this->cur;
+                $this->currentContent = array_merge($this->currentContent, $this->getLeftBrace());
                 continue;
             }
 
             if ($this->isInterpolatedParser && $this->cur == self::RightBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent[] = $this->cur;
+                continue;
+            }
+
+            if ($this->cur == self::RightBrace && $this->prev == self::AtChar) {
+                array_pop($this->currentContent);
+                $this->currentContent = array_merge($this->currentContent, $this->getRightBrace());
                 continue;
             }
 
@@ -948,7 +991,10 @@ class DocumentParser
 
         $node->interpolationRegions = $this->interpolationRegions;
 
-        $node = $this->nodeParser->parseNode($node);
+        if (! $node->isComment) {
+            $node = $this->nodeParser->parseNode($node);
+        }
+
         $this->interpolationRegions = [];
 
         return $node;

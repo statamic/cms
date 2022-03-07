@@ -129,6 +129,19 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
+    public function it_can_be_flagged_as_a_relationship_fieldtype()
+    {
+        $this->assertFalse((new TestFieldtype)->isRelationship());
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $relationship = true;
+        };
+
+        $this->assertTrue($fieldtype->isRelationship());
+    }
+
+    /** @test */
     public function converts_to_an_array()
     {
         $fieldtype = new TestFieldtype;

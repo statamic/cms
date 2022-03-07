@@ -9,6 +9,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
@@ -29,8 +30,9 @@ class CoreModifiers extends Modifier
     /**
      * Adds values together with science. Context aware.
      *
-     * @param $value
-     * @param $params
+     * @param  int  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return mixed
      */
     public function add($value, $params, $context)
@@ -41,8 +43,8 @@ class CoreModifiers extends Modifier
     /**
      * Adds a query param matching the specified key/value pair.
      *
-     * @param $value
-     * @param $params
+     * @param  string  $value
+     * @param  array  $params
      * @return string
      */
     public function addQueryParam($value, $params)
@@ -51,7 +53,7 @@ class CoreModifiers extends Modifier
             // Remove anchor from the URL.
             $url = strtok($value, '#');
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and prepend it with a "#" if a value is retrieved.
             $fragment = parse_url($value, PHP_URL_FRAGMENT);
             $anchor = is_null($fragment) ? '' : "#{$fragment}";
 
@@ -81,8 +83,8 @@ class CoreModifiers extends Modifier
     /**
      * Creates a sentence list from the given array and the ability to set the glue.
      *
-     * @param $value
-     * @param $params
+     * @param  array|string  $value
+     * @param  array  $params
      * @return string
      */
     public function ampersandList($value, $params)
@@ -101,7 +103,7 @@ class CoreModifiers extends Modifier
      * Alias an array variable.
      *
      * @param $value
-     * @param $params
+     * @param  array  $params
      * @return array|void
      */
     public function alias($value, $params)
@@ -119,7 +121,7 @@ class CoreModifiers extends Modifier
      * Returns an ASCII version of the string. A set of non-ASCII characters are replaced with their
      * closest ASCII counterparts, and the rest are removed unless instructed otherwise.
      *
-     * @param $value
+     * @param  string  $value
      * @return string
      */
     public function ascii($value)
@@ -157,8 +159,8 @@ class CoreModifiers extends Modifier
     /**
      * Removes a given number ($param[0]) of characters from the end of a variable.
      *
-     * @param $value
-     * @param $params
+     * @param  array|string  $value
+     * @param  array  $params
      * @return array|false|string
      */
     public function backspace($value, $params)
@@ -217,7 +219,8 @@ class CoreModifiers extends Modifier
     /**
      * Breaks arrays or collections into smaller ones of a given size.
      *
-     * @param $value
+     * @param  $value
+     * @param  array  $params
      * @return array
      */
     public function chunk($value, $params)
@@ -238,7 +241,7 @@ class CoreModifiers extends Modifier
     /**
      * Collapses an array of arrays into a flat array.
      *
-     * @param $value
+     * @param  array  $value
      * @return array
      */
     public function collapse($value)
@@ -294,9 +297,9 @@ class CoreModifiers extends Modifier
      * Returns true if the string contains $needle, false otherwise. By default,
      * the comparison is case-insensitive, but can be made sensitive by setting $params[1] to true.
      *
-     * @param $value
-     * @param $params
-     * @param $context
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function contains($haystack, $params, $context)
@@ -318,9 +321,9 @@ class CoreModifiers extends Modifier
      * Returns true if the string contains all needles ($params), false otherwise. Will check context before
      * assuming it's a locally defined set. Case-insensitive.
      *
-     * @param $value
-     * @param $params
-     * @param $context
+     * @param  string  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function containsAll($value, $params, $context)
@@ -348,11 +351,14 @@ class CoreModifiers extends Modifier
      * Returns the number of items in an array.
      *
      * @param  $value
-     * @param  $params
      * @return int
      */
-    public function count($value, $params)
+    public function count($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            return $value->count();
+        }
+
         return count($value);
     }
 
@@ -386,7 +392,7 @@ class CoreModifiers extends Modifier
      * Get the date difference in days.
      *
      * @param  Carbon  $value
-     * @param $params
+     * @param  array  $params
      * @return int
      */
     public function daysAgo($value, $params)
@@ -564,10 +570,9 @@ class CoreModifiers extends Modifier
      * Returns the file extension of a given filename.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function extension($value, $params)
+    public function extension($value)
     {
         return pathinfo($value, PATHINFO_EXTENSION);
     }
@@ -576,12 +581,11 @@ class CoreModifiers extends Modifier
      * Generate a link to a Favicon file.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function favicon($value, $params)
+    public function favicon($value)
     {
-        return Html::favicon($value, $this->buildAttributesFromParameters($params));
+        return Html::favicon($value);
     }
 
     /**
@@ -614,7 +618,7 @@ class CoreModifiers extends Modifier
     /**
      * Swaps the keys with their corresponding values.
      *
-     * @param $value
+     * @param  array  $value
      * @return array
      */
     public function flip($value)
@@ -691,10 +695,9 @@ class CoreModifiers extends Modifier
      * Replace /absolute/urls with http://domain.com/urls.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function fullUrls($value, $params)
+    public function fullUrls($value)
     {
         $domain = Site::current()->absoluteUrl();
 
@@ -707,6 +710,7 @@ class CoreModifiers extends Modifier
      * Get any variable from a relationship.
      *
      * @param $value
+     * @param $params
      * @return string
      */
     public function get($value, $params)
@@ -762,7 +766,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return Collection
      */
     public function groupBy($value, $params)
     {
@@ -842,7 +846,7 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains a lowercase character, false otherwise.
      *
-     * @param $value
+     * @param  string  $value
      * @return bool
      */
     public function hasLowerCase($value)
@@ -853,7 +857,7 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains an uppercase character, false otherwise.
      *
-     * @param $value
+     * @param  string  $value
      * @return bool
      */
     public function hasUpperCase($value)
@@ -903,6 +907,10 @@ class CoreModifiers extends Modifier
         // that means a pipe was used. We'll just join them for now.
         if (count($params) > 1) {
             $params = [implode('|', $params)];
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
         }
 
         return implode(Arr::get($params, 0, ', '), $value);
@@ -1049,7 +1057,7 @@ class CoreModifiers extends Modifier
     /**
      * Checks to see if an array is empty. Like, for realsies.
      *
-     * @param $value
+     * @param  mixed  $value
      * @return bool
      */
     public function isEmpty($value)
@@ -1225,10 +1233,9 @@ class CoreModifiers extends Modifier
      * Converts a string to kebab-case.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function kebab($value, $params)
+    public function kebab($value)
     {
         return Str::kebab($value);
     }
@@ -1268,6 +1275,10 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            return $value->count();
+        }
+
         if ($value instanceof Arrayable) {
             $value = $value->toArray();
         }
@@ -1278,8 +1289,8 @@ class CoreModifiers extends Modifier
     /**
      * Limit the number of items in an array.
      *
-     * @param $value
-     * @param $params
+     * @param  array|Collection  $value
+     * @param  array  $params
      * @return array|Collection
      */
     public function limit($value, $params)
@@ -1368,6 +1379,7 @@ class CoreModifiers extends Modifier
      * Parse content as Markdown.
      *
      * @param $value
+     * @param  array  $params
      * @return mixed
      */
     public function markdown($value, $params)
@@ -1522,12 +1534,11 @@ class CoreModifiers extends Modifier
      * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function obfuscateEmail($value, $params)
+    public function obfuscateEmail($value)
     {
-        return Html::email($value, null, $this->buildAttributesFromParameters($params));
+        return Html::email($value);
     }
 
     /**
@@ -1545,8 +1556,8 @@ class CoreModifiers extends Modifier
     /**
      * Turn an array into a pipe delimited list.
      *
-     * @param $value
-     * @param $params
+     * @param  array|Collection|string  $value
+     * @param  array  $params
      * @return string
      */
     public function optionList($value, $params)
@@ -1569,8 +1580,8 @@ class CoreModifiers extends Modifier
     /**
      * Offset the items in an array.
      *
-     * @param $value
-     * @param $params
+     * @param  array|Collection  $value
+     * @param  array  $params
      * @return array|Collection
      */
     public function offset($value, $params)
@@ -1621,9 +1632,9 @@ class CoreModifiers extends Modifier
     /**
      * Plucks values from a collection of items.
      *
-     * @param $value
-     * @param $params
-     * @return string
+     * @param  array|Collection  $value
+     * @param  array  $params
+     * @return array|Collection
      */
     public function pluck($value, $params)
     {
@@ -1631,6 +1642,10 @@ class CoreModifiers extends Modifier
 
         if ($wasArray = is_array($value)) {
             $value = collect($value);
+        }
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
         }
 
         $items = $value->map(function ($item) use ($key) {
@@ -1781,8 +1796,8 @@ class CoreModifiers extends Modifier
     /**
      * Removes a query param matching the specified key if it exists.
      *
-     * @param $value
-     * @param $params
+     * @param  string  $value
+     * @param  array  $params
      * @return string
      */
     public function removeQueryParam($value, $params)
@@ -1795,7 +1810,7 @@ class CoreModifiers extends Modifier
             // Parse the URL to retrieve the possible query string and anchor.
             $parsedUrl = parse_url($value);
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and prepend it with a "#" if a value is retrieved.
             $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
 
             // Build an associative array based on the query string.
@@ -1863,7 +1878,7 @@ class CoreModifiers extends Modifier
     public function reverse($value)
     {
         if ($value instanceof Collection) {
-            return $value->reverse();
+            return $value->reverse()->values()->all();
         }
 
         if (is_array($value)) {
@@ -1916,8 +1931,8 @@ class CoreModifiers extends Modifier
     /**
      * Place variables in a scope.
      *
-     * @param  $value
-     * @param  $params
+     * @param  array|Collection  $value
+     * @param  array  $params
      * @return array
      */
     public function scope($value, $params)
@@ -1978,8 +1993,8 @@ class CoreModifiers extends Modifier
     /**
      * Creates a sentence list from the given array and the ability to set the glue.
      *
-     * @param $value
-     * @param $params
+     * @param  array|Collection|string  $value
+     * @param  array  $params
      * @return string
      */
     public function sentenceList($value, $params)
@@ -2002,8 +2017,8 @@ class CoreModifiers extends Modifier
      * Sets a query param matching the specified key/value pair.
      * If the key exists, its value gets updated. Else, the key/value pair gets added.
      *
-     * @param $value
-     * @param $params
+     * @param  string  $value
+     * @param  array  $params
      * @return string
      */
     public function setQueryParam($value, $params)
@@ -2016,7 +2031,7 @@ class CoreModifiers extends Modifier
             // Parse the URL to retrieve the possible query string and anchor.
             $parsedUrl = parse_url($value);
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and prepend it with a "#" if a value is retrieved.
             $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
 
             // Build an associative array based on the query string.
@@ -2034,10 +2049,9 @@ class CoreModifiers extends Modifier
     /**
      * Because sometimes you just gotta /shrug.
      *
-     * @param $value
      * @return string
      */
-    public function shrug($value)
+    public function shrug()
     {
         return '¯\_(ツ)_/¯';
     }
@@ -2093,10 +2107,9 @@ class CoreModifiers extends Modifier
      * Parse with SmartyPants. Aren't you fancy?
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function smartypants($value, $params)
+    public function smartypants($value)
     {
         return Html::smartypants($value);
     }
@@ -2105,10 +2118,9 @@ class CoreModifiers extends Modifier
      * Converts a string to snake_case.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function snake($value, $params)
+    public function snake($value)
     {
         return Str::snake($value);
     }
@@ -2116,9 +2128,9 @@ class CoreModifiers extends Modifier
     /**
      * Sort an array by key $params[0] and direction $params[1].
      *
-     * @param $value
-     * @param $params
-     * @return array
+     * @param  array|Collection  $value
+     * @param  array  $params
+     * @return array|Collection
      */
     public function sort($value, $params)
     {
@@ -2152,10 +2164,9 @@ class CoreModifiers extends Modifier
      * Strip whitespace from HTML.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function spaceless($value, $params)
+    public function spaceless($value)
     {
         $nolb = str_replace(["\r", "\n"], '', $value);
         $nospaces = preg_replace('/\s+/', ' ', $nolb);
@@ -2219,10 +2230,9 @@ class CoreModifiers extends Modifier
      * Converts a string to StudlyCase.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function studly($value, $params)
+    public function studly($value)
     {
         return Str::studly($value);
     }
@@ -2258,7 +2268,7 @@ class CoreModifiers extends Modifier
      * Returns the sum of all items in the array, optionally by specific key.
      *
      * @param $value
-     * @param $params
+     * @param  array  $params
      * @return mixed
      */
     public function sum($value, $params)
@@ -2625,7 +2635,8 @@ class CoreModifiers extends Modifier
      * Attempts to prevent widows in a string by adding
      * <nobr> tags between the last two words of each paragraph.
      *
-     * @param $value
+     * @param  string  $value
+     * @param  array  $params
      * @return string
      */
     public function widont($value, $params)

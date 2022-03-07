@@ -38,4 +38,28 @@ EOT;
 
         $this->assertSame('hello, world', $this->renderString($input));
     }
+
+    public function test_braces_can_be_escaped_inside_string_literals()
+    {
+        $input = <<<'EOT'
+{{ var = '@{@{@}@}'; }}{{ var }}
+EOT;
+
+        $this->assertSame('{{}}', $this->renderString($input));
+    }
+
+    public function test_escape_sequences_are_replaced_inside_the_environment()
+    {
+        $input = <<<'EOT'
+{{ if title | starts_with('@{') }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('Yes', $this->renderString($input, ['title' => '{The Title}']));
+
+        $input = <<<'EOT'
+{{ if title | starts_with:'@{' }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('Yes', $this->renderString($input, ['title' => '{The Title}']));
+    }
 }

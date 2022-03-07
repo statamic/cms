@@ -5,10 +5,10 @@ namespace Tests\Data\Entries;
 use Carbon\Carbon;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
-use Illuminate\Support\Collection as IlluminateCollection;
 use Mockery;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Entries\AugmentedEntry;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Blueprint;
@@ -162,9 +162,11 @@ class AugmentedEntryTest extends AugmentedTestCase
     public function it_gets_the_authors_from_the_value_if_its_in_the_blueprint()
     {
         $blueprint = Blueprint::makeFromFields(['authors' => ['type' => 'users']]);
+        $userBlueprint = Blueprint::makeFromFields([]);
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
             'test' => $blueprint,
         ]));
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($userBlueprint);
 
         User::make()->id('user-1')->save();
         User::make()->id('user-2')->save();
@@ -176,15 +178,15 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $augmented = new AugmentedEntry($entry);
 
-        // Since it's in the blueprint, and is using a "users" fieldtype, it gets augmented to a collection.
+        // Since it's in the blueprint, and is using a "users" fieldtype, it gets augmented to a querybuilder.
         $authors = $augmented->get('authors')->value();
-        $this->assertInstanceOf(IlluminateCollection::class, $authors);
-        $this->assertEquals([], $authors->all());
+        $this->assertInstanceOf(Builder::class, $authors);
+        $this->assertEquals([], $authors->get()->all());
 
         $entry->set('authors', ['user-1', 'unknown-user', 'user-2']);
         $authors = $augmented->get('authors')->value();
-        $this->assertInstanceOf(IlluminateCollection::class, $authors);
-        $this->assertEveryItemIsInstanceOf(\Statamic\Contracts\Auth\User::class, $authors);
-        $this->assertEquals(['user-1', 'user-2'], $authors->map->id()->all());
+        $this->assertInstanceOf(Builder::class, $authors);
+        $this->assertEveryItemIsInstanceOf(\Statamic\Contracts\Auth\User::class, $authors->get());
+        $this->assertEquals(['user-1', 'user-2'], $authors->get()->map->id()->all());
     }
 }

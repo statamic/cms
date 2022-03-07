@@ -141,7 +141,7 @@ class Modify implements \IteratorAggregate
      * @param  array  $params
      * @return mixed
      *
-     * @throws \Statamic\Exceptions\ModifierException
+     * @throws ModifierException
      */
     public function modify($modifier, $params = [])
     {

@@ -140,6 +140,22 @@ EOT;
         $this->assertSame('2012-10-01', $this->renderString('{{ one:two format="Y-m-d" }}', $data, true));
     }
 
+    public function test_braces_can_be_escaped_inside_parameters()
+    {
+        Test::register();
+        $template = <<<'EOT'
+{{ test variable="@{@{ hello world @}@}" }}
+EOT;
+
+        $this->assertSame('{{ hello world }}', $this->renderString($template, [], true));
+
+        $template = <<<'EOT'
+{{ test variable="@{@{ hello @{{title}@} @}@}" }}
+EOT;
+
+        $this->assertSame('{{ hello {world} }}', $this->renderString($template, ['title' => 'world'], true));
+    }
+
     public function test_tags_are_invoked_within_interpolated_contexts()
     {
         (new class extends Tags
@@ -203,5 +219,47 @@ EOT;
             'The source is: <anything>/string var/string var/<anything>',
             $this->renderString($template, ['test' => ['anything' => 'string var']], true)
         );
+    }
+
+    public function test_interpolations_with_parameters_are_cast_to_strings()
+    {
+        $now = Carbon::now();
+        $start = $now->year - 5;
+
+        $data = [
+            'start' => $start,
+            'date_value' => $now,
+        ];
+
+        $template = <<<'EOT'
+{{ loop :from="start" to="{ date_value format='Y' }" }}{{ value }}{{ /loop }}
+EOT;
+
+        $expected = implode('', range($start, $now->year));
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
+
+    public function test_interpolation_with_array_style_parameters_returns_arrays()
+    {
+        $data = [
+            'data' => [
+                'one' => 'One',
+                'two' => 'Two',
+                'three' => 'Three',
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{# Not so nice. #}}{{ foreach array="{ data limit="2" reverse="true" }" }}<{{key}}><{{ value }}>{{ /foreach }}
+{{# Nicer #}}{{ foreach :array="data | limit(2) | reverse" }}<{{key}}><{{ value }}>{{ /foreach }}
+EOT;
+
+        $expected = <<<'EOT'
+<two><Two><one><One>
+<two><Two><one><One>
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
     }
 }

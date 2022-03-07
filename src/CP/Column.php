@@ -12,6 +12,7 @@ class Column
     public $field;
     public $fieldtype;
     public $label;
+    public $numeric = false;
     public $listable = true;
     public $defaultOrder;
     public $defaultVisibility = true;
@@ -137,6 +138,17 @@ class Column
     public function sortable($sortable = null)
     {
         return $this->fluentlyGetOrSet('sortable')->value($sortable);
+    }
+
+    /**
+     * Get or set whether the column is numeric.
+     *
+     * @param  bool  $numeric
+     * @return mixed
+     */
+    public function numeric($numeric = null)
+    {
+        return $this->fluentlyGetOrSet('numeric')->value($numeric);
     }
 
     /**

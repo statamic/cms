@@ -184,6 +184,7 @@ class NodeProcessor
      * @var bool
      */
     private $encounteredBuilder = false;
+    private $builderNodeId = null;
 
     /**
      * A reference to the last resolved Builder instance.
@@ -490,9 +491,10 @@ class NodeProcessor
                 $value = $managerResults[1];
                 $resolvedValue = $value instanceof Value ? $value->value() : $value;
 
-                if ($resolvedValue instanceof Builder) {
+                if ($resolvedValue instanceof Builder && $node->isClosedBy != null && $node->isSelfClosing == false) {
                     $this->encounteredBuilder = true;
                     $this->resolvedBuilder = $resolvedValue;
+                    $this->builderNodeId = $node->refId;
 
                     // If the path reference has more than one part,
                     // it is something like {{ products.0.name }}
@@ -654,7 +656,7 @@ class NodeProcessor
             Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
 
             return false;
-        } elseif ($this->isLoopable($value) && $node->isClosedBy == null) {
+        } elseif ($this->isInterpolationProcessor == false && $this->isLoopable($value) && $node->isClosedBy == null) {
             $varName = $node->name->getContent();
             Log::debug("Cannot render an array variable as a string: {{ {$varName} }}");
 
@@ -819,6 +821,10 @@ class NodeProcessor
      */
     public function evaluateDeferredInterpolation($regionName)
     {
+        if (! array_key_exists($regionName, $this->canHandleInterpolations)) {
+            return $regionName;
+        }
+
         if (! array_key_exists($regionName, $this->interpolationCache)) {
             $interpolationScope = $this->getActiveData();
 
@@ -965,6 +971,11 @@ class NodeProcessor
                         if ($node->name->name == 'elseif' || $node->name->name == 'if') {
                             continue;
                         }
+                    }
+
+                    if ($this->encounteredBuilder && $this->builderNodeId != $node->refId) {
+                        $this->encounteredBuilder = false;
+                        $this->builderNodeId = null;
                     }
 
                     GlobalRuntimeState::$lastNode = $node;
@@ -1207,12 +1218,14 @@ class NodeProcessor
                         GlobalRuntimeState::$globalTagEnterStack[] = $node;
 
                         $tagParameters = $node->getParameterValues($this, $this->getActiveData());
+                        $this->data = $lockData;
 
                         $tagActiveData = $this->getActiveData();
 
                         $contributedPrefixHandles = 0;
 
                         if ($node->name->name == 'partial') {
+                            $lockData = $this->data;
                             $namedSlotResults = $this->checkPartialForNamedSlots($node);
 
                             if ($namedSlotResults[0] === true) {
@@ -1228,6 +1241,7 @@ class NodeProcessor
 
                                 $tagActiveData[GlobalRuntimeState::createIndicatorVariable(GlobalRuntimeState::INDICATOR_NAMED_SLOTS_AVAILABLE)] = true;
                             }
+                            $this->data = $lockData;
                         }
 
                         if ($node->name->name == 'partial' || $node->name->name == 'scope') {
@@ -1354,7 +1368,7 @@ class NodeProcessor
 
                         if (is_object($output)) {
                             if ($output instanceof Collection) {
-                                $output = $output->toArray();
+                                $output = $output->all();
                             }
 
                             $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
@@ -1614,7 +1628,7 @@ class NodeProcessor
                             $val = $dataRetriever->getRuntimeValue($node->pathReference, $this->getActiveData());
                         }
 
-                        if ($this->isInterpolationProcessor) {
+                        if ($this->isInterpolationProcessor && empty($node->parameters)) {
                             $buffer = $val;
 
                             if ($this->isTracingEnabled()) {
@@ -1765,7 +1779,7 @@ class NodeProcessor
                             }
 
                             if ($val instanceof Collection) {
-                                $val = $val->toArray();
+                                $val = $val->all();
                             }
                         }
                         $executedParamModifiers = true;
@@ -1773,6 +1787,7 @@ class NodeProcessor
                         if (is_array($val) && ! Arr::isAssoc($val)) {
                             $val = $this->addLoopIterationVariables($val);
                         }
+                        $lockData = $this->data;
                     }
 
                     if ($this->guardRuntime($node, $val) == false) {
@@ -1780,6 +1795,11 @@ class NodeProcessor
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
 
+                        continue;
+                    }
+
+                    if ($this->isInterpolationProcessor && is_array($val)) {
+                        $buffer = $val;
                         continue;
                     }
 
@@ -2047,6 +2067,20 @@ class NodeProcessor
         $this->data = $curData;
 
         $this->scopeLock = false;
+
+        $prev = null;
+
+        foreach ($loop as $index => &$data) {
+            $data['prev'] = $prev;
+
+            if ($data['last'] == false) {
+                $data['next'] = $loop[$index + 1];
+            } else {
+                $data['next'] = null;
+            }
+
+            $prev = $data;
+        }
 
         return $loop;
     }

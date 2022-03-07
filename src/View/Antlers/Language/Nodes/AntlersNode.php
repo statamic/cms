@@ -379,26 +379,7 @@ class AntlersNode extends AbstractNode
                     $value = $retriever->getData($pathParser->parse($pathToParse), $data);
                 }
             } else {
-                // If we have a situation where an interpolation is the ONLY content here
-                // we will hand it off to the "bigger, better, stronger" parsing logic.
-                if ($param->parent != null && array_key_exists($param->value, $param->parent->processedInterpolationRegions)) {
-                    $interpolationReference = $param->parent->processedInterpolationRegions[$param->value];
-
-                    if (count($interpolationReference) > 0 &&
-                        $interpolationReference[0] instanceof AntlersNode &&
-                        // If our interpolation region itself also contains interpolations, we need to
-                        // skip this and proceed with the string collapsing logic to preserve the
-                        // behavior you would expect when using previous versions of Antlers.
-                        $this->canSafelyUseFullParserContext($interpolationReference[0])) {
-                        $value = Antlers::parser()->getVariable(trim($interpolationReference[0]->content), $data);
-                    } else {
-                        // Collapse to string.
-                        $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
-                    }
-                } else {
-                    // Try and collapse to string.
-                    $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
-                }
+                $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
             }
 
             if (is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId) {
@@ -409,42 +390,6 @@ class AntlersNode extends AbstractNode
         }
 
         return $values;
-    }
-
-    /**
-     * Tests if parameter resolution can safely utilize a full parser context.
-     *
-     * This method effectively checks if a parameter's looks like this:
-     *    {{ tag param="{{ variable }}" }}
-     * If it does, we need to return false to fall back to string collapsing behavior.
-     *
-     * @param  AntlersNode  $node  The node to test.
-     * @return bool
-     */
-    private function canSafelyUseFullParserContext(AntlersNode $node)
-    {
-        if ($node->isTagNode) {
-            return false;
-        }
-
-        if ($node->pathReference != null && $node->pathReference->isStrictTagReference) {
-            return false;
-        }
-
-        if (empty($node->processedInterpolationRegions)) {
-            return true;
-        }
-
-        $checkContent = trim($node->content);
-
-        if (! array_key_exists($checkContent, $node->processedInterpolationRegions)) {
-            return false;
-        }
-
-        /** @var AntlersNode $innerRegion */
-        $innerRegion = $node->processedInterpolationRegions[$checkContent];
-
-        return ! empty($innerRegion->processedInterpolationRegions);
     }
 
     /**
@@ -471,6 +416,10 @@ class AntlersNode extends AbstractNode
                         ->setIsInterpolationProcessor(true)
                         ->setIsProvidingParameterContent(true)
                         ->render($param->parent->processedInterpolationRegions[$interpolationVar]);
+
+                    if ((is_object($interpolationResult) || is_array($interpolationResult)) && count($param->interpolations) == 1) {
+                        return $interpolationResult;
+                    }
 
                     $mutateVar = str_replace($interpolationVar, $interpolationResult, $mutateVar);
                 }

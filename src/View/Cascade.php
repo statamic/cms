@@ -8,7 +8,6 @@ use Statamic\Facades;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
-use Statamic\Fields\Values;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 
@@ -145,13 +144,13 @@ class Cascade
 
             $global = $global->in($this->site->handle());
 
-            $this->set($global->handle(), new Values($global->toAugmentedCollection()));
+            $this->set($global->handle(), $global);
         }
 
-        $mainGlobal = $this->get('global') ?? [];
-
-        foreach ($mainGlobal as $key => $value) {
-            $this->set($key, $value);
+        if ($mainGlobal = $this->get('global')) {
+            foreach ($mainGlobal->toAugmentedCollection() as $key => $value) {
+                $this->set($key, $value);
+            }
         }
 
         return $this;
@@ -171,7 +170,7 @@ class Cascade
             $this->set($key, $value);
         }
 
-        $this->set('page', new Values($variables));
+        $this->set('page', $this->content);
 
         return $this;
     }

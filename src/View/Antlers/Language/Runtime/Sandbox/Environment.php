@@ -74,6 +74,7 @@ use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\TernaryCondition;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
+use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\ModifierManager;
@@ -883,7 +884,12 @@ class Environment
                 $right = $this->checkForFieldValue($right);
 
                 $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
-                $this->assignments[$this->dataRetriever->lastPath()] = $right;
+                $lastPath = $this->dataRetriever->lastPath();
+                $this->assignments[$lastPath] = $right;
+
+                if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                    GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                }
 
                 return null;
             } elseif ($operand instanceof AdditionAssignmentOperator) {
@@ -1425,7 +1431,13 @@ class Environment
                 return $interpolationValue;
             }
 
-            return $this->adjustValue($this->scopeValue($varName), $val);
+            $scopeValue = $this->scopeValue($varName);
+
+            if ($scopeValue instanceof Collection) {
+                $scopeValue = $scopeValue->all();
+            }
+
+            return $this->adjustValue($scopeValue, $val);
         } elseif ($val instanceof TrueConstant) {
             $returnVal = true;
         } elseif ($val instanceof FalseConstant) {
@@ -1433,17 +1445,32 @@ class Environment
         } elseif ($val instanceof NullConstant) {
             $returnVal = null;
         } elseif ($val instanceof StringValueNode) {
-            $returnVal = $val->value;
+            if (Str::contains($val->value, GlobalRuntimeState::$interpolatedVariables)) {
+                $stringValue = $val->value;
+
+                foreach ($this->dataManagerInterpolations as $regionName => $region) {
+                    if (Str::contains($val->value, $regionName)) {
+                        $tempValue = $this->nodeProcessor->evaluateDeferredInterpolation(trim($regionName));
+                        if (is_string($tempValue) || (is_object($tempValue) && method_exists($tempValue, '__toString'))) {
+                            $stringValue = str_replace($regionName, (string) $tempValue, $stringValue);
+                        }
+                    }
+                }
+
+                $returnVal = $stringValue;
+            } else {
+                $returnVal = $this->applyEscapeSequences($val->value);
+            }
         } elseif ($val instanceof NullCoalescenceGroup) {
             $returnVal = $this->evaluateNullCoalescence($val);
         } elseif ($val instanceof TernaryCondition) {
             $returnVal = $this->evaluateTernaryGroup($val);
         } elseif ($val instanceof ModifierValueNode) {
             if (is_string($val->value) && in_array(trim($val->value), GlobalRuntimeState::$interpolatedVariables)) {
-                return $this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value));
+                return $this->applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
             }
 
-            $returnVal = $val->value;
+            $returnVal = $this->applyEscapeSequences($val->value);
         } elseif ($val instanceof ArrayNode) {
             $returnVal = $this->resolveArrayValue($val);
         }
@@ -1477,5 +1504,13 @@ class Environment
         }
 
         return $this->adjustValue($returnVal, $val);
+    }
+
+    private function applyEscapeSequences($string)
+    {
+        $string = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $string);
+        $string = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $string);
+
+        return $string;
     }
 }
