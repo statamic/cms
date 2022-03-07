@@ -5,6 +5,7 @@ namespace Tests\Data\Assets;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -71,14 +72,22 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['d', 'e'], $assets->map->filename()->all());
     }
 
+    private function createWhereDateTestAssets()
+    {
+        $blueprint = Blueprint::makeFromFields(['test_date' => ['type' => 'date', 'time_enabled' => true]]);
+        Blueprint::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+
+        Asset::find('test::a.jpg')->data(['test_date' => '2021-11-15 20:31:04'])->save();
+        Asset::find('test::b.txt')->data(['test_date' => '2021-11-14 09:00:00'])->save();
+        Asset::find('test::c.txt')->data(['test_date' => '2021-11-15 00:00:00'])->save();
+        Asset::find('test::d.jpg')->data(['test_date' => '2020-09-13 14:44:24'])->save();
+        Asset::find('test::e.jpg')->data(['test_date' => null])->save();
+    }
+
     /** @test **/
     public function assets_are_found_using_where_date()
     {
-        Asset::find('test::a.jpg')->data(['test_date' => 1637008264])->save();
-        Asset::find('test::b.txt')->data(['test_date' => '2021-11-14 09:00:00'])->save();
-        Asset::find('test::c.txt')->data(['test_date' => '2021-11-15'])->save();
-        Asset::find('test::d.jpg')->data(['test_date' => 1627008264])->save();
-        Asset::find('test::e.jpg')->data(['test_date' => null])->save();
+        $this->createWhereDateTestAssets();
 
         $assets = $this->container->queryAssets()->whereDate('test_date', '2021-11-15')->get();
 
@@ -99,11 +108,7 @@ class AssetQueryBuilderTest extends TestCase
     /** @test **/
     public function assets_are_found_using_where_month()
     {
-        Asset::find('test::a.jpg')->data(['test_date' => 1637008264])->save();
-        Asset::find('test::b.txt')->data(['test_date' => '2021-11-14 09:00:00'])->save();
-        Asset::find('test::c.txt')->data(['test_date' => '2021-11-15'])->save();
-        Asset::find('test::d.jpg')->data(['test_date' => 1627008264])->save();
-        Asset::find('test::e.jpg')->data(['test_date' => null])->save();
+        $this->createWhereDateTestAssets();
 
         $assets = $this->container->queryAssets()->whereMonth('test_date', 11)->get();
 
@@ -119,11 +124,7 @@ class AssetQueryBuilderTest extends TestCase
     /** @test **/
     public function assets_are_found_using_where_day()
     {
-        Asset::find('test::a.jpg')->data(['test_date' => 1637008264])->save();
-        Asset::find('test::b.txt')->data(['test_date' => '2021-11-14 09:00:00'])->save();
-        Asset::find('test::c.txt')->data(['test_date' => '2021-11-15'])->save();
-        Asset::find('test::d.jpg')->data(['test_date' => 1627008264])->save();
-        Asset::find('test::e.jpg')->data(['test_date' => null])->save();
+        $this->createWhereDateTestAssets();
 
         $assets = $this->container->queryAssets()->whereDay('test_date', 15)->get();
 
@@ -132,18 +133,14 @@ class AssetQueryBuilderTest extends TestCase
 
         $assets = $this->container->queryAssets()->whereDay('test_date', '<', 15)->get();
 
-        $this->assertCount(1, $assets);
-        $this->assertEquals(['b'], $assets->map->filename()->all());
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['b', 'd'], $assets->map->filename()->all());
     }
 
     /** @test **/
     public function assets_are_found_using_where_year()
     {
-        Asset::find('test::a.jpg')->data(['test_date' => 1637008264])->save();
-        Asset::find('test::b.txt')->data(['test_date' => '2021-11-14 09:00:00'])->save();
-        Asset::find('test::c.txt')->data(['test_date' => '2021-11-15'])->save();
-        Asset::find('test::d.jpg')->data(['test_date' => 1600008264])->save();
-        Asset::find('test::e.jpg')->data(['test_date' => null])->save();
+        $this->createWhereDateTestAssets();
 
         $assets = $this->container->queryAssets()->whereYear('test_date', 2021)->get();
 
@@ -159,11 +156,7 @@ class AssetQueryBuilderTest extends TestCase
     /** @test **/
     public function assets_are_found_using_where_time()
     {
-        Asset::find('test::a.jpg')->data(['test_date' => 1637008264])->save();
-        Asset::find('test::b.txt')->data(['test_date' => '2021-11-14 09:00:00'])->save();
-        Asset::find('test::c.txt')->data(['test_date' => '2021-11-15'])->save();
-        Asset::find('test::d.jpg')->data(['test_date' => 1600008264])->save();
-        Asset::find('test::e.jpg')->data(['test_date' => null])->save();
+        $this->createWhereDateTestAssets();
 
         $assets = $this->container->queryAssets()->whereTime('test_date', '09:00')->get();
 

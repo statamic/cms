@@ -11,6 +11,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\SyncsOriginalState;
@@ -33,7 +34,7 @@ use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
+class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues
 {
     use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
     TracksQueriedRelations,
@@ -844,5 +845,20 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable
     private function hasDuration()
     {
         return $this->isAudio() || $this->isVideo();
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (method_exists($this, $method = Str::camel($field))) {
+            return $this->{$method}();
+        }
+
+        $value = $this->get($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
     }
 }
