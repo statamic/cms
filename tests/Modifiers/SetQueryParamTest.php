@@ -10,23 +10,49 @@ class SetQueryParamTest extends TestCase
     protected $baseUrl = 'https://www.google.com/search';
     protected $queryParam = ['q', 'test'];
 
-    /** @test */
-    public function it_updates_an_existing_query_param()
+    public function existingQueryParametersProvider()
     {
-        $this->assertSame("{$this->baseUrl}?q=", $this->modify("{$this->baseUrl}?q=statamic", ['q']));
-        $this->assertSame("{$this->baseUrl}?q=test", $this->modify("{$this->baseUrl}?q=statamic", $this->queryParam));
-        $this->assertSame("{$this->baseUrl}?q=test#test", $this->modify("{$this->baseUrl}?q=statamic#test", $this->queryParam));
-        $this->assertSame("{$this->baseUrl}?q=test&sourceid=chrome", $this->modify("{$this->baseUrl}?q=statamic&sourceid=chrome", $this->queryParam));
-        $this->assertSame("{$this->baseUrl}?sourceid=chrome&q=test", $this->modify("{$this->baseUrl}?sourceid=chrome&q=statamic", $this->queryParam));
+        return [
+            ['?q=', '?q=statamic', ['q']],
+            ['?q=test', '?q=statamic', $this->queryParam],
+            ['?q=test#test', '?q=statamic#test', $this->queryParam],
+            ['?q=test&sourceid=chrome', '?q=statamic&sourceid=chrome', $this->queryParam],
+            ['?sourceid=chrome&q=test', '?sourceid=chrome&q=statamic', $this->queryParam],
+        ];
     }
 
-    /** @test */
-    public function it_adds_a_non_existant_query_param()
+    /**
+     * @test
+     * @dataProvider existingQueryParametersProvider
+     */
+    public function it_updates_an_existing_query_param($expected, $input, array $queryParam = [])
     {
-        $this->assertSame("{$this->baseUrl}?q=", $this->modify($this->baseUrl, ['q']));
-        $this->assertSame("{$this->baseUrl}?q=test", $this->modify($this->baseUrl, $this->queryParam));
-        $this->assertSame("{$this->baseUrl}?q=test#test", $this->modify("{$this->baseUrl}#test", $this->queryParam));
-        $this->assertSame("{$this->baseUrl}?sourceid=chrome&q=test", $this->modify("{$this->baseUrl}?sourceid=chrome", $this->queryParam));
+        $this->assertSame(
+            $this->baseUrl.$expected,
+            $this->modify($this->baseUrl.$input, $queryParam)
+        );
+    }
+
+    public function nonExistingQueryParametersProvider()
+    {
+        return [
+            ['?q=', '', ['q']],
+            ['?q=test', '', $this->queryParam],
+            ['?q=test#test', '#test', $this->queryParam],
+            ['?sourceid=chrome&q=test', '?sourceid=chrome', $this->queryParam],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider nonExistingQueryParametersProvider
+     */
+    public function it_adds_a_non_existant_query_param($expected, $input, array $queryParam = [])
+    {
+        $this->assertSame(
+            $this->baseUrl.$expected,
+            $this->modify($this->baseUrl.$input, $queryParam)
+        );
     }
 
     /** @test */

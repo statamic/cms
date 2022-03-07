@@ -102,7 +102,7 @@ class PluckTest extends TestCase
     /** @test */
     public function it_plucks_values_from_collections_of_items_of_type_array()
     {
-        $items = $items = EntryCollection::make($this->itemsOfTypeArray());
+        $items = EntryCollection::make($this->itemsOfTypeArray());
 
         $modified = $this->modify($items, 'title');
         $this->assertInstanceOf(EntryCollection::class, $modified);
