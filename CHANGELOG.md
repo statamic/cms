@@ -11,6 +11,7 @@
 
 ### What's fixed
 - A handful of Antlers Runtime parser bugs. [#5408](https://github.com/statamic/cms/issues/5408) by @JohnathonKoster
+- Brought over changes from 3.2
 
 ### What's changed
 - Custom `date` fields are stored in the Stache as `Carbon` instances, not strings. [#5156](https://github.com/statamic/cms/issues/5156) by @jasonvarga
