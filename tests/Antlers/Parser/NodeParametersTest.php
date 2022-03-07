@@ -4,6 +4,7 @@ namespace Tests\Antlers\Parser;
 
 use Carbon\Carbon;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
+use Statamic\View\Antlers\Language\Nodes\LiteralNode;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Tests\Antlers\ParserTestCase;
 
@@ -140,5 +141,70 @@ EOT;
         $this->assertEquals(['p', 'img', 'span'], $paramValue1);
         $this->assertEquals([75], $paramValue2);
         $this->assertEquals(['...'], $paramValue3);
+    }
+
+    public function test_double_braces_inside_a_parameter()
+    {
+        $template = <<<'EOT'
+<figure>
+{{ params_tag class="absolute right-0 top-0 w-2/3 md:w-1/3 h-auto opacity-70"
+            animation="/visuals/pattern-0{{ count }}.json"
+        }}
+
+    <div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
+        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-4" }}
+    </div>
+</figure>
+EOT;
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(5, $nodes);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[0]);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[1]);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[3]);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[4]);
+
+        $checkString = '<div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">';
+        $this->assertStringContainsString($checkString, $nodes[2]->content);
+
+        $template = <<<'EOT'
+<figure>
+{{ params_tag class="absolute right-0 top-0 w-2/3 md:w-1/3 h-auto opacity-70"
+            animation="/visuals/pattern-0{{ count }}- {{two}} {{three}four}.json"
+        }}
+
+    <div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
+        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-4" }}
+    </div>
+</figure>
+EOT;
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(5, $nodes);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[0]);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[1]);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[3]);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[4]);
+
+        $this->assertStringContainsString($checkString, $nodes[2]->content);
+    }
+
+    public function test_double_braces_inside_a_parameter_emits_final_literal_node_if_no_other_antlers()
+    {
+        $template = <<<'EOT'
+<figure>{{ params_tag class="absolute right-0 top-0 w-2/3 md:w-1/3 h-auto opacity-70"
+            animation="/visuals/pattern-0{{ count }}.json"
+        }}FINAL_LITERAL</figure>
+EOT;
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(3, $nodes);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[0]);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[1]);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
+        $this->assertSame('<figure>', $nodes[0]->content);
+        $this->assertSame('FINAL_LITERAL</figure>', $nodes[2]->content);
     }
 }

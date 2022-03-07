@@ -184,6 +184,7 @@ class NodeProcessor
      * @var bool
      */
     private $encounteredBuilder = false;
+    private $builderNodeId = null;
 
     /**
      * A reference to the last resolved Builder instance.
@@ -493,6 +494,7 @@ class NodeProcessor
                 if ($resolvedValue instanceof Builder && $node->isClosedBy != null && $node->isSelfClosing == false) {
                     $this->encounteredBuilder = true;
                     $this->resolvedBuilder = $resolvedValue;
+                    $this->builderNodeId = $node->refId;
 
                     // If the path reference has more than one part,
                     // it is something like {{ products.0.name }}
@@ -819,6 +821,10 @@ class NodeProcessor
      */
     public function evaluateDeferredInterpolation($regionName)
     {
+        if (! array_key_exists($regionName, $this->canHandleInterpolations)) {
+            return $regionName;
+        }
+
         if (! array_key_exists($regionName, $this->interpolationCache)) {
             $interpolationScope = $this->getActiveData();
 
@@ -965,6 +971,11 @@ class NodeProcessor
                         if ($node->name->name == 'elseif' || $node->name->name == 'if') {
                             continue;
                         }
+                    }
+
+                    if ($this->encounteredBuilder && $this->builderNodeId != $node->refId) {
+                        $this->encounteredBuilder = false;
+                        $this->builderNodeId = null;
                     }
 
                     GlobalRuntimeState::$lastNode = $node;
@@ -1207,12 +1218,14 @@ class NodeProcessor
                         GlobalRuntimeState::$globalTagEnterStack[] = $node;
 
                         $tagParameters = $node->getParameterValues($this, $this->getActiveData());
+                        $this->data = $lockData;
 
                         $tagActiveData = $this->getActiveData();
 
                         $contributedPrefixHandles = 0;
 
                         if ($node->name->name == 'partial') {
+                            $lockData = $this->data;
                             $namedSlotResults = $this->checkPartialForNamedSlots($node);
 
                             if ($namedSlotResults[0] === true) {
@@ -1228,6 +1241,7 @@ class NodeProcessor
 
                                 $tagActiveData[GlobalRuntimeState::createIndicatorVariable(GlobalRuntimeState::INDICATOR_NAMED_SLOTS_AVAILABLE)] = true;
                             }
+                            $this->data = $lockData;
                         }
 
                         if ($node->name->name == 'partial' || $node->name->name == 'scope') {

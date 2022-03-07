@@ -2,10 +2,16 @@
 
 namespace Tests\Antlers\Sandbox;
 
+use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Taxonomy;
 use Tests\Antlers\ParserTestCase;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class VariableAssignmentTest extends ParserTestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     public function test_simple_variable_is_set()
     {
         $result = $this->evaluate('my_variable = 1; another_var = 3;', []);
@@ -120,5 +126,35 @@ EOT;
 {{ my_var = 0; }}{{ products }}{{ my_var += 1; }}{{ another_var += 1; another_var }}{{ /products }}<my_var {{ my_var }}><another_var: {{ another_var ?? 0 }}>
 EOT;
         $this->assertSame('11111<my_var 5><another_var: 0>', $this->renderString($template, $data));
+    }
+
+    public function test_nested_arrays_can_be_summed()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->taxonomies(['tags'])->save();
+        EntryFactory::collection('blog')->id('1')->data(['tags' => ['rad', 'test', 'test-two']])->create();
+        EntryFactory::collection('blog')->id('2')->data(['tags' => ['rad', 'two']])->create();
+        EntryFactory::collection('blog')->id('3')->data(['tags' => ['meh']])->create();
+        EntryFactory::collection('blog')->id('4')->create();
+
+        $template = <<<'EOT'
+{{ my_count = 0 }}
+{{ collection:blog }}
+    {{ my_count += (tags|count) }}
+{{ /collection:blog }}
+{{ my_count }}
+EOT;
+
+        $this->assertSame('6', trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+{{ $my_count = 0; }}
+{{ collection:blog }}
+    {{ $my_count += (tags|count) }}
+{{ /collection:blog }}
+{{ $my_count }}
+EOT;
+
+        $this->assertSame('6', trim($this->renderString($template, [], true)));
     }
 }

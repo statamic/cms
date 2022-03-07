@@ -99,33 +99,6 @@ class ConditionPairAnalyzer
     {
         $stack = [[$node, $index]];
         $nodeLen = count($nodes);
-        $lastCloseIndex = null;
-
-        $conditionCloseIndex = [];
-
-        for ($i = 0; $i < $nodeLen; $i++) {
-            $node = $nodes[$i];
-
-            if ($node instanceof AntlersNode) {
-                if ($node->isComment) {
-                    continue;
-                }
-
-                $name = $node->name->name;
-
-                if ($node->isClosingTag && $name == 'if') {
-                    $conditionCloseIndex[$i] = $i;
-                    continue;
-                } else {
-                    if ($name == 'elseif' || $name == 'else') {
-                        $conditionCloseIndex[$i] = $i;
-                        continue;
-                    }
-                }
-            }
-        }
-
-        $conditionIndexLength = count($conditionCloseIndex);
 
         while (! empty($stack)) {
             $curItem = array_pop($stack);
@@ -134,15 +107,6 @@ class ConditionPairAnalyzer
             $thisValidPairs = self::getValidClosingPairs($curNode->name->name);
 
             $doSkipValidation = false;
-
-            if ($conditionIndexLength > 50 && $lastCloseIndex != null) {
-                foreach ($conditionCloseIndex as $cIndex => $n) {
-                    if ($cIndex > $curIndex) {
-                        $curIndex = $cIndex;
-                        break;
-                    }
-                }
-            }
 
             for ($i = $curIndex; $i < $nodeLen; $i++) {
                 $subNode = $nodes[$i];
@@ -173,8 +137,6 @@ class ConditionPairAnalyzer
                         }
 
                         if ($canClose) {
-                            $lastCloseIndex = $i;
-                            unset($conditionCloseIndex[$i]);
                             $curNode->isClosedBy = $subNode;
                             $subNode->isOpenedBy = $curNode;
                             $subNode->ref += 1;

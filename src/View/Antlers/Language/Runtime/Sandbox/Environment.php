@@ -884,7 +884,12 @@ class Environment
                 $right = $this->checkForFieldValue($right);
 
                 $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
-                $this->assignments[$this->dataRetriever->lastPath()] = $right;
+                $lastPath = $this->dataRetriever->lastPath();
+                $this->assignments[$lastPath] = $right;
+
+                if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                    GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                }
 
                 return null;
             } elseif ($operand instanceof AdditionAssignmentOperator) {
@@ -1440,7 +1445,22 @@ class Environment
         } elseif ($val instanceof NullConstant) {
             $returnVal = null;
         } elseif ($val instanceof StringValueNode) {
-            $returnVal = $this->applyEscapeSequences($val->value);
+            if (Str::contains($val->value, GlobalRuntimeState::$interpolatedVariables)) {
+                $stringValue = $val->value;
+
+                foreach ($this->dataManagerInterpolations as $regionName => $region) {
+                    if (Str::contains($val->value, $regionName)) {
+                        $tempValue = $this->nodeProcessor->evaluateDeferredInterpolation(trim($regionName));
+                        if (is_string($tempValue) || (is_object($tempValue) && method_exists($tempValue, '__toString'))) {
+                            $stringValue = str_replace($regionName, (string) $tempValue, $stringValue);
+                        }
+                    }
+                }
+
+                $returnVal = $stringValue;
+            } else {
+                $returnVal = $this->applyEscapeSequences($val->value);
+            }
         } elseif ($val instanceof NullCoalescenceGroup) {
             $returnVal = $this->evaluateNullCoalescence($val);
         } elseif ($val instanceof TernaryCondition) {
