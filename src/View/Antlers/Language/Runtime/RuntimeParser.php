@@ -103,6 +103,13 @@ class RuntimeParser implements Parser
      */
     private $antlersParser = null;
 
+    /**
+     * Keeps track of how nested the RuntimeParser instance is.
+     *
+     * @var int
+     */
+    private $parseStack = 0;
+
     public function __construct(DocumentParser $documentParser, NodeProcessor $nodeProcessor, AntlersLexer $lexer, LanguageParser $antlersParser)
     {
         $this->documentParser = $documentParser;
@@ -311,10 +318,13 @@ class RuntimeParser implements Parser
     {
         RuntimeValueCache::resetRuntimeCache();
 
+        $this->parseStack += 1;
         $text = $this->runPreParserCallbacks($text);
 
         if (! $this->canPossiblyParseAntlers($text)) {
             $text = $this->sanitizePhp($text);
+
+            $this->parseStack -= 1;
 
             if ($text == null) {
                 return new AntlersString('', $this);
@@ -402,11 +412,15 @@ class RuntimeParser implements Parser
             }
         }
 
-        $bufferContent = LiteralReplacementManager::processReplacements($bufferContent);
-        $bufferContent = StackReplacementManager::processReplacements($bufferContent);
+        $this->parseStack -= 1;
 
-        $bufferContent = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $bufferContent);
-        $bufferContent = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $bufferContent);
+        if ($this->parseStack == 0) {
+            $bufferContent = LiteralReplacementManager::processReplacements($bufferContent);
+            $bufferContent = StackReplacementManager::processReplacements($bufferContent);
+
+            $bufferContent = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $bufferContent);
+            $bufferContent = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $bufferContent);
+        }
 
         return new AntlersString($bufferContent, $this);
     }
