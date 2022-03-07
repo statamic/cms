@@ -209,7 +209,7 @@ EOT;
         \Statamic\Facades\URL::swap($mock);
 
         $this->makeNav([
-            ['id' => 'home', 'title' => 'Home', 'url' => '/'],  
+            ['id' => 'home', 'title' => 'Home', 'url' => '/'],
             ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
                 ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1', 'children' => [
                     ['id' => '1-1-1', 'title' => '1.1.1', 'url' => '/1/1/1', 'children' => [
