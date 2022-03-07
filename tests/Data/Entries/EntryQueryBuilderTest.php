@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -88,11 +89,7 @@ class EntryQueryBuilderTest extends TestCase
     /** @test **/
     public function entries_are_found_using_where_date()
     {
-        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_date' => 1637008264])->create();
-        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_date' => '2021-11-14 09:00:00'])->create();
-        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_date' => '2021-11-15'])->create();
-        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_date' => 1627008264])->create();
-        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_date' => null])->create();
+        $this->createWhereDateTestEntries();
 
         $entries = Entry::query()->whereDate('test_date', '2021-11-15')->get();
 
@@ -113,11 +110,7 @@ class EntryQueryBuilderTest extends TestCase
     /** @test **/
     public function entries_are_found_using_where_month()
     {
-        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_date' => 1637008264])->create();
-        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_date' => '2021-11-14 09:00:00'])->create();
-        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_date' => '2021-11-15'])->create();
-        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_date' => 1627008264])->create();
-        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_date' => null])->create();
+        $this->createWhereDateTestEntries();
 
         $entries = Entry::query()->whereMonth('test_date', 11)->get();
 
@@ -133,11 +126,7 @@ class EntryQueryBuilderTest extends TestCase
     /** @test **/
     public function entries_are_found_using_where_day()
     {
-        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_date' => 1637008264])->create();
-        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_date' => '2021-11-14 09:00:00'])->create();
-        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_date' => '2021-11-15'])->create();
-        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_date' => 1627008264])->create();
-        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_date' => null])->create();
+        $this->createWhereDateTestEntries();
 
         $entries = Entry::query()->whereDay('test_date', 15)->get();
 
@@ -146,18 +135,14 @@ class EntryQueryBuilderTest extends TestCase
 
         $entries = Entry::query()->whereDay('test_date', '<', 15)->get();
 
-        $this->assertCount(1, $entries);
-        $this->assertEquals(['Post 2'], $entries->map->title->all());
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 2', 'Post 4'], $entries->map->title->all());
     }
 
     /** @test **/
     public function entries_are_found_using_where_year()
     {
-        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_date' => 1637008264])->create();
-        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_date' => '2021-11-14 09:00:00'])->create();
-        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_date' => '2021-11-15'])->create();
-        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_date' => 1600008264])->create();
-        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_date' => null])->create();
+        $this->createWhereDateTestEntries();
 
         $entries = Entry::query()->whereYear('test_date', 2021)->get();
 
@@ -173,11 +158,7 @@ class EntryQueryBuilderTest extends TestCase
     /** @test **/
     public function entries_are_found_using_where_time()
     {
-        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_date' => 1637008264])->create();
-        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_date' => '2021-11-14 09:00:00'])->create();
-        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_date' => '2021-11-15'])->create();
-        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_date' => 1600008264])->create();
-        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_date' => null])->create();
+        $this->createWhereDateTestEntries();
 
         $entries = Entry::query()->whereTime('test_date', '09:00')->get();
 
@@ -188,6 +169,18 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 1', 'Post 4'], $entries->map->title->all());
+    }
+
+    private function createWhereDateTestEntries()
+    {
+        $blueprint = Blueprint::makeFromFields(['test_date' => ['type' => 'date', 'time_enabled' => true]]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_date' => '2021-11-15 20:31:04'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_date' => '2021-11-14 09:00:00'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_date' => '2021-11-15 00:00:00'])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_date' => '2020-09-13 14:44:24'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_date' => null])->create();
     }
 
     public function entries_are_found_using_where_null()
