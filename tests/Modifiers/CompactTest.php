@@ -7,11 +7,6 @@ use Tests\TestCase;
 
 class CompactTest extends TestCase
 {
-    public function setUp(): void
-    {
-        $this->markTestSkipped();
-    }
-
     protected $data = [
         'view' => [
             'var_one' => 'value one',
@@ -27,7 +22,7 @@ class CompactTest extends TestCase
 
     private function tag($tag, $data = [])
     {
-        return Parse::template($tag, $data);
+        return (string) Parse::template($tag, $data);
     }
 
     /** @test */
