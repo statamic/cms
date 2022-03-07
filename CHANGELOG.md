@@ -86,6 +86,18 @@
 
 
 
+## 3.2.37 (2022-03-07)
+
+### What's improved
+- Updated Swedish translations. [#5421](https://github.com/statamic/cms/issues/5421) by @jannejava
+
+### What's fixed
+- Fix validation related error in Grid fields. [#5424](https://github.com/statamic/cms/issues/5424) by @jasonvarga
+- Fix user wizard icon size. [#5423](https://github.com/statamic/cms/issues/5423) by @duncanmcclean
+- Fix rare GitHub auth error output in the `starter-kit:install` command. [#5410](https://github.com/statamic/cms/issues/5410) by @jesseleite
+
+
+
 ## 3.2.36 (2022-03-04)
 
 ### What's new

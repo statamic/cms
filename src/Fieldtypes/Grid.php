@@ -163,11 +163,11 @@ class Grid extends Fieldtype
 
         return collect($this->field->value())->map(function ($row, $index) use ($attributes) {
             return collect($row)->except('_id')->mapWithKeys(function ($value, $handle) use ($attributes, $index) {
-                return [$this->rowRuleFieldPrefix($index).'.'.$handle => $attributes[$handle]];
+                return [$this->rowRuleFieldPrefix($index).'.'.$handle => $attributes[$handle] ?? null];
             });
         })->reduce(function ($carry, $rules) {
             return $carry->merge($rules);
-        }, collect())->all();
+        }, collect())->filter()->all();
     }
 
     public function preload()
