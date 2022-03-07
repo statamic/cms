@@ -346,4 +346,15 @@ class Statamic
 
         return $prefix.'.*';
     }
+
+    public static function trans($key, $replace = [], $locale = null)
+    {
+        $line = __($key, $replace, $locale);
+
+        if (is_array($line)) {
+            return $key;
+        }
+
+        return $line;
+    }
 }
