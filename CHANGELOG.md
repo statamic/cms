@@ -1,9 +1,16 @@
 # Release Notes
 
-## Unreleased
+## 3.3.0-beta.5 (2022-03-07)
 
 ### What's new
 - More control over how values should be stored for querying. e.g. `date` fieldtypes store `Carbon` instances. [#5156](https://github.com/statamic/cms/issues/5156) by @jasonvarga
+- Support date where clauses in the query builder. [#4753](https://github.com/statamic/cms/issues/4753) by @ryanmitchell
+
+### What improved
+- Improved test coverage for modifiers. [#5282](https://github.com/statamic/cms/issues/5282) [#5341](https://github.com/statamic/cms/issues/5341) by @Konafets
+
+### What's fixed
+- A handful of Antlers Runtime parser bugs. [#5408](https://github.com/statamic/cms/issues/5408) by @JohnathonKoster
 
 ### What's changed
 - Custom `date` fields are stored in the Stache as `Carbon` instances, not strings. [#5156](https://github.com/statamic/cms/issues/5156) by @jasonvarga
