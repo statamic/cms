@@ -502,12 +502,6 @@ class AssetContainerTest extends TestCase
             $this->assertCount(2, $assets);
             $this->assertEveryItemIsInstanceOf(Asset::class, $assets);
         });
-
-        // Ensure folder named zero does not get treated as null and selects all assets.
-        tap($this->containerWithDisk()->assets('0'), function ($assets) {
-            $this->assertInstanceOf(Collection::class, $assets);
-            $this->assertCount(0, $assets);
-        });
     }
 
     /** @test */
@@ -524,6 +518,47 @@ class AssetContainerTest extends TestCase
             $this->assertCount(4, $assets);
             $this->assertEveryItemIsInstanceOf(Asset::class, $assets);
         });
+    }
+
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/5405
+     * @see https://github.com/statamic/cms/pull/5433
+     **/
+    public function it_can_get_assets_in_a_folder_named_zero()
+    {
+        $container = $this->containerWithDisk();
+
+        $container->disk()->delete('0');
+
+        $paths = [
+            '0/a.txt',
+            '0/b.txt',
+            '0/nested/c.txt',
+            '0/nested/d.txt',
+            '0/nested/e.txt',
+        ];
+
+        foreach ($paths as $path) {
+            $container->disk()->put($path, 'test');
+        }
+
+        tap($container->assets('0'), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertEquals([
+                '0/a.txt', '0/b.txt',
+            ], $assets->map->path()->values()->all());
+        });
+
+        tap($container->assets('0', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertEquals([
+                '0/a.txt', '0/b.txt',
+                '0/nested/c.txt', '0/nested/d.txt', '0/nested/e.txt',
+            ], $assets->map->path()->values()->all());
+        });
+
+        $container->disk()->delete('0');
     }
 
     /** @test */
