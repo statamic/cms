@@ -7,6 +7,7 @@ use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
 use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
 use Statamic\Fieldtypes\Bard\LinkMark as CustomLinkMark;
 use Statamic\Fieldtypes\Text;
@@ -65,7 +66,7 @@ class Augmentor
             $value = $this->augmentSets($value, $shallow);
         }
 
-        return $value;
+        return collect($value)->mapInto(Values::class)->all();
     }
 
     public function withDisabledSets()
