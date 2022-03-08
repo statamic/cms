@@ -562,6 +562,50 @@ class AssetContainerTest extends TestCase
         $container->disk()->delete('0');
     }
 
+    /**
+     * @test
+     *
+     * @see https://github.com/statamic/cms/issues/5405
+     * @see https://github.com/statamic/cms/pull/5433
+     **/
+    public function it_wont_get_assets_that_share_a_similar_folder_prefix()
+    {
+        $container = $this->containerWithDisk();
+
+        $container->disk()->delete('test');
+
+        $paths = [
+            'test/cat/siamese.jpg',
+            'test/cat/tabby.jpg',
+            'test/cat/cartoon/cheshire.jpg',
+            'test/categories/favorite.jpg',
+            'test/categories/non-favorite.jpg',
+        ];
+
+        foreach ($paths as $path) {
+            $container->disk()->put($path, 'test');
+        }
+
+        tap($container->assets('test/cat'), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertEquals([
+                'test/cat/siamese.jpg',
+                'test/cat/tabby.jpg',
+            ], $assets->map->path()->values()->all());
+        });
+
+        tap($container->assets('test/cat', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertEquals([
+                'test/cat/cartoon/cheshire.jpg',
+                'test/cat/siamese.jpg',
+                'test/cat/tabby.jpg',
+            ], $assets->map->path()->values()->all());
+        });
+
+        $container->disk()->delete('test');
+    }
+
     /** @test */
     public function it_gets_an_asset_folder()
     {
