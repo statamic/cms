@@ -20,7 +20,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_augments_prosemirror_structure_to_a_template_friendly_array()
     {
-        (new class extends Fieldtype {
+        (new class extends Fieldtype
+        {
             public static $handle = 'test';
 
             public function augment($value)

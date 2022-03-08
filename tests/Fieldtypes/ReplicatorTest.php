@@ -335,7 +335,8 @@ class ReplicatorTest extends TestCase
     /** @test */
     public function it_augments()
     {
-        (new class extends Fieldtype {
+        (new class extends Fieldtype
+        {
             public static $handle = 'test';
 
             public function augment($value)
