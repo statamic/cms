@@ -675,7 +675,7 @@ class PathDataManager
                         $this->compact(false);
                     }
                 }
-                if ($path instanceof PathNode && !$path->isFinal) {
+                if ($path instanceof PathNode && ! $path->isFinal) {
                     $this->doBreak = false;
                 }
             } else {

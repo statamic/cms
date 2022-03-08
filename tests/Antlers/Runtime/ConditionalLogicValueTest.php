@@ -12,7 +12,6 @@ use Tests\Antlers\ParserTestCase;
 
 class ConditionalLogicValueTest extends ParserTestCase
 {
-
     public function test_conditionals_handle_values_transparently()
     {
         $integerFieldType = new Integer();
@@ -25,7 +24,7 @@ class ConditionalLogicValueTest extends ParserTestCase
                 'two' => 'Two',
                 'three' => 'Three',
             ],
-            'type' => 'button_group'
+            'type' => 'button_group',
         ]));
         $checkboxFieldType->setField(new Field('checkbox_value', [
             'inline' => false,

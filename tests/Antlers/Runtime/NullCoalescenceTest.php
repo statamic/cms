@@ -78,6 +78,6 @@ EOT;
             $m->shouldReceive('get')->with('settings')->once()->andReturn(null);
         });
 
-        $this->assertSame('Statamic', (string)$this->parser()->cascade($cascade)->render($template, $data));
+        $this->assertSame('Statamic', (string) $this->parser()->cascade($cascade)->render($template, $data));
     }
 }

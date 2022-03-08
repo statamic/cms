@@ -419,7 +419,7 @@ class Environment
     /**
      * Resolves the provided value to be used within a comparison operation.
      *
-     * @param mixed $value The value to resolve.
+     * @param  mixed  $value  The value to resolve.
      * @return mixed|string
      */
     private function getComparisonValue($value)
@@ -427,9 +427,9 @@ class Environment
         if (is_object($value)) {
             $lockData = $this->nodeProcessor->getAllData();
             if ($value instanceof Value) {
-                $value =  $value->value();
+                $value = $value->value();
             } elseif ($value instanceof ArrayableString) {
-                $value = (string)$value;
+                $value = (string) $value;
             }
             $this->nodeProcessor->swapData($lockData);
         }
@@ -605,7 +605,6 @@ class Environment
                 } else {
                     $right = $this->getComparisonValue($this->getValue($right));
                     $left = $this->getComparisonValue($this->getValue($left));
-
                 }
 
                 $this->isEvaluatingTruthValue = false;

@@ -397,7 +397,7 @@ class NodeProcessor
     /**
      * Overrides all data in the processor instance with the provided data.
      *
-     * @param array $data The data to set.
+     * @param  array  $data  The data to set.
      * @return $this
      */
     public function swapData($data)
