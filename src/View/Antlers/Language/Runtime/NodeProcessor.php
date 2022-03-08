@@ -395,6 +395,19 @@ class NodeProcessor
     }
 
     /**
+     * Overrides all data in the processor instance with the provided data.
+     *
+     * @param array $data The data to set.
+     * @return $this
+     */
+    public function swapData($data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
      * Sets the active scope data.
      *
      * @param  array  $data  The data to set.
