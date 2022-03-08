@@ -201,7 +201,6 @@ EOT;
 
         $expected = <<<'EOT'
 
-
 <div class="max-w-2xl mx-auto mb-32">
 <p>test</p> test
 </div>

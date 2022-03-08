@@ -622,6 +622,14 @@ class DocumentParser
 
         RecursiveParentAnalyzer::associateRecursiveParent($this->nodes);
 
+        if (count($this->nodes) >= 2) {
+            if ($this->nodes[0] instanceof AntlersNode && $this->nodes[0]->isComment) {
+                if ($this->nodes[1] instanceof LiteralNode) {
+                    $this->nodes[1]->content = ltrim($this->nodes[1]->content);
+                }
+            }
+        }
+
         foreach ($this->nodes as $node) {
             if ($node instanceof AntlersNode) {
                 $node->isInterpolationNode = $this->isInterpolatedParser;
