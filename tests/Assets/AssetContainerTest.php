@@ -522,6 +522,7 @@ class AssetContainerTest extends TestCase
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/5405
      * @see https://github.com/statamic/cms/pull/5433
      **/
