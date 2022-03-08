@@ -502,6 +502,12 @@ class AssetContainerTest extends TestCase
             $this->assertCount(2, $assets);
             $this->assertEveryItemIsInstanceOf(Asset::class, $assets);
         });
+
+        // Ensure folder named zero does not get treated as null and selects all assets.
+        tap($this->containerWithDisk()->assets('0'), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertCount(0, $assets);
+        });
     }
 
     /** @test */
