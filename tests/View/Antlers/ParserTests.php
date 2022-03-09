@@ -17,6 +17,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Tags\Tags;
 use Statamic\View\Cascade;
 use Tests\Antlers\Fixtures\Addon\Tags\RecursiveChildren;
@@ -2356,6 +2357,17 @@ EOT;
 
         $this->assertEquals('<Bar><Foo>', $this->renderString('<{{ my_query:1:title }}><{{ my_query:0:title }}>', [
             'my_query' => new Value($builder),
+        ]));
+    }
+
+    /** @test */
+    public function it_loops_over_values_instances()
+    {
+        $this->assertEquals('<alfa><bravo><charlie><delta>', $this->renderString('{{ grid }}<{{ foo }}><{{ bar }}>{{ /grid }}', [
+            'grid' => [
+                new Values(['foo' => 'alfa', 'bar' => 'bravo']),
+                new Values(['foo' => 'charlie', 'bar' => 'delta']),
+            ],
         ]));
     }
 
