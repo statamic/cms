@@ -3,7 +3,9 @@
 namespace Statamic\Support;
 
 use Exception;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr as IlluminateArr;
+use Statamic\Fields\Values;
 
 class Arr extends IlluminateArr
 {
@@ -49,6 +51,10 @@ class Arr extends IlluminateArr
         }
 
         return collect($array)->map(function ($value) use ($scope) {
+            if ($value instanceof Arrayable) {
+                $value = $value->toArray();
+            }
+
             if (! is_array($value)) {
                 throw new Exception('Scopes can only be added to associative or multidimensional arrays.');
             }
