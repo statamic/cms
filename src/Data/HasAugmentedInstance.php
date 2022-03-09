@@ -109,21 +109,25 @@ trait HasAugmentedInstance
         throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->__get($key);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         throw new \Exception('Method offsetSet is not currently supported.');
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return ! is_null($this->offsetGet($key));
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         throw new \Exception('Method offsetUnset is not currently supported.');
