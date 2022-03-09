@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
@@ -305,6 +306,10 @@ class Entries
         })->each(function ($values, $param) use ($query) {
             $taxonomy = substr($param, 9);
             [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, 'any');
+
+            if (Compare::isQueryBuilder($values)) {
+                $values = $values->get();
+            }
 
             if (is_string($values)) {
                 $values = array_filter(explode('|', $values));
