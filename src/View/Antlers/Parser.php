@@ -1060,7 +1060,7 @@ class Parser implements ParserContract
             return $value->getBags() ? 'true' : 'false';
         } elseif (is_array($value)) {
             return ! empty($value) ? 'true' : 'false';
-        } elseif (is_object($value) and is_callable([$value, '__toString'])) {
+        } elseif (is_object($value) and method_exists($value, '__toString')) {
             return var_export((string) $value, true);
         } elseif (is_object($value)) {
             return 'true';
