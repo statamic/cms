@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Values;
 use Tests\TestCase;
 
 class GridTest extends TestCase
@@ -314,5 +315,37 @@ class GridTest extends TestCase
         ];
 
         $this->assertSame($expected, $field->fieldtype()->preload()['defaults']);
+    }
+
+    /** @test */
+    public function it_augments()
+    {
+        (new class extends Fieldtype
+        {
+            public static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $field = new Field('test', [
+            'type' => 'grid',
+            'fields' => [
+                ['handle' => 'words', 'field' => ['type' => 'test']],
+            ],
+        ]);
+
+        $augmented = $field->fieldtype()->augment([
+            ['words' => 'one'],
+            ['words' => 'two'],
+        ]);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals([
+            ['words' => 'one (augmented)'],
+            ['words' => 'two (augmented)'],
+        ], collect($augmented)->toArray());
     }
 }

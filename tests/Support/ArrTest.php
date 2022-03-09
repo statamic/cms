@@ -2,7 +2,9 @@
 
 namespace Tests\Support;
 
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
+use Statamic\Fields\Values;
 use Statamic\Support\Arr;
 
 class ArrTest extends TestCase
@@ -27,8 +29,11 @@ class ArrTest extends TestCase
         $this->assertEquals($expected, Arr::addScope($arr, 'myscope'));
     }
 
-    /** @test */
-    public function it_adds_scope_to_multidimensional_array()
+    /**
+     * @test
+     * @dataProvider multiDimensionalArrayScopeProvider
+     */
+    public function it_adds_scope_to_multidimensional_array($mapInto)
     {
         $arr = [
             [
@@ -40,6 +45,11 @@ class ArrTest extends TestCase
                 'baz' => 'qux2',
             ],
         ];
+
+        if ($mapInto) {
+            // Convert the inner array into something (like Collection or Values objects)
+            $arr = collect($arr)->mapInto($mapInto)->all();
+        }
 
         $expected = [
             [
@@ -61,6 +71,15 @@ class ArrTest extends TestCase
         ];
 
         $this->assertEquals($expected, Arr::addScope($arr, 'myscope'));
+    }
+
+    public function multiDimensionalArrayScopeProvider()
+    {
+        return [
+            'array' => [null],
+            'collection' => [Collection::class],
+            'values' => [Values::class],
+        ];
     }
 
     /** @test */

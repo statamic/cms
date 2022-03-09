@@ -17,6 +17,7 @@ use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Ignition\Value as IgnitionViewValue;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\Modify;
@@ -308,6 +309,10 @@ class Parser implements ParserContract
         foreach ($loop as $key => &$value) {
             if ($value instanceof Augmentable) {
                 $value = $value->toAugmentedArray();
+            }
+
+            if ($value instanceof Values) {
+                $value = $value->toArray();
             }
 
             // If the value of the current iteration is *not* already an array (ie. we're

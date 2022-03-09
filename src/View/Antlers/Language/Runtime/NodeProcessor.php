@@ -13,6 +13,7 @@ use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\ModifierNotFoundException;
 use Statamic\Modifiers\Modify;
@@ -2069,6 +2070,10 @@ class NodeProcessor
         foreach ($loop as $key => &$value) {
             if ($value instanceof Augmentable) {
                 $value = RuntimeValueCache::getAugmentableValue($value);
+            }
+
+            if ($value instanceof Values) {
+                $value = $value->toArray();
             }
 
             // If the value of the current iteration is *not* already an array (ie. we're
