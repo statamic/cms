@@ -48,6 +48,7 @@ export default {
             options: this.initialOptions(),
             urlValue: this.meta.initialUrl,
             selectedEntries: this.meta.initialSelectedEntries,
+            metaChanging: false,
         }
 
     },
@@ -65,6 +66,8 @@ export default {
     watch: {
 
         option(option, oldOption) {
+            if (this.metaChanging) return;
+
             if (option === null) {
                 this.update(null);
             } else if (option === 'url') {
@@ -81,7 +84,17 @@ export default {
         },
 
         urlValue(url) {
+            if (this.metaChanging) return;
+
             this.update(url);
+        },
+
+        meta(meta) {
+            this.metaChanging = true;
+            this.urlValue = meta.initialUrl;
+            this.option = meta.initialOption;
+            this.selectedEntries = meta.initialSelectedEntries;
+            this.$nextTick(() => this.metaChanging = false);
         }
 
     },
