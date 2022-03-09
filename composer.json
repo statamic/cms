@@ -10,7 +10,7 @@
     "license": "proprietary",
     "require": {
         "ext-json": "*",
-        "ajthinking/archetype": "^0.2.5",
+        "ajthinking/archetype": "^1.0.3",
         "composer/composer": "^1.10.22 || ^2.0.13",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
