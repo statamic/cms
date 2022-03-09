@@ -2371,6 +2371,41 @@ EOT;
         ]));
     }
 
+    /**
+     * @test
+     * @dataProvider objectInConditionProvider
+     */
+    public function it_uses_entries_as_conditions($object)
+    {
+        $this->assertEquals('yes', $this->renderString('{{ if the_field }}yes{{ else }}no{{ /if }}', [
+            'the_field' => $object,
+        ]));
+    }
+
+    public function objectInConditionProvider()
+    {
+        return [
+            'with __toString' => [new class()
+            {
+                public function __toString()
+                {
+                    return 'foo';
+                }
+            }, ],
+            'with __call' => [new class()
+            {
+                public function __call($method, $args)
+                {
+                    return 'foo';
+                }
+            }, ],
+            'without __call or __toString' => [new class()
+            {
+                //
+            }, ],
+        ];
+    }
+
     private function assertEqualsWithCollapsedNewlines($expected, $actual)
     {
         $expected = trim($expected);
