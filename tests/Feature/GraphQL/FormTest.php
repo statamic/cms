@@ -135,4 +135,40 @@ GQL;
                 ],
             ]]);
     }
+
+    /** @test */
+    public function it_queries_the_validation_rules()
+    {
+        Form::make('contact')->title('Contact Us')->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'name' => ['type' => 'text', 'validate' => ['required']],
+            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
+            'message' => ['type' => 'textarea', 'validate' => ['required_if:select_field,disco']],
+        ]);
+
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        rules
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'rules' => [
+                        'name' => ['required'],
+                        'subject' => ['nullable'],
+                        'message' => ['required_if:select_field,disco'],
+                    ],
+                ],
+            ]]);
+    }
 }

@@ -83,9 +83,8 @@
                         </div>
                     </div>
 
-                    <div class="h-full" v-else-if="asset.extension == 'pdf'">
-                        <object :data="asset.url" type="application/pdf" width="100%" height="100%">
-                        </object>
+                    <div class="h-full" v-else-if="asset.isPdf">
+                        <pdf-viewer :src="asset.pdfUrl"></pdf-viewer>
                     </div>
 
                     <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
@@ -184,6 +183,7 @@
 <script>
 import EditorActions from './EditorActions.vue';
 import FocalPointEditor from './FocalPointEditor.vue';
+import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 
 export default {
@@ -191,6 +191,7 @@ export default {
     components: {
         EditorActions,
         FocalPointEditor,
+        PdfViewer,
         PublishFields,
     },
 
@@ -402,8 +403,7 @@ export default {
         actionCompleted(event) {
             this.$events.$emit('editor-action-completed');
             this.close();
-        }
-
+        },
     }
 
 }

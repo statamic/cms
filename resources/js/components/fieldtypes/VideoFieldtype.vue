@@ -69,8 +69,8 @@ export default {
                 embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
             }
 
-            // make sure additional query parameters are included
-            if (embed_url.includes('&')) {
+            // Make sure additional query parameters are included.
+            if (embed_url.includes('&') && !embed_url.includes('?')) {
                 embed_url = embed_url.replace('&', '?');
             }
 

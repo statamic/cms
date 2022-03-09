@@ -12,7 +12,7 @@
                 </template>
                 <template v-else>{{ __('Last Install Log' ) }}</template>
             </button>
-            <button v-if="showActions && ! onLatestVersion" class="btn-primary ml-2" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
+            <button v-if="canUpdateToLatestVersion" class="btn-primary ml-2" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
             <div v-if="onLatestVersion" v-text="__('Up to date')" />
         </div>
 
@@ -97,7 +97,7 @@
                 currentVersion: null,
                 lastInstallLog: null,
                 modalOpen: false,
-                latestVersion: null,
+                latestRelease: null,
                 showingUnlicensedReleases: false,
             };
         },
@@ -129,6 +129,14 @@
 
             hasUnlicensedReleases() {
                 return this.unlicensedReleases.length > 0;
+            },
+
+            latestVersion() {
+                return this.latestRelease.version;
+            },
+
+            canUpdateToLatestVersion() {
+                return this.latestVersion.canUpdate && this.showActions && ! this.onLatestVersion;
             }
         },
 
@@ -148,7 +156,7 @@
                     this.gettingChangelog = false;
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
-                    this.latestVersion = response.data.changelog[0].version;
+                    this.latestRelease = response.data.changelog[0];
                     this.lastInstallLog = response.data.lastInstallLog;
                 });
             },

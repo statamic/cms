@@ -582,6 +582,15 @@ final class Installer
      */
     protected function tidyComposerErrorOutput($output)
     {
+        if (Str::contains($output, 'github.com') && Str::contains($output, ['access', 'permission', 'credential', 'authenticate'])) {
+            return collect([
+                'Composer could not authenticate with GitHub!',
+                'Please generate a personal access token at: https://github.com/settings/tokens/new',
+                'Then save your token for future use by running the following command:',
+                'composer config --global --auth github-oauth.github.com [your-token-here]',
+            ])->implode(PHP_EOL);
+        }
+
         return preg_replace("/\\n\\nrequire \[.*$/", '', $output);
     }
 
