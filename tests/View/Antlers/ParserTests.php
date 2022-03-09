@@ -2385,21 +2385,24 @@ EOT;
     public function objectInConditionProvider()
     {
         return [
-            'with __toString' => [new class() {
+            'with __toString' => [new class()
+            {
                 public function __toString()
                 {
                     return 'foo';
                 }
-            }],
-            'with __call' => [new class() {
+            }, ],
+            'with __call' => [new class()
+            {
                 public function __call($method, $args)
                 {
                     return 'foo';
                 }
-            }],
-            'without __call or __toString' => [new class() {
+            }, ],
+            'without __call or __toString' => [new class()
+            {
                 //
-            }],
+            }, ],
         ];
     }
 
