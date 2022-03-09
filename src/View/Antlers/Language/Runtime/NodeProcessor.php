@@ -352,6 +352,8 @@ class NodeProcessor
      */
     private function processAssignments($assignments, &$lockData = null)
     {
+        $this->clearInterpolationCache();
+
         foreach ($assignments as $path => $value) {
             if (array_key_exists($path, $this->previousAssignments) == false) {
                 $this->previousAssignments[$path] = count($this->data) - 1;
@@ -390,6 +392,19 @@ class NodeProcessor
     private function replaceData($data)
     {
         $this->data = [$data];
+
+        return $this;
+    }
+
+    /**
+     * Overrides all data in the processor instance with the provided data.
+     *
+     * @param  array  $data  The data to set.
+     * @return $this
+     */
+    public function swapData($data)
+    {
+        $this->data = $data;
 
         return $this;
     }
@@ -932,6 +947,14 @@ class NodeProcessor
     }
 
     /**
+     * Resets the internal interpolation cache.
+     */
+    private function clearInterpolationCache()
+    {
+        $this->interpolationCache = [];
+    }
+
+    /**
      * Processes all nodes and returns the reduced runtime value.
      *
      * This method typically returns a string, but can return
@@ -952,6 +975,8 @@ class NodeProcessor
         $processStack = [[$processNodes, 0]];
 
         while (! empty($processStack)) {
+            $this->clearInterpolationCache();
+
             $details = array_pop($processStack);
             $nodes = $details[0];
             $startIndex = $details[1];
