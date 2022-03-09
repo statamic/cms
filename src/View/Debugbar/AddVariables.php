@@ -14,7 +14,7 @@ class AddVariables
      */
     public function handle(ViewRendered $event)
     {
-        if (!debugbar()->isEnabled() || debugbar()->hasCollector('Variables')) {
+        if (! debugbar()->isEnabled() || debugbar()->hasCollector('Variables')) {
             return;
         }
 
