@@ -243,13 +243,35 @@ class QueryBuilderTest extends TestCase
     /** @test **/
     public function results_are_found_using_or_where_json_contains()
     {
-        $this->markTestSkipped();
+        $items = collect([
+            ['reference' => 'a', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']],
+            ['reference' => 'b', 'test_taxonomy' => ['taxonomy-3']],
+            ['reference' => 'c', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']],
+            ['reference' => 'd', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']],
+            ['reference' => 'e', 'test_taxonomy' => ['taxonomy-5']],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonContains('test_taxonomy', ['taxonomy-1'])->orWhereJsonContains('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals(['a', 'c', 'e'], $results->map->reference->all());
     }
 
     /** @test **/
     public function results_are_found_using_or_where_json_doesnt_contain()
     {
-        $this->markTestSkipped();
+        $items = collect([
+            ['reference' => 'a', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']],
+            ['reference' => 'b', 'test_taxonomy' => ['taxonomy-3']],
+            ['reference' => 'c', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']],
+            ['reference' => 'd', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']],
+            ['reference' => 'e', 'test_taxonomy' => ['taxonomy-5']],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonContains('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntContain('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $results);
+        $this->assertEquals(['a', 'c', 'b', 'd'], $results->map->reference->all());
     }
 
     /** @test **/
