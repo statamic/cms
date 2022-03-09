@@ -26,7 +26,7 @@ class QueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_where()
+    public function results_are_found_using_where()
     {
         $items = collect([
             ['reference' => 'a', 'title' => 'Frodo'],
@@ -42,13 +42,13 @@ class QueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_or_where()
+    public function results_are_found_using_or_where()
     {
         $this->markTestSkipped();
     }
 
     /** @test **/
-    public function entries_are_found_using_or_where_in()
+    public function results_are_found_using_or_where_in()
     {
         $this->markTestSkipped();
     }
@@ -197,7 +197,7 @@ class QueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_where_json_contains()
+    public function results_are_found_using_where_json_contains()
     {
         $items = collect([
             ['reference' => 'a', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']],
@@ -219,7 +219,7 @@ class QueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_where_json_doesnt_contain()
+    public function results_are_found_using_where_json_doesnt_contain()
     {
         $items = collect([
             ['reference' => 'a', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']],
@@ -241,19 +241,19 @@ class QueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_or_where_json_contains()
+    public function results_are_found_using_or_where_json_contains()
     {
         $this->markTestSkipped();
     }
 
     /** @test **/
-    public function entries_are_found_using_or_where_json_doesnt_contain()
+    public function results_are_found_using_or_where_json_doesnt_contain()
     {
         $this->markTestSkipped();
     }
 
     /** @test **/
-    public function entries_are_found_using_where_json_length()
+    public function results_are_found_using_where_json_length()
     {
         $items = collect([
             ['reference' => 'a', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']],
