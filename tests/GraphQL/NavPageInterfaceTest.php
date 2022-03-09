@@ -7,7 +7,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Nav;
 use Statamic\GraphQL\Types\NavPageInterface;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

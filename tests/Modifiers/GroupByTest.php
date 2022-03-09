@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\Modify;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /**

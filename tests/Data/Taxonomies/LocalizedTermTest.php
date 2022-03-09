@@ -14,7 +14,7 @@ use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\Term;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class LocalizedTermTest extends TestCase

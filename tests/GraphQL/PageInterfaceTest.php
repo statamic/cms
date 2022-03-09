@@ -8,7 +8,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Fields\Blueprint;
 use Statamic\GraphQL\Types\PageInterface;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

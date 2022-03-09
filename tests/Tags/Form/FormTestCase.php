@@ -7,8 +7,8 @@ use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
-use Tests\NormalizesHtml;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\NormalizesHtml;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 abstract class FormTestCase extends TestCase

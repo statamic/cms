@@ -12,8 +12,8 @@ use Statamic\Facades\User;
 use Statamic\Fields\Value;
 use Statamic\Sites\Site as SiteInstance;
 use Statamic\Support\Arr;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Statamic\View\Cascade;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CascadeTest extends TestCase

@@ -5,8 +5,8 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\Feature\GraphQL\EnablesQueries;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

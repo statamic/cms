@@ -4,7 +4,7 @@ namespace Tests\Data\Structures;
 
 use Facades\Statamic\Structures\BranchIdGenerator;
 use Statamic\Structures\BranchIds;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class BranchIdsTest extends TestCase

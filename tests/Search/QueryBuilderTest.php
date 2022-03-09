@@ -4,7 +4,7 @@ namespace Tests\Search;
 
 use Illuminate\Support\Carbon;
 use Statamic\Search\QueryBuilder;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class QueryBuilderTest extends TestCase

@@ -5,6 +5,7 @@ namespace Tests\Fakes;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
 use Statamic\Support\Arr;
+use Statamic\Testing\Fixture;
 
 class FakeBlueprintRepository extends BlueprintRepository
 {
@@ -15,7 +16,7 @@ class FakeBlueprintRepository extends BlueprintRepository
     {
         $this->blueprints = [];
 
-        $this->repo = $repo->setDirectory(__DIR__.'/../__fixtures__/dev-null/blueprints');
+        $this->repo = $repo->setDirectory(Fixture::path('dev-null/blueprints'));
     }
 
     public function find($blueprint): ?Blueprint

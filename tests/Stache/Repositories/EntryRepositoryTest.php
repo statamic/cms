@@ -13,8 +13,8 @@ use Statamic\Stache\Stores\CollectionTreeStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\NavigationStore;
 use Statamic\Stache\Stores\TaxonomiesStore;
+use Statamic\Testing\UnlinksPaths;
 use Tests\TestCase;
-use Tests\UnlinksPaths;
 
 class EntryRepositoryTest extends TestCase
 {

@@ -11,7 +11,7 @@ use Statamic\API\AbstractCacher;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\Event;
 use Statamic\Facades;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CacherTest extends TestCase

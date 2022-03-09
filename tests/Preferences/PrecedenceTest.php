@@ -5,7 +5,7 @@ namespace Tests\Preferences;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
-use Tests\FakesRoles;
+use Statamic\Testing\FakesRoles;
 use Tests\TestCase;
 
 class PrecedenceTest extends TestCase

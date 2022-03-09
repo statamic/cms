@@ -8,7 +8,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\GraphQL\Types\TermType;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

@@ -1,6 +1,8 @@
 <?php
 
-namespace Tests;
+namespace Statamic\Testing;
+
+use function collect;
 
 trait WindowsHelpers
 {

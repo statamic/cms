@@ -3,7 +3,7 @@
 namespace Tests\Data\Users;
 
 use Statamic\Facades\User;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UserQueryBuilderTest extends TestCase

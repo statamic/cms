@@ -7,7 +7,7 @@ use Facades\Tests\Factories\GlobalFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

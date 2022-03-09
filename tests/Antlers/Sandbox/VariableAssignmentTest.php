@@ -5,8 +5,8 @@ namespace Tests\Antlers\Sandbox;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\Antlers\ParserTestCase;
-use Tests\PreventSavingStacheItemsToDisk;
 
 class VariableAssignmentTest extends ParserTestCase
 {

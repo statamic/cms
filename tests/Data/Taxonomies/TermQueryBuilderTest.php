@@ -10,7 +10,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TermQueryBuilderTest extends TestCase

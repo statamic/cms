@@ -4,13 +4,14 @@ namespace Tests\Console\Commands;
 
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Facades\User;
+use Statamic\Testing\Fixture;
 use Tests\TestCase;
 
 class MakeUserTest extends TestCase
 {
     public function tearDown(): void
     {
-        $path = __DIR__.'/../../__fixtures__/users';
+        $path = Fixture::path('users');
 
         $this->files = app(Filesystem::class);
         $this->files->cleanDirectory($path);

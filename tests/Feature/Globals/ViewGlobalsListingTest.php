@@ -6,8 +6,8 @@ use Facades\Tests\Factories\GlobalFactory;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewGlobalsListingTest extends TestCase

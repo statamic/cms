@@ -6,6 +6,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
 use Statamic\Statamic;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 
 class StatamicTest extends TestCase
 {

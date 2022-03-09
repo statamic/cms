@@ -7,9 +7,9 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Token;
+use Statamic\Testing\FakesViews;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Statamic\View\View;
-use Tests\FakesViews;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class SubstitutesEntryForLivePreviewTest extends TestCase

@@ -6,7 +6,7 @@ use Statamic\Facades;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Stache\Stores\TermsStore;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TermsStoreTest extends TestCase

@@ -13,7 +13,7 @@ use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Entries;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EntriesTest extends TestCase

@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests;
+namespace Statamic\Testing;
 
 use Statamic\Extend\Manifest;
+use Tests\Fixtures\TestManifest;
 
 trait ModifiesAddonManifest
 {
@@ -10,7 +11,7 @@ trait ModifiesAddonManifest
 
     protected function fakeManifest()
     {
-        $this->manifest = new \Tests\Fixtures\TestManifest;
+        $this->manifest = new TestManifest;
 
         $this->app->instance(Manifest::class, $this->manifest);
     }

@@ -7,8 +7,8 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
-use Tests\FakesViews;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesViews;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewsTest extends TestCase

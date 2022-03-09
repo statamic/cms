@@ -4,7 +4,7 @@ namespace Tests\API;
 
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ConfigTest extends TestCase

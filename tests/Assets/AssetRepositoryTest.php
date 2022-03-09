@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\AssetRepository;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetRepositoryTest extends TestCase

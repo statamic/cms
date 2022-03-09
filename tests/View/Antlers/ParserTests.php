@@ -18,10 +18,10 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Tags\Tags;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Statamic\View\Cascade;
 use Tests\Antlers\Fixtures\Addon\Tags\RecursiveChildren;
 use Tests\Factories\EntryFactory;
-use Tests\PreventSavingStacheItemsToDisk;
 
 trait ParserTests
 {

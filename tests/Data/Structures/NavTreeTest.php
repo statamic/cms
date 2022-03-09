@@ -9,9 +9,9 @@ use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Structures\NavTree;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\UnlinksPaths;
 use Tests\TestCase;
-use Tests\UnlinksPaths;
 
 class NavTreeTest extends TestCase
 {

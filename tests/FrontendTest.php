@@ -10,6 +10,10 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\FakesViews;
+use Statamic\Testing\Fixture;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class FrontendTest extends TestCase
@@ -628,7 +632,7 @@ class FrontendTest extends TestCase
     /** @test */
     public function it_sets_the_translation_locale_based_on_site()
     {
-        app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
+        app('translator')->addNamespace('test', Fixture::path('lang'));
 
         Site::setConfig(['sites' => [
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],

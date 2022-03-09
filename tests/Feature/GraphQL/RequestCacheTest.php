@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Form;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Queries\PingQuery;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

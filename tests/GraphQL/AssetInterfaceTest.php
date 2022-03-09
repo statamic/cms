@@ -9,7 +9,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Blueprint;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\GraphQL\Types\AssetType;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

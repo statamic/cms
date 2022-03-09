@@ -9,9 +9,9 @@ use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
 use Statamic\Structures\Structure;
 use Statamic\Structures\Tree;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\UnlinksPaths;
 use Tests\TestCase;
-use Tests\UnlinksPaths;
 
 class TreeTest extends TestCase
 {

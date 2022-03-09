@@ -10,8 +10,8 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UpdateNavigationTreeTest extends TestCase

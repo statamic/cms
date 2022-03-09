@@ -7,9 +7,9 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\CollectionTreeDiff;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\UnlinksPaths;
 use Tests\TestCase;
-use Tests\UnlinksPaths;
 
 class CollectionTreeTest extends TestCase
 {

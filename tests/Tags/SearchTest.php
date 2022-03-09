@@ -6,7 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Search;
 use Statamic\Search\QueryBuilder;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class SearchTest extends TestCase

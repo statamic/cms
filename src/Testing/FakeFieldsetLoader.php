@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests;
+namespace Statamic\Testing;
 
+use function app;
 use Closure;
 use Statamic\Fields\FieldsetLoader;
 use Tests\Factories\FieldsetFactory;

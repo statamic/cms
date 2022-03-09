@@ -2,7 +2,7 @@
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Validator;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UniqueEntryValueTest extends TestCase

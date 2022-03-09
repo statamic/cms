@@ -5,7 +5,7 @@ namespace Tests\API;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class APITest extends TestCase

@@ -4,7 +4,7 @@ namespace Tests\Antlers;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Antlers;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ScratchTest extends TestCase

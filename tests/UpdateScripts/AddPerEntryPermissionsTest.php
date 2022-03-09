@@ -3,8 +3,8 @@
 namespace Tests\UpdateScripts;
 
 use Statamic\Facades\Role;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Statamic\UpdateScripts\AddPerEntryPermissions;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tests\UpdateScripts\Concerns\RunsUpdateScripts;
 

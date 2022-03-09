@@ -2,12 +2,11 @@
 
 namespace Tests\Feature\Collections\Blueprints;
 
-use Statamic\Auth\User;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewBlueprintListingTest extends TestCase

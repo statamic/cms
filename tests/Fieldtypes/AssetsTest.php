@@ -16,7 +16,7 @@ use Statamic\Fieldtypes\Assets\MaxRule;
 use Statamic\Fieldtypes\Assets\MimesRule;
 use Statamic\Fieldtypes\Assets\MimetypesRule;
 use Statamic\Fieldtypes\Assets\MinRule;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetsTest extends TestCase

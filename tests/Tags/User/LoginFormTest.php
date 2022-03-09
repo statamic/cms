@@ -4,7 +4,7 @@ namespace Tests\Tags\User;
 
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class LoginFormTest extends TestCase

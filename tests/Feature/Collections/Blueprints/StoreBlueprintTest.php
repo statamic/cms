@@ -5,9 +5,9 @@ namespace Tests\Feature\Collections\Blueprints;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\Fakes\FakeBlueprintRepository;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class StoreBlueprintTest extends TestCase

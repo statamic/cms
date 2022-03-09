@@ -8,6 +8,8 @@ use Statamic\Fields\BlueprintRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Tags\Loader;
+use Statamic\Testing\Fixture;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
@@ -27,7 +29,6 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ParserTestCase extends TestCase
@@ -81,7 +82,7 @@ class ParserTestCase extends TestCase
     protected function setupTestBlueprintAndFields()
     {
         if (self::$testBlueprint == null) {
-            $blueprintContents = YAML::parse(file_get_contents(__DIR__.'/../__fixtures__/blueprints/article.yaml'));
+            $blueprintContents = YAML::parse(file_get_contents(Fixture::path('blueprints/article.yaml')));
             $blueprintFields = collect($blueprintContents['sections']['main']['fields'])->keyBy(function ($item) {
                 return $item['handle'];
             })->map(function ($item) {
@@ -93,7 +94,7 @@ class ParserTestCase extends TestCase
         }
 
         if (self::$testFieldValues == null) {
-            self::$testFieldValues = YAML::parse(file_get_contents(__DIR__.'/../__fixtures__/content/1996-11-18-dance.md'));
+            self::$testFieldValues = YAML::parse(file_get_contents(Fixture::path('content/1996-11-18-dance.md')));
         }
     }
 
@@ -119,8 +120,8 @@ class ParserTestCase extends TestCase
         }
 
         $value = $this->getTestValue($handle);
-        $template = file_get_contents(__DIR__.'/../__fixtures__/fieldtype_tests/'.$testTemplate.'/template.antlers.html');
-        $expectedResults = file_get_contents(__DIR__.'/../__fixtures__/fieldtype_tests/'.$testTemplate.'/expected.txt');
+        $template = file_get_contents(Fixture::path('fieldtype_tests/').$testTemplate.'/template.antlers.html');
+        $expectedResults = file_get_contents(Fixture::path('fieldtype_tests/').$testTemplate.'/expected.txt');
 
         $this->assertSame($this->normalize($expectedResults), $this->normalize(
             $this->renderString($template, [$handle => $value], true)
@@ -134,7 +135,7 @@ class ParserTestCase extends TestCase
 
     protected function getTemplate($template)
     {
-        $path = __DIR__.'/../__fixtures__/templates/'.$template.'.antlers.html';
+        $path = Fixture::path('templates/').$template.'.antlers.html';
 
         return file_get_contents($path);
     }

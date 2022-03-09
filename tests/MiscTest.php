@@ -6,6 +6,8 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
+use Statamic\Testing\FakesViews;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Statamic\View\View;
 
 class MiscTest extends TestCase

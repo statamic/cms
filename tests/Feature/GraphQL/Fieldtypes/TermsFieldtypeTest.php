@@ -7,8 +7,8 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\Feature\GraphQL\EnablesQueries;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

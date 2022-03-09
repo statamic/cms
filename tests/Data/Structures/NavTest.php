@@ -9,7 +9,7 @@ use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Structures\Nav;
 use Statamic\Structures\NavTree;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 
 class NavTest extends StructureTestCase
 {

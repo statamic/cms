@@ -11,7 +11,7 @@ use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 use Statamic\Support\Arr;
 use Statamic\Taxonomies\Taxonomy;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TaxonomyTest extends TestCase

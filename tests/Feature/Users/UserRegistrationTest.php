@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Facades\User;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UserRegistrationTest extends TestCase

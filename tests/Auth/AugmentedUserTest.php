@@ -6,9 +6,9 @@ use Carbon\Carbon;
 use Statamic\Auth\AugmentedUser;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\FakesUserGroups;
 use Tests\Data\AugmentedTestCase;
-use Tests\FakesRoles;
-use Tests\FakesUserGroups;
 
 class AugmentedUserTest extends AugmentedTestCase
 {

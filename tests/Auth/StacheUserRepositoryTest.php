@@ -3,7 +3,7 @@
 namespace Tests\Auth;
 
 use Statamic\Auth\File\User;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group user-repo */

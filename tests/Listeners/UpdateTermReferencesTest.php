@@ -4,7 +4,7 @@ namespace Tests\Listeners;
 
 use Statamic\Facades;
 use Statamic\Support\Arr;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UpdateTermReferencesTest extends TestCase

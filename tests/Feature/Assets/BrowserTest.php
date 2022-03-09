@@ -5,8 +5,8 @@ namespace Tests\Feature\Assets;
 use Illuminate\Http\UploadedFile;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class BrowserTest extends TestCase

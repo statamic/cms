@@ -3,7 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use Statamic\Facades\Collection;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

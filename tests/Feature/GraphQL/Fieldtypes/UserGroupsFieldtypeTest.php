@@ -6,9 +6,9 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\UserGroup;
-use Tests\FakesUserGroups;
+use Statamic\Testing\FakesUserGroups;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\Feature\GraphQL\EnablesQueries;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

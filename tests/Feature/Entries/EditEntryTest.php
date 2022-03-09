@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Entries;
 
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EditEntryTest extends TestCase

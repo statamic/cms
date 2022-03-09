@@ -6,7 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class GetContentTagTest extends TestCase

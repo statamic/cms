@@ -16,14 +16,13 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
-use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetTest extends TestCase

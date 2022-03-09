@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Validator;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UniqueTermValueTest extends TestCase

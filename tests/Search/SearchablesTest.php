@@ -14,7 +14,7 @@ use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Search\Searchables;
 use Statamic\Taxonomies\TermCollection;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class SearchablesTest extends TestCase

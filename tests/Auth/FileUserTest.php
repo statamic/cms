@@ -9,7 +9,7 @@ use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
 use Statamic\Support\Arr;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group user */

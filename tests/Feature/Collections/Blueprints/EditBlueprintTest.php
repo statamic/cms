@@ -4,8 +4,8 @@ namespace Tests\Feature\Collections\Blueprints;
 
 use Statamic\Facades;
 use Statamic\Facades\Collection;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EditBlueprintTest extends TestCase

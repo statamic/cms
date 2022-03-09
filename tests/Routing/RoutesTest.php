@@ -5,8 +5,8 @@ namespace Tests\Routing;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Collection;
-use Tests\FakesViews;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesViews;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class RoutesTest extends TestCase

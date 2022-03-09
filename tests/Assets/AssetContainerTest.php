@@ -20,7 +20,7 @@ use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Filesystem\Filesystem;
 use Statamic\Filesystem\FlysystemAdapter;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetContainerTest extends TestCase

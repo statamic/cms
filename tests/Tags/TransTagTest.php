@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Statamic\Facades\Parse;
+use Statamic\Testing\Fixture;
 use Tests\TestCase;
 
 class TransTagTest extends TestCase
@@ -11,7 +12,7 @@ class TransTagTest extends TestCase
     {
         parent::setUp();
 
-        app('translator')->addNamespace('package', __DIR__.'/../__fixtures__/lang');
+        app('translator')->addNamespace('package', Fixture::path('lang'));
     }
 
     private function parse($tag)

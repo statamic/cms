@@ -8,7 +8,7 @@ use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Fields\Blueprint;
 use Statamic\GraphQL\Types\GlobalSetInterface;
 use Statamic\GraphQL\Types\GlobalSetType;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

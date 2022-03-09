@@ -5,8 +5,8 @@ namespace Tests\Feature\Globals;
 use Facades\Tests\Factories\GlobalFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EditGlobalVariablesTest extends TestCase

@@ -3,9 +3,9 @@
 namespace Tests\View\Antlers;
 
 use Illuminate\Support\Facades\Event;
+use Statamic\Testing\FakesViews;
 use Statamic\View\Events\ViewRendered;
 use Statamic\View\View;
-use Tests\FakesViews;
 use Tests\TestCase;
 
 class ViewTest extends TestCase

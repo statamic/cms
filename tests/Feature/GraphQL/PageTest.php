@@ -7,7 +7,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Nav;
 use Statamic\Structures\CollectionStructure;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

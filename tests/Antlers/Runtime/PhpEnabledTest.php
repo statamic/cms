@@ -4,11 +4,11 @@ namespace Tests\Antlers\Runtime;
 
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 use Tests\Factories\EntryFactory;
-use Tests\PreventSavingStacheItemsToDisk;
 
 class PhpEnabledTest extends ParserTestCase
 {

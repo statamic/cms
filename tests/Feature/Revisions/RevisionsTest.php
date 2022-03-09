@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Statamic\Revisions\Revision;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class RevisionsTest extends TestCase

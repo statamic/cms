@@ -6,7 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Queue;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Collection;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class StaticWarmTest extends TestCase

@@ -5,9 +5,9 @@ namespace Tests\Tags\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
-use Tests\FakesRoles;
-use Tests\FakesUserGroups;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\FakesUserGroups;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UserTagsTest extends TestCase

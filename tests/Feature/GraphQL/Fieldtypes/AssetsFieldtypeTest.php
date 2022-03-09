@@ -7,8 +7,8 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\Feature\GraphQL\EnablesQueries;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

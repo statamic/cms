@@ -5,7 +5,7 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

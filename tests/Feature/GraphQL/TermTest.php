@@ -5,7 +5,7 @@ namespace Tests\Feature\GraphQL;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */

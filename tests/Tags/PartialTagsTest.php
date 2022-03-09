@@ -3,7 +3,7 @@
 namespace Tests\Tags;
 
 use Statamic\Facades\Parse;
-use Tests\FakesViews;
+use Statamic\Testing\FakesViews;
 use Tests\TestCase;
 
 class PartialTagsTest extends TestCase

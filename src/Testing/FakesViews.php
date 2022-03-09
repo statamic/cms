@@ -1,10 +1,12 @@
 <?php
 
-namespace Tests;
+namespace Statamic\Testing;
 
 use Illuminate\View\Factory;
+use Illuminate\View\FileViewFinder;
 use Illuminate\View\View;
 use InvalidArgumentException;
+use Statamic\View\Antlers\Engine;
 
 trait FakesViews
 {
@@ -71,7 +73,7 @@ class FakeViewFactory extends Factory
     }
 }
 
-class FakeViewEngine extends \Statamic\View\Antlers\Engine
+class FakeViewEngine extends Engine
 {
     public $rawContents = [];
     public $renderedContents = [];
@@ -100,7 +102,7 @@ class FakeViewEngine extends \Statamic\View\Antlers\Engine
     }
 }
 
-class FakeViewFinder extends \Illuminate\View\FileViewFinder
+class FakeViewFinder extends FileViewFinder
 {
     public $views = [];
 

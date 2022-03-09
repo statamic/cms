@@ -9,7 +9,8 @@ use Statamic\Auth\File\UserGroup;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
 use Statamic\Facades\User as UserAPI;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\Fixture;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UserGroupTest extends TestCase
@@ -49,7 +50,7 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_gets_all_the_users()
     {
-        config(['statamic.users.repositories.file.paths.groups' => __DIR__.'/../__fixtures__/dev-null/groups.yaml']);
+        config(['statamic.users.repositories.file.paths.groups' => Fixture::path('dev-null').'/groups.yaml']);
 
         $userA = tap(UserAPI::make())->save();
         $userB = tap(UserAPI::make())->save();

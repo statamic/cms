@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\AssetFolder;
 use Statamic\Facades;
 use Statamic\Support\Arr;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UpdateAssetReferencesTest extends TestCase

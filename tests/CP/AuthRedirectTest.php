@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\User;
 use Statamic\Statamic;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AuthRedirectTest extends TestCase
