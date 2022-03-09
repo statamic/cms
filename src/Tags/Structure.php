@@ -21,10 +21,12 @@ class Structure extends Tags
     use QueriesConditions;
 
     protected $currentUrl;
+    protected $siteAbsoluteUrl;
 
     public function __construct()
     {
         $this->currentUrl = URL::getCurrent();
+        $this->siteAbsoluteUrl = Site::current()->absoluteUrl();
     }
 
     public function wildcard($tag)
@@ -135,22 +137,21 @@ class Structure extends Tags
                 'count'       => $index + 1,
                 'first'       => $index === 0,
                 'last'        => $index === count($tree) - 1,
-                'is_current'  => rtrim($this->currentUrl, '/') === rtrim($url, '/'),
+                'is_current'  => ! is_null($url) && rtrim($url, '/') === rtrim($this->currentUrl, '/'),
+                'is_parent'   => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
                 'is_external' => URL::isExternal($absoluteUrl),
             ]);
         })->filter()->values();
 
-        $this->addIsParent($pages);
+        $this->updateIsParent($pages);
 
         return $pages->all();
     }
 
-    protected function addIsParent($pages, &$parent = null)
+    protected function updateIsParent($pages, &$parent = null)
     {
         $pages->transform(function ($page) use (&$parent) {
-            $page['is_parent'] = false;
-
-            $this->addIsParent(collect($page['children'] ?? []), $page);
+            $this->updateIsParent(collect($page['children'] ?? []), $page);
 
             if ($parent && ($page['is_current'] || $page['is_parent'])) {
                 $parent['is_parent'] = true;
