@@ -582,6 +582,11 @@ class RuntimeParser implements Parser
         return $this->renderText($text, $data);
     }
 
+    public function render($text, $data = [])
+    {
+        return $this->renderText($text, $data);
+    }
+
     public function valueWithNoparse($text)
     {
         // Just pass-thru.

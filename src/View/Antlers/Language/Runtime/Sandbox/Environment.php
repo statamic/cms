@@ -417,6 +417,27 @@ class Environment
     }
 
     /**
+     * Resolves the provided value to be used within a comparison operation.
+     *
+     * @param  mixed  $value  The value to resolve.
+     * @return mixed|string
+     */
+    private function getComparisonValue($value)
+    {
+        if (is_object($value)) {
+            $lockData = $this->nodeProcessor->getAllData();
+            if ($value instanceof Value) {
+                $value = $value->value();
+            } elseif ($value instanceof ArrayableString) {
+                $value = (string) $value;
+            }
+            $this->nodeProcessor->swapData($lockData);
+        }
+
+        return $value;
+    }
+
+    /**
      * Evaluates the provided nodes and returns the result.
      *
      * @param  AbstractNode[]  $nodes  The runtime nodes.
@@ -577,18 +598,18 @@ class Environment
                     $restoreRf = $this->dataRetriever->getReduceFinal();
                     $this->dataRetriever->setReduceFinal(false);
                     $this->isEvaluatingTruthValue = false;
-                    $left = $this->getValue($left);
+                    $left = $this->getComparisonValue($this->getValue($left));
                     $this->isEvaluatingTruthValue = true;
 
                     $this->dataRetriever->setReduceFinal($restoreRf);
                 } else {
-                    $right = $this->getValue($right);
-                    $left = $this->getValue($left);
+                    $right = $this->getComparisonValue($this->getValue($right));
+                    $left = $this->getComparisonValue($this->getValue($left));
                 }
 
                 $this->isEvaluatingTruthValue = false;
 
-                $right = $this->getValue($right);
+                $right = $this->getComparisonValue($this->getValue($right));
                 $this->isEvaluatingTruthValue = $restore;
 
                 $stack[] = $left == $right;
@@ -601,8 +622,8 @@ class Environment
 
                 $restore = $this->isEvaluatingTruthValue;
                 $this->isEvaluatingTruthValue = false;
-                $left = $this->getValue($left);
-                $right = $this->getValue($right);
+                $left = $this->getComparisonValue($this->getValue($left));
+                $right = $this->getComparisonValue($this->getValue($right));
                 $this->isEvaluatingTruthValue = $restore;
 
                 $stack[] = $left > $right;
@@ -615,8 +636,8 @@ class Environment
 
                 $restore = $this->isEvaluatingTruthValue;
                 $this->isEvaluatingTruthValue = false;
-                $left = $this->getValue($left);
-                $right = $this->getValue($right);
+                $left = $this->getComparisonValue($this->getValue($left));
+                $right = $this->getComparisonValue($this->getValue($right));
                 $this->isEvaluatingTruthValue = $restore;
 
                 $stack[] = $left >= $right;
@@ -629,8 +650,8 @@ class Environment
 
                 $restore = $this->isEvaluatingTruthValue;
                 $this->isEvaluatingTruthValue = false;
-                $left = $this->getValue($left);
-                $right = $this->getValue($right);
+                $left = $this->getComparisonValue($this->getValue($left));
+                $right = $this->getComparisonValue($this->getValue($right));
                 $this->isEvaluatingTruthValue = $restore;
 
                 $stack[] = $left < $right;
@@ -643,8 +664,8 @@ class Environment
 
                 $restore = $this->isEvaluatingTruthValue;
                 $this->isEvaluatingTruthValue = false;
-                $left = $this->getValue($left);
-                $right = $this->getValue($right);
+                $left = $this->getComparisonValue($this->getValue($left));
+                $right = $this->getComparisonValue($this->getValue($right));
                 $this->isEvaluatingTruthValue = $restore;
 
                 $stack[] = $left <= $right;
@@ -657,8 +678,8 @@ class Environment
 
                 $restore = $this->isEvaluatingTruthValue;
                 $this->isEvaluatingTruthValue = false;
-                $left = $this->getValue($left);
-                $right = $this->getValue($right);
+                $left = $this->getComparisonValue($this->getValue($left));
+                $right = $this->getComparisonValue($this->getValue($right));
                 $this->isEvaluatingTruthValue = $restore;
 
                 $stack[] = $left != $right;
@@ -671,8 +692,8 @@ class Environment
 
                 $restore = $this->isEvaluatingTruthValue;
                 $this->isEvaluatingTruthValue = false;
-                $left = $this->getValue($left);
-                $right = $this->getValue($right);
+                $left = $this->getComparisonValue($this->getValue($left));
+                $right = $this->getComparisonValue($this->getValue($right));
                 $this->isEvaluatingTruthValue = $restore;
 
                 $stack[] = $left !== $right;
@@ -685,8 +706,8 @@ class Environment
 
                 $restore = $this->isEvaluatingTruthValue;
                 $this->isEvaluatingTruthValue = false;
-                $left = $this->getValue($left);
-                $right = $this->getValue($right);
+                $left = $this->getComparisonValue($this->getValue($left));
+                $right = $this->getComparisonValue($this->getValue($right));
                 $this->isEvaluatingTruthValue = $restore;
 
                 $stack[] = $left <=> $right;
@@ -699,8 +720,8 @@ class Environment
 
                 $restore = $this->isEvaluatingTruthValue;
                 $this->isEvaluatingTruthValue = false;
-                $left = $this->getValue($left);
-                $right = $this->getValue($right);
+                $left = $this->getComparisonValue($this->getValue($left));
+                $right = $this->getComparisonValue($this->getValue($right));
                 $this->isEvaluatingTruthValue = $restore;
 
                 $stack[] = $left === $right;
@@ -711,9 +732,8 @@ class Environment
                 $left = $this->getValue(array_pop($stack));
                 $right = $this->getValue($nodes[$i + 1]);
 
-                if ($left instanceof ArrayableString) {
-                    $left = $left->value();
-                }
+                $left = $this->getComparisonValue($left);
+                $right = $this->getComparisonValue($right);
 
                 if ($this->isEvaluatingTruthValue) {
                     $stack[] = ($left || $right);
@@ -731,15 +751,14 @@ class Environment
                 $left = $this->getValue(array_pop($stack));
                 $right = $this->getValue($nodes[$i + 1]);
 
-                $stack[] = ($left && $right);
-
+                $stack[] = ($this->getComparisonValue($left) && $this->getComparisonValue($right));
                 $i += 1;
                 continue;
             } elseif ($currentNode instanceof LogicalXorOperator) {
                 $left = $this->getValue(array_pop($stack));
                 $right = $this->getValue($nodes[$i + 1]);
 
-                $stack[] = ($left xor $right);
+                $stack[] = ($this->getComparisonValue($left) xor $this->getComparisonValue($right));
 
                 $i += 1;
                 continue;
@@ -757,7 +776,7 @@ class Environment
 
                 continue;
             } elseif ($currentNode instanceof LogicalNegationOperator) {
-                $right = $this->getTruthValue($this->getValue($nodes[$i + 1]));
+                $right = $this->getTruthValue($this->getComparisonValue($this->getValue($nodes[$i + 1])));
 
                 $stack[] = $right == false;
 

@@ -675,6 +675,9 @@ class PathDataManager
                         $this->compact(false);
                     }
                 }
+                if ($path instanceof PathNode && ! $path->isFinal) {
+                    $this->doBreak = false;
+                }
             } else {
                 $this->reducedVar = null;
                 $this->didFind = false;
