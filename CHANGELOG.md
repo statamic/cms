@@ -1,5 +1,21 @@
 # Release Notes
 
+## 3.3.0-beta.6 (2022-03-09)
+
+### What's new
+- Add `Values` wrapper and use it in Grid, Replicator, and Bard. Allows for a nicer syntax in Blade. [#5436](https://github.com/statamic/cms/issues/5436) by @jasonvarga
+
+### What's fixed
+- Fix error when entries etc are used in conditions. [#5443](https://github.com/statamic/cms/issues/5443) by @jasonvarga
+- Two handfuls of Antlers Runtime parser bugs. [#5438](https://github.com/statamic/cms/issues/5438) [#5428](https://github.com/statamic/cms/issues/5428) by @JohnathonKoster
+- Allow a `terms` fieldtype value to be passed into the `collection` tag's taxonomy parameter. [#5445](https://github.com/statamic/cms/issues/5445) by @jasonvarga
+- Suppress PHP 8.1 deprecation warnings. [#5444](https://github.com/statamic/cms/issues/5444) by @jasonvarga
+- Bump minimum `league/commonmark` version. [#5434](https://github.com/statamic/cms/issues/5434) by @jesseleite
+- Bump `ajthinking/archetype` to v1. [#5440](https://github.com/statamic/cms/issues/5440) by @ajthinking
+- Bring over pending changes from 3.2
+
+
+
 ## 3.3.0-beta.5 (2022-03-07)
 
 ### What's new
