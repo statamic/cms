@@ -164,7 +164,7 @@ class AssetFolder implements Contract, Arrayable
             throw new \Exception('Folder cannot be moved to its own subfolder.');
         }
 
-        $name = $name ?: $this->basename();
+        $name = $name ?? $this->basename();
         $oldPath = $this->path();
         $newPath = Str::removeLeft(Path::tidy($parent.'/'.$name), '/');
 
