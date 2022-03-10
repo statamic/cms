@@ -67,6 +67,7 @@ return [
     'hidden.title' => 'Hidden',
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
+    'link.config.container' => 'Pilih penampung aset mana yang akan digunakan untuk bidang ini.',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Mengaktifkan jeda baris otomatis.',

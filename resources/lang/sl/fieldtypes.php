@@ -67,6 +67,7 @@ return [
     'hidden.title' => 'Hidden',
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
+    'link.config.container' => 'Izberite vsebnik sredstva, ki ga želite uporabiti za to polje.',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Omogoča samodejne prelome vrstic.',

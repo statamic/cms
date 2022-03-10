@@ -75,6 +75,7 @@ return [
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Entries from these collections will be available. Leaving this empty will make entries from routable collections available.',
+    'link.config.container' => 'Choose which asset container to use for this field.',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Enables automatic line breaks.',

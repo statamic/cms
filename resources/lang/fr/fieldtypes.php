@@ -75,6 +75,7 @@ return [
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Les entrées de ces collections seront disponibles. Si vous laissez cette zone à blanc, les entrées des collections routables seront disponibles.',
+    'link.config.container' => 'Choisissez quel conteneur de ressources à utiliser pour ce champ.',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Active les sauts de ligne automatiques.',

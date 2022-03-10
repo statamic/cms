@@ -67,6 +67,7 @@ return [
     'hidden.title' => 'Hidden',
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
+    'link.config.container' => 'Scegli quale contenitore dei media utilizzare per questo campo.',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Abilita le interruzioni di riga automatiche.',
