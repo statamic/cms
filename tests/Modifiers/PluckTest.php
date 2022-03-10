@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use ArrayAccess;
 use Illuminate\Support\Collection;
 use Mockery;
 use Statamic\Contracts\Query\Builder;
@@ -113,6 +114,20 @@ class PluckTest extends TestCase
         $this->assertEquals(['food', 'drink'], $modified->all());
     }
 
+    /** @test */
+    public function it_plucks_values_from_array_of_items_of_type_arrayaccess()
+    {
+        $items = $this->itemsOfTypeArrayAccess();
+
+        $modified = $this->modify($items, 'title');
+        $this->assertIsArray($modified);
+        $this->assertEquals(['Bread', 'Coffee'], $modified);
+
+        $modified = $this->modify($items, 'type');
+        $this->assertIsArray($modified);
+        $this->assertEquals(['food', 'drink'], $modified);
+    }
+
     private function items()
     {
         return [
@@ -136,6 +151,14 @@ class PluckTest extends TestCase
         return [
             ['title' => 'Bread', 'type' => 'food'],
             ['title' => 'Coffee', 'type' => 'drink'],
+        ];
+    }
+
+    private function itemsOfTypeArrayAccess()
+    {
+        return [
+            new ArrayAccessType(['title' => 'Bread', 'type' => 'food']),
+            new ArrayAccessType(['title' => 'Coffee', 'type' => 'drink']),
         ];
     }
 
@@ -169,6 +192,40 @@ class ItemWithOrigin
     }
 
     public function getOriginByString($origin)
+    {
+        //
+    }
+}
+
+class ArrayAccessType implements ArrayAccess
+{
+    private $data;
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
+    {
+        return $this->data[$offset];
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset)
+    {
+        return isset($this->data[$offset]);
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetSet($offset, $value)
+    {
+        //
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($offset)
     {
         //
     }
