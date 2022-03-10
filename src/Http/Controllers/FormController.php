@@ -30,7 +30,7 @@ class FormController extends Controller
      */
     public function submit(Request $request, $form)
     {
-        $site = Site::findByUrl(URL::previous());
+        $site = Site::findByUrl(URL::previous()) ?? Site::default();
         $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
         $values = array_merge($request->all(), $this->normalizeAssetsValues($fields, $request));

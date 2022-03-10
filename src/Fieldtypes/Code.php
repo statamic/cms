@@ -9,6 +9,8 @@ use Statamic\GraphQL\Types\CodeType;
 
 class Code extends Fieldtype
 {
+    protected $categories = ['text'];
+
     protected function configFieldItems(): array
     {
         return [
@@ -55,7 +57,6 @@ class Code extends Fieldtype
                     'xml' => 'XML',
                     'yaml-frontmatter' => 'YAML',
                 ],
-                'width' => 50,
             ],
             'mode_selectable' => [
                 'display' => __('Selectable Mode'),

@@ -26,7 +26,6 @@ mix.extract([
     'dmuploader',
     'jquery-ui',
     'jquery',
-    'lazysizes',
     'luminous-lightbox',
     'marked-plaintext',
     'marked',

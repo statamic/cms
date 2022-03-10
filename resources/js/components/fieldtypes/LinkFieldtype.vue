@@ -61,6 +61,7 @@ export default {
             urlValue: this.meta.initialUrl,
             selectedEntries: this.meta.initialSelectedEntries,
             selectedAssets: this.meta.initialSelectedAssets,
+            metaChanging: false,
         }
 
     },
@@ -84,6 +85,8 @@ export default {
     watch: {
 
         option(option, oldOption) {
+            if (this.metaChanging) return;
+
             if (option === null) {
                 this.update(null);
             } else if (option === 'url') {
@@ -106,7 +109,17 @@ export default {
         },
 
         urlValue(url) {
+            if (this.metaChanging) return;
+
             this.update(url);
+        },
+
+        meta(meta) {
+            this.metaChanging = true;
+            this.urlValue = meta.initialUrl;
+            this.option = meta.initialOption;
+            this.selectedEntries = meta.initialSelectedEntries;
+            this.$nextTick(() => this.metaChanging = false);
         }
 
     },
@@ -130,7 +143,7 @@ export default {
 
                 this.meta.showAssetOption
                     ? { label: __('Asset'), value: 'asset' }
-                    : null,                
+                    : null,
 
             ].filter(option => option);
         },

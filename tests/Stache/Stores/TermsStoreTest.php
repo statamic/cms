@@ -3,6 +3,7 @@
 namespace Tests\Stache\Stores;
 
 use Statamic\Facades;
+use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Stache\Stores\TermsStore;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -17,7 +18,7 @@ class TermsStoreTest extends TestCase
         parent::setUp();
 
         $this->parent = (new TermsStore)->directory(
-            $this->directory = __DIR__.'/../__fixtures__/content/taxonomies'
+            $this->directory = Path::tidy(__DIR__.'/../__fixtures__/content/taxonomies')
         );
 
         Stache::registerStore($this->parent);
@@ -33,7 +34,7 @@ class TermsStoreTest extends TestCase
 
         $this->parent->store('tags')->save($term);
 
-        $this->assertFileEqualsString($path = $this->directory.'/tags/test.yaml', $term->fileContents());
+        $this->assertStringEqualsFile($path = $this->directory.'/tags/test.yaml', $term->fileContents());
         @unlink($path);
         $this->assertFileNotExists($path);
 

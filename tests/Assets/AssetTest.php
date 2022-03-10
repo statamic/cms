@@ -15,6 +15,7 @@ use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -41,7 +42,7 @@ class AssetTest extends TestCase
             ->disk('test');
 
         Storage::fake('test');
-        Storage::fake('dimensions-cache');
+        Storage::fake('attributes-cache');
     }
 
     /** @test */
@@ -56,6 +57,23 @@ class AssetTest extends TestCase
         $this->assertTrue($asset->has('foo'));
         $this->assertEquals('bar', $asset->get('foo'));
         $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+    }
+
+    /** @test */
+    public function it_removes_data_values()
+    {
+        $asset = (new Asset)->container($this->container);
+
+        $this->assertNull($asset->get('foo'));
+
+        $asset->set('foo', 'bar');
+
+        $this->assertEquals('bar', $asset->get('foo'));
+
+        $return = $asset->remove('foo');
+
+        $this->assertEquals($asset, $return);
+        $this->assertNull($asset->get('foo'));
     }
 
     /** @test */
@@ -359,6 +377,7 @@ class AssetTest extends TestCase
             'width' => 30,
             'height' => 60,
             'mime_type' => 'image/jpeg',
+            'duration' => null,
         ];
 
         $metaWithData = [
@@ -368,6 +387,7 @@ class AssetTest extends TestCase
             'width' => 30,
             'height' => 60,
             'mime_type' => 'image/jpeg',
+            'duration' => null,
         ];
 
         // The meta that's saved to file will also be cached, but will not include in-memory data...
@@ -412,6 +432,7 @@ class AssetTest extends TestCase
             'width' => 30,
             'height' => 60,
             'mime_type' => 'image/jpeg',
+            'duration' => null,
         ];
 
         Storage::disk('test')->put('foo/.meta/image.jpg.yaml', YAML::dump($incompleteMeta));
@@ -968,6 +989,33 @@ class AssetTest extends TestCase
         $this->assertNull($asset->url());
         $this->assertNull($asset->absoluteUrl());
         $this->assertEquals('container-id::path/to/test.txt', (string) $asset);
+    }
+
+    /** @test */
+    public function it_sends_a_download_response()
+    {
+        Storage::disk('test')->put('test.txt', '');
+
+        $asset = (new Asset)->container($this->container)->path('test.txt');
+
+        $response = $asset->download();
+
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=test.txt', $response->headers->get('content-disposition'));
+    }
+
+    /** @test */
+    public function it_sends_a_download_response_with_a_different_name_and_custom_headers()
+    {
+        Storage::disk('test')->put('test.txt', '');
+
+        $asset = (new Asset)->container($this->container)->path('test.txt');
+
+        $response = $asset->download('foo.txt', ['foo' => 'bar']);
+
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=foo.txt', $response->headers->get('content-disposition'));
+        $this->assertArraySubset(['foo' => ['bar']], $response->headers->all());
     }
 
     private function toArrayKeysWhenFileExists()

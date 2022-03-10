@@ -332,6 +332,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return new AugmentedPage($this);
     }
 
+    public function shallowAugmentedArrayKeys()
+    {
+        return optional($this->entry())->shallowAugmentedArrayKeys() ?? ['title', 'url'];
+    }
+
     public function editUrl()
     {
         return optional($this->entry())->editUrl();
@@ -400,6 +405,11 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return $this->entry()->private();
     }
 
+    public function status()
+    {
+        return optional($this->entry())->status();
+    }
+
     public function blueprint()
     {
         if ($this->structure() instanceof Nav) {
@@ -422,6 +432,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return $this->forwardCallTo($this->entry(), $method, $args);
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this

@@ -246,6 +246,23 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a comma-separated list of variable names into an array.
+     *
+     * @param  string  $value
+     * @param $params
+     * @param $context
+     * @return array
+     */
+    public function compact($value, $params, $context)
+    {
+        return collect(explode(',', $value))
+            ->map(function ($variable) use ($context) {
+                return Antlers::parser()
+                    ->getVariable(trim($variable), $context);
+            })->all();
+    }
+
+    /**
      * Debug a value with a call to JavaScript's console.log.
      *
      * @param  $value
@@ -744,7 +761,7 @@ class CoreModifiers extends Modifier
         $grouped = collect($value)->groupBy(function ($item) use ($groupBy, $params, &$groupLabels) {
             $value = $this->getGroupByValue($item, $groupBy);
 
-            return $this->handleGroupByDateValue($value, $params, $groupLabels);
+            return (string) $this->handleGroupByDateValue($value, $params, $groupLabels);
         });
 
         $iterable = $grouped->map(function ($items, $key) use ($groupLabels) {
@@ -863,6 +880,10 @@ class CoreModifiers extends Modifier
         // that means a pipe was used. We'll just join them for now.
         if (count($params) > 1) {
             $params = [implode('|', $params)];
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
         }
 
         return implode(Arr::get($params, 0, ', '), $value);
@@ -1175,6 +1196,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Determines if the date is tomorrow.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isTomorrow($value)
+    {
+        return $this->carbon($value)->isTomorrow();
+    }
+
+    /**
      * Converts a string to kebab-case.
      *
      * @param $value
@@ -1475,12 +1507,11 @@ class CoreModifiers extends Modifier
      * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function obfuscateEmail($value, $params)
+    public function obfuscateEmail($value)
     {
-        return Html::email($value, null, $this->buildAttributesFromParameters($params));
+        return Html::email($value);
     }
 
     /**
@@ -1539,7 +1570,7 @@ class CoreModifiers extends Modifier
      * Get the output of an Asset, useful for SVGs.
      *
      * @param $value
-     * @return array
+     * @return array|mixed|null|void
      */
     public function output($value)
     {
@@ -1815,7 +1846,7 @@ class CoreModifiers extends Modifier
     public function reverse($value)
     {
         if ($value instanceof Collection) {
-            return $value->reverse();
+            return $value->reverse()->values()->all();
         }
 
         if (is_array($value)) {
@@ -2667,6 +2698,35 @@ class CoreModifiers extends Modifier
 
         if (Str::contains($url, 'youtube.com')) {
             $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
+        }
+
+        return $url;
+    }
+
+    /**
+     * Get the embed URL when given a youtube or vimeo link that's
+     * direct to the page.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function trackableEmbedUrl($url)
+    {
+        if (Str::contains($url, 'vimeo')) {
+            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+        }
+
+        if (Str::contains($url, 'youtu.be')) {
+            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
+
+            // Check for start at point and replace it with correct parameter.
+            if (Str::contains($url, '?t=')) {
+                $url = str_replace('?t=', '?start=', $url);
+            }
+        }
+
+        if (Str::contains($url, 'youtube.com/watch?v=')) {
+            $url = str_replace('watch?v=', 'embed/', $url);
         }
 
         return $url;

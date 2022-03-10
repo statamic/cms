@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Of u wilt dat dit veld wordt geparseerd door Antlers.',
     'any.config.cast_booleans' => 'Opties met de waarde true en false worden ogeslagen als booleans.',
-    'any.config.default' => 'Stel de standaardwaarde in',
     'array.config.keys' => 'Stel de array keys (variabelen) en optionele labels in.',
     'array.config.mode' => 'Dynamische modus geeft de gebruiker controle over de data terwijl keyed modus dat niet doet.',
     'array.title' => 'Array',

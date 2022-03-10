@@ -269,10 +269,11 @@ final class Installer
      */
     protected function ensureExportPathsExist()
     {
-        $this->exportPaths()
-             ->reject(function ($path) {
-                 return $this->files->exists($this->starterKitPath($path));
-             })
+        $this
+            ->exportPaths()
+            ->reject(function ($path) {
+                return $this->files->exists($this->starterKitPath($path));
+            })
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");
             });
@@ -581,6 +582,15 @@ final class Installer
      */
     protected function tidyComposerErrorOutput($output)
     {
+        if (Str::contains($output, 'github.com') && Str::contains($output, ['access', 'permission', 'credential', 'authenticate'])) {
+            return collect([
+                'Composer could not authenticate with GitHub!',
+                'Please generate a personal access token at: https://github.com/settings/tokens/new',
+                'Then save your token for future use by running the following command:',
+                'composer config --global --auth github-oauth.github.com [your-token-here]',
+            ])->implode(PHP_EOL);
+        }
+
         return preg_replace("/\\n\\nrequire \[.*$/", '', $output);
     }
 
@@ -619,7 +629,7 @@ final class Installer
     }
 
     /**
-     * Get export paths.
+     * Get `export_paths` paths from config.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -631,38 +641,67 @@ final class Installer
     }
 
     /**
+     * Get `export_as` paths (to be renamed on install) from config.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function exportAsPaths()
+    {
+        $config = YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml')));
+
+        return collect($config['export_as'] ?? []);
+    }
+
+    /**
      * Get installable files.
      *
      * @return \Illuminate\Support\Collection
      */
     protected function installableFiles()
     {
-        return $this
+        $installableFromExportPaths = $this
             ->exportPaths()
             ->flatMap(function ($path) {
                 return $this->expandConfigExportPaths($path);
-            })
-            ->mapWithKeys(function ($path) {
-                $path = Path::tidy($path);
-
-                return [$path => str_replace("/vendor/{$this->package}", '', $path)];
             });
+
+        $installableFromExportAsPaths = $this
+            ->exportAsPaths()
+            ->flip()
+            ->flatMap(function ($to, $from) {
+                return $this->expandConfigExportPaths($to, $from);
+            });
+
+        return collect()
+            ->merge($installableFromExportPaths)
+            ->merge($installableFromExportAsPaths);
     }
 
     /**
-     * Expand export paths.
+     * Expand config export path to `[$from => $to]` array format, normalizing directories to files.
      *
-     * @param  string  $path
+     * @param  string  $to
+     * @param  string  $from
+     * @return \Illuminate\Support\Collection
      */
-    protected function expandConfigExportPaths($path)
+    protected function expandConfigExportPaths($to, $from = null)
     {
-        $path = $this->starterKitPath($path);
+        $to = Path::tidy($this->starterKitPath($to));
+        $from = Path::tidy($from ? $this->starterKitPath($from) : $to);
 
-        if ($this->files->isDirectory($path)) {
-            return collect($this->files->allFiles($path))->map->getPathname()->all();
+        $paths = collect([$from => $to]);
+
+        if ($this->files->isDirectory($from)) {
+            $paths = collect($this->files->allFiles($from))
+                ->map->getPathname()
+                ->mapWithKeys(function ($path) use ($from, $to) {
+                    return [$path => str_replace($from, $to, $path)];
+                });
         }
 
-        return [$path];
+        return $paths->mapWithKeys(function ($to, $from) {
+            return [Path::tidy($from) => Path::tidy(str_replace("/vendor/{$this->package}", '', $to))];
+        });
     }
 
     /**
@@ -675,13 +714,13 @@ final class Installer
     {
         $directory = $this->files->isDirectory($path)
             ? $path
-            : preg_replace('/(.*)\/[^\/]*/', '$1', $path);
+            : preg_replace('/(.*)\/[^\/]*/', '$1', Path::tidy($path));
 
         if (! $this->files->exists($directory)) {
             $this->files->makeDirectory($directory, 0755, true);
         }
 
-        return $path;
+        return Path::tidy($path);
     }
 
     /**

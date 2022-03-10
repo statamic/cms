@@ -116,19 +116,6 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    public function it_belongs_to_the_text_category_by_default()
-    {
-        $this->assertEquals(['text'], (new TestFieldtype)->categories());
-
-        $fieldtype = new class extends Fieldtype
-        {
-            protected $categories = ['foo', 'bar'];
-        };
-
-        $this->assertEquals(['foo', 'bar'], $fieldtype->categories());
-    }
-
-    /** @test */
     public function it_can_be_flagged_as_hidden_from_the_fieldtype_selector()
     {
         $this->assertTrue((new TestFieldtype)->selectable());
@@ -152,7 +139,7 @@ class FieldtypeTest extends TestCase
             'localizable' => true,
             'validatable' => true,
             'defaultable' => true,
-            'categories' => ['text'],
+            'categories' => [],
             'icon' => 'test',
             'config' => [],
         ], $fieldtype->toArray());
@@ -275,6 +262,75 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
+    public function it_can_append_a_single_config_field()
+    {
+        TestAppendConfigFields::appendConfigField('group', ['type' => 'text']);
+
+        $fields = (new TestAppendConfigFields())->configFields();
+
+        $this->assertCount(3, $fields->all());
+        $this->assertEquals('text', $fields->get('group')->type());
+    }
+
+    /** @test */
+    public function it_can_append_multiple_config_fields()
+    {
+        TestAppendConfigFields::appendConfigFields([
+            'group' => [
+                'type' => 'text',
+            ],
+            'description' => [
+                'type' => 'textarea',
+            ],
+        ]);
+
+        $fields = (new TestAppendConfigFields())->configFields();
+
+        $this->assertCount(4, $fields->all());
+        $this->assertEquals('text', $fields->get('group')->type());
+        $this->assertEquals('textarea', $fields->get('description')->type());
+    }
+
+    /** @test */
+    public function it_wont_override_previously_appended_config_fields()
+    {
+        TestAppendConfigFields::appendConfigFields([
+            'group' => [
+                'type' => 'text',
+            ],
+            'description' => [
+                'type' => 'textarea',
+            ],
+        ]);
+
+        TestAppendConfigFields::appendConfigField('another', ['type' => 'text']);
+
+        $fields = (new TestAppendConfigFields())->configFields();
+
+        $this->assertCount(5, $fields->all());
+        $this->assertEquals('text', $fields->get('group')->type());
+        $this->assertEquals('textarea', $fields->get('description')->type());
+        $this->assertEquals('text', $fields->get('another')->type());
+    }
+
+    /** @test */
+    public function it_will_only_append_config_fields_to_the_intended_fieldtype()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+        };
+
+        $fieldtypeWithAppendedConfig = new class extends Fieldtype
+        {
+        };
+
+        $fieldtypeWithAppendedConfig::appendConfigField('group', ['type' => 'text']);
+
+        $this->assertCount(0, $fieldtype->configFields()->all());
+        $this->assertCount(1, $fieldtypeWithAppendedConfig->configFields()->all());
+    }
+
+    /** @test */
     public function it_can_have_an_icon()
     {
         $this->assertEquals('test', (new TestFieldtype)->icon());
@@ -373,4 +429,12 @@ class TestMultiWordFieldtype extends Fieldtype
 class TestMultiWordWithNoFieldtypeSuffix extends Fieldtype
 {
     //
+}
+
+class TestAppendConfigFields extends Fieldtype
+{
+    protected $configFields = [
+        'foo' => ['type' => 'textarea'],
+        'max_items' => ['type' => 'integer'],
+    ];
 }

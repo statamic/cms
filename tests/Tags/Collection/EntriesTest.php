@@ -386,15 +386,32 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    public function it_cannot_sort_a_nested_structured_collection()
+    public function it_can_sort_a_nested_structured_collection()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot sort a nested collection by order.');
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('b1')->save();
+        $this->makeEntry('b2')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('c1')->save();
+        $this->makeEntry('c2')->save();
 
-        $structure = (new CollectionStructure)->maxDepth(2);
+        $structure = (new CollectionStructure)->maxDepth(1);
         $this->collection->structure($structure)->save();
+        $structure->makeTree('en')->tree([
+            ['entry' => 'b', 'children' => [
+                ['entry' => 'b1'],
+                ['entry' => 'b2'],
+            ]],
+            ['entry' => 'c', 'children' => [
+                ['entry' => 'c2'],
+                ['entry' => 'c1'],
+            ]],
+            ['entry' => 'a'],
+        ])->save();
 
-        $this->getEntries(['sort' => 'order|title']);
+        $this->assertEquals(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'], $this->getEntries(['sort' => 'id'])->map->id()->all());
+        $this->assertEquals(['b', 'b1', 'b2', 'c', 'c2', 'c1', 'a'], $this->getEntries(['sort' => 'order|title'])->map->id()->all());
     }
 
     /** @test */
@@ -428,6 +445,35 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
+    public function it_filters_out_a_single_taxonomy_term()
+    {
+        $this->makeEntry('1')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('2')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('3')->data(['tags' => ['meh']])->save();
+
+        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags:not' => 'meh'])->map->slug()->all());
+        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags:not' => TermCollection::make([Term::make('meh')->taxonomy('tags')])])->map->slug()->all());
+    }
+
+    /** @test */
+    public function it_filters_out_multiple_taxonomy_terms()
+    {
+        $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
+        $this->makeEntry('2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
+        $this->makeEntry('3')->data(['tags' => ['rad', 'awesome']])->save();
+        $this->makeEntry('4')->data(['tags' => ['meh']])->save();
+        $this->makeEntry('5')->data([])->save();
+
+        $this->assertEquals([4, 5], $this->getEntries(['taxonomy:tags:not' => 'rad|awesome'])->map->slug()->all());
+        $this->assertEquals([4, 5], $this->getEntries(['taxonomy:tags:not' => ['rad', 'awesome']])->map->slug()->all());
+        $this->assertEquals([2, 5], $this->getEntries(['taxonomy:tags:not' => 'rad|meh'])->map->slug()->all());
+        $this->assertEquals([2, 5], $this->getEntries(['taxonomy:tags:not' => ['rad', 'meh']])->map->slug()->all());
+
+        // Ensure `whereIn` and `whereNot` logic intersect results properly.
+        $this->assertEquals([1, 3], $this->getEntries(['taxonomy:tags' => ['rad', 'meh'], 'taxonomy:tags:not' => ['meh']])->map->slug()->all());
+    }
+
+    /** @test */
     public function it_filters_by_in_multiple_taxonomy_terms()
     {
         $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
@@ -451,7 +497,7 @@ class EntriesTest extends TestCase
     public function it_throws_an_exception_when_using_an_unknown_taxonomy_query_modifier()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown taxonomy query modifier [xyz]. Valid values are "any" and "all".');
+        $this->expectExceptionMessage('Unknown taxonomy query modifier [xyz]. Valid values are "any", "not", and "all".');
 
         $this->getEntries(['taxonomy:tags:xyz' => 'test']);
     }

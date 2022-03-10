@@ -425,7 +425,7 @@ final class Addon
 
         $dir = Str::removeRight(dirname($reflector->getFileName()), rtrim($this->autoload, '/'));
 
-        return $this->directory = Str::ensureRight($dir, '/');
+        return $this->directory = Path::tidy(Str::ensureRight($dir, '/'));
     }
 
     public function existsOnMarketplace()

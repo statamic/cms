@@ -14,6 +14,8 @@ use Statamic\Support\Str;
 
 class Link extends Fieldtype
 {
+    protected $categories = ['relationship'];
+
     protected function configFieldItems(): array
     {
         return [

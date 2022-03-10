@@ -45,7 +45,10 @@ class UpdateFieldsetTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $user = tap(Facades\User::make()->makeSuper())->save();
-        $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
+        $fieldset = (new Fieldset)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'foo' => 'bar',
+        ])->save();
 
         $this
             ->actingAs($user)
@@ -78,6 +81,7 @@ class UpdateFieldsetTest extends TestCase
 
         $this->assertEquals([
             'title' => 'Updated title',
+            'foo' => 'bar',
             'fields' => [
                 [
                     'handle' => 'one-one',
