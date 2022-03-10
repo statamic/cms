@@ -1430,7 +1430,8 @@ EOT;
     /** @test */
     public function callback_tags_that_return_query_builders_get_parsed()
     {
-        (new class extends Tags {
+        (new class extends Tags
+        {
             public static $handle = 'tag';
 
             public function index()
