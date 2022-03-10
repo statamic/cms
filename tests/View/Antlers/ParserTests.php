@@ -1428,6 +1428,44 @@ EOT;
     }
 
     /** @test */
+    public function callback_tags_that_return_query_builders_get_parsed()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'tag';
+
+            public function index()
+            {
+                $builder = Mockery::mock(Builder::class);
+                $builder->shouldReceive('get')->andReturn(collect([
+                    ['one' => 'a', 'two' => 'b'],
+                    ['one' => 'c', 'two' => 'd'],
+                ]));
+
+                return $builder;
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ string }}
+{{ tag }}
+    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} {{ string }}
+{{ /tag }}
+EOT;
+
+        $expected = <<<'EOT'
+Hello wilderness
+
+    1 first not-last a b Hello wilderness
+
+    2 not-first last c d Hello wilderness
+
+EOT;
+
+        $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, $this->variables, true));
+    }
+
+    /** @test */
     public function callback_tags_that_return_value_objects_gets_parsed()
     {
         (new class extends Tags
