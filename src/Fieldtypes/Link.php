@@ -31,7 +31,6 @@ class Link extends Fieldtype
                 'type' => 'asset_container',
                 'mode' => 'select',
                 'max_items' => 1,
-                'width' => 50,
             ],
         ];
     }
