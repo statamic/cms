@@ -119,6 +119,7 @@ export default {
             this.urlValue = meta.initialUrl;
             this.option = meta.initialOption;
             this.selectedEntries = meta.initialSelectedEntries;
+            this.selectedAssets = meta.initialSelectedAssets;
             this.$nextTick(() => this.metaChanging = false);
         }
 
