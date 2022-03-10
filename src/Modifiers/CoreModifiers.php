@@ -882,6 +882,10 @@ class CoreModifiers extends Modifier
             $params = [implode('|', $params)];
         }
 
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         return implode(Arr::get($params, 0, ', '), $value);
     }
 
@@ -1503,12 +1507,11 @@ class CoreModifiers extends Modifier
      * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function obfuscateEmail($value, $params)
+    public function obfuscateEmail($value)
     {
-        return Html::email($value, null, $this->buildAttributesFromParameters($params));
+        return Html::email($value);
     }
 
     /**
@@ -1567,7 +1570,7 @@ class CoreModifiers extends Modifier
      * Get the output of an Asset, useful for SVGs.
      *
      * @param $value
-     * @return array
+     * @return array|mixed|null|void
      */
     public function output($value)
     {
@@ -1843,7 +1846,7 @@ class CoreModifiers extends Modifier
     public function reverse($value)
     {
         if ($value instanceof Collection) {
-            return $value->reverse();
+            return $value->reverse()->values()->all();
         }
 
         if (is_array($value)) {

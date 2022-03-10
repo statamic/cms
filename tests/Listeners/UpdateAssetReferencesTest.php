@@ -117,6 +117,44 @@ class UpdateAssetReferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_updates_link_fields()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'product',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'asset::test_container::hoff.jpg',
+            'product' => 'asset::test_container::surfboard.jpg',
+        ]))->save();
+
+        $this->assertEquals('asset::test_container::hoff.jpg', $entry->get('avatar'));
+        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->get('product'));
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals('asset::test_container::hoff-new.jpg', $entry->fresh()->get('avatar'));
+        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->fresh()->get('product'));
+    }
+
+    /** @test */
     public function it_updates_nested_asset_fields_within_replicator_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();

@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Antlers-Parsing für den Inhalt dieses Feldes aktivieren.',
     'any.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
-    'any.config.default' => 'Standardwert festlegen.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
     'array.config.mode' => 'Der dynamische Modus gibt der Benutzer*in die Kontrolle über die Daten, während der geschlossene Modus dies nicht tut.',
     'array.title' => 'Array',
@@ -76,6 +75,7 @@ return [
     'html.title' => 'HTML',
     'integer.title' => 'Ganzzahl',
     'link.config.collections' => 'Einträge aus diesen Sammlungen werden verfügbar sein. Bleibt dies leer, stehen die Einträge von gerouteten Sammlungen zur Verfügung.',
+    'link.config.container' => 'Datei-Container für dieses Feld auswählen.',
     'link.title' => 'Link',
     'list.title' => 'Liste',
     'markdown.config.automatic_line_breaks' => 'Aktiviert automatische Zeilenumbrüche.',

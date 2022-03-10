@@ -31,7 +31,7 @@ abstract class Builder extends BaseBuilder
 
         $items = $this->getItems($keys);
 
-        $items->each->selectedQueryColumns($columns);
+        $items->each->selectedQueryColumns($this->columns ?? $columns);
 
         return $this->collect($items);
     }
@@ -164,5 +164,70 @@ abstract class Builder extends BaseBuilder
         return $values->filter(function ($value) {
             return $value !== null;
         });
+    }
+
+    protected function filterWhereBetween($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            return $value >= $where['values'][0] && $value <= $where['values'][1];
+        });
+    }
+
+    protected function filterWhereNotBetween($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            return $value < $where['values'][0] || $value > $where['values'][1];
+        });
+    }
+
+    protected function filterWhereJsonContains($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return ! empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntContain($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (! is_array($value)) {
+                return true;
+            }
+
+            return empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonLength($values, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return $this->{$method}(count($value), $where['value']);
+        });
+    }
+
+    protected function filterWhereColumn($values, $where)
+    {
+        $whereColumnKeys = $this->getWhereColumnKeyValuesByIndex($where['value']);
+
+        return $values->filter(function ($value, $key) use ($where, $whereColumnKeys) {
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
+            return $this->{$method}($value, $whereColumnKeys->get($key));
+        });
+    }
+
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        return $this->store->index($column)->items();
     }
 }

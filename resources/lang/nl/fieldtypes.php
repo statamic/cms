@@ -3,7 +3,6 @@
 return [
     'any.config.antlers' => 'Of u wilt dat dit veld wordt geparseerd door Antlers.',
     'any.config.cast_booleans' => 'Opties met de waarde true en false worden ogeslagen als booleans.',
-    'any.config.default' => 'Stel de standaardwaarde in',
     'array.config.keys' => 'Stel de array keys (variabelen) en optionele labels in.',
     'array.config.mode' => 'Dynamische modus geeft de gebruiker controle over de data terwijl keyed modus dat niet doet.',
     'array.title' => 'Array',
@@ -76,6 +75,7 @@ return [
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Entries uit deze collectie zijn beschikbaar. Als je dit leeg laat zijn entries van collecties met een route beschikbaar.',
+    'link.config.container' => 'Kies welke asset-container voor dit veld gebruikt moet worden.',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Schakel in voor automatische regeleinden.',

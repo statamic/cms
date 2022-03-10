@@ -2,7 +2,6 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -13,6 +12,7 @@ class Validator
     protected $replacements = [];
     protected $extraRules = [];
     protected $customMessages = [];
+    protected $context = [];
 
     public function make()
     {
@@ -40,6 +40,13 @@ class Validator
         return $this;
     }
 
+    public function withContext($context)
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
     public function rules()
     {
         return $this
@@ -58,7 +65,7 @@ class Validator
         }
 
         return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
-            return $carry->merge($field->rules());
+            return $carry->merge($field->setValidationContext($this->context)->rules());
         }, collect());
     }
 
@@ -92,24 +99,28 @@ class Validator
             $this->fields->preProcessValidatables()->values()->all(),
             $this->rules(),
             $this->customMessages,
-            $this->fieldAttributes()
+            $this->attributes()
         );
     }
 
-    private function fieldAttributes()
+    public function attributes()
     {
-        return $this->fields->all()->map(function ($field) {
-            $handle = 'validation.attributes.'.$field->handle();
-
-            return Lang::has($handle) ? Lang::get($handle) : $field->display();
-        })->all();
+        return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
+            return $carry->merge($field->validationAttributes());
+        }, collect())->all();
     }
 
     private function parse($rule)
     {
-        if (! is_string($rule) || ! Str::contains($rule, '{')) {
+        if (! is_string($rule) ||
+            ! Str::contains($rule, '{') ||
+            Str::startsWith($rule, 'regex:') ||
+            Str::startsWith($rule, 'not_regex:')
+        ) {
             return $rule;
         }
+
+        $rule = str_replace('{this}.', $this->context['prefix'] ?? '', $rule);
 
         return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
             return Arr::get($this->replacements, $match[1], 'NULL');

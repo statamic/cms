@@ -73,6 +73,15 @@ abstract class IteratorBuilder extends Builder
         return $this->{$method}($entries, $where);
     }
 
+    protected function filterWhereColumn($entries, $where)
+    {
+        return $entries->filter(function ($value, $key) use ($where) {
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
+            return $this->{$method}($value[$where['column']] ?? '', $value[$where['value']] ?? '');
+        });
+    }
+
     protected function intersectFromWhereClause($entries, $filteredEntries, $where)
     {
         // On the first iteration, there's nothing to intersect;
@@ -137,15 +146,68 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function filterWhereBetween($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            return $value >= $where['values'][0] && $value <= $where['values'][1];
+        });
+    }
+
+    protected function filterWhereNotBetween($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            return $value < $where['values'][0] || $value > $where['values'][1];
+        });
+    }
+
+    protected function filterWhereJsonContains($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return ! empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntContain($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (! is_array($value)) {
+                return true;
+            }
+
+            return empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonLength($entries, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return $this->{$method}(count($value), $where['value']);
+        });
+    }
+
     protected function getFilterItemValue($item, $column)
     {
-        if (is_array($item)) {
-            return $item[$column] ?? null;
-        }
-
-        return method_exists($item, $column)
-            ? $item->{$column}()
-            : $item->get($column);
+        return (new ResolveValue)($item, $column);
     }
 
     abstract protected function getBaseItems();

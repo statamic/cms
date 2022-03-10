@@ -47,17 +47,22 @@ class APITest extends TestCase
         Facades\Config::set('statamic.api.resources.collections', true);
 
         Facades\Collection::make('pages')->structureContents(['root' => true])->save();
+
+        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
+        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
+
         Facades\Collection::find('pages')->structure()->makeTree('en', [
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
         ])->save();
 
-        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
-        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
-        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
-
         $this->assertEndpointDataCount('/api/collections/pages/tree', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[status:is]=published', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[status:is]=draft', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[published:is]=true', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[published:is]=false', 2);
     }
 
     /** @test */
@@ -95,6 +100,7 @@ class APITest extends TestCase
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
+            ['title' => 'Balki Bartokomous'],
         ])->save();
         $nav->save();
 
@@ -102,7 +108,43 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
         Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
 
-        $this->assertEndpointDataCount('/api/navs/footer/tree', 1);
+        $this->assertEndpointDataCount('/api/navs/footer/tree', 2);
+    }
+
+    /** @test */
+    public function it_excludes_keys()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Config::set('statamic.api.cache', false);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(true)->save();
+
+        $apiUrl = 'http://localhost/api/collections/pages/entries/dance';
+        $editUrl = 'http://localhost/cp/collections/pages/entries/dance';
+
+        $this
+            ->get('/api/collections/pages/entries')
+            ->assertJsonPath('data.0.api_url', $apiUrl)
+            ->assertJsonPath('data.0.edit_url', $editUrl);
+
+        $this
+            ->get('/api/collections/pages/entries/dance')
+            ->assertJsonPath('data.api_url', $apiUrl)
+            ->assertJsonPath('data.edit_url', $editUrl);
+
+        Facades\Config::set('statamic.api.excluded_keys', ['api_url', 'edit_url']);
+
+        $this
+            ->get('/api/collections/pages/entries')
+            ->assertJsonPath('data.0.api_url', null)
+            ->assertJsonPath('data.0.edit_url', null);
+
+        $this
+            ->get('/api/collections/pages/entries/dance')
+            ->assertJsonPath('data.api_url', null)
+            ->assertJsonPath('data.edit_url', null);
     }
 
     private function assertEndpointDataCount($endpoint, $count)

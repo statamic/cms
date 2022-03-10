@@ -102,6 +102,7 @@ class Modify implements \IteratorAggregate
      *
      * @throws \Statamic\Modifiers\ModifierException
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         if (! is_array($this->value)) {

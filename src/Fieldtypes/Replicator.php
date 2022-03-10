@@ -105,21 +105,41 @@ class Replicator extends Fieldtype
 
     protected function setRules($handle, $data, $index)
     {
-        $rules = $this->fields($handle)->addValues($data)->validator()->rules();
+        $rules = $this
+            ->fields($handle)
+            ->addValues($data)
+            ->validator()
+            ->withContext([
+                'prefix' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index).'.',
+            ])
+            ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
-            return [$this->setRuleFieldKey($handle, $index) => $rules];
+            return [$this->setRuleFieldPrefix($index).'.'.$handle => $rules];
         })->all();
     }
 
-    protected function setRuleFieldKey($handle, $index)
+    protected function setRuleFieldPrefix($index)
     {
-        return "{$this->field->handle()}.{$index}.{$handle}";
+        return "{$this->field->handle()}.{$index}";
     }
 
-    protected function setConfig($handle)
+    public function extraValidationAttributes(): array
     {
-        return array_get($this->getFieldConfig('sets'), $handle);
+        return collect($this->field->value())->map(function ($set, $index) {
+            return $this->setValidationAttributes($set['type'], $set, $index);
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
+    }
+
+    protected function setValidationAttributes($handle, $data, $index)
+    {
+        $attributes = $this->fields($handle)->addValues($data)->validator()->attributes();
+
+        return collect($attributes)->mapWithKeys(function ($attribute, $handle) use ($index) {
+            return [$this->setRuleFieldPrefix($index).'.'.$handle => $attribute];
+        })->all();
     }
 
     public function augment($values)

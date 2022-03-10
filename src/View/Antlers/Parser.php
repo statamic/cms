@@ -387,7 +387,7 @@ class Parser
      *                        {{ var or anothervar }}
      *                        {{ var | modifier or anothervar }}
      * @param  array|object  $data  The data
-     * @return string
+     * @return string|void
      */
     protected function parseStringVariableTag($var, $text, $data)
     {
