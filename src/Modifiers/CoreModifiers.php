@@ -2,6 +2,7 @@
 
 namespace Statamic\Modifiers;
 
+use ArrayAccess;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
@@ -1649,7 +1650,7 @@ class CoreModifiers extends Modifier
         }
 
         $items = $value->map(function ($item) use ($key) {
-            if (is_array($item)) {
+            if (is_array($item) || $item instanceof ArrayAccess) {
                 return Arr::get($item, $key);
             }
 
