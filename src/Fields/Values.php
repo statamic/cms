@@ -104,4 +104,9 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate
     {
         return $this->getProxiedInstance()->toArray();
     }
+
+    public function all()
+    {
+        return $this->getProxiedInstance()->all();
+    }
 }
