@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use Statamic\Data\DataReferenceUpdater;
 use Statamic\Facades\AssetContainer;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class AssetReferenceUpdater extends DataReferenceUpdater
 {
@@ -249,7 +250,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $changed = collect(Arr::dot($bardPayload))
             ->filter(function ($value, $key) {
-                return preg_match('/(.*)\.(type)/', $key) && $value === 'image';
+                return Str::endsWith($key, '.type') && $value === 'image';
             })
             ->mapWithKeys(function ($value, $key) use ($bardPayload) {
                 $key = str_replace('.type', '.attrs.src', $key);
@@ -263,7 +264,11 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 return $this->newValue ? "asset::{$this->container}::{$this->newValue}" : null;
             })
             ->each(function ($value, $key) use (&$bardPayload) {
-                Arr::set($bardPayload, $key, $value);
+                if ($value) {
+                    Arr::set($bardPayload, $key, $value);
+                } else {
+                    Arr::forget($bardPayload, Str::before($key, '.attrs.src'));
+                }
             });
 
         if ($changed->isEmpty()) {
@@ -293,7 +298,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $changed = collect(Arr::dot($bardPayload))
             ->filter(function ($value, $key) {
-                return preg_match('/(.*)\.(type)/', $key) && $value === 'link';
+                return Str::endsWith($key, '.type') && $value === 'link';
             })
             ->mapWithKeys(function ($value, $key) use ($bardPayload) {
                 $key = str_replace('.type', '.attrs.href', $key);
@@ -307,7 +312,11 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 return $this->newValue ? "statamic://asset::{$this->container}::{$this->newValue}" : null;
             })
             ->each(function ($value, $key) use (&$bardPayload) {
-                Arr::set($bardPayload, $key, $value);
+                if ($value) {
+                    Arr::set($bardPayload, $key, $value);
+                } else {
+                    Arr::forget($bardPayload, Str::before($key, '.attrs.href'));
+                }
             });
 
         if ($changed->isEmpty()) {

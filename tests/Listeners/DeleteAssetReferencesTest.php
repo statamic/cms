@@ -5,6 +5,7 @@ namespace Tests\Listeners;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades;
+use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -133,6 +134,135 @@ class DeleteAssetReferencesTest extends TestCase
         $this->assertEquals(['asset1.jpg'], $entry->fresh()->get('delete_one'));
         $this->assertEquals(['asset1.jpg'], $entry->fresh()->get('delete_two'));
         $this->assertEquals([], $entry->fresh()->get('delete_all'));
+    }
+
+    /** @test */
+    public function it_deletes_asset_references_in_bard_field()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'bardo' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'asset::test_container::asset1.jpg',
+                                'alt' => 'hoff',
+                            ],
+                        ],
+                        [
+                            'type' => 'link',
+                            'attrs' => [
+                                'href' => 'statamic://asset::test_container::asset1.jpg',
+                            ],
+                        ],
+                        [
+                            'type' => 'paragraph',
+                            'content' => 'unrelated',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'asset::test_container::asset2.jpg',
+                                'alt' => 'norris',
+                            ],
+                        ],
+                        [
+                            'type' => 'link',
+                            'attrs' => [
+                                'href' => 'statamic://asset::test_container::asset2.jpg',
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => 'unrelated',
+                ],
+            ],
+        ]))->save();
+
+        $this->assertEquals('asset::test_container::asset1.jpg', Arr::get($entry->data(), 'bardo.0.content.0.attrs.src'));
+        $this->assertEquals('hoff', Arr::get($entry->data(), 'bardo.0.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::asset1.jpg', Arr::get($entry->data(), 'bardo.0.content.1.attrs.href'));
+        $this->assertEquals('asset::test_container::asset2.jpg', Arr::get($entry->data(), 'bardo.1.content.0.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->data(), 'bardo.1.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::asset2.jpg', Arr::get($entry->data(), 'bardo.1.content.1.attrs.href'));
+
+        $this->asset1->delete();
+
+        $this->assertNull(Arr::get($entry->fresh()->data(), 'bardo.0.content.0'));
+        $this->assertNull(Arr::get($entry->fresh()->data(), 'bardo.0.content.1'));
+        $this->assertEquals('asset::test_container::asset2.jpg', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::asset2.jpg', Arr::get($entry->fresh()->data(), 'bardo.1.content.1.attrs.href'));
+    }
+
+    /** @test */
+    public function it_updates_asset_references_in_bard_field_when_saved_as_html()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                        'save_html' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $content = <<<'EOT'
+<p>Some text.</p>
+<img src="statamic://asset::test_container::asset1.jpg">
+<img src="statamic://asset::test_container::asset1.jpg" alt="test">
+</p>More text.</p>
+<p><a href="statamic://asset::test_container::asset1.jpg">Link</a></p>
+<img src="statamic://asset::test_container::asset2.jpg">
+<p><a href="statamic://asset::test_container::asset2.jpg">Link</a></p>
+EOT;
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data(['bardo' => $content]))->save();
+
+        $this->assertEquals($content, $entry->get('bardo'));
+
+        $this->asset1->delete();
+
+        $expected = <<<'EOT'
+<p>Some text.</p>
+<img src=>
+<img src= alt="test">
+</p>More text.</p>
+<p><a href=>Link</a></p>
+<img src="statamic://asset::test_container::asset2.jpg">
+<p><a href="statamic://asset::test_container::asset2.jpg">Link</a></p>
+EOT;
+
+        $this->assertEquals($expected, $entry->fresh()->get('bardo'));
     }
 
     protected function setSingleBlueprint($namespace, $blueprintContents)
