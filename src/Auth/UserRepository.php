@@ -2,12 +2,13 @@
 
 namespace Statamic\Auth;
 
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Auth\User;
-use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
-use Statamic\Events\UserBlueprintFound;
-use Statamic\Facades\Blueprint;
 use Statamic\OAuth\Provider;
+use Statamic\Facades\Blueprint;
+use Statamic\Contracts\Auth\User;
+use Illuminate\Support\Collection;
+use Statamic\Events\UserBlueprintFound;
+use WhiteCube\Lingua\Service as Lingua;
+use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
 
 abstract class UserRepository implements RepositoryContract
 {
@@ -81,7 +82,7 @@ abstract class UserRepository implements RepositoryContract
                 return [
                     $locale => [
                         'locale' => $locale,
-                        'name' => $locale, // TODO: Use https://github.com/whitecube/lingua for nicer formatting.
+                        'name' => ucfirst(Lingua::create($locale)->toName()),
                     ]
                 ];
             });
