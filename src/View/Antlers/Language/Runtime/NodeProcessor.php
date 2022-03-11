@@ -1337,7 +1337,7 @@ class NodeProcessor
                             GlobalRuntimeState::$yieldCount += 1;
                             // Wrap it in a partial thing.
                             $wrapName = 'section:'.$tagMethod.'__yield'.GlobalRuntimeState::$yieldCount;
-                            $bufferOverride = LiteralReplacementManager::registerRegion($wrapName, $output);
+                            $bufferOverride = LiteralReplacementManager::registerRegion($wrapName, $tagMethod, $output);
 
                             if (! array_key_exists(GlobalRuntimeState::$environmentId, GlobalRuntimeState::$yieldStacks)) {
                                 GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId] = [];
@@ -1378,6 +1378,7 @@ class NodeProcessor
 
                             LiteralReplacementManager::registerRegionReplacement(
                                 $sectionName,
+                                $tagMethod,
                                 $this->cascade->sections()->get($tagMethod)
                             );
 
