@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
 use Statamic\Events\UserBlueprintFound;
@@ -70,5 +71,19 @@ abstract class UserRepository implements RepositoryContract
         return $this->find(
             (new Provider($provider))->getUserId($id)
         );
+    }
+
+    public function locales(): Collection
+    {
+        return collect(config('statamic.users.locales'))
+            ->prepend(config('app.locale'))
+            ->mapWithKeys(function ($locale) {
+                return [
+                    $locale => [
+                        'locale' => $locale,
+                        'name' => $locale, // TODO: Use https://github.com/whitecube/lingua for nicer formatting.
+                    ]
+                ];
+            });
     }
 }

@@ -125,4 +125,18 @@ return [
         'web' => 'web',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Locales
+    |--------------------------------------------------------------------------
+    |
+    | The locales available to your users.
+    | This will always include the app locale, even if the array is empty.
+    |
+    */
+
+    'locales' => [
+        config('app.locale'),
+    ],
+
 ];
