@@ -2108,7 +2108,7 @@ class NodeProcessor
         foreach ($loop as $index => &$data) {
             $data['prev'] = $prev;
 
-            if ($data['last'] == false) {
+            if ($data['last'] == false && array_key_exists($index + 1, $loop)) {
                 $data['next'] = $loop[$index + 1];
             } else {
                 $data['next'] = null;
