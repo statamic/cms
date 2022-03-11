@@ -83,15 +83,22 @@ class UrlBuilder implements UrlBuilderContract
 
     private function slugify($value)
     {
-        $underscorePlaceholder = strtolower(str_random(16));
         $slashPlaceholder = strtolower(str_random(16));
 
-        $value = str_replace('_', $underscorePlaceholder, $value);
         $value = str_replace('/', $slashPlaceholder, $value);
+
+        $hasHtmlSuffix = str_contains($value, '.html');
+
+        if ($hasHtmlSuffix) {
+            $value = Str::before($value, '.html');
+        }
 
         $value = Str::slug($value);
 
-        $value = str_replace($underscorePlaceholder, '_', $value);
+        if ($hasHtmlSuffix) {
+            $value .= '.html';
+        }
+
         $value = str_replace($slashPlaceholder, '/', $value);
 
         return $value;
