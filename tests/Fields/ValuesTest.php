@@ -57,6 +57,14 @@ class ValuesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_get_itself_as_an_array()
+    {
+        $values = new Values(collect(['foo' => 'bar']));
+
+        $this->assertEquals(['foo' => 'bar'], $values->all());
+    }
+
+    /** @test */
     public function its_arrayable()
     {
         $mockOne = Mockery::mock(Collection::class)->shouldReceive('toArray')->andReturn(['title' => 'first'])->getMock();

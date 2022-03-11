@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use Statamic\Fields\Values;
+use Statamic\Modifiers\Modifier;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -23,5 +25,33 @@ class FluentModifyTest extends TestCase
 
         $this->assertTrue(is_string($result));
         $this->assertEquals("I LOVE NACHO LIBRE, IT'S THE BESSS!!!", $result);
+    }
+
+    /** @test */
+    public function passing_a_values_instance_into_it_will_not_convert_it_to_an_array()
+    {
+        $values = new Values(['foo' => 'bar']);
+
+        $result = Modify::value($values)->fetch();
+
+        $this->assertSame($values, $result);
+    }
+
+    /** @test */
+    public function values_instances_get_converted_to_an_array_when_passing_to_a_modifier()
+    {
+        (new class extends Modifier
+        {
+            public static $handle = 'to_values';
+
+            public function index($value)
+            {
+                return new Values($value);
+            }
+        })::register();
+
+        $result = Modify::value(['foo' => 'bar'])->toValues()->typeOf()->fetch();
+
+        $this->assertEquals('array', $result);
     }
 }
