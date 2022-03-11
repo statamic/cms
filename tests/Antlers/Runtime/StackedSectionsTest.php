@@ -6,7 +6,6 @@ use Tests\Antlers\ParserTestCase;
 
 class StackedSectionsTest extends ParserTestCase
 {
-
     public function test_sections_can_be_used_like_stacks_when_nested()
     {
         $template = <<<'EOT'
