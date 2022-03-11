@@ -237,6 +237,8 @@ abstract class User implements
 
     public function setPreferredLocale($locale)
     {
-        return $this->setPreference('locale', $locale);
+        return ! is_null($locale)
+            ? $this->setPreference('locale', $locale)
+            : $this->removePreference('locale');
     }
 }
