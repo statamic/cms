@@ -80,6 +80,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Time::class,
         Fieldtypes\Toggle::class,
         Fieldtypes\UserGroups::class,
+        Fieldtypes\UserLocale::class,
         Fieldtypes\UserRoles::class,
         Fieldtypes\Users::class,
         Fieldtypes\Video::class,
