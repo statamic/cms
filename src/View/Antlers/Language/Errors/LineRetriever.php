@@ -66,13 +66,13 @@ class LineRetriever
         if ($node instanceof AntlersNode) {
             if ($node->originalNode != null) {
                 $line = $node->originalNode->startPosition->line;
-            } else {
+            } elseif ($node->startPosition != null) {
                 $line = $node->startPosition->line;
             }
         } else {
             if ($node->originalAbstractNode != null) {
                 $line = $node->originalAbstractNode->startPosition->line;
-            } else {
+            } elseif ($node->startPosition != null) {
                 $line = $node->startPosition->line;
             }
         }
@@ -89,7 +89,7 @@ class LineRetriever
             if ($node->originalNode != null) {
                 $line = $node->originalNode->startPosition->line;
                 $char = $node->originalNode->startPosition->char;
-            } else {
+            } elseif ($node->startPosition != null) {
                 $line = $node->startPosition->line;
                 $char = $node->startPosition->char;
             }
@@ -97,7 +97,7 @@ class LineRetriever
             if ($node->originalAbstractNode != null) {
                 $line = $node->originalAbstractNode->startPosition->line;
                 $char = $node->originalAbstractNode->startPosition->char;
-            } else {
+            } elseif ($node->startPosition != null) {
                 $line = $node->startPosition->line;
                 $char = $node->startPosition->char;
             }
