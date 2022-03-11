@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Statamic\Assets\AssetCollection;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
@@ -33,7 +34,13 @@ class Assets extends Tags
         $value = Arr::get($this->context, $this->method);
 
         if ($this->isAssetsFieldValue($value)) {
-            $this->assets = (new AssetCollection([$value->value()]))->flatten();
+            $value = $value->value();
+
+            if ($value instanceof Builder) {
+                $value = $value->get();
+            }
+
+            $this->assets = (new AssetCollection([$value]))->flatten();
 
             return $this->output();
         }
