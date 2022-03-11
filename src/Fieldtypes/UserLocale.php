@@ -17,7 +17,7 @@ class UserLocale extends Relationship
         if ($locale = User::locales()->get($id)) {
             return [
                 'id' => $locale['locale'],
-                'title' => $locale['name'],
+                'title' => "{$locale['name']} ({$locale['locale']})",
             ];
         }
 
@@ -50,7 +50,7 @@ class UserLocale extends Relationship
         return User::locales()->map(function ($locale) {
             return [
                 'id' => $locale['locale'],
-                'title' => $locale['name'],
+                'title' => "{$locale['name']} ({$locale['locale']})",
             ];
         })->values();
     }
