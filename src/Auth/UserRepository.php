@@ -82,7 +82,7 @@ abstract class UserRepository implements RepositoryContract
                 return [
                     $locale => [
                         'locale' => $locale,
-                        'name' => ucfirst(Lingua::create($locale)->toName()),
+                        'name' => locale_get_display_name($locale),
                     ]
                 ];
             });
