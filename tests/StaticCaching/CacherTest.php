@@ -6,6 +6,7 @@ use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
+use Statamic\StaticCaching\Excluder;
 use Tests\TestCase;
 
 class CacherTest extends TestCase
@@ -200,6 +201,19 @@ class CacherTest extends TestCase
     }
 
     /** @test */
+    public function excludes_dynamic_urls()
+    {
+        $cacher = $this->cacher(['exclude' => [
+            'class' => TestExcluder::class,
+            'urls' => ['/static-url'],
+        ]]);
+
+        $this->assertTrue($cacher->isExcluded('/static-url'));
+        $this->assertTrue($cacher->isExcluded('/dynamic-url'));
+        $this->assertFalse($cacher->isExcluded('/cached-url'));
+    }
+
+    /** @test */
     public function url_exclusions_ignore_query_strings()
     {
         $cacher = $this->cacher(['exclude' => ['/blog']]);
@@ -240,5 +254,13 @@ class TestCacher extends AbstractCacher
 
     public function invalidateUrl($url)
     {
+    }
+}
+
+class TestExcluder implements Excluder
+{
+    public function __invoke(string $url): bool
+    {
+        return $url === '/dynamic-url';
     }
 }
