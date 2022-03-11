@@ -11,6 +11,6 @@ class ExtractInfo
         $disk = $asset->disk()->filesystem();
         $path = $asset->path();
 
-        return (new \getID3)->analyze($path, $disk->getSize($path), '', $disk->readStream($path));
+        return (new \getID3)->analyze($path, $disk->fileSize($path), '', $disk->readStream($path));
     }
 }
