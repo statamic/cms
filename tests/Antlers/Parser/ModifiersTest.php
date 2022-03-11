@@ -3,9 +3,13 @@
 namespace Tests\Antlers\Parser;
 
 use Statamic\View\Antlers\Language\Nodes\ModifierNameNode;
+use Statamic\View\Antlers\Language\Nodes\Modifiers\ModifierChainNode;
 use Statamic\View\Antlers\Language\Nodes\Modifiers\ModifierNode;
 use Statamic\View\Antlers\Language\Nodes\ModifierValueNode;
+use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\NotStrictEqualCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalAndOperator;
 use Statamic\View\Antlers\Language\Nodes\StringValueNode;
+use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Tests\Antlers\ParserTestCase;
@@ -251,5 +255,51 @@ class ModifiersTest extends ParserTestCase
 
         $this->assertModifierName('modifier', $modifierOne);
         $this->assertSame('hello "\\ world', $modifierOne->valueNodes[0]->value);
+    }
+
+    public function test_shorthand_syntax_breaks_on_symbolic_operators()
+    {
+        $nodes = $this->getParsedRuntimeNodes("{{  url | contains:/about/news && uri !== '/about/news' }}");
+        $this->assertInstanceOf(SemanticGroup::class, $nodes[0]);
+
+        /** @var SemanticGroup $semanticGroup */
+        $semanticGroup = $nodes[0];
+        $this->assertCount(1, $semanticGroup->nodes);
+
+        $nodes = $semanticGroup->nodes[0]->nodes;
+        $this->assertCount(3, $nodes);
+        $this->assertInstanceOf(VariableNode::class, $nodes[0]);
+
+        /** @var VariableNode $variable */
+        $variable = $nodes[0];
+        $this->assertSame('url', $variable->name);
+        $this->assertNotNull($variable->modifierChain);
+        $this->assertInstanceOf(ModifierChainNode::class, $variable->modifierChain);
+
+        $chain = $variable->modifierChain;
+        $this->assertCount(1, $chain->modifierChain);
+
+        $modifier = $chain->modifierChain[0];
+        $this->assertNotNull($modifier->nameNode);
+        $this->assertSame('contains', $modifier->nameNode->name);
+        $this->assertCount(1, $modifier->valueNodes);
+        $this->assertInstanceOf(ModifierValueNode::class, $modifier->valueNodes[0]);
+
+        /** @var ModifierValueNode $value */
+        $value = $modifier->valueNodes[0];
+        $this->assertSame('/about/news', $value->value);
+        $this->assertSame('/about/news', $value->name);
+
+        $this->assertInstanceOf(LogicalAndOperator::class, $nodes[1]);
+        $this->assertInstanceOf(LogicGroup::class, $nodes[2]);
+
+        /** @var LogicGroup $logicGroup */
+        $logicGroup = $nodes[2];
+        $this->assertCount(3, $logicGroup->nodes);
+        $this->assertInstanceOf(VariableNode::class, $logicGroup->nodes[0]);
+        $this->assertSame('uri', $logicGroup->nodes[0]->name);
+        $this->assertInstanceOf(NotStrictEqualCompOperator::class, $logicGroup->nodes[1]);
+        $this->assertInstanceOf(StringValueNode::class, $logicGroup->nodes[2]);
+        $this->assertSame('/about/news', $logicGroup->nodes[2]->value);
     }
 }
