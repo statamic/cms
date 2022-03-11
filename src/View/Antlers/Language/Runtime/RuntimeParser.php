@@ -506,7 +506,7 @@ class RuntimeParser implements Parser
 
         $exceptionLine = 1;
 
-        if ($antlersException->node->startPosition != nulL) {
+        if ($antlersException->node->startPosition != null) {
             $exceptionLine = $antlersException->node->startPosition->line;
         }
 

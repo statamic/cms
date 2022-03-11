@@ -25,6 +25,7 @@ class LiteralReplacementManager
             }
 
             self::$retargeted[$globalReplacement][] = $name;
+
             return $name;
         }
 
@@ -37,7 +38,7 @@ class LiteralReplacementManager
     {
         $name = '__literalReplacement::_'.md5($name);
 
-        $string= (string)$string;
+        $string = (string) $string;
 
         if (Str::contains($string, $name)) {
             $swap = self::$globalReplacement[$name];
@@ -50,17 +51,19 @@ class LiteralReplacementManager
                 $string = str_replace($swap, $swapContent, $string);
                 self::$regions[$swap] = $string;
                 self::$replacements[$swap] = $string;
+
                 return;
             }
 
             self::$regions[$swap] = $string;
             self::$replacements[$swap] = $string;
+
             return;
         }
 
         if (array_key_exists($name, self::$replacements)) {
-            $existing = (string)self::$replacements[$name];
-            $incoming = (string)$string;
+            $existing = (string) self::$replacements[$name];
+            $incoming = (string) $string;
 
             if (Str::contains($existing, $name) && Str::contains($incoming, $name)) {
                 $incoming = str_replace($name, $existing, $incoming);
