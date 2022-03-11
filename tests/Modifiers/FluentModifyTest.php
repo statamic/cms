@@ -40,7 +40,8 @@ class FluentModifyTest extends TestCase
     /** @test */
     public function values_instances_get_converted_to_an_array_when_passing_to_a_modifier()
     {
-        (new class extends Modifier {
+        (new class extends Modifier
+        {
             public static $handle = 'to_values';
 
             public function index($value)
