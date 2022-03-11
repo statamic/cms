@@ -133,7 +133,7 @@ abstract class User implements
      */
     public function blueprint()
     {
-        return Facades\User::blueprint();
+        return Facades\User::blueprint()->setParent($this);
     }
 
     public function save()
