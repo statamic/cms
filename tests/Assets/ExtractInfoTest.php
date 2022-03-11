@@ -31,7 +31,7 @@ class ExtractInfoTest extends TestCase
         $extracted = (new ExtractInfo)->fromAsset($asset);
 
         $expected = [
-            'filesize' => 2,
+            'filesize' => $this->isRunningWindows() ? 3 : 2,
             'filename' => 'a.txt',
             'encoding' => 'UTF-8',
         ];
