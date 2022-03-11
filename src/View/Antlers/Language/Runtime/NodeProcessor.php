@@ -495,6 +495,10 @@ class NodeProcessor
             }
         }
 
+        if ($node->name->name == 'assets' && $node->name->methodPart == 'assets') {
+            return true;
+        }
+
         $activeData = $this->getActiveData();
 
         // The third argument "true" disables the data managers value interception mechanism.
