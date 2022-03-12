@@ -1789,7 +1789,9 @@ class NodeProcessor
                                     }
 
                                     if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
-                                        $val = $this->addLoopIterationVariables($val);
+                                        if (count($val) > 0 && !is_object($val[0])) {
+                                            $val = $this->addLoopIterationVariables($val);
+                                        }
                                     }
 
                                     $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
@@ -2078,6 +2080,10 @@ class NodeProcessor
             }
 
             if ($value instanceof Values) {
+                $value = $value->toArray();
+            }
+
+            if ($value instanceof Arrayable) {
                 $value = $value->toArray();
             }
 

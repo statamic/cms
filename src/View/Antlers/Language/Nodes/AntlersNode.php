@@ -443,22 +443,11 @@ class AntlersNode extends AbstractNode
 
             $values[] = $value;
         } else {
-            $splitParams = explode('|', $value);
-            $newParams = [];
-
-            foreach ($splitParams as $paramCandidate) {
-                if ($this->isClosedBy == null) {
-                    $newParams[] = $paramCandidate;
-                } else {
-                    if (Str::contains($paramCandidate, ':')) {
-                        $newParams = array_merge($newParams, explode(':', $paramCandidate));
-                    } else {
-                        $newParams[] = $paramCandidate;
-                    }
-                }
+            if ($this->isClosedBy == null || $this->isSelfClosing) {
+                $values = explode('|', $value);
+            } else {
+                $values = explode(':', $value);
             }
-
-            $values = $values + $newParams;
         }
 
         return array_values($values);
@@ -470,34 +459,7 @@ class AntlersNode extends AbstractNode
 
         /** @var ParameterNode $param */
         foreach ($this->parameters as $param) {
-            $value = $param->value;
-
-            if ($param->isVariableReference) {
-                $pathParser = new PathParser();
-                $retriever = new PathDataManager();
-                $retriever->setIsPaired($this->isClosedBy != null);
-                $value = $retriever->getData($pathParser->parse($value), $data);
-
-                $values[] = $value;
-                continue;
-            } else {
-                $splitParams = explode('|', $value);
-                $newParams = [];
-
-                foreach ($splitParams as $paramCandidate) {
-                    if ($this->isClosedBy == null) {
-                        $newParams[] = $paramCandidate;
-                    } else {
-                        if (Str::contains($paramCandidate, ':')) {
-                            $newParams = array_merge($newParams, explode(':', $paramCandidate));
-                        } else {
-                            $newParams[] = $paramCandidate;
-                        }
-                    }
-                }
-
-                $values = $values + $newParams;
-            }
+            $values += $this->getModifierParameterValuesForParameter($param, $data);
         }
 
         return array_values($values);
