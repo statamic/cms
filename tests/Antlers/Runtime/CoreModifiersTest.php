@@ -504,7 +504,6 @@ EOT;
 <The Second Title><16>
 EOT;
 
-
         $this->assertSame($expected, trim($this->renderString($template, [
             'entries' => [
                 $entryOne, $entryTwo,
@@ -524,7 +523,7 @@ class SimpleEntryObject implements Arrayable
         return [
             'title' => $this->title,
             'date' => $this->date,
-            'title_length' => strlen($this->title)
+            'title_length' => strlen($this->title),
         ];
     }
 

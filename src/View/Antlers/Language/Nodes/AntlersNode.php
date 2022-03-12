@@ -2,7 +2,6 @@
 
 namespace Statamic\View\Antlers\Language\Nodes;
 
-use Illuminate\Support\Str;
 use Statamic\Facades\Antlers;
 use Statamic\Tags\TagNotFoundException;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;

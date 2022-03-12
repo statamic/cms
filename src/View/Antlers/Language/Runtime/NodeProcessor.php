@@ -1789,7 +1789,7 @@ class NodeProcessor
                                     }
 
                                     if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
-                                        if (count($val) > 0 && !is_object($val[0])) {
+                                        if (count($val) > 0 && ! is_object($val[0])) {
                                             $val = $this->addLoopIterationVariables($val);
                                         }
                                     }
