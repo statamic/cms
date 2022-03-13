@@ -98,7 +98,7 @@ EOT;
         $builder->shouldReceive('get')->once()->andReturn(collect($clientData));
 
         $data = [
-            'clients' => $builder
+            'clients' => $builder,
         ];
 
         VarTest::register();
