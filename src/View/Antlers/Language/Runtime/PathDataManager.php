@@ -396,7 +396,11 @@ class PathDataManager
 
                 $this->reducedVar = $interceptResult;
             } else {
-                throw new RuntimeException('Not enough context to resolve: '.$pathItem->name);
+                $this->reducedVar = $builderCheckValue->get();
+
+                if ($this->reducedVar instanceof Collection) {
+                    $this->reducedVar = $this->reducedVar->all();
+                }
             }
         }
     }
