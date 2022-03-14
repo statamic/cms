@@ -20,6 +20,8 @@ EOT;
     {
         $template = <<<'EOT'
 {{ partial:augment_one }}
+{{ entry:title }}
+{{ /partial:augment_one }}
 EOT;
 
         $entry = EntryFactory::collection('interpolation-test')->id('interpolation-one')->slug('interpolation-one')->data(['title' => 'The Title'])->create();
