@@ -635,6 +635,10 @@ class Asset implements AssetContract, Augmentable
             return null;
         }
 
+        if ($this->height() == 0) {
+            return null;
+        }
+
         return $this->width() / $this->height();
     }
 
