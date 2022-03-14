@@ -26,7 +26,7 @@ EOT;
 
         $data = [
             'entry' => $entry,
-            'condition' => true
+            'condition' => true,
         ];
 
         $this->assertSame('<The Title>', trim(($this->renderString($template, $data, true))));

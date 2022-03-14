@@ -1771,7 +1771,7 @@ class NodeProcessor
                                                 if ($value == $regionName) {
                                                     $resolvedValue = $interpolationResult;
                                                 } else {
-                                                    $resolvedValue = str_replace($regionName, (string)$interpolationResult, $value);
+                                                    $resolvedValue = str_replace($regionName, (string) $interpolationResult, $value);
                                                 }
 
                                                 $paramValues[$paramName] = $resolvedValue;

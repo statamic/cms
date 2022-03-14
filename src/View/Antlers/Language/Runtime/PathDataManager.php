@@ -144,12 +144,16 @@ class PathDataManager
 
     private function lockData()
     {
-        if ($this->nodeProcessor != null) { $this->nodeProcessor->createLockData(); }
+        if ($this->nodeProcessor != null) {
+            $this->nodeProcessor->createLockData();
+        }
     }
 
     private function unlockData()
     {
-        if ($this->nodeProcessor != null) { $this->nodeProcessor->restoreLockedData(); }
+        if ($this->nodeProcessor != null) {
+            $this->nodeProcessor->restoreLockedData();
+        }
     }
 
     /**

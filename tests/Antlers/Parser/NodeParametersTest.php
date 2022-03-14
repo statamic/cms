@@ -88,7 +88,7 @@ EOT;
             'param||four',
             '',
             '',
-            'final'
+            'final',
         ], $parameters);
     }
 
