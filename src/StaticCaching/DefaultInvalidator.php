@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Globals\GlobalSet;
@@ -26,7 +27,9 @@ class DefaultInvalidator implements Invalidator
             return $this->cacher->flush();
         }
 
-        if ($item instanceof Entry) {
+        if ($item instanceof Asset) {
+            $this->invalidateAssetUrls($item);
+        } elseif ($item instanceof Entry) {
             $this->invalidateEntryUrls($item);
         } elseif ($item instanceof Term) {
             $this->invalidateTermUrls($item);
@@ -37,6 +40,13 @@ class DefaultInvalidator implements Invalidator
         } elseif ($item instanceof Collection) {
             $this->invalidateCollectionUrls($item);
         }
+    }
+
+    protected function invalidateAssetUrls($asset)
+    {
+        $this->cacher->invalidateUrls(
+            Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls")
+        );
     }
 
     protected function invalidateEntryUrls($entry)
