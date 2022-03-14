@@ -76,7 +76,7 @@ class EntryTest extends TestCase
     {
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['locale' => 'en_US', 'url' => '/'],
-            'da' => ['locale' => 'da_DA', 'url' => '/da/'],
+            'da' => ['locale' => 'da_DK', 'url' => '/da/'],
         ]]);
 
         $entry = new Entry;
