@@ -338,7 +338,7 @@ class TermsTest extends TestCase
      * @test
      * @dataProvider collectionAttachmentProvider
      **/
-    public function it_attaches_collection_during_augmentation($parentIsEntry, $handle)
+    public function it_attaches_collection_during_augmentation($parentIsEntry, $handle, $isRootLevel)
     {
         // Make sure there is an entry that uses the term.
         EntryFactory::collection('blog')->data(['tags' => ['one']])->create();
@@ -352,13 +352,17 @@ class TermsTest extends TestCase
             };
         }
 
-        $fieldtype = $this->fieldtype(['taxonomies' => 'tags'], $parent, $handle);
+        if (! $isRootLevel) {
+            $parentField = new Field('grid', ['type' => 'grid']);
+        }
+
+        $fieldtype = $this->fieldtype(['taxonomies' => 'tags'], $parent, $handle, $parentField ?? null);
 
         $augmented = $fieldtype->augment(['one']);
 
         $collection = $augmented->first()->collection();
 
-        if ($parentIsEntry && $handle === 'tags') {
+        if ($parentIsEntry && $handle === 'tags' && $isRootLevel) {
             $this->assertInstanceOf(CollectionContract::class, $collection);
         } else {
             $this->assertNull($collection);
@@ -368,10 +372,15 @@ class TermsTest extends TestCase
     public function collectionAttachmentProvider()
     {
         return [
-            'parent is entry and handle matches taxonomy' => [true, 'tags'],
-            'parent is entry and handle does not match taxonomy' => [true, 'related_tags'],
-            'parent is not entry and handle matches taxonomy' => [false, 'tags'],
-            'parent is not entry and handle does not match taxonomy' => [false, 'related_tags'],
+            'parent is entry and handle matches taxonomy' => [true, 'tags', true],
+            'parent is entry and handle does not match taxonomy' => [true, 'related_tags', true],
+            'parent is not entry and handle matches taxonomy' => [false, 'tags', true],
+            'parent is not entry and handle does not match taxonomy' => [false, 'related_tags', true],
+
+            'parent is entry, handle matches taxonomy, nested field' => [true, 'tags', false],
+            'parent is entry, handle does not match taxonomy, nested field' => [true, 'related_tags', false],
+            'parent is not entry, handle matches taxonomy, nested field' => [false, 'tags', false],
+            'parent is not entry, handle does not match taxonomy, nested field' => [false, 'related_tags', false],
         ];
     }
 
@@ -391,7 +400,7 @@ class TermsTest extends TestCase
         $this->fieldtype(['taxonomy' => 'categories'])->taxonomies();
     }
 
-    public function fieldtype($config = [], $parent = null, $handle = 'test')
+    public function fieldtype($config = [], $parent = null, $handle = 'test', $parentField = null)
     {
         $field = new Field($handle, array_merge([
             'type' => 'terms',
@@ -402,6 +411,10 @@ class TermsTest extends TestCase
         }
 
         $field->setParent($parent);
+
+        if ($parentField) {
+            $field->setParentField($parentField);
+        }
 
         return (new Terms)->setField($field);
     }
