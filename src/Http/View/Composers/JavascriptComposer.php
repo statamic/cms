@@ -47,7 +47,7 @@ class JavascriptComposer
             'locale' => config('app.locale'),
             'permissions' => $this->permissions($user),
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
-            'charmap' => ASCII::charsArray(),
+            'charmap' => ASCII::charsArray(config('statamic.sites.transliteration.symbols', false)),
         ]);
     }
 

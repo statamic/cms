@@ -80,11 +80,14 @@ class EntryTest extends TestCase
         ]]);
 
         $entry = new Entry;
-        $entry->slug('foo bar æøå');
+        $entry->slug('foo bar & æøå');
         $this->assertEquals('foo-bar-aeoa', $entry->slug());
 
+        config(['statamic.sites.transliteration.symbols' => true]);
+        $this->assertEquals('foo-bar-and-aeoa', $entry->slug());
+
         $entry->locale('da');
-        $this->assertEquals('foo-bar-aeoeaa', $entry->slug()); // danish replaces æøå with aeoeaa
+        $this->assertEquals('foo-bar-og-aeoeaa', $entry->slug()); // danish replaces æøå with aeoeaa
     }
 
     /** @test */
