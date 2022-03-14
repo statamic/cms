@@ -14,6 +14,8 @@ class LivePreview
 
         $item->repository()->substitute($item);
 
+        $request->headers->set('X-Statamic-Live-Preview', true);
+
         $response = $next($request);
 
         $response->headers->set('X-Statamic-Live-Preview', true);
