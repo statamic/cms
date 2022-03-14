@@ -75,6 +75,7 @@ return [
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Entries uit deze collectie zijn beschikbaar. Als je dit leeg laat zijn entries van collecties met een route beschikbaar.',
+    'link.config.container' => 'Kies welke asset-container voor dit veld gebruikt moet worden.',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Schakel in voor automatische regeleinden.',

@@ -83,6 +83,7 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $expectations = [
             'id'            => ['type' => 'string', 'value' => 'entry-id'],
+            'origin_id'     => ['type' => 'string', 'value' => 'origin-id'],
             'slug'          => ['type' => 'string', 'value' => 'entry-slug'],
             'uri'           => ['type' => 'string', 'value' => '/test/entry-slug'],
             'url'           => ['type' => 'string', 'value' => '/test/entry-slug'],

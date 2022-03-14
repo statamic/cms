@@ -279,6 +279,41 @@ abstract class Builder extends BaseBuilder
         });
     }
 
+    protected function filterWhereJsonContains($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return ! empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntContain($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (! is_array($value)) {
+                return true;
+            }
+
+            return empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonLength($values, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $values->filter(function ($value) use ($method, $where) {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return $this->{$method}(count($value), $where['value']);
+        });
+    }
+
     protected function filterWhereColumn($values, $where)
     {
         $whereColumnKeys = $this->getWhereColumnKeyValuesByIndex($where['value']);

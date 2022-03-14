@@ -164,6 +164,47 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function filterWhereJsonContains($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return ! empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntContain($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (! is_array($value)) {
+                return true;
+            }
+
+            return empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonLength($entries, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return $this->{$method}(count($value), $where['value']);
+        });
+    }
+
     protected function filterWhereDate($entries, $where)
     {
         $method = $this->operatorToCarbonMethod($where['operator']);

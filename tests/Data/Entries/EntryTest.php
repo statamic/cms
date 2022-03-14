@@ -82,9 +82,17 @@ class EntryTest extends TestCase
     /** @test */
     public function the_slug_gets_slugified()
     {
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'da' => ['locale' => 'da_DK', 'url' => '/da/'],
+        ]]);
+
         $entry = new Entry;
-        $entry->slug('foo bar');
-        $this->assertEquals('foo-bar', $entry->slug());
+        $entry->slug('foo bar æøå');
+        $this->assertEquals('foo-bar-aeoa', $entry->slug());
+
+        $entry->locale('da');
+        $this->assertEquals('foo-bar-aeoeaa', $entry->slug()); // danish replaces æøå with aeoeaa
     }
 
     /** @test */
@@ -338,9 +346,9 @@ class EntryTest extends TestCase
         config(['statamic.amp.enabled' => true]);
 
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
-            'en' => ['url' => 'http://domain.com/'],
-            'fr' => ['url' => 'http://domain.com/fr/'],
-            'de' => ['url' => 'http://domain.de/'],
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr_FR'],
+            'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
         ]]);
 
         $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->ampable(true)->routes([
@@ -676,7 +684,7 @@ class EntryTest extends TestCase
     public function it_gets_the_path_and_excludes_locale_when_theres_a_single_site()
     {
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
-            'en' => ['url' => '/'],
+            'en' => ['url' => '/', 'locale' => 'en_US'],
         ]]);
 
         $collection = tap(Facades\Collection::make('blog'))->save();
@@ -690,8 +698,8 @@ class EntryTest extends TestCase
     public function it_gets_the_path_and_includes_locale_when_theres_multiple_sites()
     {
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
-            'en' => ['url' => '/'],
-            'fr' => ['url' => '/'],
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/', 'locale' => 'fr_FR'],
         ]]);
 
         $collection = tap(Facades\Collection::make('blog'))->save();

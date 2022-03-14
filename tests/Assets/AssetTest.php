@@ -773,6 +773,22 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_no_ratio_when_height_is_zero()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('.meta/image.jpg.yaml', YAML::dump(['width' => '30', 'height' => '0']));
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+
+        $asset = (new Asset)->container($container)->path('image.jpg');
+
+        $this->assertEquals([30, 0], $asset->dimensions());
+        $this->assertEquals(30, $asset->width());
+        $this->assertEquals(0, $asset->height());
+        $this->assertEquals(null, $asset->ratio());
+    }
+
+    /** @test */
     public function it_gets_no_dimensions_for_non_images()
     {
         $file = UploadedFile::fake()->create('file.txt');

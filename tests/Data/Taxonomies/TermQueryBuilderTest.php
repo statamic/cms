@@ -476,4 +476,94 @@ class TermQueryBuilderTest extends TestCase
         Term::make('d')->taxonomy('tags')->data(['title' => 'Post 4', 'test_date' => '2020-09-13 14:44:24'])->save();
         Term::make('e')->taxonomy('tags')->data(['title' => 'Post 5', 'test_date' => null])->save();
     }
+
+    /** @test **/
+    public function terms_are_found_using_where_json_contains()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+
+        $entries = Term::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['1', '3'], $entries->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_where_json_doesnt_contain()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonDoesntContain('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->slug()->all());
+
+        $entries = Term::query()->whereJsonDoesntContain('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_or_where_json_contains()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1'])->orWhereJsonContains('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_or_where_json_doesnt_contain()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntContain('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['1', '3', '2', '4'], $entries->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_where_json_length()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonLength('test_taxonomy', 1)->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['2', '5'], $entries->map->slug()->all());
+    }
 }

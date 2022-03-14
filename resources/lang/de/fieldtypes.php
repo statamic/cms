@@ -75,6 +75,7 @@ return [
     'html.title' => 'HTML',
     'integer.title' => 'Ganzzahl',
     'link.config.collections' => 'Einträge aus diesen Sammlungen werden verfügbar sein. Bleibt dies leer, stehen die Einträge von gerouteten Sammlungen zur Verfügung.',
+    'link.config.container' => 'Datei-Container für dieses Feld auswählen.',
     'link.title' => 'Link',
     'list.title' => 'Liste',
     'markdown.config.automatic_line_breaks' => 'Aktiviert automatische Zeilenumbrüche.',

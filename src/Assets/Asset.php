@@ -641,6 +641,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             return null;
         }
 
+        if ($this->height() == 0) {
+            return null;
+        }
+
         return $this->width() / $this->height();
     }
 
