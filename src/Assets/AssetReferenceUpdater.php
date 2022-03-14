@@ -37,10 +37,15 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     {
         $this
             ->updateAssetsFieldValues($fields, $dottedPrefix)
-            ->updateLinkFieldValues($fields, $dottedPrefix)
-            ->updateBardFieldValues($fields, $dottedPrefix)
-            ->updateMarkdownFieldValues($fields, $dottedPrefix)
-            ->updateNestedFieldValues($fields, $dottedPrefix);
+            ->updateLinkFieldValues($fields, $dottedPrefix);
+
+        if (! is_null($this->newValue)) {
+            $this
+                ->updateBardFieldValues($fields, $dottedPrefix)
+                ->updateMarkdownFieldValues($fields, $dottedPrefix);
+        }
+
+        $this->updateNestedFieldValues($fields, $dottedPrefix);
     }
 
     /**
@@ -170,9 +175,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $pattern = '/([("]statamic:\/\/[^()"]*::)'.$this->originalValue.'([)"])/i';
 
-        $replacement = is_null($this->newValue)
-            ? ''
-            : '${1}'.$this->newValue.'${2}';
+        $replacement = '${1}'.$this->newValue.'${2}';
 
         $value = preg_replace($pattern, $replacement, $value, -1, $count);
 
@@ -209,7 +212,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             return;
         }
 
-        $value = "asset::{$this->container}::{$this->newValue}";
+        $value = $this->newValue ? "asset::{$this->container}::{$this->newValue}" : null;
 
         if ($originalValue === $value) {
             return;
@@ -261,7 +264,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 return $value === "asset::{$this->container}::{$this->originalValue}";
             })
             ->map(function () {
-                return $this->newValue ? "asset::{$this->container}::{$this->newValue}" : null;
+                return "asset::{$this->container}::{$this->newValue}";
             })
             ->each(function ($value, $key) use (&$bardPayload) {
                 if ($value) {
@@ -309,14 +312,10 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 return $value === "statamic://asset::{$this->container}::{$this->originalValue}";
             })
             ->map(function () {
-                return $this->newValue ? "statamic://asset::{$this->container}::{$this->newValue}" : null;
+                return "statamic://asset::{$this->container}::{$this->newValue}";
             })
             ->each(function ($value, $key) use (&$bardPayload) {
-                if ($value) {
-                    Arr::set($bardPayload, $key, $value);
-                } else {
-                    Arr::forget($bardPayload, Str::before($key, '.attrs.href'));
-                }
+                Arr::set($bardPayload, $key, $value);
             });
 
         if ($changed->isEmpty()) {
