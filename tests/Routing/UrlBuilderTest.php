@@ -122,4 +122,12 @@ class UrlBuilderTest extends TestCase
             $this->builder->merge(['foo' => 'foo', 'baz' => 'baz'])->build('/test/{{ foo }}/{{ bar }}/{{ baz }}')
         );
     }
+
+    /** @test */
+    public function it_keeps_dots()
+    {
+        $this->assertEquals('/blog/post.html', $this->builder->build('/blog/{{ slug }}.html'));
+        $this->assertEquals('/blog/post.aspx', $this->builder->build('/blog/{{ slug }}.aspx'));
+        $this->assertEquals('/blog/post.foo.bar', $this->builder->build('/blog/{{ slug }}.foo.bar'));
+    }
 }
