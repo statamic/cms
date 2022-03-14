@@ -64,13 +64,32 @@ EOT;
     public function test_node_parameter_paired_behavior()
     {
         /** @var AntlersNode $unPairedNode */
-        $unPairedNode = $this->parseNodes('{{ date format="H:i:s" }}')[0];
+        $unPairedNode = $this->parseNodes('{{ date format="H|i|s" }}')[0];
 
         /** @var AntlersNode $pairedNode */
-        $pairedNode = $this->parseNodes('{{ date format="H:i:s" }}{{ /date }}')[0];
+        $pairedNode = $this->parseNodes('{{ date format="H|i|s" }}{{ /date }}')[0];
 
-        $this->assertCount(1, $unPairedNode->getModifierParameterValues([]));
+        $this->assertCount(3, $unPairedNode->getModifierParameterValues([]));
         $this->assertCount(3, $pairedNode->getModifierParameterValues([]));
+    }
+
+    public function test_pipe_can_be_escaped_inside_modifier_parameters()
+    {
+        /** @var AntlersNode $node */
+        $node = $this->parseNodes('{{ date format="param\|one|param_two|param_three|param\|\|four|||final" }}')[0];
+
+        $parameters = $node->getModifierParameterValues([]);
+
+        $this->assertCount(7, $parameters);
+        $this->assertSame([
+            'param|one',
+            'param_two',
+            'param_three',
+            'param||four',
+            '',
+            '',
+            'final'
+        ], $parameters);
     }
 
     public function test_parameter_details_are_parsed()

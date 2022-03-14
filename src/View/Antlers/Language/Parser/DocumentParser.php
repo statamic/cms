@@ -831,6 +831,11 @@ class DocumentParser
         return array_key_exists($offsetCheck, $this->interpolationEndOffsets);
     }
 
+    public static function getPipeEscape()
+    {
+        return '__antlers:pipe'.GlobalRuntimeState::$environmentId;
+    }
+
     public static function getLeftBraceEscape()
     {
         return '__antlers:leftBrace'.GlobalRuntimeState::$environmentId;
@@ -839,6 +844,11 @@ class DocumentParser
     public static function getRightBraceEscape()
     {
         return '__antlers:rightBrace'.GlobalRuntimeState::$environmentId;
+    }
+
+    public static function getPipeEscapeArray()
+    {
+        return str_split(self::getPipeEscape());
     }
 
     private function getLeftBrace()

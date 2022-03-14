@@ -223,13 +223,13 @@ EOT;
     public function test_where()
     {
         $template = <<<'EOT'
-{{ games where="feeling:love" }}{{ title}}{{ /games }}
+{{ games where="feeling|love" }}{{ title}}{{ /games }}
 EOT;
 
         $this->assertSame('DominionNetrunner', $this->result($template));
 
         $template = <<<'EOT'
-{{ games where="{"feeling"}:{"love"}" }}{{ title}}{{ /games }}
+{{ games where="{"feeling"}|{"love"}" }}{{ title}}{{ /games }}
 EOT;
 
         $this->assertSame('DominionNetrunner', $this->result($template));
@@ -249,7 +249,7 @@ EOT;
     {
         $this->assertSame('AltruisticAlphaBlatheringBravoZealousZebra', $this->result('{{ complex sort="last_name" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
 
-        $this->assertSame('ZealousZebraBlatheringBravoAltruisticAlpha', $this->result('{{ complex sort="last_name:desc" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
+        $this->assertSame('ZealousZebraBlatheringBravoAltruisticAlpha', $this->result('{{ complex sort="last_name|desc" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
     }
 
     public function test_repeat()

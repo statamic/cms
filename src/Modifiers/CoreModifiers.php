@@ -770,10 +770,13 @@ class CoreModifiers extends Modifier
      */
     public function groupBy($value, $params)
     {
-        // Workaround for https://github.com/statamic/cms/issues/3614
-        // At the moment this modifier only works properly when using the param syntax.
-        $params = implode(':', $params);
-        $params = explode('|', $params);
+        if (config('statamic.antlers.version') != 'runtime') {
+            // Workaround for https://github.com/statamic/cms/issues/3614
+            // At the moment this modifier only works properly when using the param syntax.
+            $params = implode(':', $params);
+            $params = explode('|', $params);
+        }
+
         $groupBy = $params[0];
 
         $groupLabels = [];

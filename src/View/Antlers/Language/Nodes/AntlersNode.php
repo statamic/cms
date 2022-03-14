@@ -442,11 +442,11 @@ class AntlersNode extends AbstractNode
 
             $values[] = $value;
         } else {
-            if ($this->isClosedBy == null || $this->isSelfClosing) {
-                $values = explode('|', $value);
-            } else {
-                $values = explode(':', $value);
-            }
+            $pipeEscape = DocumentParser::getPipeEscape();
+
+            $values = array_map(function ($item) use ($pipeEscape) {
+                return str_replace($pipeEscape, DocumentParser::Punctuation_Pipe, $item);
+            }, explode('|', $value));
         }
 
         return array_values($values);
