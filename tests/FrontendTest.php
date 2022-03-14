@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Facades\Statamic\CP\LivePreview;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -231,10 +232,12 @@ class FrontendTest extends TestCase
     {
         $this->withStandardBlueprints();
 
-        $this->createPage('about')->published(false)->set('content', 'Testing 123')->save();
+        $page = tap($this->createPage('about')->published(false)->set('content', 'Testing 123'))->save();
+
+        LivePreview::tokenize('test-token', $page);
 
         $response = $this
-            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->get('/about?token=test-token')
             ->assertStatus(200)
             ->assertHeader('X-Statamic-Draft', true);
 
@@ -279,10 +282,12 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRendered('default', 'The template contents');
 
         tap($this->makeCollection()->dated(true)->futureDateBehavior('private'))->save();
-        tap($this->makePage('about')->date('2019-01-02'))->save();
+        $page = tap($this->makePage('about')->date('2019-01-02'))->save();
+
+        LivePreview::tokenize('test-token', $page);
 
         $this
-            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->get('/about?token=test-token')
             ->assertStatus(200)
             ->assertHeader('X-Statamic-Private', true);
     }
@@ -325,10 +330,12 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRendered('default', 'The template contents');
 
         tap($this->makeCollection()->dated(true)->pastDateBehavior('private'))->save();
-        tap($this->makePage('about')->date('2018-01-01'))->save();
+        $page = tap($this->makePage('about')->date('2018-01-01'))->save();
+
+        LivePreview::tokenize('test-token', $page);
 
         $this
-            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->get('/about?token=test-token')
             ->assertStatus(200)
             ->assertHeader('X-Statamic-Private', true);
     }
