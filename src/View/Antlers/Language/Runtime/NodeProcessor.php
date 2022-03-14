@@ -206,6 +206,8 @@ class NodeProcessor
      */
     private $validPhpOpenTags = ['<?php'];
 
+    private $lockedData = [];
+
     public function __construct(Loader $loader, EnvironmentDetails $envDetails)
     {
         $this->loader = $loader;
@@ -219,6 +221,17 @@ class NodeProcessor
         if (ini_get('short_open_tag')) {
             $this->validPhpOpenTags[] = '<?';
         }
+    }
+
+    public function createLockData()
+    {
+        $this->lockedData = $this->data;
+    }
+
+    public function restoreLockedData()
+    {
+        $this->data = $this->lockedData;
+        $this->lockedData = [];
     }
 
     /**
@@ -1758,7 +1771,7 @@ class NodeProcessor
                                                 if ($value == $regionName) {
                                                     $resolvedValue = $interpolationResult;
                                                 } else {
-                                                    $resolvedValue = str_replace($regionName, (string) $interpolationResult, $val);
+                                                    $resolvedValue = str_replace($regionName, (string)$interpolationResult, $value);
                                                 }
 
                                                 $paramValues[$paramName] = $resolvedValue;
