@@ -10,6 +10,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use voku\helper\ASCII;
 
 class JavascriptComposer
 {
@@ -56,6 +57,10 @@ class JavascriptComposer
                 'name' => $site->name(),
                 'handle' => $site->handle(),
                 'locale' => $site->shortLocale(),
+                'transliteration' => with($site, function ($site) {
+                    return ASCII::charsArrayWithOneLanguage(Str::lower($site->locale()), true, false)
+                        ?: ASCII::charsArrayWithOneLanguage($site->shortLocale(), true, false);
+                }),
             ];
         })->values();
     }
