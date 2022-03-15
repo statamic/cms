@@ -1,5 +1,15 @@
 # Release Notes
 
+## 3.3.0 (2022-03-15)
+
+### What's new
+- Official 3.3 release! 🎉
+
+### What's changed
+- Removed unused `toCacheableArray` methods from `Entry`, `AssetContainer`, and `User`. [#5506](https://github.com/statamic/cms/issues/5506) by @jasonvarga
+
+
+
 ## 3.3.0-beta.7 (2022-03-14)
 
 ### What's fixed
