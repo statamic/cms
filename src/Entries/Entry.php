@@ -19,6 +19,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
+use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
@@ -58,6 +59,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     }
 
     use HasDirtyState;
+    use SyncsOriginalState;
 
     protected $id;
     protected $collection;
@@ -326,6 +328,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $this->slug($this->slug());
 
         Facades\Entry::save($this);
+
+        $this->syncOriginal();
 
         if ($this->id()) {
             Blink::store('structure-uris')->forget($this->id());

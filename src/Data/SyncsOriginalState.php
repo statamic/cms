@@ -18,6 +18,10 @@ trait SyncsOriginalState
             }
         }
 
+        if (method_exists($this, 'getDirtyArray')) {
+            $this->original = array_merge($this->getDirtyArray(), $this->original);
+        }
+
         return $this;
     }
 

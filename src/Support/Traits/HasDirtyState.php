@@ -46,15 +46,4 @@ trait HasDirtyState
     {
         return ! $this->isDirty($properties);
     }
-
-    /**
-     * Get the original (non-dirty) values
-     *
-     * @param  null|string|array  $properties
-     * @return bool
-     */
-    public function getOriginal()
-    {
-        return ($fresh = $this->fresh()) ? $fresh->getDirtyArray() : [];
-    }
 }
