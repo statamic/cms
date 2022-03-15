@@ -84,22 +84,15 @@ class UrlBuilder implements UrlBuilderContract
     private function slugify($value)
     {
         $slashPlaceholder = strtolower(str_random());
+        $dotPlaceholder = strtolower(str_random());
 
         $value = str_replace('/', $slashPlaceholder, $value);
-
-        $hasDot = str_contains($value, '.');
-        if ($hasDot) {
-            $dotPlaceholder = strtolower(str_random());
-            $extension = '.'.Str::after($value, '.');
-            $value = str_replace($extension, $dotPlaceholder, $value);
-        }
+        $value = str_replace('.', $dotPlaceholder, $value);
 
         $value = Str::slug($value);
 
         $value = str_replace($slashPlaceholder, '/', $value);
-        if ($hasDot) {
-            $value = str_replace($dotPlaceholder, $extension, $value);
-        }
+        $value = str_replace($dotPlaceholder, '.', $value);
 
         return $value;
     }

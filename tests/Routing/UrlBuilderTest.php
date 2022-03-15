@@ -124,7 +124,7 @@ class UrlBuilderTest extends TestCase
     }
 
     /** @test */
-    public function it_keeps_dots()
+    public function it_preserves_dots_in_url()
     {
         $this->assertEquals('/blog/post.html', $this->builder->build('/blog/{{ slug }}.html'));
         $this->assertEquals('/blog/post.aspx', $this->builder->build('/blog/{{ slug }}.aspx'));
