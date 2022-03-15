@@ -18,6 +18,11 @@ class ArithmeticTest extends ParserTestCase
                 test_count; }}')));
     }
 
+    public function test_subtraction_operator()
+    {
+        $this->assertSame('2', $this->renderString('{{ 1--1 }}'));
+    }
+
     public function test_subtracting_negative_numbers()
     {
         $this->assertSame(0, (int) $this->evaluateRaw('-1 - -1'));
@@ -51,7 +56,7 @@ class ArithmeticTest extends ParserTestCase
 
     public function test_subtract_three_variables_and_get_result()
     {
-        $data = $this->evaluate('a = 27; b = 7; c = 10; d = a-b-c;', []);
+        $data = $this->evaluate('a = 27; b = 7; c = 10; d = a - b - c;', []);
         $this->assertSame(10, intval($data['d']));
     }
 
