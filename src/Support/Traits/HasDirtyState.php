@@ -21,7 +21,7 @@ trait HasDirtyState
         }
 
         if (! $properties) {
-            return (json_encode($currentValues) !== json_encode($originalValues));
+            return json_encode($currentValues) !== json_encode($originalValues);
         }
 
         if (! is_array($properties)) {
@@ -29,7 +29,6 @@ trait HasDirtyState
         }
 
         foreach ($properties as $property) {
-
             if (! array_key_exists($property, $currentValues)) {
                 $property = 'data.'.$property;
             }
