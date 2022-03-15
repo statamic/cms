@@ -15,6 +15,7 @@ use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
+use Statamic\StaticCaching\NoCache\NoCache;
 use Statamic\Support\Str;
 use Statamic\Tags;
 use Statamic\UpdateScripts as Updates;
@@ -149,6 +150,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Member::class,
         Tags\Mix::class,
         Tags\Nav::class,
+        NoCache::class,
         Tags\NotFound::class,
         Tags\Obfuscate::class,
         Tags\ParentTags::class,

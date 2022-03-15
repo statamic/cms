@@ -8,6 +8,7 @@ use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\StaticCaching\NoCache\NoCacheManager;
 use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
@@ -34,7 +35,7 @@ class StaticCacheManager extends Manager
 
     public function createApplicationDriver(array $config)
     {
-        return new ApplicationCacher($this->app[Repository::class], $config);
+        return new ApplicationCacher($this->app[Repository::class], $config, $this->app[NoCacheManager::class]);
     }
 
     protected function getConfig($name)

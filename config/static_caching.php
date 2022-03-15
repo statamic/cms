@@ -92,4 +92,7 @@ return [
 
     'ignore_query_strings' => false,
 
+    'replacers' => [
+        \Statamic\StaticCaching\Replacers\CsrfTokenReplacer::class,
+    ],
 ];
