@@ -1889,6 +1889,25 @@ class LanguageParser
                     $newNodes[] = $node;
                 }
                 continue;
+            } elseif ($node instanceof SubtractionOperator && $newNodeCount > 0) {
+                $left = $newNodes[$newNodeCount - 1];
+                $right = $tokens[$i + 1];
+
+                if ($left instanceof VariableNode && $right instanceof VariableNode) {
+                    $lDistance = NodeHelpers::distance($left, $node);
+                    $rDistance = NodeHelpers::distance($node, $right);
+
+                    if ($lDistance <= 1 && $rDistance <= 1) {
+                        NodeHelpers::mergeVarContentLeft('-', $node, $left);
+                        NodeHelpers::mergeVarContentLeft($right->name, $right, $left);
+                        $left->endPosition = $right->endPosition;
+                        $i += 1;
+                    } else {
+                        $newNodes[] = $node;
+                    }
+                } else {
+                    $newNodes[] = $node;
+                }
             } else {
                 $newNodes[] = $node;
             }

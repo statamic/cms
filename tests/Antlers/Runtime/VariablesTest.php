@@ -68,4 +68,37 @@ EOT;
             $template, $data
         ));
     }
+
+    public function test_variables_with_hyphens_resolve_their_values()
+    {
+        $data = [
+            'test' => 100,
+            'var' => 45,
+            'test-var' => 'The Value',
+            'var-one' => 100,
+            'var-two' => 45,
+            'array-test' => [
+                'key' => 'The Key',
+                'secret' => 'The Secret',
+            ],
+            'array-values' => [
+                'one',
+                'two',
+                'three',
+            ],
+            'play-sad_Trombone' => 'Test Value',
+            'sOmeth0adsfj89235-f9_23598sdfg3294sdf_-why_would-yoUdoThis-butletsS-e_e-W-h-a-t-H_a-p-p-e-n-s' => 'Hello',
+        ];
+
+        $this->assertSame('Hello', $this->renderString('{{ sOmeth0adsfj89235-f9_23598sdfg3294sdf_-why_would-yoUdoThis-butletsS-e_e-W-h-a-t-H_a-p-p-e-n-s }}', $data));
+        $this->assertSame('Test Value', $this->renderString('{{play-sad_Trombone }}', $data));
+        $this->assertSame('<The Value><100><45><55>', $this->renderString('<{{ test-var }}><{{ test }}><{{ var }}><{{ test - var }}>', $data));
+        $this->assertSame('<The Key><The Secret>', $this->renderString('<{{ array-test:key }}><{{array-test:secret}}>', $data));
+        $this->assertSame('<The Key><The Secret>', $this->renderString('{{ array-test }}<{{key}}><{{ secret }}>{{ /array-test }}', $data));
+        $this->assertSame('<one><two><three>', $this->renderString('{{array-values }}<{{ value}}>{{ /array-values}}', $data));
+        $this->assertSame('100', $this->renderString('{{ var-one }}', $data));
+        $this->assertSame('45', $this->renderString('{{ var-two }}', $data));
+        $this->assertSame('55', $this->renderString('{{ var-one - var-two }}', $data));
+        $this->assertSame('-55', $this->renderString('{{ -1 * var-one - -1 * var-two }}', $data));
+    }
 }
