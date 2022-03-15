@@ -1810,5 +1810,30 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
     }
 
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = tap((new Entry)->collection($collection)->locale('en')->id('en')->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ]))->save();
+
+        $this->assertEquals(false, $entry->isDirty());
+        $this->assertEquals(false, $entry->isDirty('title'));
+        $this->assertEquals(false, $entry->isDirty(['title']));
+
+        $entry->merge(['title' => 'French']);
+
+        $this->assertEquals(true, $entry->isDirty());
+        $this->assertEquals(true, $entry->isDirty('title'));
+        $this->assertEquals(true, $entry->isDirty(['title']));
+        $this->assertEquals(false, $entry->isDirty('food'));
+        $this->assertEquals(false, $entry->isDirty(['food']));
+    }
+
     // todo: add tests for localization things. in(), descendants(), addLocalization(), etc
 }
