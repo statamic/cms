@@ -12,13 +12,8 @@ trait HasDirtyState
      */
     public function isDirty($properties = null)
     {
-        $currentValues = $this->toCacheableArray();
-        $currentValues['data'] = $currentValues['data']->toArray();
-
-        $originalValues = ($fresh = $this->fresh()) ? $fresh->toCacheableArray() : [];
-        if ($fresh) {
-            $originalValues['data'] = $originalValues['data']->toArray();
-        }
+        $currentValues = $this->getDirtyArray();
+        $originalValues = $this->getOriginal();
 
         if (! $properties) {
             return json_encode($currentValues) !== json_encode($originalValues);
@@ -50,5 +45,16 @@ trait HasDirtyState
     public function isClean($properties = null)
     {
         return ! $this->isDirty($properties);
+    }
+
+    /**
+     * Get the original (non-dirty) values
+     *
+     * @param  null|string|array  $properties
+     * @return bool
+     */
+    public function getOriginal()
+    {
+        return ($fresh = $this->fresh()) ? $fresh->getDirtyArray() : [];
     }
 }

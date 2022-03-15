@@ -154,9 +154,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return new AugmentedEntry($this);
     }
 
-    public function toCacheableArray()
+    private function getDirtyArray()
     {
-        return [
+        return array_merge([
             'collection' => $this->collectionHandle(),
             'locale' => $this->locale(),
             'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
@@ -164,8 +164,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             'date' => optional($this->date())->format('Y-m-d-Hi'),
             'published' => $this->published(),
             'path' => $this->initialPath() ?? $this->path(),
-            'data' => $this->data(),
-        ];
+        ], $this->data()->toArray());
     }
 
     public function delete()
