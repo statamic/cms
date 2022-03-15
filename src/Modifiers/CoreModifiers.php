@@ -2630,6 +2630,10 @@ class CoreModifiers extends Modifier
         $key = Arr::get($params, 0);
         $val = Arr::get($params, 1);
 
+        if (! $val && Str::contains($key, ':')) {
+            [$key, $val] = explode(':', $key);
+        }
+
         $collection = collect($value)->where($key, $val);
 
         return $collection->values()->all();
