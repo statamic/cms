@@ -8,7 +8,6 @@ use Tests\Antlers\ParserTestCase;
 
 class VariableParsingTest extends ParserTestCase
 {
-
     public function test_variables_can_use_hyphens()
     {
         $nodes = $this->getParsedRuntimeNodes('{{ the-variable-name }}');
