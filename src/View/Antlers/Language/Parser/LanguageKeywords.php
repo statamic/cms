@@ -22,6 +22,10 @@ class LanguageKeywords
             return true;
         }
 
+        if (ctype_punct(substr($value, 0))) {
+            return true;
+        }
+
         return false;
     }
 }

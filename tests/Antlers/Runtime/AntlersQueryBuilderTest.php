@@ -5,6 +5,7 @@ namespace Tests\Antlers\Runtime;
 use Mockery;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Tags\Tags;
+use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
 use Tests\Antlers\ParserTestCase;
 
 class AntlersQueryBuilderTest extends ParserTestCase
@@ -83,5 +84,31 @@ EOT;
 EOT;
 
         $this->assertSame('<Foo, Baz, and Bar><source>', $this->renderString($template, $data, true));
+    }
+
+    public function test_query_builders_can_materialize_within_the_sandbox()
+    {
+        $clientData = [
+            ['title' => 'Foo'],
+            ['title' => 'Baz'],
+            ['title' => 'Bar'],
+        ];
+
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->once()->andReturn(collect($clientData));
+
+        $data = [
+            'clients' => $builder,
+        ];
+
+        VarTest::register();
+
+        $template = <<<'EOT'
+{{ var_test :variable="arr('clients' => clients)" }}
+EOT;
+
+        $this->renderString($template, $data, true);
+
+        $this->assertSame(['clients' => $clientData], VarTest::$var);
     }
 }

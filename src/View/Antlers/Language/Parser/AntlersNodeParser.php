@@ -496,6 +496,12 @@ class AntlersNodeParser
                     $peek = $chars[$i + 1];
                 }
 
+                if ($peek == DocumentParser::Punctuation_Pipe) {
+                    $currentChars = array_merge($currentChars, DocumentParser::getPipeEscapeArray());
+                    $i += 1;
+                    continue;
+                }
+
                 if ($peek == DocumentParser::String_EscapeCharacter) {
                     $currentChars[] = DocumentParser::String_EscapeCharacter;
                     $i += 1;

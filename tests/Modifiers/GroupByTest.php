@@ -204,7 +204,7 @@ class GroupByTest extends TestCase
             ]),
         ]);
 
-        $this->assertEquals($expected, $this->modify($items, 'when|a'));
+        $this->assertEquals($expected, $this->modify($items, ['when', 'a']));
     }
 
     /** @test */
@@ -248,7 +248,7 @@ class GroupByTest extends TestCase
             ]),
         ]);
 
-        $this->assertEquals($expected, $this->modify($items, 'when|a|F A'));
+        $this->assertEquals($expected, $this->modify($items, ['when', 'a', 'F A']));
     }
 
     public function modify($items, $value)

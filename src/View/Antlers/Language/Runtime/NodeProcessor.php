@@ -206,6 +206,8 @@ class NodeProcessor
      */
     private $validPhpOpenTags = ['<?php'];
 
+    private $lockedData = [];
+
     public function __construct(Loader $loader, EnvironmentDetails $envDetails)
     {
         $this->loader = $loader;
@@ -219,6 +221,17 @@ class NodeProcessor
         if (ini_get('short_open_tag')) {
             $this->validPhpOpenTags[] = '<?';
         }
+    }
+
+    public function createLockData()
+    {
+        $this->lockedData = $this->data;
+    }
+
+    public function restoreLockedData()
+    {
+        $this->data = $this->lockedData;
+        $this->lockedData = [];
     }
 
     /**
@@ -493,6 +506,10 @@ class NodeProcessor
             if ($node->pathReference->isStrictVariableReference) {
                 return false;
             }
+        }
+
+        if ($node->name->name == 'assets' && $node->name->methodPart == 'assets') {
+            return true;
         }
 
         $activeData = $this->getActiveData();
@@ -1337,7 +1354,7 @@ class NodeProcessor
                             GlobalRuntimeState::$yieldCount += 1;
                             // Wrap it in a partial thing.
                             $wrapName = 'section:'.$tagMethod.'__yield'.GlobalRuntimeState::$yieldCount;
-                            $bufferOverride = LiteralReplacementManager::registerRegion($wrapName, $output);
+                            $bufferOverride = LiteralReplacementManager::registerRegion($wrapName, $tagMethod, $output);
 
                             if (! array_key_exists(GlobalRuntimeState::$environmentId, GlobalRuntimeState::$yieldStacks)) {
                                 GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId] = [];
@@ -1378,6 +1395,7 @@ class NodeProcessor
 
                             LiteralReplacementManager::registerRegionReplacement(
                                 $sectionName,
+                                $tagMethod,
                                 $this->cascade->sections()->get($tagMethod)
                             );
 
@@ -1753,7 +1771,7 @@ class NodeProcessor
                                                 if ($value == $regionName) {
                                                     $resolvedValue = $interpolationResult;
                                                 } else {
-                                                    $resolvedValue = str_replace($regionName, (string) $interpolationResult, $val);
+                                                    $resolvedValue = str_replace($regionName, (string) $interpolationResult, $value);
                                                 }
 
                                                 $paramValues[$paramName] = $resolvedValue;
@@ -1784,7 +1802,9 @@ class NodeProcessor
                                     }
 
                                     if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
-                                        $val = $this->addLoopIterationVariables($val);
+                                        if (count($val) > 0 && ! is_object($val[0])) {
+                                            $val = $this->addLoopIterationVariables($val);
+                                        }
                                     }
 
                                     $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
@@ -2076,6 +2096,10 @@ class NodeProcessor
                 $value = $value->toArray();
             }
 
+            if ($value instanceof Arrayable) {
+                $value = $value->toArray();
+            }
+
             // If the value of the current iteration is *not* already an array (ie. we're
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
@@ -2103,7 +2127,7 @@ class NodeProcessor
         foreach ($loop as $index => &$data) {
             $data['prev'] = $prev;
 
-            if ($data['last'] == false) {
+            if ($data['last'] == false && array_key_exists($index + 1, $loop)) {
                 $data['next'] = $loop[$index + 1];
             } else {
                 $data['next'] = null;

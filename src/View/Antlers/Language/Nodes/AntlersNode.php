@@ -2,7 +2,6 @@
 
 namespace Statamic\View\Antlers\Language\Nodes;
 
-use Illuminate\Support\Str;
 use Statamic\Facades\Antlers;
 use Statamic\Tags\TagNotFoundException;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
@@ -443,22 +442,11 @@ class AntlersNode extends AbstractNode
 
             $values[] = $value;
         } else {
-            $splitParams = explode('|', $value);
-            $newParams = [];
+            $pipeEscape = DocumentParser::getPipeEscape();
 
-            foreach ($splitParams as $paramCandidate) {
-                if ($this->isClosedBy == null) {
-                    $newParams[] = $paramCandidate;
-                } else {
-                    if (Str::contains($paramCandidate, ':')) {
-                        $newParams = array_merge($newParams, explode(':', $paramCandidate));
-                    } else {
-                        $newParams[] = $paramCandidate;
-                    }
-                }
-            }
-
-            $values = $values + $newParams;
+            $values = array_map(function ($item) use ($pipeEscape) {
+                return str_replace($pipeEscape, DocumentParser::Punctuation_Pipe, $item);
+            }, explode('|', $value));
         }
 
         return array_values($values);
@@ -470,34 +458,7 @@ class AntlersNode extends AbstractNode
 
         /** @var ParameterNode $param */
         foreach ($this->parameters as $param) {
-            $value = $param->value;
-
-            if ($param->isVariableReference) {
-                $pathParser = new PathParser();
-                $retriever = new PathDataManager();
-                $retriever->setIsPaired($this->isClosedBy != null);
-                $value = $retriever->getData($pathParser->parse($value), $data);
-
-                $values[] = $value;
-                continue;
-            } else {
-                $splitParams = explode('|', $value);
-                $newParams = [];
-
-                foreach ($splitParams as $paramCandidate) {
-                    if ($this->isClosedBy == null) {
-                        $newParams[] = $paramCandidate;
-                    } else {
-                        if (Str::contains($paramCandidate, ':')) {
-                            $newParams = array_merge($newParams, explode(':', $paramCandidate));
-                        } else {
-                            $newParams[] = $paramCandidate;
-                        }
-                    }
-                }
-
-                $values = $values + $newParams;
-            }
+            $values += $this->getModifierParameterValuesForParameter($param, $data);
         }
 
         return array_values($values);

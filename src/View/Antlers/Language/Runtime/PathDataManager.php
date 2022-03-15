@@ -142,6 +142,20 @@ class PathDataManager
      */
     private $isForArrayIndex = false;
 
+    private function lockData()
+    {
+        if ($this->nodeProcessor != null) {
+            $this->nodeProcessor->createLockData();
+        }
+    }
+
+    private function unlockData()
+    {
+        if ($this->nodeProcessor != null) {
+            $this->nodeProcessor->restoreLockedData();
+        }
+    }
+
     /**
      * Sets the internal environment reference.
      *
@@ -396,7 +410,11 @@ class PathDataManager
 
                 $this->reducedVar = $interceptResult;
             } else {
-                throw new RuntimeException('Not enough context to resolve: '.$pathItem->name);
+                $this->reducedVar = $builderCheckValue->get();
+
+                if ($this->reducedVar instanceof Collection) {
+                    $this->reducedVar = $this->reducedVar->all();
+                }
             }
         }
     }
@@ -517,7 +535,9 @@ class PathDataManager
                             // If we have more steps in the path to take, but we are
                             // not a tag pair, we need to reduce anyway so we
                             // can descend further into the nested values.
+                            $this->lockData();
                             $this->reducedVar = self::reduce($this->reducedVar, true, $this->shouldDoValueIntercept);
+                            $this->unlockData();
                         }
 
                         continue;
@@ -540,7 +560,9 @@ class PathDataManager
                                     // not a tag pair, we need to reduce anyway so we
                                     // can descend further into the nested values.
                                     if (! $pathItem->isFinal) {
+                                        $this->lockData();
                                         $this->reducedVar = self::reduce($this->reducedVar, true, $this->shouldDoValueIntercept);
+                                        $this->unlockData();
                                     }
                                 }
 
@@ -656,6 +678,12 @@ class PathDataManager
             }
         }
 
+        if ($this->reducedVar instanceof Augmentable) {
+            $this->lockData();
+            $this->reducedVar = self::reduce($this->reducedVar);
+            $this->unlockData();
+        }
+
         if (is_object($this->reducedVar) && method_exists($this->reducedVar, Str::camel($varPath))) {
             $this->reducedVar = call_user_func_array([$this->reducedVar, Str::camel($varPath)], []);
             $this->resolvedPath[] = '{method:'.$varPath.'}';
@@ -675,8 +703,12 @@ class PathDataManager
                         $this->compact(false);
                     }
                 }
-                if ($path instanceof PathNode && ! $path->isFinal) {
-                    $this->doBreak = false;
+                if ($path instanceof PathNode) {
+                    if ($path->isFinal) {
+                        $this->doBreak = true;
+                    } else {
+                        $this->doBreak = false;
+                    }
                 }
             } else {
                 $this->reducedVar = null;

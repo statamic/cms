@@ -2,6 +2,8 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Tests\Antlers\ParserTestCase;
@@ -221,13 +223,13 @@ EOT;
     public function test_where()
     {
         $template = <<<'EOT'
-{{ games where="feeling:love" }}{{ title}}{{ /games }}
+{{ games where="feeling|love" }}{{ title}}{{ /games }}
 EOT;
 
         $this->assertSame('DominionNetrunner', $this->result($template));
 
         $template = <<<'EOT'
-{{ games where="{"feeling"}:{"love"}" }}{{ title}}{{ /games }}
+{{ games where="{"feeling"}|{"love"}" }}{{ title}}{{ /games }}
 EOT;
 
         $this->assertSame('DominionNetrunner', $this->result($template));
@@ -247,7 +249,7 @@ EOT;
     {
         $this->assertSame('AltruisticAlphaBlatheringBravoZealousZebra', $this->result('{{ complex sort="last_name" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
 
-        $this->assertSame('ZealousZebraBlatheringBravoAltruisticAlpha', $this->result('{{ complex sort="last_name:desc" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
+        $this->assertSame('ZealousZebraBlatheringBravoAltruisticAlpha', $this->result('{{ complex sort="last_name|desc" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
     }
 
     public function test_repeat()
@@ -468,5 +470,65 @@ EOT;
                 'string' => 'testing explode modifiers',
             ], true)
         );
+    }
+
+    public function test_runtime_maintains_arrays_of_objects()
+    {
+        $entryOne = new SimpleEntryObject();
+        $entryOne->date = Carbon::parse('October 1st, 2012');
+        $entryOne->title = 'Title One';
+
+        $entryTwo = new SimpleEntryObject();
+        $entryTwo->date = Carbon::parse('November 1st, 2012');
+        $entryTwo->title = 'The Second Title';
+
+        $template = <<<'EOT'
+{{ entries group_by="date|M" }}
+{{ groups scope="month" }}
+<{{ month:group }}>
+{{ items }}
+<{{ title }}><{{ title_length }}>
+{{ /items }}
+{{ /groups }}
+{{ /entries }}
+EOT;
+
+        $expected = <<<'EOT'
+<Oct>
+
+<Title One><9>
+
+
+<Nov>
+
+<The Second Title><16>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [
+            'entries' => [
+                $entryOne, $entryTwo,
+            ],
+        ], true)));
+    }
+}
+
+class SimpleEntryObject implements Arrayable
+{
+    public $title = '';
+
+    public $date = null;
+
+    public function toAugmentedArray()
+    {
+        return [
+            'title' => $this->title,
+            'date' => $this->date,
+            'title_length' => strlen($this->title),
+        ];
+    }
+
+    public function toArray()
+    {
+        return $this->toAugmentedArray();
     }
 }
