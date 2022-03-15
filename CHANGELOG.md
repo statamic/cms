@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.3.0-beta.7 (2022-03-14)
+
+### What's fixed
+- Another handful of Antlers Runtime Bugfixes. [#5477](https://github.com/statamic/cms/issues/5477) by @JohnathonKoster
+- Fix drafts not being visible in Live Preview. [#5493](https://github.com/statamic/cms/issues/5493) by @jasonvarga
+- Use tokens for determining if a request is Live Preview. [#5495](https://github.com/statamic/cms/issues/5495) by @jasonvarga
+- Fix terms being filtered out unintentionally. [#5474](https://github.com/statamic/cms/issues/5474) by @jasonvarga
+- Fix `ExtractInfo` size call between Laravel 8 and 9. [#5470](https://github.com/statamic/cms/issues/5470) by @jesseleite
+- Modifiers convert `Values` objects to arrays [#5464](https://github.com/statamic/cms/issues/5464) by @jasonvarga
+- The `pluck` modifier supports `ArrayAccess` types [#5462](https://github.com/statamic/cms/issues/5462) by @jasonvarga
+- Regex parser can handle when tags return query builders [#5461](https://github.com/statamic/cms/issues/5461) by @jasonvarga
+- Explicitly support colon syntax in `where` modifier to avoid a breaking change. [#5499](https://github.com/statamic/cms/issues/5499) by @jasonvarga
+
+### What's changed
+- Modifiers in parameter syntax have pipe-delimited arguments. [#5477](https://github.com/statamic/cms/issues/5477) by @JohnathonKoster
+
+
+
 ## 3.3.0-beta.6 (2022-03-09)
 
 ### What's new
@@ -13,6 +31,9 @@
 - Bump minimum `league/commonmark` version. [#5434](https://github.com/statamic/cms/issues/5434) by @jesseleite
 - Bump `ajthinking/archetype` to v1. [#5440](https://github.com/statamic/cms/issues/5440) by @ajthinking
 - Bring over pending changes from 3.2
+
+### What's changed
+- Grid/Replicator/Bard now augment to `Values` instance rather than arrays. [#5436](https://github.com/statamic/cms/issues/5436) by @jasonvarga
 
 
 
