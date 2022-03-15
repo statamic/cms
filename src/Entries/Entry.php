@@ -151,20 +151,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return new AugmentedEntry($this);
     }
 
-    public function toCacheableArray()
-    {
-        return [
-            'collection' => $this->collectionHandle(),
-            'locale' => $this->locale(),
-            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
-            'slug' => $this->slug(),
-            'date' => optional($this->date())->format('Y-m-d-Hi'),
-            'published' => $this->published(),
-            'path' => $this->initialPath() ?? $this->path(),
-            'data' => $this->data(),
-        ];
-    }
-
     public function delete()
     {
         if ($this->descendants()->map->fresh()->filter()->isNotEmpty()) {
