@@ -458,11 +458,6 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         ];
     }
 
-    public function toCacheableArray()
-    {
-        return $this->fileData();
-    }
-
     public function queryAssets()
     {
         return Facades\Asset::query()->where('container', $this);

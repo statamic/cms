@@ -296,17 +296,6 @@ class User extends BaseUser
         return $this;
     }
 
-    public function toCacheableArray()
-    {
-        return [
-            'path' => $this->path(),
-            'email' => $this->email,
-            'password' => $this->password,
-            'data' => $this->data(),
-            'preferences' => $this->preferences(),
-        ];
-    }
-
     public function lastLogin()
     {
         $last_login = $this->getMeta('last_login');
