@@ -2,6 +2,7 @@
 
 namespace Statamic\Modifiers;
 
+use ArrayAccess;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
@@ -9,6 +10,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
@@ -29,8 +31,9 @@ class CoreModifiers extends Modifier
     /**
      * Adds values together with science. Context aware.
      *
-     * @param $value
-     * @param $params
+     * @param  int  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return mixed
      */
     public function add($value, $params, $context)
@@ -41,8 +44,8 @@ class CoreModifiers extends Modifier
     /**
      * Adds a query param matching the specified key/value pair.
      *
-     * @param $value
-     * @param $params
+     * @param  string  $value
+     * @param  array  $params
      * @return string
      */
     public function addQueryParam($value, $params)
@@ -51,7 +54,7 @@ class CoreModifiers extends Modifier
             // Remove anchor from the URL.
             $url = strtok($value, '#');
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and prepend it with a "#" if a value is retrieved.
             $fragment = parse_url($value, PHP_URL_FRAGMENT);
             $anchor = is_null($fragment) ? '' : "#{$fragment}";
 
@@ -81,8 +84,8 @@ class CoreModifiers extends Modifier
     /**
      * Creates a sentence list from the given array and the ability to set the glue.
      *
-     * @param $value
-     * @param $params
+     * @param  array|string  $value
+     * @param  array  $params
      * @return string
      */
     public function ampersandList($value, $params)
@@ -101,7 +104,7 @@ class CoreModifiers extends Modifier
      * Alias an array variable.
      *
      * @param $value
-     * @param $params
+     * @param  array  $params
      * @return array|void
      */
     public function alias($value, $params)
@@ -119,7 +122,7 @@ class CoreModifiers extends Modifier
      * Returns an ASCII version of the string. A set of non-ASCII characters are replaced with their
      * closest ASCII counterparts, and the rest are removed unless instructed otherwise.
      *
-     * @param $value
+     * @param  string  $value
      * @return string
      */
     public function ascii($value)
@@ -157,8 +160,8 @@ class CoreModifiers extends Modifier
     /**
      * Removes a given number ($param[0]) of characters from the end of a variable.
      *
-     * @param $value
-     * @param $params
+     * @param  array|string  $value
+     * @param  array  $params
      * @return array|false|string
      */
     public function backspace($value, $params)
@@ -168,6 +171,15 @@ class CoreModifiers extends Modifier
         }
 
         return substr($value, 0, -$params[0]);
+    }
+
+    public function boolString($value)
+    {
+        if ($value == true) {
+            return 'true';
+        }
+
+        return 'false';
     }
 
     /**
@@ -208,7 +220,8 @@ class CoreModifiers extends Modifier
     /**
      * Breaks arrays or collections into smaller ones of a given size.
      *
-     * @param $value
+     * @param  $value
+     * @param  array  $params
      * @return array
      */
     public function chunk($value, $params)
@@ -221,10 +234,15 @@ class CoreModifiers extends Modifier
             ->all();
     }
 
+    public function className($value)
+    {
+        return get_class($value);
+    }
+
     /**
      * Collapses an array of arrays into a flat array.
      *
-     * @param $value
+     * @param  array  $value
      * @return array
      */
     public function collapse($value)
@@ -280,14 +298,14 @@ class CoreModifiers extends Modifier
      * Returns true if the string contains $needle, false otherwise. By default,
      * the comparison is case-insensitive, but can be made sensitive by setting $params[1] to true.
      *
-     * @param $value
-     * @param $params
-     * @param $context
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function contains($haystack, $params, $context)
     {
-        $needle = Arr::get($context, $params[0], $params[0]);
+        $needle = $this->getFromContext($context, $params);
 
         if (is_array($haystack)) {
             if (Arr::isAssoc($haystack)) {
@@ -304,14 +322,16 @@ class CoreModifiers extends Modifier
      * Returns true if the string contains all needles ($params), false otherwise. Will check context before
      * assuming it's a locally defined set. Case-insensitive.
      *
-     * @param $value
-     * @param $params
-     * @param $context
+     * @param  string  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function containsAll($value, $params, $context)
     {
-        $needles = Arr::get($context, $params[0], $params);
+        $needles = $this->usingRuntimeMethodSyntax($context) ?
+                $params :
+                Arr::get($context, $params[0], $params);
 
         return Stringy::containsAll($value, $needles);
     }
@@ -332,11 +352,14 @@ class CoreModifiers extends Modifier
      * Returns the number of items in an array.
      *
      * @param  $value
-     * @param  $params
      * @return int
      */
-    public function count($value, $params)
+    public function count($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            return $value->count();
+        }
+
         return count($value);
     }
 
@@ -370,7 +393,7 @@ class CoreModifiers extends Modifier
      * Get the date difference in days.
      *
      * @param  Carbon  $value
-     * @param $params
+     * @param  array  $params
      * @return int
      */
     public function daysAgo($value, $params)
@@ -535,8 +558,8 @@ class CoreModifiers extends Modifier
     /**
      * Just like the PHP method, breaks a string into an array on a specified key, $params[0].
      *
-     * @param $value
-     * @param $params
+     * @param  string  $value
+     * @param  array  $params
      * @return array
      */
     public function explode($value, $params)
@@ -548,10 +571,9 @@ class CoreModifiers extends Modifier
      * Returns the file extension of a given filename.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function extension($value, $params)
+    public function extension($value)
     {
         return pathinfo($value, PATHINFO_EXTENSION);
     }
@@ -560,12 +582,11 @@ class CoreModifiers extends Modifier
      * Generate a link to a Favicon file.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function favicon($value, $params)
+    public function favicon($value)
     {
-        return Html::favicon($value, $this->buildAttributesFromParameters($params));
+        return Html::favicon($value);
     }
 
     /**
@@ -598,7 +619,7 @@ class CoreModifiers extends Modifier
     /**
      * Swaps the keys with their corresponding values.
      *
-     * @param $value
+     * @param  array  $value
      * @return array
      */
     public function flip($value)
@@ -675,10 +696,9 @@ class CoreModifiers extends Modifier
      * Replace /absolute/urls with http://domain.com/urls.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function fullUrls($value, $params)
+    public function fullUrls($value)
     {
         $domain = Site::current()->absoluteUrl();
 
@@ -691,6 +711,7 @@ class CoreModifiers extends Modifier
      * Get any variable from a relationship.
      *
      * @param $value
+     * @param $params
      * @return string
      */
     public function get($value, $params)
@@ -746,14 +767,17 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return Collection
      */
     public function groupBy($value, $params)
     {
-        // Workaround for https://github.com/statamic/cms/issues/3614
-        // At the moment this modifier only works properly when using the param syntax.
-        $params = implode(':', $params);
-        $params = explode('|', $params);
+        if (config('statamic.antlers.version') != 'runtime') {
+            // Workaround for https://github.com/statamic/cms/issues/3614
+            // At the moment this modifier only works properly when using the param syntax.
+            $params = implode(':', $params);
+            $params = explode('|', $params);
+        }
+
         $groupBy = $params[0];
 
         $groupLabels = [];
@@ -779,7 +803,7 @@ class CoreModifiers extends Modifier
     {
         $value = is_object($item)
             ? $this->getGroupByValueFromObject($item, $groupBy)
-            : $item[$groupBy];
+            : $this->getGroupByValueFromArray($item, $groupBy);
 
         if ($value instanceof Value) {
             $value = $value->value();
@@ -795,6 +819,13 @@ class CoreModifiers extends Modifier
         $context = $item->toAugmentedArray($keys);
 
         return Antlers::parser()->getVariable($groupBy, $context);
+    }
+
+    private function getGroupByValueFromArray($item, $groupBy)
+    {
+        $groupBy = str_replace(':', '.', $groupBy);
+
+        return Arr::get($item, $groupBy);
     }
 
     private function handleGroupByDateValue($value, $params, &$groupLabels)
@@ -819,7 +850,7 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains a lowercase character, false otherwise.
      *
-     * @param $value
+     * @param  string  $value
      * @return bool
      */
     public function hasLowerCase($value)
@@ -830,7 +861,7 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains an uppercase character, false otherwise.
      *
-     * @param $value
+     * @param  string  $value
      * @return bool
      */
     public function hasUpperCase($value)
@@ -902,7 +933,7 @@ class CoreModifiers extends Modifier
             return false;
         }
 
-        $needle = Arr::get($context, $params[0], $params);
+        $needle = $this->getFromContext($context, $params);
 
         if (is_array($needle) && count($needle) === 1) {
             $needle = $needle[0];
@@ -940,9 +971,7 @@ class CoreModifiers extends Modifier
      */
     public function isAfter($value, $params, $context)
     {
-        $date = $this->carbon(Arr::get($context, $params[0], $params[0]));
-
-        return $this->carbon($value)->gt($date);
+        return $this->carbon($value)->gt($this->carbon($this->getFromContext($context, $params)));
     }
 
     /**
@@ -988,9 +1017,7 @@ class CoreModifiers extends Modifier
      */
     public function isBefore($value, $params, $context)
     {
-        $date = $this->carbon(Arr::get($context, $params[0], $params[0]));
-
-        return $this->carbon($value)->lt($date);
+        return $this->carbon($value)->lt($this->carbon($this->getFromContext($context, $params)));
     }
 
     /**
@@ -1003,10 +1030,10 @@ class CoreModifiers extends Modifier
      */
     public function isBetween($value, $params, $context)
     {
-        $date1 = $this->carbon(Arr::get($context, $params[0], $params[0]));
-        $date2 = $this->carbon(Arr::get($context, $params[1], $params[1]));
-
-        return $this->carbon($value)->between($date1, $date2);
+        return $this->carbon($value)->between(
+                $this->carbon($this->getFromContext($context, $params, 0)),
+                $this->carbon($this->getFromContext($context, $params, 1))
+        );
     }
 
     /**
@@ -1034,7 +1061,7 @@ class CoreModifiers extends Modifier
     /**
      * Checks to see if an array is empty. Like, for realsies.
      *
-     * @param $value
+     * @param  mixed  $value
      * @return bool
      */
     public function isEmpty($value)
@@ -1210,10 +1237,9 @@ class CoreModifiers extends Modifier
      * Converts a string to kebab-case.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function kebab($value, $params)
+    public function kebab($value)
     {
         return Str::kebab($value);
     }
@@ -1253,6 +1279,10 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            return $value->count();
+        }
+
         if ($value instanceof Arrayable) {
             $value = $value->toArray();
         }
@@ -1263,8 +1293,8 @@ class CoreModifiers extends Modifier
     /**
      * Limit the number of items in an array.
      *
-     * @param $value
-     * @param $params
+     * @param  array|Collection  $value
+     * @param  array  $params
      * @return array|Collection
      */
     public function limit($value, $params)
@@ -1320,8 +1350,8 @@ class CoreModifiers extends Modifier
      * Rough macro prototype that only uses CoreModifiers.
      *
      * @param $value
-     * @param $params
-     * @param $context
+     * @param  array  $params
+     * @param  array  $context
      * @return mixed
      */
     public function macro($value, $params, $context)
@@ -1353,6 +1383,7 @@ class CoreModifiers extends Modifier
      * Parse content as Markdown.
      *
      * @param $value
+     * @param  array  $params
      * @return mixed
      */
     public function markdown($value, $params)
@@ -1415,13 +1446,13 @@ class CoreModifiers extends Modifier
      */
     public function mod($value, $params, $context)
     {
-        $number = Arr::get($context, $params[0], $params[0]);
+        $number = $this->getFromContext($context, $params);
 
         return $value % $number;
     }
 
     /**
-     * Alters the timestamp by incrementing or decremting in a format acceted by strtotime().
+     * Alters the timestamp by incrementing or decrementing in a format accepted by strtotime().
      *
      * @link http://php.net/manual/en/function.strtotime.php
      *
@@ -1517,8 +1548,8 @@ class CoreModifiers extends Modifier
     /**
      * Turn an array into an ordered list.
      *
-     * @param $value
-     * @param $params
+     * @param  array  $value
+     * @param  array  $params
      * @return string
      */
     public function ol($value, $params)
@@ -1529,8 +1560,8 @@ class CoreModifiers extends Modifier
     /**
      * Turn an array into a pipe delimited list.
      *
-     * @param $value
-     * @param $params
+     * @param  array|Collection|string  $value
+     * @param  array  $params
      * @return string
      */
     public function optionList($value, $params)
@@ -1553,8 +1584,8 @@ class CoreModifiers extends Modifier
     /**
      * Offset the items in an array.
      *
-     * @param $value
-     * @param $params
+     * @param  array|Collection  $value
+     * @param  array  $params
      * @return array|Collection
      */
     public function offset($value, $params)
@@ -1588,14 +1619,14 @@ class CoreModifiers extends Modifier
     /**
      * Renders an array variable with a partial, context aware.
      *
-     * @param $value
-     * @param $params
-     * @param $context
+     * @param  array  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return string
      */
     public function partial($value, $params, $context)
     {
-        $name = Arr::get($context, $params[0], $params[0]);
+        $name = $this->getFromContext($context, $params);
 
         $partial = 'partials/'.$name.'.html';
 
@@ -1605,12 +1636,11 @@ class CoreModifiers extends Modifier
     /**
      * Plucks values from a collection of items.
      *
-     * @param $value
-     * @param $params
-     * @param $context
-     * @return string
+     * @param  array|Collection  $value
+     * @param  array  $params
+     * @return array|Collection
      */
-    public function pluck($value, $params, $context)
+    public function pluck($value, $params)
     {
         $key = $params[0];
 
@@ -1618,8 +1648,12 @@ class CoreModifiers extends Modifier
             $value = collect($value);
         }
 
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         $items = $value->map(function ($item) use ($key) {
-            if (is_array($item)) {
+            if (is_array($item) || $item instanceof ArrayAccess) {
                 return Arr::get($item, $key);
             }
 
@@ -1632,16 +1666,16 @@ class CoreModifiers extends Modifier
     /**
      * Get the plural form of an English word with access to $context.
      *
-     * @param $value
-     * @param $params
-     * @param $context
+     * @param  string  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return string
      */
     public function plural($value, $params, $context)
     {
         $count = Arr::get($params, 0);
 
-        if (! is_numeric($count)) {
+        if (! is_numeric($count) && ! $this->usingRuntimeMethodSyntax($context)) {
             $count = (int) Arr::get($context, $count);
         }
 
@@ -1766,8 +1800,8 @@ class CoreModifiers extends Modifier
     /**
      * Removes a query param matching the specified key if it exists.
      *
-     * @param $value
-     * @param $params
+     * @param  string  $value
+     * @param  array  $params
      * @return string
      */
     public function removeQueryParam($value, $params)
@@ -1780,7 +1814,7 @@ class CoreModifiers extends Modifier
             // Parse the URL to retrieve the possible query string and anchor.
             $parsedUrl = parse_url($value);
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and prepend it with a "#" if a value is retrieved.
             $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
 
             // Build an associative array based on the query string.
@@ -1818,9 +1852,11 @@ class CoreModifiers extends Modifier
     public function repeat($value, $params, $context)
     {
         $times = Arr::get($params, 0, 1);
-        $times = is_numeric($times) ? $times : Arr::get($context, $times);
 
-        $times = ($times instanceof Value) ? $times->value() : $times;
+        if (! $this->usingRuntimeMethodSyntax($context)) {
+            $times = is_numeric($times) ? $times : Arr::get($context, $times);
+            $times = ($times instanceof Value) ? $times->value() : $times;
+        }
 
         return str_repeat($value, $times);
     }
@@ -1840,13 +1876,13 @@ class CoreModifiers extends Modifier
     /**
      * Reverses the order of a string or list.
      *
-     * @param $value
+     * @param  string|array|Collection  $value
      * @return mixed
      */
     public function reverse($value)
     {
         if ($value instanceof Collection) {
-            return $value->reverse();
+            return $value->reverse()->values()->all();
         }
 
         if (is_array($value)) {
@@ -1899,8 +1935,8 @@ class CoreModifiers extends Modifier
     /**
      * Place variables in a scope.
      *
-     * @param  $value
-     * @param  $params
+     * @param  array|Collection  $value
+     * @param  array  $params
      * @return array
      */
     public function scope($value, $params)
@@ -1931,7 +1967,7 @@ class CoreModifiers extends Modifier
 
         // Support a variable name
         if (! is_numeric($segment)) {
-            $segment = Arr::get($context, $segment);
+            $segment = $this->getFromContext($context, $params);
         }
 
         $url = parse_url($value);
@@ -1961,8 +1997,8 @@ class CoreModifiers extends Modifier
     /**
      * Creates a sentence list from the given array and the ability to set the glue.
      *
-     * @param $value
-     * @param $params
+     * @param  array|Collection|string  $value
+     * @param  array  $params
      * @return string
      */
     public function sentenceList($value, $params)
@@ -1985,8 +2021,8 @@ class CoreModifiers extends Modifier
      * Sets a query param matching the specified key/value pair.
      * If the key exists, its value gets updated. Else, the key/value pair gets added.
      *
-     * @param $value
-     * @param $params
+     * @param  string  $value
+     * @param  array  $params
      * @return string
      */
     public function setQueryParam($value, $params)
@@ -1999,7 +2035,7 @@ class CoreModifiers extends Modifier
             // Parse the URL to retrieve the possible query string and anchor.
             $parsedUrl = parse_url($value);
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and prepend it with a "#" if a value is retrieved.
             $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
 
             // Build an associative array based on the query string.
@@ -2017,28 +2053,29 @@ class CoreModifiers extends Modifier
     /**
      * Because sometimes you just gotta /shrug.
      *
-     * @param $value
      * @return string
      */
-    public function shrug($value)
+    public function shrug()
     {
         return '¯\_(ツ)_/¯';
     }
 
     /**
-     * Shuffles arrays or strings. Multibye friendly.
+     * Shuffles arrays or strings. Multibyte friendly.
      *
-     * @param $value
+     * @param  array|string|Collection  $value
      * @return array|string
      */
-    public function shuffle($value)
+    public function shuffle($value, array $params)
     {
+        $seed = Arr::get($params, 0);
+
         if (is_array($value)) {
-            return collect($value)->shuffle()->all();
+            return collect($value)->shuffle($seed)->all();
         }
 
         if ($value instanceof Collection) {
-            return $value->shuffle();
+            return $value->shuffle($seed);
         }
 
         return Stringy::shuffle($value);
@@ -2074,10 +2111,9 @@ class CoreModifiers extends Modifier
      * Parse with SmartyPants. Aren't you fancy?
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function smartypants($value, $params)
+    public function smartypants($value)
     {
         return Html::smartypants($value);
     }
@@ -2086,10 +2122,9 @@ class CoreModifiers extends Modifier
      * Converts a string to snake_case.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function snake($value, $params)
+    public function snake($value)
     {
         return Str::snake($value);
     }
@@ -2097,9 +2132,9 @@ class CoreModifiers extends Modifier
     /**
      * Sort an array by key $params[0] and direction $params[1].
      *
-     * @param $value
-     * @param $params
-     * @return array
+     * @param  array|Collection  $value
+     * @param  array  $params
+     * @return array|Collection
      */
     public function sort($value, $params)
     {
@@ -2133,10 +2168,9 @@ class CoreModifiers extends Modifier
      * Strip whitespace from HTML.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function spaceless($value, $params)
+    public function spaceless($value)
     {
         $nolb = str_replace(["\r", "\n"], '', $value);
         $nospaces = preg_replace('/\s+/', ' ', $nolb);
@@ -2187,15 +2221,10 @@ class CoreModifiers extends Modifier
      */
     public function stripTags($value, $params, $context)
     {
-        $tag_var = Arr::get($params, 0);
+        $tags = Arr::get($params, 0, []);
 
-        // When used in a macro without specifying any tags, the tag list will just be the boolean
-        // value `true`. In that case, we'll use an empty to indicate "all the tags". Otherwise,
-        // we'll get the tag list from the context, and then finally just an array of tags.
-        if ($tag_var === true) {
-            $tags = [];
-        } else {
-            $tags = ($tag_var) ? Arr::get($context, $tag_var, $params) : $params;
+        if (! $this->usingRuntimeMethodSyntax($context)) {
+            $tags = ($tags) ? Arr::get($context, $tags, $params) : $params;
         }
 
         return Str::stripTags($value, (array) $tags);
@@ -2205,10 +2234,9 @@ class CoreModifiers extends Modifier
      * Converts a string to StudlyCase.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function studly($value, $params)
+    public function studly($value)
     {
         return Str::studly($value);
     }
@@ -2244,7 +2272,7 @@ class CoreModifiers extends Modifier
      * Returns the sum of all items in the array, optionally by specific key.
      *
      * @param $value
-     * @param $params
+     * @param  array  $params
      * @return mixed
      */
     public function sum($value, $params)
@@ -2377,6 +2405,11 @@ class CoreModifiers extends Modifier
         return Stringy::toSpaces($value, Arr::get($params, 0, 4));
     }
 
+    public function toString($value)
+    {
+        return (string) $value;
+    }
+
     /**
      * Converts each occurrence of some consecutive number of spaces, as defined by
      * $param[0], to a tab. By default, each 4 consecutive spaces are converted to a tab.
@@ -2411,7 +2444,7 @@ class CoreModifiers extends Modifier
      */
     public function transChoice($value, $params, $context)
     {
-        $count = Arr::get($context, $params[0], $params[0]);
+        $count = $this->getFromContext($context, $params);
 
         return trans_choice($value, $count);
     }
@@ -2470,6 +2503,11 @@ class CoreModifiers extends Modifier
         return $this->carbon($value)->tz($timezone);
     }
 
+    public function typeOf($value)
+    {
+        return gettype($value);
+    }
+
     /**
      * Converts the first character of the supplied string to upper case.
      *
@@ -2484,8 +2522,8 @@ class CoreModifiers extends Modifier
     /**
      * Turn an array into an unordered list.
      *
-     * @param $value
-     * @param $params
+     * @param  array  $value
+     * @param  array  $params
      * @return string
      */
     public function ul($value, $params)
@@ -2543,8 +2581,8 @@ class CoreModifiers extends Modifier
      * Returns all of the unique-by-key items in the array.
      *
      * @param $value
-     * @param $params
-     * @return static
+     * @param  array  $params
+     * @return array
      */
     public function unique($value, $params)
     {
@@ -2584,13 +2622,17 @@ class CoreModifiers extends Modifier
      * Filters the data by a given key / value pair.
      *
      * @param  array  $value
-     * @param $params
+     * @param  array  $params
      * @return array
      */
     public function where($value, $params)
     {
         $key = Arr::get($params, 0);
         $val = Arr::get($params, 1);
+
+        if (! $val && Str::contains($key, ':')) {
+            [$key, $val] = explode(':', $key);
+        }
 
         $collection = collect($value)->where($key, $val);
 
@@ -2601,7 +2643,8 @@ class CoreModifiers extends Modifier
      * Attempts to prevent widows in a string by adding
      * <nobr> tags between the last two words of each paragraph.
      *
-     * @param $value
+     * @param  string  $value
+     * @param  array  $params
      * @return string
      */
     public function widont($value, $params)
@@ -2783,6 +2826,10 @@ class CoreModifiers extends Modifier
     {
         $number = $params[0];
 
+        if ($this->usingRuntimeMethodSyntax($context)) {
+            return $number;
+        }
+
         // If the number is already a number, use that. Otherwise, attempt to resolve it
         // from a value in the context. This allows users to specify a variable name.
         $number = (is_numeric($number))
@@ -2799,5 +2846,20 @@ class CoreModifiers extends Modifier
         }
 
         return $value;
+    }
+
+    // The Antlers Runtime Engine's method modifier syntax handles
+    // context automatically. Looking for {__method_args} in context
+    // is the best way to know if you're in the Runtime Engine.
+    private function usingRuntimeMethodSyntax($context)
+    {
+        return array_key_exists('{__method_args}', $context);
+    }
+
+    private function getFromContext($context, $params, $key = 0)
+    {
+        return $this->usingRuntimeMethodSyntax($context) ?
+                $params[$key] :
+                Arr::get($context, $params[$key], $params[$key]);
     }
 }

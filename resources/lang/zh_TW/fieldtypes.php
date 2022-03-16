@@ -75,6 +75,7 @@ return [
     'html.title' => 'HTML',
     'integer.title' => '整數',
     'link.config.collections' => '將可選擇這些條目集中的條目。留空則會顯示所有條目。',
+    'link.config.container' => '選擇用於此欄位的素材容器。',
     'link.title' => '連結',
     'list.title' => '列表',
     'markdown.config.automatic_line_breaks' => '啟用自動斷行。',

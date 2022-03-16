@@ -30,6 +30,7 @@ class AugmentedTerm extends AbstractAugmented
             'api_url',
             'taxonomy',
             'edit_url',
+            'locale',
             'updated_at',
             'updated_by',
         ];

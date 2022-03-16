@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Statamic\Facades\Collection;
 use Statamic\Http\Resources\API\EntryResource;
 
 class TaxonomyTermEntriesController extends ApiController
@@ -31,8 +32,10 @@ class TaxonomyTermEntriesController extends ApiController
             $query->where('collection', $collection);
         }
 
+        $with = $this->getRelationshipFieldsFromCollections($taxonomy);
+
         return app(EntryResource::class)::collection(
-            $this->filterSortAndPaginate($query)
+            $this->filterSortAndPaginate($query->with($with))
         );
     }
 
@@ -41,5 +44,18 @@ class TaxonomyTermEntriesController extends ApiController
         $entriesConfig = config('statamic.api.resources.collections');
 
         return is_array($entriesConfig) ? $entriesConfig : [];
+    }
+
+    private function getRelationshipFieldsFromCollections($taxonomy)
+    {
+        $collections = ($allowed = $this->allowedCollections())
+            ? collect($allowed)->map(fn ($collection) => Collection::findByHandle($collection))
+            : $taxonomy->collections();
+
+        return $collections->flatMap(function ($collection) {
+            return $collection->entryBlueprints()
+                ->flatMap(fn ($blueprint) => $blueprint->fields()->all())
+                ->filter->isRelationship()->keys()->all();
+        })->all();
     }
 }

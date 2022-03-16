@@ -20,6 +20,7 @@ class AugmentedEntry extends AbstractAugmented
     {
         return [
             'id',
+            'origin_id',
             'slug',
             'uri',
             'url',
@@ -75,5 +76,10 @@ class AugmentedEntry extends AbstractAugmented
     public function authors()
     {
         return $this->wrapValue($this->getFromData('authors'), 'authors');
+    }
+
+    public function originId()
+    {
+        return optional($this->data->origin())->id();
     }
 }

@@ -14,6 +14,7 @@
         :localizations="{{ json_encode($localizations) }}"
         create-another-url="{{ cp_route('taxonomies.terms.create', [$taxonomy, $locale]) }}"
         listing-url="{{ cp_route('taxonomies.show', $taxonomy) }}"
+        :preview-targets="{{ json_encode($previewTargets) }}"
     ></base-term-create-form>
 
 @endsection

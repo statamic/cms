@@ -40,7 +40,8 @@
         }
 
         &.drag-handle {
-            @apply w-3 border-r h-full p-1;
+            @apply border-r h-full p-1;
+            width: 1%;
             cursor: grab;
             background: theme('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
             &:hover { @apply .bg-grey-30; }
@@ -59,7 +60,8 @@
 }
 
 .grid-table .row-controls {
-    @apply w-8 pl-0 text-center;
+    @apply pl-0 text-center;
+    width: 1%;
     padding-top: 21px; // pseudo-center for text/select fields
 }
 

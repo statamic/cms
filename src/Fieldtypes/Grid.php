@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Values;
 use Statamic\GraphQL\Types\GridItemType;
 use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
 use Statamic\Support\Arr;
@@ -163,11 +164,11 @@ class Grid extends Fieldtype
 
         return collect($this->field->value())->map(function ($row, $index) use ($attributes) {
             return collect($row)->except('_id')->mapWithKeys(function ($value, $handle) use ($attributes, $index) {
-                return [$this->rowRuleFieldPrefix($index).'.'.$handle => $attributes[$handle]];
+                return [$this->rowRuleFieldPrefix($index).'.'.$handle => $attributes[$handle] ?? null];
             });
         })->reduce(function ($carry, $rules) {
             return $carry->merge($rules);
-        }, collect())->all();
+        }, collect())->filter()->all();
     }
 
     public function preload()
@@ -203,7 +204,7 @@ class Grid extends Fieldtype
         $method = $shallow ? 'shallowAugment' : 'augment';
 
         return collect($value)->map(function ($row) use ($method) {
-            return $this->fields()->addValues($row)->{$method}()->values()->all();
+            return new Values($this->fields()->addValues($row)->{$method}()->values()->all());
         })->all();
     }
 

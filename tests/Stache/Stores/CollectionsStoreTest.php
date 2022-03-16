@@ -66,6 +66,25 @@ class CollectionsStoreTest extends TestCase
     }
 
     /** @test */
+    public function it_normalizes_preview_target_url_into_format()
+    {
+        // it's just nicer to write "url" into yaml than "format".
+
+        $contents = <<<'YAML'
+preview_targets:
+  - { label: Foo, url: '/{bar}' }
+  - { label: Baz, url: '/{qux}' }
+YAML;
+
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', $contents);
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '/{bar}'],
+            ['label' => 'Baz', 'format' => '/{qux}'],
+        ], $item->previewTargets()->all());
+    }
+
+    /** @test */
     public function it_uses_the_filename_as_the_item_key()
     {
         $this->assertEquals(

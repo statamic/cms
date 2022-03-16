@@ -129,4 +129,16 @@ class EloquentUserTest extends TestCase
             ],
         ];
     }
+
+    /** @test */
+    public function it_gets_the_timestamps_property_from_the_model()
+    {
+        $user = $this->user();
+
+        $this->assertTrue($user->timestamps);
+
+        $user->model()->timestamps = false;
+
+        $this->assertFalse($user->timestamps);
+    }
 }

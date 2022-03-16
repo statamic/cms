@@ -10,6 +10,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
+use Statamic\Imaging\GlideServer;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
@@ -101,9 +102,10 @@ class Glide extends Tags
             $data = ['url' => $this->generateGlideUrl($item)];
 
             if ($this->isResizable($item)) {
+                $pathPrefix = (new GlideServer)->cachePath();
                 $path = $this->generateImage($item);
 
-                [$width, $height] = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
+                [$width, $height] = getimagesize(Path::tidy($pathPrefix.'/'.$path));
 
                 $data['width'] = $width;
                 $data['height'] = $height;

@@ -18,8 +18,8 @@ class ParentTest extends TestCase
         parent::setUp();
 
         Site::setConfig(['sites' => [
-            'en' => ['url' => '/'],
-            'fr' => ['url' => '/fr'],
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
         ]]);
     }
 

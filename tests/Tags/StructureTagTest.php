@@ -15,16 +15,11 @@ class StructureTagTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->createCollectionAndNav();
-    }
-
     /** @test */
     public function it_renders_a_nav()
     {
+        $this->createCollectionAndNav();
+
         // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
         $template = <<<'EOT'
 <ul>
@@ -88,6 +83,8 @@ EOT;
     /** @test */
     public function it_renders_a_nav_with_scope()
     {
+        $this->createCollectionAndNav();
+
         // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
         $template = <<<'EOT'
 <ul>
@@ -152,6 +149,8 @@ EOT;
     /** @test */
     public function it_hides_unpublished_entries_by_default()
     {
+        $this->createCollectionAndNav();
+
         $this->assertEquals('[1][1-1][1-2][2][3][3-1][3-2][5][5-1]', $this->parseBasicTemplate('test'));
 
         $this->assertEquals('[1][1-1][2][3][3-1][3-2]', $this->parseBasicTemplate('collection:pages'));
@@ -160,6 +159,8 @@ EOT;
     /** @test */
     public function it_shows_or_hides_unpublished_entries_using_the_show_unpublished_parameter()
     {
+        $this->createCollectionAndNav();
+
         $this->assertEquals('[1][1-1][1-2][2][3][3-1][3-2][5][5-1]', $this->parseBasicTemplate('test', 'show_unpublished="false"'));
         $this->assertEquals('[1][1-1][1-2][2][3][3-1][3-2][3-3][4][4-1][5][5-1]', $this->parseBasicTemplate('test', 'show_unpublished="true"'));
 
@@ -170,6 +171,8 @@ EOT;
     /** @test */
     public function it_filters_by_status()
     {
+        $this->createCollectionAndNav();
+
         $this->assertEquals('[1][1-1][2][3][3-1][3-2]', $this->parseBasicTemplate('collection:pages', 'status:is="published"'));
         $this->assertEquals('[4]', $this->parseBasicTemplate('collection:pages', 'status:not="published"'));
         $this->assertEquals('[4]', $this->parseBasicTemplate('collection:pages', 'status:is="draft"'));
@@ -179,6 +182,8 @@ EOT;
     /** @test */
     public function it_filters_by_published_boolean()
     {
+        $this->createCollectionAndNav();
+
         $this->assertEquals('[1][1-1][2][3][3-1][3-2]', $this->parseBasicTemplate('collection:pages', 'published:is="true"'));
         $this->assertEquals('[4]', $this->parseBasicTemplate('collection:pages', 'published:is="false"'));
     }
@@ -186,11 +191,195 @@ EOT;
     /** @test */
     public function it_filters_by_entry_data()
     {
+        $this->createCollectionAndNav();
+
         $this->assertEquals('[3][3-1][3-2]', $this->parseBasicTemplate('collection:pages', 'title:contains="Three"'));
         $this->assertEquals('[2]', $this->parseBasicTemplate('collection:pages', 'foo:is="notbar"'));
         $this->assertEquals('[1][1-1][3][3-1]', $this->parseBasicTemplate('collection:pages', 'foo:isnt="notbar"'));
         $this->assertEquals('[1]', $this->parseBasicTemplate('collection:pages', 'nav_title:in="Grapes|Navtitle Four|Bananas|Navtitle One"'));
         $this->assertEquals('[]', $this->parseBasicTemplate('collection:pages', 'never:is="true"'));
+    }
+
+    /** @test */
+    public function it_sets_is_current_and_is_parent_for_a_nav()
+    {
+        $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+
+        $this->makeNav([
+            ['id' => 'home', 'title' => 'Home', 'url' => '/'],
+            ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
+                ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1', 'children' => [
+                    ['id' => '1-1-1', 'title' => '1.1.1', 'url' => '/1/1/1', 'children' => [
+                        ['id' => '1-1-1-1', 'title' => '1.1.1.1', 'url' => '/1/1/1/1'],
+                    ]],
+                ]],
+            ]],
+            ['id' => '2', 'title' => '2', 'url' => '/2'],
+            ['id' => '3', 'title' => '3'],
+        ]);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home=parent][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home=parent][1=parent][1-1=current][1-1-1][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home=parent][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home=parent][1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home=parent][1][1-1][1-1-1][1-1-1-1][2=current][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[home=parent][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+
+        // Only the last child has an URL.
+        $this->makeNav([
+            ['id' => '1', 'title' => '1', 'children' => [
+                ['id' => '1-1', 'title' => '1.1', 'children' => [
+                    ['id' => '1-1-1', 'title' => '1.1.1', 'children' => [
+                        ['id' => '1-1-1-1', 'title' => '1.1.1.1', 'url' => '/1/1/1/1'],
+                    ]],
+                ]],
+            ]],
+        ]);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
+
+        // Only the top parent has an URL.
+        $this->makeNav([
+            ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
+                ['id' => '1-1', 'title' => '1.1', 'children' => [
+                    ['id' => '1-1-1', 'title' => '1.1.1', 'children' => [
+                        ['id' => '1-1-1-1', 'title' => '1.1.1.1'],
+                    ]],
+                ]],
+            ]],
+        ]);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1=current][1-1][1-1-1][1-1-1-1]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
+    }
+
+    /** @test */
+    public function it_sets_is_parent_based_on_the_url_too()
+    {
+        $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+
+        $this->makeNav([
+            ['id' => '1', 'title' => 'One', 'url' => '/1', 'children' => [
+                ['id' => '2', 'title' => 'Two', 'url' => '/1/2'],
+            ]],
+        ]);
+
+        tap(Collection::make('rad')->routes('/1/2/{slug}'))->save();
+        EntryFactory::collection('rad')->id('3')->slug('3')->data(['title' => 'Three'])->create();
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/2/3');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1=parent][2=parent]', $result);
+    }
+
+    /** @test */
+    public function it_sets_is_current_and_is_parent_for_a_collection()
+    {
+        $collection = tap(Collection::make('pages'))->save();
+
+        $page_1 = EntryFactory::collection('pages')->id('1')->data(['title' => 'One'])->create();
+        $page_1_1 = EntryFactory::collection('pages')->id('1-1')->data(['title' => 'One One'])->create();
+        $page_1_1_1 = EntryFactory::collection('pages')->id('1-1-1')->data(['title' => 'One One One'])->create();
+        $page_1_1_1_1 = EntryFactory::collection('pages')->id('1-1-1-1')->data(['title' => 'One One One One'])->create();
+        $page_2 = EntryFactory::collection('pages')->id('2')->data(['title' => 'Two'])->create();
+
+        $collection->structureContents(['foo' => 'bar'])->save();
+        $collection->structure()->in('en')->tree([
+            ['entry' => '1', 'url' => '/1', 'children' => [
+                ['entry' => '1-1', 'url' => '/1/1', 'children' => [
+                    ['entry' => '1-1-1', 'url' => '/1/1/1', 'children' => [
+                        ['entry' => '1-1-1-1', 'url' => '/1/1/1/1'],
+                    ]],
+                ]],
+            ]],
+            ['entry' => '2', 'url' => '/2'],
+        ])->save();
+
+        $ids = ['1', '1-1', '1-1-1', '1-1-1-1', '2'];
+
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('whereIn')->with('id', $ids)->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(collect([$page_1, $page_1_1, $page_1_1_1, $page_1_1_1_1, $page_2]));
+        Entry::shouldReceive('query')->andReturn($builder);
+
+        $template = '{{ nav }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav }}';
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2=current]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1=current][1-1][1-1-1][1-1-1-1][2]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1=parent][1-1=current][1-1-1][1-1-1-1][2]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1=parent][1-1=parent][1-1-1=current][1-1-1-1][2]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
+        $result = (string) Antlers::parse($template);
+        $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2]', $result);
     }
 
     private function makeNav($tree)

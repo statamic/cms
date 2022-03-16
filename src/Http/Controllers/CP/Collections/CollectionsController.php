@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use LogicException;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -43,7 +44,7 @@ class CollectionsController extends CpController
             'collections' => $collections,
             'columns' => [
                 Column::make('title')->label(__('Title')),
-                Column::make('entries')->label(__('Entries')),
+                Column::make('entries')->label(__('Entries'))->numeric(true),
             ],
         ]);
     }
@@ -85,8 +86,12 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'sites' => $collection->sites()->map(function ($site) {
-                $site = Site::get($site);
+            'sites' => $collection->sites()->map(function ($site_handle) {
+                $site = Site::get($site_handle);
+
+                if (! $site) {
+                    throw new SiteNotFoundException($site_handle);
+                }
 
                 return [
                     'handle' => $site->handle(),
@@ -156,6 +161,7 @@ class CollectionsController extends CpController
             'title_formats' => $collection->titleFormats()->unique()->count() === 1
                 ? $collection->titleFormats()->first()
                 : $collection->titleFormats()->all(),
+            'preview_targets' => $collection->previewTargets(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))
@@ -231,7 +237,8 @@ class CollectionsController extends CpController
             ->mount(array_get($values, 'mount'))
             ->propagate(array_get($values, 'propagate'))
             ->titleFormats($values['title_formats'])
-            ->requiresSlugs($values['require_slugs']);
+            ->requiresSlugs($values['require_slugs'])
+            ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -247,8 +254,6 @@ class CollectionsController extends CpController
         }
 
         $collection->save();
-
-        return $collection->toArray();
     }
 
     protected function updateLinkBlueprint($shouldExist, $collection)
@@ -485,6 +490,25 @@ class CollectionsController extends CpController
                         'display' => __('Enable AMP'),
                         'instructions' => __('statamic::messages.collections_amp_instructions'),
                         'type' => 'toggle',
+                    ],
+                    'preview_targets' => [
+                        'display' => __('Preview Targets'),
+                        'instructions' => __('statamic::messages.collections_preview_targets_instructions'),
+                        'type' => 'grid',
+                        'fields' => [
+                            [
+                                'handle' => 'label',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                            [
+                                'handle' => 'format',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],

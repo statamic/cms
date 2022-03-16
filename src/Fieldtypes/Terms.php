@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
@@ -17,10 +18,10 @@ use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
+use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Taxonomies\TermCollection;
 
 class Terms extends Relationship
 {
@@ -77,61 +78,69 @@ class Terms extends Relationship
         return new TermsFilter($this);
     }
 
-    public function augment($value)
+    public function augment($values)
     {
-        $terms = $this->getTermsForAugmentation($value);
+        // The parent is the item this terms fieldtype exists on. Most commonly an
+        // entry, but could also be something else, like another taxonomy term.
+        $parent = $this->field->parent();
 
-        return $this->config('max_items') === 1 ? $terms->first() : $terms;
-    }
+        $site = $parent && $parent instanceof Localization
+            ? $parent->locale()
+            : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
 
-    public function shallowAugment($value)
-    {
-        $terms = $this->getTermsForAugmentation($value);
+        $ids = $this->convertAugmentationValuesToIds($values);
 
-        $terms = collect($terms)->map->toShallowAugmentedCollection();
+        $query = (new OrderedQueryBuilder(Term::query(), $ids))
+            ->whereIn('id', $ids)
+            ->where('site', $site);
 
-        return $this->config('max_items') === 1 ? $terms->first() : $terms;
-    }
+        $shouldQueryCollection = $this->usingSingleTaxonomy()
+            && ! $this->field->parentField()
+            && $parent
+            && $parent instanceof Entry
+            && $this->field->handle() === $this->taxonomies()[0];
 
-    private function getTermsForAugmentation($value)
-    {
-        $handle = $taxonomy = null;
-
-        if ($this->usingSingleTaxonomy()) {
-            $handle = $this->taxonomies()[0];
-            $taxonomy = Facades\Taxonomy::findByHandle($handle);
+        if ($shouldQueryCollection) {
+            $query->where('collection', $parent->collectionHandle());
         }
 
-        return (new TermCollection(Arr::wrap($value)))
-            ->map(function ($value) use ($handle, $taxonomy) {
-                if ($taxonomy) {
-                    $slug = $value;
-                    $id = "{$handle}::{$slug}";
-                } else {
-                    if (! Str::contains($value, '::')) {
-                        throw new \Exception("Ambigious taxonomy term value [$value]. Field [{$this->field->handle()}] is configured with multiple taxonomies.");
-                    }
-                    $id = $value;
-                    [$handle, $slug] = explode('::', $id, 2);
-                    $taxonomy = Facades\Taxonomy::findByHandle($handle);
+        return $this->config('max_items') === 1 ? $query->first() : $query;
+    }
+
+    private function convertAugmentationValuesToIds($values)
+    {
+        $taxonomy = $this->usingSingleTaxonomy()
+            ? $this->taxonomies()[0]
+            : null;
+
+        return collect(Arr::wrap($values))->map(function ($value) use ($taxonomy) {
+            if ($taxonomy) {
+                return "{$taxonomy}::{$value}";
+            } else {
+                if (! Str::contains($value, '::')) {
+                    throw new \Exception("Ambigious taxonomy term value [$value]. Field [{$this->field->handle()}] is configured with multiple taxonomies.");
                 }
 
-                $term = Term::find($id) ?? Term::make($slug)->taxonomy($taxonomy);
+                return $value;
+            }
+        })->all();
+    }
 
-                // The parent is the item this terms fieldtype exists on. Most commonly an
-                // entry, but could also be something else, like another taxonomy term.
-                $parent = $this->field->parent();
+    public function shallowAugment($values)
+    {
+        $items = $this->augment($values);
 
-                if ($parent && $parent instanceof Entry && $this->field->handle() === $taxonomy->handle()) {
-                    $term->collection($parent->collection());
-                }
+        if ($this->config('max_items') === 1) {
+            $items = collect([$items]);
+        } else {
+            $items = $items->get();
+        }
 
-                $locale = $parent && $parent instanceof Localization
-                    ? $parent->locale()
-                    : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
+        $items = $items->filter()->map(function ($item) {
+            return $item->toShallowAugmentedCollection();
+        })->collect();
 
-                return $term->in($locale);
-            });
+        return $this->config('max_items') === 1 ? $items->first() : $items;
     }
 
     public function process($data)
@@ -388,5 +397,14 @@ class Terms extends Relationship
         }
 
         return $type;
+    }
+
+    protected function getItemsForPreProcessIndex($values): Collection
+    {
+        if (! $augmented = $this->augment($values)) {
+            return collect();
+        }
+
+        return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
     }
 }

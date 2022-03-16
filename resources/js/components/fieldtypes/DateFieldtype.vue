@@ -9,45 +9,97 @@
 
         <div v-if="hasDate || config.inline"
             class="date-time-container"
-            :class="{ 'narrow': containerWidth <= 260 }"
+            :class="{ 'narrow': isNarrow }"
         >
 
-            <div class="flex-1 date-container" :class="{'input-group': !config.inline }">
-                <div class="input-group-prepend flex items-center" v-if="!config.inline">
-                    <svg-icon name="calendar" class="w-4 h-4" />
-                </div>
-                <input type="text" class="input-text" readonly :value="$moment(value).format(displayFormat)" v-if="isReadOnly">
+            <div class="flex-1 date-container">
                 <v-date-picker
-                    v-else
-                    v-model="date"
-                    :popover="{ visibility: 'click' }"
-                    :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
+                    :class="{ 'w-full': !config.inline }"
+                    :columns="$screens({ default: 1, lg: config.columns })"
+                    :input-debounce="500"
+                    :is-expanded="name === 'date' || config.full_width"
+                    :is-range="isRange"
+                    :is-required="config.required"
                     :locale="$config.get('locale').replace('_', '-')"
                     :masks="{ input: [displayFormat] }"
-                    :mode="config.mode"
-                    :input="value"
                     :min-date="config.earliest_date"
                     :max-date="config.latest_date"
-                    :is-required="config.required"
-                    :is-inline="config.inline"
-                    :is-expanded="name === 'date' || config.full_width"
-                    :columns="$screens({ default: 1, lg: config.columns })"
-                    :rows="$screens({ default: 1, lg: config.rows })">
-                        <input
-                            slot-scope="{ inputProps, inputEvents }"
-                            class="bg-transparent leading-none w-full focus:outline-none"
-                            v-bind="inputProps"
-                            v-on="inputEvents" />
+                    :model-config="modelConfig"
+                    :popover="{ visibility: 'focus' }"
+                    :rows="$screens({ default: 1, lg: config.rows })"
+                    :update-on-input="true"
+                    :value="value"
+                    @input="setDate"
+                >
+                    <template v-if="!config.inline" v-slot="{ inputValue, inputEvents }">
+                        <!-- Date range inputs -->
+                        <div
+                            v-if="isRange"
+                            class="w-full flex items-center"
+                            :class="{ 'flex-col': isNarrow }"
+                        >
+                            <div class="input-group">
+                                <div class="input-group-prepend flex items-center" v-if="!config.inline">
+                                    <svg-icon name="calendar" class="w-4 h-4" />
+                                </div>
+                                <div class="input-text border border-grey-50 border-l-0" :class="{ 'read-only': isReadOnly }">
+                                    <input
+                                        class="input-text-minimal p-0 bg-transparent leading-none"
+                                        :value="inputValue.start"
+                                        :readonly="isReadOnly"
+                                        v-on="!isReadOnly && inputEvents.start"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="icon icon-arrow-right my-sm mx-1 text-grey-60" />
+
+                            <div class="input-group">
+                                <div class="input-group-prepend flex items-center" v-if="!config.inline">
+                                    <svg-icon name="calendar" class="w-4 h-4" />
+                                </div>
+                                <div class="input-text border border-grey-50 border-l-0" :class="{ 'read-only': isReadOnly }">
+                                    <input
+                                        class="input-text-minimal p-0 bg-transparent leading-none"
+                                        :value="inputValue.end"
+                                        :readonly="isReadOnly"
+                                        v-on="!isReadOnly && inputEvents.end"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Single date input -->
+                        <div v-else class="input-group">
+                            <div class="input-group-prepend flex items-center" v-if="!config.inline">
+                                <svg-icon name="calendar" class="w-4 h-4" />
+                            </div>
+                            <div class="input-text border border-grey-50 border-l-0" :class="{ 'read-only': isReadOnly }">
+                                <input
+                                    class="input-text-minimal p-0 bg-transparent leading-none"
+                                    :value="inputValue"
+                                    :readonly="isReadOnly"
+                                    v-on="!isReadOnly && inputEvents"
+                                />
+                            </div>
+                        </div>
+                    </template>
                 </v-date-picker>
             </div>
 
-            <div v-if="config.time_enabled && config.mode === 'single'" class="time-container time-fieldtype">
-				<time-fieldtype ref="time" v-if="time" v-model="time" :required="config.time_enabled && config.time_required" :read-only="isReadOnly" :config="{}" handle=""></time-fieldtype>
-				<button type="button" class="btn flex items-center pl-1.5" v-if="! time" @click="addTime" tabindex="0">
-					<svg-icon name="time" class="w-4 h-4 mr-1"></svg-icon>
-                    <span v-text="__('Add Time')"></span>
-				</button>
+            <div v-if="config.time_enabled && !isRange" class="time-container time-fieldtype">
+				<time-fieldtype
+                    v-if="hasTime"
+                    ref="time"
+                    handle=""
+                    :value="timeString"
+                    :required="config.time_enabled"
+                    :show-seconds="config.time_seconds_enabled"
+                    :read-only="isReadOnly"
+                    :config="{}"
+                    @input="setTime"
+                />
 			</div>
         </div>
     </div>
@@ -63,8 +115,6 @@ export default {
 
     data() {
         return {
-            date: null,
-            time: null,
             attrs: [
                 {
                     key: 'today',
@@ -80,113 +130,99 @@ export default {
     },
 
     computed: {
+
         hasDate() {
-            return (this.config.required) ? true : this.date !== null;
+            return this.config.required || this.value;
         },
 
-        dateTime() {
-            return Vue.moment(this.date).set({'hour': this.hour, 'minute': this.minutes}).format(this.format);
+        hasTime() {
+            return this.config.time_enabled && !this.isRange;
         },
 
-        hour() {
-            return this.time ? this.time.split(':')[0] : 0;
+        hasSeconds() {
+            return this.config.time_has_seconds;
         },
 
-        minutes() {
-            return this.time ? this.time.split(':')[1] : 0;
+        isRange() {
+            return this.config.mode === 'range';
+        },
+
+        modelConfig() {
+            return {
+                type: 'string',
+                mask: this.format,
+            }
+        },
+
+        timeString() {
+            return Vue.moment(this.value).format('HH:mm:ss');
         },
 
         format() {
-            return (this.time) ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD';
+            return (this.hasTime) ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD';
         },
 
         displayFormat() {
             return this.meta.displayFormat;
-        }
-    },
-
-    watch: {
-
-        value: {
-            immediate: true,
-            handler(value) {
-                this.date = this.parseDate(value);
-                this.time = this.parseTime(value);
-            }
         },
 
-        date(value, oldValue) {
-            if (JSON.stringify(value) === JSON.stringify(oldValue)) return;
-            this.handleUpdate(value)
+        isNarrow() {
+            return this.containerWidth <= 320;
         },
 
-        time(value) {
-            this.handleUpdate(value)
-        }
-
     },
+
 
     methods: {
-        handleUpdate(value) {
-            let date;
-            if (this.config.mode === "range") {
-                date = value ? {
-                    start: Vue.moment(value.start).format(this.format),
-                    end: Vue.moment(value.end).format(this.format)
-                } : null;
+
+        setDate(date) {
+            if (this.isRange) {
+                this.setDateRange(date);
             } else {
-                date = Vue.moment(this.dateTime).format(this.format);
+                this.setSingleDate(date);
+            }
+        },
+
+        setSingleDate(date) {
+            const moment = Vue.moment(date);
+
+            if (this.hasTime) {
+                const timeMoment = Vue.moment(this.value);
+                moment
+                    .hour(timeMoment.hour())
+                    .minute(timeMoment.minute())
+                    .second(this.hasSeconds ? timeMoment.second() : 0);
             }
 
-            if (date == 'Invalid date') {
-                date = null;
+            if (moment.isValid()) {
+                this.update(moment.format(this.format));
             }
+        },
 
-            this.update(date);
+        setDateRange(range) {
+            if (Vue.moment(range.start).isValid() && Vue.moment(range.end).isValid()) {
+                this.update(range);
+            }
+        },
+
+        setTime(timeString) {
+            const [hour, minute, second] = timeString.split(':');
+
+            const moment = Vue.moment(this.value) // clone before mutating
+                .hour(hour)
+                .minute(minute)
+                .second(second)
+
+            if (moment.isValid()) {
+                this.update(moment.format(this.format));
+            }
         },
 
         addDate() {
-            this.date = Vue.moment().format(this.format);
-            if (this.config.time_enabled && this.config.time_required) {
-                this.addTime();
-            }
+            const now = Vue.moment().format(this.format);
+            this.update(this.isRange ? { start: now, end: now } : now);
         },
 
-        addTime() {
-            this.time = Vue.moment().format('HH:mm');
-            this.$nextTick(function() {
-                $(this.$refs.time.$refs.hour).focus().select();
-            });
-        },
-
-        removeTime() {
-            this.time = null;
-        },
-
-        parseDate(value) {
-            if (value) {
-                if (this.config.mode === "single") {
-                    return Vue.moment(value).toDate()
-                } else if (this.config.mode === "range") {
-                    return {
-                        'start': Vue.moment(value.start).toDate(),
-                        'end': Vue.moment(value.end).toDate()
-                    }
-                }
-             } else {
-                 return (this.config.required) ?  Vue.moment().toDate() : null
-             }
-        },
-
-        parseTime(value) {
-            if (this.config.time_enabled && value && value.length > 10) {
-                return Vue.moment(value).format('HH:mm');
-            } else if (this.config.time_required) {
-                return Vue.moment().format('HH:mm');
-            } else {
-                return null;
-            }
-        }
     },
 };
 </script>

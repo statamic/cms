@@ -2,17 +2,21 @@
 
 namespace Statamic\Assets;
 
+use ArrayAccess;
 use Facades\Statamic\Assets\Attributes;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
@@ -30,9 +34,11 @@ use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable
+class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, SyncsOriginalState, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
+    TracksQueriedRelations,
+    SyncsOriginalState, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -306,6 +312,11 @@ class Asset implements AssetContract, Augmentable
         return cp_route('assets.svgs.show', ['encoded_asset' => base64_encode($this->id())]);
     }
 
+    public function pdfUrl()
+    {
+        return cp_route('assets.pdfs.show', ['encoded_asset' => base64_encode($this->id())]);
+    }
+
     /**
      * Get either a image URL builder instance, or a URL if passed params.
      *
@@ -348,6 +359,7 @@ class Asset implements AssetContract, Augmentable
             'dxf', 'xps',
             'zip', 'rar',
             'xls', 'xlsx',
+            'pdf',
         ]);
     }
 
@@ -379,6 +391,16 @@ class Asset implements AssetContract, Augmentable
     public function isVideo()
     {
         return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
+    }
+
+    /**
+     * Is this asset a PDF?
+     *
+     * @return bool
+     */
+    public function isPdf()
+    {
+        return $this->extensionIsOneOf(['pdf']);
     }
 
     /**
@@ -577,6 +599,20 @@ class Asset implements AssetContract, Augmentable
     }
 
     /**
+     * Get the asset's duration.
+     *
+     * @return float|null
+     */
+    public function duration()
+    {
+        if (! $this->hasDuration()) {
+            return null;
+        }
+
+        return $this->meta('duration');
+    }
+
+    /**
      * Get the asset's orientation.
      *
      * @return string|null
@@ -602,6 +638,10 @@ class Asset implements AssetContract, Augmentable
     public function ratio()
     {
         if (! $this->hasDimensions()) {
+            return null;
+        }
+
+        if ($this->height() == 0) {
             return null;
         }
 
@@ -692,6 +732,16 @@ class Asset implements AssetContract, Augmentable
         }
 
         return (string) $str;
+    }
+
+    /**
+     * Get the asset file contents.
+     *
+     * @return mixed
+     */
+    public function contents()
+    {
+        return $this->disk()->get($this->path());
     }
 
     /**
@@ -786,8 +836,33 @@ class Asset implements AssetContract, Augmentable
         return ['id', 'url', 'permalink', 'api_url'];
     }
 
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
+    }
+
     private function hasDimensions()
     {
         return $this->isImage() || $this->isSvg() || $this->isVideo();
+    }
+
+    private function hasDuration()
+    {
+        return $this->isAudio() || $this->isVideo();
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (method_exists($this, $method = Str::camel($field))) {
+            return $this->{$method}();
+        }
+
+        $value = $this->get($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
     }
 }

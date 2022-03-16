@@ -2,7 +2,6 @@
 
 namespace Statamic\Facades\Endpoint;
 
-use League\Flysystem\Util;
 use Statamic\Facades\Pattern;
 use Statamic\Support\Str;
 
@@ -83,7 +82,12 @@ class Path
     {
         $leadingSlash = Str::startsWith($path, '/');
 
-        $path = Util::normalizeRelativePath(self::tidy($path));
+        $path = self::tidy($path);
+
+        // The `Util` class was removed in Flysystem 3.x, but this functionality exists in the new `WhitespacePathNormalizer`.
+        $path = class_exists('\League\Flysystem\Util')
+            ? \League\Flysystem\Util::normalizeRelativePath($path)
+            : (new \League\Flysystem\WhitespacePathNormalizer)->normalizePath($path);
 
         // Flysystem's method removes the leading slashes. We want to maintain them.
         return $leadingSlash ? Str::ensureLeft($path, '/') : $path;
@@ -106,7 +110,7 @@ class Path
             return null;
         }
 
-        return self::tidy(join('/', $args));
+        return self::tidy(implode('/', $args));
     }
 
     /**
@@ -194,10 +198,10 @@ class Path
     {
         // Replace backslashes with forward slashes for consistency between platforms.
         // PHP is capable of understanding Windows paths that use forward slashes.
-        $path = str_replace('\\', '/', $path);
+        $path = str_replace('\\', '/', (string) $path);
 
         // Remove occurrences of "//" in a $path (except when part of a protocol).
-        return preg_replace('#(^|[^:])//+#', '\\1/', $path);
+        return preg_replace('#(^|[^:])//+#', '\\1/', (string) $path);
     }
 
     /**

@@ -25,6 +25,11 @@ class ResolveRedirect
             $redirect = optional(Facades\Entry::find($id))->url() ?? 404;
         }
 
+        if (Str::startsWith($redirect, 'asset::')) {
+            $id = Str::after($redirect, 'asset::');
+            $redirect = optional(Facades\Asset::find($id))->url() ?? 404;
+        }
+
         return is_numeric($redirect) ? (int) $redirect : $redirect;
     }
 

@@ -54,6 +54,11 @@ class AugmentedAsset extends AbstractAugmented
                 'orientation',
                 'ratio',
                 'mime_type',
+                'duration',
+                'duration_seconds',
+                'duration_minutes',
+                'duration_sec',
+                'duration_min',
             ]);
         }
 
@@ -133,5 +138,34 @@ class AugmentedAsset extends AbstractAugmented
     protected function focusCss()
     {
         return Modify::value($this->get('focus'))->backgroundPosition()->fetch();
+    }
+
+    protected function duration()
+    {
+        return round($this->data->duration());
+    }
+
+    protected function durationSeconds()
+    {
+        return $this->duration();
+    }
+
+    protected function durationSec()
+    {
+        return $this->duration();
+    }
+
+    protected function durationMinutes()
+    {
+        if (! $seconds = $this->duration()) {
+            return null;
+        }
+
+        return floor($seconds / 60).':'.$seconds % 60;
+    }
+
+    protected function durationMin()
+    {
+        return $this->durationMinutes();
     }
 }

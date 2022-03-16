@@ -250,7 +250,7 @@ class SiteTest extends TestCase
             'permalink' => 'http://absolute-url-resolved-from-request.com/sub',
             'direction' => 'ltr',
             'attributes' => [],
-        ], $values->all());
+        ], $values->map->value()->all());
 
         $this->assertEquals(
             'test Test en_US en /sub http://absolute-url-resolved-from-request.com/sub',
@@ -260,6 +260,20 @@ class SiteTest extends TestCase
             'test Test en_US en /sub http://absolute-url-resolved-from-request.com/sub',
             (string) Antlers::parse('{{ site:handle }} {{ site:name }} {{ site:locale }} {{ site:short_locale }} {{ site:url }} {{ site:permalink }}', ['site' => $site])
         );
+    }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $site = new Site('test', [
+            'name' => 'Test',
+            'url' => '/sub',
+            'locale' => 'en_US',
+        ]);
+
+        $site
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $site->{$key}));
     }
 
     /** @test */

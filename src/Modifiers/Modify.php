@@ -4,6 +4,7 @@ namespace Statamic\Modifiers;
 
 use ArrayIterator;
 use Exception;
+use Statamic\Fields\Values;
 use Statamic\Support\Arr;
 
 class Modify implements \IteratorAggregate
@@ -23,6 +24,11 @@ class Modify implements \IteratorAggregate
      */
     private $loader;
 
+    /**
+     * Instantiate fluent modifier helper.
+     *
+     * @param  Loader  $loader
+     */
     public function __construct(Loader $loader)
     {
         $this->loader = $loader;
@@ -136,7 +142,7 @@ class Modify implements \IteratorAggregate
      * @param  array  $params
      * @return mixed
      *
-     * @throws \Statamic\Exceptions\ModifierException
+     * @throws ModifierException
      */
     public function modify($modifier, $params = [])
     {
@@ -184,6 +190,12 @@ class Modify implements \IteratorAggregate
     {
         [$class, $method] = $this->loader->load($modifier);
 
-        return $class->$method($this->value, $params, $this->context);
+        $value = $this->value;
+
+        if ($value instanceof Values) {
+            $value = $value->all();
+        }
+
+        return $class->$method($value, $params, $this->context);
     }
 }
