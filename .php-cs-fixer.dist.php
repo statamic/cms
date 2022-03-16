@@ -4,28 +4,36 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
 $rules = [
+    'array_indentation' => true,
     'array_syntax' => ['syntax' => 'short'],
     'binary_operator_spaces' => [
         'default' => 'single_space',
-        'operators' => ['=>' => null]
+        'operators' => ['=>' => null],
     ],
     'blank_line_after_namespace' => true,
     'blank_line_after_opening_tag' => true,
     'blank_line_before_statement' => [
-        'statements' => ['return']
+        'statements' => ['return'],
     ],
     'braces' => true,
     'cast_spaces' => true,
     'class_attributes_separation' => [
-        'elements' => ['method' => 'one']
+        'elements' => [
+            'const' => 'one',
+            'method' => 'one',
+            'property' => 'one',
+            'trait_import' => 'none',
+        ],
     ],
-    'class_definition' => true,
+    'class_definition' => [
+        'multi_line_extends_each_single_line' => true,
+        'single_item_single_line' => true,
+        'single_line' => true,
+    ],
     'concat_space' => [
-        'spacing' => 'none'
+        'spacing' => 'none',
     ],
-    'constant_case' => [
-        'case' => 'lower'
-    ],
+    'constant_case' => ['case' => 'lower'],
     'declare_equal_normalize' => true,
     'elseif' => true,
     'encoding' => true,
@@ -45,7 +53,12 @@ $rules = [
     'lowercase_static_reference' => true, // added from Symfony
     'magic_method_casing' => true, // added from Symfony
     'magic_constant_casing' => true,
-    'method_argument_space' => true,
+    'method_argument_space' => [
+        'on_multiline' => 'ignore',
+    ],
+    'multiline_whitespace_before_semicolons' => [
+        'strategy' => 'no_multi_line',
+    ],
     'native_function_casing' => true,
     'no_alias_functions' => true,
     'no_extra_blank_lines' => [
@@ -53,8 +66,7 @@ $rules = [
             'extra',
             'throw',
             'use',
-            'use_trait',
-        ]
+        ],
     ],
     'no_blank_lines_after_class_opening' => true,
     'no_blank_lines_after_phpdoc' => true,
@@ -64,24 +76,24 @@ $rules = [
     'no_leading_import_slash' => true,
     'no_leading_namespace_whitespace' => true,
     'no_mixed_echo_print' => [
-        'use' => 'echo'
+        'use' => 'echo',
     ],
     'no_multiline_whitespace_around_double_arrow' => true,
-    'multiline_whitespace_before_semicolons' => [
-        'strategy' => 'no_multi_line'
-    ],
     'no_short_bool_cast' => true,
     'no_singleline_whitespace_before_semicolons' => true,
     'no_spaces_after_function_name' => true,
-    'no_spaces_around_offset' => true,
+    'no_spaces_around_offset' => [
+        'positions' => ['inside', 'outside'],
+    ],
     'no_spaces_inside_parenthesis' => true,
     'no_trailing_comma_in_list_call' => true,
     'no_trailing_comma_in_singleline_array' => true,
     'no_trailing_whitespace' => true,
     'no_trailing_whitespace_in_comment' => true,
-    'no_unneeded_control_parentheses' => true,
+    'no_unneeded_control_parentheses' => [
+        'statements' => ['break', 'clone', 'continue', 'echo_print', 'return', 'switch_case', 'yield'],
+    ],
     'no_unreachable_default_argument_value' => true,
-    'no_unused_imports' => true,
     'no_useless_return' => true,
     'no_whitespace_before_comma_in_array' => true,
     'no_whitespace_in_blank_line' => true,
@@ -89,6 +101,7 @@ $rules = [
     'not_operator_with_successor_space' => true,
     'object_operator_without_whitespace' => true,
     'ordered_imports' => ['sort_algorithm' => 'alpha'],
+    'psr_autoloading' => true,
     'phpdoc_indent' => true,
     'phpdoc_inline_tag_normalizer' => true,
     'phpdoc_no_access' => true,
@@ -96,23 +109,24 @@ $rules = [
     'phpdoc_no_useless_inheritdoc' => true,
     'phpdoc_scalar' => true,
     'phpdoc_single_line_var_spacing' => true,
-    'phpdoc_summary' => true,
+    'phpdoc_summary' => false,
+    'phpdoc_to_comment' => false, // override to preserve user preference
     'phpdoc_tag_type' => true,
-    'phpdoc_to_comment' => true,
     'phpdoc_trim' => true,
     'phpdoc_types' => true,
     'phpdoc_var_without_name' => true,
-    'psr_autoloading' => true,
     'self_accessor' => true,
     'short_scalar_cast' => true,
-    'simplified_null_return' => false, // disabled by Shift
+    'simplified_null_return' => false, // disabled as "risky"
     'single_blank_line_at_eof' => true,
     'single_blank_line_before_namespace' => true,
-    'single_class_element_per_statement' => true,
+    'single_class_element_per_statement' => [
+        'elements' => ['const', 'property'],
+    ],
     'single_import_per_statement' => true,
     'single_line_after_imports' => true,
     'single_line_comment_style' => [
-        'comment_types' => ['hash']
+        'comment_types' => ['hash'],
     ],
     'single_quote' => true,
     'space_after_semicolon' => true,
@@ -120,24 +134,21 @@ $rules = [
     'switch_case_semicolon_to_colon' => true,
     'switch_case_space' => true,
     'ternary_operator_spaces' => true,
-    'trailing_comma_in_multiline' => [
-        'elements' => ['arrays']
-    ],
+    'trailing_comma_in_multiline' => ['elements' => ['arrays']],
     'trim_array_spaces' => true,
     'unary_operator_spaces' => true,
     'visibility_required' => [
-        'elements' => ['method', 'property']
+        'elements' => ['method', 'property'],
     ],
     'whitespace_after_comma_in_array' => true,
 ];
 
-$project_path = __DIR__;
 $finder = Finder::create()
     ->in([
-        $project_path . '/src',
-        $project_path . '/config',
-        $project_path . '/routes',
-        $project_path . '/tests',
+        __DIR__ . '/src',
+        __DIR__ . '/config',
+        __DIR__ . '/routes',
+        __DIR__ . '/tests',
     ])
     ->name('*.php')
     ->notName('*.blade.php')
