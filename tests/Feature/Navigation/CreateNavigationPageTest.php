@@ -58,6 +58,7 @@ class CreateNavigationPageTest extends TestCase
         $nav = tap(Nav::make('test'))->save();
         $nav->makeTree('en', [])->save();
         $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
 
         $this
@@ -103,6 +104,7 @@ class CreateNavigationPageTest extends TestCase
             'baz' => ['type' => 'text'],
         ]);
 
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($navBlueprint);
         BlueprintRepository::shouldReceive('in')->with('collections/articles')->andReturn(collect(['articles' => $entryBlueprint]));
 

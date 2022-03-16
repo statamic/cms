@@ -339,6 +339,7 @@ class EntryRevisionsTest extends TestCase
     {
         $blueprint = Blueprint::makeFromFields($fields)->setHandle($handle);
 
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect(['test' => $blueprint]));
     }
