@@ -244,6 +244,14 @@ class ValuesTest extends TestCase
         }
         $this->assertEquals(['foo', 'bar', 'baz', 'qux'], $results);
     }
+
+    /** @test */
+    public function its_json_serializable()
+    {
+        $values = new Values(['foo' => 'bar', 'baz' => 'qux']);
+
+        $this->assertEquals('{"foo":"bar","baz":"qux"}', json_encode($values));
+    }
 }
 
 class FakeFieldtypeThatAugmentsToMockedBuilder extends Fieldtype
