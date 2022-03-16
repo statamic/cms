@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.3.1 (2022-03-16)
+
+### What's new
+- Ability to make fields read only through the Blueprint builder. [#5379](https://github.com/statamic/cms/issues/5379) by @jackmcdade
+
+### What's improved
+- Update German translations. [#5511](https://github.com/statamic/cms/issues/5511) by @helloDanuk
+
+### What's fixed
+- Fix issue in Runtime parser where augmenting within an expression could alter the scope. [#5525](https://github.com/statamic/cms/issues/5525) by @JohnathonKoster
+- Fix Grid fields not converting to JSON by making `Values` implement `JsonSerializable`. [#5524](https://github.com/statamic/cms/issues/5524) by @jasonvarga
+- Fix error when determining slug language on non-entry forms. [#5523](https://github.com/statamic/cms/issues/5523) by @jasonvarga
+- Fix nested query builder access in Regex parser. [#5521](https://github.com/statamic/cms/issues/5521) by @jasonvarga
+- Fix Runtime parser not supporting dashes in variable names. [#5516](https://github.com/statamic/cms/issues/5516) by @JohnathonKoster
+- Fix Flysystem error on Cache Manager utility page. [#5509](https://github.com/statamic/cms/issues/5509) by @jesseleite
+
+
+
 ## 3.3.0 (2022-03-15)
 
 ### What's new
