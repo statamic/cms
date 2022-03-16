@@ -2,6 +2,9 @@
 
 namespace Tests\Imaging;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\Server;
@@ -80,8 +83,38 @@ class ImageGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function it_generates_an_image_by_url()
+    public function it_generates_an_image_by_external_url()
     {
+        $this->assertCount(0, $this->generatedImagePaths());
+
+        $this->app->bind('statamic.imaging.guzzle', function () {
+            $response = new Response(200, [], UploadedFile::fake()->image('', 30, 60)->getContent());
+
+            // Glide, Flysystem, or the Guzzle adapter will try to perform the requests
+            // at different points to check if the file exists or to get the content
+            // of it. Here we'll just mock the same response multiple times.
+            return new Client(['handler' => new MockHandler([
+                $response, $response, $response,
+            ])]);
+        });
+
+        $path = $this->makeGenerator()->generateByUrl(
+            'https://example.com/foo/hoff.jpg',
+            $userParams = ['w' => 100, 'h' => 100]
+        );
+
+        // Since we can't really mock the server, we'll generate the md5 hash the same
+        // way it does. It will not include the fit parameter since it's not an asset.
+        $md5 = $this->getGlideMd5('foo/hoff.jpg', $userParams);
+
+        // While writing this test I noticed that we don't include the domain in the
+        // cache path, so the same file path on two different domains will conflict.
+        // TODO: Fix this.
+        $expectedPath = "http/foo/hoff.jpg/{$md5}.jpg";
+
+        $this->assertEquals($expectedPath, $path);
+        $this->assertCount(1, $paths = $this->generatedImagePaths());
+        $this->assertContains($expectedPath, $paths);
     }
 
     private function makeGenerator()

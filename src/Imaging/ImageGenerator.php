@@ -2,7 +2,6 @@
 
 namespace Statamic\Imaging;
 
-use GuzzleHttp\Client;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
@@ -85,7 +84,9 @@ class ImageGenerator
 
         $base = $parsed['scheme'].'://'.$parsed['host'];
 
-        $filesystem = new Filesystem(new GuzzleAdapter($base, new Client()));
+        $guzzleClient = app('statamic.imaging.guzzle');
+
+        $filesystem = new Filesystem(new GuzzleAdapter($base, $guzzleClient));
 
         $this->server->setSource($filesystem);
         $this->server->setSourcePathPrefix('/');
