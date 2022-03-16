@@ -45,6 +45,8 @@ class TaxonomyRepository implements RepositoryContract
 
     public function save(Taxonomy $taxonomy)
     {
+        Facades\Blink::forget('taxonomy-'.$taxonomy->handle());
+
         $this->store->save($taxonomy);
     }
 
