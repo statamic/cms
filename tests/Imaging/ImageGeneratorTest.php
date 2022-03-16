@@ -55,6 +55,28 @@ class ImageGeneratorTest extends TestCase
     /** @test */
     public function it_generates_an_image_by_local_path()
     {
+        $this->assertCount(0, $this->generatedImagePaths());
+
+        // Path relative to the "public" directory.
+        $imagePath = 'testimages/foo/hoff.jpg';
+
+        $image = UploadedFile::fake()->image('', 30, 60);
+        File::put(public_path($imagePath), $image->getContent());
+
+        $path = $this->makeGenerator()->generateByPath(
+            $imagePath,
+            $userParams = ['w' => 100, 'h' => 100]
+        );
+
+        // Since we can't really mock the server, we'll generate the md5 hash the same
+        // way it does. It will not include the fit parameter since it's not an asset.
+        $md5 = $this->getGlideMd5($imagePath, $userParams);
+
+        $expectedPath = "paths/testimages/foo/hoff.jpg/{$md5}.jpg";
+
+        $this->assertEquals($expectedPath, $path);
+        $this->assertCount(1, $paths = $this->generatedImagePaths());
+        $this->assertContains($expectedPath, $paths);
     }
 
     /** @test */
