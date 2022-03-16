@@ -215,10 +215,10 @@ class EditNavigationPageTest extends TestCase
                     'title',
                 ],
                 'syncableFields' => [
+                    'title',
                     'foo',
                     'bar',
                     'baz',
-                    'title',
                 ],
             ]);
     }

@@ -59,6 +59,11 @@ class Range extends Fieldtype
         ];
     }
 
+    public function process($data)
+    {
+        return (int) $data;
+    }
+
     public function toGqlType()
     {
         return GraphQL::int();

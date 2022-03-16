@@ -73,7 +73,7 @@ class CollectionsServiceProvider extends ServiceProvider
 
     private function l10n()
     {
-        /**
+        /*
          * Extract the translations from the files and transform them for
          * usage for the javascript helper.
          *
@@ -167,6 +167,16 @@ class CollectionsServiceProvider extends ServiceProvider
             return array_map(function ($value) use ($keys) {
                 if ($value instanceof Augmentable) {
                     return $value->toAugmentedCollection($keys);
+                }
+
+                return $value instanceof Arrayable ? $value->toArray() : $value;
+            }, $this->items);
+        });
+
+        Collection::macro('toEvaluatedAugmentedArray', function ($keys = null) {
+            return array_map(function ($value) use ($keys) {
+                if ($value instanceof Augmentable) {
+                    return $value->toAugmentedCollection($keys)->withEvaluation()->toArray();
                 }
 
                 return $value instanceof Arrayable ? $value->toArray() : $value;

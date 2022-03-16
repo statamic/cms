@@ -149,10 +149,10 @@ class CreateNavigationPageTest extends TestCase
                 ],
                 'localizedFields' => [],
                 'syncableFields' => [
+                    'title',
                     'foo',
                     'bar',
                     'baz',
-                    'title',
                 ],
             ]);
     }

@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
 use Statamic\Statamic;
@@ -109,6 +110,18 @@ class StatamicTest extends TestCase
         $this->assertEquals($format, Statamic::cpDateTimeFormat());
     }
 
+    /** @test */
+    public function it_wraps_fluent_tag_helper()
+    {
+        $this->assertInstanceOf(\Statamic\Tags\FluentTag::class, Statamic::tag('some_tag'));
+    }
+
+    /** @test */
+    public function it_wraps_fluent_modifier_helper()
+    {
+        $this->assertInstanceOf(\Statamic\Modifiers\Modify::class, Statamic::modify('some_value'));
+    }
+
     public function formatsWithTime()
     {
         return [
@@ -120,5 +133,39 @@ class StatamicTest extends TestCase
             'ISO 8601' => ['c'],
             'RFC 2822' => ['r'],
         ];
+    }
+
+    /** @test */
+    public function it_aliases_query_builders()
+    {
+        app()->bind('statamic.queries.test', function () {
+            return 'the test query builder';
+        });
+
+        $this->assertEquals('the test query builder', Statamic::query('test'));
+    }
+
+    /** @test */
+    public function native_query_builder_aliases_are_bound()
+    {
+        $aliases = [
+            'entries' => \Statamic\Stache\Query\EntryQueryBuilder::class,
+            'terms' => \Statamic\Stache\Query\TermQueryBuilder::class,
+            'assets' => \Statamic\Assets\QueryBuilder::class,
+            'users' => \Statamic\Stache\Query\UserQueryBuilder::class,
+        ];
+
+        foreach ($aliases as $alias => $class) {
+            $this->assertInstanceOf($class, Statamic::query($alias));
+        }
+    }
+
+    /** @test */
+    public function it_throws_exception_for_invalid_query_builder_alias()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Target class [statamic.queries.test] does not exist.');
+
+        Statamic::query('test');
     }
 }

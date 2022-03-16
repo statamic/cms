@@ -96,6 +96,7 @@ export default {
                 state: {
                     blueprint: initial.blueprint,
                     values: initial.values,
+                    hiddenFields: {},
                     meta: initial.meta,
                     localizedFields: initial.localizedFields,
                     site: initial.site,
@@ -111,6 +112,9 @@ export default {
                     },
                     setValues(state, values) {
                         state.values = values;
+                    },
+                    setHiddenField(state, field) {
+                        state.hiddenFields[field.handle] = field.hidden;
                     },
                     setMeta(state, meta) {
                         state.meta = meta;

@@ -22,7 +22,7 @@ class AssetRepositoryTest extends TestCase
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
-        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
+        $realFilePath = Storage::disk('test')->path('foo/image.jpg');
         touch($realFilePath, $timestamp = Carbon::now()->subMinutes(3)->timestamp);
 
         $container = tap(AssetContainer::make('test')->disk('test'))->save();
@@ -50,12 +50,13 @@ EOT;
     {
         Storage::fake('disk_long', ['url' => 'test_long_url_same_beginning']);
         Storage::fake('disk_short', ['url' => 'test']);
+
         $assetRepository = new AssetRepository;
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
 
         Storage::disk('disk_short')->putFileAs('foo', $file, 'image_in_short.jpg');
-        $realFilePath = Storage::disk('disk_short')->getAdapter()->getPathPrefix().'foo/image_in_short.jpg';
+        $realFilePath = Storage::disk('disk_short')->path('foo/image_in_short.jpg');
         touch($realFilePath, $timestamp = Carbon::now()->subMinutes(3)->timestamp);
 
         $containerShortUrl = tap(AssetContainer::make('container_short')->disk('disk_short'))->save();
@@ -63,7 +64,7 @@ EOT;
         $assetRepository->save($assetShortUrl);
 
         Storage::disk('disk_long')->putFileAs('foo', $file, 'image_in_long.jpg');
-        $realFilePath = Storage::disk('disk_long')->getAdapter()->getPathPrefix().'foo/image_in_long.jpg';
+        $realFilePath = Storage::disk('disk_long')->path('foo/image_in_long.jpg');
         touch($realFilePath, $timestamp = Carbon::now()->subMinutes(3)->timestamp);
 
         $containerLongUrl = tap(AssetContainer::make('container_long')->disk('disk_long'))->save();

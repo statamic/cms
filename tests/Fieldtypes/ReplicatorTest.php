@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Values;
 use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
@@ -329,5 +330,41 @@ class ReplicatorTest extends TestCase
         ];
 
         $this->assertEquals($expected, $field->fieldtype()->preload()['new']['main']);
+    }
+
+    /** @test */
+    public function it_augments()
+    {
+        (new class extends Fieldtype
+        {
+            public static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $field = new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
+                'a' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'test']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $augmented = $field->fieldtype()->augment([
+            ['type' => 'a', 'words' => 'one'],
+            ['type' => 'a', 'words' => 'two'],
+        ]);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals([
+            ['type' => 'a', 'words' => 'one (augmented)'],
+            ['type' => 'a', 'words' => 'two (augmented)'],
+        ], collect($augmented)->toArray());
     }
 }
