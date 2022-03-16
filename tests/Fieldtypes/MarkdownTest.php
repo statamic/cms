@@ -135,7 +135,7 @@ EOT;
     /** @test */
     public function it_converts_statamic_asset_urls()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
         Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
 

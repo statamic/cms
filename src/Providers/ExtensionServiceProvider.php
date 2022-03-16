@@ -9,6 +9,7 @@ use Statamic\Actions\Action;
 use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
+use Statamic\Forms\JsDrivers;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes;
@@ -188,6 +189,10 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Widget::class,
     ];
 
+    protected $formJsDrivers = [
+        JsDrivers\Alpine::class,
+    ];
+
     protected $updateScripts = [
         Updates\AddPerEntryPermissions::class,
         Updates\UseDedicatedTrees::class,
@@ -198,6 +203,7 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->registerExtensions();
         $this->registerAddonManifest();
+        $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
     }
 
@@ -300,6 +306,15 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.extensions'][Modifier::class] = collect()
             ->merge($this->app['statamic.extensions'][Modifier::class] ?? [])
             ->merge($modifiers);
+    }
+
+    protected function registerFormJsDrivers()
+    {
+        $this->app->instance('statamic.form-js-drivers', collect());
+
+        foreach ($this->formJsDrivers as $class) {
+            $class::register();
+        }
     }
 
     protected function registerUpdateScripts()

@@ -5,8 +5,10 @@ namespace Statamic\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Facades\GraphQL;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Field implements Arrayable
@@ -17,6 +19,8 @@ class Field implements Arrayable
     protected $value;
     protected $parent;
     protected $parentField;
+    protected $filled = false;
+    protected $validationContext;
 
     public function __construct($handle, array $config)
     {
@@ -29,7 +33,8 @@ class Field implements Arrayable
         return (new static($this->handle, $this->config))
             ->setParent($this->parent)
             ->setParentField($this->parentField)
-            ->setValue($this->value);
+            ->setValue($this->value)
+            ->setFilled($this->filled);
     }
 
     public function setHandle(string $handle)
@@ -102,6 +107,10 @@ class Field implements Arrayable
 
     protected function addNullableRule($rules)
     {
+        if (in_array('nullable', $rules)) {
+            return $rules;
+        }
+
         $nullable = true;
 
         foreach ($rules as $rule) {
@@ -121,6 +130,30 @@ class Field implements Arrayable
     public function isRequired()
     {
         return collect($this->rules()[$this->handle])->contains('required');
+    }
+
+    public function setValidationContext($context)
+    {
+        $this->validationContext = $context;
+
+        return $this;
+    }
+
+    public function validationContext($key = null)
+    {
+        return func_num_args() === 0 ? $this->validationContext : Arr::get($this->validationContext, $key);
+    }
+
+    public function validationAttributes()
+    {
+        $display = Lang::has($key = 'validation.attributes.'.$this->handle())
+            ? Lang::get($key)
+            : $this->display();
+
+        return array_merge(
+            [$this->handle() => $display],
+            $this->fieldtype()->extraValidationAttributes()
+        );
     }
 
     public function isLocalizable()
@@ -168,6 +201,11 @@ class Field implements Arrayable
         return (bool) $this->get('filterable');
     }
 
+    public function isFilled()
+    {
+        return (bool) $this->filled;
+    }
+
     public function toPublishArray()
     {
         return array_merge($this->preProcessedConfig(), [
@@ -194,9 +232,24 @@ class Field implements Arrayable
         ];
     }
 
+    public function setFilled($filled)
+    {
+        $this->filled = $filled;
+
+        return $this;
+    }
+
     public function setValue($value)
     {
         $this->value = $value;
+
+        return $this;
+    }
+
+    public function fillValue($value)
+    {
+        $this->value = $value;
+        $this->filled = true;
 
         return $this;
     }
@@ -304,6 +357,20 @@ class Field implements Arrayable
         return $this->config;
     }
 
+    public function conditions(): array
+    {
+        return collect($this->config)->only([
+            'if',
+            'if_any',
+            'show_when',
+            'show_when_any',
+            'unless',
+            'unless_any',
+            'hide_when',
+            'hide_when_any',
+        ])->all();
+    }
+
     public function get(string $key, $fallback = null)
     {
         return array_get($this->config, $key, $fallback);
@@ -342,5 +409,10 @@ class Field implements Arrayable
         }
 
         return $type;
+    }
+
+    public function isRelationship(): bool
+    {
+        return $this->fieldtype()->isRelationship();
     }
 }

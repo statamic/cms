@@ -2,6 +2,8 @@
 
 namespace Statamic\Assets;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -20,7 +22,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable
+class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess, Arrayable
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -91,36 +93,14 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return URL::makeAbsolute($this->url());
     }
 
-    /**
-     * Convert to an array.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        $array = [
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'disk' => $this->disk,
-            'search_index' => $this->searchIndex,
-            'allow_uploads' => $this->allowUploads,
-            'allow_downloading' => $this->allowDownloading,
-            'allow_renaming' => $this->allowRenaming,
-            'allow_moving' => $this->allowMoving,
-            'create_folders' => $this->createFolders,
-        ];
-
-        // if ($user = user()) {
-        //     $array['allow_uploads'] = user()->can('store', [AssetContract::class, $this]);
-        //     $array['create_folders'] = user()->can('create', [AssetFolder::class, $this]);
-        // }
-
-        return $array;
-    }
-
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedAssetContainer($this);
+    }
+
+    protected function excludedEvaluatedAugmentedArrayKeys()
+    {
+        return ['assets'];
     }
 
     /**
@@ -283,10 +263,12 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $folder = null;
         }
 
-        if ($folder && $recursive) {
-            $query->where('folder', 'like', "{$folder}%");
-        } elseif ($folder) {
-            $query->where('folder', $folder);
+        if ($folder !== null) {
+            if ($recursive) {
+                $query->where('path', 'like', "{$folder}/%");
+            } else {
+                $query->where('folder', $folder);
+            }
         }
 
         return $query->get();
@@ -361,7 +343,15 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function accessible()
     {
-        return $this->disk()->filesystem()->getDriver()->getConfig()->get('url') !== null;
+        $config = $this->disk()->filesystem()->getConfig();
+
+        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
+        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
+        if (is_array($config)) {
+            $config = collect($config);
+        }
+
+        return $config->get('url') !== null;
     }
 
     /**
@@ -456,24 +446,16 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     public function fileData()
     {
-        $data = array_except($this->toArray(), 'handle');
-
-        // @TODO: Determine why we were explicity unsetting this data
-
-        // if ($data['allow_uploads'] === true) {
-        //     unset($data['allow_uploads']);
-        // }
-
-        // if ($data['create_folders'] === true) {
-        //     unset($data['create_folders']);
-        // }
-
-        return $data;
-    }
-
-    public function toCacheableArray()
-    {
-        return $this->fileData();
+        return [
+            'title' => $this->title,
+            'disk' => $this->disk,
+            'search_index' => $this->searchIndex,
+            'allow_uploads' => $this->allowUploads,
+            'allow_downloading' => $this->allowDownloading,
+            'allow_renaming' => $this->allowRenaming,
+            'allow_moving' => $this->allowMoving,
+            'create_folders' => $this->createFolders,
+        ];
     }
 
     public function queryAssets()

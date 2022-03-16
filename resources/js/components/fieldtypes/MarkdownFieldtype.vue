@@ -121,7 +121,7 @@
 
 <script>
 var CodeMirror = require('codemirror');
-var marked = require('marked');
+var { marked } = require('marked');
 var PlainTextRenderer = require('marked-plaintext');
 
 require('codemirror/addon/edit/closebrackets');

@@ -150,7 +150,11 @@ export default {
 
             this.updateSetMeta(set._id, this.meta.new[handle]);
 
-            this.update([...this.value, set]);
+            this.update([
+                ...this.value.slice(0, index),
+                set,
+                ...this.value.slice(index)
+            ]);
 
             this.expandSet(set._id);
         },

@@ -18,6 +18,7 @@
         :initial-origin-values="{}"
         :create-another-url="createAnotherUrl"
         :listing-url="listingUrl"
+        :preview-targets="previewTargets"
         @saved="saved"
     ></term-publish-form>
 
@@ -37,6 +38,7 @@ export default {
         'localizations',
         'createAnotherUrl',
         'listingUrl',
+        'previewTargets',
     ],
 
     methods: {

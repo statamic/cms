@@ -143,6 +143,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('assets/{encoded_asset}/download', 'AssetsController@download')->name('assets.download');
         Route::get('thumbnails/{encoded_asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
         Route::get('svgs/{encoded_asset}', 'SvgController@show')->name('assets.svgs.show');
+        Route::get('pdfs/{encoded_asset}', 'PdfController@show')->name('assets.pdfs.show');
     });
 
     Route::group(['prefix' => 'fields', 'namespace' => 'Fields'], function () {

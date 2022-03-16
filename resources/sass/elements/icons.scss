@@ -35,7 +35,7 @@ svg {
 
     &.published { @apply bg-green-light }
     &.draft, &.expired { @apply bg-grey-60 }
-    &.scheduled { @apply bg-transparent border border-grey-60 }
+    &.scheduled, &.hollow { @apply bg-transparent border border-grey-60 }
 }
 
 .icon-status-draft {

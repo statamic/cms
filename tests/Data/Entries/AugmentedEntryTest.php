@@ -5,16 +5,15 @@ namespace Tests\Data\Entries;
 use Carbon\Carbon;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
-use Illuminate\Support\Collection as IlluminateCollection;
 use Mockery;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Entries\AugmentedEntry;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
-use Statamic\Fields\Value;
 use Tests\Data\AugmentedTestCase;
 
 class AugmentedEntryTest extends AugmentedTestCase
@@ -84,7 +83,8 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $expectations = [
             'id'            => ['type' => 'string', 'value' => 'entry-id'],
-            'slug'          => ['type' => Value::class, 'value' => 'entry-slug'],
+            'origin_id'     => ['type' => 'string', 'value' => 'origin-id'],
+            'slug'          => ['type' => 'string', 'value' => 'entry-slug'],
             'uri'           => ['type' => 'string', 'value' => '/test/entry-slug'],
             'url'           => ['type' => 'string', 'value' => '/test/entry-slug'],
             'edit_url'      => ['type' => 'string', 'value' => 'http://localhost/cp/collections/test/entries/entry-id'],
@@ -104,14 +104,14 @@ class AugmentedEntryTest extends AugmentedTestCase
             'updated_at'    => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_by'    => ['type' => UserContract::class, 'value' => 'test-user'],
             'one'           => ['type' => 'string', 'value' => 'the "one" value on the entry'],
-            'two'           => ['type' => Value::class, 'value' => 'the "two" value on the entry and in the blueprint'],
+            'two'           => ['type' => 'string', 'value' => 'the "two" value on the entry and in the blueprint'],
             'three'         => ['type' => 'string', 'value' => 'the "three" value supplemented on the entry'],
-            'four'          => ['type' => Value::class, 'value' => 'the "four" value supplemented on the entry and in the blueprint'],
+            'four'          => ['type' => 'string', 'value' => 'the "four" value supplemented on the entry and in the blueprint'],
             'five'          => ['type' => 'string', 'value' => 'the "five" value from the origin'],
-            'six'           => ['type' => Value::class, 'value' => 'the "six" value from the origin and in the blueprint'],
+            'six'           => ['type' => 'string', 'value' => 'the "six" value from the origin and in the blueprint'],
             'seven'         => ['type' => 'string', 'value' => 'the "seven" value from the collection'],
-            'title'         => ['type' => Value::class, 'value' => null],
-            'unused_in_bp'  => ['type' => Value::class, 'value' => null],
+            'title'         => ['type' => 'string', 'value' => null],
+            'unused_in_bp'  => ['type' => 'string', 'value' => null],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
@@ -129,13 +129,13 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $augmented = new AugmentedEntry($entry);
 
-        $this->assertNull($augmented->get('mount'));
+        $this->assertNull($augmented->get('mount')->value());
 
         $mount->mount($entry->id())->save();
-        $this->assertEquals($mount, $augmented->get('mount'));
+        $this->assertEquals($mount, $augmented->get('mount')->value());
 
         $entry->set('mount', 'b');
-        $this->assertEquals('b', $augmented->get('mount'));
+        $this->assertEquals('b', $augmented->get('mount')->value());
     }
 
     /** @test */
@@ -153,19 +153,21 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $augmented = new AugmentedEntry($entry);
 
-        $this->assertNull($augmented->get('authors'));
+        $this->assertNull($augmented->get('authors')->value());
 
         $entry->set('authors', 'joe and bob');
-        $this->assertEquals('joe and bob', $augmented->get('authors'));
+        $this->assertEquals('joe and bob', $augmented->get('authors')->value());
     }
 
     /** @test */
     public function it_gets_the_authors_from_the_value_if_its_in_the_blueprint()
     {
         $blueprint = Blueprint::makeFromFields(['authors' => ['type' => 'users']]);
+        $userBlueprint = Blueprint::makeFromFields([]);
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
             'test' => $blueprint,
         ]));
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($userBlueprint);
 
         User::make()->id('user-1')->save();
         User::make()->id('user-2')->save();
@@ -177,19 +179,15 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $augmented = new AugmentedEntry($entry);
 
-        // Since it's in the blueprint, and is using a "users" fieldtype, it gets augmented to a collection.
-        $authors = $augmented->get('authors');
-        $this->assertInstanceOf(Value::class, $authors);
-        $authors = $authors->value();
-        $this->assertInstanceOf(IlluminateCollection::class, $authors);
-        $this->assertEquals([], $authors->all());
+        // Since it's in the blueprint, and is using a "users" fieldtype, it gets augmented to a querybuilder.
+        $authors = $augmented->get('authors')->value();
+        $this->assertInstanceOf(Builder::class, $authors);
+        $this->assertEquals([], $authors->get()->all());
 
         $entry->set('authors', ['user-1', 'unknown-user', 'user-2']);
-        $authors = $augmented->get('authors');
-        $this->assertInstanceOf(Value::class, $authors);
-        $authors = $authors->value();
-        $this->assertInstanceOf(IlluminateCollection::class, $authors);
-        $this->assertEveryItemIsInstanceOf(\Statamic\Contracts\Auth\User::class, $authors);
-        $this->assertEquals(['user-1', 'user-2'], $authors->map->id()->all());
+        $authors = $augmented->get('authors')->value();
+        $this->assertInstanceOf(Builder::class, $authors);
+        $this->assertEveryItemIsInstanceOf(\Statamic\Contracts\Auth\User::class, $authors->get());
+        $this->assertEquals(['user-1', 'user-2'], $authors->get()->map->id()->all());
     }
 }

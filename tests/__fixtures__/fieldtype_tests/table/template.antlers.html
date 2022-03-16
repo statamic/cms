@@ -1,0 +1,11 @@
+<table>
+{{ table }}
+    <tr>
+{{ cells }}
+        <td>{{ value | markdown }}</td>
+{{ /cells }}
+    </tr>
+{{ /table }}
+</table>
+
+{{ table | table }}
