@@ -181,4 +181,34 @@ class TermTest extends TestCase
             ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/de/tags/das-foo?preview=true'],
         ], $termDe->previewTargets()->all());
     }
+
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        tap(Taxonomy::make('tags')->sites(['en', 'fr']))->save();
+
+        $term = (new Term)
+            ->taxonomy('tags')
+            ->slug('test');
+
+        $term->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ])->save();
+
+        $this->assertEquals(false, $term->isDirty());
+        $this->assertEquals(false, $term->isDirty('title'));
+        $this->assertEquals(false, $term->isDirty(['title']));
+
+        $term->merge(['title' => 'French']);
+
+        $this->assertEquals(true, $term->isDirty());
+        $this->assertEquals(true, $term->isDirty('title'));
+        $this->assertEquals(true, $term->isDirty(['title']));
+        $this->assertEquals(false, $term->isDirty('food'));
+        $this->assertEquals(false, $term->isDirty(['food']));
+    }
 }

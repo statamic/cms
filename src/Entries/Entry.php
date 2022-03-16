@@ -156,7 +156,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return new AugmentedEntry($this);
     }
 
-    private function getDirtyArray()
+    public function getDirtyArray()
     {
         return array_merge([
             'collection' => $this->collectionHandle(),

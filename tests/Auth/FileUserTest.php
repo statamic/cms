@@ -119,4 +119,28 @@ class FileUserTest extends TestCase
         // Doing it a second time should give the same result but without multiple calls.
         $this->assertEquals($expectedPermissions, $user->permissions()->all());
     }
+
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        $user = $this->makeUser()->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ])->save();
+
+        $this->assertEquals(false, $user->isDirty());
+        $this->assertEquals(false, $user->isDirty('title'));
+        $this->assertEquals(false, $user->isDirty(['title']));
+
+        $user->merge(['title' => 'French']);
+
+        $this->assertEquals(true, $user->isDirty());
+        $this->assertEquals(true, $user->isDirty('title'));
+        $this->assertEquals(true, $user->isDirty(['title']));
+        $this->assertEquals(false, $user->isDirty('food'));
+        $this->assertEquals(false, $user->isDirty(['food']));
+    }
 }

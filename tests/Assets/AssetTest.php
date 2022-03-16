@@ -1185,4 +1185,33 @@ class AssetTest extends TestCase
             'charlie' => ['augmented c', 'augmented d'],
         ], Arr::only($asset->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
+
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+
+        $asset = (new Asset)->container($container);
+
+        $asset->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ])->save();
+
+        $this->assertEquals(false, $asset->isDirty());
+        $this->assertEquals(false, $asset->isDirty('title'));
+        $this->assertEquals(false, $asset->isDirty(['title']));
+
+        $asset->merge(['title' => 'French']);
+
+        $this->assertEquals(true, $asset->isDirty());
+        $this->assertEquals(true, $asset->isDirty('title'));
+        $this->assertEquals(true, $asset->isDirty(['title']));
+        $this->assertEquals(false, $asset->isDirty('food'));
+        $this->assertEquals(false, $asset->isDirty(['food']));
+    }
 }

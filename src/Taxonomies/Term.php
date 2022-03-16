@@ -14,10 +14,11 @@ use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Support\Traits\HasDirtyState;
 
 class Term implements TermContract
 {
-    use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
+    use ExistsAsFile, FluentlyGetsAndSets, HasDirtyState, SyncsOriginalState;
 
     protected $taxonomy;
     protected $slug;
@@ -216,6 +217,14 @@ class Term implements TermContract
         $this->inDefaultLocale()->set($key, $value);
 
         return $this;
+    }
+
+    private function getDirtyArray()
+    {
+        return array_merge([
+            'slug' => $this->slug(),
+            'taxonomy' => $this->taxonomyHandle(),
+        ], $this->data()->toArray());
     }
 
     public function __call($method, $args)

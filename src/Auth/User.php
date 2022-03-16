@@ -18,6 +18,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\UserDeleted;
@@ -28,6 +29,7 @@ use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\HasDirtyState;
 
 abstract class User implements
     UserContract,
@@ -40,7 +42,7 @@ abstract class User implements
     ArrayAccess,
     Arrayable
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, HasDirtyState, SyncsOriginalState;
 
     abstract public function get($key, $fallback = null);
 
@@ -144,6 +146,8 @@ abstract class User implements
     public function save()
     {
         Facades\User::save($this);
+
+        $this->syncOriginal();
 
         UserSaved::dispatch($this);
 

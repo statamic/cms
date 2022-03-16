@@ -30,13 +30,14 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Support\Traits\HasDirtyState;
 use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
+    use HasAugmentedInstance, HasDirtyState, FluentlyGetsAndSets, TracksQueriedColumns,
     TracksQueriedRelations,
     SyncsOriginalState, ContainsData {
         set as traitSet;
@@ -864,5 +865,12 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function getDirtyArray()
+    {
+        return array_merge([
+            'path' => $this->path(),
+        ], $this->data()->toArray());
     }
 }

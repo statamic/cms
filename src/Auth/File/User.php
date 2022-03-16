@@ -361,4 +361,16 @@ class User extends BaseUser
     {
         return Facades\User::find($this->id);
     }
+
+    public function getDirtyArray()
+    {
+        return array_merge([
+            'email' => $this->email(),
+            'groups' => $this->get('groups', []),
+            'password_hash' => $this->passwordHash(),
+            'permissions' => $this->get('permissions', []),
+            'roles' => $this->get('roles', []),
+            'super' => $this->get('super', false),
+        ], $this->data()->toArray());
+    }
 }
