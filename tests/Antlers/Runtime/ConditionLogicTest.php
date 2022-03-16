@@ -3,10 +3,6 @@
 namespace Tests\Antlers\Runtime;
 
 use Facades\Tests\Factories\EntryFactory;
-use Illuminate\Contracts\Support\Arrayable;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Data\HasAugmentedData;
-use Statamic\Entries\Collection;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Select;
@@ -729,9 +725,7 @@ EOT;
 
         $result = $this->renderString($template, $data, true);
 
-
         $this->assertStringContainsString('<1-One><root value><2-Two><root value><1-One><root value>', $result);
         $this->assertStringContainsString('<else><1-One><root value><else><2-Two><root value><else><1-One><root value>', $result);
     }
 }
-

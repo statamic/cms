@@ -355,33 +355,40 @@ class Environment
             if ($result instanceof ArrayableString) {
                 $value = $this->getTruthValue($result->value());
                 $this->unlock();
+
                 return $value;
             } elseif ($result instanceof QueryBuilder) {
                 $builderResults = $result->count();
                 $this->unlock();
+
                 return $builderResults > 0;
             } elseif ($result instanceof Collection) {
                 $value = $result->count() > 0;
                 $this->unlock();
+
                 return $value;
             }
 
             $this->unlock();
+
             return true;
         }
 
         if (is_bool($result)) {
             $this->unlock();
+
             return $result;
         }
 
         if (is_numeric($result)) {
-            $value =  $result >= 1;
+            $value = $result >= 1;
             $this->unlock();
+
             return $value;
         }
 
         $this->unlock();
+
         return null;
     }
 
