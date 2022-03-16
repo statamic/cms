@@ -8,6 +8,7 @@ use League\Glide\Server;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -79,7 +80,7 @@ class ImageGeneratorTest extends TestCase
     private function generatedImagePaths()
     {
         return File::getFilesRecursively($this->glideCachePath())
-            ->map(fn ($path) => (string) str($path)->after($this->glideCachePath().'/'))
+            ->map(fn ($path) => (string) Str::of($path)->after($this->glideCachePath().'/'))
             ->all();
     }
 
