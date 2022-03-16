@@ -574,8 +574,8 @@ class Parser implements ParserContract
             // If there's a matching value in the context, we would have intentionally treated it as
             // a callback. If it's a query builder instance, we want to use the Query tag's index
             // method to handle the logic. We'll pass the builder into the builder parameter.
-            if (isset($data[$name])) {
-                $value = $data[$name];
+            [$exists, $value] = $this->getVariableExistenceAndValue($name, $data);
+            if ($exists) {
                 $value = $value instanceof Value ? $value->value() : $value;
                 if ($value instanceof Builder) {
                     $parameters['builder'] = $value;
