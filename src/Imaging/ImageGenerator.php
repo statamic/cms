@@ -88,7 +88,11 @@ class ImageGenerator
 
         $guzzleClient = app('statamic.imaging.guzzle');
 
-        $filesystem = new Filesystem(new GuzzleAdapter($base, $guzzleClient));
+        $adapter = $this->isUsingFlysystemOne()
+            ? new GuzzleAdapterV1($base, $guzzleClient)
+            : new GuzzleAdapter($base, $guzzleClient);
+
+        $filesystem = new Filesystem($adapter);
 
         $this->server->setSource($filesystem);
         $this->server->setSourcePathPrefix('/');
@@ -201,5 +205,10 @@ class ImageGenerator
         if ($mime !== null && strncmp($mime, 'image/', 6) !== 0) {
             throw new \Exception("Image [{$path}] does not actually appear to be an image.");
         }
+    }
+
+    private function isUsingFlysystemOne()
+    {
+        return class_exists('\League\Flysystem\Util');
     }
 }
