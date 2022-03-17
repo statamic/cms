@@ -56,6 +56,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $requiresSlugs = true;
     protected $titleFormats = [];
     protected $previewTargets = [];
+    protected static $extraPreviewTargets = [];
 
     public function __construct()
     {
@@ -710,7 +711,22 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                     $targets = $this->defaultPreviewTargets();
                 }
 
-                return collect($targets);
+                return collect($targets)->merge($this->extraPreviewTargets());
+            })
+            ->args(func_get_args());
+    }
+
+    public function extraPreviewTargets($targets = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('extraPreviewTargets')
+            ->setter(function ($targets) {
+                return collect(self::$extraPreviewTargets)
+                    ->merge($targets)
+                    ->unique(function ($target) {
+                        return $target['format'];
+                    })
+                    ->toArray();
             })
             ->args(func_get_args());
     }
