@@ -721,12 +721,16 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $this
             ->fluentlyGetOrSet('extraPreviewTargets')
             ->setter(function ($targets) {
-                return collect(self::$extraPreviewTargets)
+                $targets = collect(self::$extraPreviewTargets[$this->handle] ?? [])
                     ->merge($targets)
                     ->unique(function ($target) {
                         return $target['format'];
-                    })
-                    ->toArray();
+                    })->toArray();
+
+                return array_merge(self::$extraPreviewTargets, [$this->handle => $targets]);
+            })
+            ->getter(function () {
+                return self::$extraPreviewTargets[$this->handle] ?? [];
             })
             ->args(func_get_args());
     }
