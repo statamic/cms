@@ -120,6 +120,18 @@ class ImageGeneratorTest extends TestCase
         $this->assertContains($expectedPath, $paths);
     }
 
+    /** @test */
+    public function it_validates_an_asset()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    public function it_validates_an_image()
+    {
+        $this->markTestIncomplete();
+    }
+
     private function makeGenerator()
     {
         return new ImageGenerator($this->app->make(Server::class));
