@@ -88,7 +88,10 @@ class ImageGeneratorTest extends TestCase
         $this->assertCount(0, $this->generatedImagePaths());
 
         $this->app->bind('statamic.imaging.guzzle', function () {
-            $response = new Response(200, [], UploadedFile::fake()->image('', 30, 60)->getContent());
+            $file = UploadedFile::fake()->image('', 30, 60);
+            $contents = file_get_contents($file->getPathname());
+
+            $response = new Response(200, [], $contents);
 
             // Glide, Flysystem, or the Guzzle adapter will try to perform the requests
             // at different points to check if the file exists or to get the content
