@@ -89,7 +89,7 @@ class ImageGenerator
         $guzzleClient = app('statamic.imaging.guzzle');
 
         $adapter = $this->isUsingFlysystemOne()
-            ? new GuzzleAdapterV1($base, $guzzleClient)
+            ? new LegacyGuzzleAdapter($base, $guzzleClient)
             : new GuzzleAdapter($base, $guzzleClient);
 
         $filesystem = new Filesystem($adapter);

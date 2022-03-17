@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseInterface;
  *
  * This is for Flysystem v1.
  */
-class GuzzleAdapterV1 implements AdapterInterface
+class LegacyGuzzleAdapter implements AdapterInterface
 {
     /**
      * Whether this endpoint supports head requests.
