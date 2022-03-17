@@ -64,7 +64,8 @@ class ImageGeneratorTest extends TestCase
         $imagePath = 'testimages/foo/hoff.jpg';
 
         $image = UploadedFile::fake()->image('', 30, 60);
-        File::put(public_path($imagePath), $image->getContent());
+        $contents = file_get_contents($image->getPathname());
+        File::put(public_path($imagePath), $contents);
 
         $path = $this->makeGenerator()->generateByPath(
             $imagePath,
