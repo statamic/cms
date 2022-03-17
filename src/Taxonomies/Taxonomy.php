@@ -38,6 +38,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
+    protected static $extraPreviewTargets = [];
 
     public function __construct()
     {
@@ -351,7 +352,26 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
                     $targets = $this->defaultPreviewTargets();
                 }
 
-                return collect($targets);
+                return collect($targets)->merge($this->extraPreviewTargets());
+            })
+            ->args(func_get_args());
+    }
+
+    public function extraPreviewTargets($targets = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('extraPreviewTargets')
+            ->setter(function ($targets) {
+                $targets = collect(self::$extraPreviewTargets[$this->handle] ?? [])
+                    ->merge($targets)
+                    ->unique(function ($target) {
+                        return $target['format'];
+                    })->toArray();
+
+                return array_merge(self::$extraPreviewTargets, [$this->handle => $targets]);
+            })
+            ->getter(function () {
+                return self::$extraPreviewTargets[$this->handle] ?? [];
             })
             ->args(func_get_args());
     }

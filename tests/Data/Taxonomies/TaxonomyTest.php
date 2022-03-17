@@ -191,4 +191,39 @@ class TaxonomyTest extends TestCase
             ['label' => 'Bar', 'format' => '{bar}'],
         ], $taxonomy->previewTargets()->all());
     }
+
+    /** @test */
+    public function it_can_add_extra_preview_targets()
+    {
+        $taxonomy = (new Taxonomy)->handle('test');
+
+        $taxonomy->extraPreviewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ]);
+
+        $this->assertEquals([
+            ['label' => 'Term', 'format' => '{permalink}'],
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $taxonomy->previewTargets()->all());
+    }
+
+    /** @test */
+    public function it_can_add_unique_extra_preview_targets_per_taxonomy()
+    {
+        $taxonomy = (new Taxonomy)->handle('test');
+        $taxonomy2 = (new Taxonomy)->handle('test_2');
+
+        $taxonomy->extraPreviewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ]);
+
+        $taxonomy2->extraPreviewTargets([
+            ['label' => 'Baz', 'format' => '{baz}'],
+        ]);
+
+        $this->assertNotEquals($taxonomy->previewTargets()->all(), $taxonomy2->previewTargets()->all());
+    }
 }
