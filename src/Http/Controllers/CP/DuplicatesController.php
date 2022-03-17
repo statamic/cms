@@ -36,7 +36,7 @@ class DuplicatesController extends CpController
 
         $request->validate(['path' => 'required']);
 
-        $path = base_path().'/'.$request->path;
+        $path = $request->path;
 
         $store = $this->getStoreByPath($path);
 
