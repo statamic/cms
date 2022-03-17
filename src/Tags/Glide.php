@@ -6,6 +6,7 @@ use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
@@ -95,6 +96,10 @@ class Glide extends Tags
     public function generate($items = null)
     {
         $items = $items ?? $this->params->get(['src', 'id', 'path']);
+
+        if (Compare::isQueryBuilder($items)) {
+            $items = $items->get();
+        }
 
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
