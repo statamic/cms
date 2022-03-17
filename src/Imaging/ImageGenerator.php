@@ -2,7 +2,7 @@
 
 namespace Statamic\Imaging;
 
-use League\Flysystem\Adapter\Local;
+use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
 use League\Glide\Filesystem\FileNotFoundException as GlideFileNotFoundException;
@@ -61,7 +61,9 @@ class ImageGenerator
         $this->path = $path;
         $this->params = $params;
 
-        $this->server->setSource(new Filesystem(new Local(public_path())));
+        $source = Storage::build(['driver' => 'local', 'root' => public_path()])->getDriver();
+
+        $this->server->setSource($source);
         $this->server->setSourcePathPrefix('/');
         $this->server->setCachePathPrefix('paths');
 
