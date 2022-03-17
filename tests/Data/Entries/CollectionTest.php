@@ -693,4 +693,39 @@ class CollectionTest extends TestCase
             ['label' => 'Bar', 'format' => '{bar}'],
         ], $collection->previewTargets()->all());
     }
+
+    /** @test */
+    public function it_can_add_extra_preview_targets()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $collection->extraPreviewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ]);
+
+        $this->assertEquals([
+            ['label' => 'Entry', 'format' => '{permalink}'],
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $collection->previewTargets()->all());
+    }
+
+    /** @test */
+    public function it_can_add_unique_extra_preview_targets_per_collection()
+    {
+        $collection = (new Collection)->handle('test');
+        $collection2 = (new Collection)->handle('test_2');
+
+        $collection->extraPreviewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ]);
+
+        $collection2->extraPreviewTargets([
+            ['label' => 'Baz', 'format' => '{baz}'],
+        ]);
+
+        $this->assertNotEquals($collection->previewTargets()->all(), $collection2->previewTargets()->all());
+    }
 }
