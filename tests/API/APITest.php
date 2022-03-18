@@ -5,6 +5,7 @@ namespace Tests\API;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -199,6 +200,39 @@ class APITest extends TestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @test
+     * @dataProvider userPasswordFilterProvider
+     */
+    public function it_doesnt_allow_filtering_users_by_password($filter)
+    {
+        Facades\Config::set('statamic.api.resources.users', true);
+
+        User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
+        User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
+
+        $this
+            ->get("/api/users?filter[{$filter}]=abc")
+            ->assertJson([
+                'data' => [
+                    ['id' => 'one'],
+                    ['id' => 'two'], // this one would be filtered out if the password was allowed
+                ],
+            ]);
+    }
+
+    public function userPasswordFilterProvider()
+    {
+        return collect([
+            'password',
+            'password:is',
+            'password:regex',
+            'password_hash',
+            'password_hash:is',
+            'password_hash:regex',
+        ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
     }
 
     private function assertEndpointDataCount($endpoint, $count)
