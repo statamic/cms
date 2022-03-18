@@ -1,5 +1,21 @@
 # Release Notes
 
+## 3.3.2 (2022-03-18)
+
+### What's improved
+- Update French translations. [#5540](https://github.com/statamic/cms/issues/5540) by @ebeauchamps
+- Link to automatic titles section in the docs. [#5553](https://github.com/statamic/cms/issues/5553) by @jackmcdade
+
+### What's fixed
+- Prevent filtering users by password hashes in the APIs. [#5568](https://github.com/statamic/cms/issues/5568) by @jasonvarga
+- Prevent usage of `null` as filesystem paths. [#5562](https://github.com/statamic/cms/issues/5562) by @jasonvarga
+- The `glide` tag pair can handle query builders. [#5552](https://github.com/statamic/cms/issues/5552) by @jasonvarga
+- Fix Flysystem 3 support in Glide. [#5551](https://github.com/statamic/cms/issues/5551) by @jasonvarga
+- Make `isset` on properties work. [#5530](https://github.com/statamic/cms/issues/5530) by @jasonvarga
+- Range fields can now use `0` as a value or default. [#5538](https://github.com/statamic/cms/issues/5538) by @jasonvarga
+
+
+
 ## 3.3.1 (2022-03-16)
 
 ### What's new
