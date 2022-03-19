@@ -5,7 +5,10 @@ namespace Tests\Tags\Collection;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
+use Mockery;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
@@ -125,7 +128,7 @@ class EntriesTest extends TestCase
     /** @test */
     public function it_gets_localized_site_entries_in_a_collection()
     {
-        $this->withoutEvents();
+        Event::fake();
 
         $this->collection->sites(['en', 'fr'])->save();
 
@@ -511,6 +514,23 @@ class EntriesTest extends TestCase
 
         $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => ''])->map->slug()->all());
         $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => '|'])->map->slug()->all());
+    }
+
+    /** @test */
+    public function it_accepts_a_query_builder_to_filter_by_taxonomy()
+    {
+        $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
+        $this->makeEntry('2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
+        $this->makeEntry('3')->data(['tags' => ['rad', 'awesome']])->save();
+        $this->makeEntry('4')->data(['tags' => ['meh']])->save();
+
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->andReturn(TermCollection::make([
+            tap(Term::make('rad')->taxonomy('tags')->dataForLocale('en', []))->save(),
+            tap(Term::make('awesome')->taxonomy('tags')->dataForLocale('en', []))->save(),
+        ]));
+
+        $this->assertEquals([3], $this->getEntries(['taxonomy:tags:all' => $builder])->map->slug()->all());
     }
 }
 

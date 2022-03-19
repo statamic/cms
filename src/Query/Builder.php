@@ -3,8 +3,10 @@
 namespace Statamic\Query;
 
 use Closure;
+use DateTimeInterface;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
@@ -15,6 +17,7 @@ abstract class Builder implements Contract
     protected $limit;
     protected $offset = 0;
     protected $wheres = [];
+    protected $with = [];
     protected $orderBys = [];
     protected $operators = [
         '=' => 'Equals',
@@ -328,6 +331,162 @@ abstract class Builder implements Contract
         return $this->whereNotBetween($column, $values, 'or');
     }
 
+    public function whereDate($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        if (! in_array($operator, ['=', '<>', '!=', '>', '>=', '<', '<='])) {
+            throw new InvalidArgumentException('Illegal operator for date comparison');
+        }
+
+        if (! ($value instanceof DateTimeInterface)) {
+            $value = Carbon::parse($value);
+        }
+
+        $value = Carbon::parse($value->format('Y-m-d')); // we only care about the date part
+
+        $this->wheres[] = [
+            'type' => 'Date',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereDate($column, $operator, $value = null)
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->whereDate($column, $operator, $value, 'or');
+    }
+
+    public function whereMonth($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        if (! in_array($operator, ['=', '<>', '!=', '>', '>=', '<', '<='])) {
+            throw new InvalidArgumentException('Illegal operator for date comparison');
+        }
+
+        $this->wheres[] = [
+            'type' => 'Month',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereMonth($column, $operator, $value = null)
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->whereMonth($column, $operator, $value, 'or');
+    }
+
+    public function whereDay($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        if (! in_array($operator, ['=', '<>', '!=', '>', '>=', '<', '<='])) {
+            throw new InvalidArgumentException('Illegal operator for date comparison');
+        }
+
+        $this->wheres[] = [
+            'type' => 'Day',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereDay($column, $operator, $value = null)
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->whereDay($column, $operator, $value, 'or');
+    }
+
+    public function whereYear($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        if (! in_array($operator, ['=', '<>', '!=', '>', '>=', '<', '<='])) {
+            throw new InvalidArgumentException('Illegal operator for date comparison');
+        }
+
+        $this->wheres[] = [
+            'type' => 'Year',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereYear($column, $operator, $value = null)
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->whereYear($column, $operator, $value, 'or');
+    }
+
+    public function whereTime($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        if (! in_array($operator, ['=', '<>', '!=', '>', '>=', '<', '<='])) {
+            throw new InvalidArgumentException('Illegal operator for date comparison');
+        }
+
+        $this->wheres[] = [
+            'type' => 'Time',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereTime($column, $operator, $value = null)
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->whereTime($column, $operator, $value, 'or');
+    }
+
     public function whereColumn($column, $operator = null, $value = null, $boolean = 'and')
     {
         // If the given operator is not found in the list of valid operators we will
@@ -481,5 +640,12 @@ abstract class Builder implements Contract
     protected function filterTestNotLikeRegex($item, $pattern)
     {
         return ! $this->filterTestLikeRegex($item, $pattern);
+    }
+
+    public function with($relations)
+    {
+        $this->with = array_merge($this->with, Arr::wrap($relations));
+
+        return $this;
     }
 }

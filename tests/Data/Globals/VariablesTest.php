@@ -2,8 +2,17 @@
 
 namespace Tests\Data\Globals;
 
+use BadMethodCallException;
+use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Contracts\Support\Arrayable;
+use Mockery;
+use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
 use Statamic\Globals\Variables;
+use Statamic\Support\Arr;
 use Tests\TestCase;
 
 class VariablesTest extends TestCase
@@ -173,5 +182,182 @@ EOT;
         $this->assertEquals(null, $e->value('two'));
         $this->assertEquals('india', $e->value('three'));
         $this->assertEquals(null, $e->value('four'));
+    }
+
+    /** @test */
+    public function it_sets_data_values_using_magic_properties()
+    {
+        $variables = new Variables;
+        $this->assertNull($variables->get('foo'));
+
+        $variables->foo = 'bar';
+
+        $this->assertTrue($variables->has('foo'));
+        $this->assertEquals('bar', $variables->get('foo'));
+    }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $blueprint = Facades\Blueprint::makeFromFields(['charlie' => ['type' => 'test']]);
+        BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
+        $global = GlobalSet::make('settings');
+        $variables = $global->makeLocalization('en');
+        $variables->set('alfa', 'bravo');
+        $variables->set('charlie', 'delta');
+
+        $this->assertEquals('bravo', $variables->alfa);
+        $this->assertEquals('bravo', $variables['alfa']);
+        $this->assertEquals('delta (augmented)', $variables->charlie);
+        $this->assertEquals('delta (augmented)', $variables['charlie']);
+    }
+
+    /**
+     * @test
+     * @dataProvider queryBuilderProvider
+     **/
+    public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
+    {
+        $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
+        app()->instance('mocked-builder', $builder);
+
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return app('mocked-builder');
+            }
+        })::register();
+
+        $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'test']]);
+        BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
+        $global = GlobalSet::make('settings');
+        $variables = $global->makeLocalization('en');
+        $variables->set('foo', 'delta');
+
+        $this->assertEquals('query builder results', $variables->foo);
+        $this->assertEquals('query builder results', $variables['foo']);
+        $this->assertSame($builder, $variables->foo());
+    }
+
+    public function queryBuilderProvider()
+    {
+        return [
+            'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],
+            'database' => [Mockery::mock(\Illuminate\Database\Query\Builder::class)],
+            'eloquent' => [Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)],
+        ];
+    }
+
+    /** @test */
+    public function calling_unknown_method_throws_exception()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Statamic\Globals\Variables::thisFieldDoesntExist()');
+
+        GlobalSet::make('settings')->makeLocalization('en')->thisFieldDoesntExist();
+    }
+
+    /** @test */
+    public function it_converts_to_an_array()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return [
+                    new Value('alfa'),
+                    new Value([
+                        new Value('bravo'),
+                        new Value('charlie'),
+                        'delta',
+                    ]),
+                ];
+            }
+        };
+        $fieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'baz' => [
+                'type' => 'test',
+            ],
+        ]);
+        BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
+        $global = GlobalSet::make('settings');
+        $variables = $global->makeLocalization('en');
+        $variables->set('foo', 'bar');
+        $variables->set('baz', 'qux');
+
+        $this->assertInstanceOf(Arrayable::class, $variables);
+
+        $array = $variables->toArray();
+        $this->assertEquals($variables->augmented()->keys(), array_keys($array));
+        $this->assertEquals([
+            'alfa',
+            [
+                'bravo',
+                'charlie',
+                'delta',
+            ],
+        ], $array['baz'], 'Value objects are not resolved recursively');
+    }
+
+    /** @test */
+    public function only_requested_relationship_fields_are_included_in_to_array()
+    {
+        $regularFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'regular';
+
+            public function augment($value)
+            {
+                return 'augmented '.$value;
+            }
+        };
+        $regularFieldtype::register();
+
+        $relationshipFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'relationship';
+            protected $relationship = true;
+
+            public function augment($values)
+            {
+                return collect($values)->map(fn ($value) => 'augmented '.$value)->all();
+            }
+        };
+        $relationshipFieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'alfa' => ['type' => 'regular'],
+            'bravo' => ['type' => 'relationship'],
+            'charlie' => ['type' => 'relationship'],
+        ]);
+        BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
+        $global = GlobalSet::make('settings');
+        $variables = $global->makeLocalization('en');
+        $variables->set('alfa', 'one');
+        $variables->set('bravo', ['a', 'b']);
+        $variables->set('charlie', ['c', 'd']);
+
+        $this->assertEquals([
+            'alfa' => 'augmented one',
+            'bravo' => ['a', 'b'],
+            'charlie' => ['augmented c', 'augmented d'],
+        ], Arr::only($variables->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 }

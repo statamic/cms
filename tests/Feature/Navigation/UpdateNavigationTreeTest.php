@@ -47,6 +47,7 @@ class UpdateNavigationTreeTest extends TestCase
             'baz' => ['type' => 'text'],
             'qux' => ['type' => 'text'],
         ]);
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
         BranchIdGenerator::shouldReceive('generate')->times(3)->andReturn('newly-generated-id1', 'newly-generated-id2', 'newly-generated-id3');
 

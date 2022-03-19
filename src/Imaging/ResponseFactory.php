@@ -2,7 +2,6 @@
 
 namespace Statamic\Imaging;
 
-use League\Flysystem\FilesystemInterface;
 use League\Glide\Responses\ResponseFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -33,19 +32,26 @@ class ResponseFactory implements ResponseFactoryInterface
      * @param  string  $path  The cached file path.
      * @return StreamedResponse The response object.
      */
-    public function create(FilesystemInterface $cache, $path)
+    public function create($cache, $path)
     {
+        $isFlysystemV1 = method_exists($cache, 'getTimestamp');
+
+        // Determine whether or not to use Flysystem 1.x or 3.x getter methods.
+        $mimeTypeMethod = $isFlysystemV1 ? 'getMimetype' : 'mimeType';
+        $fileSizeMethod = $isFlysystemV1 ? 'getSize' : 'fileSize';
+        $lastModifiedMethod = $isFlysystemV1 ? 'getTimestamp' : 'lastModified';
+
         $stream = $cache->readStream($path);
 
         $response = new StreamedResponse();
-        $response->headers->set('Content-Type', $cache->getMimetype($path));
-        $response->headers->set('Content-Length', $cache->getSize($path));
+        $response->headers->set('Content-Type', $cache->{$mimeTypeMethod}($path));
+        $response->headers->set('Content-Length', $cache->{$fileSizeMethod}($path));
         $response->setPublic();
         $response->setMaxAge(31536000);
         $response->setExpires(date_create()->modify('+1 years'));
 
         if ($this->request) {
-            $response->setLastModified(date_create()->setTimestamp($cache->getTimestamp($path)));
+            $response->setLastModified(date_create()->setTimestamp($cache->{$lastModifiedMethod}($path)));
             $response->isNotModified($this->request);
         }
 

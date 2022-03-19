@@ -32,6 +32,21 @@ class HtmlTest extends TestCase
         $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>&amp;</li></ol>', $ol);
     }
 
+    /**
+     * @test
+     */
+    public function it_returns_empty_string_when_no_list_items_given(): void
+    {
+        $list = [];
+        $attributes = ['class' => 'example'];
+
+        $ol = Html::ol($list, $attributes);
+        $this->assertEquals('', $ol);
+
+        $ul = Html::ul($list, $attributes);
+        $this->assertEquals('', $ul);
+    }
+
     public function testUl()
     {
         $list = ['foo', 'bar', '&amp;'];

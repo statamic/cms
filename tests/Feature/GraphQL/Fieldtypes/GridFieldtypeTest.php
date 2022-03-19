@@ -32,21 +32,30 @@ class GridFieldtypeTest extends TestCase
                 'fields' => [
                     ['handle' => 'food', 'field' => ['type' => 'text']],
                     ['handle' => 'drink', 'field' => ['type' => 'text']],
+                    ['handle' => 'stuff', 'field' => ['type' => 'entries']],
                 ],
             ],
         ]);
 
+        $stuff = Blueprint::makeFromFields([]);
+
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
             'article' => $article->setHandle('article'),
+        ]));
+
+        BlueprintRepository::shouldReceive('in')->with('collections/stuff')->andReturn(collect([
+            'stuff' => $stuff->setHandle('stuff'),
         ]));
 
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'meals' => [
                 ['food' => 'burger', 'drink' => 'coke'],
-                ['food' => 'salad', 'drink' => 'water'],
+                ['food' => 'salad', 'drink' => 'water', 'stuff' => ['stuff1']],
             ],
         ])->create();
+
+        EntryFactory::collection('stuff')->id('stuff1')->data(['title' => 'One'])->create();
 
         $query = <<<'GQL'
 {
@@ -56,6 +65,9 @@ class GridFieldtypeTest extends TestCase
             meals {
                 food
                 drink
+                stuff {
+                    title
+                }
             }
         }
     }
@@ -70,8 +82,8 @@ GQL;
                 'entry' => [
                     'title' => 'Main Post',
                     'meals' => [
-                        ['food' => 'burger', 'drink' => 'coke'],
-                        ['food' => 'salad', 'drink' => 'water'],
+                        ['food' => 'burger', 'drink' => 'coke', 'stuff' => []],
+                        ['food' => 'salad', 'drink' => 'water', 'stuff' => [['title' => 'One']]],
                     ],
                 ],
             ]]);

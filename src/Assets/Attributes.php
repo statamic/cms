@@ -93,7 +93,7 @@ class Attributes
         $manager->copy("source://{$this->asset->path()}", $destination);
 
         try {
-            [$width, $height] = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
+            [$width, $height] = getimagesize($this->prefixPath($cachePath));
             $size = compact('width', 'height');
         } catch (\Exception $e) {
             $size = [];
@@ -126,7 +126,7 @@ class Attributes
 
         $manager->copy("source://{$this->asset->path()}", $destination);
 
-        $svg = simplexml_load_file($cache->getAdapter()->getPathPrefix().$cachePath);
+        $svg = simplexml_load_file($this->prefixPath($cachePath));
 
         $cache->delete($cachePath);
 
@@ -169,5 +169,10 @@ class Attributes
         ]]);
 
         return Storage::disk($disk)->getDriver();
+    }
+
+    private function prefixPath($path)
+    {
+        return Storage::disk('attributes-cache')->path($path);
     }
 }

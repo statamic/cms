@@ -6,6 +6,9 @@ use Statamic\Fields\Value;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
+/**
+ * @group array
+ */
 class SumTest extends TestCase
 {
     /**

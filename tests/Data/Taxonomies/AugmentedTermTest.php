@@ -48,8 +48,8 @@ class AugmentedTermTest extends AugmentedTestCase
 
         $expectations = [
             'id'            => ['type' => 'string', 'value' => 'test::term-slug'],
-            'slug'          => ['type' => Value::class, 'value' => 'term-slug'],
-            'title'         => ['type' => Value::class, 'value' => 'term-slug'],
+            'slug'          => ['type' => 'string', 'value' => 'term-slug'],
+            'title'         => ['type' => 'string', 'value' => 'term-slug'],
             'uri'           => ['type' => 'string', 'value' => '/test/term-slug'],
             'url'           => ['type' => 'string', 'value' => '/test/term-slug'],
             'edit_url'      => ['type' => 'string', 'value' => 'http://localhost/cp/taxonomies/test/terms/term-slug/en'],
@@ -60,9 +60,10 @@ class AugmentedTermTest extends AugmentedTestCase
             'entries_count' => ['type' => 'int', 'value' => 0],
             'entries'       => ['type' => EntryQueryBuilder::class],
             'one'           => ['type' => 'string', 'value' => 'the "one" value on the term'],
-            'two'           => ['type' => Value::class, 'value' => 'the "two" value on the term and in the blueprint'],
+            'two'           => ['type' => 'string', 'value' => 'the "two" value on the term and in the blueprint'],
             'three'         => ['type' => 'string', 'value' => 'the "three" value from the taxonomy'],
-            'unused_in_bp'  => ['type' => Value::class, 'value' => null],
+            'unused_in_bp'  => ['type' => 'string', 'value' => null],
+            'locale'        => ['type' => 'string', 'value' => 'en'],
             'updated_at'    => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_by'    => ['type' => UserContract::class, 'value' => 'test-user'],
         ];

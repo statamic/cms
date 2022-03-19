@@ -116,7 +116,7 @@
 
                 <publish-container
                     v-if="fields"
-                    name="publishContainer"
+                    :name="publishContainer"
                     :blueprint="fieldset"
                     :values="values"
                     :meta="meta"
@@ -185,8 +185,13 @@ import EditorActions from './EditorActions.vue';
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
+import HasHiddenFields from '../../data-list/HasHiddenFields';
 
 export default {
+
+    mixins: [
+        HasHiddenFields,
+    ],
 
     components: {
         EditorActions,
@@ -333,7 +338,7 @@ export default {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
-            this.$axios.patch(url, this.values).then(response => {
+            this.$axios.patch(url, this.visibleValues).then(response => {
                 this.$emit('saved', response.data.asset);
                 this.$toast.success(__('Saved'));
                 this.saving = false;

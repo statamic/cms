@@ -7,6 +7,7 @@ use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
+use Statamic\Support\Arr;
 
 class Fields
 {
@@ -118,7 +119,9 @@ class Fields
     public function addValues(array $values)
     {
         $fields = $this->fields->map(function ($field) use ($values) {
-            return $field->newInstance()->setValue(array_get($values, $field->handle()));
+            return Arr::has($values, $field->handle())
+                ? $field->newInstance()->fillValue(Arr::get($values, $field->handle()))
+                : $field->newInstance();
         });
 
         return $this->newInstance()->setFields($fields);
@@ -128,6 +131,13 @@ class Fields
     {
         return $this->fields->mapWithKeys(function ($field) {
             return [$field->handle() => $field->value()];
+        });
+    }
+
+    public function validatableValues()
+    {
+        return $this->values()->filter(function ($value, $handle) {
+            return $this->fields->get($handle)->isFilled();
         });
     }
 

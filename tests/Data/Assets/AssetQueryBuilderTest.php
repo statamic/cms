@@ -5,6 +5,7 @@ namespace Tests\Data\Assets;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -16,7 +17,7 @@ class AssetQueryBuilderTest extends TestCase
     {
         parent::setUp();
 
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
 
         Storage::disk('test')->put('a.jpg', '');
         Storage::disk('test')->put('b.txt', '');
@@ -71,7 +72,103 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['d', 'e'], $assets->map->filename()->all());
     }
 
+    private function createWhereDateTestAssets()
+    {
+        $blueprint = Blueprint::makeFromFields(['test_date' => ['type' => 'date', 'time_enabled' => true]]);
+        Blueprint::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+
+        Asset::find('test::a.jpg')->data(['test_date' => '2021-11-15 20:31:04'])->save();
+        Asset::find('test::b.txt')->data(['test_date' => '2021-11-14 09:00:00'])->save();
+        Asset::find('test::c.txt')->data(['test_date' => '2021-11-15 00:00:00'])->save();
+        Asset::find('test::d.jpg')->data(['test_date' => '2020-09-13 14:44:24'])->save();
+        Asset::find('test::e.jpg')->data(['test_date' => null])->save();
+    }
+
     /** @test **/
+    public function assets_are_found_using_where_date()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereDate('test_date', '2021-11-15')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereDate('test_date', 1637000264)->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereDate('test_date', '>=', '2021-11-15')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_month()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereMonth('test_date', 11)->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'b', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereMonth('test_date', '<', 11)->get();
+
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['d'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_day()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereDay('test_date', 15)->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereDay('test_date', '<', 15)->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['b', 'd'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_year()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereYear('test_date', 2021)->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'b', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereYear('test_date', '<', 2021)->get();
+
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['d'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_time()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereTime('test_date', '09:00')->get();
+
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['b'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereTime('test_date', '>', '09:00')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'd'], $assets->map->filename()->all());
+    }
+
     public function assets_are_found_using_where_null()
     {
         Asset::find('test::a.jpg')->data(['text' => 'Text 1'])->save();

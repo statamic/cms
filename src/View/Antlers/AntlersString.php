@@ -2,6 +2,8 @@
 
 namespace Statamic\View\Antlers;
 
+use Statamic\Contracts\View\Antlers\Parser;
+
 class AntlersString
 {
     protected $string;
