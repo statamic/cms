@@ -1765,36 +1765,46 @@ class NodeProcessor
                             foreach ($node->parameters as $param) {
                                 if (ModifierManager::isModifier($param)) {
                                     $activeData = $this->getActiveData();
-
-                                    $tempValues = $node->getModifierParameterValuesForParameter($param, $activeData);
                                     $paramValues = [];
 
-                                    foreach ($tempValues as $paramName => $value) {
-                                        $containedInterpolation = false;
+                                    if ($param->isVariableReference) {
+                                        $varValue = $node->getSingleParameterValue($param, $this, $activeData);
 
-                                        foreach ($node->interpolationRegions as $regionName => $region) {
-                                            if (Str::contains($value, $regionName)) {
-                                                $containedInterpolation = true;
-                                                if (array_key_exists($regionName, $this->canHandleInterpolations) == false) {
-                                                    $this->canHandleInterpolations[$regionName] = $node->processedInterpolationRegions[$regionName];
-                                                }
-
-                                                $interpolationResult = $this->evaluateDeferredInterpolation($regionName);
-
-                                                $resolvedValue = null;
-
-                                                if ($value == $regionName) {
-                                                    $resolvedValue = $interpolationResult;
-                                                } else {
-                                                    $resolvedValue = str_replace($regionName, (string) $interpolationResult, $value);
-                                                }
-
-                                                $paramValues[$paramName] = $resolvedValue;
-                                            }
+                                        if ($varValue == 'void::'.GlobalRuntimeState::$environmentId) {
+                                            continue;
                                         }
 
-                                        if (! $containedInterpolation) {
-                                            $paramValues[$paramName] = $value;
+                                        $paramValues[] = $varValue;
+                                    } else {
+                                        $tempValues = $node->getModifierParameterValuesForParameter($param, $activeData);
+
+                                        foreach ($tempValues as $paramName => $value) {
+                                            $containedInterpolation = false;
+
+                                            foreach ($node->interpolationRegions as $regionName => $region) {
+                                                if (Str::contains($value, $regionName)) {
+                                                    $containedInterpolation = true;
+                                                    if (array_key_exists($regionName, $this->canHandleInterpolations) == false) {
+                                                        $this->canHandleInterpolations[$regionName] = $node->processedInterpolationRegions[$regionName];
+                                                    }
+
+                                                    $interpolationResult = $this->evaluateDeferredInterpolation($regionName);
+
+                                                    $resolvedValue = null;
+
+                                                    if ($value == $regionName) {
+                                                        $resolvedValue = $interpolationResult;
+                                                    } else {
+                                                        $resolvedValue = str_replace($regionName, (string) $interpolationResult, $value);
+                                                    }
+
+                                                    $paramValues[$paramName] = $resolvedValue;
+                                                }
+                                            }
+
+                                            if (! $containedInterpolation) {
+                                                $paramValues[$paramName] = $value;
+                                            }
                                         }
                                     }
 
