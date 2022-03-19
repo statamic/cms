@@ -502,53 +502,64 @@ class NodeProcessor
             if ($node->pathReference->isStrictTagReference) {
                 return true;
             }
-
-            if ($node->pathReference->isStrictVariableReference) {
-                return false;
-            }
         }
 
         if ($node->name->name == 'assets' && $node->name->methodPart == 'assets') {
             return true;
         }
 
-        $activeData = $this->getActiveData();
-
         // The third argument "true" disables the data managers value interception mechanism.
         // This is to prevent it from resolving expensive items like Builders too many
         // times when all we are interested in is if the data value actually exists.
-        $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $activeData, true);
+        $cur = $this->pathDataManager->getIsPaired();
+        $curReduce = $this->pathDataManager->getReduceFinal();
+
+        $this->pathDataManager->setIsPaired(false);
+        $this->pathDataManager->setReduceFinal(false);
+        $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
+        $this->pathDataManager->setIsPaired($cur);
+        $this->pathDataManager->setReduceFinal($curReduce);
+
+        $resolvedValue = null;
 
         if ($managerResults[0] === true) {
-            if (is_object($managerResults[1])) {
-                $value = $managerResults[1];
-                $resolvedValue = $value instanceof Value ? $value->value() : $value;
+            $value = $managerResults[1];
+            $this->createLockData();
+            $resolvedValue = $value instanceof Value ? $value->value() : $value;
+            $this->restoreLockedData();
 
-                if ($resolvedValue instanceof Builder && $node->isClosedBy != null && $node->isSelfClosing == false) {
-                    $this->encounteredBuilder = true;
-                    $this->resolvedBuilder = $resolvedValue;
-                    $this->builderNodeId = $node->refId;
+            if ($resolvedValue instanceof Builder && $node->isClosedBy != null && $node->isSelfClosing == false) {
+                $this->encounteredBuilder = true;
+                $this->resolvedBuilder = $resolvedValue;
+                $this->builderNodeId = $node->refId;
 
-                    // If the path reference has more than one part,
-                    // it is something like {{ products.0.name }}
-                    if ($node->pathReference != null && count($node->pathReference->pathParts) > 1) {
-                        return false;
-                    }
-
-                    return true;
+                // If the path reference has more than one part,
+                // it is something like {{ products.0.name }}
+                if ($node->pathReference != null && count($node->pathReference->pathParts) > 1) {
+                    return false;
                 }
-            }
 
-            if (is_string($managerResults[1]) && $node->isTagNode === true) {
+                return true;
+            }
+        }
+
+        if ($node->pathReference != null) {
+            if ($node->pathReference->isStrictVariableReference) {
                 return false;
             }
         }
 
-        if ($node->isTagNode === false) {
+        if ($managerResults[0] === true) {
+            if ($node->isPaired() && !$this->isLoopable($resolvedValue)) {
+
+                // Safe to do this since there is no ambiguity here.
+                return $node->isTagNode;
+            }
+
             return false;
         }
 
-        return true;
+        return $node->isTagNode;
     }
 
     /**
@@ -1336,8 +1347,12 @@ class NodeProcessor
                                 $activeLockFrame = $tempLockData[count($tempLockData) - 1];
                             }
 
+                            if ($output instanceof Collection) {
+                                $output = $output->all();
+                            }
+
                             $newData = [
-                                $dataSetName => $output->all(),
+                                $dataSetName => $output,
                             ];
 
                             $builderScope = array_merge($activeLockFrame, $newData);
@@ -2155,7 +2170,9 @@ class NodeProcessor
             return false;
         }
 
+        $this->createLockData();
         $value = $value->value();
+        $this->restoreLockedData();
 
         return is_array($value) || $value instanceof Collection;
     }

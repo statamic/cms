@@ -45,9 +45,7 @@ class ParserTestCase extends TestCase
     {
         parent::setUp();
 
-        GlobalRuntimeState::$tracedRuntimeAssignments = [];
-        GlobalRuntimeState::$traceTagAssignments = false;
-        GlobalRuntimeState::$environmentId = StringUtilities::uuidv4();
+        GlobalRuntimeState::resetGlobalState();
 
         $this->setupTestBlueprintAndFields();
 
@@ -151,9 +149,7 @@ class ParserTestCase extends TestCase
 
     protected function parser($data = [], $withCoreTagsAndModifiers = false)
     {
-        GlobalRuntimeState::$yieldCount = 0;
-        GlobalRuntimeState::$yieldStacks = [];
-        StackReplacementManager::clearStackState();
+        GlobalRuntimeState::resetGlobalState();
 
         $documentParser = new DocumentParser();
         $loader = new Loader();
@@ -174,9 +170,7 @@ class ParserTestCase extends TestCase
 
     protected function renderStringWithConfiguration($text, RuntimeConfiguration $config, $data = [], $withCoreTagsAndModifiers = false)
     {
-        GlobalRuntimeState::$yieldCount = 0;
-        GlobalRuntimeState::$yieldStacks = [];
-        StackReplacementManager::clearStackState();
+        GlobalRuntimeState::resetGlobalState();
 
         $documentParser = new DocumentParser();
         $loader = new Loader();
@@ -204,9 +198,7 @@ class ParserTestCase extends TestCase
 
     protected function renderString($text, $data = [], $withCoreTagsAndModifiers = false)
     {
-        GlobalRuntimeState::$yieldCount = 0;
-        GlobalRuntimeState::$yieldStacks = [];
-        StackReplacementManager::clearStackState();
+        GlobalRuntimeState::resetGlobalState();
 
         $documentParser = new DocumentParser();
         $loader = new Loader();

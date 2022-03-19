@@ -12,6 +12,14 @@ class RecursiveNodeManager
     protected static $depthMapping = [];
     protected static $namedDepthMapping = [];
 
+    public static function resetRecursiveNodeState()
+    {
+        self::$registry = [];
+        self::$dataRegistry = [];
+        self::$depthMapping = [];
+        self::$namedDepthMapping = [];
+    }
+
     public static function getNamedMappings()
     {
         return self::$namedDepthMapping;
@@ -53,6 +61,11 @@ class RecursiveNodeManager
     public static function releaseRecursiveNode(AntlersNode $node)
     {
         $namedDepthMapping = $node->content.'_depth';
+
+        if (array_key_exists($namedDepthMapping, self::$namedDepthMapping) && self::$namedDepthMapping[$namedDepthMapping] > 1) {
+            self::decrementDepth($node);
+            return;
+        }
 
         unset(self::$depthMapping[$node->refId]);
         unset(self::$namedDepthMapping[$namedDepthMapping]);
