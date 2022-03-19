@@ -18,7 +18,7 @@ class VariablePriorityTest extends ParserTestCase
         $this->data = [
             'collection' => [
                 'articles' => [
-                    ['title' => 'Test One',],
+                    ['title' => 'Test One'],
                     ['title' => 'Test Two'],
                 ],
                 'handle' => 'The Collection',
@@ -27,7 +27,7 @@ class VariablePriorityTest extends ParserTestCase
                 'handle' => 'The Form',
             ],
             'link' => 'Hello, there!',
-            'taxonomy' => 'The Taxonomy'
+            'taxonomy' => 'The Taxonomy',
         ];
     }
 
@@ -44,6 +44,7 @@ EOT;
 
         $this->assertSame('<Test One><Test Two>', $this->render($template));
     }
+
     public function test_collection_tag_is_still_invoked()
     {
         $template = <<<'EOT'

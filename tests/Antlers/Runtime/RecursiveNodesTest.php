@@ -14,12 +14,12 @@ class RecursiveNodesTest extends ParserTestCase
     public function test_recursive_nodes_on_structures()
     {
         $tree = [
-            ['id' => 'home', 'title' => 'Home', 'url' => '/',],
+            ['id' => 'home', 'title' => 'Home', 'url' => '/'],
             [
                 'id' => 'about', 'title' => 'About', 'url' => 'about',
                 'children' => [
-                    ['id' => 'team', 'title' => 'Team', 'url' => 'team',],
-                    ['id' => 'leadership', 'title' => 'Leadership', 'url' => 'leadership',],
+                    ['id' => 'team', 'title' => 'Team', 'url' => 'team'],
+                    ['id' => 'leadership', 'title' => 'Leadership', 'url' => 'leadership'],
                 ],
             ],
             [
@@ -29,12 +29,12 @@ class RecursiveNodesTest extends ParserTestCase
                     [
                         'id' => 'project-2', 'title' => 'Project-2', 'url' => 'project-2',
                         'children' => [
-                            ['id' => 'project-2-nested', 'title' => 'Project 2 Nested', 'url' => 'project-2-nested',],
+                            ['id' => 'project-2-nested', 'title' => 'Project 2 Nested', 'url' => 'project-2-nested'],
                         ],
                     ],
                 ],
             ],
-            ['id' => 'contact', 'title' => 'Contact', 'url' => 'contact',],
+            ['id' => 'contact', 'title' => 'Contact', 'url' => 'contact'],
         ];
 
         $nav = Nav::make('main');

@@ -99,7 +99,6 @@ class View
             $contents = view($this->layoutViewName(), array_merge($cascade, [
                 'template_content' => $contents,
             ]));
-
         } else {
             $contents = view($this->templateViewName(), $cascade);
         }
