@@ -64,6 +64,7 @@ class RecursiveNodeManager
 
         if (array_key_exists($namedDepthMapping, self::$namedDepthMapping) && self::$namedDepthMapping[$namedDepthMapping] > 1) {
             self::decrementDepth($node);
+
             return;
         }
 

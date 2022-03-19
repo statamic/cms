@@ -550,7 +550,7 @@ class NodeProcessor
         }
 
         if ($managerResults[0] === true) {
-            if ($node->isPaired() && !$this->isLoopable($resolvedValue)) {
+            if ($node->isPaired() && ! $this->isLoopable($resolvedValue)) {
 
                 // Safe to do this since there is no ambiguity here.
                 return $node->isTagNode;
