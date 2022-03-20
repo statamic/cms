@@ -124,7 +124,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) use ($key) {
                 return Blink::once($key, function () use ($blueprint) {
-                    if (!$blueprint) {
+                    if (! $blueprint) {
                         $blueprint = $this->hasOrigin()
                             ? $this->origin()->blueprint()->handle()
                             : $this->get('blueprint');
@@ -252,7 +252,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     protected function cpUrl($route)
     {
-        if (!$id = $this->id()) {
+        if (! $id = $this->id()) {
             return null;
         }
 
@@ -261,7 +261,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function apiUrl()
     {
-        if (!$id = $this->id()) {
+        if (! $id = $this->id()) {
             return null;
         }
 
@@ -332,7 +332,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             EntrySaved::dispatch($this);
         }
 
-        if ($isNew && !$this->hasOrigin() && $this->collection()->propagate()) {
+        if ($isNew && ! $this->hasOrigin() && $this->collection()->propagate()) {
             $this->collection()->sites()
                 ->reject($this->site()->handle())
                 ->each(function ($siteHandle) {
@@ -358,13 +358,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $prefix = '';
 
         if ($this->hasDate()) {
-            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d') . '.';
+            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
             rtrim(Stache::store('entries')->directory(), '/'),
             $this->collectionHandle(),
-            Site::hasMultiple() ? $this->locale() . '/' : '',
+            Site::hasMultiple() ? $this->locale().'/' : '',
             $prefix,
             $this->slug() ?? $this->id(),
             $this->fileExtension(),
@@ -373,7 +373,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function order()
     {
-        if (!$this->hasStructure()) {
+        if (! $this->hasStructure()) {
             return $this->value('order');
         }
 
@@ -399,7 +399,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     protected function inferTemplateFromBlueprint()
     {
-        $template = $this->collection()->handle() . '.' . $this->blueprint();
+        $template = $this->collection()->handle().'.'.$this->blueprint();
 
         $slugifiedTemplate = str_replace('_', '-', $template);
 
@@ -526,7 +526,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $entry = clone $this;
 
-        if (!$revision) {
+        if (! $revision) {
             return $entry;
         }
 
@@ -548,11 +548,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $collection = $this->collection();
 
-        if (!$this->published()) {
+        if (! $this->published()) {
             return 'draft';
         }
 
-        if (!$collection->dated() && $this->published()) {
+        if (! $collection->dated() && $this->published()) {
             return 'published';
         }
 
@@ -571,7 +571,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $collection = $this->collection();
 
-        if (!$collection->dated()) {
+        if (! $collection->dated()) {
             return false;
         }
 
@@ -592,7 +592,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return $this;
         }
 
-        if (!$this->isRoot()) {
+        if (! $this->isRoot()) {
             return $this->root()->in($locale);
         }
 
@@ -601,7 +601,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function descendants()
     {
-        if (!$this->localizations) {
+        if (! $this->localizations) {
             $this->localizations = Facades\Entry::query()
                 ->where('collection', $this->collectionHandle())
                 ->where('origin', $this->id())->get()
@@ -668,11 +668,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function page()
     {
-        if (!$this->hasStructure()) {
+        if (! $this->hasStructure()) {
             return null;
         }
 
-        if (!$id = $this->id()) {
+        if (! $id = $this->id()) {
             return null;
         }
 
@@ -706,7 +706,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function uri()
     {
-        if (!$this->route()) {
+        if (! $this->route()) {
             return null;
         }
 
@@ -834,7 +834,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $value = $this->value($field);
 
-        if (!$field = $this->blueprint()->field($field)) {
+        if (! $field = $this->blueprint()->field($field)) {
             return $value;
         }
 
