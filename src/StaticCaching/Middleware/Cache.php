@@ -48,7 +48,7 @@ class Cache
     {
         $noCacheCanHandle = $this->noCacheManager->canHandle($request);
 
-        if (!$noCacheCanHandle && $this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
+        if (! $noCacheCanHandle && $this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             return $this->getPreparedResponseFromCache($request);
         }
 
