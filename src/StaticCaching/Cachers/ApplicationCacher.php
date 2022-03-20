@@ -2,7 +2,9 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Statamic\StaticCaching\NoCache\NoCacheManager;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -15,6 +17,18 @@ class ApplicationCacher extends AbstractCacher
      * @var string|null
      */
     private $cached;
+
+    /**
+     * @var NoCacheManager|null
+     */
+    private $noCacheManager;
+
+    public function __construct(Repository $cache, $config, NoCacheManager $noCacheManager = null)
+    {
+        parent::__construct($cache, $config);
+
+        $this->noCacheManager = $noCacheManager;
+    }
 
     /**
      * Cache a page.
@@ -100,6 +114,10 @@ class ApplicationCacher extends AbstractCacher
      */
     public function invalidateUrl($url)
     {
+        if ($this->noCacheManager != null) {
+            $this->noCacheManager->invalidateUrl($url);
+        }
+
         if (! $key = $this->getUrls()->flip()->get($url)) {
             // URL doesn't exist, nothing to invalidate.
             return;

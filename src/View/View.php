@@ -4,6 +4,8 @@ namespace Statamic\View;
 
 use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
+use Statamic\StaticCaching\NoCache\NoCacheManager;
+use Statamic\StaticCaching\ResponseReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
@@ -81,7 +83,14 @@ class View
 
     public function render(): string
     {
+        /** @var NoCacheManager $noCacheManager */
+        $noCacheManager = app(NoCacheManager::class);
+
         $cascade = $this->gatherData();
+
+        $noCacheManager->session()
+            ->setId(Arr::get($cascade, 'id', null))
+            ->setViewPath($this->templateViewPath())->setRootData($cascade);
 
         $contents = view($this->templateViewName(), $cascade);
 
@@ -97,7 +106,22 @@ class View
 
         ViewRendered::dispatch($this);
 
-        return $contents->render();
+        $renderedContents = $contents->render();
+
+        if ($noCacheManager->session()->isActive($this->templateViewPath())) {
+            $mockResponse = response($renderedContents);
+
+            /** @var ResponseReplacer $replacer */
+            $replacer = app(ResponseReplacer::class);
+            $replacer->prepareForCache($mockResponse);
+
+            $cacheContents = $mockResponse->getContent();
+
+            $noCacheManager->writeSession(request(), $cacheContents);
+            $renderedContents = $noCacheManager->session()->prepareContents($renderedContents);
+        }
+
+        return $renderedContents;
     }
 
     private function shouldUseLayout()
