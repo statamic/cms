@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Cascade;
 use Tests\Antlers\ParserTestCase;
 
 class LoopTest extends ParserTestCase
@@ -75,5 +76,32 @@ EOT;
         ];
 
         $this->assertSame('', $this->renderString('{{ taxonomy }}', $data, true));
+    }
+
+    public function test_strict_variable_syntax_can_be_used_for_loops()
+    {
+        $cascade = $this->mock(Cascade::class, function ($m) {
+            $m->shouldReceive('get')->with('theme')->andReturn([
+                'social_links' => [
+                    'one',
+                    'two',
+                    'three',
+                ],
+            ]);
+        });
+
+        $template = <<<'EOT'
+{{ theme:social_links }}<{{ value }}>{{ /theme:social_links }}
+EOT;
+        $templateTwo = <<<'EOT'
+{{ $theme:social_links }}<{{ value }}>{{ /$theme:social_links }}
+EOT;
+
+
+        $results = (string)$this->parser()->cascade($cascade)->parse($template, []);
+        $resultsTwo = (string)$this->parser()->cascade($cascade)->parse($template, []);
+
+        $this->assertSame('<one><two><three>', $results);
+        $this->assertSame('<one><two><three>', $resultsTwo);
     }
 }

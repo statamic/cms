@@ -1728,12 +1728,6 @@ class NodeProcessor
                             $dataRetriever->setIsPaired($node->isClosedBy != null);
                             $valDetails = $dataRetriever->getDataWithExistence($node->pathReference, $this->getActiveData());
 
-                            if ($node->pathReference->isStrictVariableReference && $node->pathReference->isExplicitVariableReference) {
-                                $runLoopMagic = true;
-                            } elseif ($node->pathReference->isStrictVariableReference && $node->pathReference->isExplicitVariableReference == false) {
-                                $runLoopMagic = false;
-                            }
-
                             if ($valDetails[0] == false) {
                                 if ($this->isTracingEnabled()) {
                                     $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
