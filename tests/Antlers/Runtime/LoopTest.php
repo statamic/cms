@@ -67,4 +67,13 @@ EOT;
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), $this->renderString($template, $data));
     }
+
+    public function test_empty_collections_do_not_print_brackets()
+    {
+        $data = [
+            'taxonomy' => collect(),
+        ];
+
+        dd($this->renderString('{{ taxonomy }}', $data, true));
+    }
 }
