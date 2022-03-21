@@ -74,6 +74,6 @@ EOT;
             'taxonomy' => collect(),
         ];
 
-        dd($this->renderString('{{ taxonomy }}', $data, true));
+        $this->assertSame('', $this->renderString('{{ taxonomy }}', $data, true));
     }
 }
