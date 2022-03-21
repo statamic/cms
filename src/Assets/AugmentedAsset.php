@@ -59,6 +59,7 @@ class AugmentedAsset extends AbstractAugmented
                 'duration_minutes',
                 'duration_sec',
                 'duration_min',
+                'playtime',
             ]);
         }
 
@@ -167,5 +168,14 @@ class AugmentedAsset extends AbstractAugmented
     protected function durationMin()
     {
         return $this->durationMinutes();
+    }
+
+    protected function playtime()
+    {
+        if ($this->duration() >= 3600) {
+            return date('H:i:s', $this->duration());
+        }
+
+        return date('i:s', $this->duration());
     }
 }
