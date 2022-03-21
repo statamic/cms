@@ -39,10 +39,12 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function value()
     {
-        if ($this->value) return $this->value;
-
         if (! $this->fieldtype) {
             return $this->raw;
+        }
+
+        if ($this->value) {
+            return $this->value;
         }
 
         $value = $this->shallow
