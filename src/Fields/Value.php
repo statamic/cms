@@ -17,6 +17,7 @@ class Value implements IteratorAggregate, JsonSerializable
     protected $fieldtype;
     protected $augmentable;
     protected $shallow = false;
+    protected $value = false;
 
     public function __construct($value, $handle = null, $fieldtype = null, $augmentable = null, $shallow = false)
     {
@@ -38,6 +39,8 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function value()
     {
+        if ($this->value) return $this->value;
+
         if (! $this->fieldtype) {
             return $this->raw;
         }
@@ -46,7 +49,7 @@ class Value implements IteratorAggregate, JsonSerializable
             ? $this->fieldtype->shallowAugment($this->raw)
             : $this->fieldtype->augment($this->raw);
 
-        return $value;
+        return $this->value = $value;
     }
 
     public function __toString()
