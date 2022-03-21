@@ -97,9 +97,8 @@ EOT;
 {{ $theme:social_links }}<{{ value }}>{{ /$theme:social_links }}
 EOT;
 
-
-        $results = (string)$this->parser()->cascade($cascade)->parse($template, []);
-        $resultsTwo = (string)$this->parser()->cascade($cascade)->parse($template, []);
+        $results = (string) $this->parser()->cascade($cascade)->parse($template, []);
+        $resultsTwo = (string) $this->parser()->cascade($cascade)->parse($template, []);
 
         $this->assertSame('<one><two><three>', $results);
         $this->assertSame('<one><two><three>', $resultsTwo);
