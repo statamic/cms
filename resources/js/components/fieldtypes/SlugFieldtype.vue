@@ -65,7 +65,7 @@ export default {
 
         language() {
             const targetSite = this.$store.state.publish[this.store].site;
-            return Statamic.$config.get('sites').find(site => site.handle === targetSite).lang;
+            return targetSite ? Statamic.$config.get('sites').find(site => site.handle === targetSite).lang : null;
         }
 
     },
