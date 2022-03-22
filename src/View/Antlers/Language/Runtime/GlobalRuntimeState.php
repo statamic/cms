@@ -193,6 +193,7 @@ class GlobalRuntimeState
         self::$yieldCount = 0;
         self::$yieldStacks = [];
         StackReplacementManager::clearStackState();
+
         RecursiveNodeManager::resetRecursiveNodeState();
     }
 
