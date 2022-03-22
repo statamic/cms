@@ -50,4 +50,13 @@ class UsersStore extends BasicStore
 
         return $user;
     }
+
+    public function getItem($key)
+    {
+        if ($user = parent::getItem($key)) {
+            $user->syncOriginal();
+        }
+
+        return $user;
+    }
 }
