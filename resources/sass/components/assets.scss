@@ -309,15 +309,11 @@
     }
 
     .image-wrapper {
-        flex: 1 1 auto;
-        position: relative;
+        @apply flex items-center h-full w-full justify-center relative;
 
         > * {
-            @apply absolute w-auto h-auto max-w-full max-h-full;
+            @apply max-w-full max-h-full w-full;
             box-shadow: 0 0 32px rgba(0, 0, 0, .35);
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
         }
     }
 
