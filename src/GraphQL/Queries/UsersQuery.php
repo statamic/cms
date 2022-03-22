@@ -56,6 +56,10 @@ class UsersQuery extends Query
 
     private function filterQuery($query, $filters)
     {
+        $filters = collect($filters)->reject(function ($_, $filter) {
+            return Str::startsWith($filter, 'password');
+        });
+
         foreach ($filters as $field => $definitions) {
             if (! is_array($definitions)) {
                 $definitions = [['equals' => $definitions]];

@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\API;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\API\UserResource;
+use Statamic\Support\Str;
 
 class UsersController extends ApiController
 {
@@ -33,5 +34,12 @@ class UsersController extends ApiController
         throw_unless($user, new NotFoundHttpException("User [$id] not found."));
 
         return $user;
+    }
+
+    protected function getFilters()
+    {
+        return parent::getFilters()->reject(function ($_, $filter) {
+            return Str::startsWith($filter, 'password');
+        });
     }
 }

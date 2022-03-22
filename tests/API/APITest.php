@@ -3,6 +3,7 @@
 namespace Tests\API;
 
 use Statamic\Facades;
+use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -145,6 +146,41 @@ class APITest extends TestCase
             ->get('/api/collections/pages/entries/dance')
             ->assertJsonPath('data.api_url', null)
             ->assertJsonPath('data.edit_url', null);
+    }
+
+    /**
+     * @test
+     * @dataProvider userPasswordFilterProvider
+     */
+    public function it_doesnt_allow_filtering_users_by_password($filter)
+    {
+        Facades\Config::set('statamic.api.resources.users', true);
+
+        User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
+        User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
+
+        $this
+              ->get("/api/users?filter[{$filter}]=abc")
+              ->assertJson([
+                  'data' => [
+                      ['id' => 'one'],
+                      ['id' => 'two'], // this one would be filtered out if the password was allowed
+                  ],
+              ]);
+    }
+
+    public function userPasswordFilterProvider()
+    {
+        return collect([
+            'password',
+            'password:is',
+            'password:regex',
+            'password_hash',
+            'password_hash:is',
+            'password_hash:regex',
+        ])->mapWithKeys(function ($filter) {
+            return [$filter => [$filter]];
+        })->all();
     }
 
     private function assertEndpointDataCount($endpoint, $count)
