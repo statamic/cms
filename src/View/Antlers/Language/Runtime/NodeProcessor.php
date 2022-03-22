@@ -2017,7 +2017,7 @@ class NodeProcessor
                                     }
 
                                     $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
-                                    $lockData  = $this->data;
+                                    $lockData = $this->data;
 
                                     $buffer .= $this->measureBufferAppend($node, $loopBuffer);
                                 }
