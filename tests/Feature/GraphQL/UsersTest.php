@@ -259,7 +259,7 @@ GQL;
 
     /**
      * @test
-     * @dataProvider userPasswordFilterProvider
+     * @dataProvider userPasswordFilters
      */
     public function it_doesnt_allow_filtering_users_by_password($filter)
     {
@@ -286,7 +286,7 @@ GQL;
               ]]]]);
     }
 
-    public function userPasswordFilterProvider()
+    public function userPasswordFilters()
     {
         return [
             'password' => ['{ password: "abc" }'],
