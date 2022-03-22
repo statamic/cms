@@ -289,12 +289,7 @@ GQL;
     public function userPasswordFilters()
     {
         return [
-            'password' => ['{ password: "abc" }'],
-            'password:is' => ['{ password: {is: "abc"} }'],
-            'password:regex' => ['{ password: {regex: "abc"} }'],
-            'password_hash' => ['{ password_hash: "abc" }'],
-            'password_hash:is' => ['{ password_hash: {is: "abc"} }'],
-            'password_hash:regex' => ['{ password_hash: {regex: "abc"} }'],
+            'password' => ['bla'],
         ];
     }
 
