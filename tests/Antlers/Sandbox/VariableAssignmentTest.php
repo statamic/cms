@@ -201,7 +201,7 @@ EOT;
 {{ partial:prefixed }}
 {{ data_count }}Adding {{ data_count += 1;}}
 {{ partial:prefixed }}
-{{ data_count }}Adding {{ data_count += 1;}}
+{{ if true == true }}{{ data_count }}Adding {{ data_count += 1;}}{{ /if }}
 {{ /partial:prefixed }}
 {{ /partial:prefixed }}
 {{ thing = 'that one thing'; }}
