@@ -56,7 +56,9 @@ class UsersQuery extends Query
 
     private function filterQuery($query, $filters)
     {
-        $filters = collect($filters)->reject(fn ($_, $filter) => Str::startsWith($filter, 'password'));
+        $filters = collect($filters)->reject(function ($_, $filter) {
+            return Str::startsWith($filter, 'password');
+        });
 
         foreach ($filters as $field => $definitions) {
             if (! is_array($definitions)) {

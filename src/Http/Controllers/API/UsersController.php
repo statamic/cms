@@ -38,7 +38,8 @@ class UsersController extends ApiController
 
     protected function getFilters()
     {
-        return parent::getFilters()
-            ->reject(fn ($_, $filter) => Str::startsWith($filter, 'password'));
+        return parent::getFilters()->reject(function ($_, $filter) {
+            return Str::startsWith($filter, 'password');
+        });
     }
 }
