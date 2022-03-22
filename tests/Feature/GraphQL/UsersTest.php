@@ -259,38 +259,47 @@ GQL;
 
     /**
      * @test
-     * @dataProvider userPasswordFilters
+     * @dataProvider userPasswordFilterProvider
      */
     public function it_doesnt_allow_filtering_users_by_password($filter)
     {
+        if (version_compare(PHP_VERSION, '7.3.0', '<')) {
+            $this->markTestSkipped('This test does not behave on 7.2.');
+        }
+
         User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
         User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
 
         $query = <<<GQL
-  {
-      users(filter: {{$filter}}) {
-          data {
-              id
-          }
-      }
-  }
-  GQL;
+ {
+     users(filter: $filter) {
+         data {
+             id
+         }
+     }
+ }
+ GQL;
 
         $this
-              ->withoutExceptionHandling()
-              ->post('/graphql', ['query' => $query])
-              ->assertGqlOk()
-              ->assertExactJson(['data' => ['users' => ['data' => [
-                  ['id' => 'one'],
-                  ['id' => 'two'], // this one would be filtered out if the password was allowed
-              ]]]]);
+             ->withoutExceptionHandling()
+             ->post('/graphql', ['query' => $query])
+             ->assertGqlOk()
+             ->assertExactJson(['data' => ['users' => ['data' => [
+                 ['id' => 'one'],
+                 ['id' => 'two'], // this one would be filtered out if the password was allowed
+             ]]]]);
     }
 
-    public function userPasswordFilters()
+    public function userPasswordFilterProvider()
     {
         return [
-            'password' => ['password: "abc"'],
-        ];
+             'password' => ['{ password: "abc" }'],
+             'password:is' => ['{ password: {is: "abc"} }'],
+             'password:regex' => ['{ password: {regex: "abc"} }'],
+             'password_hash' => ['{ password_hash: "abc" }'],
+             'password_hash:is' => ['{ password_hash: {is: "abc"} }'],
+             'password_hash:regex' => ['{ password_hash: {regex: "abc"} }'],
+         ];
     }
 
     /** @test */
