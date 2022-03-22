@@ -517,9 +517,9 @@ abstract class Builder implements Contract
         return $this->get()->first();
     }
 
-    public function paginate($perPage = null, $columns = ['*'], $currentPage = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $page = $currentPage ?: Paginator::resolveCurrentPage();
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->defaultPerPageSize();
 
@@ -529,7 +529,7 @@ abstract class Builder implements Contract
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
-            'pageName' => 'page',
+            'pageName' => $pageName,
         ]);
     }
 
