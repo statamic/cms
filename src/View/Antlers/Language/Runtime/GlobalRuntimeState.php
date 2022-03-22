@@ -184,6 +184,16 @@ class GlobalRuntimeState
 
     public static $containsLayout = false;
 
+    /**
+     * A list of callbacks that will be invoked when ___internal_debug:peek is called.
+     *
+     * The callback will receive the current NodeProcessor
+     * instance before it enters into tag callback state.
+     *
+     * @var array
+     */
+    public static $peekCallbacks = [];
+
     public static function resetGlobalState()
     {
         self::$containsLayout = false;

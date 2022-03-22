@@ -244,6 +244,11 @@ class NodeProcessor
         return $this->activeNode;
     }
 
+    public function getPathDataManager()
+    {
+        return $this->pathDataManager;
+    }
+
     public function registerInterpolations(AntlersNode $node)
     {
         if (! empty($node->processedInterpolationRegions)) {
@@ -1025,6 +1030,15 @@ class NodeProcessor
                         if ($node->name->name == 'elseif' || $node->name->name == 'if') {
                             continue;
                         }
+
+                        if ($node->name->name == '___internal_debug' && $node->name->methodPart == 'peek' && ! empty(GlobalRuntimeState::$peekCallbacks)) {
+                            foreach (GlobalRuntimeState::$peekCallbacks as $callback) {
+                                if (is_callable($callback)) {
+                                    $callback($this);
+                                }
+                            }
+                            continue;
+                        }
                     }
 
                     if ($this->encounteredBuilder && $this->builderNodeId != $node->refId) {
@@ -1751,9 +1765,13 @@ class NodeProcessor
                     }
 
                     if ($node->hasParameters && $tagCallbackResult == null) {
+                        $curIsPaired = $this->pathDataManager->getIsPaired();
+                        $curReduceFinal = $this->pathDataManager->getReduceFinal();
                         $this->pathDataManager->setIsPaired(false);
                         $this->pathDataManager->setReduceFinal(false);
                         $val = $this->pathDataManager->getData($node->pathReference, $this->getActiveData());
+                        $this->pathDataManager->setIsPaired($curIsPaired);
+                        $this->pathDataManager->setReduceFinal($curReduceFinal);
 
                         if (! $this->shouldProcessAsTag($node)) {
                             foreach ($node->parameters as $param) {
