@@ -517,9 +517,9 @@ abstract class Builder implements Contract
         return $this->get()->first();
     }
 
-    public function paginate($perPage = null, $columns = ['*'])
+    public function paginate($perPage = null, $columns = ['*'], $currentPage = null)
     {
-        $page = Paginator::resolveCurrentPage();
+        $page = $currentPage ?: Paginator::resolveCurrentPage();
 
         $perPage = $perPage ?: $this->defaultPerPageSize();
 
