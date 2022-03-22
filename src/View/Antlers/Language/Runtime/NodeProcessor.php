@@ -738,6 +738,11 @@ class NodeProcessor
         return $this->runtimeAssignments;
     }
 
+    public function setRuntimeAssignments($assignments)
+    {
+        $this->runtimeAssignments = $assignments;
+    }
+
     /**
      * Tests if the node sequence represents an iterable assignment.
      *
@@ -1335,6 +1340,10 @@ class NodeProcessor
                             $tagParameters['builder'] = $this->resolvedBuilder;
                         }
 
+                        if (! empty($this->runtimeAssignments)) {
+                            GlobalRuntimeState::$traceTagAssignments = true;
+                            GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
+                        }
                         /** @var Tags $tag */
                         $tag = $this->loader->load($tagToLoad, [
                             'parser' => $this->antlersParser,
@@ -1468,7 +1477,7 @@ class NodeProcessor
                             } else {
                                 GlobalRuntimeState::$traceTagAssignments = true;
                                 GlobalRuntimeState::$activeTracerCount += 1;
-                                GlobalRuntimeState::$traceTagAssignments = $this->runtimeAssignments;
+                                GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
 
                                 if ($node->hasModifierParameters()) {
                                     $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
@@ -1501,11 +1510,26 @@ class NodeProcessor
                             }
                         }
 
+                        $this->data = $lockData;
+
                         if (! $currentProcessorCanHandleTagValue) {
                             $buffer .= $this->measureBufferAppend($node, $output);
+
+                            if (! empty(GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                                $runtimeAssignmentsToProcess = [];
+
+                                foreach (GlobalRuntimeState::$tracedRuntimeAssignments as $assignmentVar => $value) {
+                                    if (array_key_exists($assignmentVar, $this->runtimeAssignments)) {
+                                        $runtimeAssignmentsToProcess[$assignmentVar] = $value;
+                                    }
+                                }
+
+                                if (! empty($runtimeAssignmentsToProcess)) {
+                                    $this->processAssignments($runtimeAssignmentsToProcess);
+                                }
+                            }
                         }
 
-                        $this->data = $lockData;
                         if (! $currentProcessorCanHandleTagValue) {
                             continue;
                         }
@@ -1940,6 +1964,7 @@ class NodeProcessor
                                     $processor->allowPhp($this->allowPhp);
                                     $processor->cascade($this->cascade);
                                     $processor->setAntlersParserInstance($this->antlersParser);
+                                    $processor->setRuntimeAssignments($this->runtimeAssignments, $this->previousAssignments);
 
                                     if ($this->runtimeConfiguration != null) {
                                         $processor->setRuntimeConfiguration($this->runtimeConfiguration);
@@ -1970,6 +1995,14 @@ class NodeProcessor
                                         }
 
                                         if (! empty($runtimeAssignments)) {
+                                            $procActive = $processor->getActiveData();
+
+                                            foreach ($runtimeAssignments as $var => $varValue) {
+                                                if (array_key_exists($var, $procActive)) {
+                                                    $runtimeAssignments[$var] = $procActive[$var];
+                                                }
+                                            }
+
                                             foreach ($runtimeAssignments as $assignmentVar => $assignmentValue) {
                                                 if (array_key_exists($assignmentVar, $this->runtimeAssignments)) {
                                                     $runtimeAssignmentsToProcess[$assignmentVar] = $assignmentValue;
@@ -1984,6 +2017,7 @@ class NodeProcessor
                                     }
 
                                     $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
+                                    $lockData  = $this->data;
 
                                     $buffer .= $this->measureBufferAppend($node, $loopBuffer);
                                 }
