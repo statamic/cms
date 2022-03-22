@@ -268,7 +268,7 @@ GQL;
 
         $query = <<<GQL
   {
-      users(filter: $filter) {
+      users(filter: {$filter}) {
           data {
               id
           }
@@ -289,7 +289,7 @@ GQL;
     public function userPasswordFilters()
     {
         return [
-            'password' => ['{ password: "abc" }'],
+            'password' => ['password: "abc"'],
         ];
     }
 
