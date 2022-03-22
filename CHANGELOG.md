@@ -1,5 +1,13 @@
 # Release Notes
 
+## 3.2.39 (2022-03-22)
+
+### What's fixed
+- Prevent filtering users by password hashes in the APIs. [#5604](https://github.com/statamic/cms/issues/5604) by @jasonvarga
+- Fix error when determining slug language on non-entry forms. [#5603](https://github.com/statamic/cms/issues/5603) by @jasonvarga
+
+
+
 ## 3.2.38 (2022-03-14)
 
 ### What's new
