@@ -176,7 +176,7 @@ EOT;
                     'breadcrumb_one',
                     'breadcrumb_two',
                     'breadcrumb_three',
-                ]
+                ],
             ],
             'oauth' => 'oauth',
             'obfuscate' => 'obfuscate',
@@ -651,7 +651,7 @@ yield
 EOT;
 
         // Double parse/assertion is to ensure that it doesn't confuse itself/properly resets state.
-        $this->assertSame($expected, (string)$this->parser()->parse($template, $data));
-        $this->assertSame($expected, (string)$this->parser()->parse($template, $data));
+        $this->assertSame($expected, (string) $this->parser()->parse($template, $data));
+        $this->assertSame($expected, (string) $this->parser()->parse($template, $data));
     }
 }
