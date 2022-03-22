@@ -268,7 +268,7 @@ GQL;
 
         $query = <<<GQL
   {
-      users(filter: {$filter}) {
+      users(filter: {{$filter}}) {
           data {
               id
           }
