@@ -178,7 +178,9 @@ class APITest extends TestCase
             'password_hash',
             'password_hash:is',
             'password_hash:regex',
-        ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
+        ])->mapWithKeys(function ($filter) {
+            return [$filter => [$filter]];
+        })->all();
     }
 
     private function assertEndpointDataCount($endpoint, $count)
