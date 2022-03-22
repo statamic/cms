@@ -172,13 +172,13 @@ class APITest extends TestCase
     public function userPasswordFilterProvider()
     {
         return collect([
-              'password',
-              'password:is',
-              'password:regex',
-              'password_hash',
-              'password_hash:is',
-              'password_hash:regex',
-          ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
+            'password',
+            'password:is',
+            'password:regex',
+            'password_hash',
+            'password_hash:is',
+            'password_hash:regex',
+        ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
     }
 
     private function assertEndpointDataCount($endpoint, $count)
