@@ -289,7 +289,7 @@ GQL;
     public function userPasswordFilters()
     {
         return [
-            'password' => ['bla'],
+            'password' => ['{ password: "abc" }'],
         ];
     }
 
