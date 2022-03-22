@@ -2,6 +2,7 @@
 
     <stack name="asset-editor"
         :before-close="shouldClose"
+        :full="true"
         @closed="close">
 
     <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
