@@ -263,22 +263,10 @@ GQL;
      */
     public function it_doesnt_allow_filtering_users_by_password($filter)
     {
-        if (version_compare(PHP_VERSION, '7.3.0', '<')) {
-            $this->markTestSkipped('This test does not behave on 7.2.');
-        }
-
         User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
         User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
 
-        $query = <<<GQL
- {
-     users(filter: $filter) {
-         data {
-             id
-         }
-     }
- }
- GQL;
+        $query = "{ users(filter: $filter) { data { id } } }";
 
         $this
              ->withoutExceptionHandling()
