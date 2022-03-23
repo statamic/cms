@@ -19,10 +19,7 @@ $rules = [
     'cast_spaces' => true,
     'class_attributes_separation' => [
         'elements' => [
-            'const' => 'one',
             'method' => 'one',
-            'property' => 'one',
-            'trait_import' => 'none',
         ],
     ],
     'class_definition' => [
