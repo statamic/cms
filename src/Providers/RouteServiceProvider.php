@@ -86,6 +86,10 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindTerms()
     {
         Route::bind('term', function ($handle, $route) {
+            if ($this->isApiRoute($route)) {
+                return $handle;
+            }
+
             $id = $route->parameter('taxonomy')->handle().'::'.$handle;
             $site = $route->parameter('site') ?? Site::default()->handle();
 
