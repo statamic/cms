@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Statamic\Facades\Entry;
 use Statamic\Http\Resources\API\EntryResource;
 
 class CollectionEntriesController extends ApiController
@@ -25,6 +26,8 @@ class CollectionEntriesController extends ApiController
 
     public function show($collection, $entry)
     {
+        $entry = Entry::find($entry);
+
         $this->abortIfDisabled();
         $this->abortIfUnpublished($entry);
 

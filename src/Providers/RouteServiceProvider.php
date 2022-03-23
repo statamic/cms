@@ -15,6 +15,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Mixins\Router;
+use Statamic\Support\Str;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -57,6 +58,10 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindEntries()
     {
         Route::bind('entry', function ($handle, $route) {
+            if ($this->isApiRoute($route)) {
+                return $handle;
+            }
+
             throw_if(
                 ! ($entry = Entry::find($handle)) || $entry->collection()->id() !== $route->parameter('collection')->id(),
                 new NotFoundHttpException("Entry [$handle] not found.")
@@ -175,5 +180,10 @@ class RouteServiceProvider extends ServiceProvider
 
             return $form;
         });
+    }
+
+    private function isApiRoute(\Illuminate\Routing\Route $route)
+    {
+        return Str::startsWith($route->uri(), config('statamic.api.route').'/');
     }
 }
