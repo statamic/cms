@@ -78,7 +78,7 @@ class Tags extends BaseTags
         }
 
         $knownParams = array_merge(static::HANDLE_PARAM, [
-            'redirect', 'error_redirect', 'allow_request_redirect', 'files', 'js',
+            'redirect', 'error_redirect', 'allow_request_redirect', 'csrf', 'files', 'js',
         ]);
 
         $action = $this->params->get('action', route('statamic.forms.submit', $formHandle));
