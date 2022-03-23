@@ -2,6 +2,7 @@
 
 namespace Tests\API;
 
+use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
@@ -221,6 +222,54 @@ class APITest extends TestCase
                     ['id' => 'two'], // this one would be filtered out if the password was allowed
                 ],
             ]);
+    }
+
+    /** @test */
+    public function it_replaces_entries_using_live_preview_token()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('dance')->set('title', 'Dance')->slug('dance')->save();
+
+        $substitute = Facades\Entry::make()->collection('pages')->id('dance')->set('title', 'Dance modified in live preview')->slug('dance');
+
+        $this->get('/api/collections/pages/entries/dance')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+
+        LivePreview::tokenize('test-token', $substitute);
+
+        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+            'data' => [
+                'title' => 'Dance modified in live preview',
+            ],
+        ]);
+    }
+
+    /** @test */
+    public function it_replaces_terms_using_live_preview_token()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data(['title' => 'Dance'])->save();
+
+        $substitute = Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data(['title' => 'Dance modified in live preview']);
+
+        $this->get('/api/taxonomies/topics/terms/dance')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+
+        LivePreview::tokenize('test-token', $substitute);
+
+        $this->get('/api/taxonomies/topics/terms/dance?token=test-token')->assertJson([
+            'data' => [
+                'title' => 'Dance modified in live preview',
+            ],
+        ]);
     }
 
     public function userPasswordFilterProvider()
