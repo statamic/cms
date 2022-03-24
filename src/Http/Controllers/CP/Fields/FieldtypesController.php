@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
+use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
 class FieldtypesController extends CpController
@@ -14,6 +15,14 @@ class FieldtypesController extends CpController
             ->map(function ($class) {
                 return app($class);
             });
+
+        if ($request->blueprint) {
+            $blueprint = Blueprint::find($request->blueprint);
+
+            $fieldtypes = $fieldtypes->filter(function ($fieldtype) use ($blueprint) {
+                return $fieldtype->visibleTo($blueprint);
+            });
+        }
 
         if ($request->selectable) {
             $selectableMethod = $request->forms ? 'selectableInForms' : 'selectable';

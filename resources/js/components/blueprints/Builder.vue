@@ -78,6 +78,8 @@ export default {
             this.save();
         });
 
+        Statamic.$config.set('currentBlueprint', `${this.initialBlueprint.namespace}.${this.initialBlueprint.handle}`);
+
         if (this.isFormBlueprint) {
             Statamic.$config.set('isFormBlueprint', true);
         }

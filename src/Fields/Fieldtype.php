@@ -290,4 +290,9 @@ abstract class Fieldtype implements Arrayable
     {
         return $value;
     }
+
+    public function visibleTo($blueprint): bool
+    {
+        return true;
+    }
 }

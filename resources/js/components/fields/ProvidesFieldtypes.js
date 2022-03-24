@@ -25,6 +25,8 @@ export default {
 
         let url = cp_url('fields/fieldtypes?selectable=true');
 
+        if (this.$config.get('currentBlueprint')) url += '&blueprint=' + this.$config.get('currentBlueprint');
+
         if (this.$config.get('isFormBlueprint')) url += '&forms=true';
 
         this.$axios.get(url).then(response => this.$store.commit('statamic/fieldtypes', response.data));

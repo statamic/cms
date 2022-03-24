@@ -80,6 +80,7 @@ trait ManagesBlueprints
         return [
             'title' => $blueprint->title(),
             'handle' => $blueprint->handle(),
+            'namespace' => $blueprint->namespace(),
             'hidden' => $blueprint->hidden(),
             'sections' => $blueprint->sections()->map(function ($section, $i) {
                 return array_merge($this->sectionToVue($section), ['_id' => $i]);
