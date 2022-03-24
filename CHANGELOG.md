@@ -1,5 +1,29 @@
 # Release Notes
 
+## 3.3.3 (2022-03-24)
+
+### What's new
+- Live Preview is supported in the REST API. [#5623](https://github.com/statamic/cms/issues/5623) by @jasonvarga
+- Query builders can accept page name and number. [#5602](https://github.com/statamic/cms/issues/5602) by @mattmurtaugh
+- Added `csrf` parameter to `form` tag. [#5626](https://github.com/statamic/cms/issues/5626) by @robdekort
+- Added `has_focus` variable to assets. [#5638](https://github.com/statamic/cms/issues/5638) by @jasonvarga
+- Added `playtime` variable to assets. [#5586](https://github.com/statamic/cms/issues/5586) by @jackmcdade
+
+### What's improved
+- Redesigned Search Index Utility. [#5625](https://github.com/statamic/cms/issues/5625) by @jackmcdade
+- Removed primary style on the Asset browser's "Create Container" button. [#5629](https://github.com/statamic/cms/issues/5629) by @jackmcdade
+- Expanded Windows testing. [#5613](https://github.com/statamic/cms/issues/5613) by @jesseleite
+- Updated Swedish translations. [#5615](https://github.com/statamic/cms/issues/5615) [#5620](https://github.com/statamic/cms/issues/5620) [#5617](https://github.com/statamic/cms/issues/5617) [#5616](https://github.com/statamic/cms/issues/5616) by @jannejava
+- Made asset editor full width. [#5608](https://github.com/statamic/cms/issues/5608) by @jackmcdade
+- Asset fields will auto-select the container when only one exists. [#5498](https://github.com/statamic/cms/issues/5498) by @duncanmcclean
+
+### What's fixed
+- The `to_json` modifier can handle query builders. [#5635](https://github.com/statamic/cms/issues/5635) by @jasonvarga
+- Fix `is_external` check for anchors. [#5631](https://github.com/statamic/cms/issues/5631) by @grandpalacko
+- Fix Asset Editor not showing HTML5 players. [#5607](https://github.com/statamic/cms/issues/5607) by @jackmcdade
+
+
+
 ## 3.3.2 (2022-03-18)
 
 ### What's improved
