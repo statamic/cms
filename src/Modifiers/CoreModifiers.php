@@ -2385,6 +2385,10 @@ class CoreModifiers extends Modifier
     {
         $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : null;
 
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         if ($value instanceof Collection || $value instanceof Augmentable) {
             $value = $value->toAugmentedArray();
         }

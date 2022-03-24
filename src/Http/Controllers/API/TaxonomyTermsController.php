@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\TermResource;
 
 class TaxonomyTermsController extends ApiController
@@ -24,6 +25,8 @@ class TaxonomyTermsController extends ApiController
 
     public function show($taxonomy, $term)
     {
+        $term = Term::find($taxonomy.'::'.$term);
+
         $this->abortIfDisabled();
 
         return app(TermResource::class)::make($term);

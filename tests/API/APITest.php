@@ -2,9 +2,11 @@
 
 namespace Tests\API;
 
+use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -199,6 +201,87 @@ class APITest extends TestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @test
+     * @dataProvider userPasswordFilterProvider
+     */
+    public function it_doesnt_allow_filtering_users_by_password($filter)
+    {
+        Facades\Config::set('statamic.api.resources.users', true);
+
+        User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
+        User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
+
+        $this
+            ->get("/api/users?filter[{$filter}]=abc")
+            ->assertJson([
+                'data' => [
+                    ['id' => 'one'],
+                    ['id' => 'two'], // this one would be filtered out if the password was allowed
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_replaces_entries_using_live_preview_token()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('dance')->set('title', 'Dance')->slug('dance')->save();
+
+        $substitute = Facades\Entry::make()->collection('pages')->id('dance')->set('title', 'Dance modified in live preview')->slug('dance');
+
+        $this->get('/api/collections/pages/entries/dance')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+
+        LivePreview::tokenize('test-token', $substitute);
+
+        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+            'data' => [
+                'title' => 'Dance modified in live preview',
+            ],
+        ]);
+    }
+
+    /** @test */
+    public function it_replaces_terms_using_live_preview_token()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data(['title' => 'Dance'])->save();
+
+        $substitute = Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data(['title' => 'Dance modified in live preview']);
+
+        $this->get('/api/taxonomies/topics/terms/dance')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+
+        LivePreview::tokenize('test-token', $substitute);
+
+        $this->get('/api/taxonomies/topics/terms/dance?token=test-token')->assertJson([
+            'data' => [
+                'title' => 'Dance modified in live preview',
+            ],
+        ]);
+    }
+
+    public function userPasswordFilterProvider()
+    {
+        return collect([
+            'password',
+            'password:is',
+            'password:regex',
+            'password_hash',
+            'password_hash:is',
+            'password_hash:regex',
+        ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
     }
 
     private function assertEndpointDataCount($endpoint, $count)

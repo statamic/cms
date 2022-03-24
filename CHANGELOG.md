@@ -1,5 +1,45 @@
 # Release Notes
 
+## 3.3.3 (2022-03-24)
+
+### What's new
+- Live Preview is supported in the REST API. [#5623](https://github.com/statamic/cms/issues/5623) by @jasonvarga
+- Query builders can accept page name and number. [#5602](https://github.com/statamic/cms/issues/5602) by @mattmurtaugh
+- Added `csrf` parameter to `form` tag. [#5626](https://github.com/statamic/cms/issues/5626) by @robdekort
+- Added `has_focus` variable to assets. [#5638](https://github.com/statamic/cms/issues/5638) by @jasonvarga
+- Added `playtime` variable to assets. [#5586](https://github.com/statamic/cms/issues/5586) by @jackmcdade
+
+### What's improved
+- Redesigned Search Index Utility. [#5625](https://github.com/statamic/cms/issues/5625) by @jackmcdade
+- Removed primary style on the Asset browser's "Create Container" button. [#5629](https://github.com/statamic/cms/issues/5629) by @jackmcdade
+- Expanded Windows testing. [#5613](https://github.com/statamic/cms/issues/5613) by @jesseleite
+- Updated Swedish translations. [#5615](https://github.com/statamic/cms/issues/5615) [#5620](https://github.com/statamic/cms/issues/5620) [#5617](https://github.com/statamic/cms/issues/5617) [#5616](https://github.com/statamic/cms/issues/5616) by @jannejava
+- Made asset editor full width. [#5608](https://github.com/statamic/cms/issues/5608) by @jackmcdade
+- Asset fields will auto-select the container when only one exists. [#5498](https://github.com/statamic/cms/issues/5498) by @duncanmcclean
+
+### What's fixed
+- The `to_json` modifier can handle query builders. [#5635](https://github.com/statamic/cms/issues/5635) by @jasonvarga
+- Fix `is_external` check for anchors. [#5631](https://github.com/statamic/cms/issues/5631) by @grandpalacko
+- Fix Asset Editor not showing HTML5 players. [#5607](https://github.com/statamic/cms/issues/5607) by @jackmcdade
+
+
+
+## 3.3.2 (2022-03-18)
+
+### What's improved
+- Update French translations. [#5540](https://github.com/statamic/cms/issues/5540) by @ebeauchamps
+- Link to automatic titles section in the docs. [#5553](https://github.com/statamic/cms/issues/5553) by @jackmcdade
+
+### What's fixed
+- Prevent filtering users by password hashes in the APIs. [#5568](https://github.com/statamic/cms/issues/5568) by @jasonvarga
+- Prevent usage of `null` as filesystem paths. [#5562](https://github.com/statamic/cms/issues/5562) by @jasonvarga
+- The `glide` tag pair can handle query builders. [#5552](https://github.com/statamic/cms/issues/5552) by @jasonvarga
+- Fix Flysystem 3 support in Glide. [#5551](https://github.com/statamic/cms/issues/5551) by @jasonvarga
+- Make `isset` on properties work. [#5530](https://github.com/statamic/cms/issues/5530) by @jasonvarga
+- Range fields can now use `0` as a value or default. [#5538](https://github.com/statamic/cms/issues/5538) by @jasonvarga
+
+
+
 ## 3.3.1 (2022-03-16)
 
 ### What's new

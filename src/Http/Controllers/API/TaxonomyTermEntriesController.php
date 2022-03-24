@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Statamic\Facades\Collection;
+use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\EntryResource;
 
 class TaxonomyTermEntriesController extends ApiController
@@ -25,6 +26,8 @@ class TaxonomyTermEntriesController extends ApiController
     public function index($taxonomy, $term)
     {
         $this->abortIfDisabled();
+
+        $term = Term::find($taxonomy.'::'.$term);
 
         $query = $term->queryEntries();
 
