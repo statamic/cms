@@ -86,7 +86,7 @@ class Value implements IteratorAggregate, JsonSerializable
         }
 
         if ($this->shouldParseAntlers()) {
-            return $parser->parse($value, $variables);
+            return $this->fieldtype->augment($parser->parse($this->raw(), $variables));
         }
 
         if (Str::contains($value, '{')) {
