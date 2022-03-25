@@ -184,6 +184,8 @@ class GlobalRuntimeState
 
     public static $containsLayout = false;
 
+    public static $userContentEvalState = null;
+
     /**
      * A list of callbacks that will be invoked when ___internal_debug:peek is called.
      *
