@@ -1483,7 +1483,7 @@ class Environment
 
             $scopeValue = $this->scopeValue($varName);
 
-            if ($scopeValue instanceof Collection && !$val->hasModifiers()) {
+            if ($scopeValue instanceof Collection && ! $val->hasModifiers()) {
                 $scopeValue = $scopeValue->all();
             }
 
