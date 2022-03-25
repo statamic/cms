@@ -83,6 +83,6 @@ EOT;
 {{ /partial }}
 EOT;
 
-        $this->assertSame('<The Content>', $this->renderString($template, ['content' => 'The Content',], true));
+        $this->assertSame('<The Content>', $this->renderString($template, ['content' => 'The Content'], true));
     }
 }
