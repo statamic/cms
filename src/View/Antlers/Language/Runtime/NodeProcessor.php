@@ -1849,7 +1849,7 @@ class NodeProcessor
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$userContentEvalState = [
                                                 $val,
-                                                $node
+                                                $node,
                                             ];
                                             $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
                                             GlobalRuntimeState::$userContentEvalState = null;

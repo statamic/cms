@@ -536,7 +536,7 @@ class RuntimeParser implements Parser
             if (GlobalRuntimeState::$userContentEvalState[0] instanceof Value) {
                 /** @var Value $value */
                 $value = GlobalRuntimeState::$userContentEvalState[0];
-                $valueContent = (string)$value;
+                $valueContent = (string) $value;
 
                 $handle = $value->handle();
 
@@ -567,11 +567,10 @@ INFO;
                 $exceptionView = $this->tempFileCreated;
                 $rebuiltTrace[] = [
                     'file' => $this->tempFileCreated,
-                    'line' => $dynamicExceptionLine
+                    'line' => $dynamicExceptionLine,
                 ];
             }
         }
-
 
         $ignitionException = new $exceptionClass($newMessage, 0, 1, $exceptionView, $exceptionLine, $antlersException);
         $traceProperty = new ReflectionProperty('Exception', 'trace');
