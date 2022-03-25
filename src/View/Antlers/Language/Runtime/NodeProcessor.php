@@ -1854,18 +1854,12 @@ class NodeProcessor
                                         }
                                     }
 
-                                    if ($val instanceof Collection) {
-                                        $val = $val->values()->all();
-                                    }
-
                                     if ($val instanceof AntlersString) {
                                         $val = (string) $val;
                                     }
 
-                                    if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
-                                        if (count($val) > 0 && ! is_object($val[0])) {
-                                            $val = $this->addLoopIterationVariables($val);
-                                        }
+                                    if ($this->isLoopable($val) && is_array($val) && ! Arr::isAssoc($val) && count($val) > 0 && ! is_object($val[0])) {
+                                        $val = $this->addLoopIterationVariables($val);
                                     }
 
                                     $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
@@ -1887,6 +1881,9 @@ class NodeProcessor
 
                             if ($val instanceof Collection) {
                                 $val = $val->all();
+                                if (! Arr::isAssoc($val)) {
+                                    $val = $this->addLoopIterationVariables($val);
+                                }
                             }
                         }
                         $executedParamModifiers = true;
@@ -2157,6 +2154,16 @@ class NodeProcessor
         $total = count($loop);
         $lastIndex = $total - 1;
         $curData = $this->data;
+
+        if ($loop instanceof Collection) {
+            $this->createLockData();
+            $loop = $loop->all();
+            $this->restoreLockedData();
+
+            if (Arr::isAssoc($loop)) {
+                return $loop;
+            }
+        }
 
         foreach ($loop as $key => &$value) {
             if ($value instanceof Augmentable) {

@@ -20,6 +20,7 @@ use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\ModifierManager;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
@@ -197,6 +198,7 @@ class ParserTestCase extends TestCase
 
     protected function renderString($text, $data = [], $withCoreTagsAndModifiers = false)
     {
+        ModifierManager::$statamicModifiers = null;
         GlobalRuntimeState::resetGlobalState();
 
         $documentParser = new DocumentParser();
