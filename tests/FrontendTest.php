@@ -15,6 +15,7 @@ use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class FrontendTest extends TestCase
 {
+    use FakesContent;
     use FakesRoles;
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
@@ -678,28 +679,5 @@ class FrontendTest extends TestCase
 
         // Before the fix, you'd see "Service" instead of "Home", because the URI would also be /
         $this->get('/')->assertSee('Home');
-    }
-
-    private function createPage($slug, $attributes = [])
-    {
-        $this->makeCollection()->save();
-
-        return tap($this->makePage($slug, $attributes))->save();
-    }
-
-    private function makePage($slug, $attributes = [])
-    {
-        return EntryFactory::slug($slug)
-            ->id($slug)
-            ->collection('pages')
-            ->data($attributes['with'] ?? [])
-            ->make();
-    }
-
-    private function makeCollection()
-    {
-        return Collection::make('pages')
-            ->routes('{slug}')
-            ->template('default');
     }
 }
