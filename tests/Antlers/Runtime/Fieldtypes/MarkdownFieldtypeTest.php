@@ -26,7 +26,7 @@ class MarkdownFieldtypeTest extends ParserTestCase
         ]);
         $markdown->setField($field);
 
-        $value = <<<EOT
+        $value = <<<'EOT'
 {{ if 1 > 3 }}Yes.{{ else }}No.{{ /if }}
 {{ if 1 < 3 && true == true }}Yes.{{ else }}No.{{ /if }}
 {{ if 3 > 1 }}3 is bigger{{ /if }}
