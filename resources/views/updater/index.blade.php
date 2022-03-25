@@ -16,7 +16,7 @@
                 @if ($count = $statamic->availableUpdatesCount())
                     <td class="text-right"><span class="badge-sm bg-green btn-sm">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
                 @else
-                    <td class="text-right">{{ __('Up to date')}}</td>
+                    <td class="text-right">{{ __('Up to date') }}</td>
                 @endif
             </tr>
         </table>
@@ -32,7 +32,7 @@
                     @if ($count = $addon->changelog()->availableUpdatesCount())
                         <td class="text-right"><span class="badge-sm bg-green btn-sm">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
                     @else
-                        <td class="text-right">{{ __('Up to date')}}</td>
+                        <td class="text-right">{{ __('Up to date') }}</td>
                     @endif
                 </tr>
             @endforeach

@@ -58,6 +58,10 @@ class StackReplacementManager
             return $content;
         }
 
+        if (! array_key_exists(GlobalRuntimeState::$environmentId, self::$stackContents)) {
+            return $content;
+        }
+
         foreach (self::$stacks as $stackName => $throwAway) {
             $replacement = '';
 

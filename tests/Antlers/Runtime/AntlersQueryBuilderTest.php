@@ -13,12 +13,12 @@ class AntlersQueryBuilderTest extends ParserTestCase
     public function test_query_builder_loops_receive_tag_parameters()
     {
         $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('get')->once()->andReturn(collect([
+        $builder->shouldReceive('get')->twice()->andReturn(collect([
             ['title' => 'Foo'],
             ['title' => 'Baz'],
             ['title' => 'Bar'],
         ]));
-        $builder->shouldReceive('orderBy')->withArgs(function ($field, $direction) {
+        $builder->shouldReceive('orderBy')->twice()->withArgs(function ($field, $direction) {
             return $field == 'title' && $direction == 'desc';
         });
 
@@ -28,6 +28,41 @@ class AntlersQueryBuilderTest extends ParserTestCase
 
         $template = <<<'EOT'
 {{ data order_by="title:desc" }}{{ title }}{{ /data }}
+EOT;
+
+        $this->assertSame('FooBazBar', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ data order_by="title:desc" as="entries" }}{{ entries }}{{ title }}{{ /entries }}{{ /data }}
+EOT;
+
+        $this->assertSame('FooBazBar', $this->renderString($template, $data));
+    }
+
+    public function test_strict_variable_query_builders_are_correctly_handled()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->twice()->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Baz'],
+            ['title' => 'Bar'],
+        ]));
+        $builder->shouldReceive('orderBy')->twice()->withArgs(function ($field, $direction) {
+            return $field == 'title' && $direction == 'desc';
+        });
+
+        $data = [
+            'data' => $builder,
+        ];
+
+        $template = <<<'EOT'
+{{ $data order_by="title:desc" }}{{ title }}{{ /$data }}
+EOT;
+
+        $this->assertSame('FooBazBar', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ $data order_by="title:desc" as="entries" }}{{ entries }}{{ title }}{{ /entries }}{{ /$data }}
 EOT;
 
         $this->assertSame('FooBazBar', $this->renderString($template, $data));

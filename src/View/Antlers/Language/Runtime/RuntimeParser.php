@@ -414,7 +414,7 @@ class RuntimeParser implements Parser
 
         $this->parseStack -= 1;
 
-        if ($this->parseStack == 0) {
+        if ($this->parseStack == 0 && GlobalRuntimeState::$containsLayout == false) {
             $bufferContent = LiteralReplacementManager::processReplacements($bufferContent);
             $bufferContent = StackReplacementManager::processReplacements($bufferContent);
 
