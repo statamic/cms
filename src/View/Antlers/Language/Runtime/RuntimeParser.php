@@ -303,6 +303,11 @@ class RuntimeParser implements Parser
         self::$standardRenderNodeCache[$entry] = $nodes;
     }
 
+    protected function isIgnitionInstalled()
+    {
+        return class_exists(ViewException::class) || class_exists('Spatie\LaravelIgnition\Exceptions\ViewException');
+    }
+
     /**
      * Parses and renders the input text, with the provided runtime data.
      *
@@ -370,7 +375,7 @@ class RuntimeParser implements Parser
 
             $this->nodeProcessor->triggerRenderComplete();
         } catch (AntlersException $antlersException) {
-            if (class_exists(ViewException::class) || class_exists('Spatie\LaravelIgnition\Exceptions\ViewException')) {
+            if ($this->isIgnitionInstalled()) {
                 throw $this->buildAntlersExceptionError($antlersException, $text, $data);
             }
 
