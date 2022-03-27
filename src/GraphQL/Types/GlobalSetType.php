@@ -4,7 +4,6 @@ namespace Statamic\GraphQL\Types;
 
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Facades\GraphQL;
-use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
 class GlobalSetType extends \Rebing\GraphQL\Support\Type
@@ -55,13 +54,7 @@ class GlobalSetType extends \Rebing\GraphQL\Support\Type
                 return $globals->handle();
             }
 
-            $value = $globals->augmentedValue($info->fieldName);
-
-            if ($value instanceof Value) {
-                $value = $value->value();
-            }
-
-            return $value;
+            return $globals->resolveGqlValue($info->fieldName);
         };
     }
 }

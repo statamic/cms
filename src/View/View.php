@@ -10,6 +10,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Events\ViewRendered;
 
 class View
@@ -92,16 +93,23 @@ class View
             ->setId(Arr::get($cascade, 'id', null))
             ->setViewPath($this->templateViewPath())->setRootData($cascade);
 
-        $contents = view($this->templateViewName(), $cascade);
-
         if ($this->shouldUseLayout()) {
+            GlobalRuntimeState::$containsLayout = true;
+
+            $contents = view($this->templateViewName(), $cascade);
+
             if (Str::endsWith($this->layoutViewPath(), Engine::EXTENSIONS)) {
                 $contents = $contents->withoutExtractions();
             }
 
+            $contents = $contents->render();
+            GlobalRuntimeState::$containsLayout = false;
+
             $contents = view($this->layoutViewName(), array_merge($cascade, [
-                'template_content' => $contents->render(),
+                'template_content' => $contents,
             ]));
+        } else {
+            $contents = view($this->templateViewName(), $cascade);
         }
 
         ViewRendered::dispatch($this);
