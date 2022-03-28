@@ -12,11 +12,19 @@ class DefaultCache implements ResponseCache
 {
     public function get(Request $request)
     {
+        if ($request->has('token')) {
+            return null;
+        }
+
         return Cache::get($this->getCacheKey($request));
     }
 
     public function put(Request $request, $response)
     {
+        if ($request->has('token')) {
+            return null;
+        }
+        
         $key = $this->track($request);
 
         $ttl = Carbon::now()->addMinutes(config('statamic.graphql.cache.expiry', 60));
