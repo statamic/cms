@@ -65,7 +65,7 @@ EOT;
 
         $this->assertSame($expected, $this->renderString($template, [
             'now' => Carbon::parse('2019-03-10 13:00'),
-            'test' => $value
+            'test' => $value,
         ]));
     }
 }
