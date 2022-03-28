@@ -402,6 +402,26 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         return $this;
     }
 
+    public function removeEnsuredFieldFromSection($handle, $section)
+    {
+        $fieldKey = collect($this->ensuredFields)->search(function ($field) use ($handle, $section) {
+            return Arr::get($field, 'handle') === $handle && Arr::get($field, 'section') === $section;
+        });
+
+        Arr::pull($this->ensuredFields, $fieldKey);
+
+        return $this->resetFieldsCache();
+    }
+
+    public function removeEnsuredFieldsFromSection($section)
+    {
+        $this->ensuredFields = collect($this->ensuredFields)->filter(function ($field) use ($section) {
+            return Arr::get($field, 'section') !== $section;
+        })->values()->toArray();
+
+        return $this->resetFieldsCache();
+    }
+
     public function ensureFieldPrepended($handle, $field, $section = null)
     {
         return $this->ensureField($handle, $field, $section, true);
