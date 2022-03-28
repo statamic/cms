@@ -547,6 +547,34 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_can_remove_an_ensured_field_from_a_specific_section()
+    {
+        $blueprint = (new Blueprint)
+            ->ensureField('field_one', ['type' => 'textarea'], 'section_one')
+            ->ensureField('field_two', ['type' => 'textarea'], 'section_two')
+            ->ensureField('field_three', ['type' => 'textarea'], 'section_two')
+            ->removeEnsuredFieldFromSection('field_two', 'section_two');
+
+        $this->assertTrue($blueprint->hasField('field_one'));
+        $this->assertTrue(! $blueprint->hasField('field_two'));
+        $this->assertTrue($blueprint->hasField('field_three'));
+    }
+
+    /** @test */
+    public function it_can_remove_ensured_fields_from_a_specific_section()
+    {
+        $blueprint = (new Blueprint)
+            ->ensureField('field_one', ['type' => 'textarea'], 'section_one')
+            ->ensureField('field_two', ['type' => 'textarea'], 'section_two')
+            ->ensureField('field_three', ['type' => 'textarea'], 'section_two')
+            ->removeEnsuredFieldsFromSection('section_two');
+
+        $this->assertTrue($blueprint->hasField('field_one'));
+        $this->assertTrue(! $blueprint->hasField('field_two'));
+        $this->assertTrue(! $blueprint->hasField('field_three'));
+    }
+
+    /** @test */
     public function it_ensures_a_field_has_config()
     {
         $blueprint = (new Blueprint)->setContents(['sections' => [
