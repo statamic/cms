@@ -633,6 +633,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->collection($this->collection)
             ->origin($this)
             ->locale($site)
+            ->published($this->published)
             ->slug($this->slug())
             ->date($this->date());
     }
