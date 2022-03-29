@@ -6,11 +6,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\Eloquent\UserGroup as EloquentGroup;
 use Statamic\Auth\Eloquent\UserGroupModel;
-use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Console\Please\Kernel;
-use Statamic\Facades;
 use Tests\TestCase;
 
 class EloquentGroupTest extends TestCase

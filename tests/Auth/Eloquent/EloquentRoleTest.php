@@ -10,7 +10,6 @@ use Statamic\Auth\Eloquent\Role as EloquentRole;
 use Statamic\Auth\Eloquent\RoleModel;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Console\Please\Kernel;
-use Statamic\Facades;
 use Tests\TestCase;
 
 class EloquentRoleTest extends TestCase
