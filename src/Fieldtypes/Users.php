@@ -106,6 +106,7 @@ class Users extends Relationship
                 if ($lastName = $user->get('last_name')) {
                     $name .= ' '.$lastName;
                 }
+                
                 return [
                     'id' => $user->id(),
                     'title' => $name,
@@ -113,6 +114,7 @@ class Users extends Relationship
                     'published' => null,
                 ];
             }
+            
             return [
                 'id' => $user->id(),
                 'title' => $user->get('name', $user->email()),
