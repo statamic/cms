@@ -52,6 +52,10 @@ class AuthMigration extends Command
 
     private function createGroupsTable()
     {
+        if (config('statamic.users.tables.groups', false) == false) {
+            return;
+        }
+
         $from = __DIR__.'/stubs/auth/statamic_groups_table.php.stub';
         $file = date('Y_m_d_His', time()).'_statamic_groups_table';
         $to = database_path("migrations/{$file}.php");
@@ -67,6 +71,10 @@ class AuthMigration extends Command
 
     private function createRolesTable()
     {
+        if (config('statamic.users.tables.roles', false) == false) {
+            return;
+        }
+
         $from = __DIR__.'/stubs/auth/statamic_roles_table.php.stub';
         $file = date('Y_m_d_His', time()).'_statamic_roles_table';
         $to = database_path("migrations/{$file}.php");
