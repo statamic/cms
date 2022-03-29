@@ -93,31 +93,9 @@ class Users extends Relationship
     public function preProcessIndex($data)
     {
         return $this->getItemsForPreProcessIndex($data)->map(function ($user) {
-            if ($name = $user->get('name')) {
-                return [
-                    'id' => $user->id(),
-                    'title' => $name,
-                    'edit_url' => $user->editUrl(),
-                    'published' => null,
-                ];
-            }
-
-            if ($name = $user->get('first_name')) {
-                if ($lastName = $user->get('last_name')) {
-                    $name .= ' '.$lastName;
-                }
-
-                return [
-                    'id' => $user->id(),
-                    'title' => $name,
-                    'edit_url' => $user->editUrl(),
-                    'published' => null,
-                ];
-            }
-
             return [
                 'id' => $user->id(),
-                'title' => $user->get('name', $user->email()),
+                'title' => $user->name(),
                 'edit_url' => $user->editUrl(),
                 'published' => null,
             ];
