@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Statamic\Facades\Entry;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Resources\API\EntryResource;
 
 class CollectionEntriesController extends ApiController
@@ -24,9 +25,12 @@ class CollectionEntriesController extends ApiController
         );
     }
 
-    public function show($collection, $entry)
+    public function show($collection, $handle)
     {
-        $entry = Entry::find($entry);
+        throw_if(
+            ! ($entry = Entry::find($handle)) || $entry->collection()->id() !== $collection->id(),
+            new NotFoundHttpException
+        );
 
         $this->abortIfDisabled();
         $this->abortIfUnpublished($entry);

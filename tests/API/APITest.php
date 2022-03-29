@@ -24,6 +24,19 @@ class APITest extends TestCase
     }
 
     /** @test */
+    public function it_handles_not_found_entries()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)->save();
+
+        $this->assertEndpointSuccessful('/api/collections/pages/entries/about');
+        $this->assertEndpointNotFound('/api/collections/pages/entries/dance');
+    }
+
+    /** @test */
     public function it_filters_published_entries_by_default()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
