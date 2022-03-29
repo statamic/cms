@@ -2,11 +2,15 @@
 
 namespace Tests\Auth\Eloquent;
 
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
+use Statamic\Console\Please\Kernel;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Facades;
 use Tests\Auth\PermissibleContractTests;
@@ -18,6 +22,8 @@ class EloquentUserTest extends TestCase
 {
     use UserContractTests, PermissibleContractTests, HasPreferencesTests, WithFaker;
 
+    public static $migrationsGenerated = false;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -26,9 +32,28 @@ class EloquentUserTest extends TestCase
 
         config(['statamic.users.repository' => 'eloquent']);
 
-        // TODO: The migration has been added into the test, but the implementation could be broken if the real
-        // migration is different from what's in here. We should find a way to reference the actual migrations.
-        $this->loadMigrationsFrom(__DIR__.'/__migrations__');
+        $this->migrationsDir = __DIR__.'/__migrations__';
+
+        if (! self::$migrationsGenerated) {
+            $this->please('auth:migration', ['--path' => $this->migrationsDir]);
+
+            self::$migrationsGenerated = true;
+        }
+
+        $this->loadMigrationsFrom($this->migrationsDir);
+    }
+
+    public function tearDown(): void
+    {
+        // our down() migration sets password to not be nullable, so change it back
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('password')->nullable(true)->change();
+        });
+    }
+
+    private function please($command, $parameters = [])
+    {
+        return $this->app[Kernel::class]->call($command, $parameters);
     }
 
     /** @test */
