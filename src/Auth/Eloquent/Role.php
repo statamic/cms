@@ -20,12 +20,13 @@ class Role extends FileRole
 
     public function toModel()
     {
-        return RoleModel::findOrNew($this->model?->id)->fill([
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'permissions' => $this->permissions,
-            'preferences' => $this->preferences,
-        ]);
+        return RoleModel::findOrNew($this->model ? $this->model->id : null)
+            ->fill([
+                'title' => $this->title,
+                'handle' => $this->handle,
+                'permissions' => $this->permissions,
+                'preferences' => $this->preferences,
+            ]);
     }
 
     public function model($model = null)

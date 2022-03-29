@@ -20,11 +20,12 @@ class UserGroup extends FileUserGroup
 
     public function toModel()
     {
-        return UserGroupModel::findOrNew($this->model?->id)->fill([
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'roles' => $this->roles->keys(),
-        ]);
+        return UserGroupModel::findOrNew($this->model ? $this->model->id : null)
+            ->fill([
+                'title' => $this->title,
+                'handle' => $this->handle,
+                'roles' => $this->roles->keys(),
+            ]);
     }
 
     public function model($model = null)
