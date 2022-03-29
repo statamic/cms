@@ -23,17 +23,33 @@ class APITest extends TestCase
             ->assertJson(['message' => 'Not found.']);
     }
 
-    /** @test */
-    public function it_handles_not_found_entries()
+    /**
+     * @test
+     * @dataProvider entryNotFoundProvider
+     */
+    public function it_handles_not_found_entries($url, $requestShouldSucceed)
     {
         Facades\Config::set('statamic.api.resources.collections', true);
 
         Facades\Collection::make('pages')->save();
+        Facades\Collection::make('articles')->save();
 
         Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)->save();
 
-        $this->assertEndpointSuccessful('/api/collections/pages/entries/about');
-        $this->assertEndpointNotFound('/api/collections/pages/entries/dance');
+        if ($requestShouldSucceed) {
+            $this->assertEndpointSuccessful($url);
+        } else {
+            $this->assertEndpointNotFound($url);
+        }
+    }
+
+    public function entryNotFoundProvider()
+    {
+        return [
+            'valid entry id' => ['/api/collections/pages/entries/about', true],
+            'invalid entry id' => ['/api/collections/pages/entries/dance', false],
+            'valid entry id but wrong collection' => ['/api/collections/articles/entries/about', false],
+        ];
     }
 
     /** @test */
