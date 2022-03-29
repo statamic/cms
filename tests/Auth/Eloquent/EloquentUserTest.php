@@ -3,6 +3,7 @@
 namespace Tests\Auth\Eloquent;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -33,13 +34,18 @@ class EloquentUserTest extends TestCase
 
         $this->migrationsDir = __DIR__.'/__migrations__';
 
+        $this->loadMigrationsFrom($this->migrationsDir);
+
+        $tmpDir = $this->migrationsDir.'/tmp';
+
         if (! self::$migrationsGenerated) {
-            $this->please('auth:migration', ['--path' => $this->migrationsDir]);
+            (new Filesystem)->deleteDirectory($tmpDir);
+            $this->please('auth:migration', ['--path' => $tmpDir]);
 
             self::$migrationsGenerated = true;
         }
 
-        $this->loadMigrationsFrom($this->migrationsDir);
+        $this->loadMigrationsFrom($tmpDir);
     }
 
     public function tearDown(): void
