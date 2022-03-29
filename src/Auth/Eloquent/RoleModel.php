@@ -1,0 +1,28 @@
+<?php
+
+namespace Statamic\Auth\Eloquent;
+
+use Illuminate\Database\Eloquent\Model as Eloquent;
+
+class RoleModel extends Eloquent
+{
+    protected $guarded = [];
+
+    protected $table = 'roles';
+
+    protected $casts = [
+        'permissions' => 'json',
+        'preferences' => 'json',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        if ($table = config('statamic.users.roles', '')) {
+            $this->setTable($table);
+        }
+    }
+}

@@ -42,8 +42,41 @@ class AuthMigration extends Command
 
         File::put($to, $contents);
 
-        $this->line("<info>Created Migration:</info> {$file}");
+        $this->line("<info>Created Auth Migration:</info> {$file}");
+
+        $this->createGroupsTable();
+        $this->createRolesTable();
 
         $this->composer->dumpAutoloads();
+    }
+
+    private function createGroupsTable()
+    {
+        $from = __DIR__.'/stubs/auth/statamic_groups_table.php.stub';
+        $file = date('Y_m_d_His', time()).'_statamic_groups_table';
+        $to = database_path("migrations/{$file}.php");
+
+        $contents = File::get($from);
+
+        $contents = str_replace('GROUPS_TABLE', config('statamic.users.tables.groups', 'groups'), $contents);
+
+        File::put($to, $contents);
+
+        $this->line("<info>Created Groups Migration:</info> {$file}");
+    }
+
+    private function createRolesTable()
+    {
+        $from = __DIR__.'/stubs/auth/statamic_roles_table.php.stub';
+        $file = date('Y_m_d_His', time()).'_statamic_roles_table';
+        $to = database_path("migrations/{$file}.php");
+
+        $contents = File::get($from);
+
+        $contents = str_replace('ROLES_TABLE', config('statamic.users.tables.roles', 'roles'), $contents);
+
+        File::put($to, $contents);
+
+        $this->line("<info>Created Roles Migration:</info> {$file}");
     }
 }
