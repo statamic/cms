@@ -39,7 +39,8 @@ class Site extends Filter
 
     public function badge($values)
     {
-        $site = Facades\Site::all()[$values['site']];
+        $site = Facades\Site::get($values['site']);
+
         return __('Site').': '.$site->name();
     }
 
