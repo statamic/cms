@@ -36,7 +36,7 @@ class UserGroup extends FileUserGroup
 
         $this->model = $model;
 
-        $this->id($model->id);
+        $this->handle($model->handle);
 
         return $this;
     }
