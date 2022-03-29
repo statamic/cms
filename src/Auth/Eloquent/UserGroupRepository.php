@@ -15,6 +15,10 @@ class UserGroupRepository extends BaseRepository
 
     public function save($userGroup)
     {
+        if (! $this->isEloquentEnabled()) {
+            return parent::save($userGroup);
+        }
+
         $model = $userGroup->toModel();
 
         $model->save();
@@ -24,6 +28,10 @@ class UserGroupRepository extends BaseRepository
 
     public function delete($userGroup)
     {
+        if (! $this->isEloquentEnabled()) {
+            return parent::delete($userGroup);
+        }
+
         $userGroup->model()->delete();
     }
 
@@ -36,6 +44,10 @@ class UserGroupRepository extends BaseRepository
 
     public function all(): Collection
     {
+        if (! $this->isEloquentEnabled()) {
+            return parent::all();
+        }
+
         return UserGroupModel::all()->map(function ($model) {
             return (new UserGroup)::fromModel($model);
         });
@@ -43,8 +55,17 @@ class UserGroupRepository extends BaseRepository
 
     public function find($id): ?UserGroupContract
     {
+        if (! $this->isEloquentEnabled()) {
+            return parent::find($id);
+        }
+
         $model = UserGroupModel::whereHandle($id)->first();
 
         return $model ? (new UserGroup)->fromModel($model) : null;
+    }
+
+    private function isEloquentEnabled()
+    {
+        return config('statamic.users.tables.groups', false) != false;
     }
 }

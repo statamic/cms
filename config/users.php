@@ -106,9 +106,9 @@ return [
     'tables' => [
         'users' => 'users',
         'role_user' => 'role_user',
-        'roles' => 'roles',
+        'roles' => false,
         'group_user' => 'group_user',
-        'groups' => 'groups',
+        'groups' => false,
     ],
 
     /*

@@ -15,6 +15,10 @@ class RoleRepository extends BaseRepository
 
     public function save($role)
     {
+        if (! $this->isEloquentEnabled()) {
+            return parent::save($role);
+        }
+
         $model = $role->toModel();
         $model->save();
 
@@ -23,6 +27,10 @@ class RoleRepository extends BaseRepository
 
     public function delete($role)
     {
+        if (! $this->isEloquentEnabled()) {
+            return parent::delete($role);
+        }
+
         $role->model()->delete();
     }
 
@@ -35,6 +43,10 @@ class RoleRepository extends BaseRepository
 
     public function all(): Collection
     {
+        if (! $this->isEloquentEnabled()) {
+            return parent::all();
+        }
+
         return RoleModel::all()->map(function ($model) {
             return (new Role)::fromModel($model);
         });
@@ -42,8 +54,17 @@ class RoleRepository extends BaseRepository
 
     public function find($handle): ?RoleContract
     {
+        if (! $this->isEloquentEnabled()) {
+            return parent::find($handle);
+        }
+
         $model = RoleModel::whereHandle($handle)->first();
 
         return $model ? (new Role)->fromModel($model) : null;
+    }
+
+    private function isEloquentEnabled()
+    {
+        return config('statamic.users.tables.roles', false) != false;
     }
 }
