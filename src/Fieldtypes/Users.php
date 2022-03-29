@@ -95,7 +95,7 @@ class Users extends Relationship
         return $this->getItemsForPreProcessIndex($data)->map(function ($user) {
             return [
                 'id' => $user->id(),
-                'title' => $user->get('name', $user->email()),
+                'title' => $user->name(),
                 'edit_url' => $user->editUrl(),
                 'published' => null,
             ];
