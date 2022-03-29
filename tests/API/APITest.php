@@ -313,6 +313,35 @@ class APITest extends TestCase
         ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
     }
 
+    /**
+     * @test
+     * @dataProvider termNotFoundProvider
+     */
+    public function it_handles_not_found_terms($url, $requestShouldSucceed)
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        Facades\Taxonomy::make('tags')->save();
+        Facades\Taxonomy::make('categories')->save();
+
+        Facades\Term::make('test')->taxonomy('tags')->dataForLocale('en', [])->save();
+
+        if ($requestShouldSucceed) {
+            $this->assertEndpointSuccessful($url);
+        } else {
+            $this->assertEndpointNotFound($url);
+        }
+    }
+
+    public function termNotFoundProvider()
+    {
+        return [
+            'valid term id' => ['/api/taxonomies/tags/terms/test', true],
+            'invalid term id' => ['/api/taxonomies/tags/terms/missing', false],
+            'valid term id but wrong collection' => ['/api/taxonomies/categories/terms/test', false],
+        ];
+    }
+
     private function assertEndpointDataCount($endpoint, $count)
     {
         $response = $this
