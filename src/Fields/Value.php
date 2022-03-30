@@ -87,9 +87,11 @@ class Value implements IteratorAggregate, JsonSerializable
         }
 
         if ($this->shouldParseAntlers()) {
-            $correctedValue = (new DocumentTransformer())->correct($value);
+            if (config('statamic.antlers.version') === 'runtime') {
+                $value = (new DocumentTransformer())->correct($value);
+            }
 
-            return $parser->parse($correctedValue, $variables);
+            return $parser->parse($value, $variables);
         }
 
         if (Str::contains($value, '{')) {
