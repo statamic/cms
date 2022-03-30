@@ -13,7 +13,7 @@ use Statamic\Auth\Eloquent\UserGroupModel;
 use Statamic\Console\Please\Kernel;
 use Tests\TestCase;
 
-class EloquentGroupTest extends TestCase
+class EloquentUserGroupTest extends TestCase
 {
     use WithFaker;
 
@@ -87,5 +87,15 @@ class EloquentGroupTest extends TestCase
         $group = $this->makeGroup();
 
         $this->assertInstanceOf(EloquentGroup::class, $group);
+    }
+
+    /** @test */
+    public function it_assigns_a_group_to_a_user()
+    {
+        $group = $this->makeGroup();
+        $user = $this->makeUser();
+        $user->addToGroup($group);
+
+        $this->assertEquals($user->groups()->first(), $group);
     }
 }

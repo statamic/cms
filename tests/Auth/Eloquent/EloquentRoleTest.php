@@ -89,4 +89,14 @@ class EloquentRoleTest extends TestCase
 
         $this->assertInstanceOf(EloquentRole::class, $role);
     }
+
+    /** @test */
+    public function it_assigns_a_role_to_a_user()
+    {
+        $role = $this->makeRole();
+        $user = $this->makeUser();
+        $user->assignRole($role);
+
+        $this->assertEquals($user->roles()->first(), $role);
+    }
 }
