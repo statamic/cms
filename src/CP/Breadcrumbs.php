@@ -29,6 +29,7 @@ class Breadcrumbs implements Arrayable, JsonSerializable
         return $this->crumbs->toJson();
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->crumbs->toArray();
