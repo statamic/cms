@@ -299,6 +299,10 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     private function dispatchEntryBlueprintFoundEvent($blueprint, $entry)
     {
+        if (! optional($entry)->cacheBlueprint()) {
+            return EntryBlueprintFound::dispatch($blueprint, $entry);
+        }
+
         $id = optional($entry)->id() ?? 'null';
 
         $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint->handle().'-'.$id;

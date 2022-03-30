@@ -66,6 +66,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    protected $cacheBlueprint = true;
 
     public function __construct()
     {
@@ -116,6 +117,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->args(func_get_args());
     }
 
+    public function cacheBlueprint($cache = null)
+    {
+        return $this->fluentlyGetOrSet('cacheBlueprint')->args(func_get_args());
+    }
+
     public function blueprint($blueprint = null)
     {
         $key = "entry-{$this->id()}-blueprint";
@@ -123,6 +129,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) use ($key) {
+                if (! $this->cacheBlueprint()) {
+                    if (! $blueprint) {
+                        $blueprint = $this->hasOrigin()
+                            ? $this->origin()->blueprint()->handle()
+                            : $this->get('blueprint');
+                    }
+
+                    return $this->collection()->entryBlueprint($blueprint, $this);
+                }
+
                 return Blink::once($key, function () use ($blueprint) {
                     if (! $blueprint) {
                         $blueprint = $this->hasOrigin()
