@@ -788,7 +788,7 @@ class PathDataManager
                 $reductionStack[] = $augmented;
                 continue;
             } elseif ($reductionValue instanceof \Statamic\Entries\Collection) {
-                $reductionStack[] = $reductionValue->toAugmentedArray();
+                $reductionStack[] = RuntimeValueCache::resolveWithRuntimeIsolation($reductionValue);
                 continue;
             } elseif ($reductionValue instanceof ArrayableString) {
                 $reductionStack[] = $reductionValue->toArray();

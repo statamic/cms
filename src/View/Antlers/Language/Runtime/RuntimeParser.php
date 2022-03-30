@@ -110,6 +110,8 @@ class RuntimeParser implements Parser
      */
     private $parseStack = 0;
 
+    private $isolateRuntimes = false;
+
     public function __construct(DocumentParser $documentParser, NodeProcessor $nodeProcessor, AntlersLexer $lexer, LanguageParser $antlersParser)
     {
         $this->documentParser = $documentParser;
@@ -583,8 +585,28 @@ class RuntimeParser implements Parser
         return $stackTrace;
     }
 
+    public function isolateRuntimes($isolate)
+    {
+        $this->isolateRuntimes = $isolate;
+
+        return $this;
+    }
+
+    private function cloneRuntimeParser()
+    {
+        return new RuntimeParser(
+            $this->documentParser,
+            $this->nodeProcessor->cloneProcessor(),
+            $this->antlersLexer, $this->antlersParser
+        );
+    }
+
     public function parse($text, $data = [])
     {
+        if ($this->isolateRuntimes) {
+            return $this->cloneRuntimeParser()->renderText($text, $data);
+        }
+
         return $this->renderText($text, $data);
     }
 

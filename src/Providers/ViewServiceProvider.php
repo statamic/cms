@@ -145,7 +145,8 @@ class ViewServiceProvider extends ServiceProvider
                 $runtimeConfig->traceManager->registerTracer(GlobalDebugManager::getTimingsTracer());
             }
 
-            $parser->setRuntimeConfiguration($runtimeConfig);
+            $parser->isolateRuntimes(GlobalRuntimeState::$requiresRuntimeIsolation)
+                ->setRuntimeConfiguration($runtimeConfig);
 
             return $parser;
         });
