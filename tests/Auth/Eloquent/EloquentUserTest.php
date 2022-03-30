@@ -39,8 +39,7 @@ class EloquentUserTest extends TestCase
         $tmpDir = $this->migrationsDir.'/tmp';
 
         if (! self::$migrationsGenerated) {
-            (new Filesystem)->deleteDirectory($tmpDir);
-            $this->please('auth:migration', ['--path' => $tmpDir]);
+            $this->please('auth:migration', ['--path' => $tmpDir, '--test' => true]);
 
             self::$migrationsGenerated = true;
         }

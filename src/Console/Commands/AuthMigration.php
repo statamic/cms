@@ -12,7 +12,7 @@ class AuthMigration extends Command
     use RunsInPlease;
 
     protected $composer;
-    protected $name = 'statamic:auth:migration {--path=}';
+    protected $name = 'statamic:auth:migration {--path=} {--test=}';
     protected $description = 'Generate Auth Migrations';
 
     public function __construct(Composer $composer)
@@ -25,7 +25,7 @@ class AuthMigration extends Command
     public function handle()
     {
         $from = __DIR__.'/stubs/auth/statamic_auth_tables.php.stub';
-        $file = date('Y_m_d_His', time()).'_statamic_auth_tables';
+        $file = date('Y_m_d_His', $this->option('test') ? 1648622397 : time()).'_statamic_auth_tables';
         $to = ($path = $this->option('path')) ? $path."/{$file}.php" : database_path("migrations/{$file}.php");
 
         $contents = File::get($from);
@@ -57,7 +57,7 @@ class AuthMigration extends Command
         }
 
         $from = __DIR__.'/stubs/auth/statamic_groups_table.php.stub';
-        $file = date('Y_m_d_His', time()).'_statamic_groups_table';
+        $file = date('Y_m_d_His', $this->option('test') ? 1648622397 : time()).'_statamic_groups_table';
         $to = ($path = $this->option('path')) ? $path."/{$file}.php" : database_path("migrations/{$file}.php");
 
         $contents = File::get($from);
@@ -76,7 +76,7 @@ class AuthMigration extends Command
         }
 
         $from = __DIR__.'/stubs/auth/statamic_roles_table.php.stub';
-        $file = date('Y_m_d_His', time()).'_statamic_roles_table';
+        $file = date('Y_m_d_His', $this->option('test') ? 1648622397 : time()).'_statamic_roles_table';
         $to = ($path = $this->option('path')) ? $path."/{$file}.php" : database_path("migrations/{$file}.php");
 
         $contents = File::get($from);
