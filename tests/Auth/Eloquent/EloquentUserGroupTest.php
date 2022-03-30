@@ -98,4 +98,19 @@ class EloquentUserGroupTest extends TestCase
 
         $this->assertEquals($user->groups()->first(), $group);
     }
+
+    /** @test */
+    public function it_assigns_a_group_to_a_user_then_removes_it()
+    {
+        $group = $this->makeGroup();
+        $user = $this->makeUser();
+        $user->addToGroup($group);
+
+        $this->assertEquals($user->groups()->first(), $group);
+        $this->assertCount(1, $user->groups());
+
+        $user->removeFromGroup($group);
+
+        $this->assertCount(0, $user->groups());
+    }
 }

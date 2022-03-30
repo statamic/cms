@@ -99,4 +99,19 @@ class EloquentRoleTest extends TestCase
 
         $this->assertEquals($user->roles()->first(), $role);
     }
+
+    /** @test */
+    public function it_assigns_a_role_to_a_user_and_then_removes_it()
+    {
+        $role = $this->makeRole();
+        $user = $this->makeUser();
+        $user->assignRole($role);
+
+        $this->assertEquals($user->roles()->first(), $role);
+        $this->assertCount(1, $user->roles());
+
+        $user->removeRole($role);
+
+        $this->assertCount(0, $user->roles());
+    }
 }
