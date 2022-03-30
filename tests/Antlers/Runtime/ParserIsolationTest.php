@@ -2,16 +2,16 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Log;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
-use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Log;
 
 class ParserIsolationTest extends TestCase
 {
@@ -34,7 +34,7 @@ class ParserIsolationTest extends TestCase
         ]);
 
         BlueprintRepository::shouldReceive('in')->with('collections/news')->andReturn(collect([
-            'news' => $news->setHandle('news')
+            'news' => $news->setHandle('news'),
         ]));
 
         Collection::make('news')->routes(['en' => '{topic}/{slug}'])->save();
@@ -42,14 +42,14 @@ class ParserIsolationTest extends TestCase
         EntryFactory::collection('news')->id('1')
                 ->slug('news-1')->data([
                     'title' => 'News 1',
-                    'content' => 'News 1 Content'
-            ])->create();
+                    'content' => 'News 1 Content',
+                ])->create();
         EntryFactory::collection('news')->id('2')
                 ->slug('news-2')->data([
                     'title' => 'News 2',
                     'content' => 'News 2 Content',
                     'topic' => 'dance',
-            ])->create();
+                ])->create();
     }
 
     public function test_context_data_does_not_leak_when_resolving_augmented_Values()

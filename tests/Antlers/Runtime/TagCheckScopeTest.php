@@ -2,12 +2,12 @@
 
 namespace Tests\Antlers\Runtime;
 
-use Tests\FakesViews;
-use Statamic\Facades\Collection;
-use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Tests\Factories\EntryFactory;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
+use Tests\FakesViews;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TagCheckScopeTest extends TestCase
@@ -24,7 +24,7 @@ class TagCheckScopeTest extends TestCase
                     'handle' => 'title',
                     'field' => [
                         'type' => 'text',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'replicator_field',
@@ -39,20 +39,20 @@ class TagCheckScopeTest extends TestCase
                                         'field' => [
                                             'antlers' => false,
                                             'type' => 'bard',
-                                        ]
-                                    ]
-                                ]
-                            ]
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ],
                         'type' => 'replicator',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
         $blueprint->save();
 
         BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect([
-            'pages' => $blueprint->setHandle('pages')
+            'pages' => $blueprint->setHandle('pages'),
         ]));
 
         Collection::make('pages')->routes(['en' => '{slug}'])->save();
@@ -76,7 +76,7 @@ class TagCheckScopeTest extends TestCase
                                 'content' => [
                                     [
                                         'type' => 'text',
-                                        'text' => 'I am some text'
+                                        'text' => 'I am some text',
                                     ],
                                     [
                                         'type' => 'text',
@@ -87,17 +87,17 @@ class TagCheckScopeTest extends TestCase
                                                     'href' => 'statamic://entry::1',
                                                     'rel' => null,
                                                     'target' => null,
-                                                    'title' => null
-                                                ]
-                                            ]
+                                                    'title' => null,
+                                                ],
+                                            ],
                                         ],
                                         'text' => 'I am the link',
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ])->create();
     }
 
