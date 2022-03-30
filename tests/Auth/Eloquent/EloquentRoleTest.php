@@ -3,7 +3,6 @@
 namespace Tests\Auth\Eloquent;
 
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
