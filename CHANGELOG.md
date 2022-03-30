@@ -1,5 +1,30 @@
 # Release Notes
 
+## 3.3.4 (2022-03-30)
+
+### What's improved
+- The `site` filter's badge will display the name instead of the handle. [#5683](https://github.com/statamic/cms/issues/5683) by @j3ll3yfi5h
+- Show a more graceful error when hitting a rate limit on the licensing page. [#5678](https://github.com/statamic/cms/issues/5678) by @jesseleite
+- The `users` fieldtype will show the first/last name in listings when applicable. [#5677](https://github.com/statamic/cms/issues/5677) by @j3ll3yfi5h
+- The "Site selected." toast message is localizable. [#5687](https://github.com/statamic/cms/issues/5687) by @j3ll3yfi5h
+
+### What's fixed
+- Fix issue where the `date` fieldtype could not be cleared. [#5682](https://github.com/statamic/cms/issues/5682) by @potentweb
+- The cache is bypassed for tokenized GraphQL requests. [#5693](https://github.com/statamic/cms/issues/5693) by @jasonvarga
+- Fix 404 handling for entries/terms in the REST API. [#5690](https://github.com/statamic/cms/issues/5690) by @notnek
+- Fix an error when you have a comment at the start of a `partial` slot. [#5651](https://github.com/statamic/cms/issues/5651) by @JohnathonKoster
+- Fix issue where the updates badge shows the wrong count in some cases. [#5678](https://github.com/statamic/cms/issues/5678) by @jesseleite
+- Fix asset editor overflow issues. [#5689](https://github.com/statamic/cms/issues/5689) by @jackmcdade
+- Fix issue where collections were unnecessarily converted to arrays in modifiers. [#5642](https://github.com/statamic/cms/issues/5642) by @JohnathonKoster
+- A handful more Antlers bug fxies. [#5571](https://github.com/statamic/cms/issues/5571) by @JohnathonKoster
+- Tidy up some Blade echo statements. [#5645](https://github.com/statamic/cms/issues/5645) by @michaelr0
+- Fix the initial height of textareas. [#5649](https://github.com/statamic/cms/issues/5649) by @wiebkevogel
+- Prevent slug error when used on forms without containers. [#5657](https://github.com/statamic/cms/issues/5657) by @jasonvarga
+- Fix Global Variables in GraphQL not resolving query builders [#5640](https://github.com/statamic/cms/issues/5640) by @jasonvarga
+- Upgraded to PHP CS Fixer v3. [#5541](https://github.com/statamic/cms/issues/5541) by @jesseleite
+
+
+
 ## 3.3.3 (2022-03-24)
 
 ### What's new
