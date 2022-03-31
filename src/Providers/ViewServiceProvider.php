@@ -97,6 +97,7 @@ class ViewServiceProvider extends ServiceProvider
 
             $isTracingOn = config('statamic.antlers.tracing', false);
             $runtimeConfig->fatalErrorOnUnpairedLoop = config('statamic.antlers.fatalErrorOnUnpairedLoop', false);
+            $runtimeConfig->fatalErrorOnStringObject = config('statamic.antlers.fatalErrorOnPrintObjects', false);
             $runtimeConfig->throwErrorOnAccessViolation = config('statamic.antlers.errorOnAccessViolation', false);
             $runtimeConfig->guardedVariablePatterns = config('statamic.antlers.guardedVariables', [
                 'config.app.key',

@@ -63,7 +63,7 @@ class ParserIsolationTest extends TestCase
 <{{ title }}><{{ content }}>
 EOT;
 
-        // Log::shouldReceive('debug')->times(0)->with('Cannot render an object variable as a string: {{ topic }}');
+        $this->app['config']->set('statamic.antlers.fatalErrorOnPrintObjects', true);
         $this->viewShouldReturnRaw('default', $template);
 
         $responseOne = $this->get('dance/news-2')->assertOk();
