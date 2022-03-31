@@ -71,6 +71,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    protected $syncOriginalProperties = [];
 
     public function __construct()
     {

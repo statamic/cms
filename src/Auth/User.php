@@ -44,6 +44,8 @@ abstract class User implements
 {
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, HasDirtyState, SyncsOriginalState;
 
+    protected $syncOriginalProperties = [];
+
     abstract public function get($key, $fallback = null);
 
     abstract public function value($key);
