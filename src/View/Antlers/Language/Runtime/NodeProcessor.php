@@ -723,7 +723,7 @@ class NodeProcessor
 
             $varName = $node->name->getContent();
 
-            if ($this->runtimeConfiguration->fatalErrorOnStringObject) {
+            if ($this->runtimeConfiguration != null && $this->runtimeConfiguration->fatalErrorOnStringObject) {
                 throw ErrorFactory::makeRuntimeError(
                     AntlersErrorCodes::TYPE_RUNTIME_ATTEMPTING_TO_RENDER_OBJECT_AS_STRING,
                     $node,
