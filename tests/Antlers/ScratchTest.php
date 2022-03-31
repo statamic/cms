@@ -43,4 +43,35 @@ class ScratchTest extends TestCase
         $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{ bar}" }}', ['bar' => 'baz']));
         $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{ bar }" }}', ['bar' => 'baz']));
     }
+
+    public function test_runtime_can_parse_expanded_ascii_characters()
+    {
+        $template = <<<'EOT'
+<h1>{{ title }}</h1><h1>{{ title replace="®|<sup>®®</sup>" }}</h1>
+<{{ title }}>
+{{ my_var = '¥¦§¨©ª«¬®¯°±²³´µ¶¼½¾¿À' }}
+<h1>{{ title }}</h1><h1>{{ title replace="®|<sup>®®</sup>" }}</h1>
+<{{ my_var }}>
+    {{ another_var = 'aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz' }}after
+next line
+    <before>{{ another_var }}<after>
+EOT;
+
+        $data = [
+         'title' => 'PRODUCT®',
+        ];
+
+        $expected = <<<'EOT'
+<h1>PRODUCT®</h1><h1>PRODUCT<sup>®®</sup></h1>
+<PRODUCT®>
+
+<h1>PRODUCT®</h1><h1>PRODUCT<sup>®®</sup></h1>
+<¥¦§¨©ª«¬®¯°±²³´µ¶¼½¾¿À>
+    after
+next line
+    <before>aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz<after>
+EOT;
+
+        $this->assertSame($expected, (string)Antlers::parse($template, $data));
+    }
 }

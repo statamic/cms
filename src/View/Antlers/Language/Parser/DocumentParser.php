@@ -361,12 +361,11 @@ class DocumentParser
     public function parse($text)
     {
         $this->resetState();
+        StringUtilities::prepareSplit($text);
 
         if (! $this->processInputText($text)) {
             return [];
         }
-
-        StringUtilities::prepareSplit($text);
 
         $indexCount = count($this->antlersStartIndex);
         $lastIndex = $indexCount - 1;
@@ -664,6 +663,8 @@ class DocumentParser
             }
         }
 
+        ray($this->nodes);
+
         return $this->renderNodes;
     }
 
@@ -866,6 +867,8 @@ class DocumentParser
         for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
             $this->checkCurrentOffsets();
 
+            ray($this->prev, $this->cur, $this->next);
+
             if ($this->cur == self::LeftBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent = array_merge($this->currentContent, $this->getLeftBrace());
@@ -1007,6 +1010,8 @@ class DocumentParser
             $this->lastAntlersEndIndex
         );
 
+        ray($node->endPosition);
+
         $node->interpolationRegions = $this->interpolationRegions;
 
         if (! $node->isComment) {
@@ -1105,10 +1110,12 @@ class DocumentParser
             $this->prev = $this->chars[$this->currentIndex - 1];
         }
 
+
+
         if (($this->currentIndex + 1) < $this->inputLen) {
             $doPeek = true;
             if ($this->currentIndex == $this->charLen - 1) {
-                $nextChunk = StringUtilities::split(StringUtilities::substr($this->content, $this->currentChunkOffset + $this->chunkSize, $this->chunkSize));
+                $nextChunk = mb_str_split(mb_substr($this->content, $this->currentChunkOffset + $this->chunkSize, $this->chunkSize));
                 $this->currentChunkOffset += $this->chunkSize;
 
                 if ($this->currentChunkOffset == $this->inputLen) {
