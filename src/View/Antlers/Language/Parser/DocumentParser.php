@@ -663,8 +663,6 @@ class DocumentParser
             }
         }
 
-        ray($this->nodes);
-
         return $this->renderNodes;
     }
 
