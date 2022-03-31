@@ -871,6 +871,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     {
         return array_merge([
             'path' => $this->path(),
-        ], $this->data()->toArray());
+        ], $this->data->toArray());
     }
 }
