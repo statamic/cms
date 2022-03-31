@@ -865,8 +865,6 @@ class DocumentParser
         for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
             $this->checkCurrentOffsets();
 
-            ray($this->prev, $this->cur, $this->next);
-
             if ($this->cur == self::LeftBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent = array_merge($this->currentContent, $this->getLeftBrace());
@@ -1007,8 +1005,6 @@ class DocumentParser
             $this->lastAntlersEndIndex,
             $this->lastAntlersEndIndex
         );
-
-        ray($node->endPosition);
 
         $node->interpolationRegions = $this->interpolationRegions;
 
