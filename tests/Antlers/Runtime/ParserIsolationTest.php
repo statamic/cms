@@ -4,7 +4,6 @@ namespace Tests\Antlers\Runtime;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
-use Illuminate\Support\Facades\Log;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;

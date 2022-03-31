@@ -694,9 +694,10 @@ class NodeProcessor
      * This method is responsible for ensuring that developers are not
      * attempting to loop over a string value, among other things.
      *
-     * @param AntlersNode $node The reference node.
-     * @param mixed $value The runtime value.
+     * @param  AntlersNode  $node  The reference node.
+     * @param  mixed  $value  The runtime value.
      * @return bool
+     *
      * @throws RuntimeException
      */
     private function guardRuntime(AntlersNode $node, $value)
