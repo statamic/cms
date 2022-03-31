@@ -21,7 +21,6 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Value;
-use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -1936,7 +1935,7 @@ class CoreModifiers extends Modifier
     /**
      * Place variables in a scope.
      *
-     * @param  array|Collection|OrderedQueryBuilder  $value
+     * @param  $value
      * @param  array  $params
      * @return array
      */
