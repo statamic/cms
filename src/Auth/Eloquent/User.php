@@ -378,6 +378,6 @@ class User extends BaseUser
     {
         return array_merge([
             'email' => $this->email(),
-        ], $this->data()->toArray());
+        ], $this->data->toArray());
     }
 }
