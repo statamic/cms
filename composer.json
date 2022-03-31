@@ -35,6 +35,7 @@
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
+        "doctrine/dbal": "^3.3",
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
         "mockery/mockery": "^1.2.3",
