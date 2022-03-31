@@ -1104,8 +1104,6 @@ class DocumentParser
             $this->prev = $this->chars[$this->currentIndex - 1];
         }
 
-
-
         if (($this->currentIndex + 1) < $this->inputLen) {
             $doPeek = true;
             if ($this->currentIndex == $this->charLen - 1) {

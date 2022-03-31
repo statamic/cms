@@ -58,7 +58,7 @@ next line
 EOT;
 
         $data = [
-         'title' => 'PRODUCT®',
+            'title' => 'PRODUCT®',
         ];
 
         $expected = <<<'EOT'
@@ -72,6 +72,6 @@ next line
     <before>aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz<after>
 EOT;
 
-        $this->assertSame($expected, (string)Antlers::parse($template, $data));
+        $this->assertSame($expected, (string) Antlers::parse($template, $data));
     }
 }
