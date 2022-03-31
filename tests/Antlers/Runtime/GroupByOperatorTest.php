@@ -1730,7 +1730,7 @@ EOT;
                         'title' => 'Article Four',
                         'url' => 'url-four',
                         'date' => Carbon::parse('2014-12-01'),
-                    ]
+                    ],
                 ],
             ],
         ];
