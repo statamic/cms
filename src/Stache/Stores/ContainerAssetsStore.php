@@ -81,6 +81,7 @@ class ContainerAssetsStore extends ChildStore
     {
         return $this->container()->listContents()->reject(function ($file) {
             return $file['type'] !== 'file'
+                || $file['path'] === ''
                 || $file['dirname'] === '.meta'
                 || Str::contains($file['path'], '/.meta/')
                 || in_array($file['basename'], ['.gitignore', '.gitkeep', '.DS_Store']);
