@@ -4,6 +4,7 @@ namespace Tests\Imaging;
 
 use Facades\Statamic\Imaging\GlideServer;
 use InvalidArgumentException;
+use League\Flysystem\Adapter\Local;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Imaging\GlideUrlBuilder;
@@ -82,13 +83,24 @@ class GlideTest extends TestCase
 
     private function assertLocalAdapter($adapter)
     {
-        $this->assertInstanceOf(LocalFilesystemAdapter::class, $adapter);
+        if ($this->isUsingFlysystemV1()) {
+            return $this->assertInstanceOf(Local::class, $adapter);
+        }
 
-        // todo: flysystem v1
+        $this->assertInstanceOf(LocalFilesystemAdapter::class, $adapter);
+    }
+
+    private function isUsingFlysystemV1()
+    {
+        return class_exists('\League\Flysystem\Util');
     }
 
     private function defaultFolderVisibility($filesystem)
     {
+        if ($this->isUsingFlysystemV1()) {
+            return 'public'; // irrelevant in v1
+        }
+
         $adapter = $this->getAdapterFromFilesystem($filesystem);
 
         $reflection = new \ReflectionClass($adapter);
@@ -114,6 +126,10 @@ class GlideTest extends TestCase
 
     private function getRootFromLocalAdapter($adapter)
     {
+        if ($this->isUsingFlysystemV1()) {
+            return $adapter->getPathPrefix();
+        }
+
         $reflection = new \ReflectionClass($adapter);
         $property = $reflection->getProperty('prefixer');
         $property->setAccessible(true);
