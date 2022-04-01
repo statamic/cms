@@ -14,7 +14,6 @@ use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\PresetGenerator;
 use Statamic\Imaging\StaticUrlBuilder;
-use Statamic\Support\Str;
 
 class GlideServiceProvider extends ServiceProvider
 {
@@ -46,17 +45,15 @@ class GlideServiceProvider extends ServiceProvider
 
     private function getBuilder()
     {
-        $route = Config::get('statamic.assets.image_manipulation.route');
-
-        if (Config::get('statamic.assets.image_manipulation.cache')) {
+        if (GlideServer::shouldServeDirectly()) {
             return new StaticUrlBuilder($this->app->make(ImageGenerator::class), [
-                'route' => Str::start($route, '/'),
+                'route' => GlideServer::url(),
             ]);
         }
 
         return new GlideUrlBuilder([
             'key' => (Config::get('statamic.assets.image_manipulation.secure')) ? Config::getAppKey() : null,
-            'route' => $route,
+            'route' => GlideServer::url(),
         ]);
     }
 
