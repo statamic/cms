@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'any.config.antlers' => "Angi at Antlers skal parse innholdet i dette feltet.",
+    'any.config.antlers' => 'Angi at Antlers skal parse innholdet i dette feltet.',
     'any.config.cast_booleans' => 'Alternativer med verdiene sann og usann vil bli lagret som boolske.',
     'array.config.keys' => 'Angi matrisenøkler (variabler) og valgfrie etiketter.',
     'array.config.mode' => 'Dynamisk modus gir brukeren kontroll over dataene, mens nøkkelmodus ikke gjør det.',
