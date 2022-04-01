@@ -26,7 +26,7 @@ class GlideTest extends TestCase
 
         $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($cache));
         $this->assertEquals('public', $this->defaultFolderVisibility($cache));
-        $this->assertEquals(storage_path('statamic/glide/'), $this->getRootFromLocalAdapter($adapter));
+        $this->assertEquals(storage_path('statamic/glide').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
         $this->assertInstanceOf(GlideUrlBuilder::class, $this->app[UrlBuilder::class]);
         $this->assertEquals('/imgs', GlideServer::url());
     }
@@ -44,7 +44,7 @@ class GlideTest extends TestCase
 
         $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($cache));
         $this->assertEquals('public', $this->defaultFolderVisibility($cache));
-        $this->assertEquals(public_path('imgcache/'), $this->getRootFromLocalAdapter($adapter));
+        $this->assertEquals(public_path('imgcache').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
         $this->assertInstanceOf(StaticUrlBuilder::class, $this->app[UrlBuilder::class]);
         $this->assertEquals('/imgs', GlideServer::url());
     }
@@ -65,7 +65,7 @@ class GlideTest extends TestCase
         $cache = GlideServer::create()->getCache();
 
         $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($cache));
-        $this->assertEquals(public_path('diskimgroot/'), $this->getRootFromLocalAdapter($adapter));
+        $this->assertEquals(public_path('diskimgroot').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
         $this->assertInstanceOf(StaticUrlBuilder::class, $this->app[UrlBuilder::class]);
         $this->assertEquals('http://the-glide-url', GlideServer::url());
     }
