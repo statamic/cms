@@ -1864,10 +1864,14 @@ class NodeProcessor
                                     if ($val instanceof  Value) {
                                         if ($val->shouldParseAntlers()) {
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
                                             GlobalRuntimeState::$isEvaluatingUserData = false;
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         } else {
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->value();
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         }
                                     }
 
@@ -1883,11 +1887,15 @@ class NodeProcessor
                                 } else {
                                     if ($param->name === 'raw') {
                                         if ($val instanceof Value) {
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->raw();
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         }
                                     } elseif ($param->name === 'noparse') {
                                         if ($val instanceof Value) {
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->value();
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         }
                                     } else {
                                         // Throw an exception here to maintain consistent behavior with the regex parser.

@@ -78,6 +78,7 @@ class GlobalRuntimeState
      * @var bool
      */
     public static $isEvaluatingUserData = false;
+    public static $isEvaluatingData = false;
 
     /**
      * A counter of the active tracer count.
