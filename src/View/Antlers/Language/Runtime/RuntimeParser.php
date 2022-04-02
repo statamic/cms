@@ -112,6 +112,7 @@ class RuntimeParser implements Parser
 
     /**
      * Determines if runtime processors should be isolated.
+     *
      * @var bool
      */
     private $isolateRuntimes = false;
