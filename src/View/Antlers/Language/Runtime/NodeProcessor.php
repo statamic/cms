@@ -2096,7 +2096,6 @@ class NodeProcessor
 
     protected function evaluateAntlersPhpNode(PhpExecutionNode $node)
     {
-        ray('hi!');
         if (! GlobalRuntimeState::$allowPhpInContent == false && GlobalRuntimeState::$isEvaluatingUserData) {
             return StringUtilities::sanitizePhp($node->content);
         }
