@@ -118,6 +118,7 @@ class ThumbnailController extends Controller
      * Get control panel thumbnail image preset name.
      *
      * Statamic has few control panel specific image presets
+     *
      * @see \Statamic\Imaging\Manager::cpManipulationPresets
      *
      * @return string
