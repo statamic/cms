@@ -63,6 +63,10 @@ svg {
     width: 32px;
     line-height: 32px;
     @apply rounded-full shadow overflow-hidden;
+
+    img {
+      @apply w-full h-full object-cover;
+    }
 }
 
 .icon-user-initials {
