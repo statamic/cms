@@ -49,14 +49,14 @@ trait HasAvatar
     {
         $assetId = optional($this->avatarFieldValue()->value())->id();
 
-        if (!$assetId) {
+        if (! $assetId) {
             return null;
         }
 
         return cp_route('assets.thumbnails.show', [
             'encoded_asset' => base64_encode($assetId),
             'size' => 'small',
-            'orientation' => 'square'
+            'orientation' => 'square',
         ]);
     }
 
