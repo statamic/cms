@@ -14,7 +14,7 @@ trait HasAvatar
      */
     public function avatar($size = 64)
     {
-        if ($this->hasAvatarField() && ($url = $this->avatarFieldUrl())) {
+        if ($this->hasAvatarField() && ($url = $this->avatarFieldSmallSquareThumbnailUrl())) {
             return $url;
         }
 
@@ -43,11 +43,21 @@ trait HasAvatar
     }
 
     /**
-     * The URL of the avatar from the asset field.
+     * Square thumbnail URL of the avatar from the asset field.
      */
-    public function avatarFieldUrl()
+    public function avatarFieldSmallSquareThumbnailUrl()
     {
-        return optional($this->avatarFieldValue()->value())->url();
+        $assetId = optional($this->avatarFieldValue()->value())->id();
+
+        if (!$assetId) {
+            return null;
+        }
+
+        return cp_route('assets.thumbnails.show', [
+            'encoded_asset' => base64_encode($assetId),
+            'size' => 'small',
+            'orientation' => 'square'
+        ]);
     }
 
     /**
