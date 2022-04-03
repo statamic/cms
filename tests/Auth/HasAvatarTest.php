@@ -76,8 +76,8 @@ class HasAvatarTest extends TestCase
     {
         $user = $this->withAvatarField()->withGravatar()->userWithUploadedAvatar();
 
-        $this->assertEquals('/avatars/john.jpg', $user->avatar());
-        $this->assertEquals('/avatars/john.jpg', $user->avatar(64));
+        $this->assertStringContainsString('/cp/thumbnails/YXZhdGFyczo6am9obi5qcGc=/small/square', $user->avatar());
+        $this->assertStringContainsString('/cp/thumbnails/YXZhdGFyczo6am9obi5qcGc=/small/square', $user->avatar(64));
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=64', $user->gravatarUrl());
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=64', $user->gravatarUrl(64));
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->gravatarUrl(128));
