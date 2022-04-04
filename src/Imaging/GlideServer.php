@@ -42,9 +42,13 @@ class GlideServer
 
     private function localCacheFilesystem()
     {
+        if (! $root = $this->cachePath()) {
+            throw new \Exception('Image manipulation cache path is not defined.');
+        }
+
         return Storage::build([
             'driver' => 'local',
-            'root' => $this->cachePath(),
+            'root' => $root,
             'visibility' => 'public',
         ]);
     }

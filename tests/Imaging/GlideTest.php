@@ -50,6 +50,21 @@ class GlideTest extends TestCase
     }
 
     /** @test */
+    public function cache_true_without_cache_path_will_throw_exception()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Image manipulation cache path is not defined.');
+
+        config([
+            'statamic.assets.image_manipulation.route' => 'imgs',
+            'statamic.assets.image_manipulation.cache' => true,
+            'statamic.assets.image_manipulation.cache_path' => null,
+        ]);
+
+        GlideServer::create()->getCache();
+    }
+
+    /** @test */
     public function cache_string_will_use_a_corresponding_filesystem()
     {
         config([
