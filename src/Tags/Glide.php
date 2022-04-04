@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Facades\Statamic\Imaging\GlideServer;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -11,7 +12,6 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
-use Statamic\Imaging\GlideServer;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
@@ -180,7 +180,7 @@ class Glide extends Tags
             return;
         }
 
-        $url = ($this->params->bool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+        $url = ($this->params->bool('absolute', $this->useAbsoluteUrls())) ? URL::makeAbsolute($url) : URL::makeRelative($url);
 
         return $url;
     }
@@ -318,5 +318,10 @@ class Glide extends Tags
         }
 
         throw new \Exception("Unsupported image manipulation driver [$driver]");
+    }
+
+    private function useAbsoluteUrls()
+    {
+        return Str::startsWith(GlideServer::url(), ['http://', 'https://']);
     }
 }
