@@ -88,7 +88,7 @@ class GlideTest extends TestCase
     /** @test */
     public function invalid_cache_string_will_throw_exception()
     {
-        $this->expectExceptionMessage(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Disk [glidecache] does not have a configured driver.');
 
         config(['statamic.assets.image_manipulation.cache' => 'glidecache']);
