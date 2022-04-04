@@ -2125,7 +2125,7 @@ class NodeProcessor
                 $___antlersVarAfter = get_defined_vars();
 
                 foreach ($___antlersVarAfter as $varKey => $varValue) {
-                    if (! array_key_exists($varKey, $___antlersVarBefore)) {
+                    if (! array_key_exists($varKey, $___antlersVarBefore) || array_key_exists($varKey, $this->previousAssignments)) {
                         $phpRuntimeAssignments[$varKey] = $varValue;
                     }
                 }
