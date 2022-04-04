@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Facades\Statamic\Imaging\Attributes;
 use Facades\Statamic\Imaging\GlideServer;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -107,13 +108,9 @@ class Glide extends Tags
             $data = ['url' => $this->generateGlideUrl($item)];
 
             if ($this->isResizable($item)) {
-                $pathPrefix = (new GlideServer)->cachePath();
                 $path = $this->generateImage($item);
-
-                [$width, $height] = getimagesize(Path::tidy($pathPrefix.'/'.$path));
-
-                $data['width'] = $width;
-                $data['height'] = $height;
+                $attrs = Attributes::from(GlideServer::cacheDisk()->getDriver(), $path);
+                $data = array_merge($data, $attrs);
             }
 
             if ($item instanceof Augmentable) {
