@@ -145,7 +145,7 @@ class DocumentParser
     /**
      * Fetches content from the source content without appending characters to the current char list.
      *
-     * @param int $count The number of characters to fetch.
+     * @param  int  $count  The number of characters to fetch.
      * @return string
      */
     private function fetch($count)
@@ -190,9 +190,8 @@ class DocumentParser
                 $escapeNode->startPosition = $this->positionFromOffset(
                     $this->currentIndex + $this->seedOffset,
                     $this->currentIndex + $this->seedOffset
-                );AntlersLexer::
-
-                $escapeNode->endPosition = $this->positionFromOffset(
+                );
+                AntlersLexer::$escapeNode->endPosition = $this->positionFromOffset(
                     $this->currentIndex + $this->seedOffset,
                     $this->currentIndex + $this->seedOffset
                 );
@@ -214,7 +213,7 @@ class DocumentParser
                     $peek = $this->peek($this->currentIndex + 2);
                 }
 
-                if ($peek == self::Punctuation_Question && !$this->isNoParse) {
+                if ($peek == self::Punctuation_Question && ! $this->isNoParse) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfPhpRegion(self::Punctuation_Question);
@@ -222,7 +221,7 @@ class DocumentParser
                     break;
                 }
 
-                if ($peek == self::Punctuation_Dollar && !$this->isNoParse) {
+                if ($peek == self::Punctuation_Dollar && ! $this->isNoParse) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfPhpRegion(self::Punctuation_Dollar);
@@ -230,7 +229,7 @@ class DocumentParser
                     break;
                 }
 
-                if ($peek == self::Punctuation_Octothorp && !$this->isNoParse) {
+                if ($peek == self::Punctuation_Octothorp && ! $this->isNoParse) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfAntlersCommentRegion();
@@ -249,7 +248,7 @@ class DocumentParser
                     $this->scanToEndOfAntlersRegion();
                     $this->isDoubleBrace = false;
                 } else {
-                    $contentPeek = strtolower(str_replace(' ' , '', $this->fetch(11)));
+                    $contentPeek = strtolower(str_replace(' ', '', $this->fetch(11)));
 
                     if (Str::startsWith($contentPeek, '{{/noparse')) {
                         // Advances over the {{.
@@ -553,7 +552,7 @@ class DocumentParser
                         if ($nextAntlersStart < $literalStartIndex) {
                             if ($this->lastAntlersEndIndex > $nextAntlersStart) {
                                 $skipIndex = null;
-                                for ($j = $i; $j <  $indexCount; $j++) {
+                                for ($j = $i; $j < $indexCount; $j++) {
                                     if ($this->antlersStartIndex[$j] > $this->lastAntlersEndIndex) {
                                         $skipIndex = $this->antlersStartIndex[$j];
                                         break;
