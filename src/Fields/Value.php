@@ -12,6 +12,8 @@ use Statamic\Support\Str;
 
 class Value implements IteratorAggregate, JsonSerializable
 {
+    private $cachedValue = null;
+
     protected $raw;
     protected $handle;
     protected $fieldtype;
@@ -38,6 +40,10 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function value()
     {
+        if ($this->cachedValue != null) {
+            return $this->cachedValue;
+        }
+
         if (! $this->fieldtype) {
             return $this->raw;
         }
@@ -45,6 +51,8 @@ class Value implements IteratorAggregate, JsonSerializable
         $value = $this->shallow
             ? $this->fieldtype->shallowAugment($this->raw)
             : $this->fieldtype->augment($this->raw);
+
+        $this->cachedValue = $value;
 
         return $value;
     }
