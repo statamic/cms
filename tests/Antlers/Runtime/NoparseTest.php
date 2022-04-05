@@ -7,7 +7,6 @@ use Tests\Antlers\ParserTestCase;
 
 class NoparseTest extends ParserTestCase
 {
-
     public function test_noparse_ignores_braces_entirely()
     {
         $template = <<<'EOT'
@@ -52,5 +51,4 @@ EOT;
 
         $this->assertSame($expected, StringUtilities::normalizeLineEndings(trim($this->renderString($template))));
     }
-
 }
