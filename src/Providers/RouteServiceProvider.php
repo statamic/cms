@@ -205,7 +205,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindForms()
     {
         Route::bind('form', function ($handle, $route) {
-            if (! $this->isCpOrApiRoute($route)) {
+            if (! $this->isCpOrApiRoute($route) && !Str::startsWith($route->uri(), '!/forms/')) {
                 return $handle;
             }
 
