@@ -1868,7 +1868,9 @@ class NodeProcessor
 
                                     $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
 
-                                    if ($val === null) { break; }
+                                    if ($val === null) {
+                                        break;
+                                    }
                                 } else {
                                     if ($param->name === 'raw') {
                                         if ($val instanceof Value) {
