@@ -16,7 +16,7 @@ class EntryPreviewController extends PreviewController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $this->authorize('create', [EntryContract::class, $collection]);

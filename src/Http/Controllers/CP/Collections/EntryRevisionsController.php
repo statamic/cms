@@ -17,7 +17,7 @@ class EntryRevisionsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $revisions = $entry
@@ -45,7 +45,7 @@ class EntryRevisionsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $entry->createRevision([
@@ -61,7 +61,7 @@ class EntryRevisionsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $entry = $entry->makeFromRevision($revision);

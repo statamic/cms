@@ -24,7 +24,7 @@ class CollectionBlueprintsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(0);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $blueprints = $this->indexItems($collection->entryBlueprints(), $collection);
@@ -47,7 +47,7 @@ class CollectionBlueprintsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(0);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $blueprint = $collection->entryBlueprint($blueprint);
@@ -64,7 +64,7 @@ class CollectionBlueprintsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $request->validate([
@@ -80,7 +80,7 @@ class CollectionBlueprintsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(0);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         return view('statamic::collections.blueprints.create', [
@@ -93,7 +93,7 @@ class CollectionBlueprintsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $request->validate(['title' => 'required']);
@@ -117,7 +117,7 @@ class CollectionBlueprintsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(0);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $blueprint = $collection->entryBlueprint($blueprint);

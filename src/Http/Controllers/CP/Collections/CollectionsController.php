@@ -55,7 +55,7 @@ class CollectionsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
@@ -135,7 +135,7 @@ class CollectionsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(0);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
@@ -148,7 +148,7 @@ class CollectionsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(0);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $this->authorize('edit', $collection, __('You are not authorized to edit this collection.'));
@@ -233,7 +233,7 @@ class CollectionsController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $this->authorize('update', $collection, __('You are not authorized to edit this collection.'));

@@ -15,7 +15,7 @@ class LocalizeEntryController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $request->validate(['site' => 'required']);

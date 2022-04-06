@@ -16,7 +16,7 @@ class ScaffoldCollectionController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(0);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
@@ -29,7 +29,7 @@ class ScaffoldCollectionController extends CpController
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
             $handle = func_get_arg(1);
-            new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
         $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
