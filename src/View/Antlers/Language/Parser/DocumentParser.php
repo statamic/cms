@@ -153,6 +153,11 @@ class DocumentParser
         return StringUtilities::substr($this->content, $this->currentChunkOffset + $this->chunkSize - count($this->chars), $count);
     }
 
+    public function getParsedContent()
+    {
+        return $this->content;
+    }
+
     private function peek($count)
     {
         if ($count == $this->charLen) {

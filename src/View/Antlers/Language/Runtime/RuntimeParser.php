@@ -8,6 +8,7 @@ use Facade\IgnitionContracts\ProvidesSolution;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use ReflectionProperty;
 use Statamic\Contracts\View\Antlers\Parser;
+use Statamic\Fields\Value;
 use Statamic\Modifiers\ModifierNotFoundException;
 use Statamic\Search\Comb\Exceptions\Exception;
 use Statamic\Support\Str;
@@ -302,6 +303,11 @@ class RuntimeParser implements Parser
         self::$standardRenderNodeCache[$entry] = $nodes;
     }
 
+    protected function isIgnitionInstalled()
+    {
+        return class_exists(ViewException::class) || class_exists('Spatie\LaravelIgnition\Exceptions\ViewException');
+    }
+
     /**
      * Parses and renders the input text, with the provided runtime data.
      *
@@ -369,11 +375,11 @@ class RuntimeParser implements Parser
 
             $this->nodeProcessor->triggerRenderComplete();
         } catch (AntlersException $antlersException) {
-            if (! class_exists(ViewException::class)) {
-                throw $antlersException;
+            if ($this->isIgnitionInstalled()) {
+                throw $this->buildAntlersExceptionError($antlersException, $text, $data);
             }
 
-            throw $this->buildAntlersExceptionError($antlersException, $text, $data);
+            throw $antlersException;
         } catch (ModifierNotFoundException $exception) {
             if (GlobalRuntimeState::$lastNode != null && GlobalDebugManager::isDebugSessionActive()) {
                 $wrapper = new AntlersException($exception->getMessage());
@@ -510,7 +516,68 @@ class RuntimeParser implements Parser
             $exceptionLine = $antlersException->node->startPosition->line;
         }
 
-        $ignitionException = new ViewException($newMessage, 0, 1, $this->view, $exceptionLine, null);
+        $exceptionClass = ViewException::class;
+
+        if (class_exists('Spatie\LaravelIgnition\Exceptions\ViewException')) {
+            $exceptionClass = 'Spatie\LaravelIgnition\Exceptions\ViewException';
+        }
+
+        $exceptionView = $this->view;
+
+        if (GlobalRuntimeState::$userContentEvalState != null && ! empty(GlobalRuntimeState::$userContentEvalState)) {
+            $dynamicExceptionLine = $exceptionLine;
+
+            if (GlobalRuntimeState::$userContentEvalState[1] instanceof AbstractNode) {
+                /** @var AbstractNode $node */
+                $node = GlobalRuntimeState::$userContentEvalState[1];
+
+                if ($node->startPosition != null) {
+                    if (count($rebuiltTrace) >= 1) {
+                        $rebuiltTrace[0]['line'] = $node->startPosition->line;
+                    }
+                }
+            }
+
+            if (GlobalRuntimeState::$userContentEvalState[0] instanceof Value) {
+                /** @var Value $value */
+                $value = GlobalRuntimeState::$userContentEvalState[0];
+                $valueContent = (string) $value;
+
+                $handle = $value->handle();
+
+                $newMessage .= ' Exception thrown while parsing an Antlers enabled field ['.$handle.']';
+
+                $valueAugmentable = $value->augmentable();
+
+                if ($valueAugmentable != null) {
+                    if (method_exists($valueAugmentable, 'path')) {
+                        $path = $valueAugmentable->path();
+
+                        $additionalInfo = <<<'INFO'
+
+{{#
+    {name} field defined in
+        {path}
+#}}
+INFO;
+
+                        $additionalInfo = str_replace('{name}', $handle, $additionalInfo);
+                        $additionalInfo = str_replace('{path}', $path, $additionalInfo);
+
+                        $valueContent .= $additionalInfo;
+                    }
+                }
+
+                $this->makeTempAntlersFile($valueContent);
+                $exceptionView = $this->tempFileCreated;
+                $rebuiltTrace[] = [
+                    'file' => $this->tempFileCreated,
+                    'line' => $dynamicExceptionLine,
+                ];
+            }
+        }
+
+        $ignitionException = new $exceptionClass($newMessage, 0, 1, $exceptionView, $exceptionLine, $antlersException);
         $traceProperty = new ReflectionProperty('Exception', 'trace');
         $traceProperty->setAccessible(true);
         $traceProperty->setValue($ignitionException, $rebuiltTrace);
@@ -526,23 +593,28 @@ class RuntimeParser implements Parser
         return $ignitionException;
     }
 
+    private function makeTempAntlersFile($documentText)
+    {
+        $extension = 'html';
+
+        if ($this->allowPhp) {
+            $extension = 'php';
+        }
+
+        $antlersDirectory = storage_path('antlers/');
+
+        if (! file_exists($antlersDirectory)) {
+            @mkdir($antlersDirectory, 0755);
+        }
+
+        $this->tempFileCreated = storage_path('antlers/'.sha1($documentText).'.antlers.'.$extension);
+        file_put_contents($this->tempFileCreated, $documentText);
+    }
+
     private function buildStackTrace(AbstractNode $activeNode, $documentText)
     {
         if (count(GlobalRuntimeState::$templateFileStack) == 0) {
-            $extension = 'html';
-
-            if ($this->allowPhp) {
-                $extension = 'php';
-            }
-
-            $antlersDirectory = storage_path('antlers/');
-
-            if (! file_exists($antlersDirectory)) {
-                @mkdir($antlersDirectory, 0755);
-            }
-
-            $this->tempFileCreated = storage_path('antlers/'.sha1($documentText).'.antlers.'.$extension);
-            file_put_contents($this->tempFileCreated, $documentText);
+            $this->makeTempAntlersFile($documentText);
 
             $debugTrace = debug_backtrace();
 

@@ -538,6 +538,11 @@ class AntlersNode extends AbstractNode
         return true;
     }
 
+    public function getNodeDocumentText()
+    {
+        return $this->parser->getText($this->startPosition->index, $this->endPosition->index + 1);
+    }
+
     public function documentText()
     {
         if ($this->isSelfClosing || $this->isClosedBy == null) {
