@@ -3,8 +3,8 @@
 namespace Statamic\Http\Controllers\API;
 
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Http\Resources\API\TreeResource;
 use Statamic\Facades\Collection;
+use Statamic\Http\Resources\API\TreeResource;
 use Statamic\Query\ItemQueryBuilder;
 
 class CollectionTreeController extends ApiController

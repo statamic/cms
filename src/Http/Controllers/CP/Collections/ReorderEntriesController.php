@@ -4,8 +4,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Facades\Collection;
+use Statamic\Http\Controllers\CP\CpController;
 
 class ReorderEntriesController extends CpController
 {

@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
-use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;

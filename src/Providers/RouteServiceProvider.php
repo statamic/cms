@@ -7,7 +7,6 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
