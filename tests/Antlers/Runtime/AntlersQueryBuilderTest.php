@@ -146,4 +146,36 @@ EOT;
 
         $this->assertSame(['clients' => $clientData], VarTest::$var);
     }
+
+    public function test_using_builders_as_a_pair_does_not_mutate_existing_variable()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->times(5)->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Baz'],
+            ['title' => 'Bar'],
+        ]));
+
+        $data = [
+            'query_builder_field' => $builder,
+        ];
+
+        $template = <<<'EOT'
+{{ query_builder_field | class_name }}
+{{ query_builder_field }}<{{ title }}>{{ /query_builder_field }}
+{{ query_builder_field | class_name }}
+{{ query_builder_field }}<{{ title }}>{{ /query_builder_field }}
+{{ query_builder_field | class_name }}
+EOT;
+
+        $expected = <<<'EOT'
+Illuminate\Support\Collection
+<Foo><Baz><Bar>
+Illuminate\Support\Collection
+<Foo><Baz><Bar>
+Illuminate\Support\Collection
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data));
+    }
 }

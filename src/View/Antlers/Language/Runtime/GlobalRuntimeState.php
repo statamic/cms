@@ -187,6 +187,8 @@ class GlobalRuntimeState
 
     public static $requiresRuntimeIsolation = false;
 
+    public static $userContentEvalState = null;
+
     /**
      * A list of callbacks that will be invoked when ___internal_debug:peek is called.
      *

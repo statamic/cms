@@ -986,7 +986,7 @@ class NodeProcessor
         $namedSlots = [];
 
         foreach ($node->children as $child) {
-            if ($child instanceof AntlersNode && $child->name->name == 'slot') {
+            if ($child instanceof AntlersNode && ! $child->isComment && $child->name->name == 'slot') {
                 $namedSlots[$child->name->methodPart] = $child;
             }
         }
@@ -1396,7 +1396,6 @@ class NodeProcessor
                             ];
 
                             $builderScope = array_merge($activeLockFrame, $newData);
-                            $lockData[] = $builderScope;
 
                             // It is important to reset these so builder instances do not leak.
                             $this->encounteredBuilder = false;
@@ -1865,7 +1864,13 @@ class NodeProcessor
                                         if ($val->shouldParseAntlers()) {
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$isEvaluatingData = true;
+                                            GlobalRuntimeState::$userContentEvalState = [
+                                                $val,
+                                                $node,
+                                            ];
+
                                             $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
+                                            GlobalRuntimeState::$userContentEvalState = null;
                                             GlobalRuntimeState::$isEvaluatingUserData = false;
                                             GlobalRuntimeState::$isEvaluatingData = false;
                                         } else {
@@ -2150,7 +2155,7 @@ class NodeProcessor
                 $___antlersVarAfter = get_defined_vars();
 
                 foreach ($___antlersVarAfter as $varKey => $varValue) {
-                    if (! array_key_exists($varKey, $___antlersVarBefore)) {
+                    if (! array_key_exists($varKey, $___antlersVarBefore) || array_key_exists($varKey, $this->previousAssignments)) {
                         $phpRuntimeAssignments[$varKey] = $varValue;
                     }
                 }
