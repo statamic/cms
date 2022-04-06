@@ -17,10 +17,10 @@ class CollectionEntriesController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $handle = $collection;
+        $collectionHandle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            throw new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$collectionHandle] not found.");
         }
 
         $with = $collection->entryBlueprints()
@@ -36,10 +36,10 @@ class CollectionEntriesController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $handle = $collection;
+        $collectionHandle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            throw new NotFoundHttpException("Collection [$handle] not found.");
+            throw new NotFoundHttpException("Collection [$collectionHandle] not found.");
         }
 
         $entry = Entry::find($handle);
