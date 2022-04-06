@@ -21,9 +21,9 @@ class CollectionBlueprintsController extends CpController
 
     public function index($collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(0);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -44,9 +44,9 @@ class CollectionBlueprintsController extends CpController
 
     public function edit($collection, $blueprint)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(0);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -61,9 +61,9 @@ class CollectionBlueprintsController extends CpController
 
     public function update(Request $request, $collection, $blueprint)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -77,9 +77,9 @@ class CollectionBlueprintsController extends CpController
 
     public function create($collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(0);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -90,9 +90,9 @@ class CollectionBlueprintsController extends CpController
 
     public function store(Request $request, $collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -114,9 +114,9 @@ class CollectionBlueprintsController extends CpController
 
     public function destroy($collection, $blueprint)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(0);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 

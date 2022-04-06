@@ -11,9 +11,9 @@ class ReorderEntriesController extends CpController
 {
     public function __invoke(Request $request, $collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 

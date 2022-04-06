@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Http\Resources\API\EntryResource;
 
@@ -16,6 +17,12 @@ class CollectionEntriesController extends ApiController
     {
         $this->abortIfDisabled();
 
+        $handle = $collection;
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            throw new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $with = $collection->entryBlueprints()
             ->flatMap(fn ($blueprint) => $blueprint->fields()->all())
             ->filter->isRelationship()->keys()->all();
@@ -28,6 +35,12 @@ class CollectionEntriesController extends ApiController
     public function show($collection, $handle)
     {
         $this->abortIfDisabled();
+
+        $handle = $collection;
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            throw new NotFoundHttpException("Collection [$handle] not found.");
+        }
 
         $entry = Entry::find($handle);
 

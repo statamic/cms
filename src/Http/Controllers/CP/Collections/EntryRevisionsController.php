@@ -14,9 +14,9 @@ class EntryRevisionsController extends CpController
 {
     public function index(Request $request, $collection, $entry)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -42,9 +42,9 @@ class EntryRevisionsController extends CpController
 
     public function store(Request $request, $collection, $entry)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -58,9 +58,9 @@ class EntryRevisionsController extends CpController
 
     public function show(Request $request, $collection, $entry, $revision)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 

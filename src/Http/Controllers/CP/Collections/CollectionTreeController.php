@@ -17,9 +17,9 @@ class CollectionTreeController extends CpController
 {
     public function index(Request $request, $collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -36,9 +36,9 @@ class CollectionTreeController extends CpController
 
     public function update(Request $request, $collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 

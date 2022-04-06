@@ -52,9 +52,9 @@ class CollectionsController extends CpController
 
     public function show(Request $request, $collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -132,9 +132,9 @@ class CollectionsController extends CpController
 
     public function fresh($collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(0);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -145,9 +145,9 @@ class CollectionsController extends CpController
 
     public function edit($collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(0);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -230,9 +230,9 @@ class CollectionsController extends CpController
 
     public function update(Request $request, $collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 

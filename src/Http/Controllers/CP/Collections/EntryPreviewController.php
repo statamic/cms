@@ -13,9 +13,9 @@ class EntryPreviewController extends PreviewController
 {
     public function create(Request $request, $collection, $site)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 

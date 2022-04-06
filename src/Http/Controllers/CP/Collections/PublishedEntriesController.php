@@ -13,9 +13,9 @@ class PublishedEntriesController extends CpController
 {
     public function store(Request $request, $collection, $entry)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -31,9 +31,9 @@ class PublishedEntriesController extends CpController
 
     public function destroy(Request $request, $collection, $entry)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 

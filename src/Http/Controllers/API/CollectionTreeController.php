@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\API;
 
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Resources\API\TreeResource;
+use Statamic\Facades\Collection;
 use Statamic\Query\ItemQueryBuilder;
 
 class CollectionTreeController extends ApiController
@@ -15,6 +16,12 @@ class CollectionTreeController extends ApiController
     public function show($collection)
     {
         $this->abortIfDisabled();
+
+        $handle = $collection;
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            throw new NotFoundHttpException("Collection [$handle] not found.");
+        }
 
         $site = $this->queryParam('site');
 

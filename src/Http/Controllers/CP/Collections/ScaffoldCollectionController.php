@@ -13,9 +13,9 @@ class ScaffoldCollectionController extends CpController
 {
     public function index($collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(0);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
@@ -26,9 +26,9 @@ class ScaffoldCollectionController extends CpController
 
     public function create(Request $request, $collection)
     {
+        $handle = $collection;
         $collection = Collection::findByHandle($collection);
         if (! $collection) {
-            $handle = func_get_arg(1);
             throw new NotFoundHttpException("Collection [$handle] not found.");
         }
 
