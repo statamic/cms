@@ -1,5 +1,31 @@
 # Release Notes
 
+## 3.3.5 (2022-04-06)
+
+### What's new
+- Norwegian translation CP [#5722](https://github.com/statamic/cms/issues/5722) by @espenlg
+- When there's a syntax error inside an Antlers-enabled field, the exception will show the contents. [#5659](https://github.com/statamic/cms/issues/5659) by @JohnathonKoster
+
+### What's improved
+- German translations. [#5715](https://github.com/statamic/cms/issues/5715) by @helloDanuk
+- French translations. [#5705](https://github.com/statamic/cms/issues/5705) by @ebeauchamps
+
+### What's fixed
+- Fix runtime parser not maintaining query builder results accurately in subsequent tags. [#5716](https://github.com/statamic/cms/issues/5716) by @JohnathonKoster
+- Fix the `groupby` operator not supporting modifiers in the runtime parser. [#5716](https://github.com/statamic/cms/issues/5716) by @JohnathonKoster
+- Fix runtime parser outputting a replacement string when a stack is used with nothing pushed into it. [#5716](https://github.com/statamic/cms/issues/5716) by @JohnathonKoster
+- Fix runtime parser support for multibyte characters. [#5704](https://github.com/statamic/cms/issues/5704) by @JohnathonKoster
+- Fix runtime parser support for tags with parameters in Antlers-enabled fields. [#5659](https://github.com/statamic/cms/issues/5659) by @JohnathonKoster
+- Fix Glide cache disk permissions. [#5724](https://github.com/statamic/cms/issues/5724) by @jasonvarga
+- Fix URL typo in Dutch translation. [#5772](https://github.com/statamic/cms/issues/5772) by @MarcelWeidum
+- Fix slugification not using appropriate language on the create term form. [#5738](https://github.com/statamic/cms/issues/5738) by @arthurperton
+- Fix issue where Flysystem could return pathless FileAttributes response. [#5726](https://github.com/statamic/cms/issues/5726) by @jesseleite
+- Fix runtime parser support for PHP assignments inside loops. [#5734](https://github.com/statamic/cms/issues/5734) by @JohnathonKoster
+- Add attribute to suppress deprecation notice [#5719](https://github.com/statamic/cms/issues/5719) by @marcorieser
+- Add ReturnTypeWillChange attribute [#5701](https://github.com/statamic/cms/issues/5701) by @jasonvarga
+
+
+
 ## 3.3.4 (2022-03-30)
 
 ### What's improved
