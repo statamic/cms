@@ -1847,7 +1847,12 @@ class NodeProcessor
                                     if ($val instanceof  Value) {
                                         if ($val->shouldParseAntlers()) {
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
+                                            GlobalRuntimeState::$userContentEvalState = [
+                                                $val,
+                                                $node,
+                                            ];
                                             $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
+                                            GlobalRuntimeState::$userContentEvalState = null;
                                             GlobalRuntimeState::$isEvaluatingUserData = false;
                                         } else {
                                             $val = $val->value();

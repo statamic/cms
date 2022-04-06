@@ -140,6 +140,11 @@ class DocumentParser
         return $this;
     }
 
+    public function getParsedContent()
+    {
+        return $this->content;
+    }
+
     private function peek($count)
     {
         if ($count == $this->charLen) {
