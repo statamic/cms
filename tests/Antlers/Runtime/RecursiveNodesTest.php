@@ -187,6 +187,7 @@ EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
     }
+
     public function test_recursive_node_can_be_root()
     {
         $this->parseNodes(<<<'EOT'
