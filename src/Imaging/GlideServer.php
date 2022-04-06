@@ -39,7 +39,7 @@ class GlideServer
             : storage_path('statamic/glide');
     }
 
-    public function cacheFilesystem()
+    private function cacheFilesystem()
     {
         return Storage::build([
             'driver' => 'local',
