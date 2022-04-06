@@ -65,6 +65,8 @@ class ModifierManager
             return $value;
         }
 
+        if ($value === null) { return null; }
+
         $returnValue = $value;
 
         foreach ($modifierChain->modifierChain as $chain) {
@@ -102,6 +104,8 @@ class ModifierManager
                     }
                 }
             }
+
+            if ($returnValue === null) { break; }
 
             if ($returnValue instanceof Value) {
                 $returnValue = $value->value();

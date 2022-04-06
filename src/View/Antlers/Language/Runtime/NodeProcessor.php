@@ -1796,7 +1796,7 @@ class NodeProcessor
                         $this->pathDataManager->setIsPaired($curIsPaired);
                         $this->pathDataManager->setReduceFinal($curReduceFinal);
 
-                        if (! $this->shouldProcessAsTag($node)) {
+                        if (! $this->shouldProcessAsTag($node) && $val !== null) {
                             foreach ($node->parameters as $param) {
                                 if (ModifierManager::isModifier($param)) {
                                     $activeData = $this->getActiveData();
@@ -1867,6 +1867,8 @@ class NodeProcessor
                                     }
 
                                     $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
+
+                                    if ($val === null) { break; }
                                 } else {
                                     if ($param->name === 'raw') {
                                         if ($val instanceof Value) {
