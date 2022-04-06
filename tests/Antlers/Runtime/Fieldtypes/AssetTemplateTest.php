@@ -65,8 +65,8 @@ class AssetTemplateTest extends ParserTestCase
 
         $this->assertSame('path/to/asset.jpg', $this->renderString(
             '{{ asset }}{{ path }}{{ /asset }}', [
-            'asset' => $value,
-        ], true
+                'asset' => $value,
+            ], true
         ));
     }
 
