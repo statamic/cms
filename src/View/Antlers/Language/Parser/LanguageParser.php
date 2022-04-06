@@ -2239,6 +2239,18 @@ class LanguageParser
                 }
             }
 
+            if ($subToken instanceof StringValueNode || $subToken instanceof VariableNode || $subToken instanceof NumberNode) {
+                $subTokenCount = count($subTokens);
+
+                if ($subTokenCount > 0) {
+                    $last = $subTokens[$subTokenCount - 1];
+
+                    if ($last instanceof LogicGroup) {
+                        break;
+                    }
+                }
+            }
+
             if ($subToken instanceof ModifierSeparator ||
                 $subToken instanceof LogicGroupEnd ||
                 $subToken instanceof LogicGroupBegin ||

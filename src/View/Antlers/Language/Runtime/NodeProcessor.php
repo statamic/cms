@@ -1379,7 +1379,6 @@ class NodeProcessor
                             ];
 
                             $builderScope = array_merge($activeLockFrame, $newData);
-                            $lockData[] = $builderScope;
 
                             // It is important to reset these so builder instances do not leak.
                             $this->encounteredBuilder = false;

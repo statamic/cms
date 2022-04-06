@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Carbon\Carbon;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 
@@ -1703,5 +1704,73 @@ EOT;
         $this->assertSame(
             trim(StringUtilities::normalizeLineEndings($expected)),
             trim(StringUtilities::normalizeLineEndings($this->renderString($template, $this->groupByData))));
+    }
+
+    public function test_group_by_with_string_alias_can_be_used_with_modifier_method_syntax()
+    {
+        $data = [
+            'collection' => [
+                'articles' => [
+                    [
+                        'title' => 'Article One',
+                        'url' => 'url-one',
+                        'date' => Carbon::parse('2012-10-01'),
+                    ],
+                    [
+                        'title' => 'Article Two',
+                        'url' => 'url-two',
+                        'date' => Carbon::parse('2012-12-01'),
+                    ],
+                    [
+                        'title' => 'Article Three',
+                        'url' => 'url-three',
+                        'date' => Carbon::parse('2013-10-01'),
+                    ],
+                    [
+                        'title' => 'Article Four',
+                        'url' => 'url-four',
+                        'date' => Carbon::parse('2014-12-01'),
+                    ],
+                ],
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{ blog = {collection:articles} groupby (date|format('Y') 'year') as 'entries' }}
+  <h2>{{ year }}</h2>
+  <ul>
+    {{ entries }}
+      <li><a href="{{ url }}">{{ title }}</a></li>
+    {{ /entries }}
+  </ul>
+{{ /blog }}
+EOT;
+
+        $expected = <<<'EOT'
+<h2>2012</h2>
+  <ul>
+    
+      <li><a href="url-one">Article One</a></li>
+    
+      <li><a href="url-two">Article Two</a></li>
+    
+  </ul>
+
+  <h2>2013</h2>
+  <ul>
+    
+      <li><a href="url-three">Article Three</a></li>
+    
+  </ul>
+
+  <h2>2014</h2>
+  <ul>
+    
+      <li><a href="url-four">Article Four</a></li>
+    
+  </ul>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, $data)));
     }
 }
