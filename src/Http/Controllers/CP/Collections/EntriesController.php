@@ -7,7 +7,9 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -25,6 +27,12 @@ class EntriesController extends CpController
 
     public function index(FilteredRequest $request, $collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('view', $collection);
 
         $query = $this->indexQuery($collection);
@@ -73,6 +81,12 @@ class EntriesController extends CpController
 
     public function edit(Request $request, $collection, $entry)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('view', $entry);
 
         $entry = $entry->fromWorkingCopy();
@@ -159,6 +173,12 @@ class EntriesController extends CpController
 
     public function update(Request $request, $collection, $entry)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('update', $entry);
 
         $entry = $entry->fromWorkingCopy();
@@ -238,6 +258,12 @@ class EntriesController extends CpController
 
     public function create(Request $request, $collection, $site)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('create', [EntryContract::class, $collection]);
 
         $blueprint = $collection->entryBlueprint($request->blueprint);
@@ -310,6 +336,12 @@ class EntriesController extends CpController
 
     public function store(Request $request, $collection, $site)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('store', [EntryContract::class, $collection]);
 
         $blueprint = $collection->entryBlueprint($request->_blueprint);

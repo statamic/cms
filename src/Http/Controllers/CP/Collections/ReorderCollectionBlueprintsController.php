@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;
 
@@ -17,6 +19,12 @@ class ReorderCollectionBlueprintsController extends CpController
 
     public function __invoke(Request $request, $collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         foreach ($request->order as $index => $handle) {
             $collection->entryBlueprint($handle)->setOrder($index + 1)->save();
         }

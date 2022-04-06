@@ -4,7 +4,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Statamic\Contracts\Entries\Collection;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -14,8 +15,14 @@ use Statamic\Support\Arr;
 
 class CollectionTreeController extends CpController
 {
-    public function index(Request $request, Collection $collection)
+    public function index(Request $request, $collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $site = $request->site ?? Site::selected()->handle();
 
         $pages = (new TreeBuilder)->buildForController([
@@ -29,6 +36,12 @@ class CollectionTreeController extends CpController
 
     public function update(Request $request, $collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('reorder', $collection);
 
         $contents = $this->toTree($request->pages);

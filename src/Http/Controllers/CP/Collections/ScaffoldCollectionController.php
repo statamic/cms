@@ -4,6 +4,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Facades\File;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -11,6 +13,12 @@ class ScaffoldCollectionController extends CpController
 {
     public function index($collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(0);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         return view('statamic::collections.scaffold', compact('collection'));
@@ -18,6 +26,12 @@ class ScaffoldCollectionController extends CpController
 
     public function create(Request $request, $collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
 
         // Make the index template

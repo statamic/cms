@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
@@ -12,6 +14,12 @@ class EntryRevisionsController extends CpController
 {
     public function index(Request $request, $collection, $entry)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $revisions = $entry
             ->revisions()
             ->reverse()
@@ -34,6 +42,12 @@ class EntryRevisionsController extends CpController
 
     public function store(Request $request, $collection, $entry)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $entry->createRevision([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
@@ -44,6 +58,12 @@ class EntryRevisionsController extends CpController
 
     public function show(Request $request, $collection, $entry, $revision)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $entry = $entry->makeFromRevision($revision);
 
         // TODO: Most of this is duplicated with EntriesController@edit. DRY it off.

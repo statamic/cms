@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Revisions\WorkingCopy;
 
@@ -10,6 +12,12 @@ class RestoreEntryRevisionController extends CpController
 {
     public function __invoke(Request $request, $collection, $entry)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         if (! $target = $entry->revision($request->revision)) {
             dd('no such revision', $request->revision);
             // todo: handle invalid revision reference

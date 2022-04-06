@@ -4,6 +4,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Http\Controllers\CP\PreviewController;
 
@@ -11,6 +13,12 @@ class EntryPreviewController extends PreviewController
 {
     public function create(Request $request, $collection, $site)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('create', [EntryContract::class, $collection]);
 
         $fields = $collection->entryBlueprint($request->blueprint)

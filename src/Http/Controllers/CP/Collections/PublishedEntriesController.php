@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
@@ -11,6 +13,12 @@ class PublishedEntriesController extends CpController
 {
     public function store(Request $request, $collection, $entry)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('publish', $entry);
 
         $entry = $entry->publish([
@@ -23,6 +31,12 @@ class PublishedEntriesController extends CpController
 
     public function destroy(Request $request, $collection, $entry)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('publish', $entry);
 
         $entry = $entry->unpublish([

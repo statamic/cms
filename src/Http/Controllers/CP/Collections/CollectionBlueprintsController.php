@@ -4,7 +4,9 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;
 
@@ -17,8 +19,14 @@ class CollectionBlueprintsController extends CpController
         $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
     }
 
-    public function index(CollectionContract $collection)
+    public function index($collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(0);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $blueprints = $this->indexItems($collection->entryBlueprints(), $collection);
 
         return view('statamic::collections.blueprints.index', compact('collection', 'blueprints'));
@@ -36,6 +44,12 @@ class CollectionBlueprintsController extends CpController
 
     public function edit($collection, $blueprint)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(0);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $blueprint = $collection->entryBlueprint($blueprint);
 
         return view('statamic::collections.blueprints.edit', [
@@ -47,6 +61,12 @@ class CollectionBlueprintsController extends CpController
 
     public function update(Request $request, $collection, $blueprint)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $request->validate([
             'title' => 'required',
             'sections' => 'array',
@@ -57,6 +77,12 @@ class CollectionBlueprintsController extends CpController
 
     public function create($collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(0);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         return view('statamic::collections.blueprints.create', [
             'action' => cp_route('collections.blueprints.store', $collection),
         ]);
@@ -64,6 +90,12 @@ class CollectionBlueprintsController extends CpController
 
     public function store(Request $request, $collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $request->validate(['title' => 'required']);
 
         // If there are no user-defined blueprints, save the default one.
@@ -82,6 +114,12 @@ class CollectionBlueprintsController extends CpController
 
     public function destroy($collection, $blueprint)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(0);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $blueprint = $collection->entryBlueprint($blueprint);
 
         $this->authorize('delete', $blueprint);

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use LogicException;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
@@ -51,6 +52,12 @@ class CollectionsController extends CpController
 
     public function show(Request $request, $collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         $blueprints = $collection
@@ -125,6 +132,12 @@ class CollectionsController extends CpController
 
     public function fresh($collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(0);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         return view('statamic::collections.fresh');
@@ -132,6 +145,12 @@ class CollectionsController extends CpController
 
     public function edit($collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(0);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('edit', $collection, __('You are not authorized to edit this collection.'));
 
         $values = [
@@ -211,6 +230,12 @@ class CollectionsController extends CpController
 
     public function update(Request $request, $collection)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('update', $collection, __('You are not authorized to edit this collection.'));
 
         $fields = $this->editFormBlueprint($collection)->fields()->addValues($request->all());

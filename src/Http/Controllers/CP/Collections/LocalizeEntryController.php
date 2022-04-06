@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -10,6 +12,12 @@ class LocalizeEntryController extends CpController
 {
     public function __invoke(Request $request, $collection, $entry)
     {
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            $handle = func_get_arg(1);
+            new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $request->validate(['site' => 'required']);
 
         $localized = $entry->makeLocalization($site = $request->site);

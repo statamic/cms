@@ -31,7 +31,6 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::mixin(new Router);
 
-        $this->bindCollections();
         $this->bindEntries();
         $this->bindTaxonomies();
         $this->bindTerms();
@@ -43,18 +42,6 @@ class RouteServiceProvider extends ServiceProvider
         $this->bindForms();
     }
 
-    protected function bindCollections()
-    {
-        Route::bind('collection', function ($handle) {
-            throw_unless(
-                $collection = Collection::findByHandle($handle),
-                new NotFoundHttpException("Collection [$handle] not found.")
-            );
-
-            return $collection;
-        });
-    }
-
     protected function bindEntries()
     {
         Route::bind('entry', function ($handle, $route) {
@@ -63,7 +50,7 @@ class RouteServiceProvider extends ServiceProvider
             }
 
             throw_if(
-                ! ($entry = Entry::find($handle)) || $entry->collection()->id() !== $route->parameter('collection')->id(),
+                ! ($entry = Entry::find($handle)) || $entry->collection()->handle() !== $route->parameter('collection'),
                 new NotFoundHttpException("Entry [$handle] not found.")
             );
 
