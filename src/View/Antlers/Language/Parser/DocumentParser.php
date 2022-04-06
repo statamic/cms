@@ -366,12 +366,11 @@ class DocumentParser
     public function parse($text)
     {
         $this->resetState();
+        StringUtilities::prepareSplit($text);
 
         if (! $this->processInputText($text)) {
             return [];
         }
-
-        StringUtilities::prepareSplit($text);
 
         $indexCount = count($this->antlersStartIndex);
         $lastIndex = $indexCount - 1;
@@ -1113,7 +1112,7 @@ class DocumentParser
         if (($this->currentIndex + 1) < $this->inputLen) {
             $doPeek = true;
             if ($this->currentIndex == $this->charLen - 1) {
-                $nextChunk = StringUtilities::split(StringUtilities::substr($this->content, $this->currentChunkOffset + $this->chunkSize, $this->chunkSize));
+                $nextChunk = mb_str_split(mb_substr($this->content, $this->currentChunkOffset + $this->chunkSize, $this->chunkSize));
                 $this->currentChunkOffset += $this->chunkSize;
 
                 if ($this->currentChunkOffset == $this->inputLen) {
