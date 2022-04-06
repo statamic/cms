@@ -3,7 +3,7 @@
 ## 3.3.5 (2022-04-06)
 
 ### What's new
-- Norwegian translation CP [#5722](https://github.com/statamic/cms/issues/5722) by @espenlg
+- Norwegian translation. [#5722](https://github.com/statamic/cms/issues/5722) by @espenlg
 - When there's a syntax error inside an Antlers-enabled field, the exception will show the contents. [#5659](https://github.com/statamic/cms/issues/5659) by @JohnathonKoster
 
 ### What's improved
