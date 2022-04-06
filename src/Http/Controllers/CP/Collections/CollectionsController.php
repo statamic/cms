@@ -327,6 +327,12 @@ class CollectionsController extends CpController
 
     public function destroy($collection)
     {
+        $handle = $collection;
+        $collection = Collection::findByHandle($collection);
+        if (! $collection) {
+            throw new NotFoundHttpException("Collection [$handle] not found.");
+        }
+
         $this->authorize('delete', $collection, __('You are not authorized to delete this collection.'));
 
         $collection->delete();
