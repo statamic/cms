@@ -1144,6 +1144,7 @@ class DocumentParser
             $this->cur = null;
             $this->prev = null;
             $this->next = null;
+
             return;
         }
 
