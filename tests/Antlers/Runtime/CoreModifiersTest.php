@@ -527,20 +527,20 @@ EOT;
 EOT;
 
         $this->assertSame('No', $this->renderString($template, [], true));
-        $this->assertSame('No', $this->renderString($template, ['variable' => null,], true));
-        $this->assertSame('No', $this->renderString($template, ['variable' => [],], true));
-        $this->assertSame('No', $this->renderString($template, ['variable' => collect(),], true));
-        $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One'],], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => null], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => []], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => collect()], true));
+        $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One']], true));
 
         $template = <<<'EOT'
 {{ if {variable count="count"} > 0 }}Yes{{ else }}No{{ /if }}
 EOT;
 
         $this->assertSame('No', $this->renderString($template, [], true));
-        $this->assertSame('No', $this->renderString($template, ['variable' => null,], true));
-        $this->assertSame('No', $this->renderString($template, ['variable' => [],], true));
-        $this->assertSame('No', $this->renderString($template, ['variable' => collect(),], true));
-        $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One'],], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => null], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => []], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => collect()], true));
+        $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One']], true));
     }
 }
 

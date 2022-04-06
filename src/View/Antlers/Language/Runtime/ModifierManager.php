@@ -65,7 +65,9 @@ class ModifierManager
             return $value;
         }
 
-        if ($value === null) { return null; }
+        if ($value === null) {
+            return null;
+        }
 
         $returnValue = $value;
 
@@ -105,7 +107,9 @@ class ModifierManager
                 }
             }
 
-            if ($returnValue === null) { break; }
+            if ($returnValue === null) {
+                break;
+            }
 
             if ($returnValue instanceof Value) {
                 $returnValue = $value->value();
