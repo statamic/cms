@@ -77,6 +77,115 @@ EOT;
 EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+<ul class="parent-menu">
+{{ nav:main }}
+{{ if depth == 1 }}
+<li {{ if children }} something{{ endif }}>
+<a>
+{{ title }}
+</a>
+{{ if children }}
+<ul class="child-menu">
+{{ *recursive children* }}
+</ul>
+{{ endif }}
+</li>
+{{ else }}
+<li>
+<a>
+{{ title }}
+</a>
+</li>
+{{ endif }}
+{{ /nav:main }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul class="parent-menu">
+
+
+<li >
+<a>
+Home
+</a>
+
+</li>
+
+
+
+<li  something>
+<a>
+About
+</a>
+
+<ul class="child-menu">
+
+
+<li>
+<a>
+Team
+</a>
+</li>
+
+
+
+<li>
+<a>
+Leadership
+</a>
+</li>
+
+
+</ul>
+
+</li>
+
+
+
+<li  something>
+<a>
+Projects
+</a>
+
+<ul class="child-menu">
+
+
+<li>
+<a>
+Project-1
+</a>
+</li>
+
+
+
+<li>
+<a>
+Project-2
+</a>
+</li>
+
+
+</ul>
+
+</li>
+
+
+
+<li >
+<a>
+Contact
+</a>
+
+</li>
+
+
+</ul>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
     }
 
     public function test_recursive_node_can_be_root()

@@ -65,6 +65,10 @@ class ModifierManager
             return $value;
         }
 
+        if ($value === null) {
+            return null;
+        }
+
         $returnValue = $value;
 
         foreach ($modifierChain->modifierChain as $chain) {
@@ -101,6 +105,10 @@ class ModifierManager
                         $parameters[] = $env->getValue($node);
                     }
                 }
+            }
+
+            if ($returnValue === null) {
+                break;
             }
 
             if ($returnValue instanceof Value) {
