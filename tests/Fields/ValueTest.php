@@ -2,6 +2,7 @@
 
 namespace Tests\Fields;
 
+use Mockery;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -77,6 +78,54 @@ class ValueTest extends TestCase
         $this->assertNotSame($value, $value->shallow());
         $this->assertInstanceOf(Value::class, $value->shallow());
         $this->assertEquals('test shallow', $value->shallow()->value());
+    }
+
+    /**
+     * @test
+     * @dataProvider augmentedValueCachingProvider
+     **/
+    public function it_only_augments_once($return)
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            //
+        };
+        $fieldtype = Mockery::mock($fieldtype)->makePartial();
+        $fieldtype->shouldReceive('augment')->once()->andReturn($return);
+
+        $value = new Value('test', null, $fieldtype);
+
+        $this->assertEquals($return, $value->value());
+        $this->assertEquals($return, $value->value());
+    }
+
+    /**
+     * @test
+     * @dataProvider augmentedValueCachingProvider
+     **/
+    public function it_only_shallow_augments_once($return)
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            //
+        };
+        $fieldtype = Mockery::mock($fieldtype)->makePartial();
+        $fieldtype->shouldReceive('augment')->once()->andReturn($return);
+
+        $value = new Value('test', null, $fieldtype);
+        $value->shallow();
+
+        $this->assertEquals($return, $value->value());
+        $this->assertEquals($return, $value->value());
+    }
+
+    public function augmentedValueCachingProvider()
+    {
+        return [
+            'truthy' => ['truthy'],
+            'false' => [false],
+            'null' => [null],
+        ];
     }
 
     /** @test */
