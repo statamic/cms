@@ -116,7 +116,7 @@ class TagPairAnalyzer
                             break;
                         }
 
-                        if ($node->isClosingTag == false && $tagName == $node->name->compound) {
+                        if ($node->isClosingTag == false && $tagName == $node->name->compound && ! $node->isSelfClosing) {
                             if (array_key_exists($this->stackCount, $this->openTagIndexCount) == false) {
                                 $this->openTagIndexCount[$this->stackCount] = [];
                             }
