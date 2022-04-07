@@ -20,10 +20,11 @@ class PartialsTest extends ParserTestCase
 EOT;
 
         $this->withFakeViews();
-        $this->viewShouldReturnRaw('wrapper', '{{ slot }}');
-        $this->viewShouldReturnRaw('second_wrapper', '');
+        $this->viewShouldReturnRaw('wrapper', 'outer {{ slot }}');
+        $this->viewShouldReturnRaw('second_wrapper', 'inner');
         $this->viewShouldReturnRaw('content', 'My content');
 
-        $this->assertSame('', $this->renderString($template));
+        // Before the fix, "My content" would be rendered at the end of the string.
+        $this->assertSame('outer inner', $this->renderString($template));
     }
 }
