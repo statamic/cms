@@ -361,25 +361,8 @@ class AntlersNode extends AbstractNode
     {
         $values = [];
 
-        /** @var ParameterNode $param */
         foreach ($this->parameters as $param) {
-            $value = $param->value;
-
-            if ($param->isVariableReference) {
-                $pathToParse = $this->reduceParameterInterpolations($param, $processor->cloneProcessor()->setIsProvidingParameterContent(true), $param->value, $data);
-
-                // Only use the full Antlers parser here if the string contains characters like |, (, {, }, etc.
-                if (StringUtilities::containsSymbolicCharacters($pathToParse)) {
-                    $value = Antlers::parser()->getVariable($pathToParse, $data, null);
-                } else {
-                    $pathParser = new PathParser();
-                    $retriever = new PathDataManager();
-                    $retriever->setIsPaired(false)->setReduceFinal(false);
-                    $value = $retriever->getData($pathParser->parse($pathToParse), $data);
-                }
-            } else {
-                $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
-            }
+            $value = $this->getSingleParameterValue($param, $processor, $data);
 
             if (is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId) {
                 continue;
@@ -389,6 +372,29 @@ class AntlersNode extends AbstractNode
         }
 
         return $values;
+    }
+
+    public function getSingleParameterValue(ParameterNode $param, NodeProcessor $processor, $data = [])
+    {
+        $value = $param->value;
+
+        if ($param->isVariableReference) {
+            $pathToParse = $this->reduceParameterInterpolations($param, $processor->cloneProcessor()->setIsProvidingParameterContent(true), $param->value, $data);
+
+            // Only use the full Antlers parser here if the string contains characters like |, (, {, }, etc.
+            if (StringUtilities::containsSymbolicCharacters($pathToParse)) {
+                $value = Antlers::parser()->getVariable($pathToParse, $data, null);
+            } else {
+                $pathParser = new PathParser();
+                $retriever = new PathDataManager();
+                $retriever->setIsPaired(false)->setReduceFinal(false);
+                $value = $retriever->getData($pathParser->parse($pathToParse), $data);
+            }
+        } else {
+            $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
+        }
+
+        return $value;
     }
 
     /**
@@ -405,7 +411,7 @@ class AntlersNode extends AbstractNode
      * @throws TagNotFoundException
      * @throws Throwable
      */
-    private function reduceParameterInterpolations(ParameterNode $param, NodeProcessor $processor, $mutateVar, $data)
+    public function reduceParameterInterpolations(ParameterNode $param, NodeProcessor $processor, $mutateVar, $data)
     {
         if ($param->parent != null && ! empty($param->interpolations)) {
             foreach ($param->interpolations as $interpolationVar) {
@@ -530,6 +536,11 @@ class AntlersNode extends AbstractNode
         }
 
         return true;
+    }
+
+    public function getNodeDocumentText()
+    {
+        return $this->parser->getText($this->startPosition->index, $this->endPosition->index + 1);
     }
 
     public function documentText()

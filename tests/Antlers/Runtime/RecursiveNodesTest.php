@@ -2,11 +2,192 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Statamic\Facades\Nav;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class RecursiveNodesTest extends ParserTestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
+    public function test_recursive_nodes_on_structures()
+    {
+        $tree = [
+            ['id' => 'home', 'title' => 'Home', 'url' => '/'],
+            [
+                'id' => 'about', 'title' => 'About', 'url' => 'about',
+                'children' => [
+                    ['id' => 'team', 'title' => 'Team', 'url' => 'team'],
+                    ['id' => 'leadership', 'title' => 'Leadership', 'url' => 'leadership'],
+                ],
+            ],
+            [
+                'id' => 'projects', 'title' => 'Projects', 'url' => 'projects',
+                'children' => [
+                    ['id' => 'project-1', 'title' => 'Project-1', 'url' => 'project-1'],
+                    [
+                        'id' => 'project-2', 'title' => 'Project-2', 'url' => 'project-2',
+                        'children' => [
+                            ['id' => 'project-2-nested', 'title' => 'Project 2 Nested', 'url' => 'project-2-nested'],
+                        ],
+                    ],
+                ],
+            ],
+            ['id' => 'contact', 'title' => 'Contact', 'url' => 'contact'],
+        ];
+
+        $nav = Nav::make('main');
+        $nav->makeTree('en', $tree)->save();
+        $nav->save();
+
+        $template = <<<'EOT'
+{{ nav:main include_home="true" }}
+<div>{{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+EOT;
+
+        $expected = <<<'EOT'
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+<ul class="parent-menu">
+{{ nav:main }}
+{{ if depth == 1 }}
+<li {{ if children }} something{{ endif }}>
+<a>
+{{ title }}
+</a>
+{{ if children }}
+<ul class="child-menu">
+{{ *recursive children* }}
+</ul>
+{{ endif }}
+</li>
+{{ else }}
+<li>
+<a>
+{{ title }}
+</a>
+</li>
+{{ endif }}
+{{ /nav:main }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul class="parent-menu">
+
+
+<li >
+<a>
+Home
+</a>
+
+</li>
+
+
+
+<li  something>
+<a>
+About
+</a>
+
+<ul class="child-menu">
+
+
+<li>
+<a>
+Team
+</a>
+</li>
+
+
+
+<li>
+<a>
+Leadership
+</a>
+</li>
+
+
+</ul>
+
+</li>
+
+
+
+<li  something>
+<a>
+Projects
+</a>
+
+<ul class="child-menu">
+
+
+<li>
+<a>
+Project-1
+</a>
+</li>
+
+
+
+<li>
+<a>
+Project-2
+</a>
+</li>
+
+
+</ul>
+
+</li>
+
+
+
+<li >
+<a>
+Contact
+</a>
+
+</li>
+
+
+</ul>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
+
     public function test_recursive_node_can_be_root()
     {
         $this->parseNodes(<<<'EOT'

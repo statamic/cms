@@ -13,12 +13,12 @@ class AntlersQueryBuilderTest extends ParserTestCase
     public function test_query_builder_loops_receive_tag_parameters()
     {
         $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('get')->once()->andReturn(collect([
+        $builder->shouldReceive('get')->twice()->andReturn(collect([
             ['title' => 'Foo'],
             ['title' => 'Baz'],
             ['title' => 'Bar'],
         ]));
-        $builder->shouldReceive('orderBy')->withArgs(function ($field, $direction) {
+        $builder->shouldReceive('orderBy')->twice()->withArgs(function ($field, $direction) {
             return $field == 'title' && $direction == 'desc';
         });
 
@@ -28,6 +28,41 @@ class AntlersQueryBuilderTest extends ParserTestCase
 
         $template = <<<'EOT'
 {{ data order_by="title:desc" }}{{ title }}{{ /data }}
+EOT;
+
+        $this->assertSame('FooBazBar', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ data order_by="title:desc" as="entries" }}{{ entries }}{{ title }}{{ /entries }}{{ /data }}
+EOT;
+
+        $this->assertSame('FooBazBar', $this->renderString($template, $data));
+    }
+
+    public function test_strict_variable_query_builders_are_correctly_handled()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->twice()->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Baz'],
+            ['title' => 'Bar'],
+        ]));
+        $builder->shouldReceive('orderBy')->twice()->withArgs(function ($field, $direction) {
+            return $field == 'title' && $direction == 'desc';
+        });
+
+        $data = [
+            'data' => $builder,
+        ];
+
+        $template = <<<'EOT'
+{{ $data order_by="title:desc" }}{{ title }}{{ /$data }}
+EOT;
+
+        $this->assertSame('FooBazBar', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ $data order_by="title:desc" as="entries" }}{{ entries }}{{ title }}{{ /entries }}{{ /$data }}
 EOT;
 
         $this->assertSame('FooBazBar', $this->renderString($template, $data));
@@ -110,5 +145,37 @@ EOT;
         $this->renderString($template, $data, true);
 
         $this->assertSame(['clients' => $clientData], VarTest::$var);
+    }
+
+    public function test_using_builders_as_a_pair_does_not_mutate_existing_variable()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->times(5)->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Baz'],
+            ['title' => 'Bar'],
+        ]));
+
+        $data = [
+            'query_builder_field' => $builder,
+        ];
+
+        $template = <<<'EOT'
+{{ query_builder_field | class_name }}
+{{ query_builder_field }}<{{ title }}>{{ /query_builder_field }}
+{{ query_builder_field | class_name }}
+{{ query_builder_field }}<{{ title }}>{{ /query_builder_field }}
+{{ query_builder_field | class_name }}
+EOT;
+
+        $expected = <<<'EOT'
+Illuminate\Support\Collection
+<Foo><Baz><Bar>
+Illuminate\Support\Collection
+<Foo><Baz><Bar>
+Illuminate\Support\Collection
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data));
     }
 }

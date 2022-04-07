@@ -3,6 +3,7 @@
 namespace Statamic\View\Antlers\Language\Runtime;
 
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 /**
  * Class GlobalRuntimeState.
@@ -180,6 +181,33 @@ class GlobalRuntimeState
      * @var array
      */
     public static $prefixState = [];
+
+    public static $containsLayout = false;
+
+    public static $userContentEvalState = null;
+
+    /**
+     * A list of callbacks that will be invoked when ___internal_debug:peek is called.
+     *
+     * The callback will receive the current NodeProcessor
+     * instance before it enters into tag callback state.
+     *
+     * @var array
+     */
+    public static $peekCallbacks = [];
+
+    public static function resetGlobalState()
+    {
+        self::$containsLayout = false;
+        self::$tracedRuntimeAssignments = [];
+        self::$traceTagAssignments = false;
+        self::$environmentId = StringUtilities::uuidv4();
+        self::$yieldCount = 0;
+        self::$yieldStacks = [];
+        StackReplacementManager::clearStackState();
+
+        RecursiveNodeManager::resetRecursiveNodeState();
+    }
 
     public static function createIndicatorVariable($indicator)
     {

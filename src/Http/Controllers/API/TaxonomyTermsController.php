@@ -2,6 +2,8 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\TermResource;
 
 class TaxonomyTermsController extends ApiController
@@ -25,6 +27,10 @@ class TaxonomyTermsController extends ApiController
     public function show($taxonomy, $term)
     {
         $this->abortIfDisabled();
+
+        $term = Term::find($taxonomy.'::'.$term);
+
+        throw_unless($term, new NotFoundHttpException);
 
         return app(TermResource::class)::make($term);
     }

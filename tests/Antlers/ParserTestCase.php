@@ -20,11 +20,11 @@ use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\ModifierManager;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
-use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -45,9 +45,7 @@ class ParserTestCase extends TestCase
     {
         parent::setUp();
 
-        GlobalRuntimeState::$tracedRuntimeAssignments = [];
-        GlobalRuntimeState::$traceTagAssignments = false;
-        GlobalRuntimeState::$environmentId = StringUtilities::uuidv4();
+        GlobalRuntimeState::resetGlobalState();
 
         $this->setupTestBlueprintAndFields();
 
@@ -151,9 +149,7 @@ class ParserTestCase extends TestCase
 
     protected function parser($data = [], $withCoreTagsAndModifiers = false)
     {
-        GlobalRuntimeState::$yieldCount = 0;
-        GlobalRuntimeState::$yieldStacks = [];
-        StackReplacementManager::clearStackState();
+        GlobalRuntimeState::resetGlobalState();
 
         $documentParser = new DocumentParser();
         $loader = new Loader();
@@ -174,9 +170,7 @@ class ParserTestCase extends TestCase
 
     protected function renderStringWithConfiguration($text, RuntimeConfiguration $config, $data = [], $withCoreTagsAndModifiers = false)
     {
-        GlobalRuntimeState::$yieldCount = 0;
-        GlobalRuntimeState::$yieldStacks = [];
-        StackReplacementManager::clearStackState();
+        GlobalRuntimeState::resetGlobalState();
 
         $documentParser = new DocumentParser();
         $loader = new Loader();
@@ -204,9 +198,8 @@ class ParserTestCase extends TestCase
 
     protected function renderString($text, $data = [], $withCoreTagsAndModifiers = false)
     {
-        GlobalRuntimeState::$yieldCount = 0;
-        GlobalRuntimeState::$yieldStacks = [];
-        StackReplacementManager::clearStackState();
+        ModifierManager::$statamicModifiers = null;
+        GlobalRuntimeState::resetGlobalState();
 
         $documentParser = new DocumentParser();
         $loader = new Loader();

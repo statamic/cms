@@ -917,6 +917,7 @@ class AssetTest extends TestCase
             ->set('focus', '75-25');
 
         $this->assertSame($asset->augmentedValue('focus_css')->value(), '75% 25%');
+        $this->assertTrue($asset->augmentedValue('has_focus')->value());
     }
 
     /** @test */
@@ -931,6 +932,7 @@ class AssetTest extends TestCase
             ->path('path/to/asset.jpg');
 
         $this->assertSame($asset->augmentedValue('focus_css')->value(), '50% 50%');
+        $this->assertFalse($asset->augmentedValue('has_focus')->value());
     }
 
     /** @test */

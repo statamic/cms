@@ -2,7 +2,7 @@
 
     <portal :to="portal" :order="depth">
         <div class="stack-container"
-            :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering }"
+            :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-1 shadow-lg': full }"
             :style="{ zIndex: (depth + 1) * 1000, left: `${leftOffset}px` }"
         >
             <transition name="stack-overlay-fade">
@@ -38,7 +38,10 @@ export default {
         },
         half: {
             type: Boolean
-        }
+        },
+        full: {
+            type: Boolean
+        },
     },
 
     data() {
@@ -69,6 +72,10 @@ export default {
         },
 
         leftOffset() {
+            if (this.full) {
+                return 0;
+            }
+
             if (this.isTopStack && (this.narrow || this.half)) {
                 return this.offset;
             }

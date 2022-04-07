@@ -2,7 +2,11 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Statamic\Fields\Value;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Cascade;
 use Tests\Antlers\ParserTestCase;
 
 class LoopTest extends ParserTestCase
@@ -66,5 +70,79 @@ EOT;
 EOT;
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), $this->renderString($template, $data));
+    }
+
+    public function test_empty_collections_do_not_print_brackets()
+    {
+        $data = [
+            'taxonomy' => collect(),
+        ];
+
+        $this->assertSame('', $this->renderString('{{ taxonomy }}', $data, true));
+    }
+
+    public function test_strict_variable_syntax_can_be_used_for_loops()
+    {
+        $cascade = $this->mock(Cascade::class, function ($m) {
+            $m->shouldReceive('get')->with('theme')->andReturn([
+                'social_links' => [
+                    'one',
+                    'two',
+                    'three',
+                ],
+            ]);
+        });
+
+        $template = <<<'EOT'
+{{ theme:social_links }}<{{ value }}>{{ /theme:social_links }}
+EOT;
+        $templateTwo = <<<'EOT'
+{{ $theme:social_links }}<{{ value }}>{{ /$theme:social_links }}
+EOT;
+
+        $results = (string) $this->parser()->cascade($cascade)->parse($template, []);
+        $resultsTwo = (string) $this->parser()->cascade($cascade)->parse($template, []);
+
+        $this->assertSame('<one><two><three>', $results);
+        $this->assertSame('<one><two><three>', $resultsTwo);
+    }
+
+    public function test_runtime_resets_data_manager_paired_state()
+    {
+        $value = new Value(['one', 'two', 'three']);
+        $data = [
+            'value' => 'a value',
+            'loop' => $value,
+        ];
+
+        $isPaired = null;
+
+        GlobalRuntimeState::$peekCallbacks[] = function (NodeProcessor $processor) use (&$isPaired) {
+            $isPaired = $processor->getPathDataManager()->getIsPaired();
+        };
+
+        $template = <<<'EOT'
+{{ loop  }}
+<{{ value }}>
+<{{ value ensure_right="test" }}>
+{{ ___internal_debug:peek }}
+{{ /loop }}
+EOT;
+
+        $expected = <<<'EOT'
+<one>
+<onetest>
+
+
+<two>
+<twotest>
+
+
+<three>
+<threetest>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, $data, true)));
+        $this->assertTrue($isPaired);
     }
 }

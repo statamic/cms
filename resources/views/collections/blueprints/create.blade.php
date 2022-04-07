@@ -24,7 +24,7 @@
 
         <div class="flex justify-center mt-4">
             <button tabindex="4" class="btn-primary mx-auto btn-lg">
-                {{ __('Create Blueprint')}}
+                {{ __('Create Blueprint') }}
             </button>
         </div>
     </div>
