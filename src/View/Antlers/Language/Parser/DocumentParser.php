@@ -525,8 +525,31 @@ class DocumentParser
 
                         if ($nextAntlersStart < $literalStartIndex) {
                             if ($this->lastAntlersEndIndex > $nextAntlersStart) {
-                                if ($i + 2 < $indexCount) {
-                                    $nextAntlersStart = $this->antlersStartIndex[$i + 2];
+                                $skipIndex = null;
+                                for ($j = $i; $j < $indexCount; $j++) {
+                                    if ($this->antlersStartIndex[$j] > $this->lastAntlersEndIndex) {
+                                        $skipIndex = $this->antlersStartIndex[$j];
+                                        break;
+                                    }
+                                }
+
+                                if ($skipIndex != null) {
+                                    $nextAntlersStart = $skipIndex;
+                                } else {
+                                    // In this scenario, we will create the last trailing literal node and break.
+                                    $thisOffset = $this->currentChunkOffset;
+                                    $content = StringUtilities::substr($this->content, $literalStartIndex);
+
+                                    $node = new LiteralNode();
+
+                                    $node->content = $this->prepareLiteralContent($content);
+
+                                    if (! strlen($node->content) == 0) {
+                                        $node->startPosition = $this->positionFromOffset($thisOffset, $thisOffset);
+                                        $node->endPosition = $this->positionFromOffset($nextAntlersStart, $thisOffset);
+                                        $this->nodes[] = $node;
+                                    }
+                                    break;
                                 }
                             } else {
                                 continue;
