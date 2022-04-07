@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ParseError;
-use Statamic\Assets\Asset;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
@@ -559,7 +558,7 @@ class NodeProcessor
             // The specific Asset exception is to allow for a single asset field named {{ asset }} {{ /asset }}
             // This is not checking for augmentable/arrayable otherwise CollectionTest::it_augments_in_the_parser
             // would produce the wrong behavior.
-            if ($node->isPaired() && (! $resolvedValue instanceof Asset && ! $this->isLoopable($resolvedValue))) {
+            if ($node->isPaired() && ! $this->isLoopable($resolvedValue)) {
 
                 // Safe to do this since there is no ambiguity here.
                 return $node->isTagNode;
