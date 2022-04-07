@@ -147,6 +147,46 @@ EOT;
         $this->assertSame(['clients' => $clientData], VarTest::$var);
     }
 
+    public function test_query_builders_and_modifiers()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->times(6)->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Baz'],
+            ['title' => 'Bar'],
+        ]));
+
+        $data = [
+            'page' => [
+                'images_entries_fieldtype' => $builder,
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{ page:images_entries_fieldtype scope="image" }}<{{ image:title }}>{{ /page:images_entries_fieldtype }}
+EOT;
+
+        $this->assertSame('<Foo><Baz><Bar>', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ page:images_entries_fieldtype | scope:image }}<{{ image:title }}>{{ /page:images_entries_fieldtype }}
+EOT;
+
+        $this->assertSame('<Foo><Baz><Bar>', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ page:images_entries_fieldtype | scope('image') }}<{{ image:title }}>{{ /page:images_entries_fieldtype }}
+EOT;
+
+        $this->assertSame('<Foo><Baz><Bar>', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ entries = ((page:images_entries_fieldtype | reverse) merge page:images_entries_fieldtype) | scope('image') }}<{{ image:title }}>{{ /entries }}
+EOT;
+
+        $this->assertSame('<Bar><Baz><Foo><Foo><Baz><Bar>', $this->renderString($template, $data));
+    }
+
     public function test_using_builders_as_a_pair_does_not_mutate_existing_variable()
     {
         $builder = Mockery::mock(Builder::class);

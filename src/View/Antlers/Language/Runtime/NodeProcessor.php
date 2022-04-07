@@ -2279,6 +2279,10 @@ class NodeProcessor
         $value = $data->antlersValue($this->antlersParser, $context);
         GlobalRuntimeState::$isEvaluatingUserData = false;
 
+        if ($value instanceof Builder) {
+            $value = $value->get()->all();
+        }
+
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
