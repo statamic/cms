@@ -24,5 +24,7 @@ class RoleModel extends Eloquent
         if ($table = config('statamic.users.roles', '')) {
             $this->setTable($table);
         }
+
+        $this->setConnection(config('statamic.users.database'));
     }
 }

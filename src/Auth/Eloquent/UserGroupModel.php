@@ -23,5 +23,7 @@ class UserGroupModel extends Eloquent
         if ($table = config('statamic.users.groups', '')) {
             $this->setTable($table);
         }
+
+        $this->setConnection(config('statamic.users.database'));
     }
 }
