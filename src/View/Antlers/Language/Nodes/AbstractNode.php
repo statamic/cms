@@ -53,6 +53,15 @@ abstract class AbstractNode
         $this->refId = StringUtilities::uuidv4();
     }
 
+    public function hasModifiers()
+    {
+        if ($this->modifierChain == null || empty($this->modifierChain->modifierChain)) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Retrieves the inner content of the node.
      *

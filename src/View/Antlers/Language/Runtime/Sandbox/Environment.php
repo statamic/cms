@@ -1275,7 +1275,12 @@ class Environment
         if ($value instanceof Value) {
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
+                GlobalRuntimeState::$userContentEvalState = [
+                    $value,
+                    $this->nodeProcessor->getActiveNode(),
+                ];
                 $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                GlobalRuntimeState::$userContentEvalState = null;
             } else {
                 if (! $hasModifiers) {
                     $value = $value->value();
@@ -1483,7 +1488,7 @@ class Environment
 
             $scopeValue = $this->scopeValue($varName);
 
-            if ($scopeValue instanceof Collection) {
+            if ($scopeValue instanceof Collection && ! $val->hasModifiers()) {
                 $scopeValue = $scopeValue->all();
             }
 

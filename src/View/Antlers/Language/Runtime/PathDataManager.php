@@ -836,6 +836,10 @@ class PathDataManager
     {
         GlobalRuntimeState::$isEvaluatingUserData = true;
 
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         if ($value instanceof Value) {
             GlobalRuntimeState::$isEvaluatingUserData = true;
 

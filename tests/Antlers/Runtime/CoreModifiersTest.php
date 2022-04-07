@@ -510,6 +510,15 @@ EOT;
             ],
         ], true)));
     }
+
+    public function test_dynamic_binding_is_resolved_on_modifier_parameters()
+    {
+        $template = <<<'EOT'
+{{ title :ensure_right="title | upper" }}
+EOT;
+
+        $this->assertSame('As the World TurnsAS THE WORLD TURNS', $this->renderString($template, $this->data, true));
+    }
 }
 
 class SimpleEntryObject implements Arrayable

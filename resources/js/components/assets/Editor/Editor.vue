@@ -2,6 +2,7 @@
 
     <stack name="asset-editor"
         :before-close="shouldClose"
+        :full="true"
         @closed="close">
 
     <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
@@ -70,16 +71,16 @@
                                         <img :src="asset.url" class="asset-thumb w-24 h-24" />
                                     </div>
                                 </div>
-                                <div class="min-h-0 p-2 flex items-center justify-center">
+                                <div class="min-h-0 h-full p-2 flex items-center justify-center">
                                     <img :src="asset.url" class="asset-thumb w-2/3 max-w-full max-h-full" />
                                 </div>
                             </div>
 
                             <!-- Audio -->
-                            <audio v-else-if="asset.isAudio" :src="asset.url" controls preload="auto"></audio>
+                            <div class="w-full shadow-none" v-else-if="asset.isAudio"><audio :src="asset.url" class="w-full" controls preload="auto"></audio></div>
 
                             <!-- Video -->
-                            <video v-else-if="asset.isVideo" :src="asset.url" controls></video>
+                            <div class="w-full shadow-none" v-else-if="asset.isVideo"><video :src="asset.url" class="w-full" controls></video></div>
                         </div>
                     </div>
 

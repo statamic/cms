@@ -48,7 +48,7 @@ return [
     'collections_default_publish_state_instructions' => 'Tijdens het aanmaken van entries in deze collectie wordt de publiceerknop standaard op **aan** gezet in plaats van **uit** (concept).',
     'collections_future_date_behavior_instructions' => 'Hoe entries met een datum in de toekomst zich moeten gedragen.',
     'collections_links_instructions' => 'Entries in deze collectie mogen links (doorverwijzingen) naar andere entries of URL\'s bevatten.',
-    'collections_mount_instructions' => 'Kies een entry waarop deze collectie gemonteerd moet worden. Lees meer in de [documentatie](https://statamic.dev/colletions-and-entrie#mounting).',
+    'collections_mount_instructions' => 'Kies een entry waarop deze collectie gemonteerd moet worden. Lees meer in de [documentatie](https://statamic.dev/collections#mounting).',
     'collections_orderable_instructions' => 'Activeer handmatig ordenen met drag & drop.',
     'collections_past_date_behavior_instructions' => 'Hoe entries met een datum in het verleden zich moeten gedragen.',
     'collections_preview_targets_instructions' => 'DE URL\'s die bezocht kunnen worden in Live preview. Lees meer in de [documentatie](https://statamic.dev/live-preview#preview-targets).',
