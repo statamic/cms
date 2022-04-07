@@ -14,6 +14,12 @@ class Toggle extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
+            'inline_label' => [
+                'display' => __('Inline Label'),
+                'instructions' => __('statamic::fieldtypes.toggle.config.inline_label'),
+                'type' => 'text',
+                'default' => '',
+            ],
             'default' => [
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),

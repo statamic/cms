@@ -8,4 +8,7 @@
         {{ if ! old && default }}checked{{ /if }}
         {{ if validate|contains:required }}required{{ /if }}
     >
+    {{ if inline_label }}
+        {{ inline_label }}
+    {{ /if }}
 </label>
