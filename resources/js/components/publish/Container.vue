@@ -114,7 +114,7 @@ export default {
                         state.values = values;
                     },
                     setHiddenField(state, field) {
-                        state.hiddenFields[field.handle] = field.hidden;
+                        state.hiddenFields[field.dottedKey] = field.hidden;
                     },
                     setMeta(state, meta) {
                         state.meta = meta;
