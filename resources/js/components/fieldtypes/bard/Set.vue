@@ -36,7 +36,7 @@
         <div class="replicator-set-body" v-if="!collapsed && index !== undefined">
             <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, dottedKey(field))"
                 :key="field.handle"
                 :field="field"
                 :value="values[field.handle]"
@@ -194,7 +194,11 @@ export default {
         errorKey(field) {
             let prefix = this.options.bard.errorKeyPrefix || this.options.bard.handle;
             return `${prefix}.${this.index}.attrs.values.${field.handle}`;
-        }
+        },
+
+        dottedKey(field) {
+            return this.errorKey(field);
+        },
 
     }
 }

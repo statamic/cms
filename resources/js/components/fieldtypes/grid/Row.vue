@@ -4,7 +4,7 @@
         <td class="drag-handle" :class="sortableHandleClass" v-if="grid.isReorderable"></td>
         <grid-cell
             v-for="(field, i) in fields"
-            :show-inner="showField(field)"
+            :show-inner="showField(field, dottedKey(field))"
             :key="field.handle"
             :field="field"
             :value="values[field.handle]"
@@ -116,7 +116,11 @@ export default {
             const state = this.$store.state.publish[this.storeName];
             if (! state) return [];
             return state.errors[this.errorKey(handle)] || [];
-        }
+        },
+
+        dottedKey(field) {
+            return this.errorKey(field.handle);
+        },
     }
 
 }

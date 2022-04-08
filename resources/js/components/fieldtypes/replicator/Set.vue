@@ -35,7 +35,7 @@
         <div class="replicator-set-body" v-if="!collapsed">
             <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, dottedKey(field))"
                 :key="field.handle"
                 :field="field"
                 :meta="meta[field.handle]"
@@ -201,7 +201,11 @@ export default {
 
         errorKey(field) {
             return `${this.errorKeyPrefix}.${this.index}.${field.handle}`;
-        }
+        },
+
+        dottedKey(field) {
+            return this.errorKey(field);
+        },
 
     }
 
