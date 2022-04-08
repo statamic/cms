@@ -1389,12 +1389,15 @@ class CoreModifiers extends Modifier
     public function markdown($value, $params)
     {
         $parser = $params[0] ?? 'default';
+        $withFrontMatter = $params[1] ?? false;
 
         if (in_array($parser, [true, 'true', ''], true)) {
             $parser = 'default';
         }
 
-        return Markdown::parser($parser)->parse((string) $value);
+        $method = $withFrontMatter ? 'parseWithFrontMatter' : 'parse';
+
+        return Markdown::parser($parser)->{$method}((string) $value);
     }
 
     /**

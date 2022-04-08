@@ -161,4 +161,27 @@ EOT;
             rtrim(Markdown::withSmartPunctuation()->parse('"Foo" -- Bar...'))
         );
     }
+
+    /** @test */
+    public function it_uses_front_matter_on_demand()
+    {
+        $markdown = <<<'EOT'
+---
+title: Foo Bar
+---
+
+# Heading
+EOT;
+
+        $result = Markdown::withFrontMatter()->parseWithFrontMatter($markdown);
+
+        $this->assertEquals(
+            '<h1>Heading</h1>',
+            rtrim($result['content'])
+        );
+        $this->assertEquals(
+            'Foo Bar',
+            $result['title']
+        );
+    }
 }

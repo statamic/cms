@@ -5,6 +5,8 @@ namespace Statamic\Markdown;
 use Closure;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Extension\Autolink\AutolinkExtension;
+use League\CommonMark\Extension\FrontMatter\FrontMatterExtension;
+use League\CommonMark\Extension\FrontMatter\Output\RenderedContentWithFrontMatter;
 use League\CommonMark\Extension\SmartPunct\SmartPunctExtension;
 use Statamic\Support\Arr;
 
@@ -22,6 +24,21 @@ class Parser
     public function parse(string $markdown): string
     {
         return $this->converter()->convert($markdown);
+    }
+
+    public function parseWithFrontMatter(string $markdown): array
+    {
+        $result = $this->converter()->convert($markdown);
+
+        $data = [
+            'content' => $result->getContent(),
+        ];
+
+        if ($result instanceof RenderedContentWithFrontMatter) {
+            $data = array_merge($result->getFrontMatter(), $data);
+        }
+
+        return $data;
     }
 
     public function converter(): CommonMarkConverter
@@ -109,6 +126,13 @@ class Parser
     {
         return $this->newInstance()->addExtension(function () {
             return new SmartPunctExtension;
+        });
+    }
+
+    public function withFrontMatter(): self
+    {
+        return $this->newInstance()->addExtension(function () {
+            return new FrontMatterExtension;
         });
     }
 
