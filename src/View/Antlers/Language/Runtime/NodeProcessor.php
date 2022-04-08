@@ -1262,14 +1262,15 @@ class NodeProcessor
                         $tagName = $node->name->getCompoundTagName();
                         $tagMethod = $node->name->getMethodName();
 
-                        if (array_key_exists($tagMethod, $node->processedInterpolationRegions)) {
-                            if (! empty($node->processedInterpolationRegions)) {
-                                foreach ($node->processedInterpolationRegions as $region => $regionNodes) {
-                                    $this->canHandleInterpolations[$region] = $regionNodes;
+                        if (! empty($node->processedInterpolationRegions)) {
+                            foreach ($node->processedInterpolationRegions as $region => $regionNodes) {
+                                $this->canHandleInterpolations[$region] = $regionNodes;
+
+                                if (Str::contains($tagMethod, $region)) {
+                                    $tagMethod = str_replace($region, $this->evaluateDeferredInterpolation($region), $tagMethod);
                                 }
                             }
 
-                            $tagMethod = $this->evaluateDeferredInterpolation($tagMethod);
                             $tagName = $node->name->name.':'.$tagMethod;
                         }
 
