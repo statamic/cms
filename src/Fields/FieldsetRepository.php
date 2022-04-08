@@ -81,12 +81,16 @@ class FieldsetRepository
 
     public function save(Fieldset $fieldset)
     {
-        if (! File::exists($this->directory)) {
-            File::makeDirectory($this->directory);
+        $handle = str_replace('/', '.', $fieldset->handle());
+        $path = str_replace('.', '/', $handle);
+        $file = "{$this->directory}/{$path}.yaml";
+
+        if (! File::exists(dirname($file))) {
+            File::makeDirectory(dirname($file));
         }
 
         File::put(
-            "{$this->directory}/{$fieldset->handle()}.yaml",
+            $file,
             YAML::dump($fieldset->contents())
         );
     }

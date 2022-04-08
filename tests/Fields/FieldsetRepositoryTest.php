@@ -172,4 +172,35 @@ EOT;
 
         $this->repo->save($fieldset);
     }
+
+    /** @test */
+    public function it_saves_to_disk_in_a_subdirectory()
+    {
+        $expectedYaml = <<<'EOT'
+title: 'Test Fieldset'
+fields:
+  -
+    handle: foo
+    field:
+      type: textarea
+      bar: baz
+
+EOT;
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub')->once()->andReturnFalse();
+        File::shouldReceive('makeDirectory')->with('/path/to/resources/fieldsets/sub')->once();
+        File::shouldReceive('put')->with('/path/to/resources/fieldsets/sub/test.yaml', $expectedYaml)->once();
+
+        $fieldset = (new Fieldset)->setHandle('sub/test')->setContents([
+            'title' => 'Test Fieldset',
+            'fields' => [
+                [
+                    'handle' => 'foo',
+                    'field' => ['type' => 'textarea', 'bar' => 'baz'],
+                ],
+            ],
+        ]);
+
+        $this->repo->save($fieldset);
+    }
+
 }
