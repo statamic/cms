@@ -16,6 +16,7 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
@@ -1186,5 +1187,23 @@ class AssetTest extends TestCase
             'bravo' => ['a', 'b'],
             'charlie' => ['augmented c', 'augmented d'],
         ], Arr::only($asset->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
+    }
+
+    /** @test */
+    public function it_augments_in_the_parser()
+    {
+        $container = Mockery::mock($this->container)->makePartial();
+        $container->shouldReceive('private')->andReturnFalse();
+        $container->shouldReceive('url')->andReturn('/container');
+        $asset = (new Asset)->container($container)->path('path/to/test.txt');
+
+        $this->assertEquals('/container/path/to/test.txt', Antlers::parse('{{ asset }}', ['asset' => $asset]));
+
+        $this->assertEquals('path/to/test.txt', Antlers::parse('{{ asset }}{{ path }}{{ /asset }}', ['asset' => $asset]));
+
+        $this->assertEquals('test.txt', Antlers::parse('{{ asset:basename }}', ['asset' => $asset]));
+
+        // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
+        $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
     }
 }
