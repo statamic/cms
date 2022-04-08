@@ -55,21 +55,6 @@ class AssetTemplateTest extends ParserTestCase
         ));
     }
 
-    public function test_variable_named_asset_with_an_actual_value_is_not_treated_like_a_tag()
-    {
-        $asset = new Asset();
-        $asset->container($this->container);
-        $asset->path('path/to/asset.jpg');
-
-        $value = new Value($asset, 'asset');
-
-        $this->assertSame('path/to/asset.jpg', $this->renderString(
-            '{{ asset }}{{ path }}{{ /asset }}', [
-                'asset' => $value,
-            ], true
-        ));
-    }
-
     public function test_passing_asset_in_parameter_actually_passes_asset()
     {
         VarTest::register();
