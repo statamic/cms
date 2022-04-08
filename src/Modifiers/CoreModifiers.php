@@ -4,6 +4,7 @@ namespace Statamic\Modifiers;
 
 use ArrayAccess;
 use Carbon\Carbon;
+use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -1279,7 +1280,7 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
-        if (Compare::isQueryBuilder($value)) {
+        if (Compare::isQueryBuilder($value) || $value instanceof Countable) {
             return $value->count();
         }
 
