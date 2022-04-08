@@ -7,11 +7,26 @@ export default {
         },
 
         visibleValues() {
-            return _.omit(this.values, (_, handle) => {
-                return this.hiddenFields[handle];
-            });
+            let visibleValues = clone(this.values);
+
+            let hiddenKeys = _.chain(this.hiddenFields)
+                .pick(hidden => hidden)
+                .keys()
+                .each(dottedKey => {
+                    eval('delete visibleValues.' + this.dottedKeyToJsProperty(dottedKey));
+                });
+
+            return visibleValues;
         },
 
-    }
+    },
+
+    methods: {
+
+        dottedKeyToJsProperty(dottedKey) {
+            return dottedKey.replace(/\.*(\d+)\./g, '[$1].');
+        },
+
+    },
 
 }
