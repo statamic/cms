@@ -44,6 +44,15 @@ class LengthTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_the_number_of_items_in_an_arrayable()
+    {
+        $arrayable = Mockery::mock(Arrayable::class)->shouldReceive('toArray')->andReturn(['one', 'two'])->getMock();
+
+        $modified = $this->modify($arrayable);
+        $this->assertSame(2, $modified);
+    }
+
+    /** @test */
     public function it_returns_the_numbers_of_chars_in_string(): void
     {
         $string = 'LEEEEROOOYYYY JEEENKINNNSS!';
