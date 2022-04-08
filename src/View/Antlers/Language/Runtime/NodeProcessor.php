@@ -555,9 +555,6 @@ class NodeProcessor
         }
 
         if ($managerResults[0] === true) {
-            // The specific Asset exception is to allow for a single asset field named {{ asset }} {{ /asset }}
-            // This is not checking for augmentable/arrayable otherwise CollectionTest::it_augments_in_the_parser
-            // would produce the wrong behavior.
             if ($node->isPaired() && ! $this->isLoopable($resolvedValue)) {
 
                 // Safe to do this since there is no ambiguity here.
