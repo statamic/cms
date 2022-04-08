@@ -38,7 +38,7 @@ return [
     'digits_between'       => 'Må være mellom :min og :max sifre.',
     'dimensions'           => 'Ugyldige bildemål.',
     'distinct'             => 'Dette feltet har en duplisert verdi.',
-    'email'                => 'Må være en gyldig mailadresse.',
+    'email'                => 'Må være en gyldig e-postadresse.',
     'exists'               => 'Ugyldig.',
     'file'                 => 'Må være en fil.',
     'filled'               => 'Må ha en verdi.',
