@@ -651,7 +651,7 @@ INFO;
                     }
 
                     return [
-                        $currentFileStack->get($index)[0],
+                        $currentFileStack->get($index)[0] ?? 'unknown',
                         $tag,
                     ];
                 })->reverse()->all();
