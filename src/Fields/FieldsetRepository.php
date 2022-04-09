@@ -106,7 +106,7 @@ class FieldsetRepository
                 })
                 ->keyBy->handle()
                 ->each(function ($fieldset, $handle) use ($fieldsets) {
-                    if (!$fieldsets->has($handle)) {
+                    if (! $fieldsets->has($handle)) {
                         $fieldsets->put($handle, $fieldset);
                     }
                 });

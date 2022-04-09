@@ -278,7 +278,7 @@ EOT;
         File::shouldReceive('withAbsolutePaths')->twice()->andReturnSelf();
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnTrue();
         File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
-            '/path/to/resources/fieldsets/test.yaml'
+            '/path/to/resources/fieldsets/test.yaml',
         ]));
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturn($duplicateContents);
         File::shouldReceive('exists')->with('/another/path/to/resources/fieldsets')->once()->andReturnTrue();
