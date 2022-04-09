@@ -18,7 +18,7 @@ class FieldsetRepository
             $directories = [$directories];
         }
 
-        $this->directories = array_map(fn($directory) => Path::tidy($directory), $directories);
+        $this->directories = array_map(fn ($directory) => Path::tidy($directory), $directories);
 
         return $this;
     }
@@ -37,11 +37,11 @@ class FieldsetRepository
     {
         $path = str_replace('.', '/', $handle);
 
-        foreach($this->directories as $directory) {
+        foreach ($this->directories as $directory) {
             if (File::exists("{$directory}/{$path}.yaml")) {
                 return Path::tidy(vsprintf('%s/%s.yaml', [
                     $directory,
-                    $path
+                    $path,
                 ]));
             }
         }
@@ -88,7 +88,7 @@ class FieldsetRepository
     {
         $fieldsets = collect();
 
-        foreach($this->directories as $directory) {
+        foreach ($this->directories as $directory) {
             if (! File::exists($directory)) {
                 continue;
             }
@@ -105,7 +105,7 @@ class FieldsetRepository
                         ->setContents(YAML::file($file)->parse());
                 })
                 ->keyBy->handle()
-                ->each(function($fieldset, $handle) use ($fieldsets) {
+                ->each(function ($fieldset, $handle) use ($fieldsets) {
                     if (!$fieldsets->has($handle)) {
                         $fieldsets->put($handle, $fieldset);
                     }
@@ -121,7 +121,7 @@ class FieldsetRepository
         $path = $this->path($handle);
 
         if ($path === null) {
-            $path = sprintf("%s/%s.yaml", $this->directory(), str_replace('.', '/', $handle));
+            $path = sprintf('%s/%s.yaml', $this->directory(), str_replace('.', '/', $handle));
         }
 
         if (! File::exists(dirname($path))) {

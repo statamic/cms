@@ -18,7 +18,7 @@ class FieldsetRepositoryArrayTest extends TestCase
         $this->repo = app(FieldsetRepository::class)
             ->setDirectory([
                 '/path/to/resources/fieldsets',
-                '/another/path/to/resources/fieldsets'
+                '/another/path/to/resources/fieldsets',
             ]);
     }
 
@@ -41,7 +41,7 @@ class FieldsetRepositoryArrayTest extends TestCase
     {
         $this->assertEquals([
             '/path/to/resources/fieldsets',
-            '/another/path/to/resources/fieldsets'
+            '/another/path/to/resources/fieldsets',
         ], $this->repo->directories());
     }
 
@@ -391,5 +391,4 @@ EOT;
 
         $this->repo->delete($fieldset);
     }
-
 }

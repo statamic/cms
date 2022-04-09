@@ -6,7 +6,6 @@ use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Facades;
-use Statamic\Facades\Path;
 use Statamic\Support\Str;
 
 class Fieldset
