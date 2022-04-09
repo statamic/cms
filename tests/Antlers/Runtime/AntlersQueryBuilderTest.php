@@ -191,6 +191,9 @@ EOT;
             'query_builder_field' => $builder,
         ];
 
+        // Reset the callbacks from any other tests.
+        GlobalRuntimeState::$peekCallbacks = [];
+
         // We will perform some assertions here as well. Since the runtime environment
         // has special handling around modifiers, we can use a peek callback to
         // check what the actual value is set to without touching it at all.

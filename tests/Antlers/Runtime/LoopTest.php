@@ -117,6 +117,8 @@ EOT;
 
         $isPaired = null;
 
+        // Reset the callbacks from any other tests.
+        GlobalRuntimeState::$peekCallbacks = [];
         GlobalRuntimeState::$peekCallbacks[] = function (NodeProcessor $processor) use (&$isPaired) {
             $isPaired = $processor->getPathDataManager()->getIsPaired();
         };
