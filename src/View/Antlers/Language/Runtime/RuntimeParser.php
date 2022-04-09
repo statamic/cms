@@ -486,7 +486,7 @@ class RuntimeParser implements Parser
             [
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
-            ]
+            ],
         ];
 
         $rebuiltTrace = array_merge($previous, $rebuiltTrace, $exception->getTrace());
