@@ -223,7 +223,7 @@ class PathDataManager
     /**
      * Sets whether the PathDataManager will intercept values or not.
      *
-     * @param bool $shouldIntercept Whether to intercept.
+     * @param  bool  $shouldIntercept  Whether to intercept.
      * @return $this
      */
     public function setShouldDoValueIntercept($shouldIntercept)

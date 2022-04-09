@@ -1160,7 +1160,7 @@ class Environment
      * Returns the current value associated with the provided variable name.
      *
      * @param  string|VariableReference  $name  The variable name.
-     * @param AbstractNode|null $originalNode The original node, if available.
+     * @param  AbstractNode|null  $originalNode  The original node, if available.
      * @return array|ArrayAccess|mixed|string|null
      *
      * @throws RuntimeException
