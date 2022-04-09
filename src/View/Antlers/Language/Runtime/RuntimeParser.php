@@ -485,7 +485,7 @@ class RuntimeParser implements Parser
         $previous = [
             [
                 'file' => $exception->getFile(),
-                'line' => $exception->getLine()
+                'line' => $exception->getLine(),
             ]
         ];
 
