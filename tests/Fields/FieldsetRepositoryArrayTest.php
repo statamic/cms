@@ -258,6 +258,46 @@ EOT;
     }
 
     /** @test */
+    public function it_returns_first_fieldset_when_duplicates_exists()
+    {
+        $duplicateContents = <<<'EOT'
+title: Duplicate Fieldset
+fields:
+  one:
+    type: text
+    display: Duplicate Field
+EOT;
+        $originalContents = <<<'EOT'
+title: Original Fieldset
+fields:
+  two:
+    type: text
+    display: Original Field
+EOT;
+
+        File::shouldReceive('withAbsolutePaths')->twice()->andReturnSelf();
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnTrue();
+        File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
+            '/path/to/resources/fieldsets/test.yaml'
+        ]));
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturn($duplicateContents);
+        File::shouldReceive('exists')->with('/another/path/to/resources/fieldsets')->once()->andReturnTrue();
+        File::shouldReceive('getFilesByTypeRecursively')->with('/another/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
+            '/another/path/to/resources/fieldsets/test.yaml',
+        ]));
+        File::shouldReceive('get')->with('/another/path/to/resources/fieldsets/test.yaml')->once()->andReturn($originalContents);
+
+        $all = $this->repo->all();
+
+        $this->assertInstanceOf(Collection::class, $all);
+        $this->assertCount(1, $all);
+        $this->assertEveryItemIsInstanceOf(Fieldset::class, $all);
+        $this->assertEquals(['test'], $all->keys()->all());
+        $this->assertEquals(['test'], $all->map->handle()->values()->all());
+        $this->assertEquals(['Duplicate Fieldset'], $all->map->title()->values()->all());
+    }
+
+    /** @test */
     public function it_returns_empty_collection_if_fieldset_directory_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
