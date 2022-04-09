@@ -480,7 +480,16 @@ class RuntimeParser implements Parser
         }
 
         $rebuiltTrace = $this->buildStackTrace(GlobalRuntimeState::$lastNode, $text);
-        $rebuiltTrace = array_merge($rebuiltTrace, $exception->getTrace());
+
+        // Prepare and prepend the actual exception's data
+        $previous = [
+            [
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine()
+            ]
+        ];
+
+        $rebuiltTrace = array_merge($previous, $rebuiltTrace, $exception->getTrace());
 
         $traceProperty = new ReflectionProperty('Exception', 'trace');
         $traceProperty->setAccessible(true);
@@ -628,7 +637,24 @@ INFO;
 
             ];
         } else {
-            $currentStack = array_reverse(GlobalRuntimeState::$templateFileStack);
+            $currentFileStack = collect(GlobalRuntimeState::$templateFileStack);
+            $currentStack = collect(GlobalRuntimeState::$globalTagEnterStack)
+                ->transform(function ($tag, $index) use (&$currentFileStack) {
+                    $fileStack = $currentFileStack->filter(function ($stackItem) use ($tag) {
+                        return $stackItem[1] === $tag;
+                    });
+
+                    $currentFileStack = $currentFileStack->diffKeys($fileStack);
+
+                    if ($fileStack->containsOneItem()) {
+                        return $fileStack->flatten()->all();
+                    }
+
+                    return [
+                        $currentFileStack->get($index)[0],
+                        $tag,
+                    ];
+                })->reverse()->all();
         }
 
         $currentStack[0][1] = $activeNode;
