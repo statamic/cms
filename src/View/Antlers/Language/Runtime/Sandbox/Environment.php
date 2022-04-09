@@ -1160,11 +1160,12 @@ class Environment
      * Returns the current value associated with the provided variable name.
      *
      * @param  string|VariableReference  $name  The variable name.
+     * @param AbstractNode|null $originalNode The original node, if available.
      * @return array|ArrayAccess|mixed|string|null
      *
      * @throws RuntimeException
      */
-    private function scopeValue($name)
+    private function scopeValue($name, $originalNode = null)
     {
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
@@ -1173,6 +1174,16 @@ class Environment
                 }
 
                 $this->dataRetriever->setReduceFinal(false);
+            }
+
+            if ($originalNode != null && $originalNode->hasModifiers()) {
+                $doIntercept = $this->dataRetriever->getShouldDoValueIntercept();
+
+                $this->dataRetriever->setShouldDoValueIntercept(false);
+                $value = $this->dataRetriever->getData($name, $this->data);
+                $this->dataRetriever->setShouldDoValueIntercept($doIntercept);
+
+                return $value;
             }
 
             return $this->dataRetriever->getData($name, $this->data);
@@ -1486,7 +1497,7 @@ class Environment
                 return $interpolationValue;
             }
 
-            $scopeValue = $this->scopeValue($varName);
+            $scopeValue = $this->scopeValue($varName, $val);
 
             if ($scopeValue instanceof Collection && ! $val->hasModifiers()) {
                 $scopeValue = $scopeValue->all();
