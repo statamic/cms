@@ -126,7 +126,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function () {
             return (new \Statamic\Fields\BlueprintRepository)
-                ->setDirectory(resource_path('blueprints'))
+                ->setDirectory(config('statamic.system.blueprints_path', resource_path('blueprints')))
                 ->setFallback('default', function () {
                     return \Statamic\Facades\Blueprint::makeFromFields([
                         'content' => ['type' => 'markdown', 'localizable' => true],
@@ -136,7 +136,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function () {
             return (new \Statamic\Fields\FieldsetRepository)
-                ->setDirectory(resource_path('fieldsets'));
+                ->setDirectory(config('statamic.system.fieldsets_path', resource_path('fieldsets')));
         });
 
         collect([

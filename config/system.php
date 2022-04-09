@@ -31,6 +31,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Default Blueprints Paths
+    |--------------------------------------------------------------------------
+    |
+    | The location that Statamic will use for loading and saving blueprints,
+    | can be either a single path or an array of paths.
+    |
+    */
+
+    'blueprints_path' => resource_path('blueprints'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Fieldset Paths
+    |--------------------------------------------------------------------------
+    |
+    | The location that Statamic will use for loading and saving blueprints,
+    | can be either a single path or an array of paths.
+    |
+    */
+
+    'fieldsets_path' => resource_path('fieldsets'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Send the Powered-By Header
     |--------------------------------------------------------------------------
     |

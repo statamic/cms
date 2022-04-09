@@ -28,10 +28,7 @@ class Fieldset
 
     public function path()
     {
-        return Path::tidy(vsprintf('%s/%s.yaml', [
-            Facades\Fieldset::directory(),
-            str_replace('.', '/', $this->handle()),
-        ]));
+        return Facades\Fieldset::path($this->handle());
     }
 
     public function setContents(array $contents)
