@@ -1,5 +1,32 @@
 # Release Notes
 
+## 3.3.6 (2022-04-11)
+
+### What's new
+- The Markdown `Parser` class is macroable. [#5797](https://github.com/statamic/cms/issues/5797) by @jacksleight
+
+### What's improved
+- Dutch translations. [#5801](https://github.com/statamic/cms/issues/5801) by @robdekort
+- Norwegian translations. [#5798](https://github.com/statamic/cms/issues/5798) by @espenlg
+
+### What's fixed
+- The `nav:breadcrumbs` tag can now be used in Blade. [#5599](https://github.com/statamic/cms/issues/5599) by @jasonvarga
+- Collections are counted more efficiently in the `length` modifier. [#5802](https://github.com/statamic/cms/issues/5802) by @jasonvarga
+- Fix issue when using a single `assets` field named `asset`. [#5799](https://github.com/statamic/cms/issues/5799) by @jasonvarga
+- Fix `entries` fieldtype in select mode pushing the content area wider. [#5787](https://github.com/statamic/cms/issues/5787) by @jackmcdade
+- Runtime: Support for multiple interpolations in tag method names. [#5800](https://github.com/statamic/cms/issues/5800) by @JohnathonKoster
+- Runtime: Isolate scope when resolving values to prevent overriding page data. [#5668](https://github.com/statamic/cms/issues/5668) by @JohnathonKoster
+- Runtime: Correct self closing tags. [#5781](https://github.com/statamic/cms/issues/5781) by @JohnathonKoster
+- Runtime: Fix issue when using recursion and conditions. [#5779](https://github.com/statamic/cms/issues/5779) by @JohnathonKoster
+- Runtime: Fix `noparse` behavior. [#5778](https://github.com/statamic/cms/issues/5778) by @JohnathonKoster
+- Runtime: Fix modifier chains and null values. [#5780](https://github.com/statamic/cms/issues/5780) by @JohnathonKoster
+- Runtime: Prevent literal from being removed when using multiple nested double braces in a parameter. [#5777](https://github.com/statamic/cms/issues/5777) by @JohnathonKoster
+- Runtime: Removes ctype_space null deprecation warning. [#5776](https://github.com/statamic/cms/issues/5776) by @JohnathonKoster
+- Bump `minimist` from 1.2.5 to 1.2.6 [#5808](https://github.com/statamic/cms/issues/5808) by @dependabot
+- Bump `moment` from 2.27.0 to 2.29.2 [#5806](https://github.com/statamic/cms/issues/5806) by @dependabot
+
+
+
 ## 3.3.5 (2022-04-06)
 
 ### What's new
