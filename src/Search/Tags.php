@@ -19,6 +19,26 @@ class Tags extends BaseTags
 
     protected static $handle = 'search';
 
+    public function count()
+    {
+        if (! $query = request($this->params->get('query', 'q'))) {
+            return 0;
+        }
+
+        $builder = Search::index($this->params->get('index'))
+            ->ensureExists()
+            ->search($query);
+
+        $this->querySite($builder);
+        $this->queryStatus($builder);
+        $this->queryConditions($builder);
+        $this->queryScopes($builder);
+
+        $results = $this->getQueryResults($builder);
+
+        return $results->count();
+    }
+
     public function results()
     {
         if (! $query = request($this->params->get('query', 'q'))) {
