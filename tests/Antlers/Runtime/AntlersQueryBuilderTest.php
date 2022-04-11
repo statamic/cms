@@ -149,6 +149,13 @@ EOT;
         $this->renderString($template, $data, true);
 
         $this->assertSame(['clients' => $clientData], VarTest::$var);
+
+        $template = <<<'EOT'
+{{ var_test :variable="clients" }}
+EOT;
+
+        $this->renderString($template, $data, true);
+        $this->assertSame(VarTest::$var, $builder);
     }
 
     public function test_query_builders_are_not_resolved_for_modifiers()

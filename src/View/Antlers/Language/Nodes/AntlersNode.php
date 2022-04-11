@@ -387,7 +387,8 @@ class AntlersNode extends AbstractNode
             } else {
                 $pathParser = new PathParser();
                 $retriever = new PathDataManager();
-                $retriever->setIsPaired(false)->setReduceFinal(false);
+                $retriever->setIsPaired(false)->setReduceFinal(false)
+                    ->setShouldDoValueIntercept(false);
                 $value = $retriever->getData($pathParser->parse($pathToParse), $data);
             }
         } else {
