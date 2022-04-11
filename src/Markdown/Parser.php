@@ -3,6 +3,7 @@
 namespace Statamic\Markdown;
 
 use Closure;
+use Illuminate\Support\Traits\Macroable;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Extension\Autolink\AutolinkExtension;
 use League\CommonMark\Extension\SmartPunct\SmartPunctExtension;
@@ -10,6 +11,8 @@ use Statamic\Support\Arr;
 
 class Parser
 {
+    use Macroable;
+
     protected $converter;
     protected $extensions = [];
     protected $config = [];
