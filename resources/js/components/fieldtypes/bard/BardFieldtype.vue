@@ -286,6 +286,8 @@ export default {
         this.$nextTick(() => this.mounted = true);
 
         this.pageHeader = document.querySelector('.global-header');
+
+        this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.errorKeyPrefix || this.handle);
     },
 
     beforeDestroy() {
