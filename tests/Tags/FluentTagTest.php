@@ -9,7 +9,6 @@ use Statamic\Support\Arr;
 use Statamic\Tags\FluentTag;
 use Statamic\Tags\Loader;
 use Statamic\Tags\Tags;
-use Statamic\View\Antlers\Parser;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
