@@ -111,6 +111,13 @@ class RuntimeParser implements Parser
      */
     private $parseStack = 0;
 
+    /**
+     * Determines if runtime processors should be isolated.
+     *
+     * @var bool
+     */
+    private $isolateRuntimes = false;
+
     public function __construct(DocumentParser $documentParser, NodeProcessor $nodeProcessor, AntlersLexer $lexer, LanguageParser $antlersParser)
     {
         $this->documentParser = $documentParser;
@@ -655,8 +662,28 @@ INFO;
         return $stackTrace;
     }
 
+    public function isolateRuntimes($isolate)
+    {
+        $this->isolateRuntimes = $isolate;
+
+        return $this;
+    }
+
+    private function cloneRuntimeParser()
+    {
+        return (new RuntimeParser(
+            $this->documentParser,
+            $this->nodeProcessor->cloneProcessor(),
+            $this->antlersLexer, $this->antlersParser
+        ))->allowPhp($this->allowPhp);
+    }
+
     public function parse($text, $data = [])
     {
+        if ($this->isolateRuntimes || GlobalRuntimeState::$isEvaluatingData) {
+            return $this->cloneRuntimeParser()->renderText($text, $data);
+        }
+
         return $this->renderText($text, $data);
     }
 
