@@ -275,7 +275,7 @@ class AntlersLexer
             if ($this->isInModifierParameterValue && ! $this->isParsingString) {
                 $breakForKeyword = false;
 
-                if (! $this->isParsingString && ctype_space($this->next)) {
+                if (! $this->isParsingString && $this->next != null && ctype_space($this->next)) {
                     $nextWord = strtolower(trim(implode($this->scanForwardTo(' ', 1))));
 
                     if (strlen($nextWord) > 0 && LanguageKeywords::isLanguageLogicalKeyword($nextWord)) {

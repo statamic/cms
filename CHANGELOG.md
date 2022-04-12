@@ -1,5 +1,58 @@
 # Release Notes
 
+## 3.3.6 (2022-04-11)
+
+### What's new
+- The Markdown `Parser` class is macroable. [#5797](https://github.com/statamic/cms/issues/5797) by @jacksleight
+
+### What's improved
+- Dutch translations. [#5801](https://github.com/statamic/cms/issues/5801) by @robdekort
+- Norwegian translations. [#5798](https://github.com/statamic/cms/issues/5798) by @espenlg
+
+### What's fixed
+- The `nav:breadcrumbs` tag can now be used in Blade. [#5599](https://github.com/statamic/cms/issues/5599) by @jasonvarga
+- Collections are counted more efficiently in the `length` modifier. [#5802](https://github.com/statamic/cms/issues/5802) by @jasonvarga
+- Fix issue when using a single `assets` field named `asset`. [#5799](https://github.com/statamic/cms/issues/5799) by @jasonvarga
+- Fix `entries` fieldtype in select mode pushing the content area wider. [#5787](https://github.com/statamic/cms/issues/5787) by @jackmcdade
+- Runtime: Support for multiple interpolations in tag method names. [#5800](https://github.com/statamic/cms/issues/5800) by @JohnathonKoster
+- Runtime: Isolate scope when resolving values to prevent overriding page data. [#5668](https://github.com/statamic/cms/issues/5668) by @JohnathonKoster
+- Runtime: Correct self closing tags. [#5781](https://github.com/statamic/cms/issues/5781) by @JohnathonKoster
+- Runtime: Fix issue when using recursion and conditions. [#5779](https://github.com/statamic/cms/issues/5779) by @JohnathonKoster
+- Runtime: Fix `noparse` behavior. [#5778](https://github.com/statamic/cms/issues/5778) by @JohnathonKoster
+- Runtime: Fix modifier chains and null values. [#5780](https://github.com/statamic/cms/issues/5780) by @JohnathonKoster
+- Runtime: Prevent literal from being removed when using multiple nested double braces in a parameter. [#5777](https://github.com/statamic/cms/issues/5777) by @JohnathonKoster
+- Runtime: Removes ctype_space null deprecation warning. [#5776](https://github.com/statamic/cms/issues/5776) by @JohnathonKoster
+- Bump `minimist` from 1.2.5 to 1.2.6 [#5808](https://github.com/statamic/cms/issues/5808) by @dependabot
+- Bump `moment` from 2.27.0 to 2.29.2 [#5806](https://github.com/statamic/cms/issues/5806) by @dependabot
+
+
+
+## 3.3.5 (2022-04-06)
+
+### What's new
+- Norwegian translation. [#5722](https://github.com/statamic/cms/issues/5722) by @espenlg
+- When there's a syntax error inside an Antlers-enabled field, the exception will show the contents. [#5659](https://github.com/statamic/cms/issues/5659) by @JohnathonKoster
+
+### What's improved
+- German translations. [#5715](https://github.com/statamic/cms/issues/5715) by @helloDanuk
+- French translations. [#5705](https://github.com/statamic/cms/issues/5705) by @ebeauchamps
+
+### What's fixed
+- Fix runtime parser not maintaining query builder results accurately in subsequent tags. [#5716](https://github.com/statamic/cms/issues/5716) by @JohnathonKoster
+- Fix the `groupby` operator not supporting modifiers in the runtime parser. [#5716](https://github.com/statamic/cms/issues/5716) by @JohnathonKoster
+- Fix runtime parser outputting a replacement string when a stack is used with nothing pushed into it. [#5716](https://github.com/statamic/cms/issues/5716) by @JohnathonKoster
+- Fix runtime parser support for multibyte characters. [#5704](https://github.com/statamic/cms/issues/5704) by @JohnathonKoster
+- Fix runtime parser support for tags with parameters in Antlers-enabled fields. [#5659](https://github.com/statamic/cms/issues/5659) by @JohnathonKoster
+- Fix Glide cache disk permissions. [#5724](https://github.com/statamic/cms/issues/5724) by @jasonvarga
+- Fix URL typo in Dutch translation. [#5772](https://github.com/statamic/cms/issues/5772) by @MarcelWeidum
+- Fix slugification not using appropriate language on the create term form. [#5738](https://github.com/statamic/cms/issues/5738) by @arthurperton
+- Fix issue where Flysystem could return pathless FileAttributes response. [#5726](https://github.com/statamic/cms/issues/5726) by @jesseleite
+- Fix runtime parser support for PHP assignments inside loops. [#5734](https://github.com/statamic/cms/issues/5734) by @JohnathonKoster
+- Add attribute to suppress deprecation notice [#5719](https://github.com/statamic/cms/issues/5719) by @marcorieser
+- Add ReturnTypeWillChange attribute [#5701](https://github.com/statamic/cms/issues/5701) by @jasonvarga
+
+
+
 ## 3.3.4 (2022-03-30)
 
 ### What's improved

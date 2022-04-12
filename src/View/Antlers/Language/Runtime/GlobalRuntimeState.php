@@ -78,6 +78,7 @@ class GlobalRuntimeState
      * @var bool
      */
     public static $isEvaluatingUserData = false;
+    public static $isEvaluatingData = false;
 
     /**
      * A counter of the active tracer count.
@@ -183,6 +184,10 @@ class GlobalRuntimeState
     public static $prefixState = [];
 
     public static $containsLayout = false;
+
+    public static $requiresRuntimeIsolation = false;
+
+    public static $userContentEvalState = null;
 
     /**
      * A list of callbacks that will be invoked when ___internal_debug:peek is called.

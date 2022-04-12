@@ -127,6 +127,14 @@ EOT;
         $this->assertSame('hello_world', $this->renderString($template, [
             'var_name' => 'hello_world',
         ], true));
+
+        $template = <<<'EOT'
+{{ echo_method:components/{var_name}/{{ var_name}}/{2+5+10}/more/{var_name|upper} }}
+EOT;
+
+        $this->assertSame('components/button/button/17/more/BUTTON', $this->renderString($template, [
+            'var_name' => 'button',
+        ], true));
     }
 
     public function test_array_syntax_modifiers_work_on_multi_part_variable_paths()

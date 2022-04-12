@@ -59,6 +59,10 @@ class StackReplacementManager
         }
 
         if (! array_key_exists(GlobalRuntimeState::$environmentId, self::$stackContents)) {
+            foreach (array_keys(self::$stacks) as $replacementString) {
+                $content = str_replace($replacementString, '', $content);
+            }
+
             return $content;
         }
 
