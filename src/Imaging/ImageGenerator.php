@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
@@ -11,6 +12,7 @@ use Statamic\Events\GlideImageGenerated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
+use Statamic\Facades\Glide;
 
 class ImageGenerator
 {
@@ -58,6 +60,14 @@ class ImageGenerator
      */
     public function generateByPath($path, array $params)
     {
+        return Glide::cacheStore()->rememberForever(
+            'path::'.$path.'::'.md5(json_encode($params)),
+            fn () => $this->doGenerateByPath($path, $params)
+        );
+    }
+
+    private function doGenerateByPath($path, array $params)
+    {
         $this->path = $path;
         $this->params = $params;
 
@@ -78,6 +88,14 @@ class ImageGenerator
      * @return mixed
      */
     public function generateByUrl($url, array $params)
+    {
+        return Glide::cacheStore()->rememberForever(
+            'url::'.$url.'::'.md5(json_encode($params)),
+            fn () => $this->doGenerateByUrl($url, $params)
+        );
+    }
+
+    private function doGenerateByUrl($url, array $params)
     {
         $this->skip_validation = true;
         $this->params = $params;
@@ -109,6 +127,14 @@ class ImageGenerator
      * @return mixed
      */
     public function generateByAsset($asset, array $params)
+    {
+        return Glide::cacheStore()->rememberForever(
+            'asset::'.$asset->id().'::'.md5(json_encode($params)),
+            fn () => $this->doGenerateByAsset($asset, $params)
+        );
+    }
+
+    private function doGenerateByAsset($asset, array $params)
     {
         $this->asset = $asset;
         $this->params = $params;

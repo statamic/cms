@@ -6,10 +6,13 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\Server;
+use Statamic\Events\GlideImageGenerated;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
+use Statamic\Facades\Glide;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -29,6 +32,11 @@ class ImageGeneratorTest extends TestCase
     /** @test */
     public function it_generates_an_image_by_asset()
     {
+        Event::fake();
+
+        $cacheKey = 'asset::test_container::foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
+        $this->assertNull(Glide::cacheStore()->get($cacheKey));
+
         Storage::fake('test');
         $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
         Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
@@ -37,10 +45,13 @@ class ImageGeneratorTest extends TestCase
 
         $this->assertCount(0, $this->generatedImagePaths());
 
-        $path = $this->makeGenerator()->generateByAsset(
-            $asset,
-            $userParams = ['w' => 100, 'h' => 100]
-        );
+        // Generate the image twice to make sure it's cached.
+        foreach (range(1, 2) as $i) {
+            $path = $this->makeGenerator()->generateByAsset(
+                $asset,
+                $userParams = ['w' => 100, 'h' => 100]
+            );
+        }
 
         // Since we can't really mock the server, we'll generate the md5 hash the same
         // way it does. It will also include the fit parameter based on the asset's
@@ -53,11 +64,18 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
         $this->assertContains($expectedPath, $paths);
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
+        Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
     /** @test */
     public function it_generates_an_image_by_local_path()
     {
+        Event::fake();
+
+        $cacheKey = 'path::testimages/foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
+        $this->assertNull(Glide::cacheStore()->get($cacheKey));
+
         $this->assertCount(0, $this->generatedImagePaths());
 
         // Path relative to the "public" directory.
@@ -67,10 +85,13 @@ class ImageGeneratorTest extends TestCase
         $contents = file_get_contents($image->getPathname());
         File::put(public_path($imagePath), $contents);
 
-        $path = $this->makeGenerator()->generateByPath(
-            $imagePath,
-            $userParams = ['w' => 100, 'h' => 100]
-        );
+        // Generate the image twice to make sure it's cached.
+        foreach (range(1, 2) as $i) {
+            $path = $this->makeGenerator()->generateByPath(
+                $imagePath,
+                $userParams = ['w' => 100, 'h' => 100]
+            );
+        }
 
         // Since we can't really mock the server, we'll generate the md5 hash the same
         // way it does. It will not include the fit parameter since it's not an asset.
@@ -81,11 +102,18 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
         $this->assertContains($expectedPath, $paths);
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
+        Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
     /** @test */
     public function it_generates_an_image_by_external_url()
     {
+        Event::fake();
+
+        $cacheKey = 'url::https://example.com/foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
+        $this->assertNull(Glide::cacheStore()->get($cacheKey));
+
         $this->assertCount(0, $this->generatedImagePaths());
 
         $this->app->bind('statamic.imaging.guzzle', function () {
@@ -102,10 +130,13 @@ class ImageGeneratorTest extends TestCase
             ])]);
         });
 
-        $path = $this->makeGenerator()->generateByUrl(
-            'https://example.com/foo/hoff.jpg',
-            $userParams = ['w' => 100, 'h' => 100]
-        );
+        // Generate the image twice to make sure it's cached.
+        foreach (range(1, 2) as $i) {
+            $path = $this->makeGenerator()->generateByUrl(
+                'https://example.com/foo/hoff.jpg',
+                $userParams = ['w' => 100, 'h' => 100]
+            );
+        }
 
         // Since we can't really mock the server, we'll generate the md5 hash the same
         // way it does. It will not include the fit parameter since it's not an asset.
@@ -119,6 +150,8 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
         $this->assertContains($expectedPath, $paths);
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
+        Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
     /** @test */
@@ -140,6 +173,7 @@ class ImageGeneratorTest extends TestCase
 
     private function clearGlideCache()
     {
+        Glide::cacheStore()->flush();
         File::delete($this->glideCachePath());
     }
 
