@@ -3,13 +3,13 @@
 namespace Statamic\Tags;
 
 use Facades\Statamic\Imaging\Attributes;
-use Facades\Statamic\Imaging\GlideServer;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Config;
+use Statamic\Facades\Glide as GlideManager;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -109,7 +109,7 @@ class Glide extends Tags
 
             if ($this->isResizable($item)) {
                 $path = $this->generateImage($item);
-                $attrs = Attributes::from(GlideServer::cacheDisk()->getDriver(), $path);
+                $attrs = Attributes::from(GlideManager::cacheDisk()->getDriver(), $path);
                 $data = array_merge($data, $attrs);
             }
 
@@ -319,6 +319,6 @@ class Glide extends Tags
 
     private function useAbsoluteUrls()
     {
-        return Str::startsWith(GlideServer::url(), ['http://', 'https://']);
+        return Str::startsWith(GlideManager::url(), ['http://', 'https://']);
     }
 }

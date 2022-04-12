@@ -9,14 +9,14 @@ use Statamic\Facades\Image;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 use Statamic\Support\Str;
 
-class GlideServer
+class GlideManager
 {
     /**
      * Create glide server.
      *
      * @return \League\Glide\Server
      */
-    public function create()
+    public function server()
     {
         return ServerFactory::create([
             'source'   => base_path(), // this gets overriden on the fly by the image generator

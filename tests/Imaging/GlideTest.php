@@ -2,11 +2,11 @@
 
 namespace Tests\Imaging;
 
-use Facades\Statamic\Imaging\GlideServer;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Statamic\Contracts\Imaging\UrlBuilder;
+use Statamic\Facades\Glide;
 use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\StaticUrlBuilder;
 use Tests\TestCase;
@@ -22,13 +22,13 @@ class GlideTest extends TestCase
             'statamic.assets.image_manipulation.cache_path' => public_path('img'), // irrelevant
         ]);
 
-        $cache = GlideServer::create()->getCache();
+        $cache = Glide::server()->getCache();
 
         $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($cache));
         $this->assertEquals('public', $this->defaultFolderVisibility($cache));
         $this->assertEquals(storage_path('statamic/glide').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
         $this->assertInstanceOf(GlideUrlBuilder::class, $this->app[UrlBuilder::class]);
-        $this->assertEquals('/imgs', GlideServer::url());
+        $this->assertEquals('/imgs', Glide::url());
     }
 
     /** @test */
@@ -40,13 +40,13 @@ class GlideTest extends TestCase
             'statamic.assets.image_manipulation.cache_path' => public_path('imgcache'),
         ]);
 
-        $cache = GlideServer::create()->getCache();
+        $cache = Glide::server()->getCache();
 
         $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($cache));
         $this->assertEquals('public', $this->defaultFolderVisibility($cache));
         $this->assertEquals(public_path('imgcache').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
         $this->assertInstanceOf(StaticUrlBuilder::class, $this->app[UrlBuilder::class]);
-        $this->assertEquals('/imgs', GlideServer::url());
+        $this->assertEquals('/imgs', Glide::url());
     }
 
     /** @test */
@@ -61,7 +61,7 @@ class GlideTest extends TestCase
             'statamic.assets.image_manipulation.cache_path' => null,
         ]);
 
-        GlideServer::create()->getCache();
+        Glide::server()->getCache();
     }
 
     /** @test */
@@ -77,12 +77,12 @@ class GlideTest extends TestCase
             ],
         ]);
 
-        $cache = GlideServer::create()->getCache();
+        $cache = Glide::server()->getCache();
 
         $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($cache));
         $this->assertEquals(public_path('diskimgroot').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
         $this->assertInstanceOf(StaticUrlBuilder::class, $this->app[UrlBuilder::class]);
-        $this->assertEquals('http://the-glide-url', GlideServer::url());
+        $this->assertEquals('http://the-glide-url', Glide::url());
     }
 
     /** @test */
@@ -93,7 +93,7 @@ class GlideTest extends TestCase
 
         config(['statamic.assets.image_manipulation.cache' => 'glidecache']);
 
-        GlideServer::create()->getCache();
+        Glide::server()->getCache();
     }
 
     private function assertLocalAdapter($adapter)

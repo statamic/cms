@@ -2,12 +2,12 @@
 
 namespace Statamic\Providers;
 
-use Facades\Statamic\Imaging\GlideServer;
 use Illuminate\Support\ServiceProvider;
 use League\Glide\Server;
 use Statamic\Contracts\Imaging\ImageManipulator;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Config;
+use Statamic\Facades\Glide;
 use Statamic\Facades\Image;
 use Statamic\Imaging\GlideImageManipulator;
 use Statamic\Imaging\GlideUrlBuilder;
@@ -32,7 +32,7 @@ class GlideServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Server::class, function () {
-            return GlideServer::create();
+            return Glide::server();
         });
 
         $this->app->bind(PresetGenerator::class, function ($app) {
@@ -45,15 +45,15 @@ class GlideServiceProvider extends ServiceProvider
 
     private function getBuilder()
     {
-        if (GlideServer::shouldServeDirectly()) {
+        if (Glide::shouldServeDirectly()) {
             return new StaticUrlBuilder($this->app->make(ImageGenerator::class), [
-                'route' => GlideServer::url(),
+                'route' => Glide::url(),
             ]);
         }
 
         return new GlideUrlBuilder([
             'key' => (Config::get('statamic.assets.image_manipulation.secure')) ? Config::getAppKey() : null,
-            'route' => GlideServer::url(),
+            'route' => Glide::url(),
         ]);
     }
 
