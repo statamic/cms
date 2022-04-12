@@ -76,11 +76,21 @@ class GlideManager
         return (bool) Config::get('statamic.assets.image_manipulation.cache');
     }
 
+    public function shouldServeByHttp()
+    {
+        return ! $this->shouldServeDirectly();
+    }
+
+    public function route()
+    {
+        return Config::get('statamic.assets.image_manipulation.route');
+    }
+
     public function url()
     {
         $url = $this->wantsCustomFilesystem()
             ? self::cacheDisk()->url('/')
-            : Str::start(Config::get('statamic.assets.image_manipulation.route'), '/');
+            : Str::start(self::route(), '/');
 
         return Str::removeRight($url, '/');
     }
