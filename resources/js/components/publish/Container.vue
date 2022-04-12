@@ -118,7 +118,9 @@ export default {
                         state.hiddenFields[field.dottedKey] = field.hidden;
                     },
                     setFieldSubmitsJson(state, dottedKey) {
-                        state.jsonSubmittingFields.push(dottedKey);
+                        if (state.jsonSubmittingFields.indexOf(dottedKey) === -1) {
+                            state.jsonSubmittingFields.push(dottedKey);
+                        }
                     },
                     setMeta(state, meta) {
                         state.meta = meta;
