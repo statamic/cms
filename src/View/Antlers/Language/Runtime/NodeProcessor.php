@@ -540,7 +540,7 @@ class NodeProcessor
 
                 // If the path reference has more than one part,
                 // it is something like {{ products.0.name }}
-                if ($node->pathReference != null && count($node->pathReference->pathParts) > 1) {
+                if ($node->pathReference != null && count($node->pathReference->pathParts) > 1 && $node->isPaired() == false) {
                     return false;
                 }
 
@@ -1372,7 +1372,13 @@ class NodeProcessor
                             'tag_method' => $tagMethod,
                         ]);
 
-                        $output = call_user_func([$tag, $node->name->getRuntimeMethodName()]);
+                        $methodToCall = $node->name->getRuntimeMethodName();
+
+                        if ($this->encounteredBuilder) {
+                            $methodToCall = 'index';
+                        }
+
+                        $output = call_user_func([$tag, $methodToCall]);
 
                         // While the PathDataManager can resolve builder instances,
                         // we will handle this case here so that the values can
