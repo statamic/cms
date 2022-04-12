@@ -555,8 +555,6 @@ class FieldsTest extends TestCase
 
         $fields = $fields->addValues(['one' => 'foo']);
 
-        $this->assertTrue($fields->get('one')->isFilled());
-        $this->assertFalse($fields->get('two')->isFilled());
         $this->assertEquals(['one' => 'foo', 'two' => null], $fields->values()->all());
         $this->assertEquals(['one' => 'foo'], $fields->validatableValues()->all());
     }
@@ -564,8 +562,7 @@ class FieldsTest extends TestCase
     /** @test */
     public function it_processes_each_fields_values_by_its_fieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
-        {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
             public function process($data)
             {
                 return $data.' processed';
@@ -604,8 +601,7 @@ class FieldsTest extends TestCase
     /** @test */
     public function it_preprocesses_each_fields_values_by_its_fieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
-        {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
             public function preProcess($data)
             {
                 return $data.' preprocessed';
@@ -644,8 +640,7 @@ class FieldsTest extends TestCase
     /** @test */
     public function it_augments_each_fields_values_by_its_fieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
-        {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
             public function augment($data)
             {
                 return $data.' augmented';
@@ -701,8 +696,7 @@ class FieldsTest extends TestCase
     /** @test */
     public function it_gets_meta_data_from_all_fields()
     {
-        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
-        {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
             public function preload()
             {
                 return 'meta data from field '.$this->field->handle().' is '.($this->field->value() * 2);
