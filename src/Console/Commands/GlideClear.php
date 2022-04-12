@@ -45,11 +45,6 @@ class GlideClear extends Command
         // Clean up subfolders.
         Folder::deleteEmptySubfolders($cachePath);
 
-        // Remove the cached keys so the middleware doesn't try to load a non existent image.
-        collect(Cache::get('glide::paths', []))->keys()->each(function ($key) {
-            Cache::forget("glide::paths.$key");
-        });
-
         $this->info('Your Glide image cache is now so very, very empty.');
     }
 }
