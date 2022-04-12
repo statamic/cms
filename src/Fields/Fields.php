@@ -15,6 +15,7 @@ class Fields
     protected $fields;
     protected $parent;
     protected $parentField;
+    protected $filled;
 
     public function __construct($items = [], $parent = null, $parentField = null)
     {
@@ -58,6 +59,13 @@ class Fields
         return $this;
     }
 
+    public function setFilled($dottedKeys)
+    {
+        $this->filled = $dottedKeys;
+
+        return $this;
+    }
+
     public function items()
     {
         return $this->items;
@@ -84,7 +92,8 @@ class Fields
             ->setParent($this->parent)
             ->setParentField($this->parentField)
             ->setItems($this->items)
-            ->setFields($this->fields);
+            ->setFields($this->fields)
+            ->setFilled($this->filled);
     }
 
     public function localizable()
@@ -118,13 +127,13 @@ class Fields
 
     public function addValues(array $values)
     {
+        $filled = array_keys($values);
+
         $fields = $this->fields->map(function ($field) use ($values) {
-            return Arr::has($values, $field->handle())
-                ? $field->newInstance()->fillValue(Arr::get($values, $field->handle()))
-                : $field->newInstance();
+            return $field->newInstance()->setValue(Arr::get($values, $field->handle()));
         });
 
-        return $this->newInstance()->setFields($fields);
+        return $this->newInstance()->setFilled($filled)->setFields($fields);
     }
 
     public function values()
@@ -136,8 +145,8 @@ class Fields
 
     public function validatableValues()
     {
-        return $this->values()->filter(function ($value, $handle) {
-            return $this->fields->get($handle)->isFilled();
+        return $this->values()->filter(function ($field, $handle) {
+            return in_array($handle, $this->filled);
         });
     }
 
