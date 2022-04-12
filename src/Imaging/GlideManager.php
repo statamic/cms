@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\ServerFactory;
 use Statamic\Facades\Config;
@@ -82,5 +83,17 @@ class GlideManager
             : Str::start(Config::get('statamic.assets.image_manipulation.route'), '/');
 
         return Str::removeRight($url, '/');
+    }
+
+    public function cacheStore()
+    {
+        if (! config()->has('cache.stores.glide')) {
+            config(['cache.stores.glide' => [
+                'driver' => 'file',
+                'path' => storage_path('framework/cache/glide'),
+            ]]);
+        }
+
+        return Cache::store('glide');
     }
 }

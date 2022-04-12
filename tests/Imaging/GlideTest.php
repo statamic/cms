@@ -2,6 +2,8 @@
 
 namespace Tests\Imaging;
 
+use Illuminate\Cache\FileStore;
+use Illuminate\Contracts\Cache\Repository;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -94,6 +96,31 @@ class GlideTest extends TestCase
         config(['statamic.assets.image_manipulation.cache' => 'glidecache']);
 
         Glide::server()->getCache();
+    }
+
+    /** @test */
+    public function it_gets_the_glide_cache_store()
+    {
+        config(['cache.stores.glide' => [
+            'driver' => 'file',
+            'path' => $path = storage_path('custom-glide-store-location'),
+        ]]);
+
+        $cache = Glide::cacheStore();
+
+        $this->assertInstanceOf(Repository::class, $cache);
+        $this->assertInstanceOf(FileStore::class, $cache->getStore());
+        $this->assertEquals($path, $cache->getStore()->getDirectory());
+    }
+
+    /** @test */
+    public function it_creates_a_glide_cache_store_on_the_fly_if_undefined()
+    {
+        $cache = Glide::cacheStore();
+
+        $this->assertInstanceOf(Repository::class, $cache);
+        $this->assertInstanceOf(FileStore::class, $cache->getStore());
+        $this->assertEquals(storage_path('framework/cache/glide'), $cache->getStore()->getDirectory());
     }
 
     private function assertLocalAdapter($adapter)
