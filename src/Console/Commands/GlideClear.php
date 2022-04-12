@@ -34,6 +34,8 @@ class GlideClear extends Command
      */
     public function handle()
     {
+        $this->clearCache();
+
         $disk = File::disk(Glide::cacheDisk());
 
         $files = $this->getFiles($disk);
@@ -45,6 +47,12 @@ class GlideClear extends Command
         $this->deleteEmptyDirectories($disk);
 
         $this->info('Your Glide image cache is now so very, very empty.');
+    }
+
+    private function clearCache()
+    {
+        Glide::cacheStore()->flush();
+        $this->line('<info>[✔]</info> Glide path cache cleared.');
     }
 
     private function getFiles(Filesystem $disk)
