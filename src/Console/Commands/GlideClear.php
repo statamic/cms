@@ -3,11 +3,11 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
-use Statamic\Facades\Folder;
 use Statamic\Facades\Glide;
+use Statamic\Filesystem\Filesystem;
+use Statamic\Support\FileCollection;
 
 class GlideClear extends Command
 {
@@ -34,17 +34,50 @@ class GlideClear extends Command
      */
     public function handle()
     {
-        // Get the glide server cache path.
-        $cachePath = Glide::cachePath();
+        $disk = File::disk(Glide::cacheDisk());
 
-        // Delete the cached images.
-        collect(Folder::getFilesRecursively($cachePath))->each(function ($path) {
-            File::delete($path);
-        });
+        $files = $this->getFiles($disk);
 
-        // Clean up subfolders.
-        Folder::deleteEmptySubfolders($cachePath);
+        if (! $files->isEmpty()) {
+            $this->deleteImages($disk, $files);
+        }
+
+        $this->deleteEmptyDirectories($disk);
 
         $this->info('Your Glide image cache is now so very, very empty.');
+    }
+
+    private function getFiles(Filesystem $disk)
+    {
+        $this->line('Counting images to delete...');
+
+        $files = $disk->getFilesRecursively('/');
+
+        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Found {$files->count()} images.");
+
+        return $files;
+    }
+
+    private function deleteImages(Filesystem $disk, FileCollection $files)
+    {
+        $bar = $this->output->createProgressBar($files->count());
+        $bar->setFormat('[%current%/%max%] Deleting <comment>%path%</comment>...');
+
+        $files->each(function ($path) use ($disk, $bar) {
+            $bar->setMessage($path, 'path');
+            $disk->delete($path);
+            $bar->advance();
+        });
+
+        $bar->setFormat('<info>[✔]</info> Images deleted.');
+        $bar->finish();
+        $this->line('');
+    }
+
+    private function deleteEmptyDirectories(Filesystem $disk)
+    {
+        $this->line('Removing empty directories...');
+        $disk->deleteEmptySubfolders('/');
+        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Deleted empty directories.");
     }
 }
