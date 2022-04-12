@@ -1,5 +1,4 @@
 import { clone } from  '../../bootstrap/globals.js'
-import { data_get } from  '../../bootstrap/globals.js'
 
 export default class {
     constructor(values, jsonFields) {
@@ -44,15 +43,19 @@ export default class {
     }
 
     missingValue(dottedKey) {
-        return data_get(clone(this.values), dottedKey) === null;
+        var properties = Array.isArray(dottedKey) ? dottedKey : dottedKey.split('.');
+        var value = properties.reduce((prev, curr) => prev && prev[curr], clone(this.values));
+
+        return value === undefined;
     }
 
     jsonDecodeValue(dottedKey) {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let decodedFieldValue = JSON.parse(data_get(values, dottedKey));
         let jsPath = this.dottedKeyToJsPath(dottedKey);
+        let fieldValue = eval('values.' + jsPath);
+        let decodedFieldValue = JSON.parse(fieldValue);
 
         eval('values.' + jsPath + ' = decodedFieldValue');
 
@@ -63,8 +66,9 @@ export default class {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let encodedFieldValue = JSON.stringify(data_get(values, dottedKey));
         let jsPath = this.dottedKeyToJsPath(dottedKey);
+        let fieldValue = eval('values.' + jsPath);
+        let encodedFieldValue = JSON.stringify(fieldValue);
 
         eval('values.' + jsPath + ' = encodedFieldValue');
 

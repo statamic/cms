@@ -144,6 +144,27 @@ test('it omits nested json field values', () => {
     expect(omitted).toEqual(expected);
 });
 
+test('it omits null hidden values', () => {
+    let values = {
+        first_name: 'Han',
+        last_name: 'Solo',
+        ship: 'Falcon',
+        bff: null, // this is null, but should still get removed
+    };
+
+    let omitted = new Omitter(values).omit([
+        'last_name',
+        'bff',
+    ]);
+
+    let expected = {
+        first_name: 'Han',
+        ship: 'Falcon',
+    };
+
+    expect(new Omitter(values).omit(['last_name', 'bff'])).toEqual(expected);
+});
+
 test('it doesnt error when operating on non-existent keys', () => {
     let values = {
         first_name: 'Han',
