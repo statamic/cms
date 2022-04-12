@@ -165,7 +165,7 @@ test('it omits null hidden values', () => {
     expect(new Omitter(values).omit(['last_name', 'bff'])).toEqual(expected);
 });
 
-test('it doesnt error when operating on non-existent keys', () => {
+test('it gracefully handles errors', () => {
     let values = {
         first_name: 'Han',
         last_name: 'Solo',
@@ -179,6 +179,7 @@ test('it doesnt error when operating on non-existent keys', () => {
 
     let jsonFields = [
         'bffs',
+        'bffs',         // duplicate field
         'middle_name',  // non-existent field
         'bffs.0.crush', // non-existent field
     ];
@@ -187,6 +188,7 @@ test('it doesnt error when operating on non-existent keys', () => {
         'last_name',
         'middle_name',  // non-existent field
         'bffs.0.name',
+        'bffs.0.name',  // duplicate field
         'bffs.1.name',  // non-existent field
         'bffs.0.crush', // non-existent field
         'bffs.0.crush.0.name', // non-existent field

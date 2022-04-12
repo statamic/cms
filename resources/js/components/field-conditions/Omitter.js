@@ -3,7 +3,10 @@ import { clone } from  '../../bootstrap/globals.js'
 export default class {
     constructor(values, jsonFields) {
         this.values = clone(values);
-        this.jsonFields = clone(jsonFields || []).sort();
+
+        this.jsonFields = clone(jsonFields || [])
+            .filter((field, index) => jsonFields.indexOf(field) === index)
+            .sort();
     }
 
     omit(hiddenKeys) {
