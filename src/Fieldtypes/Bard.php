@@ -438,7 +438,7 @@ class Bard extends Replicator
             $processed = $this->fields($values['type'])
                 ->addValues($values)
                 ->preProcessValidatables()
-                ->values()
+                ->validatableValues()
                 ->all();
 
             $item['attrs']['values'] = array_merge($values, $processed);
