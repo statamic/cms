@@ -143,3 +143,42 @@ test('it omits nested json field values', () => {
 
     expect(omitted).toEqual(expected);
 });
+
+test('it doesnt error when operating on non-existent keys', () => {
+    let values = {
+        first_name: 'Han',
+        last_name: 'Solo',
+        bffs: JSON.stringify([
+            {
+                name: 'Chewy',
+                type: 'Wookie',
+            },
+        ]),
+    };
+
+    let jsonFields = [
+        'bffs',
+        'middle_name',  // non-existent field
+        'bffs.0.crush', // non-existent field
+    ];
+
+    let omitted = new Omitter(values, jsonFields).omit([
+        'last_name',
+        'middle_name',  // non-existent field
+        'bffs.0.name',
+        'bffs.1.name',  // non-existent field
+        'bffs.0.crush', // non-existent field
+        'bffs.0.crush.0.name', // non-existent field
+    ]);
+
+    let expected = {
+        first_name: 'Han',
+        bffs: JSON.stringify([
+            {
+                type: 'Wookie',
+            },
+        ]),
+    };
+
+    expect(omitted).toEqual(expected);
+});

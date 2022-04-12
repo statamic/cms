@@ -1,4 +1,5 @@
 import { clone } from  '../../bootstrap/globals.js'
+import { data_get } from  '../../bootstrap/globals.js'
 
 export default class {
     constructor(values, jsonFields) {
@@ -42,11 +43,16 @@ export default class {
         return dottedKey.replace(/\.*(\d+)\./g, '[$1].');
     }
 
+    missingValue(dottedKey) {
+        return data_get(clone(this.values), dottedKey) === null;
+    }
+
     jsonDecodeValue(dottedKey) {
+        if (this.missingValue(dottedKey)) return;
+
         let values = clone(this.values);
+        let decodedFieldValue = JSON.parse(data_get(values, dottedKey));
         let jsPath = this.dottedKeyToJsPath(dottedKey);
-        let value = eval('values.' + jsPath);
-        let decodedFieldValue = JSON.parse(value);
 
         eval('values.' + jsPath + ' = decodedFieldValue');
 
@@ -54,10 +60,11 @@ export default class {
     }
 
     jsonEncodeValue(dottedKey) {
+        if (this.missingValue(dottedKey)) return;
+
         let values = clone(this.values);
+        let encodedFieldValue = JSON.stringify(data_get(values, dottedKey));
         let jsPath = this.dottedKeyToJsPath(dottedKey);
-        let fieldValue = eval('values.' + jsPath);
-        let encodedFieldValue = JSON.stringify(fieldValue);
 
         eval('values.' + jsPath + ' = encodedFieldValue');
 
@@ -65,6 +72,8 @@ export default class {
     }
 
     forgetValue(dottedKey) {
+        if (this.missingValue(dottedKey)) return;
+
         let values = clone(this.values);
         let jsPath = this.dottedKeyToJsPath(dottedKey);
 
