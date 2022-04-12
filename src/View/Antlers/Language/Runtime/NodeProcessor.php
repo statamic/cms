@@ -1632,6 +1632,15 @@ class NodeProcessor
                             $runtimeResult = $environment->evaluate($node->parsedRuntimeNodes);
                             $this->data = $restoreData;
 
+                            // If the environment processed modifiers for the current node
+                            // and the node does _not_ have parameters, we will set the
+                            // $runtimeResolveModifiedValue flag to true to prevent
+                            // the NodeProcessor from attempting to evaluate the
+                            // modifier chain again down below before loops.
+                            if (! $node->hasParameters && $environment->getDidEvaluateModifiers()) {
+                                $runtimeResolveModifiedValue = true;
+                            }
+
                             if (is_string($runtimeResult) && $node->hasProcessedInterpolationRegions) {
                                 $interpolationScope = $this->getActiveData();
 
