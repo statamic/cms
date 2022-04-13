@@ -235,7 +235,7 @@ class Grid extends Fieldtype
             $processed = $this->fields()
                 ->addValues($values)
                 ->preProcessValidatables()
-                ->validatableValues()
+                ->values()
                 ->all();
 
             return array_merge($values, $processed);

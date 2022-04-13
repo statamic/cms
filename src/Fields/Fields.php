@@ -16,6 +16,7 @@ class Fields
     protected $parent;
     protected $parentField;
     protected $filled;
+    protected $withValidatableValues = false;
 
     public function __construct($items = [], $parent = null, $parentField = null)
     {
@@ -62,6 +63,13 @@ class Fields
     public function setFilled($dottedKeys)
     {
         $this->filled = $dottedKeys;
+
+        return $this;
+    }
+
+    public function withValidatableValues()
+    {
+        $this->withValidatableValues = true;
 
         return $this;
     }
@@ -138,16 +146,17 @@ class Fields
 
     public function values()
     {
-        return $this->fields->mapWithKeys(function ($field) {
+        $values = $this->fields->mapWithKeys(function ($field) {
             return [$field->handle() => $field->value()];
         });
-    }
 
-    public function validatableValues()
-    {
-        return $this->values()->filter(function ($field, $handle) {
-            return in_array($handle, $this->filled);
-        });
+        if ($this->withValidatableValues) {
+            $values = $values->filter(function ($field, $handle) {
+                return in_array($handle, $this->filled);
+            });
+        }
+
+        return $values;
     }
 
     public function process()
@@ -168,7 +177,7 @@ class Fields
     {
         return $this->newInstance()->setFields(
             $this->fields->map->preProcessValidatable()
-        );
+        )->withValidatableValues();
     }
 
     public function augment()

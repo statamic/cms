@@ -253,7 +253,7 @@ class Replicator extends Fieldtype
             $processed = $this->fields($values['type'])
                 ->addValues($values)
                 ->preProcessValidatables()
-                ->validatableValues()
+                ->values()
                 ->all();
 
             return array_merge($values, $processed);

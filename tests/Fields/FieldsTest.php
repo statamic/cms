@@ -556,7 +556,7 @@ class FieldsTest extends TestCase
         $fields = $fields->addValues(['one' => 'foo']);
 
         $this->assertEquals(['one' => 'foo', 'two' => null], $fields->values()->all());
-        $this->assertEquals(['one' => 'foo'], $fields->validatableValues()->all());
+        $this->assertEquals(['one' => 'foo'], $fields->preProcessValidatables()->values()->all());
     }
 
     /** @test */
