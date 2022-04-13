@@ -33,9 +33,19 @@ class GlideImageManipulatorTest extends TestCase
      * @test
      * @dataProvider paramProvider
      */
-    public function testAddsParams($param)
+    public function adds_standard_api_params($param)
     {
         $this->man->setParam($param, 'value');
+        $this->assertArrayHasKey($param, $this->man->getParams());
+    }
+
+    /**
+     * @test
+     * @dataProvider paramProvider
+     */
+    public function adds_standard_api_params_using_magic_method($param)
+    {
+        $this->man->$param('value');
         $this->assertArrayHasKey($param, $this->man->getParams());
     }
 
@@ -71,57 +81,51 @@ class GlideImageManipulatorTest extends TestCase
         ];
     }
 
-    public function testCannotAddNonGlideParam()
+    /** @test */
+    public function cannot_add_invalid_glide_param()
     {
         $this->expectException('Exception');
         $this->expectExceptionMessage('Glide URL parameter [foo] does not exist.');
         $this->man->setParam('foo', 'bar');
     }
 
-    public function testCannotAddNonGlideParamUsingAlias()
+    /** @test */
+    public function cannot_add_invalid_glide_param_using_magic_method()
     {
         $this->expectException('Exception');
         $this->expectExceptionMessage('Glide URL parameter [foo] does not exist.');
         $this->man->foo('bar');
     }
 
-    public function testAddsParamsUsingAliases()
+    /**
+     * @test
+     * @dataProvider aliasProvider
+     */
+    public function testAddsParamsUsingAliases($alias, $value, $expected)
     {
-        $this->man->width(10);
-        $this->assertArraySubset(['w' => 10], $this->man->getParams());
-
-        $this->man->height(10);
-        $this->assertArraySubset(['h' => 10], $this->man->getParams());
-
-        $this->man->square(50);
-        $this->assertArraySubset(['w' => 50, 'h' => 50], $this->man->getParams());
-
-        $this->man->orient('landscape');
-        $this->assertArraySubset(['or' => 'landscape'], $this->man->getParams());
-
-        $this->man->brightness(50);
-        $this->assertArraySubset(['bri' => 50], $this->man->getParams());
-
-        $this->man->contrast(50);
-        $this->assertArraySubset(['con' => 50], $this->man->getParams());
-
-        $this->man->gamma(50);
-        $this->assertArraySubset(['gam' => 50], $this->man->getParams());
-
-        $this->man->sharpen(50);
-        $this->assertArraySubset(['sharp' => 50], $this->man->getParams());
-
-        $this->man->pixelate(50);
-        $this->assertArraySubset(['pixel' => 50], $this->man->getParams());
-
-        $this->man->filter(50);
-        $this->assertArraySubset(['filt' => 50], $this->man->getParams());
-
-        $this->man->quality(50);
-        $this->assertArraySubset(['q' => 50], $this->man->getParams());
+        $this->man->$alias($value);
+        $this->assertArraySubset($expected, $this->man->getParams());
     }
 
-    public function testFocalCropUsesAssetValue()
+    public function aliasProvider()
+    {
+        return [
+            'width' => ['width', 10, ['w' => 10]],
+            'height' => ['height', 10, ['h' => 10]],
+            'square' => ['square', 50, ['w' => 50, 'h' => 50]],
+            'orient' => ['orient', 90, ['or' => 90]],
+            'brightness' => ['brightness', 50, ['bri' => 50]],
+            'contrast' => ['contrast', 50, ['con' => 50]],
+            'gamma' => ['gamma', 50, ['gam' => 50]],
+            'sharpen' => ['sharpen', 50, ['sharp' => 50]],
+            'pixelate' => ['pixelate', 50, ['pixel' => 50]],
+            'filter' => ['filter', 'sepia', ['filt' => 'sepia']],
+            'quality' => ['quality', 50, ['q' => 50]],
+        ];
+    }
+
+    /** @test */
+    public function focal_crop_uses_asset_value()
     {
         $asset = $this->mock(Asset::class);
         $asset->shouldReceive('get')->with('focus')->andReturn('60-40');
@@ -132,7 +136,8 @@ class GlideImageManipulatorTest extends TestCase
         $this->assertEquals('crop-60-40', array_get($this->man->getParams(), 'fit'));
     }
 
-    public function testFocalCropJustUsesCropIfNoValueExists()
+    /** @test */
+    public function focal_crop_just_uses_crop_if_no_value_exists()
     {
         $asset = $this->mock(Asset::class);
         $asset->shouldReceive('get')->with('focus')->andReturnNull();
