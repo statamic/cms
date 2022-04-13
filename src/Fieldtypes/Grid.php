@@ -163,7 +163,7 @@ class Grid extends Fieldtype
         $attributes = $this->fields()->validator()->attributes();
 
         return collect($this->field->value())->map(function ($row, $index) use ($attributes) {
-            return collect($attributes)->except('_id')->mapWithKeys(function ($attribute, $handle) use ($attributes, $index) {
+            return collect($attributes)->except('_id')->mapWithKeys(function ($attribute, $handle) use ($index) {
                 return [$this->rowRuleFieldPrefix($index).'.'.$handle => $attribute];
             });
         })->reduce(function ($carry, $rules) {
