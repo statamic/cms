@@ -8,12 +8,17 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
 use Statamic\Events\GlideImageGenerated;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
+use Statamic\Imaging\GuzzleAdapter;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\LegacyGuzzleAdapter;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -155,6 +160,80 @@ class ImageGeneratorTest extends TestCase
     }
 
     /** @test */
+    public function without_a_mark_param_there_is_no_watermarks_disk()
+    {
+        $generator = $this->makeGenerator();
+
+        $filesystem = $this->getWatermarkFilesystem($generator);
+
+        $this->assertNull($filesystem);
+    }
+
+    /** @test */
+    public function the_watermark_disk_is_the_container_when_an_asset_is_provided()
+    {
+        // Make the asset to be used as the watermark.
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        $generator = $this->makeGenerator();
+
+        $generator->setParams(['mark' => $asset]);
+
+        $filesystem = $this->getWatermarkFilesystem($generator);
+
+        $this->assertSame($container->disk()->filesystem()->getDriver(), $filesystem);
+        $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
+    }
+
+    /** @test */
+    public function the_watermark_disk_is_a_local_adapter_when_a_path_is_provided()
+    {
+        $generator = $this->makeGenerator();
+
+        $generator->setParams(['mark' => 'foo/hoff.jpg']);
+
+        $filesystem = $this->getWatermarkFilesystem($generator);
+
+        $this->assertLocalAdapter($adapter = $filesystem->getAdapter());
+        $this->assertEquals(public_path().DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
+        $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
+    }
+
+    /**
+     * @test
+     * @dataProvider guzzleWatermarkProvider
+     */
+    public function the_watermark_disk_is_a_guzzle_adapter_when_a_url_is_provided($protocol)
+    {
+        $generator = $this->makeGenerator();
+
+        $generator->setParams(['mark' => $protocol.'://example.com/foo/hoff.jpg']);
+
+        $filesystem = $this->getWatermarkFilesystem($generator);
+
+        $this->assertGuzzleAdapter($filesystem->getAdapter());
+        $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
+    }
+
+    public function guzzleWatermarkProvider()
+    {
+        return ['http' => ['http'], 'https' => ['https']];
+    }
+
+    private function getWatermarkFilesystem(ImageGenerator $generator)
+    {
+        $manipulators = $generator->getServer()->getApi()->getManipulators();
+
+        $watermark = collect($manipulators)->first(fn ($m) => $m instanceof Watermark);
+
+        return $watermark->getWatermarks();
+    }
+
+    /** @test */
     public function it_validates_an_asset()
     {
         $this->markTestIncomplete();
@@ -194,5 +273,42 @@ class ImageGeneratorTest extends TestCase
         ksort($params);
 
         return md5($basename.'?'.http_build_query($params));
+    }
+
+    private function assertLocalAdapter($adapter)
+    {
+        if ($this->isUsingFlysystemV1()) {
+            return $this->assertInstanceOf(Local::class, $adapter);
+        }
+
+        $this->assertInstanceOf(LocalFilesystemAdapter::class, $adapter);
+    }
+
+    private function assertGuzzleAdapter($adapter)
+    {
+        if ($this->isUsingFlysystemV1()) {
+            return $this->assertInstanceOf(LegacyGuzzleAdapter::class, $adapter);
+        }
+
+        $this->assertInstanceOf(GuzzleAdapter::class, $adapter);
+    }
+
+    private function isUsingFlysystemV1()
+    {
+        return class_exists('\League\Flysystem\Util');
+    }
+
+    private function getRootFromLocalAdapter($adapter)
+    {
+        if ($this->isUsingFlysystemV1()) {
+            return $adapter->getPathPrefix();
+        }
+
+        $reflection = new \ReflectionClass($adapter);
+        $property = $reflection->getProperty('prefixer');
+        $property->setAccessible(true);
+        $prefixer = $property->getValue($adapter);
+
+        return $prefixer->prefixPath('');
     }
 }
