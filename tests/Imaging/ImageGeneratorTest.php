@@ -190,6 +190,26 @@ class ImageGeneratorTest extends TestCase
     }
 
     /** @test */
+    public function the_watermark_disk_is_the_container_when_an_asset_encoded_url_string_is_provided()
+    {
+        // Make the asset to be used as the watermark.
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        $generator = $this->makeGenerator();
+
+        $generator->setParams(['mark' => 'asset::'.base64_encode('test_container/foo/hoff.jpg')]);
+
+        $filesystem = $this->getWatermarkFilesystem($generator);
+
+        $this->assertSame($container->disk()->filesystem()->getDriver(), $filesystem);
+        $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
+    }
+
+    /** @test */
     public function the_watermark_disk_is_a_local_adapter_when_a_path_is_provided()
     {
         $generator = $this->makeGenerator();

@@ -12,6 +12,7 @@ use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Events\GlideImageGenerated;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Asset as Assets;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
@@ -183,6 +184,12 @@ class ImageGenerator
 
     private function getWatermarkFilesystemAndParam($item)
     {
+        if (is_string($item) && Str::startsWith($item, 'asset::')) {
+            $decoded = base64_decode(Str::after($item, 'asset::'));
+            [$container, $path] = explode('/', $decoded, 2);
+            $item = Assets::find($container.'::'.$path);
+        }
+
         if ($item instanceof Asset) {
             return [$item->disk()->filesystem()->getDriver(), $item->path()];
         }
