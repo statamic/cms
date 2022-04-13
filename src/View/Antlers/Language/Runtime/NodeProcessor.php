@@ -1715,6 +1715,10 @@ class NodeProcessor
                                 $val = $runtimeResult;
                             } else {
                                 if (! $runtimeResult instanceof Builder) {
+                                    if ($runtimeResult === null) {
+                                        continue;
+                                    }
+
                                     if ($this->guardRuntime($node, $runtimeResult)) {
                                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($runtimeResult));
                                     }
