@@ -29,10 +29,46 @@ class GlideImageManipulatorTest extends TestCase
         );
     }
 
-    public function testAddsParams()
+    /**
+     * @test
+     * @dataProvider paramProvider
+     */
+    public function testAddsParams($param)
     {
-        $this->man->setParam('w', 100);
-        $this->assertArrayHasKey('w', $this->man->getParams());
+        $this->man->setParam($param, 'value');
+        $this->assertArrayHasKey($param, $this->man->getParams());
+    }
+
+    public function paramProvider()
+    {
+        return [
+            'or' => ['or'],
+            'crop' => ['crop'],
+            'w' => ['w'],
+            'h' => ['h'],
+            'fit' => ['fit'],
+            'dpr' => ['dpr'],
+            'bri' => ['bri'],
+            'con' => ['con'],
+            'gam' => ['gam'],
+            'sharp' => ['sharp'],
+            'blur' => ['blur'],
+            'pixel' => ['pixel'],
+            'filt' => ['filt'],
+            'mark' => ['mark'],
+            'markw' => ['markw'],
+            'markx' => ['markx'],
+            'marky' => ['marky'],
+            'markpad' => ['markpad'],
+            'markpos' => ['markpos'],
+            'markfit' => ['markfit'],
+            'markalpha' => ['markalpha'],
+            'bg' => ['bg'],
+            'border' => ['border'],
+            'q' => ['q'],
+            'fm' => ['fm'],
+            'p' => ['p'],
+        ];
     }
 
     public function testCannotAddNonGlideParam()
