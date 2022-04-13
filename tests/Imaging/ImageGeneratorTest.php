@@ -218,7 +218,7 @@ class ImageGeneratorTest extends TestCase
 
         $filesystem = $this->getWatermarkFilesystem($generator);
 
-        $this->assertLocalAdapter($adapter = $filesystem->getAdapter());
+        $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($filesystem));
         $this->assertEquals(public_path().DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
@@ -235,7 +235,7 @@ class ImageGeneratorTest extends TestCase
 
         $filesystem = $this->getWatermarkFilesystem($generator);
 
-        $this->assertGuzzleAdapter($filesystem->getAdapter());
+        $this->assertGuzzleAdapter($this->getAdapterFromFilesystem($filesystem));
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
 
@@ -330,5 +330,14 @@ class ImageGeneratorTest extends TestCase
         $prefixer = $property->getValue($adapter);
 
         return $prefixer->prefixPath('');
+    }
+
+    private function getAdapterFromFilesystem($filesystem)
+    {
+        $reflection = new \ReflectionClass($filesystem);
+        $property = $reflection->getProperty('adapter');
+        $property->setAccessible(true);
+
+        return $property->getValue($filesystem);
     }
 }
