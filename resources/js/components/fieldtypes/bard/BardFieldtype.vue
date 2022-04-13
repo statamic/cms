@@ -245,7 +245,7 @@ export default {
             if (! this.storeState) return [];
 
             return Object.values(this.setIndexes).filter((setIndex) => {
-                const prefix = `${this.errorKeyPrefix || this.handle}.${setIndex}.`;
+                const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
 
                 return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
             })
@@ -287,7 +287,7 @@ export default {
 
         this.pageHeader = document.querySelector('.global-header');
 
-        this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.errorKeyPrefix || this.handle);
+        this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
 
     beforeDestroy() {

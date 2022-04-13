@@ -4,7 +4,7 @@
         <td class="drag-handle" :class="sortableHandleClass" v-if="grid.isReorderable"></td>
         <grid-cell
             v-for="(field, i) in fields"
-            :show-inner="showField(field, dottedKey(field))"
+            :show-inner="showField(field, fieldPath(field.handle))"
             :key="field.handle"
             :field="field"
             :value="values[field.handle]"
@@ -13,7 +13,7 @@
             :row-index="index"
             :grid-name="name"
             :errors="errors(field.handle)"
-            :error-key="errorKey(field.handle)"
+            :field-path="fieldPath(field.handle)"
             @updated="updated(field.handle, $event)"
             @meta-updated="metaUpdated(field.handle, $event)"
             @focus="$emit('focus')"
@@ -67,7 +67,7 @@ export default {
             type: String,
             required: true
         },
-        errorKeyPrefix: {
+        fieldPathPrefix: {
             type: String
         },
         canDelete: {
@@ -108,19 +108,16 @@ export default {
             this.$emit('meta-updated', meta);
         },
 
-        errorKey(handle) {
-            return `${this.errorKeyPrefix}.${this.index}.${handle}`;
+        fieldPath(handle) {
+            return `${this.fieldPathPrefix}.${this.index}.${handle}`;
         },
 
         errors(handle) {
             const state = this.$store.state.publish[this.storeName];
             if (! state) return [];
-            return state.errors[this.errorKey(handle)] || [];
+            return state.errors[this.fieldPath(handle)] || [];
         },
 
-        dottedKey(field) {
-            return this.errorKey(field.handle);
-        },
     }
 
 }
