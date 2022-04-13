@@ -2,7 +2,6 @@
 
 namespace Statamic\Imaging;
 
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
