@@ -66,6 +66,7 @@ class GlideImageManipulatorTest extends TestCase
             'pixel' => ['pixel'],
             'filt' => ['filt'],
             'mark' => ['mark'],
+            'markh' => ['markh'],
             'markw' => ['markw'],
             'markx' => ['markx'],
             'marky' => ['marky'],

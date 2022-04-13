@@ -59,6 +59,7 @@ class GlideImageManipulator implements ImageManipulator
         'mark',
         'markalpha',
         'markfit',
+        'markh',
         'markpad',
         'markpos',
         'markw',
