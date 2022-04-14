@@ -56,7 +56,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $requiresSlugs = true;
     protected $titleFormats = [];
     protected $previewTargets = [];
-    protected static $extraPreviewTargets = [];
 
     public function __construct()
     {
@@ -718,21 +717,22 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function extraPreviewTargets($targets = null)
     {
-        return $this
-            ->fluentlyGetOrSet('extraPreviewTargets')
-            ->setter(function ($targets) {
-                $targets = collect(self::$extraPreviewTargets[$this->handle] ?? [])
-                    ->merge($targets)
-                    ->unique(function ($target) {
-                        return $target['format'];
-                    })->toArray();
+        if (! $targets) {
+            return \Statamic\Facades\Collection::extraPreviewTargets($this->handle);
+        }
 
-                return array_merge(self::$extraPreviewTargets, [$this->handle => $targets]);
-            })
-            ->getter(function () {
-                return self::$extraPreviewTargets[$this->handle] ?? [];
-            })
-            ->args(func_get_args());
+        \Statamic\Facades\Collection::addExtraPreviewTargets($this->handle, $targets);
+
+        return $this;
+    }
+
+    public function previewTargetsWithoutExtra()
+    {
+        return $this->previewTargets()->filter(function ($target) {
+            return $this->extraPreviewTargets()->doesntContain(function ($extraTarget) use ($target) {
+                return $target['format'] === $extraTarget['format'];
+            });
+        });
     }
 
     private function defaultPreviewTargets()

@@ -12,6 +12,7 @@ class CollectionRepository implements RepositoryContract
 {
     protected $stache;
     protected $store;
+    protected $extraPreviewTargets = [];
 
     public function __construct(Stache $stache)
     {
@@ -98,5 +99,21 @@ class CollectionRepository implements RepositoryContract
         return [
             Collection::class => \Statamic\Entries\Collection::class,
         ];
+    }
+
+    public function addExtraPreviewTargets($handle, $targets)
+    {
+        $targets = collect($this->extraPreviewTargets[$handle] ?? [])
+            ->merge($targets)
+            ->unique(function ($target) {
+                return $target['format'];
+            })->toArray();
+
+        $this->extraPreviewTargets = array_merge($this->extraPreviewTargets, [$handle => $targets]);
+    }
+
+    public function extraPreviewTargets($handle)
+    {
+        return collect($this->extraPreviewTargets[$handle] ?? []);
     }
 }
