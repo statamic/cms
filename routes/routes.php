@@ -25,6 +25,7 @@ if (config('statamic.cp.enabled')) {
         Route::middleware('statamic.cp')
             ->name('statamic.cp.')
             ->prefix(config('statamic.cp.route'))
+            ->domain(config('statamic.cp.domain'))
             ->namespace('Statamic\Http\Controllers\CP')
             ->group(__DIR__.'/cp.php');
     });

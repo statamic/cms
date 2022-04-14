@@ -7,13 +7,15 @@ return [
     | Control Panel
     |--------------------------------------------------------------------------
     |
-    | Whether the Control Panel should be enabled, and through what route.
+    | Whether the Control Panel should be enabled, and through what route and domain.
     |
     */
 
     'enabled' => env('CP_ENABLED', true),
 
     'route' => env('CP_ROUTE', 'cp'),
+
+    'domain' => env('CP_DOMAIN', null),
 
     /*
     |--------------------------------------------------------------------------
