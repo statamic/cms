@@ -91,6 +91,7 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $dataManagerInterpolations = [];
+    protected $evaluatedModifiers = false;
 
     /**
      * @var LanguageOperatorManager|null
@@ -309,6 +310,8 @@ class Environment
      */
     public function evaluate($nodes)
     {
+        $this->evaluatedModifiers = false;
+
         if (count($nodes) == 0) {
             return null;
         }
@@ -318,6 +321,20 @@ class Environment
         }
 
         return $this->process($nodes);
+    }
+
+    private function lock()
+    {
+        if ($this->nodeProcessor != null) {
+            $this->nodeProcessor->createLockData();
+        }
+    }
+
+    private function unlock()
+    {
+        if ($this->nodeProcessor != null) {
+            $this->nodeProcessor->restoreLockedData();
+        }
     }
 
     /**
@@ -332,31 +349,48 @@ class Environment
      */
     public function evaluateBool($nodes)
     {
+        $this->lock();
         $this->isEvaluatingTruthValue = true;
         $result = $this->getValue($this->evaluate($nodes));
         $this->isEvaluatingTruthValue = false;
 
         if (is_object($result)) {
             if ($result instanceof ArrayableString) {
-                return $this->getTruthValue($result->value());
+                $value = $this->getTruthValue($result->value());
+                $this->unlock();
+
+                return $value;
             } elseif ($result instanceof QueryBuilder) {
                 $builderResults = $result->count();
+                $this->unlock();
 
                 return $builderResults > 0;
             } elseif ($result instanceof Collection) {
-                return $result->count() > 0;
+                $value = $result->count() > 0;
+                $this->unlock();
+
+                return $value;
             }
+
+            $this->unlock();
 
             return true;
         }
 
         if (is_bool($result)) {
+            $this->unlock();
+
             return $result;
         }
 
         if (is_numeric($result)) {
-            return $result >= 1;
+            $value = $result >= 1;
+            $this->unlock();
+
+            return $value;
         }
+
+        $this->unlock();
 
         return null;
     }
@@ -1210,7 +1244,14 @@ class Environment
      */
     private function applyModifiers($value, ModifierChainNode $modifierChain)
     {
+        $this->evaluatedModifiers = true;
+
         return ModifierManager::evaluate($value, $this, $modifierChain, $this->data);
+    }
+
+    public function getDidEvaluateModifiers()
+    {
+        return $this->evaluatedModifiers;
     }
 
     /**
@@ -1244,7 +1285,12 @@ class Environment
         if ($value instanceof Value) {
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
+                GlobalRuntimeState::$userContentEvalState = [
+                    $value,
+                    $this->nodeProcessor->getActiveNode(),
+                ];
                 $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                GlobalRuntimeState::$userContentEvalState = null;
             } else {
                 if (! $hasModifiers) {
                     $value = $value->value();
@@ -1347,8 +1393,8 @@ class Environment
         foreach ($argumentGroup->args as $arg) {
             if ($arg instanceof NamedArgumentNode) {
                 // if ($arg->name instanceof VariableNode) {
-                    // TODO: Determine if this system is still useful in other areas.
-                    // $namedArgs[$arg->name->name] = $env->evaluate([$arg->value]);
+                // TODO: Determine if this system is still useful in other areas.
+                // $namedArgs[$arg->name->name] = $env->evaluate([$arg->value]);
                 // }
             } else {
                 $normalArgs[] = $env->evaluate([$arg]);
@@ -1452,7 +1498,7 @@ class Environment
 
             $scopeValue = $this->scopeValue($varName);
 
-            if ($scopeValue instanceof Collection) {
+            if ($scopeValue instanceof Collection && ! $val->hasModifiers()) {
                 $scopeValue = $scopeValue->all();
             }
 

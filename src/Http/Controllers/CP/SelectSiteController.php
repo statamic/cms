@@ -8,6 +8,6 @@ class SelectSiteController extends CpController
     {
         session()->put('statamic.cp.selected-site', $handle);
 
-        return back()->with('success', 'Site selected.');
+        return back()->with('success', __('Site selected.'));
     }
 }

@@ -927,11 +927,16 @@ class LanguageParser
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::STRUCT_SWITCH) {
                     if ($i + 1 >= $tokenCount) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_SWITCH_GROUP,
-                            $token,
-                            'Unexpected end of input while parsing [T_SWITCH_GROUP].'
-                        );
+                        if ($token->originalAbstractNode instanceof VariableNode == false) {
+                            throw ErrorFactory::makeSyntaxError(
+                                AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_SWITCH_GROUP,
+                                $token,
+                                'Unexpected end of input while parsing [T_SWITCH_GROUP].'
+                            );
+                        }
+
+                        $newTokens[] = $token->originalAbstractNode;
+                        continue;
                     }
 
                     /** @var ScopedLogicGroup $next */
@@ -1889,6 +1894,25 @@ class LanguageParser
                     $newNodes[] = $node;
                 }
                 continue;
+            } elseif ($node instanceof SubtractionOperator && $newNodeCount > 0) {
+                $left = $newNodes[$newNodeCount - 1];
+                $right = $tokens[$i + 1];
+
+                if ($left instanceof VariableNode && $right instanceof VariableNode) {
+                    $lDistance = NodeHelpers::distance($left, $node);
+                    $rDistance = NodeHelpers::distance($node, $right);
+
+                    if ($lDistance <= 1 && $rDistance <= 1) {
+                        NodeHelpers::mergeVarContentLeft('-', $node, $left);
+                        NodeHelpers::mergeVarContentLeft($right->name, $right, $left);
+                        $left->endPosition = $right->endPosition;
+                        $i += 1;
+                    } else {
+                        $newNodes[] = $node;
+                    }
+                } else {
+                    $newNodes[] = $node;
+                }
             } else {
                 $newNodes[] = $node;
             }
@@ -2212,6 +2236,18 @@ class LanguageParser
 
                 if (NodeHelpers::distance($last, $subToken) > 1) {
                     break;
+                }
+            }
+
+            if ($subToken instanceof StringValueNode || $subToken instanceof VariableNode || $subToken instanceof NumberNode) {
+                $subTokenCount = count($subTokens);
+
+                if ($subTokenCount > 0) {
+                    $last = $subTokens[$subTokenCount - 1];
+
+                    if ($last instanceof LogicGroup) {
+                        break;
+                    }
                 }
             }
 

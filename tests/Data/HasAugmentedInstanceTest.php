@@ -135,10 +135,13 @@ class HasAugmentedInstanceTest extends TestCase
             }
         };
 
-        $mock->shouldReceive('get')->with('foo')->once()->andReturn(new Value('bar'));
-        $mock->shouldReceive('get')->with('baz')->once()->andReturn(new Value(null));
+        $mock->shouldReceive('get')->with('foo')->times(2)->andReturn(new Value('bar'));
+        $mock->shouldReceive('get')->with('baz')->times(2)->andReturn(new Value(null));
 
         $this->assertTrue(isset($thing['foo']));
         $this->assertFalse(isset($thing['baz']));
+
+        $this->assertTrue(isset($thing->foo));
+        $this->assertFalse(isset($thing->baz));
     }
 }

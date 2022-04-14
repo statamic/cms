@@ -1,5 +1,151 @@
 # Release Notes
 
+## 3.3.6 (2022-04-11)
+
+### What's new
+- The Markdown `Parser` class is macroable. [#5797](https://github.com/statamic/cms/issues/5797) by @jacksleight
+
+### What's improved
+- Dutch translations. [#5801](https://github.com/statamic/cms/issues/5801) by @robdekort
+- Norwegian translations. [#5798](https://github.com/statamic/cms/issues/5798) by @espenlg
+
+### What's fixed
+- The `nav:breadcrumbs` tag can now be used in Blade. [#5599](https://github.com/statamic/cms/issues/5599) by @jasonvarga
+- Collections are counted more efficiently in the `length` modifier. [#5802](https://github.com/statamic/cms/issues/5802) by @jasonvarga
+- Fix issue when using a single `assets` field named `asset`. [#5799](https://github.com/statamic/cms/issues/5799) by @jasonvarga
+- Fix `entries` fieldtype in select mode pushing the content area wider. [#5787](https://github.com/statamic/cms/issues/5787) by @jackmcdade
+- Runtime: Support for multiple interpolations in tag method names. [#5800](https://github.com/statamic/cms/issues/5800) by @JohnathonKoster
+- Runtime: Isolate scope when resolving values to prevent overriding page data. [#5668](https://github.com/statamic/cms/issues/5668) by @JohnathonKoster
+- Runtime: Correct self closing tags. [#5781](https://github.com/statamic/cms/issues/5781) by @JohnathonKoster
+- Runtime: Fix issue when using recursion and conditions. [#5779](https://github.com/statamic/cms/issues/5779) by @JohnathonKoster
+- Runtime: Fix `noparse` behavior. [#5778](https://github.com/statamic/cms/issues/5778) by @JohnathonKoster
+- Runtime: Fix modifier chains and null values. [#5780](https://github.com/statamic/cms/issues/5780) by @JohnathonKoster
+- Runtime: Prevent literal from being removed when using multiple nested double braces in a parameter. [#5777](https://github.com/statamic/cms/issues/5777) by @JohnathonKoster
+- Runtime: Removes ctype_space null deprecation warning. [#5776](https://github.com/statamic/cms/issues/5776) by @JohnathonKoster
+- Bump `minimist` from 1.2.5 to 1.2.6 [#5808](https://github.com/statamic/cms/issues/5808) by @dependabot
+- Bump `moment` from 2.27.0 to 2.29.2 [#5806](https://github.com/statamic/cms/issues/5806) by @dependabot
+
+
+
+## 3.3.5 (2022-04-06)
+
+### What's new
+- Norwegian translation. [#5722](https://github.com/statamic/cms/issues/5722) by @espenlg
+- When there's a syntax error inside an Antlers-enabled field, the exception will show the contents. [#5659](https://github.com/statamic/cms/issues/5659) by @JohnathonKoster
+
+### What's improved
+- German translations. [#5715](https://github.com/statamic/cms/issues/5715) by @helloDanuk
+- French translations. [#5705](https://github.com/statamic/cms/issues/5705) by @ebeauchamps
+
+### What's fixed
+- Fix runtime parser not maintaining query builder results accurately in subsequent tags. [#5716](https://github.com/statamic/cms/issues/5716) by @JohnathonKoster
+- Fix the `groupby` operator not supporting modifiers in the runtime parser. [#5716](https://github.com/statamic/cms/issues/5716) by @JohnathonKoster
+- Fix runtime parser outputting a replacement string when a stack is used with nothing pushed into it. [#5716](https://github.com/statamic/cms/issues/5716) by @JohnathonKoster
+- Fix runtime parser support for multibyte characters. [#5704](https://github.com/statamic/cms/issues/5704) by @JohnathonKoster
+- Fix runtime parser support for tags with parameters in Antlers-enabled fields. [#5659](https://github.com/statamic/cms/issues/5659) by @JohnathonKoster
+- Fix Glide cache disk permissions. [#5724](https://github.com/statamic/cms/issues/5724) by @jasonvarga
+- Fix URL typo in Dutch translation. [#5772](https://github.com/statamic/cms/issues/5772) by @MarcelWeidum
+- Fix slugification not using appropriate language on the create term form. [#5738](https://github.com/statamic/cms/issues/5738) by @arthurperton
+- Fix issue where Flysystem could return pathless FileAttributes response. [#5726](https://github.com/statamic/cms/issues/5726) by @jesseleite
+- Fix runtime parser support for PHP assignments inside loops. [#5734](https://github.com/statamic/cms/issues/5734) by @JohnathonKoster
+- Add attribute to suppress deprecation notice [#5719](https://github.com/statamic/cms/issues/5719) by @marcorieser
+- Add ReturnTypeWillChange attribute [#5701](https://github.com/statamic/cms/issues/5701) by @jasonvarga
+
+
+
+## 3.3.4 (2022-03-30)
+
+### What's improved
+- The `site` filter's badge will display the name instead of the handle. [#5683](https://github.com/statamic/cms/issues/5683) by @j3ll3yfi5h
+- Show a more graceful error when hitting a rate limit on the licensing page. [#5678](https://github.com/statamic/cms/issues/5678) by @jesseleite
+- The `users` fieldtype will show the first/last name in listings when applicable. [#5677](https://github.com/statamic/cms/issues/5677) by @j3ll3yfi5h
+- The "Site selected." toast message is localizable. [#5687](https://github.com/statamic/cms/issues/5687) by @j3ll3yfi5h
+
+### What's fixed
+- Fix issue where the `date` fieldtype could not be cleared. [#5682](https://github.com/statamic/cms/issues/5682) by @potentweb
+- The cache is bypassed for tokenized GraphQL requests. [#5693](https://github.com/statamic/cms/issues/5693) by @jasonvarga
+- Fix 404 handling for entries/terms in the REST API. [#5690](https://github.com/statamic/cms/issues/5690) by @notnek
+- Fix an error when you have a comment at the start of a `partial` slot. [#5651](https://github.com/statamic/cms/issues/5651) by @JohnathonKoster
+- Fix issue where the updates badge shows the wrong count in some cases. [#5678](https://github.com/statamic/cms/issues/5678) by @jesseleite
+- Fix asset editor overflow issues. [#5689](https://github.com/statamic/cms/issues/5689) by @jackmcdade
+- Fix issue where collections were unnecessarily converted to arrays in modifiers. [#5642](https://github.com/statamic/cms/issues/5642) by @JohnathonKoster
+- A handful more Antlers bug fxies. [#5571](https://github.com/statamic/cms/issues/5571) by @JohnathonKoster
+- Tidy up some Blade echo statements. [#5645](https://github.com/statamic/cms/issues/5645) by @michaelr0
+- Fix the initial height of textareas. [#5649](https://github.com/statamic/cms/issues/5649) by @wiebkevogel
+- Prevent slug error when used on forms without containers. [#5657](https://github.com/statamic/cms/issues/5657) by @jasonvarga
+- Fix Global Variables in GraphQL not resolving query builders [#5640](https://github.com/statamic/cms/issues/5640) by @jasonvarga
+- Upgraded to PHP CS Fixer v3. [#5541](https://github.com/statamic/cms/issues/5541) by @jesseleite
+
+
+
+## 3.3.3 (2022-03-24)
+
+### What's new
+- Live Preview is supported in the REST API. [#5623](https://github.com/statamic/cms/issues/5623) by @jasonvarga
+- Query builders can accept page name and number. [#5602](https://github.com/statamic/cms/issues/5602) by @mattmurtaugh
+- Added `csrf` parameter to `form` tag. [#5626](https://github.com/statamic/cms/issues/5626) by @robdekort
+- Added `has_focus` variable to assets. [#5638](https://github.com/statamic/cms/issues/5638) by @jasonvarga
+- Added `playtime` variable to assets. [#5586](https://github.com/statamic/cms/issues/5586) by @jackmcdade
+
+### What's improved
+- Redesigned Search Index Utility. [#5625](https://github.com/statamic/cms/issues/5625) by @jackmcdade
+- Removed primary style on the Asset browser's "Create Container" button. [#5629](https://github.com/statamic/cms/issues/5629) by @jackmcdade
+- Expanded Windows testing. [#5613](https://github.com/statamic/cms/issues/5613) by @jesseleite
+- Updated Swedish translations. [#5615](https://github.com/statamic/cms/issues/5615) [#5620](https://github.com/statamic/cms/issues/5620) [#5617](https://github.com/statamic/cms/issues/5617) [#5616](https://github.com/statamic/cms/issues/5616) by @jannejava
+- Made asset editor full width. [#5608](https://github.com/statamic/cms/issues/5608) by @jackmcdade
+- Asset fields will auto-select the container when only one exists. [#5498](https://github.com/statamic/cms/issues/5498) by @duncanmcclean
+
+### What's fixed
+- The `to_json` modifier can handle query builders. [#5635](https://github.com/statamic/cms/issues/5635) by @jasonvarga
+- Fix `is_external` check for anchors. [#5631](https://github.com/statamic/cms/issues/5631) by @grandpalacko
+- Fix Asset Editor not showing HTML5 players. [#5607](https://github.com/statamic/cms/issues/5607) by @jackmcdade
+
+
+
+## 3.3.2 (2022-03-18)
+
+### What's improved
+- Update French translations. [#5540](https://github.com/statamic/cms/issues/5540) by @ebeauchamps
+- Link to automatic titles section in the docs. [#5553](https://github.com/statamic/cms/issues/5553) by @jackmcdade
+
+### What's fixed
+- Prevent filtering users by password hashes in the APIs. [#5568](https://github.com/statamic/cms/issues/5568) by @jasonvarga
+- Prevent usage of `null` as filesystem paths. [#5562](https://github.com/statamic/cms/issues/5562) by @jasonvarga
+- The `glide` tag pair can handle query builders. [#5552](https://github.com/statamic/cms/issues/5552) by @jasonvarga
+- Fix Flysystem 3 support in Glide. [#5551](https://github.com/statamic/cms/issues/5551) by @jasonvarga
+- Make `isset` on properties work. [#5530](https://github.com/statamic/cms/issues/5530) by @jasonvarga
+- Range fields can now use `0` as a value or default. [#5538](https://github.com/statamic/cms/issues/5538) by @jasonvarga
+
+
+
+## 3.3.1 (2022-03-16)
+
+### What's new
+- Ability to make fields read only through the Blueprint builder. [#5379](https://github.com/statamic/cms/issues/5379) by @jackmcdade
+
+### What's improved
+- Update German translations. [#5511](https://github.com/statamic/cms/issues/5511) by @helloDanuk
+
+### What's fixed
+- Fix issue in Runtime parser where augmenting within an expression could alter the scope. [#5525](https://github.com/statamic/cms/issues/5525) by @JohnathonKoster
+- Fix Grid fields not converting to JSON by making `Values` implement `JsonSerializable`. [#5524](https://github.com/statamic/cms/issues/5524) by @jasonvarga
+- Fix error when determining slug language on non-entry forms. [#5523](https://github.com/statamic/cms/issues/5523) by @jasonvarga
+- Fix nested query builder access in Regex parser. [#5521](https://github.com/statamic/cms/issues/5521) by @jasonvarga
+- Fix Runtime parser not supporting dashes in variable names. [#5516](https://github.com/statamic/cms/issues/5516) by @JohnathonKoster
+- Fix Flysystem error on Cache Manager utility page. [#5509](https://github.com/statamic/cms/issues/5509) by @jesseleite
+
+
+
+## 3.3.0 (2022-03-15)
+
+### What's new
+- Official 3.3 release! 🎉
+
+### What's changed
+- Removed unused `toCacheableArray` methods from `Entry`, `AssetContainer`, and `User`. [#5506](https://github.com/statamic/cms/issues/5506) by @jasonvarga
+
+
+
 ## 3.3.0-beta.7 (2022-03-14)
 
 ### What's fixed

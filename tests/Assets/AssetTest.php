@@ -16,6 +16,7 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
@@ -917,6 +918,7 @@ class AssetTest extends TestCase
             ->set('focus', '75-25');
 
         $this->assertSame($asset->augmentedValue('focus_css')->value(), '75% 25%');
+        $this->assertTrue($asset->augmentedValue('has_focus')->value());
     }
 
     /** @test */
@@ -931,6 +933,7 @@ class AssetTest extends TestCase
             ->path('path/to/asset.jpg');
 
         $this->assertSame($asset->augmentedValue('focus_css')->value(), '50% 50%');
+        $this->assertFalse($asset->augmentedValue('has_focus')->value());
     }
 
     /** @test */
@@ -1213,5 +1216,23 @@ class AssetTest extends TestCase
         $this->assertEquals(true, $asset->isDirty(['title']));
         $this->assertEquals(false, $asset->isDirty('food'));
         $this->assertEquals(false, $asset->isDirty(['food']));
+    }
+
+    /** @test */
+    public function it_augments_in_the_parser()
+    {
+        $container = Mockery::mock($this->container)->makePartial();
+        $container->shouldReceive('private')->andReturnFalse();
+        $container->shouldReceive('url')->andReturn('/container');
+        $asset = (new Asset)->container($container)->path('path/to/test.txt');
+
+        $this->assertEquals('/container/path/to/test.txt', Antlers::parse('{{ asset }}', ['asset' => $asset]));
+
+        $this->assertEquals('path/to/test.txt', Antlers::parse('{{ asset }}{{ path }}{{ /asset }}', ['asset' => $asset]));
+
+        $this->assertEquals('test.txt', Antlers::parse('{{ asset:basename }}', ['asset' => $asset]));
+
+        // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
+        $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
     }
 }

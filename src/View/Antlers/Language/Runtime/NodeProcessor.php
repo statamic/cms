@@ -244,6 +244,11 @@ class NodeProcessor
         return $this->activeNode;
     }
 
+    public function getPathDataManager()
+    {
+        return $this->pathDataManager;
+    }
+
     public function registerInterpolations(AntlersNode $node)
     {
         if (! empty($node->processedInterpolationRegions)) {
@@ -502,53 +507,64 @@ class NodeProcessor
             if ($node->pathReference->isStrictTagReference) {
                 return true;
             }
-
-            if ($node->pathReference->isStrictVariableReference) {
-                return false;
-            }
         }
 
         if ($node->name->name == 'assets' && $node->name->methodPart == 'assets') {
             return true;
         }
 
-        $activeData = $this->getActiveData();
-
         // The third argument "true" disables the data managers value interception mechanism.
         // This is to prevent it from resolving expensive items like Builders too many
         // times when all we are interested in is if the data value actually exists.
-        $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $activeData, true);
+        $cur = $this->pathDataManager->getIsPaired();
+        $curReduce = $this->pathDataManager->getReduceFinal();
+
+        $this->pathDataManager->setIsPaired(false);
+        $this->pathDataManager->setReduceFinal(false);
+        $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
+        $this->pathDataManager->setIsPaired($cur);
+        $this->pathDataManager->setReduceFinal($curReduce);
+
+        $resolvedValue = null;
 
         if ($managerResults[0] === true) {
-            if (is_object($managerResults[1])) {
-                $value = $managerResults[1];
-                $resolvedValue = $value instanceof Value ? $value->value() : $value;
+            $value = $managerResults[1];
+            $this->createLockData();
+            $resolvedValue = $value instanceof Value ? $value->value() : $value;
+            $this->restoreLockedData();
 
-                if ($resolvedValue instanceof Builder && $node->isClosedBy != null && $node->isSelfClosing == false) {
-                    $this->encounteredBuilder = true;
-                    $this->resolvedBuilder = $resolvedValue;
-                    $this->builderNodeId = $node->refId;
+            if ($resolvedValue instanceof Builder && $node->isClosedBy != null && $node->isSelfClosing == false) {
+                $this->encounteredBuilder = true;
+                $this->resolvedBuilder = $resolvedValue;
+                $this->builderNodeId = $node->refId;
 
-                    // If the path reference has more than one part,
-                    // it is something like {{ products.0.name }}
-                    if ($node->pathReference != null && count($node->pathReference->pathParts) > 1) {
-                        return false;
-                    }
-
-                    return true;
+                // If the path reference has more than one part,
+                // it is something like {{ products.0.name }}
+                if ($node->pathReference != null && count($node->pathReference->pathParts) > 1) {
+                    return false;
                 }
-            }
 
-            if (is_string($managerResults[1]) && $node->isTagNode === true) {
+                return true;
+            }
+        }
+
+        if ($node->pathReference != null) {
+            if ($node->pathReference->isStrictVariableReference) {
                 return false;
             }
         }
 
-        if ($node->isTagNode === false) {
+        if ($managerResults[0] === true) {
+            if ($node->isPaired() && ! $this->isLoopable($resolvedValue)) {
+
+                // Safe to do this since there is no ambiguity here.
+                return $node->isTagNode;
+            }
+
             return false;
         }
 
-        return true;
+        return $node->isTagNode;
     }
 
     /**
@@ -681,6 +697,8 @@ class NodeProcessor
      * @param  AntlersNode  $node  The reference node.
      * @param  mixed  $value  The runtime value.
      * @return bool
+     *
+     * @throws RuntimeException
      */
     private function guardRuntime(AntlersNode $node, $value)
     {
@@ -704,6 +722,15 @@ class NodeProcessor
             }
 
             $varName = $node->name->getContent();
+
+            if ($this->runtimeConfiguration != null && $this->runtimeConfiguration->fatalErrorOnStringObject) {
+                throw ErrorFactory::makeRuntimeError(
+                    AntlersErrorCodes::TYPE_RUNTIME_ATTEMPTING_TO_RENDER_OBJECT_AS_STRING,
+                    $node,
+                    'Fatal Error: Attempting to render object as string.'
+                );
+            }
+
             Log::debug("Cannot render an object variable as a string: {{ {$varName} }}");
 
             return false;
@@ -720,6 +747,11 @@ class NodeProcessor
     public function getRuntimeAssignments()
     {
         return $this->runtimeAssignments;
+    }
+
+    public function setRuntimeAssignments($assignments)
+    {
+        $this->runtimeAssignments = $assignments;
     }
 
     /**
@@ -755,7 +787,9 @@ class NodeProcessor
     {
         $processor = new NodeProcessor($this->loader, $this->envDetails);
         $processor->allowPhp($this->allowPhp);
-        $processor->setAntlersParserInstance($this->antlersParser);
+        if ($this->antlersParser != null) {
+            $processor->setAntlersParserInstance($this->antlersParser);
+        }
         $processor->cascade($this->cascade);
 
         if ($this->runtimeConfiguration != null) {
@@ -952,7 +986,7 @@ class NodeProcessor
         $namedSlots = [];
 
         foreach ($node->children as $child) {
-            if ($child instanceof AntlersNode && $child->name->name == 'slot') {
+            if ($child instanceof AntlersNode && ! $child->isComment && $child->name->name == 'slot') {
                 $namedSlots[$child->name->methodPart] = $child;
             }
         }
@@ -1012,6 +1046,15 @@ class NodeProcessor
                 if ($node instanceof AntlersNode) {
                     if ($node->name != null) {
                         if ($node->name->name == 'elseif' || $node->name->name == 'if') {
+                            continue;
+                        }
+
+                        if ($node->name->name == '___internal_debug' && $node->name->methodPart == 'peek' && ! empty(GlobalRuntimeState::$peekCallbacks)) {
+                            foreach (GlobalRuntimeState::$peekCallbacks as $callback) {
+                                if (is_callable($callback)) {
+                                    $callback($this);
+                                }
+                            }
                             continue;
                         }
                     }
@@ -1228,18 +1271,23 @@ class NodeProcessor
                     $currentProcessorCanHandleTagValue = false;
                     $tagCallbackResult = null;
 
-                    if ($this->shouldProcessAsTag($node)) {
+                    $lockData = $this->data;
+                    $shouldProcessAsTag = $this->shouldProcessAsTag($node);
+                    $this->data = $lockData;
+
+                    if ($shouldProcessAsTag) {
                         $tagName = $node->name->getCompoundTagName();
                         $tagMethod = $node->name->getMethodName();
 
-                        if (array_key_exists($tagMethod, $node->processedInterpolationRegions)) {
-                            if (! empty($node->processedInterpolationRegions)) {
-                                foreach ($node->processedInterpolationRegions as $region => $regionNodes) {
-                                    $this->canHandleInterpolations[$region] = $regionNodes;
+                        if (! empty($node->processedInterpolationRegions)) {
+                            foreach ($node->processedInterpolationRegions as $region => $regionNodes) {
+                                $this->canHandleInterpolations[$region] = $regionNodes;
+
+                                if (Str::contains($tagMethod, $region)) {
+                                    $tagMethod = str_replace($region, $this->evaluateDeferredInterpolation($region), $tagMethod);
                                 }
                             }
 
-                            $tagMethod = $this->evaluateDeferredInterpolation($tagMethod);
                             $tagName = $node->name->name.':'.$tagMethod;
                         }
 
@@ -1310,6 +1358,10 @@ class NodeProcessor
                             $tagParameters['builder'] = $this->resolvedBuilder;
                         }
 
+                        if (! empty($this->runtimeAssignments)) {
+                            GlobalRuntimeState::$traceTagAssignments = true;
+                            GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
+                        }
                         /** @var Tags $tag */
                         $tag = $this->loader->load($tagToLoad, [
                             'parser' => $this->antlersParser,
@@ -1336,12 +1388,15 @@ class NodeProcessor
                                 $activeLockFrame = $tempLockData[count($tempLockData) - 1];
                             }
 
+                            if ($output instanceof Collection) {
+                                $output = $output->all();
+                            }
+
                             $newData = [
-                                $dataSetName => $output->all(),
+                                $dataSetName => $output,
                             ];
 
                             $builderScope = array_merge($activeLockFrame, $newData);
-                            $lockData[] = $builderScope;
 
                             // It is important to reset these so builder instances do not leak.
                             $this->encounteredBuilder = false;
@@ -1439,7 +1494,7 @@ class NodeProcessor
                             } else {
                                 GlobalRuntimeState::$traceTagAssignments = true;
                                 GlobalRuntimeState::$activeTracerCount += 1;
-                                GlobalRuntimeState::$traceTagAssignments = $this->runtimeAssignments;
+                                GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
 
                                 if ($node->hasModifierParameters()) {
                                     $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
@@ -1472,11 +1527,26 @@ class NodeProcessor
                             }
                         }
 
+                        $this->data = $lockData;
+
                         if (! $currentProcessorCanHandleTagValue) {
                             $buffer .= $this->measureBufferAppend($node, $output);
+
+                            if (! empty(GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                                $runtimeAssignmentsToProcess = [];
+
+                                foreach (GlobalRuntimeState::$tracedRuntimeAssignments as $assignmentVar => $value) {
+                                    if (array_key_exists($assignmentVar, $this->runtimeAssignments)) {
+                                        $runtimeAssignmentsToProcess[$assignmentVar] = $value;
+                                    }
+                                }
+
+                                if (! empty($runtimeAssignmentsToProcess)) {
+                                    $this->processAssignments($runtimeAssignmentsToProcess);
+                                }
+                            }
                         }
 
-                        $this->data = $lockData;
                         if (! $currentProcessorCanHandleTagValue) {
                             continue;
                         }
@@ -1562,6 +1632,15 @@ class NodeProcessor
                             $runtimeResult = $environment->evaluate($node->parsedRuntimeNodes);
                             $this->data = $restoreData;
 
+                            // If the environment processed modifiers for the current node
+                            // and the node does _not_ have parameters, we will set the
+                            // $runtimeResolveModifiedValue flag to true to prevent
+                            // the NodeProcessor from attempting to evaluate the
+                            // modifier chain again down below before loops.
+                            if (! $node->hasParameters && $environment->getDidEvaluateModifiers()) {
+                                $runtimeResolveModifiedValue = true;
+                            }
+
                             if (is_string($runtimeResult) && $node->hasProcessedInterpolationRegions) {
                                 $interpolationScope = $this->getActiveData();
 
@@ -1645,6 +1724,10 @@ class NodeProcessor
                                 $val = $runtimeResult;
                             } else {
                                 if (! $runtimeResult instanceof Builder) {
+                                    if ($runtimeResult === null) {
+                                        continue;
+                                    }
+
                                     if ($this->guardRuntime($node, $runtimeResult)) {
                                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($runtimeResult));
                                     }
@@ -1713,12 +1796,6 @@ class NodeProcessor
                             $dataRetriever->setIsPaired($node->isClosedBy != null);
                             $valDetails = $dataRetriever->getDataWithExistence($node->pathReference, $this->getActiveData());
 
-                            if ($node->pathReference->isStrictVariableReference && $node->pathReference->isExplicitVariableReference) {
-                                $runLoopMagic = true;
-                            } elseif ($node->pathReference->isStrictVariableReference && $node->pathReference->isExplicitVariableReference == false) {
-                                $runLoopMagic = false;
-                            }
-
                             if ($valDetails[0] == false) {
                                 if ($this->isTracingEnabled()) {
                                     $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
@@ -1742,80 +1819,106 @@ class NodeProcessor
                     }
 
                     if ($node->hasParameters && $tagCallbackResult == null) {
+                        $curIsPaired = $this->pathDataManager->getIsPaired();
+                        $curReduceFinal = $this->pathDataManager->getReduceFinal();
                         $this->pathDataManager->setIsPaired(false);
                         $this->pathDataManager->setReduceFinal(false);
                         $val = $this->pathDataManager->getData($node->pathReference, $this->getActiveData());
+                        $this->pathDataManager->setIsPaired($curIsPaired);
+                        $this->pathDataManager->setReduceFinal($curReduceFinal);
 
-                        if (! $this->shouldProcessAsTag($node)) {
+                        if (! $shouldProcessAsTag && $val !== null) {
                             foreach ($node->parameters as $param) {
                                 if (ModifierManager::isModifier($param)) {
                                     $activeData = $this->getActiveData();
-
-                                    $tempValues = $node->getModifierParameterValuesForParameter($param, $activeData);
                                     $paramValues = [];
 
-                                    foreach ($tempValues as $paramName => $value) {
-                                        $containedInterpolation = false;
+                                    if ($param->isVariableReference) {
+                                        $varValue = $node->getSingleParameterValue($param, $this, $activeData);
 
-                                        foreach ($node->interpolationRegions as $regionName => $region) {
-                                            if (Str::contains($value, $regionName)) {
-                                                $containedInterpolation = true;
-                                                if (array_key_exists($regionName, $this->canHandleInterpolations) == false) {
-                                                    $this->canHandleInterpolations[$regionName] = $node->processedInterpolationRegions[$regionName];
-                                                }
-
-                                                $interpolationResult = $this->evaluateDeferredInterpolation($regionName);
-
-                                                $resolvedValue = null;
-
-                                                if ($value == $regionName) {
-                                                    $resolvedValue = $interpolationResult;
-                                                } else {
-                                                    $resolvedValue = str_replace($regionName, (string) $interpolationResult, $value);
-                                                }
-
-                                                $paramValues[$paramName] = $resolvedValue;
-                                            }
+                                        if ($varValue == 'void::'.GlobalRuntimeState::$environmentId) {
+                                            continue;
                                         }
 
-                                        if (! $containedInterpolation) {
-                                            $paramValues[$paramName] = $value;
+                                        $paramValues[] = $varValue;
+                                    } else {
+                                        $tempValues = $node->getModifierParameterValuesForParameter($param, $activeData);
+
+                                        foreach ($tempValues as $paramName => $value) {
+                                            $containedInterpolation = false;
+
+                                            foreach ($node->interpolationRegions as $regionName => $region) {
+                                                if (Str::contains($value, $regionName)) {
+                                                    $containedInterpolation = true;
+                                                    if (array_key_exists($regionName, $this->canHandleInterpolations) == false) {
+                                                        $this->canHandleInterpolations[$regionName] = $node->processedInterpolationRegions[$regionName];
+                                                    }
+
+                                                    $interpolationResult = $this->evaluateDeferredInterpolation($regionName);
+
+                                                    $resolvedValue = null;
+
+                                                    if ($value == $regionName) {
+                                                        $resolvedValue = $interpolationResult;
+                                                    } else {
+                                                        $resolvedValue = str_replace($regionName, (string) $interpolationResult, $value);
+                                                    }
+
+                                                    $paramValues[$paramName] = $resolvedValue;
+                                                }
+                                            }
+
+                                            if (! $containedInterpolation) {
+                                                $paramValues[$paramName] = $value;
+                                            }
                                         }
                                     }
 
                                     if ($val instanceof  Value) {
                                         if ($val->shouldParseAntlers()) {
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
-                                            $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
-                                            GlobalRuntimeState::$isEvaluatingUserData = false;
-                                        } else {
-                                            $val = $val->value();
-                                        }
-                                    }
+                                            GlobalRuntimeState::$isEvaluatingData = true;
+                                            GlobalRuntimeState::$userContentEvalState = [
+                                                $val,
+                                                $node,
+                                            ];
 
-                                    if ($val instanceof Collection) {
-                                        $val = $val->values()->all();
+                                            $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
+                                            GlobalRuntimeState::$userContentEvalState = null;
+                                            GlobalRuntimeState::$isEvaluatingUserData = false;
+                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                        } else {
+                                            GlobalRuntimeState::$isEvaluatingData = true;
+                                            $val = $val->value();
+                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                        }
                                     }
 
                                     if ($val instanceof AntlersString) {
                                         $val = (string) $val;
                                     }
 
-                                    if ($this->isLoopable($val) && ! empty($val) && ! Arr::isAssoc($val)) {
-                                        if (count($val) > 0 && ! is_object($val[0])) {
-                                            $val = $this->addLoopIterationVariables($val);
-                                        }
+                                    if ($this->isLoopable($val) && is_array($val) && ! Arr::isAssoc($val) && count($val) > 0 && ! is_object($val[0])) {
+                                        $val = $this->addLoopIterationVariables($val);
                                     }
 
                                     $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
+
+                                    if ($val === null) {
+                                        break;
+                                    }
                                 } else {
                                     if ($param->name === 'raw') {
                                         if ($val instanceof Value) {
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->raw();
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         }
                                     } elseif ($param->name === 'noparse') {
                                         if ($val instanceof Value) {
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->value();
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         }
                                     } else {
                                         // Throw an exception here to maintain consistent behavior with the regex parser.
@@ -1826,6 +1929,9 @@ class NodeProcessor
 
                             if ($val instanceof Collection) {
                                 $val = $val->all();
+                                if (! Arr::isAssoc($val)) {
+                                    $val = $this->addLoopIterationVariables($val);
+                                }
                             }
                         }
                         $executedParamModifiers = true;
@@ -1903,6 +2009,7 @@ class NodeProcessor
                                     $processor->allowPhp($this->allowPhp);
                                     $processor->cascade($this->cascade);
                                     $processor->setAntlersParserInstance($this->antlersParser);
+                                    $processor->setRuntimeAssignments($this->runtimeAssignments, $this->previousAssignments);
 
                                     if ($this->runtimeConfiguration != null) {
                                         $processor->setRuntimeConfiguration($this->runtimeConfiguration);
@@ -1933,6 +2040,14 @@ class NodeProcessor
                                         }
 
                                         if (! empty($runtimeAssignments)) {
+                                            $procActive = $processor->getActiveData();
+
+                                            foreach ($runtimeAssignments as $var => $varValue) {
+                                                if (array_key_exists($var, $procActive)) {
+                                                    $runtimeAssignments[$var] = $procActive[$var];
+                                                }
+                                            }
+
                                             foreach ($runtimeAssignments as $assignmentVar => $assignmentValue) {
                                                 if (array_key_exists($assignmentVar, $this->runtimeAssignments)) {
                                                     $runtimeAssignmentsToProcess[$assignmentVar] = $assignmentValue;
@@ -1947,6 +2062,7 @@ class NodeProcessor
                                     }
 
                                     $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
+                                    $lockData = $this->data;
 
                                     $buffer .= $this->measureBufferAppend($node, $loopBuffer);
                                 }
@@ -2057,7 +2173,7 @@ class NodeProcessor
                 $___antlersVarAfter = get_defined_vars();
 
                 foreach ($___antlersVarAfter as $varKey => $varValue) {
-                    if (! array_key_exists($varKey, $___antlersVarBefore)) {
+                    if (! array_key_exists($varKey, $___antlersVarBefore) || array_key_exists($varKey, $this->previousAssignments)) {
                         $phpRuntimeAssignments[$varKey] = $varValue;
                     }
                 }
@@ -2086,6 +2202,16 @@ class NodeProcessor
         $total = count($loop);
         $lastIndex = $total - 1;
         $curData = $this->data;
+
+        if ($loop instanceof Collection) {
+            $this->createLockData();
+            $loop = $loop->all();
+            $this->restoreLockedData();
+
+            if (Arr::isAssoc($loop)) {
+                return $loop;
+            }
+        }
 
         foreach ($loop as $key => &$value) {
             if ($value instanceof Augmentable) {
@@ -2155,7 +2281,9 @@ class NodeProcessor
             return false;
         }
 
+        $this->createLockData();
         $value = $value->value();
+        $this->restoreLockedData();
 
         return is_array($value) || $value instanceof Collection;
     }

@@ -104,19 +104,16 @@ class Submission implements SubmissionContract, Augmentable
     }
 
     /**
-     * Upload files.
+     * Upload files and return asset IDs.
+     *
+     * @param  array  $uploadedFiles
+     * @return array
      */
-    public function uploadFiles()
+    public function uploadFiles($uploadedFiles)
     {
-        collect($this->fields())
-            ->filter(function ($config, $handle) {
-                return Arr::get($config, 'type') === 'assets' && request()->hasFile($handle);
-            })
-            ->each(function ($config, $handle) {
-                Arr::set($this->data, $handle, AssetsUploader::field($config)->upload(request()->file($handle)));
-            });
-
-        return $this;
+        return collect($uploadedFiles)->map(function ($config, $handle) {
+            return AssetsUploader::field($config)->upload(request()->file($handle));
+        })->all();
     }
 
     /**
@@ -124,7 +121,7 @@ class Submission implements SubmissionContract, Augmentable
      */
     public function save()
     {
-        File::put($this->getPath(), YAML::dump($this->data()->all()));
+        File::put($this->getPath(), YAML::dump(Arr::removeNullValues($this->data()->all())));
 
         SubmissionSaved::dispatch($this);
     }

@@ -39,6 +39,15 @@ body:
         - Other (please explain)
     validations:
       required: true
+  - type: dropdown
+    attributes:
+      label: Antlers Parser
+      description: If using 3.3+, which Antlers Parser are you using?
+      options:
+        - regex (default)
+        - runtime (new)
+    validations:
+      required: false
   - type: textarea
     attributes:
       label: Additional details

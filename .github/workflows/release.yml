@@ -42,7 +42,6 @@ jobs:
           tag_name: ${{ steps.changelog.outputs.version }}
           release_name: ${{ steps.changelog.outputs.version }}
           body: ${{ steps.changelog.outputs.text }}
-          prerelease: true
 
       - name: Upload dist zip to release
         uses: actions/upload-release-asset@v1.0.1

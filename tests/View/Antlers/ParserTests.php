@@ -2399,6 +2399,22 @@ EOT;
     }
 
     /** @test */
+    public function it_can_get_nested_query_builders()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Bar'],
+        ]));
+
+        $this->assertEquals('<Foo><Bar>', $this->renderString('{{ nested:my_query }}<{{ title }}>{{ /nested:my_query }}', [
+            'nested' => [
+                'my_query' => $builder,
+            ],
+        ]));
+    }
+
+    /** @test */
     public function it_loops_over_values_instances()
     {
         $this->assertEquals('<alfa><bravo><charlie><delta>', $this->renderString('{{ grid }}<{{ foo }}><{{ bar }}>{{ /grid }}', [

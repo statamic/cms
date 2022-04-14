@@ -140,6 +140,7 @@ return [
     'textarea.title' => 'Textarea',
     'time.title' => 'Time',
     'toggle.title' => 'Toggle',
+    'toggle.config.inline_label' => 'Set an inline label to be shown beside the toggle input.',
     'user_groups.title' => 'User Groups',
     'user_roles.title' => 'User Roles',
     'users.title' => 'Users',

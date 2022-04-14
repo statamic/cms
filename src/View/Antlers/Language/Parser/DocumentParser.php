@@ -101,6 +101,7 @@ class DocumentParser
     private $antlersStartPositionIndex = [];
     private $chunkSize = 5;
     private $currentChunkOffset = 0;
+    private $isNoParse = false;
 
     /**
      * A list of node visitors.
@@ -140,10 +141,26 @@ class DocumentParser
         return $this;
     }
 
+    /**
+     * Fetches content from the source content without appending characters to the current char list.
+     *
+     * @param  int  $count  The number of characters to fetch.
+     * @return string
+     */
+    private function fetch($count)
+    {
+        return mb_substr($this->content, $this->currentChunkOffset + $this->chunkSize - count($this->chars), $count);
+    }
+
+    public function getParsedContent()
+    {
+        return $this->content;
+    }
+
     private function peek($count)
     {
         if ($count == $this->charLen) {
-            $nextChunk = StringUtilities::split(StringUtilities::substr($this->content, $this->currentChunkOffset + $this->chunkSize, $this->chunkSize));
+            $nextChunk = mb_str_split(mb_substr($this->content, $this->currentChunkOffset + $this->chunkSize, $this->chunkSize));
             $this->currentChunkOffset += $this->chunkSize;
 
             foreach ($nextChunk as $nextChar) {
@@ -160,7 +177,7 @@ class DocumentParser
         $this->currentContent = [];
         $this->startIndex = 0;
 
-        $this->chars = StringUtilities::split(StringUtilities::substr($this->content, $this->currentChunkOffset, $this->chunkSize));
+        $this->chars = mb_str_split(mb_substr($this->content, $this->currentChunkOffset, $this->chunkSize));
         $this->charLen = count($this->chars);
 
         for ($this->currentIndex = 0; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
@@ -178,7 +195,6 @@ class DocumentParser
                     $this->currentIndex + $this->seedOffset,
                     $this->currentIndex + $this->seedOffset
                 );
-
                 $escapeNode->endPosition = $this->positionFromOffset(
                     $this->currentIndex + $this->seedOffset,
                     $this->currentIndex + $this->seedOffset
@@ -201,7 +217,7 @@ class DocumentParser
                     $peek = $this->peek($this->currentIndex + 2);
                 }
 
-                if ($peek == self::Punctuation_Question) {
+                if ($peek == self::Punctuation_Question && ! $this->isNoParse) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfPhpRegion(self::Punctuation_Question);
@@ -209,7 +225,7 @@ class DocumentParser
                     break;
                 }
 
-                if ($peek == self::Punctuation_Dollar) {
+                if ($peek == self::Punctuation_Dollar && ! $this->isNoParse) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfPhpRegion(self::Punctuation_Dollar);
@@ -217,7 +233,7 @@ class DocumentParser
                     break;
                 }
 
-                if ($peek == self::Punctuation_Octothorp) {
+                if ($peek == self::Punctuation_Octothorp && ! $this->isNoParse) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfAntlersCommentRegion();
@@ -227,13 +243,32 @@ class DocumentParser
                     break;
                 }
 
-                // Advances over the {{.
-                $this->startIndex = $this->currentIndex;
+                if (! $this->isNoParse) {
+                    // Advances over the {{.
+                    $this->startIndex = $this->currentIndex;
 
-                $this->isDoubleBrace = true;
-                $this->currentIndex += 2;
-                $this->scanToEndOfAntlersRegion();
-                $this->isDoubleBrace = false;
+                    $this->isDoubleBrace = true;
+                    $this->currentIndex += 2;
+                    $this->scanToEndOfAntlersRegion();
+                    $this->isDoubleBrace = false;
+                } else {
+                    $contentPeek = strtolower(str_replace(' ', '', $this->fetch(11)));
+
+                    if (Str::startsWith($contentPeek, '{{/noparse')) {
+                        // Advances over the {{.
+                        $this->startIndex = $this->currentIndex;
+
+                        $this->isDoubleBrace = true;
+                        $this->currentIndex += 2;
+                        $this->scanToEndOfAntlersRegion();
+                        $this->isDoubleBrace = false;
+                        $this->isNoParse = false;
+                        break;
+                    } else {
+                        $this->currentContent[] = $this->cur;
+                        continue;
+                    }
+                }
 
                 break;
             }
@@ -521,8 +556,31 @@ class DocumentParser
 
                         if ($nextAntlersStart < $literalStartIndex) {
                             if ($this->lastAntlersEndIndex > $nextAntlersStart) {
-                                if ($i + 2 < $indexCount) {
-                                    $nextAntlersStart = $this->antlersStartIndex[$i + 2];
+                                $skipIndex = null;
+                                for ($j = $i; $j < $indexCount; $j++) {
+                                    if ($this->antlersStartIndex[$j] > $this->lastAntlersEndIndex) {
+                                        $skipIndex = $this->antlersStartIndex[$j];
+                                        break;
+                                    }
+                                }
+
+                                if ($skipIndex != null) {
+                                    $nextAntlersStart = $skipIndex;
+                                } else {
+                                    // In this scenario, we will create the last trailing literal node and break.
+                                    $thisOffset = $this->currentChunkOffset;
+                                    $content = StringUtilities::substr($this->content, $literalStartIndex);
+
+                                    $node = new LiteralNode();
+
+                                    $node->content = $this->prepareLiteralContent($content);
+
+                                    if (! strlen($node->content) == 0) {
+                                        $node->startPosition = $this->positionFromOffset($thisOffset, $thisOffset);
+                                        $node->endPosition = $this->positionFromOffset($nextAntlersStart, $thisOffset);
+                                        $this->nodes[] = $node;
+                                    }
+                                    break;
                                 }
                             } else {
                                 continue;
@@ -896,6 +954,11 @@ class DocumentParser
 
             if ($this->cur == self::RightBrace && $this->next != null && $this->next == self::RightBrace) {
                 $node = $this->makeAntlersTagNode($this->currentIndex, false);
+
+                if ($node->name != null && $node->name->name == 'noparse') {
+                    $this->isNoParse = true;
+                }
+
                 $this->currentIndex += 2;
                 $this->nodes[] = $node;
 
@@ -1025,6 +1088,10 @@ class DocumentParser
 
     private function dumpLiteralNode($index)
     {
+        if ($this->isNoParse) {
+            return;
+        }
+
         if (! empty($this->currentContent)) {
             $this->nodes[] = $this->makeLiteralNode($this->currentContent, $this->startIndex, $index);
         }
@@ -1096,6 +1163,14 @@ class DocumentParser
 
     private function checkCurrentOffsets()
     {
+        if (array_key_exists($this->currentIndex, $this->chars) == false) {
+            $this->cur = null;
+            $this->prev = null;
+            $this->next = null;
+
+            return;
+        }
+
         $this->cur = $this->chars[$this->currentIndex];
 
         $this->prev = null;
@@ -1108,7 +1183,7 @@ class DocumentParser
         if (($this->currentIndex + 1) < $this->inputLen) {
             $doPeek = true;
             if ($this->currentIndex == $this->charLen - 1) {
-                $nextChunk = StringUtilities::split(StringUtilities::substr($this->content, $this->currentChunkOffset + $this->chunkSize, $this->chunkSize));
+                $nextChunk = mb_str_split(mb_substr($this->content, $this->currentChunkOffset + $this->chunkSize, $this->chunkSize));
                 $this->currentChunkOffset += $this->chunkSize;
 
                 if ($this->currentChunkOffset == $this->inputLen) {
@@ -1121,7 +1196,7 @@ class DocumentParser
                 }
             }
 
-            if ($doPeek) {
+            if ($doPeek && array_key_exists($this->currentIndex + 1, $this->chars)) {
                 $this->next = $this->chars[$this->currentIndex + 1];
             }
         }

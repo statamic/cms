@@ -4,6 +4,7 @@ namespace Statamic\Modifiers;
 
 use ArrayAccess;
 use Carbon\Carbon;
+use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -1279,7 +1280,7 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
-        if (Compare::isQueryBuilder($value)) {
+        if (Compare::isQueryBuilder($value) || $value instanceof Countable) {
             return $value->count();
         }
 
@@ -2384,6 +2385,10 @@ class CoreModifiers extends Modifier
     public function toJson($value, $params)
     {
         $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : null;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
 
         if ($value instanceof Collection || $value instanceof Augmentable) {
             $value = $value->toAugmentedArray();
