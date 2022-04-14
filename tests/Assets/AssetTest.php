@@ -1197,7 +1197,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('test');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
 
-        $asset = (new Asset)->container($container);
+        $asset = (new Asset)->container($container)->path('test.jpg');
 
         $asset->data([
             'title' => 'English',
