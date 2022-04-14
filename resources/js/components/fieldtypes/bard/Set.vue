@@ -36,14 +36,14 @@
         <div class="replicator-set-body" v-if="!collapsed && index !== undefined">
             <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, fieldPath(field))"
                 :key="field.handle"
                 :field="field"
                 :value="values[field.handle]"
                 :meta="meta[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                :error-key="errorKey(field)"
+                :field-path="fieldPath(field)"
                 :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
@@ -191,10 +191,10 @@ export default {
             this.options.bard.expandSet(this.node.attrs.id);
         },
 
-        errorKey(field) {
-            let prefix = this.options.bard.errorKeyPrefix || this.options.bard.handle;
+        fieldPath(field) {
+            let prefix = this.options.bard.fieldPathPrefix || this.options.bard.handle;
             return `${prefix}.${this.index}.attrs.values.${field.handle}`;
-        }
+        },
 
     }
 }

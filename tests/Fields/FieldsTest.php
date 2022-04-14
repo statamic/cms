@@ -536,29 +536,67 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    public function adding_values_sets_filled_status_on_fields_for_validation()
+    public function preprocessing_validatables_removes_unfilled_values()
     {
-        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
-            return new Field('one', []);
-        });
-
-        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
-            return new Field('two', []);
-        });
-
         $fields = new Fields([
-            ['handle' => 'one', 'field' => 'one'],
-            ['handle' => 'two', 'field' => 'two'],
+            ['handle' => 'title', 'field' => ['type' => 'text']],
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+            ['handle' => 'reppy', 'field' => ['type' => 'replicator', 'sets' => ['replicator_set' => ['fields' => [
+                ['handle' => 'title', 'field' => ['type' => 'text']],
+                ['handle' => 'one', 'field' => ['type' => 'text']],
+                ['handle' => 'two', 'field' => ['type' => 'text']],
+                ['handle' => 'griddy_in_reppy', 'field' => ['type' => 'grid', 'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text']],
+                    ['handle' => 'one', 'field' => ['type' => 'text']],
+                    ['handle' => 'two', 'field' => ['type' => 'text']],
+                    ['handle' => 'bardo_in_griddy_in_reppy', 'field' => ['type' => 'bard', 'sets' => ['bard_set' => ['fields' => [
+                        ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                        ['handle' => 'bardo_in_bardo_in_griddy_in_reppy', 'field' => ['type' => 'bard', 'sets' => ['bard_set_set' => ['fields' => [
+                            ['handle' => 'title', 'field' => ['type' => 'text']],
+                            ['handle' => 'one', 'field' => ['type' => 'text']],
+                            ['handle' => 'two', 'field' => ['type' => 'text']],
+                        ]]]]],
+                    ]]]]],
+                ]]],
+            ]]]]],
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
+        $this->assertEquals(['title' => null, 'one' => null, 'two' => null, 'reppy' => null], $fields->values()->all());
+        $this->assertEquals([], $fields->preProcessValidatables()->values()->all());
 
-        $fields = $fields->addValues(['one' => 'foo']);
+        $values = $expected = [
+            'title' => 'recursion madness',
+            'one' => 'foo',
+            'reppy' => [
+                ['type' => 'replicator_set', 'two' => 'foo'],
+                ['type' => 'replicator_set', 'griddy_in_reppy' => [
+                    ['one' => 'foo'],
+                    ['bardo_in_griddy_in_reppy' => json_encode($bardValues = [
+                        ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'two' => 'foo']]],
+                        ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'foo']]],
+                        ['type' => 'set', 'attrs' => ['type' => 'bard_set', 'values' => ['type' => 'bard_set', 'bardo_in_bardo_in_griddy_in_reppy' => json_encode($doubleNestedBardValues = [
+                            ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'two' => 'foo']]],
+                            ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'foo']]],
+                        ])]]],
+                    ])],
+                ]],
+            ],
+        ];
 
-        $this->assertTrue($fields->get('one')->isFilled());
-        $this->assertFalse($fields->get('two')->isFilled());
-        $this->assertEquals(['one' => 'foo', 'two' => null], $fields->values()->all());
-        $this->assertEquals(['one' => 'foo'], $fields->validatableValues()->all());
+        // Calling `addValues()` should track which fields are filled at each level of nesting.
+        // When we call `preProcessValidatables()`, unfilled values should get removed, in
+        // order to ensure rules like `sometimes` and `required_if` work at all levels.
+        $validatableValues = $fields->addValues($values)->preProcessValidatables()->values()->all();
+
+        // Bard fields submit JSON values, so we'll replace them with their corresponding PHP array
+        // values here, since `preProcessValidatables()` will return JSON decoded decoded values.
+        $expected['reppy'][1]['griddy_in_reppy'][1]['bardo_in_griddy_in_reppy'] = $bardValues;
+        $expected['reppy'][1]['griddy_in_reppy'][1]['bardo_in_griddy_in_reppy'][2]['attrs']['values']['bardo_in_bardo_in_griddy_in_reppy'] = $doubleNestedBardValues;
+
+        $this->assertEquals($expected, $validatableValues);
     }
 
     /** @test */

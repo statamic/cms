@@ -8,11 +8,11 @@ export default {
     },
 
     methods: {
-        showField(field) {
+        showField(field, dottedKey) {
             let passes = new Validator(field, this.values, this.$store, this.storeName).passesConditions();
 
             this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
-                handle: field.handle,
+                dottedKey: dottedKey || field.handle,
                 hidden: ! passes,
             });
 
