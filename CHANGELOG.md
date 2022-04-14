@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.3.7 (2022-04-14)
+
+### What's new
+- The `toggle` fieldtype is available in frontend forms. [#5789](https://github.com/statamic/cms/issues/5789) by @jesseleite
+- Added an `inline_label` option to the `toggle` fieldtype. [#5789](https://github.com/statamic/cms/issues/5789) by @jesseleite
+
+### What's improved
+- User avatars in the CP header are cropped appropriately. [#5731](https://github.com/statamic/cms/issues/5731) by @ncla
+
+### What's fixed
+- Fix handling of hidden nested fields in publish forms. [#5805](https://github.com/statamic/cms/issues/5805) by @jesseleite
+- Runtime: Prevent modifiers on tag pairs being evaluated twice. [#5828](https://github.com/statamic/cms/issues/5828) by @JohnathonKoster
+- Runtime: Prevent a log when looping over a null. [#5832](https://github.com/statamic/cms/issues/5832) by @JohnathonKoster
+- Adjusted docs link in French translation. [#5835](https://github.com/statamic/cms/issues/5835) by @ebeauchamps
+- Another ReturnTypeWillChange annotation. [#5839](https://github.com/statamic/cms/issues/5839) by @jasonvarga
+
+
+
 ## 3.3.6 (2022-04-11)
 
 ### What's new
