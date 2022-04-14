@@ -10,11 +10,11 @@ trait HasAvatar
     /**
      * Get a user's avatar URL.
      *
-     * Could be an asset's URL through a field named avatar, a Gravatar URL, or null.
+     * Could be an asset thumbnail URL through a field named avatar, a Gravatar URL, or null.
      */
     public function avatar($size = 64)
     {
-        if ($this->hasAvatarField() && ($url = $this->avatarFieldSmallSquareThumbnailUrl())) {
+        if ($this->hasAvatarField() && ($url = $this->avatarFieldSquareThumbnailUrl())) {
             return $url;
         }
 
@@ -53,7 +53,7 @@ trait HasAvatar
     /**
      * Square thumbnail URL of the avatar from the asset field.
      */
-    public function avatarFieldSmallSquareThumbnailUrl()
+    public function avatarFieldSquareThumbnailUrl()
     {
         $assetId = optional($this->avatarFieldValue()->value())->id();
 
