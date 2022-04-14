@@ -43,6 +43,14 @@ trait HasAvatar
     }
 
     /**
+     * The URL of the avatar from the asset field.
+     */
+    public function avatarFieldUrl()
+    {
+        return optional($this->avatarFieldValue()->value())->url();
+    }
+
+    /**
      * Square thumbnail URL of the avatar from the asset field.
      */
     public function avatarFieldSmallSquareThumbnailUrl()
