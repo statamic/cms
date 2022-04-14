@@ -46,12 +46,12 @@ EOT;
     public function test_query_builder_loops_receive_tag_parameters_and_can_be_scoped()
     {
         $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('get')->twice()->andReturn(collect([
+        $builder->shouldReceive('get')->times(3)->andReturn(collect([
             ['title' => 'Foo'],
             ['title' => 'Baz'],
             ['title' => 'Bar'],
         ]));
-        $builder->shouldReceive('orderBy')->twice()->withArgs(function ($field, $direction) {
+        $builder->shouldReceive('orderBy')->times(3)->withArgs(function ($field, $direction) {
             return $field == 'title' && $direction == 'desc';
         });
 
@@ -72,6 +72,14 @@ EOT;
 EOT;
 
         $this->assertSame('FooBazBar', $this->renderString($template, $data));
+
+        $template = <<<'EOT'
+{{ scope:the_scope }}
+{{ the_scope:block:taxonomies order_by="title:desc" as="entries" }}{{ entries }}{{ title }}{{ /entries }}{{ /the_scope:block:taxonomies }}
+{{ /scope:the_scope }}
+EOT;
+
+        $this->assertSame('FooBazBar', trim($this->renderString($template, $data, true)));
     }
 
     public function test_strict_variable_query_builders_are_correctly_handled()

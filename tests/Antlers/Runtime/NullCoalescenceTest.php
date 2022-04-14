@@ -75,7 +75,7 @@ EOT;
         $this->assertSame('Statamic', $this->renderString($template, $data));
 
         $cascade = $this->mock(Cascade::class, function ($m) {
-            $m->shouldReceive('get')->with('settings')->once()->andReturn(null);
+            $m->shouldReceive('get')->with('settings')->andReturn(null);
         });
 
         $this->assertSame('Statamic', (string) $this->parser()->cascade($cascade)->render($template, $data));

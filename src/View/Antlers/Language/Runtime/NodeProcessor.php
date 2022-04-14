@@ -521,7 +521,8 @@ class NodeProcessor
 
         $this->pathDataManager->setIsPaired(false);
         $this->pathDataManager->setReduceFinal(false);
-        $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
+        $managerResults = $this->pathDataManager->cascade($this->cascade)
+            ->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
         $this->pathDataManager->setIsPaired($cur);
         $this->pathDataManager->setReduceFinal($curReduce);
 
@@ -863,6 +864,8 @@ class NodeProcessor
             $parameters = $node->getParameterValues($this, $this->getActiveData());
             $runtimeContent = $node->runtimeContent;
         }
+
+        $parameters = array_merge($parameters, $additionalData);
 
         /** @var Tags $tag */
         $tag = $this->loader->load($tagName, [

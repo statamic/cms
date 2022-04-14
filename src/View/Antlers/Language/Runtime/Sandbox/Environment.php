@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Statamic\Contracts\Entries\QueryBuilder;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
@@ -357,7 +357,7 @@ class Environment
                 $this->unlock();
 
                 return $value;
-            } elseif ($result instanceof QueryBuilder) {
+            } elseif ($result instanceof Builder) {
                 $builderResults = $result->count();
                 $this->unlock();
 

@@ -428,7 +428,7 @@ class PathDataManager
                 $interceptResult = $nodeProcessor->evaluateDeferredNodeAsTag(
                     $activeNode,
                     'query',
-                    $pathItem->name, ['builder' => $builderCheckValue]
+                    'index', ['builder' => $builderCheckValue]
                 );
 
                 $this->reducedVar = $interceptResult;
