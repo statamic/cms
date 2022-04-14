@@ -107,7 +107,7 @@ class CollectionRepository implements RepositoryContract
             ->merge($targets)
             ->unique(function ($target) {
                 return $target['format'];
-            })->toArray();
+            })->all();
 
         $this->extraPreviewTargets = array_merge($this->extraPreviewTargets, [$handle => $targets]);
     }
