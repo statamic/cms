@@ -161,7 +161,7 @@ class CollectionsController extends CpController
             'title_formats' => $collection->titleFormats()->unique()->count() === 1
                 ? $collection->titleFormats()->first()
                 : $collection->titleFormats()->all(),
-            'preview_targets' => $collection->previewTargetsWithoutExtra(),
+            'preview_targets' => $collection->basePreviewTargets(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))

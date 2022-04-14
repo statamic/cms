@@ -701,7 +701,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
-    public function previewTargets($targets = null)
+    public function basePreviewTargets($targets = null)
     {
         return $this
             ->fluentlyGetOrSet('previewTargets')
@@ -710,7 +710,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                     $targets = $this->defaultPreviewTargets();
                 }
 
-                return collect($targets)->merge($this->extraPreviewTargets());
+                return collect($targets);
             })
             ->args(func_get_args());
     }
@@ -726,13 +726,9 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $this;
     }
 
-    public function previewTargetsWithoutExtra()
+    public function previewTargets()
     {
-        return $this->previewTargets()->filter(function ($target) {
-            return $this->extraPreviewTargets()->doesntContain(function ($extraTarget) use ($target) {
-                return $target['format'] === $extraTarget['format'];
-            });
-        });
+        return $this->basePreviewTargets()->merge($this->extraPreviewTargets());
     }
 
     private function defaultPreviewTargets()
