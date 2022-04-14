@@ -15,7 +15,7 @@ class Fields
     protected $fields;
     protected $parent;
     protected $parentField;
-    protected $filled;
+    protected $filled = [];
     protected $withValidatableValues = false;
 
     public function __construct($items = [], $parent = null, $parentField = null)
