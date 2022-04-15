@@ -302,6 +302,11 @@ abstract class EloquentQueryBuilder implements Builder
     public function whereNested(Closure $callback, $boolean = 'and')
     {
         call_user_func($callback, $query = $this->builder->getQuery()->forNestedWhere());
+
+        foreach ($query->wheres as $index => $where) {
+            $query->wheres[$index]['column'] = $this->column($where['column']);
+        }
+
         $this->builder->getQuery()->addNestedWhereQuery($query, $boolean);
 
         return $this;
@@ -314,7 +319,7 @@ abstract class EloquentQueryBuilder implements Builder
                 if (is_numeric($key) && is_array($value)) {
                     $query->{$method}(...array_values($value));
                 } else {
-                    $query->$method($key, '=', $value, $boolean);
+                    $query->$method($this->column($key), '=', $value, $boolean);
                 }
             }
         }, $boolean);
