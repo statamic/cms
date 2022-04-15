@@ -9,6 +9,14 @@
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="form.edit_url" />
                         <dropdown-item :text="__('Edit Blueprint')" :redirect="form.blueprint_url" />
+                        <div class="divider" v-if="form.deleteable || form.actions.length" />
+                        <data-list-inline-actions
+                            :item="form.id"
+                            :url="actionUrl"
+                            :actions="form.actions"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
                         <dropdown-item
                             v-if="form.deleteable"
                             :text="__('Delete')"

@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
+use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -31,11 +32,15 @@ class FormsController extends CpController
                     'delete_url' => $form->deleteUrl(),
                     'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
                     'deleteable' => User::current()->can('delete', $form),
+                    'actions' => Action::for($form),
                 ];
             })
             ->values();
 
-        return view('statamic::forms.index', compact('forms'));
+        return view('statamic::forms.index', [
+            'forms' => $forms,
+            'actionUrl' => cp_route('forms.actions.run'),
+        ]);
     }
 
     public function show($form)
