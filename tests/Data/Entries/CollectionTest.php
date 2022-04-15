@@ -671,17 +671,17 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_preview_targets()
+    public function it_gets_base_preview_targets()
     {
         $collection = (new Collection)->handle('test');
 
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->previewTargets());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->basePreviewTargets());
 
         $this->assertEquals([
             ['label' => 'Entry', 'format' => '{permalink}'],
-        ], $collection->previewTargets()->all());
+        ], $collection->basePreviewTargets()->all());
 
-        $return = $collection->previewTargets([
+        $return = $collection->basePreviewTargets([
             ['label' => 'Foo', 'format' => '{foo}'],
             ['label' => 'Bar', 'format' => '{bar}'],
         ]);
@@ -691,13 +691,37 @@ class CollectionTest extends TestCase
         $this->assertEquals([
             ['label' => 'Foo', 'format' => '{foo}'],
             ['label' => 'Bar', 'format' => '{bar}'],
-        ], $collection->previewTargets()->all());
+        ], $collection->basePreviewTargets()->all());
     }
 
     /** @test */
-    public function it_can_add_extra_preview_targets()
+    public function it_gets_extra_preview_targets()
     {
         $collection = (new Collection)->handle('test');
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->extraPreviewTargets());
+
+        $this->assertEquals([], $collection->extraPreviewTargets()->all());
+
+        $collection->extraPreviewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ]);
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $collection->extraPreviewTargets()->all());
+    }
+
+    /** @test */
+    public function it_gets_all_preview_targets()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertEquals([
+            ['label' => 'Entry', 'format' => '{permalink}'],
+        ], $collection->previewTargets()->all());
 
         $collection->extraPreviewTargets([
             ['label' => 'Foo', 'format' => '{foo}'],
@@ -709,23 +733,5 @@ class CollectionTest extends TestCase
             ['label' => 'Foo', 'format' => '{foo}'],
             ['label' => 'Bar', 'format' => '{bar}'],
         ], $collection->previewTargets()->all());
-    }
-
-    /** @test */
-    public function it_can_add_unique_extra_preview_targets_per_collection()
-    {
-        $collection = (new Collection)->handle('test');
-        $collection2 = (new Collection)->handle('test_2');
-
-        $collection->extraPreviewTargets([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
-        ]);
-
-        $collection2->extraPreviewTargets([
-            ['label' => 'Baz', 'format' => '{baz}'],
-        ]);
-
-        $this->assertNotEquals($collection->previewTargets()->all(), $collection2->previewTargets()->all());
     }
 }

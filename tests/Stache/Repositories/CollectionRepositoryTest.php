@@ -88,4 +88,29 @@ class CollectionRepositoryTest extends TestCase
         $this->assertTrue(file_exists($this->directory.'/new.yaml'));
         @unlink($this->directory.'/new.yaml');
     }
+
+    /** @test */
+    public function it_gets_extra_preview_targets()
+    {
+        $collection1 = (new Collection)->handle('test');
+        $collection2 = (new Collection)->handle('test_2');
+
+        $previewTargetsCollection1 = [
+            ['label' => 'Foo', 'format' => '{foo}'],
+        ];
+
+        $previewTargetsCollection2 = [
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ];
+
+        CollectionAPI::addExtraPreviewTargets('test', $previewTargetsCollection1);
+        CollectionAPI::addExtraPreviewTargets('test_2', $previewTargetsCollection2);
+
+        $previewTargetsTest = CollectionAPI::extraPreviewTargets('test');
+        $previewTargetsTest2 = CollectionAPI::extraPreviewTargets('test_2');
+
+        $this->assertEquals($previewTargetsCollection1, $previewTargetsTest->all());
+        $this->assertEquals($previewTargetsCollection2, $previewTargetsTest2->all());
+        $this->assertNotEquals($previewTargetsTest->all(), $previewTargetsTest2->all());
+    }
 }

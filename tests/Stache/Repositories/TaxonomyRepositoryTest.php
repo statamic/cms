@@ -97,4 +97,29 @@ class TaxonomyRepositoryTest extends TestCase
         $this->assertTrue(file_exists($this->directory.'/new.yaml'));
         @unlink($this->directory.'/new.yaml');
     }
+
+    /** @test */
+    public function it_gets_extra_preview_targets()
+    {
+        $taxonomy1 = (new Taxonomy)->handle('test');
+        $taxonomy2 = (new Taxonomy)->handle('test_2');
+
+        $previewTargetsTaxonomy1 = [
+            ['label' => 'Foo', 'format' => '{foo}'],
+        ];
+
+        $previewTargetsTaxonomy2 = [
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ];
+
+        TaxonomyAPI::addExtraPreviewTargets('test', $previewTargetsTaxonomy1);
+        TaxonomyAPI::addExtraPreviewTargets('test_2', $previewTargetsTaxonomy2);
+
+        $previewTargetsTest = TaxonomyAPI::extraPreviewTargets('test');
+        $previewTargetsTest2 = TaxonomyAPI::extraPreviewTargets('test_2');
+
+        $this->assertEquals($previewTargetsTaxonomy1, $previewTargetsTest->all());
+        $this->assertEquals($previewTargetsTaxonomy2, $previewTargetsTest2->all());
+        $this->assertNotEquals($previewTargetsTest->all(), $previewTargetsTest2->all());
+    }
 }
