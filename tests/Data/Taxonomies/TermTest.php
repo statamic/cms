@@ -161,7 +161,7 @@ class TermTest extends TestCase
             ['label' => 'Term', 'format' => '{permalink}', 'url' => 'http://domain.de/tags/das-foo'],
         ], $termDe->previewTargets()->all());
 
-        $taxonomy->previewTargets([
+        $taxonomy->basePreviewTargets([
             ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true'],
             ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true'],
         ])->save();
