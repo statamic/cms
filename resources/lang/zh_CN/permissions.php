@@ -24,9 +24,9 @@ return [
     'publish_{collection}_entries_desc' => '从草稿变为已发表，反之亦然的能力',
     'reorder_{collection}_entries' => '重新排序条目',
     'reorder_{collection}_entries_desc' => '启用拖放重新排序',
-    'edit_other_authors_{collection}_entries' => "编辑其他作者的条目",
-    'publish_other_authors_{collection}_entries' => "管理其他作者条目的发表状态",
-    'delete_other_authors_{collection}_entries' => "删除其他作者的条目",
+    'edit_other_authors_{collection}_entries' => '编辑其他作者的条目',
+    'publish_other_authors_{collection}_entries' => '管理其他作者条目的发表状态',
+    'delete_other_authors_{collection}_entries' => '删除其他作者的条目',
 
     'group_taxonomies' => '分类',
     'configure_taxonomies' => '配置分类',
