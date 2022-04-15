@@ -2,6 +2,7 @@
 
 namespace Statamic\Query;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
@@ -80,7 +81,31 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if (is_array($column)) {
+            return $this->addArrayOfWheres($column, $boolean);
+        }
+
+        if ($column instanceof Closure && is_null($operator)) {
+            return $this->whereNested($column, $boolean);
+        }
+
         $this->builder->where($this->column($column), $operator, $value, $boolean);
+
+        return $this;
+    }
+
+    public function orWhere($column, $operator = null, $value = null)
+    {
+        return $this->where($column, $operator, $value, 'or');
+    }
+
+    public function whereColumn($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->builder->whereColumn($this->column($column), $operator, $value, $boolean);
 
         return $this;
     }
@@ -88,6 +113,211 @@ abstract class EloquentQueryBuilder implements Builder
     public function whereIn($column, $values, $boolean = 'and')
     {
         $this->builder->whereIn($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereIn($column, $values)
+    {
+        return $this->whereIn($column, $values, 'or');
+    }
+
+    public function whereNotIn($column, $values, $boolean = 'and')
+    {
+        $this->builder->whereNotIn($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereNotIn($column, $values)
+    {
+        return $this->whereNotIn($column, $values, 'or');
+    }
+
+
+    public function whereJsonContains($column, $values, $boolean = 'and')
+    {
+        $this->builder->whereJsonContains($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereJsonContains($column, $values)
+    {
+        return $this->whereJsonContains($column, $values, 'or');
+    }
+
+    public function whereJsonDoesntContain($column, $values, $boolean = 'and')
+    {
+        $this->builder->whereJsonDoesntContain($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereJsonDoesntContain($column, $values)
+    {
+        return $this->whereJsonDoesntContain($column, $values, 'or');
+    }
+
+    public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->builder->whereJsonLength($this->column($column), $operator, $value, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereJsonLength($column, $operator, $value)
+    {
+        return $this->whereJsonLength($column, $operator, $value = null, 'or');
+    }
+
+    public function whereNull($column, $boolean = 'and', $not = false)
+    {
+        $this->builder->whereNull($this->column($column), $boolean, $not);
+
+        return $this;
+    }
+
+    public function orWhereNull($column)
+    {
+        return $this->whereNull($column, 'or');
+    }
+
+    public function whereNotNull($column, $boolean = 'and')
+    {
+        return $this->whereNull($column, $boolean, true);
+    }
+
+    public function orWhereNotNull($column)
+    {
+        return $this->whereNotNull($column, 'or');
+    }
+
+    public function whereBetween($column, $values, $boolean = 'and', $not = false)
+    {
+        $this->builder->whereBetween($this->column($column), $values, $boolean, $not);
+
+        return $this;
+    }
+
+    public function orWhereBetween($column, $values)
+    {
+        return $this->whereBetween($column, $values, 'or');
+    }
+
+    public function whereNotBetween($column, $values, $boolean = 'and')
+    {
+        return $this->whereBetween($column, $values, 'or', true);
+    }
+
+    public function orWhereNotBetween($column, $values)
+    {
+        return $this->whereNotBetween($column, $values, 'or');
+    }
+
+    public function whereDate($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->builder->whereDate($this->column($column), $operator, $value, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereDate($column, $operator, $value = null)
+    {
+        return $this->whereDate($column, $operator, $value, 'or');
+    }
+
+    public function whereMonth($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->builder->whereMonth($this->column($column), $operator, $value, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereMonth($column, $operator, $value = null)
+    {
+        return $this->whereMonth($column, $operator, $value, 'or');
+    }
+
+    public function whereDay($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->builder->whereDate($this->column($column), $operator, $value, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereDay($column, $operator, $value = null)
+    {
+        return $this->whereDay($column, $operator, $value, 'or');
+    }
+
+    public function whereYear($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->builder->whereYear($this->column($column), $operator, $value, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereYear($column, $operator, $value = null)
+    {
+        return $this->whereYear($column, $operator, $value, 'or');
+    }
+
+    public function whereTime($column, $operator, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->builder->whereTime($this->column($column), $operator, $value, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereTime($column, $operator, $value = null)
+    {
+        return $this->whereTime($column, $operator, $value, 'or');
+    }
+
+    public function whereNested(Closure $callback, $boolean = 'and')
+    {
+        call_user_func($callback, $query = $this->builder->getQuery()->forNestedWhere());
+        $this->builder->getQuery()->addNestedWhereQuery($query, $boolean);
+
+        return $this;
+    }
+
+    protected function addArrayOfWheres($column, $boolean, $method = 'where')
+    {
+        $this->whereNested(function ($query) use ($column, $method, $boolean) {
+            foreach ($column as $key => $value) {
+                if (is_numeric($key) && is_array($value)) {
+                    $query->{$method}(...array_values($value));
+                } else {
+                    $query->$method($key, '=', $value, $boolean);
+                }
+            }
+        }, $boolean);
 
         return $this;
     }
@@ -121,5 +351,22 @@ abstract class EloquentQueryBuilder implements Builder
         }
 
         return empty($selected) ? ['*'] : $selected;
+    }
+
+    public function prepareValueAndOperator($value, $operator, $useDefault = false)
+    {
+        if ($useDefault) {
+            return [$operator, '='];
+        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+            throw new InvalidArgumentException('Illegal operator and value combination.');
+        }
+
+        return [$value, $operator];
+    }
+
+    protected function invalidOperatorAndValue($operator, $value)
+    {
+        return is_null($value) && in_array($operator, array_keys($this->operators)) &&
+             ! in_array($operator, ['=', '<>', '!=']);
     }
 }
