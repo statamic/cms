@@ -148,7 +148,6 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->whereNotIn($column, $values, 'or');
     }
 
-
     public function whereJsonContains($column, $values, $boolean = 'and')
     {
         $this->builder->whereJsonContains($this->column($column), $values, $boolean);
