@@ -56,7 +56,7 @@ class CollectionsStore extends BasicStore
             ->sortDirection(array_get($data, 'sort_dir'))
             ->taxonomies(array_get($data, 'taxonomies'))
             ->propagate(array_get($data, 'propagate'))
-            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
+            ->basePreviewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection

@@ -45,7 +45,7 @@ class TaxonomiesStore extends BasicStore
             ->searchIndex(array_get($data, 'search_index'))
             ->defaultPublishState($this->getDefaultPublishState($data))
             ->sites($sites)
-            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
+            ->basePreviewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
     }
 
     protected function getDefaultPublishState($data)
