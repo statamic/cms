@@ -194,6 +194,7 @@ class FormsController extends CpController
                         'html' => ''.
                             '<div class="text-xs">'.
                             '   <a href="'.cp_route('forms.blueprint.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
                     ],
                     'honeypot' => [
                         'type' => 'text',
