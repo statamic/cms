@@ -13,7 +13,10 @@
             @endif
         </div>
 
-        <form-listing :forms="{{ json_encode($forms) }}" action-url="{{ $actionUrl }}"></form-listing>
+        <form-listing
+            :initial-columns="{{ json_encode($initialColumns) }}"
+            action-url="{{ $actionUrl }}"
+        ></form-listing>
 
     @else
 

@@ -1,5 +1,5 @@
 <template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows">
+    <data-list :visible-columns="columns" :columns="columns" :rows="items">
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table>
                 <template slot="cell-title" slot-scope="{ row: form }">
@@ -9,7 +9,7 @@
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="form.edit_url" />
                         <dropdown-item :text="__('Edit Blueprint')" :redirect="form.blueprint_url" />
-                        <div class="divider" v-if="form.deleteable || form.actions.length" />
+                        <div class="divider" v-if="form.actions.length" />
                         <data-list-inline-actions
                             :item="form.id"
                             :url="actionUrl"
@@ -31,15 +31,12 @@ export default {
 
     mixins: [Listing],
 
-    props: ['forms'],
+    props: ['initialColumns'],
 
     data() {
         return {
-            rows: this.forms,
-            columns: [
-                { field: 'title', label: __('Title') },
-                { field: 'submissions', label: __('Submissions') },
-            ]
+            columns: this.initialColumns,
+            requestUrl: cp_url('forms'),
         }
     }
 

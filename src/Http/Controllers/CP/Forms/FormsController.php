@@ -14,9 +14,14 @@ use Statamic\Support\Str;
 
 class FormsController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('index', FormContract::class);
+
+        $columns = [
+            Column::make('title')->label(__('Title')),
+            Column::make('submissions')->label(__('Submissions')),
+        ];
 
         $forms = Form::all()
             ->filter(function ($form) {
@@ -35,8 +40,19 @@ class FormsController extends CpController
             })
             ->values();
 
+        if ($request->wantsJson()) {
+            return [
+                'meta' => [
+                    'columns' => $columns,
+                    'activeFilterBadges' => [],
+                ],
+                'data' => $forms,
+            ];
+        }
+
         return view('statamic::forms.index', [
             'forms' => $forms,
+            'initialColumns' => $columns,
             'actionUrl' => cp_route('forms.actions.run'),
         ]);
     }
