@@ -256,7 +256,6 @@ class DocumentParser
                 $this->scanToEndOfAntlersRegion();
                 $this->isDoubleBrace = false;
 
-
                 break;
             }
 
