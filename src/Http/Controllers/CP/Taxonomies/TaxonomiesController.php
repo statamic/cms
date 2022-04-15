@@ -162,7 +162,7 @@ class TaxonomiesController extends CpController
 
         $taxonomy
             ->title($values['title'])
-            ->basePreviewTargets($values['preview_targets']);
+            ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);

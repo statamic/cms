@@ -179,7 +179,7 @@ class TaxonomyTest extends TestCase
             ['label' => 'Term', 'format' => '{permalink}'],
         ], $taxonomy->basePreviewTargets()->all());
 
-        $return = $taxonomy->basePreviewTargets([
+        $return = $taxonomy->previewTargets([
             ['label' => 'Foo', 'format' => '{foo}'],
             ['label' => 'Bar', 'format' => '{bar}'],
         ]);
@@ -198,6 +198,10 @@ class TaxonomyTest extends TestCase
         $taxonomy = (new Taxonomy)->handle('test');
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->extraPreviewTargets());
+
+        $taxonomy->previewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+        ]);
 
         $this->assertEquals([], $taxonomy->extraPreviewTargets()->all());
 
@@ -232,23 +236,4 @@ class TaxonomyTest extends TestCase
             ['label' => 'Bar', 'format' => '{bar}'],
         ], $taxonomy->previewTargets()->all());
     }
-
-    /** @test */
-    // TODO: Move this to the taxonomy test
-    // public function it_can_add_unique_extra_preview_targets_per_taxonomy()
-    // {
-    //     $taxonomy = (new Taxonomy)->handle('test');
-    //     $taxonomy2 = (new Taxonomy)->handle('test_2');
-
-    //     $taxonomy->extraPreviewTargets([
-    //         ['label' => 'Foo', 'format' => '{foo}'],
-    //         ['label' => 'Bar', 'format' => '{bar}'],
-    //     ]);
-
-    //     $taxonomy2->extraPreviewTargets([
-    //         ['label' => 'Baz', 'format' => '{baz}'],
-    //     ]);
-
-    //     $this->assertNotEquals($taxonomy->previewTargets()->all(), $taxonomy2->previewTargets()->all());
-    // }
 }

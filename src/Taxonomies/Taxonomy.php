@@ -342,18 +342,23 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         ], $this->supplements->all());
     }
 
-    public function basePreviewTargets($targets = null)
+    public function previewTargets($targets = null)
     {
         return $this
             ->fluentlyGetOrSet('previewTargets')
-            ->getter(function ($targets) {
-                if (empty($targets)) {
-                    $targets = $this->defaultPreviewTargets();
-                }
-
-                return collect($targets);
+            ->getter(function () {
+                return $this->basePreviewTargets()->merge($this->extraPreviewTargets());
             })
             ->args(func_get_args());
+    }
+
+    public function basePreviewTargets()
+    {
+        $targets = empty($this->previewTargets)
+            ? $this->defaultPreviewTargets()
+            : $this->previewTargets;
+
+        return collect($targets);
     }
 
     public function extraPreviewTargets($targets = null)
@@ -365,11 +370,6 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         \Statamic\Facades\Taxonomy::addExtraPreviewTargets($this->handle, $targets);
 
         return $this;
-    }
-
-    public function previewTargets()
-    {
-        return $this->basePreviewTargets()->merge($this->extraPreviewTargets());
     }
 
     private function defaultPreviewTargets()

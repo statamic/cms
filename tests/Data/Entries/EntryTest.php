@@ -1789,7 +1789,7 @@ class EntryTest extends TestCase
             ['label' => 'Entry', 'format' => '{permalink}', 'url' => 'http://domain.de/das-blog/das-foo'],
         ], $entryDe->previewTargets()->all());
 
-        $collection->basePreviewTargets([
+        $collection->previewTargets([
             ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true'],
             ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true'],
         ])->save();

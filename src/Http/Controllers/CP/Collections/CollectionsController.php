@@ -238,7 +238,7 @@ class CollectionsController extends CpController
             ->propagate(array_get($values, 'propagate'))
             ->titleFormats($values['title_formats'])
             ->requiresSlugs($values['require_slugs'])
-            ->basePreviewTargets($values['preview_targets']);
+            ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);

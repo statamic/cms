@@ -681,7 +681,7 @@ class CollectionTest extends TestCase
             ['label' => 'Entry', 'format' => '{permalink}'],
         ], $collection->basePreviewTargets()->all());
 
-        $return = $collection->basePreviewTargets([
+        $return = $collection->previewTargets([
             ['label' => 'Foo', 'format' => '{foo}'],
             ['label' => 'Bar', 'format' => '{bar}'],
         ]);
@@ -700,6 +700,10 @@ class CollectionTest extends TestCase
         $collection = (new Collection)->handle('test');
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->extraPreviewTargets());
+
+        $collection->previewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+        ]);
 
         $this->assertEquals([], $collection->extraPreviewTargets()->all());
 
