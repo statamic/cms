@@ -13,6 +13,20 @@ abstract class EloquentQueryBuilder implements Builder
     protected $builder;
     protected $columns;
 
+    protected $operators = [
+        '=' => 'Equals',
+        '<>' => 'NotEquals',
+        '!=' => 'NotEquals',
+        'like' => 'Like',
+        'not like' => 'NotLike',
+        'regexp' => 'LikeRegex',
+        'not regexp' => 'NotLikeRegex',
+        '>' => 'GreaterThan',
+        '<' => 'LessThan',
+        '>=' => 'GreaterThanOrEqualTo',
+        '<=' => 'LessThanOrEqualTo',
+    ];
+
     public function __construct(EloquentBuilder $builder)
     {
         $this->builder = $builder;
