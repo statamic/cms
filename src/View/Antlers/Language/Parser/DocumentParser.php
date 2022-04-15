@@ -867,7 +867,7 @@ class DocumentParser
                         $this->threeCharCollisionCount += 1;
                         $this->threeCharCollisions[$content] = $this->threeCharCollisionCount;
                     }
-                    $varContent = 'i' . $this->threeCharCollisionCount;
+                    $varContent = 'i'.$this->threeCharCollisionCount;
                 } else {
                     $this->interpolatedCollisionCount[$varContent] += 1;
                     $varContent = str_replace('_', $this->interpolatedCollisionCount[$varContent], $varContent);

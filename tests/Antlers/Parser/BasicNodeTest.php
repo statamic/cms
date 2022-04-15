@@ -261,9 +261,9 @@ EOT;
             'method' => 'some_method',
             'title' => 'The Title',
             'articles' => [
-                ['title' => 'one',],
-                ['title' => 'two',],
-                ['title' => 'three',],
+                ['title' => 'one'],
+                ['title' => 'two'],
+                ['title' => 'three'],
             ],
         ];
 
