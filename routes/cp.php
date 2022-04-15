@@ -181,7 +181,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('forms/actions/list', 'ActionController@bulkActions')->name('forms.actions.bulk');
         Route::post('forms/{form}/submissions/actions', 'SubmissionActionController@run')->name('forms.submissions.actions.run');
         Route::post('forms/{form}/submissions/actions/list', 'SubmissionActionController@bulkActions')->name('forms.submissions.actions.bulk');
-        Route::resource('forms', 'FormsController');
+        Route::resource('forms', 'FormsController')->except('destroy');
         Route::resource('forms.submissions', 'FormSubmissionsController');
         Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
         Route::get('forms/{form}/blueprint', 'FormBlueprintController@edit')->name('forms.blueprint.edit');
