@@ -105,7 +105,7 @@ abstract class EloquentQueryBuilder implements Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $this->builder->whereColumn($this->column($column), $operator, $value, $boolean);
+        $this->builder->whereColumn($this->column($column), $operator, $this->column($value), $boolean);
 
         return $this;
     }
