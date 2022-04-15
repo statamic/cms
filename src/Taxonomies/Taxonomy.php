@@ -38,7 +38,6 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
-    protected static $extraPreviewTargets = [];
 
     public function __construct()
     {
@@ -343,7 +342,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         ], $this->supplements->all());
     }
 
-    public function previewTargets($targets = null)
+    public function basePreviewTargets($targets = null)
     {
         return $this
             ->fluentlyGetOrSet('previewTargets')
@@ -352,28 +351,25 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
                     $targets = $this->defaultPreviewTargets();
                 }
 
-                return collect($targets)->merge($this->extraPreviewTargets());
+                return collect($targets);
             })
             ->args(func_get_args());
     }
 
     public function extraPreviewTargets($targets = null)
     {
-        return $this
-            ->fluentlyGetOrSet('extraPreviewTargets')
-            ->setter(function ($targets) {
-                $targets = collect(self::$extraPreviewTargets[$this->handle] ?? [])
-                    ->merge($targets)
-                    ->unique(function ($target) {
-                        return $target['format'];
-                    })->toArray();
+        if (! $targets) {
+            return \Statamic\Facades\Taxonomy::extraPreviewTargets($this->handle);
+        }
 
-                return array_merge(self::$extraPreviewTargets, [$this->handle => $targets]);
-            })
-            ->getter(function () {
-                return self::$extraPreviewTargets[$this->handle] ?? [];
-            })
-            ->args(func_get_args());
+        \Statamic\Facades\Taxonomy::addExtraPreviewTargets($this->handle, $targets);
+
+        return $this;
+    }
+
+    public function previewTargets()
+    {
+        return $this->basePreviewTargets()->merge($this->extraPreviewTargets());
     }
 
     private function defaultPreviewTargets()

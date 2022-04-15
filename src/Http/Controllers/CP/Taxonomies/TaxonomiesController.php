@@ -132,7 +132,7 @@ class TaxonomiesController extends CpController
             'blueprints' => $taxonomy->termBlueprints()->map->handle()->all(),
             'collections' => $taxonomy->collections()->map->handle()->all(),
             'sites' => $taxonomy->sites()->all(),
-            'preview_targets' => $taxonomy->previewTargets(),
+            'preview_targets' => $taxonomy->basePreviewTargets(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
@@ -162,7 +162,7 @@ class TaxonomiesController extends CpController
 
         $taxonomy
             ->title($values['title'])
-            ->previewTargets($values['preview_targets']);
+            ->basePreviewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
