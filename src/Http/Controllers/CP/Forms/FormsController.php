@@ -191,10 +191,9 @@ class FormsController extends CpController
                     'blueprint' => [
                         'type' => 'html',
                         'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                        'html' => '' .
-                            '<div class="text-xs">' .
-                            '   <a href="' . cp_route('forms.blueprint.edit', $form->handle()) . '" class="text-blue">' . __('Edit') . '</a>' .
-                            '</div>',
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <a href="'.cp_route('forms.blueprint.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
                     ],
                     'honeypot' => [
                         'type' => 'text',
@@ -237,7 +236,7 @@ class FormsController extends CpController
                                 'field' => [
                                     'type' => 'text',
                                     'display' => __('Sender'),
-                                    'instructions' => __('statamic::messages.form_configure_email_from_instructions') . ' (' . config('mail.from.address') . ').',
+                                    'instructions' => __('statamic::messages.form_configure_email_from_instructions').' ('.config('mail.from.address').').',
                                 ],
                             ],
                             [
