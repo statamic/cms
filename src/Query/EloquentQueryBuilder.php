@@ -78,16 +78,16 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->builder->count();
     }
 
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        $this->builder->where($this->column($column), $operator, $value);
+        $this->builder->where($this->column($column), $operator, $value, $boolean);
 
         return $this;
     }
 
-    public function whereIn($column, $values)
+    public function whereIn($column, $values, $boolean = 'and')
     {
-        $this->builder->whereIn($this->column($column), $values);
+        $this->builder->whereIn($this->column($column), $values, $boolean);
 
         return $this;
     }
