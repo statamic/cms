@@ -17,6 +17,18 @@
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
+                        <dropdown-item
+                            v-if="form.deleteable"
+                            :text="__('Delete')"
+                            class="warning"
+                            @click="$refs[`deleter_${form.id}`].confirm()"
+                        >
+                            <resource-deleter
+                                :ref="`deleter_${form.id}`"
+                                :resource="form"
+                                @deleted="removeRow(form)">
+                            </resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
                 </template>
             </data-list-table>
