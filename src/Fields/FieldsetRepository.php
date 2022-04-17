@@ -10,18 +10,45 @@ use Statamic\Facades\YAML;
 class FieldsetRepository
 {
     protected $fieldsets = [];
-    protected $directory;
+    protected $directories = [];
 
-    public function setDirectory($directory)
+    public function setDirectory($directories)
     {
-        $this->directory = Path::tidy($directory);
+        if (is_string($directories)) {
+            $directories = [$directories];
+        }
+
+        $this->directories = array_map(function ($directory) {
+            return Path::tidy($directory);
+        }, $directories);
 
         return $this;
     }
 
     public function directory()
     {
-        return $this->directory;
+        return array_first($this->directories);
+    }
+
+    public function directories()
+    {
+        return $this->directories;
+    }
+
+    public function path(string $handle): ?string
+    {
+        $path = str_replace('.', '/', $handle);
+
+        foreach ($this->directories as $directory) {
+            if (File::exists("{$directory}/{$path}.yaml")) {
+                return Path::tidy(vsprintf('%s/%s.yaml', [
+                    $directory,
+                    $path,
+                ]));
+            }
+        }
+
+        return null;
     }
 
     public function find(string $handle): ?Fieldset
@@ -31,9 +58,9 @@ class FieldsetRepository
         }
 
         $handle = str_replace('/', '.', $handle);
-        $path = str_replace('.', '/', $handle);
+        $path = $this->path($handle);
 
-        if (! File::exists($path = "{$this->directory}/{$path}.yaml")) {
+        if ($path === null) {
             return null;
         }
 
@@ -49,9 +76,9 @@ class FieldsetRepository
     public function exists(string $handle): bool
     {
         $handle = str_replace('/', '.', $handle);
-        $path = str_replace('.', '/', $handle);
+        $filename = str_replace('.', '/', $handle);
 
-        return File::exists($path = "{$this->directory}/{$path}.yaml");
+        return $this->path($handle) !== null;
     }
 
     public function make($handle = null): Fieldset
@@ -61,38 +88,60 @@ class FieldsetRepository
 
     public function all(): Collection
     {
-        if (! File::exists($this->directory)) {
-            return collect();
+        $fieldsets = collect();
+
+        foreach ($this->directories as $directory) {
+            if (! File::exists($directory)) {
+                continue;
+            }
+
+            File::withAbsolutePaths()
+                ->getFilesByTypeRecursively($directory, 'yaml')
+                ->map(function ($file) use ($directory) {
+                    $basename = str_after($file, str_finish($directory, '/'));
+                    $handle = str_before($basename, '.yaml');
+                    $handle = str_replace('/', '.', $handle);
+
+                    return (new Fieldset)
+                        ->setHandle($handle)
+                        ->setContents(YAML::file($file)->parse());
+                })
+                ->keyBy->handle()
+                ->each(function ($fieldset, $handle) use ($fieldsets) {
+                    if (! $fieldsets->has($handle)) {
+                        $fieldsets->put($handle, $fieldset);
+                    }
+                });
         }
 
-        return File::withAbsolutePaths()
-            ->getFilesByTypeRecursively($this->directory, 'yaml')
-            ->map(function ($file) {
-                $basename = str_after($file, str_finish($this->directory, '/'));
-                $handle = str_before($basename, '.yaml');
-                $handle = str_replace('/', '.', $handle);
-
-                return (new Fieldset)
-                    ->setHandle($handle)
-                    ->setContents(YAML::file($file)->parse());
-            })
-            ->keyBy->handle();
+        return $fieldsets;
     }
 
     public function save(Fieldset $fieldset)
     {
-        if (! File::exists($this->directory)) {
-            File::makeDirectory($this->directory);
+        $handle = str_replace('/', '.', $fieldset->handle());
+        $path = $this->path($handle);
+
+        if ($path === null) {
+            $path = sprintf('%s/%s.yaml', $this->directory(), str_replace('.', '/', $handle));
+        }
+
+        if (! File::exists(dirname($path))) {
+            File::makeDirectory(dirname($path));
         }
 
         File::put(
-            "{$this->directory}/{$fieldset->handle()}.yaml",
+            $path,
             YAML::dump($fieldset->contents())
         );
     }
 
     public function delete(Fieldset $fieldset)
     {
-        File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
+        $handle = str_replace('/', '.', $fieldset->handle());
+
+        if (($path = $this->path($handle)) !== null) {
+            File::delete($path);
+        }
     }
 }

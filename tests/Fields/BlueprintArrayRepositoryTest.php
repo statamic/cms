@@ -10,20 +10,23 @@ use Statamic\Fields\BlueprintRepository;
 use Statamic\Support\FileCollection;
 use Tests\TestCase;
 
-class BlueprintRepositoryTest extends TestCase
+class BlueprintArrayRepositoryTest extends TestCase
 {
     public function setUp(): void
     {
         parent::setUp();
 
         $this->repo = app(BlueprintRepository::class)
-            ->setDirectory('/path/to/resources/blueprints');
+            ->setDirectory([
+                '/path/to/resources/blueprints',
+                '/another/path/to/resources/blueprints',
+            ]);
 
         Facades\Blueprint::swap($this->repo);
     }
 
     /** @test */
-    public function it_gets_a_blueprint()
+    public function it_gets_a_blueprint_from_additional_directory()
     {
         $contents = <<<'EOT'
 title: Test
@@ -33,8 +36,9 @@ sections:
       - one
       - two
 EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturnTrue();
-        File::shouldReceive('get')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturn($contents);
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/another/path/to/resources/blueprints/test.yaml')->once()->andReturn($contents);
 
         $blueprint = $this->repo->find('test');
 
@@ -52,7 +56,7 @@ EOT;
     }
 
     /** @test */
-    public function it_gets_a_blueprint_in_a_namespace()
+    public function it_gets_a_blueprint_in_a_namespace_in_the_additional_directory()
     {
         $contents = <<<'EOT'
 title: Test
@@ -62,8 +66,9 @@ sections:
       - one
       - two
 EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturnTrue();
-        File::shouldReceive('get')->with('/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturn($contents);
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/another/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturn($contents);
 
         $blueprint = $this->repo->find('foo.bar.baz');
 
@@ -81,17 +86,18 @@ EOT;
     }
 
     /** @test */
-    public function it_gets_a_blueprint_path()
+    public function it_gets_a_blueprint_path_from_additional_directory()
     {
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/test.yaml')->once()->andReturnTrue();
 
         $path = $this->repo->path('test');
 
-        $this->assertEquals('/path/to/resources/blueprints/test.yaml', $path);
+        $this->assertEquals('/another/path/to/resources/blueprints/test.yaml', $path);
     }
 
     /** @test */
-    public function it_gets_a_blueprint_path_in_a_namespace()
+    public function it_gets_a_blueprint_path_in_a_namespace_in_additional_directory()
     {
         $contents = <<<'EOT'
 title: Test
@@ -101,28 +107,19 @@ sections:
       - one
       - two
 EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturnTrue();
-        File::shouldReceive('get')->with('/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturn($contents);
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturnTrue();
 
-        $blueprint = $this->repo->find('foo.bar.baz');
+        $path = $this->repo->path('foo.bar.baz');
 
-        $this->assertInstanceOf(Blueprint::class, $blueprint);
-        $this->assertEquals('baz', $blueprint->handle());
-        $this->assertEquals('foo.bar', $blueprint->namespace());
-        $this->assertEquals([
-            'title' => 'Test',
-            'sections' => [
-                'main' => [
-                    'fields' => ['one', 'two'],
-                ],
-            ],
-        ], $blueprint->contents());
+        $this->assertEquals('/another/path/to/resources/blueprints/foo/bar/baz.yaml', $path);
     }
 
     /** @test */
     public function it_returns_null_if_path_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
 
         $path = $this->repo->path('unknown');
 
@@ -133,6 +130,7 @@ EOT;
     public function it_returns_null_if_blueprint_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
 
         $this->assertNull($this->repo->find('unknown'));
     }
@@ -141,30 +139,16 @@ EOT;
     public function it_returns_null_if_blueprint_doesnt_exist_in_a_namespace()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnFalse();
 
         $this->assertNull($this->repo->find('foo.bar.unknown'));
-    }
-
-    /** @test */
-    public function it_gets_fallback_path()
-    {
-        $fallbackPath = $this->repo->fallbackPath('unknown');
-
-        $this->assertEquals('/path/to/resources/blueprints/unknown.yaml', $fallbackPath);
-    }
-
-    /** @test */
-    public function it_gets_fallback_path_in_namespace()
-    {
-        $fallbackPath = $this->repo->fallbackPath('foo.bar.unknown');
-
-        $this->assertEquals('/path/to/resources/blueprints/foo/bar/unknown.yaml', $fallbackPath);
     }
 
     /** @test */
     public function it_gets_fallback_blueprint()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
 
         $fallback = $this->repo->make();
         $this->repo->setFallback('unknown', function () use ($fallback) {
@@ -180,6 +164,7 @@ EOT;
     public function it_gets_namespaced_fallback_blueprint()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnNull();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnNull();
 
         $fallback = $this->repo->make();
         $this->repo->setFallback('foo.bar.unknown', function () use ($fallback) {
@@ -195,6 +180,7 @@ EOT;
     public function getting_a_non_existent_namespaced_blueprint_will_not_return_the_non_namespaced_fallback()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnNull();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnNull();
 
         $fallback = $this->repo->make();
         $this->repo->setFallback('unknown', function () use ($fallback) {
@@ -205,7 +191,7 @@ EOT;
     }
 
     /** @test */
-    public function it_saves_to_disk()
+    public function it_saves_to_disk_in_additional_folder()
     {
         $expectedYaml = <<<'EOT'
 title: 'Test Blueprint'
@@ -227,8 +213,10 @@ sections:
           bar: foo
 
 EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints/the_test_blueprint.yaml')->once()->andReturnTrue();
-        File::shouldReceive('put')->with('/path/to/resources/blueprints/the_test_blueprint.yaml', $expectedYaml)->once();
+
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/the_test_blueprint.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/the_test_blueprint.yaml')->once()->andReturnTrue();
+        File::shouldReceive('put')->with('/another/path/to/resources/blueprints/the_test_blueprint.yaml', $expectedYaml)->once();
 
         $blueprint = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
             'title' => 'Test Blueprint',
@@ -261,16 +249,25 @@ EOT;
     }
 
     /** @test */
-    public function it_gets_blueprints_in_a_namespace()
+    public function it_gets_blueprints_in_a_namespace_with_additional_directories()
     {
-        $dir = '/path/to/resources/blueprints/collections/blog';
+        $default_dir = '/path/to/resources/blueprints/collections/blog';
+
         File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
-        File::shouldReceive('exists')->with($dir)->once()->andReturnTrue();
-        File::shouldReceive('getFilesByType')->with($dir, 'yaml')->once()->andReturn(
-            new FileCollection([$dir.'/first.yaml', $dir.'/second.yaml'])
+        File::shouldReceive('exists')->with($default_dir)->once()->andReturnTrue();
+        File::shouldReceive('getFilesByType')->with($default_dir, 'yaml')->once()->andReturn(
+            new FileCollection([$default_dir.'/first.yaml'])
         );
-        File::shouldReceive('get')->with($dir.'/first.yaml')->once()->andReturn('title: First Blueprint');
-        File::shouldReceive('get')->with($dir.'/second.yaml')->once()->andReturn('title: Second Blueprint');
+        File::shouldReceive('get')->with($default_dir.'/first.yaml')->once()->andReturn('title: First Blueprint');
+
+        $additional_dir = '/another/path/to/resources/blueprints/collections/blog';
+
+        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
+        File::shouldReceive('exists')->with($additional_dir)->once()->andReturnTrue();
+        File::shouldReceive('getFilesByType')->with($additional_dir, 'yaml')->once()->andReturn(
+            new FileCollection([$additional_dir.'/second.yaml'])
+        );
+        File::shouldReceive('get')->with($additional_dir.'/second.yaml')->once()->andReturn('title: Second Blueprint');
 
         $blueprints = $this->repo->in('collections.blog');
 
@@ -287,6 +284,7 @@ EOT;
     public function it_returns_empty_collection_if_directory_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/test')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/blueprints/test')->once()->andReturnFalse();
 
         $all = $this->repo->in('test');
 

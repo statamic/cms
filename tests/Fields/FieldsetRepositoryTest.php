@@ -69,6 +69,26 @@ EOT;
     }
 
     /** @test */
+    public function it_gets_a_fieldset_path()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
+
+        $path = $this->repo->path('test');
+
+        $this->assertEquals('/path/to/resources/fieldsets/test.yaml', $path);
+    }
+
+    /** @test */
+    public function it_returns_null_if_path_doesnt_exist()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
+
+        $path = $this->repo->path('unknown');
+
+        $this->assertNull($path);
+    }
+
+    /** @test */
     public function it_returns_null_if_fieldset_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
@@ -156,6 +176,7 @@ fields:
       bar: baz
 
 EOT;
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml')->once()->andReturnFalse();
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
         File::shouldReceive('makeDirectory')->with('/path/to/resources/fieldsets')->once();
         File::shouldReceive('put')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml', $expectedYaml)->once();
@@ -171,5 +192,55 @@ EOT;
         ]);
 
         $this->repo->save($fieldset);
+    }
+
+    /** @test */
+    public function it_saves_to_disk_in_a_subdirectory()
+    {
+        $expectedYaml = <<<'EOT'
+title: 'Test Fieldset'
+fields:
+  -
+    handle: foo
+    field:
+      type: textarea
+      bar: baz
+
+EOT;
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub')->once()->andReturnFalse();
+        File::shouldReceive('makeDirectory')->with('/path/to/resources/fieldsets/sub')->once();
+        File::shouldReceive('put')->with('/path/to/resources/fieldsets/sub/test.yaml', $expectedYaml)->once();
+
+        $fieldset = (new Fieldset)->setHandle('sub/test')->setContents([
+            'title' => 'Test Fieldset',
+            'fields' => [
+                [
+                    'handle' => 'foo',
+                    'field' => ['type' => 'textarea', 'bar' => 'baz'],
+                ],
+            ],
+        ]);
+
+        $this->repo->save($fieldset);
+    }
+
+    /** @test */
+    public function it_deletes_from_disk()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml')->once()->andReturnTrue();
+        File::shouldReceive('delete')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml')->once();
+
+        $fieldset = (new Fieldset)->setHandle('the_test_fieldset')->setContents([
+            'title' => 'Test Fieldset',
+            'fields' => [
+                [
+                    'handle' => 'foo',
+                    'field' => ['type' => 'textarea', 'bar' => 'baz'],
+                ],
+            ],
+        ]);
+
+        $this->repo->delete($fieldset);
     }
 }

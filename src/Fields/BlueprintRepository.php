@@ -16,19 +16,70 @@ class BlueprintRepository
     private const BLINK_FROM_FILE = 'blueprints.from-file';
     private const BLINK_NAMESPACE_PATHS = 'blueprints.paths-in-namespace';
 
-    protected $directory;
+    protected $directories = [];
     protected $fallbacks = [];
 
-    public function setDirectory(string $directory)
+    public function setDirectory(array|string $directories)
     {
-        $this->directory = Path::tidy($directory);
+        if (is_string($directories)) {
+            $directories = [$directories];
+        }
+
+        $this->directories = array_map(function ($directory) {
+            return Path::tidy($directory);
+        }, $directories);
 
         return $this;
     }
 
     public function directory()
     {
-        return $this->directory;
+        return array_first($this->directories);
+    }
+
+    public function directories()
+    {
+        return $this->directories;
+    }
+
+    public function path(string $blueprint): ?string
+    {
+        $path = str_replace('.', '/', $blueprint);
+
+        foreach ($this->directories as $directory) {
+            if (File::exists("{$directory}/{$path}.yaml")) {
+                return Path::tidy(vsprintf('%s/%s.yaml', [
+                    $directory,
+                    $path,
+                ]));
+            }
+        }
+
+        return null;
+    }
+
+    public function fallbackPath($handle)
+    {
+        [$namespace, $handle] = $this->getNamespaceAndHandle($handle);
+
+        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
+            $this->directory(),
+            str_replace('.', '/', $namespace),
+            $handle,
+        ]));
+    }
+
+    private function blueprintDirectory(string $blueprint): ?string
+    {
+        $path = str_replace('.', '/', $blueprint);
+
+        foreach ($this->directories as $directory) {
+            if (Str::startsWith($blueprint, $directory)) {
+                return $directory;
+            }
+        }
+
+        return null;
     }
 
     public function find($blueprint): ?Blueprint
@@ -38,9 +89,7 @@ class BlueprintRepository
                 return null;
             }
 
-            $path = $this->directory.'/'.str_replace('.', '/', $blueprint).'.yaml';
-
-            return File::exists($path)
+            return ($path = $this->path($blueprint)) !== null
                 ? $this->makeBlueprintFromFile($path)
                 : $this->findFallback($blueprint);
         });
@@ -143,15 +192,25 @@ class BlueprintRepository
     private function filesIn($namespace)
     {
         return Blink::store(self::BLINK_NAMESPACE_PATHS)->once($namespace, function () use ($namespace) {
-            $namespace = str_replace('/', '.', $namespace);
-            $namespaceDir = str_replace('.', '/', $namespace);
-            $directory = $this->directory.'/'.$namespaceDir;
+            $files = collect();
 
-            if (! File::exists(Str::removeRight($directory, '/'))) {
-                return collect();
+            foreach ($this->directories as $directory) {
+                $namespace = str_replace('/', '.', $namespace);
+                $namespaceDir = str_replace('.', '/', $namespace);
+                $directory = $directory.'/'.$namespaceDir;
+
+                if (! File::exists(Str::removeRight($directory, '/'))) {
+                    continue;
+                }
+
+                File::withAbsolutePaths()
+                    ->getFilesByType($directory, 'yaml')
+                    ->each(function ($blueprint) use ($files) {
+                        $files->push($blueprint);
+                    });
             }
 
-            return File::withAbsolutePaths()->getFilesByType($directory, 'yaml');
+            return $files;
         });
     }
 
@@ -159,7 +218,10 @@ class BlueprintRepository
     {
         return Blink::store(self::BLINK_FROM_FILE)->once($path, function () use ($path) {
             [$namespace, $handle] = $this->getNamespaceAndHandle(
-                Str::after(Str::before($path, '.yaml'), $this->directory.'/')
+                Str::after(
+                    Str::before($path, '.yaml'),
+                    $this->blueprintDirectory($path).'/'
+                )
             );
 
             $contents = YAML::file($path)->parse();
