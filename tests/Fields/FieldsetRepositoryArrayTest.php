@@ -46,36 +46,7 @@ class FieldsetRepositoryArrayTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_a_fieldset_from_default_directory()
-    {
-        $contents = <<<'EOT'
-title: Test Fieldset
-fields:
-  -
-    handle: one
-    field:
-      type: text
-      display: First Field
-  -
-    handle: two
-    field:
-      type: text
-      display: Second Field
-EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
-        File::shouldReceive('get')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturn($contents);
-
-        $fieldset = $this->repo->find('test');
-
-        $this->assertInstanceOf(Fieldset::class, $fieldset);
-        $this->assertEquals('Test Fieldset', $fieldset->title());
-        $this->assertEquals('test', $fieldset->handle());
-        $this->assertEquals(['one', 'two'], $fieldset->fields()->all()->map->handle()->values()->all());
-        $this->assertEquals(['First Field', 'Second Field'], $fieldset->fields()->all()->map->display()->values()->all());
-    }
-
-    /** @test */
-    public function it_gets_a_fieldset_from_second_directory()
+    public function it_gets_a_fieldset_from_additional_directory()
     {
         $contents = <<<'EOT'
 title: Test External Fieldset
@@ -105,17 +76,7 @@ EOT;
     }
 
     /** @test */
-    public function it_gets_a_fieldset_path_from_default_directory()
-    {
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
-
-        $path = $this->repo->path('test');
-
-        $this->assertEquals('/path/to/resources/fieldsets/test.yaml', $path);
-    }
-
-    /** @test */
-    public function it_gets_a_fieldset_path_from_second_directory()
+    public function it_gets_a_fieldset_path_from_additional_directory()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnFalse();
         File::shouldReceive('exists')->with('/another/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
@@ -137,27 +98,7 @@ EOT;
     }
 
     /** @test */
-    public function it_gets_a_fieldset_in_first_subdirectory()
-    {
-        $contents = <<<'EOT'
-title: Test Fieldset
-fields: []
-EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->twice()->andReturnTrue();
-        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/test.yaml')->twice()->andReturn($contents);
-
-        $fieldset = $this->repo->find('sub.test');
-
-        $this->assertInstanceOf(Fieldset::class, $fieldset);
-        $this->assertEquals('Test Fieldset', $fieldset->title());
-        $this->assertEquals('sub.test', $fieldset->handle());
-
-        // Test that using slash delimiter instead of dots returns the same thing.
-        $this->assertEquals($fieldset, $this->repo->find('sub/test'));
-    }
-
-    /** @test */
-    public function it_gets_a_fieldset_in_second_subdirectory()
+    public function it_gets_a_fieldset_in_additional_subdirectory()
     {
         $contents = <<<'EOT'
 title: Test Fieldset
@@ -189,13 +130,14 @@ EOT;
     }
 
     /** @test */
-    public function it_checks_if_a_fieldset_exists()
+    public function it_checks_if_a_fieldset_exists_in_additional_directory()
     {
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/additional.yaml')->once()->andReturnFalse();
         File::shouldReceive('exists')->with('/another/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/another/path/to/resources/fieldsets/additional.yaml')->once()->andReturnTrue();
 
-        $this->assertTrue($this->repo->exists('test'));
+        $this->assertTrue($this->repo->exists('additional'));
         $this->assertFalse($this->repo->exists('unknown'));
     }
 
@@ -310,39 +252,7 @@ EOT;
     }
 
     /** @test */
-    public function it_saves_to_disk_using_first_default_folder()
-    {
-        $expectedYaml = <<<'EOT'
-title: 'Test Fieldset'
-fields:
-  -
-    handle: foo
-    field:
-      type: textarea
-      bar: baz
-
-EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml')->once()->andReturnFalse();
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
-        File::shouldReceive('exists')->with('/another/path/to/resources/fieldsets/the_test_fieldset.yaml')->once()->andReturnFalse();
-        File::shouldReceive('makeDirectory')->with('/path/to/resources/fieldsets')->once();
-        File::shouldReceive('put')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml', $expectedYaml)->once();
-
-        $fieldset = (new Fieldset)->setHandle('the_test_fieldset')->setContents([
-            'title' => 'Test Fieldset',
-            'fields' => [
-                [
-                    'handle' => 'foo',
-                    'field' => ['type' => 'textarea', 'bar' => 'baz'],
-                ],
-            ],
-        ]);
-
-        $this->repo->save($fieldset);
-    }
-
-    /** @test */
-    public function it_saves_to_disk_in_second_folder()
+    public function it_saves_to_disk_in_additional_folder()
     {
         $expectedYaml = <<<'EOT'
 title: 'Test Fieldset'
@@ -373,7 +283,7 @@ EOT;
     }
 
     /** @test */
-    public function it_deletes_from_disk_in_second_folder()
+    public function it_deletes_from_disk_in_additional_folder()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml')->once()->andReturnFalse();
         File::shouldReceive('exists')->with('/another/path/to/resources/fieldsets/the_test_fieldset.yaml')->once()->andReturnTrue();

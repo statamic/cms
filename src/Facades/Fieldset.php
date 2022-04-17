@@ -7,6 +7,7 @@ use Statamic\Fields\FieldsetRepository;
 
 /**
  * @method static self setDirectory($directory)
+ * @method static null|string path(string $handle)
  * @method static null|\Statamic\Fields\Fieldset find(string $handle)
  * @method static bool exists(string $handle)
  * @method static \Statamic\Fields\Fieldset make($handle = null)

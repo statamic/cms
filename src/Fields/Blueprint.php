@@ -18,7 +18,6 @@ use Statamic\Events\BlueprintSaved;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -106,11 +105,19 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 
     public function path()
     {
-        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
-            Facades\Blueprint::directory(),
-            str_replace('.', '/', $this->namespace()),
+        $path = Facades\Blueprint::path(ltrim(vsprintf('%s/%s', [
+            $this->namespace(),
             $this->handle(),
-        ]));
+        ]), '/'));
+
+        if (! $path) {
+            return Facades\Blueprint::fallbackPath(ltrim(vsprintf('%s.%s', [
+                $this->namespace(),
+                $this->handle(),
+            ]), '.'));
+        }
+
+        return $path;
     }
 
     public function setContents(array $contents)
