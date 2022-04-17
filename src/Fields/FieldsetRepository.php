@@ -18,7 +18,9 @@ class FieldsetRepository
             $directories = [$directories];
         }
 
-        $this->directories = array_map(fn ($directory) => Path::tidy($directory), $directories);
+        $this->directories = array_map(function ($directory) {
+            return Path::tidy($directory);
+        }, $directories);
 
         return $this;
     }
