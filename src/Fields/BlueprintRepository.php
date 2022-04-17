@@ -72,7 +72,6 @@ class BlueprintRepository
         $path = str_replace('.', '/', $blueprint);
 
         foreach ($this->directories as $directory) {
-            //if (File::exists("{$directory}/{$path}.yaml")) {
             if (Str::startsWith($blueprint, $directory)) {
                 return $directory;
             }
