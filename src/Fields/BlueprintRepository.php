@@ -192,7 +192,6 @@ class BlueprintRepository
     private function filesIn($namespace)
     {
         return Blink::store(self::BLINK_NAMESPACE_PATHS)->once($namespace, function () use ($namespace) {
-
             $files = collect();
 
             foreach ($this->directories as $directory) {
