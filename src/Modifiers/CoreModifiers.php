@@ -22,6 +22,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -802,7 +803,7 @@ class CoreModifiers extends Modifier
 
     private function getGroupByValue($item, $groupBy)
     {
-        $value = is_object($item)
+        $value = is_object($item) && ! $item instanceof Values
             ? $this->getGroupByValueFromObject($item, $groupBy)
             : $this->getGroupByValueFromArray($item, $groupBy);
 
