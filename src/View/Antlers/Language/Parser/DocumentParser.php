@@ -101,7 +101,7 @@ class DocumentParser
     private $antlersStartPositionIndex = [];
     private $chunkSize = 5;
     private $currentChunkOffset = 0;
-    private $isNoParse = false;
+    private $jumpToIndex = null;
 
     private $interpolatedCollisions = [];
     private $interpolatedCollisionCount = [];
@@ -155,6 +155,11 @@ class DocumentParser
     private function fetch($count)
     {
         return mb_substr($this->content, $this->currentChunkOffset + $this->chunkSize - count($this->chars), $count);
+    }
+
+    private function fetchAt($location, $count)
+    {
+        return mb_substr($this->content, $location, $count);
     }
 
     public function getParsedContent()
@@ -222,7 +227,7 @@ class DocumentParser
                     $peek = $this->peek($this->currentIndex + 2);
                 }
 
-                if ($peek == self::Punctuation_Question && ! $this->isNoParse) {
+                if ($peek == self::Punctuation_Question) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfPhpRegion(self::Punctuation_Question);
@@ -230,7 +235,7 @@ class DocumentParser
                     break;
                 }
 
-                if ($peek == self::Punctuation_Dollar && ! $this->isNoParse) {
+                if ($peek == self::Punctuation_Dollar) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfPhpRegion(self::Punctuation_Dollar);
@@ -238,7 +243,7 @@ class DocumentParser
                     break;
                 }
 
-                if ($peek == self::Punctuation_Octothorp && ! $this->isNoParse) {
+                if ($peek == self::Punctuation_Octothorp) {
                     $this->isDoubleBrace = true;
                     $this->currentIndex += 3;
                     $this->scanToEndOfAntlersCommentRegion();
@@ -248,32 +253,13 @@ class DocumentParser
                     break;
                 }
 
-                if (! $this->isNoParse) {
-                    // Advances over the {{.
-                    $this->startIndex = $this->currentIndex;
+                // Advances over the {{.
+                $this->startIndex = $this->currentIndex;
 
-                    $this->isDoubleBrace = true;
-                    $this->currentIndex += 2;
-                    $this->scanToEndOfAntlersRegion();
-                    $this->isDoubleBrace = false;
-                } else {
-                    $contentPeek = strtolower(str_replace(' ', '', $this->fetch(11)));
-
-                    if (Str::startsWith($contentPeek, '{{/noparse')) {
-                        // Advances over the {{.
-                        $this->startIndex = $this->currentIndex;
-
-                        $this->isDoubleBrace = true;
-                        $this->currentIndex += 2;
-                        $this->scanToEndOfAntlersRegion();
-                        $this->isDoubleBrace = false;
-                        $this->isNoParse = false;
-                        break;
-                    } else {
-                        $this->currentContent[] = $this->cur;
-                        continue;
-                    }
-                }
+                $this->isDoubleBrace = true;
+                $this->currentIndex += 2;
+                $this->scanToEndOfAntlersRegion();
+                $this->isDoubleBrace = false;
 
                 break;
             }
@@ -441,6 +427,12 @@ class DocumentParser
                 $this->currentChunkOffset = $offset;
                 $this->resetIntermediateState();
                 $this->parseIntermediateText();
+
+                if ($this->jumpToIndex != null) {
+                    $i = $this->jumpToIndex - 1;
+                    $this->jumpToIndex = null;
+                    continue;
+                }
 
                 if ($this->lastAntlersNode != null && $this->lastAntlersNode instanceof PhpExecutionNode == false && $this->lastAntlersNode->isComment) {
                     if ($i + 1 < $indexCount) {
@@ -976,13 +968,31 @@ class DocumentParser
                 $node = $this->makeAntlersTagNode($this->currentIndex, false);
 
                 if ($node->name != null && $node->name->name == 'noparse') {
-                    $this->isNoParse = true;
+                    $this->currentIndex += 2;
+                    $this->nodes[] = $node;
+
+                    $this->lastAntlersNode = $node;
+
+                    if (! $node->isClosingTag) {
+                        // Skips everything in the template until it finds the next {{ /noparse }} closing tag.
+                        foreach ($this->antlersStartIndex as $sIndex => $start) {
+                            if ($start > $node->endPosition->index) {
+                                $fetchContent = $this->fetchAt($start, 11);
+                                $fetchContent = strtolower(str_replace(' ', '', $fetchContent));
+
+                                if (Str::startsWith($fetchContent, '{{/noparse')) {
+                                    $this->jumpToIndex = $sIndex;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $this->currentIndex += 2;
+                    $this->nodes[] = $node;
+
+                    $this->lastAntlersNode = $node;
                 }
-
-                $this->currentIndex += 2;
-                $this->nodes[] = $node;
-
-                $this->lastAntlersNode = $node;
 
                 break;
             }
@@ -1108,10 +1118,6 @@ class DocumentParser
 
     private function dumpLiteralNode($index)
     {
-        if ($this->isNoParse) {
-            return;
-        }
-
         if (! empty($this->currentContent)) {
             $this->nodes[] = $this->makeLiteralNode($this->currentContent, $this->startIndex, $index);
         }
