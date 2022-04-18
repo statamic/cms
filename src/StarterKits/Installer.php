@@ -292,13 +292,13 @@ final class Installer
             return $this;
         }
 
-        $this->installableDependencies('dependencies')->each(function ($version, $package) {
-            $this->ensureCompatibleDependency($package, $version);
-        });
+        if ($packages = $this->installableDependencies('dependencies')) {
+            $this->ensureCanRequireDependencies($packages);
+        }
 
-        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
-            $this->ensureCompatibleDependency($package, $version, true);
-        });
+        if ($packages = $this->installableDependencies('dependencies_dev')) {
+            $this->ensureCanRequireDependencies($packages, true);
+        }
 
         return $this;
     }
@@ -377,61 +377,56 @@ final class Installer
             return $this;
         }
 
-        $this->installableDependencies('dependencies')->each(function ($version, $package) {
-            $this->installDependency($package, $version);
-        });
+        if ($packages = $this->installableDependencies('dependencies')) {
+            $this->requireDependencies($packages);
+        }
 
-        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
-            $this->installDependency($package, $version, true);
-        });
+        if ($packages = $this->installableDependencies('dependencies_dev')) {
+            $this->requireDependencies($packages, true);
+        }
 
         return $this;
     }
 
     /**
-     * Ensure compatible dependency by performing a dry-run.
+     * Ensure dependencies are installable by performing a dry-run.
      *
-     * @param  string  $package
-     * @param  string  $version
+     * @param  array  $packages
      * @param  bool  $dev
      */
-    protected function ensureCompatibleDependency($package, $version, $dev = false)
+    protected function ensureCanRequireDependencies($packages, $dev = false)
     {
-        $requireMethod = $dev ? 'requireDev' : 'require';
+        $requireMethod = $dev ? 'requireMultipleDev' : 'requireMultiple';
 
         try {
-            Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($package, $version, '--dry-run');
+            Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($packages, '--dry-run');
         } catch (ProcessException $exception) {
-            $this->rollbackWithError("Cannot install due to error with [{$package}] dependency.", $exception->getMessage());
+            $this->rollbackWithError('Cannot install due to dependency conflict.', $exception->getMessage());
         }
     }
 
     /**
      * Install starter kit dependency permanently into app.
      *
-     * @param  string  $package
-     * @param  string  $version
+     * @param  array  $packages
      * @param  bool  $dev
      */
-    protected function installDependency($package, $version, $dev = false)
+    protected function requireDependencies($packages, $dev = false)
     {
-        $this->console->info("Installing dependency [{$package}]...");
+        $this->console->info('Installing dependencies...');
 
-        $args = ['require'];
+        $args = array_merge(['require'], $this->normalizePackagesArrayToRequireArgs($packages));
 
         if ($dev) {
             $args[] = '--dev';
         }
-
-        $args[] = $package;
-        $args[] = $version;
 
         try {
             Composer::withoutQueue()->throwOnFailure()->runAndOperateOnOutput($args, function ($output) {
                 return $this->outputFromSymfonyProcess($output);
             });
         } catch (ProcessException $exception) {
-            $this->console->error("Error installing [{$package}].");
+            $this->console->error('Error installing dependencies.');
         }
     }
 
@@ -743,12 +738,30 @@ final class Installer
      * Get installable dependencies from appropriate require key in composer.json.
      *
      * @param  string  $configKey
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
     protected function installableDependencies($configKey)
     {
         return collect($this->config($configKey))->filter(function ($version, $package) {
             return Str::contains($package, '/');
-        });
+        })->all();
+    }
+
+    /**
+     * Normalize packages array to require args, with version handling if `package => version` array structure is passed.
+     *
+     * @param  array  $packages
+     * @return array
+     */
+    private function normalizePackagesArrayToRequireArgs(array $packages)
+    {
+        return collect($packages)
+            ->map(function ($value, $key) {
+                return Str::contains($key, '/')
+                    ? "{$key}:{$value}"
+                    : "{$value}";
+            })
+            ->values()
+            ->all();
     }
 }

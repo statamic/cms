@@ -652,6 +652,20 @@ class FakeComposer
         $this->fakeInstallVendorFiles($package);
     }
 
+    public function requireMultiple($packages)
+    {
+        foreach ($packages as $package => $version) {
+            $this->require($package, $version);
+        }
+    }
+
+    public function requireMultipleDev($packages)
+    {
+        foreach ($packages as $package => $version) {
+            $this->requireDev($package, $version);
+        }
+    }
+
     public function remove($package)
     {
         $this->removeFromComposerJson($package);
