@@ -74,6 +74,11 @@ abstract class Action implements Arrayable
         return false;
     }
 
+    public function alert($items, $values)
+    {
+        return false;
+    }
+
     public function buttonText()
     {
         /** @translation */

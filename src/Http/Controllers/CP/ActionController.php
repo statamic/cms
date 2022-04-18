@@ -39,6 +39,8 @@ abstract class ActionController extends CpController
             return ['redirect' => $redirect];
         } elseif ($download = $action->download($items, $values)) {
             return $download instanceof Response ? $download : response()->download($download);
+        } elseif ($alert = $action->alert($items, $values)) {
+            return ['alert' => $alert];
         }
 
         if (is_string($response)) {
