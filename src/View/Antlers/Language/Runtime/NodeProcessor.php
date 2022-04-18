@@ -521,7 +521,8 @@ class NodeProcessor
 
         $this->pathDataManager->setIsPaired(false);
         $this->pathDataManager->setReduceFinal(false);
-        $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
+        $managerResults = $this->pathDataManager->cascade($this->cascade)
+            ->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
         $this->pathDataManager->setIsPaired($cur);
         $this->pathDataManager->setReduceFinal($curReduce);
 
@@ -540,7 +541,7 @@ class NodeProcessor
 
                 // If the path reference has more than one part,
                 // it is something like {{ products.0.name }}
-                if ($node->pathReference != null && count($node->pathReference->pathParts) > 1) {
+                if ($node->pathReference != null && count($node->pathReference->pathParts) > 1 && $node->isPaired() == false) {
                     return false;
                 }
 
@@ -863,6 +864,8 @@ class NodeProcessor
             $parameters = $node->getParameterValues($this, $this->getActiveData());
             $runtimeContent = $node->runtimeContent;
         }
+
+        $parameters = array_merge($parameters, $additionalData);
 
         /** @var Tags $tag */
         $tag = $this->loader->load($tagName, [
@@ -1372,7 +1375,13 @@ class NodeProcessor
                             'tag_method' => $tagMethod,
                         ]);
 
-                        $output = call_user_func([$tag, $node->name->getRuntimeMethodName()]);
+                        $methodToCall = $node->name->getRuntimeMethodName();
+
+                        if ($this->encounteredBuilder) {
+                            $methodToCall = 'index';
+                        }
+
+                        $output = call_user_func([$tag, $methodToCall]);
 
                         // While the PathDataManager can resolve builder instances,
                         // we will handle this case here so that the values can

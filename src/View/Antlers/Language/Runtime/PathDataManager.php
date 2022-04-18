@@ -211,6 +211,29 @@ class PathDataManager
     }
 
     /**
+     * Returns a value indicating if the PathDataManager will intercept values.
+     *
+     * @return bool
+     */
+    public function getShouldDoValueIntercept()
+    {
+        return $this->shouldDoValueIntercept;
+    }
+
+    /**
+     * Sets whether the PathDataManager will intercept values or not.
+     *
+     * @param  bool  $shouldIntercept  Whether to intercept.
+     * @return $this
+     */
+    public function setShouldDoValueIntercept($shouldIntercept)
+    {
+        $this->shouldDoValueIntercept = $shouldIntercept;
+
+        return $this;
+    }
+
+    /**
      * Attempts to locate a value within the provided data.
      *
      * The first element of the return value indicates if the data was located.
@@ -405,7 +428,7 @@ class PathDataManager
                 $interceptResult = $nodeProcessor->evaluateDeferredNodeAsTag(
                     $activeNode,
                     'query',
-                    $pathItem->name, ['builder' => $builderCheckValue]
+                    'index', ['builder' => $builderCheckValue]
                 );
 
                 $this->reducedVar = $interceptResult;
