@@ -19,7 +19,7 @@ class BlueprintRepository
     protected $directories = [];
     protected $fallbacks = [];
 
-    public function setDirectory(array|string $directories)
+    public function setDirectory($directories)
     {
         if (is_string($directories)) {
             $directories = [$directories];
