@@ -191,7 +191,7 @@ EOT;
     }
 
     /** @test */
-    public function it_saves_to_disk_in_additional_folder()
+    public function it_saves_to_disk_in_additional_directory()
     {
         $expectedYaml = <<<'EOT'
 title: 'Test Blueprint'

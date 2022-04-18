@@ -142,7 +142,7 @@ EOT;
     }
 
     /** @test */
-    public function it_gets_all_fieldsets()
+    public function it_gets_all_fieldsets_from_multiple_paths()
     {
         $firstContents = <<<'EOT'
 title: First Fieldset
@@ -200,7 +200,7 @@ EOT;
     }
 
     /** @test */
-    public function it_returns_first_fieldset_when_duplicates_exists()
+    public function it_returns_first_fieldset_from_default_path_when_duplicates_exists()
     {
         $duplicateContents = <<<'EOT'
 title: Duplicate Fieldset
@@ -252,7 +252,7 @@ EOT;
     }
 
     /** @test */
-    public function it_saves_to_disk_in_additional_folder()
+    public function it_saves_to_disk_in_additional_directory()
     {
         $expectedYaml = <<<'EOT'
 title: 'Test Fieldset'
@@ -283,7 +283,7 @@ EOT;
     }
 
     /** @test */
-    public function it_deletes_from_disk_in_additional_folder()
+    public function it_deletes_from_disk_in_additional_directory()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml')->once()->andReturnFalse();
         File::shouldReceive('exists')->with('/another/path/to/resources/fieldsets/the_test_fieldset.yaml')->once()->andReturnTrue();
