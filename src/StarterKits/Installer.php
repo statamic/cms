@@ -413,7 +413,11 @@ final class Installer
      */
     protected function requireDependencies($packages, $dev = false)
     {
-        $this->console->info('Installing dependencies...');
+        if ($dev) {
+            $this->console->info('Installing development dependencies...');
+        } else {
+            $this->console->info('Installing dependencies...');
+        }
 
         $args = array_merge(['require'], $this->normalizePackagesArrayToRequireArgs($packages));
 
