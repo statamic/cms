@@ -12,7 +12,7 @@ use Statamic\Support\Str;
 class TaxonomyRepository implements RepositoryContract
 {
     protected $store;
-    protected $extraPreviewTargets = [];
+    protected $additionalPreviewTargets = [];
 
     public function __construct(Stache $stache)
     {
@@ -99,17 +99,17 @@ class TaxonomyRepository implements RepositoryContract
 
     public function addPreviewTargets($handle, $targets)
     {
-        $targets = collect($this->extraPreviewTargets[$handle] ?? [])
+        $targets = collect($this->additionalPreviewTargets[$handle] ?? [])
             ->merge($targets)
             ->unique(function ($target) {
                 return $target['format'];
             })->all();
 
-        $this->extraPreviewTargets = array_merge($this->extraPreviewTargets, [$handle => $targets]);
+        $this->additionalPreviewTargets = array_merge($this->additionalPreviewTargets, [$handle => $targets]);
     }
 
-    public function extraPreviewTargets($handle)
+    public function additionalPreviewTargets($handle)
     {
-        return collect($this->extraPreviewTargets[$handle] ?? []);
+        return collect($this->additionalPreviewTargets[$handle] ?? []);
     }
 }

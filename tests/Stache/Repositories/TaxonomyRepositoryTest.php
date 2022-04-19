@@ -99,7 +99,7 @@ class TaxonomyRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_extra_preview_targets()
+    public function it_gets_additional_preview_targets()
     {
         $taxonomy1 = (new Taxonomy)->handle('test');
         $taxonomy2 = (new Taxonomy)->handle('test_2');
@@ -115,8 +115,8 @@ class TaxonomyRepositoryTest extends TestCase
         TaxonomyAPI::addPreviewTargets('test', $previewTargetsTaxonomy1);
         TaxonomyAPI::addPreviewTargets('test_2', $previewTargetsTaxonomy2);
 
-        $previewTargetsTest = TaxonomyAPI::extraPreviewTargets('test');
-        $previewTargetsTest2 = TaxonomyAPI::extraPreviewTargets('test_2');
+        $previewTargetsTest = TaxonomyAPI::additionalPreviewTargets('test');
+        $previewTargetsTest2 = TaxonomyAPI::additionalPreviewTargets('test_2');
 
         $this->assertEquals($previewTargetsTaxonomy1, $previewTargetsTest->all());
         $this->assertEquals($previewTargetsTaxonomy2, $previewTargetsTest2->all());

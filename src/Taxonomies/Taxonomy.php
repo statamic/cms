@@ -347,7 +347,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return $this
             ->fluentlyGetOrSet('previewTargets')
             ->getter(function () {
-                return $this->basePreviewTargets()->merge($this->extraPreviewTargets());
+                return $this->basePreviewTargets()->merge($this->additionalPreviewTargets());
             })
             ->args(func_get_args());
     }
@@ -361,15 +361,16 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return collect($targets);
     }
 
-    public function extraPreviewTargets($targets = null)
+    public function addPreviewTargets($targets)
     {
-        if (! $targets) {
-            return \Statamic\Facades\Taxonomy::extraPreviewTargets($this->handle);
-        }
-
         \Statamic\Facades\Taxonomy::addPreviewTargets($this->handle, $targets);
 
         return $this;
+    }
+
+    public function additionalPreviewTargets()
+    {
+        return \Statamic\Facades\Taxonomy::additionalPreviewTargets($this->handle);
     }
 
     private function defaultPreviewTargets()

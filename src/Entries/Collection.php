@@ -706,7 +706,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $this
             ->fluentlyGetOrSet('previewTargets')
             ->getter(function () {
-                return $this->basePreviewTargets()->merge($this->extraPreviewTargets());
+                return $this->basePreviewTargets()->merge($this->additionalPreviewTargets());
             })
             ->args(func_get_args());
     }
@@ -720,15 +720,16 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return collect($targets);
     }
 
-    public function extraPreviewTargets($targets = null)
+    public function addPreviewTargets($targets)
     {
-        if (! $targets) {
-            return \Statamic\Facades\Collection::extraPreviewTargets($this->handle);
-        }
-
         \Statamic\Facades\Collection::addPreviewTargets($this->handle, $targets);
 
         return $this;
+    }
+
+    public function additionalPreviewTargets()
+    {
+        return \Statamic\Facades\Collection::additionalPreviewTargets($this->handle);
     }
 
     private function defaultPreviewTargets()

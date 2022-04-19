@@ -90,7 +90,7 @@ class CollectionRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_extra_preview_targets()
+    public function it_gets_additional_preview_targets()
     {
         $collection1 = (new Collection)->handle('test');
         $collection2 = (new Collection)->handle('test_2');
@@ -106,8 +106,8 @@ class CollectionRepositoryTest extends TestCase
         CollectionAPI::addPreviewTargets('test', $previewTargetsCollection1);
         CollectionAPI::addPreviewTargets('test_2', $previewTargetsCollection2);
 
-        $previewTargetsTest = CollectionAPI::extraPreviewTargets('test');
-        $previewTargetsTest2 = CollectionAPI::extraPreviewTargets('test_2');
+        $previewTargetsTest = CollectionAPI::additionalPreviewTargets('test');
+        $previewTargetsTest2 = CollectionAPI::additionalPreviewTargets('test_2');
 
         $this->assertEquals($previewTargetsCollection1, $previewTargetsTest->all());
         $this->assertEquals($previewTargetsCollection2, $previewTargetsTest2->all());
