@@ -7,6 +7,8 @@ use Statamic\Contracts\Auth\User as UserContract;
 
 class CopyPasswordResetLink extends Action
 {
+    protected $confirm = false;
+
     public static function title()
     {
         return __('Copy Password Reset Link');
