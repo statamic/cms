@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Statamic\Contracts\Entries\QueryBuilder;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
@@ -91,6 +91,7 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $dataManagerInterpolations = [];
+    protected $evaluatedModifiers = false;
 
     /**
      * @var LanguageOperatorManager|null
@@ -309,6 +310,8 @@ class Environment
      */
     public function evaluate($nodes)
     {
+        $this->evaluatedModifiers = false;
+
         if (count($nodes) == 0) {
             return null;
         }
@@ -357,7 +360,7 @@ class Environment
                 $this->unlock();
 
                 return $value;
-            } elseif ($result instanceof QueryBuilder) {
+            } elseif ($result instanceof Builder) {
                 $builderResults = $result->count();
                 $this->unlock();
 
@@ -1160,11 +1163,12 @@ class Environment
      * Returns the current value associated with the provided variable name.
      *
      * @param  string|VariableReference  $name  The variable name.
+     * @param  AbstractNode|null  $originalNode  The original node, if available.
      * @return array|ArrayAccess|mixed|string|null
      *
      * @throws RuntimeException
      */
-    private function scopeValue($name)
+    private function scopeValue($name, $originalNode = null)
     {
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
@@ -1173,6 +1177,16 @@ class Environment
                 }
 
                 $this->dataRetriever->setReduceFinal(false);
+            }
+
+            if ($originalNode != null && $originalNode->hasModifiers()) {
+                $doIntercept = $this->dataRetriever->getShouldDoValueIntercept();
+
+                $this->dataRetriever->setShouldDoValueIntercept(false);
+                $value = $this->dataRetriever->getData($name, $this->data);
+                $this->dataRetriever->setShouldDoValueIntercept($doIntercept);
+
+                return $value;
             }
 
             return $this->dataRetriever->getData($name, $this->data);
@@ -1241,7 +1255,14 @@ class Environment
      */
     private function applyModifiers($value, ModifierChainNode $modifierChain)
     {
+        $this->evaluatedModifiers = true;
+
         return ModifierManager::evaluate($value, $this, $modifierChain, $this->data);
+    }
+
+    public function getDidEvaluateModifiers()
+    {
+        return $this->evaluatedModifiers;
     }
 
     /**
@@ -1275,7 +1296,12 @@ class Environment
         if ($value instanceof Value) {
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
+                GlobalRuntimeState::$userContentEvalState = [
+                    $value,
+                    $this->nodeProcessor->getActiveNode(),
+                ];
                 $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                GlobalRuntimeState::$userContentEvalState = null;
             } else {
                 if (! $hasModifiers) {
                     $value = $value->value();
@@ -1481,9 +1507,9 @@ class Environment
                 return $interpolationValue;
             }
 
-            $scopeValue = $this->scopeValue($varName);
+            $scopeValue = $this->scopeValue($varName, $val);
 
-            if ($scopeValue instanceof Collection) {
+            if ($scopeValue instanceof Collection && ! $val->hasModifiers()) {
                 $scopeValue = $scopeValue->all();
             }
 

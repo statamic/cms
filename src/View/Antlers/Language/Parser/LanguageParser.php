@@ -927,11 +927,16 @@ class LanguageParser
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::STRUCT_SWITCH) {
                     if ($i + 1 >= $tokenCount) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_SWITCH_GROUP,
-                            $token,
-                            'Unexpected end of input while parsing [T_SWITCH_GROUP].'
-                        );
+                        if ($token->originalAbstractNode instanceof VariableNode == false) {
+                            throw ErrorFactory::makeSyntaxError(
+                                AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_SWITCH_GROUP,
+                                $token,
+                                'Unexpected end of input while parsing [T_SWITCH_GROUP].'
+                            );
+                        }
+
+                        $newTokens[] = $token->originalAbstractNode;
+                        continue;
                     }
 
                     /** @var ScopedLogicGroup $next */
@@ -2231,6 +2236,18 @@ class LanguageParser
 
                 if (NodeHelpers::distance($last, $subToken) > 1) {
                     break;
+                }
+            }
+
+            if ($subToken instanceof StringValueNode || $subToken instanceof VariableNode || $subToken instanceof NumberNode) {
+                $subTokenCount = count($subTokens);
+
+                if ($subTokenCount > 0) {
+                    $last = $subTokens[$subTokenCount - 1];
+
+                    if ($last instanceof LogicGroup) {
+                        break;
+                    }
                 }
             }
 

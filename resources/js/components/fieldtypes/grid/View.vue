@@ -15,8 +15,8 @@ export default {
             return `${this.name}-drag-handle`;
         },
 
-        errorKeyPrefix() {
-            return this.grid.errorKeyPrefix || this.grid.handle;
+        fieldPathPrefix() {
+            return this.grid.fieldPathPrefix || this.grid.handle;
         }
 
     },

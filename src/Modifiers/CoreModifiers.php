@@ -4,6 +4,7 @@ namespace Statamic\Modifiers;
 
 use ArrayAccess;
 use Carbon\Carbon;
+use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -21,6 +22,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -801,7 +803,7 @@ class CoreModifiers extends Modifier
 
     private function getGroupByValue($item, $groupBy)
     {
-        $value = is_object($item)
+        $value = is_object($item) && ! $item instanceof Values
             ? $this->getGroupByValueFromObject($item, $groupBy)
             : $this->getGroupByValueFromArray($item, $groupBy);
 
@@ -1279,7 +1281,7 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
-        if (Compare::isQueryBuilder($value)) {
+        if (Compare::isQueryBuilder($value) || $value instanceof Countable) {
             return $value->count();
         }
 
@@ -2384,6 +2386,10 @@ class CoreModifiers extends Modifier
     public function toJson($value, $params)
     {
         $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : null;
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
 
         if ($value instanceof Collection || $value instanceof Augmentable) {
             $value = $value->toAugmentedArray();

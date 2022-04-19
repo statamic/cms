@@ -225,5 +225,19 @@ EOT;
         $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
         $this->assertSame('<figure>', $nodes[0]->content);
         $this->assertSame('FINAL_LITERAL</figure>', $nodes[2]->content);
+
+        $template = <<<'EOT'
+ <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div> 
+EOT;
+
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(3, $nodes);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[0]);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[1]);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
+
+        $this->assertSame(' <div class="list-of-classes">     ', $nodes[0]->content);
+        $this->assertSame('FINAL_LITERAL </div> ', $nodes[2]->content);
     }
 }

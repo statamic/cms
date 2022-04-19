@@ -20,7 +20,7 @@
             :value="value"
             :handle="field.handle"
             :name-prefix="namePrefix"
-            :error-key-prefix="errorKey"
+            :field-path-prefix="fieldPath"
             :has-error="hasError || hasNestedError"
             :read-only="isReadOnly"
             @input="$emit('updated', $event)"
@@ -65,7 +65,7 @@ export default {
             type: Number,
             required: true
         },
-        errorKey: {
+        fieldPath: {
             type: String
         },
         readOnly: Boolean,
@@ -98,7 +98,7 @@ export default {
         },
 
         errors() {
-            return this.storeState.errors[this.errorKey] || [];
+            return this.storeState.errors[this.fieldPath] || [];
         },
 
         hasError() {
@@ -106,7 +106,7 @@ export default {
         },
 
         hasNestedError() {
-            const prefix = `${this.errorKey}.`;
+            const prefix = `${this.fieldPath}.`;
 
             return Object.keys(this.storeState.errors).some(handle => handle.startsWith(prefix));
         },

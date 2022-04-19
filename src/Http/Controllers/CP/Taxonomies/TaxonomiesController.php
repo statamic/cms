@@ -104,7 +104,7 @@ class TaxonomiesController extends CpController
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        if (Collection::find($handle)) {
+        if (Taxonomy::findByHandle($handle)) {
             throw new \Exception('Taxonomy already exists');
         }
 

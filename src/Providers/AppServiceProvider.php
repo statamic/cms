@@ -147,6 +147,10 @@ class AppServiceProvider extends ServiceProvider
         ])->each(function ($binding, $alias) {
             app()->bind('statamic.queries.'.$alias, $binding);
         });
+
+        $this->app->bind('statamic.imaging.guzzle', function () {
+            return new \GuzzleHttp\Client;
+        });
     }
 
     protected function registerMiddlewareGroup()

@@ -22,7 +22,7 @@
                 :parent-name="name"
                 :set-index="index"
                 :errors="errors(field.handle)"
-                :error-key-prefix="errorKey(field.handle)"
+                :field-path-prefix="fieldPath(field.handle)"
                 class="p-2"
                 :read-only="grid.isReadOnly"
                 @updated="updated(field.handle, $event)"

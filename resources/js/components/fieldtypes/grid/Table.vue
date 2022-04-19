@@ -30,7 +30,7 @@
                     :values="row"
                     :meta="meta[row._id]"
                     :name="name"
-                    :error-key-prefix="errorKeyPrefix"
+                    :field-path-prefix="fieldPathPrefix"
                     :can-delete="canDeleteRows"
                     :can-add-rows="canAddRows"
                     @updated="(row, value) => $emit('updated', row, value)"

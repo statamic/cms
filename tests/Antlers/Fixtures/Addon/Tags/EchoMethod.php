@@ -10,4 +10,9 @@ class EchoMethod extends Tags
     {
         return $this->method;
     }
+
+    public function parameter()
+    {
+        return $this->params->get('param');
+    }
 }

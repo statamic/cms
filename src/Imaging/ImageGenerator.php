@@ -2,8 +2,7 @@
 
 namespace Statamic\Imaging;
 
-use GuzzleHttp\Client;
-use League\Flysystem\Adapter\Local;
+use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
 use League\Glide\Filesystem\FileNotFoundException as GlideFileNotFoundException;
@@ -62,7 +61,9 @@ class ImageGenerator
         $this->path = $path;
         $this->params = $params;
 
-        $this->server->setSource(new Filesystem(new Local(public_path())));
+        $source = Storage::build(['driver' => 'local', 'root' => public_path()])->getDriver();
+
+        $this->server->setSource($source);
         $this->server->setSourcePathPrefix('/');
         $this->server->setCachePathPrefix('paths');
 
@@ -85,7 +86,13 @@ class ImageGenerator
 
         $base = $parsed['scheme'].'://'.$parsed['host'];
 
-        $filesystem = new Filesystem(new GuzzleAdapter($base, new Client()));
+        $guzzleClient = app('statamic.imaging.guzzle');
+
+        $adapter = $this->isUsingFlysystemOne()
+            ? new LegacyGuzzleAdapter($base, $guzzleClient)
+            : new GuzzleAdapter($base, $guzzleClient);
+
+        $filesystem = new Filesystem($adapter);
 
         $this->server->setSource($filesystem);
         $this->server->setSourcePathPrefix('/');
@@ -189,12 +196,19 @@ class ImageGenerator
             $mime = $this->asset->mimeType();
         } else {
             $path = public_path($this->path);
-            throw_unless(File::exists($path), new FlysystemFileNotFoundException($path));
+            if (! File::exists($path)) {
+                throw new FlysystemFileNotFoundException($path);
+            }
             $mime = File::mimeType($path);
         }
 
         if ($mime !== null && strncmp($mime, 'image/', 6) !== 0) {
             throw new \Exception("Image [{$path}] does not actually appear to be an image.");
         }
+    }
+
+    private function isUsingFlysystemOne()
+    {
+        return class_exists('\League\Flysystem\Util');
     }
 }

@@ -25,6 +25,6 @@ class UpdateSearchController extends CpController
             Search::index($index)->update();
         });
 
-        return back()->withSuccess(__('Indexes successfully updated.'));
+        return back()->withSuccess(__('Update successful.'));
     }
 }

@@ -467,4 +467,45 @@ EOT;
 
         $this->assertSame('<p>Literal Content. hi!<END></p>', trim($this->renderString($template)));
     }
+
+    public function test_php_node_assignments_within_loops()
+    {
+        mt_srand(1234);
+        $data = [
+            'collection' => [
+                'articles' => [
+                    'one',
+                    'two',
+                    'three',
+                    'four',
+                    'five',
+                ],
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{ collection:articles }}
+{{? $rand = mt_rand(1,4); ?}}
+<{{ value }}><{{ rand }}>
+{{ /collection:articles }}
+EOT;
+
+        $expected = <<<'EOT'
+<one><4>
+
+
+<two><4>
+
+
+<three><3>
+
+
+<four><2>
+
+
+<five><1>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, $data)));
+    }
 }

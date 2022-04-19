@@ -35,14 +35,14 @@
         <div class="replicator-set-body" v-if="!collapsed">
             <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, fieldPath(field))"
                 :key="field.handle"
                 :field="field"
                 :meta="meta[field.handle]"
                 :value="values[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                :error-key="errorKey(field)"
+                :field-path="fieldPath(field)"
                 :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
@@ -104,7 +104,7 @@ export default {
             type: String,
             required: true
         },
-        errorKeyPrefix: {
+        fieldPathPrefix: {
             type: String,
             required: true
         },
@@ -199,9 +199,9 @@ export default {
             this.$emit('expanded');
         },
 
-        errorKey(field) {
-            return `${this.errorKeyPrefix}.${this.index}.${field.handle}`;
-        }
+        fieldPath(field) {
+            return `${this.fieldPathPrefix}.${this.index}.${field.handle}`;
+        },
 
     }
 

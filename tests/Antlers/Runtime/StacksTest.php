@@ -3,9 +3,14 @@
 namespace Tests\Antlers\Runtime;
 
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesContent;
+use Tests\FakesViews;
 
 class StacksTest extends ParserTestCase
 {
+    use FakesContent;
+    use FakesViews;
+
     public function test_basic_stacks_work()
     {
         $template = <<<'EOT'
@@ -76,5 +81,89 @@ EOT;
 EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
+
+    public function test_stacks_can_be_created_out_of_order()
+    {
+        $layoutTemplate = <<<'LAYOUT'
+{{ push:example }}
+Layout Push 1
+{{ /push:example }}
+{{ push:example }}
+Layout Push 2
+{{ /push:example }}
+{{ template_content }}
+{{ push:example }}
+Layout Push 3
+{{ /push:example }}
+{{ push:example }}
+Layout Push 4
+{{ /push:example }}
+LAYOUT;
+
+        $templateTemplate = <<<'TEMPLATE'
+{{ push:example }}
+Template Push 1
+{{ /push:example  }}
+{{ push:example }}
+Template Push 2
+{{ /push:example  }}
+{{ content }}
+{{ stack:example }}
+
+TEMPLATE;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', $layoutTemplate);
+        $this->viewShouldReturnRaw('home', $templateTemplate);
+
+        $page = $this->createPage('home', [
+            'with' => [
+                'title' => 'Home Page',
+                'content' => 'This is the home page.',
+                'template' => 'home',
+            ],
+        ]);
+
+        $response = $this->get('/home')
+            ->assertStatus(200);
+
+        $expected = <<<'EXPECTED'
+<p>This is the home page.</p>
+
+Template Push 1Template Push 2Layout Push 1Layout Push 2Layout Push 3Layout Push 4
+EXPECTED;
+
+        $this->assertSame($expected, trim($response->getContent()));
+    }
+
+    public function test_stack_replacements_are_removed_if_nothing_is_pushed_to_them()
+    {
+        $layoutTemplate = <<<'LAYOUT'
+{{ stack:head }}
+{{ template_content }}
+{{ stack:footer }}
+LAYOUT;
+
+        $templateTemplate = <<<'TEMPLATE'
+{{ title }}
+TEMPLATE;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', $layoutTemplate);
+        $this->viewShouldReturnRaw('home', $templateTemplate);
+
+        $this->createPage('home', [
+            'with' => [
+                'title' => 'Home Page',
+                'content' => 'This is the home page.',
+                'template' => 'home',
+            ],
+        ]);
+
+        $response = $this->get('/home')
+            ->assertStatus(200);
+
+        $this->assertSame('Home Page', trim($response->getContent()));
     }
 }
