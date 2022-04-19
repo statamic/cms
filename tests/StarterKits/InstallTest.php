@@ -652,17 +652,17 @@ class FakeComposer
         $this->fakeInstallVendorFiles($package);
     }
 
-    public function requireMultiple($packages)
+    public function requireMultiple($packages, ...$extraParams)
     {
         foreach ($packages as $package => $version) {
-            $this->require($package, $version);
+            $this->require($package, $version, ...$extraParams);
         }
     }
 
-    public function requireMultipleDev($packages)
+    public function requireMultipleDev($packages, ...$extraParams)
     {
         foreach ($packages as $package => $version) {
-            $this->requireDev($package, $version);
+            $this->requireDev($package, $version, ...$extraParams);
         }
     }
 
@@ -686,18 +686,21 @@ class FakeComposer
         }
 
         $requireMethod = $args->contains('--dev')
-            ? 'requireDev'
-            : 'require';
+            ? 'requireMultipleDev'
+            : 'requireMultiple';
 
-        $package = $args->first(function ($arg) {
-            return preg_match('/[^\/]+\/[^\/]+/', $arg);
-        });
+        $packages = $args
+            ->filter(function ($arg) {
+                return Str::contains($arg, '/');
+            })
+            ->mapWithKeys(function ($arg) {
+                $parts = explode(':', $arg);
 
-        $version = $args->first(function ($arg) {
-            return preg_match('/\./', $arg);
-        });
+                return [$parts[0] => $parts[1]];
+            })
+            ->all();
 
-        $this->{$requireMethod}($package, $version);
+        $this->{$requireMethod}($packages);
     }
 
     private function fakeInstallComposerJson($requireKey, $package, $version)
