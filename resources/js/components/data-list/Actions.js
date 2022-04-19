@@ -53,10 +53,7 @@ export default {
                 else {
                     response.data.text().then(data => {
                         data = JSON.parse(data);
-                    
                         if (data.redirect) window.location = data.redirect;
-                        if (data.alert) alert(data.alert)
-
                         this.$emit('completed', true, data);
                     });
                 }

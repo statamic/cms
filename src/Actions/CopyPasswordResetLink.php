@@ -41,7 +41,7 @@ class CopyPasswordResetLink extends Action
         return 'Copy';
     }
 
-    public function alert($items, $values)
+    public function run($items, $values)
     {
         $user = $items->first();
 
@@ -49,6 +49,9 @@ class CopyPasswordResetLink extends Action
             ? PasswordReset::url($user->generatePasswordResetToken(), PasswordReset::BROKER_RESETS)
             : PasswordReset::url($user->generatePasswordResetToken(), PasswordReset::BROKER_ACTIVATIONS);
 
-        return "Password Reset Link: {$passwordResetLink}";
+        return [
+            'message' => "Password Reset Link: {$passwordResetLink}",
+            'alert' => true,
+        ];
     }
 }
