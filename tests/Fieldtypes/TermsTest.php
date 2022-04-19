@@ -338,8 +338,14 @@ class TermsTest extends TestCase
      * @test
      * @dataProvider collectionAttachmentProvider
      **/
-    public function it_attaches_collection_during_augmentation($parentIsEntry, $handle, $isRootLevel)
+    public function it_attaches_collection_during_augmentation($parentIsEntry, $handle, $isRootLevel, $collectionUsesTaxonomy)
     {
+        if ($collectionUsesTaxonomy) {
+            Facades\Collection::find('blog')->taxonomies(['tags'])->save();
+        } else {
+            Facades\Collection::find('blog')->taxonomies([])->save();
+        }
+
         // Make sure there is an entry that uses the term.
         EntryFactory::collection('blog')->data(['tags' => ['one']])->create();
 
@@ -362,7 +368,7 @@ class TermsTest extends TestCase
 
         $collection = $augmented->first()->collection();
 
-        if ($parentIsEntry && $handle === 'tags' && $isRootLevel) {
+        if ($parentIsEntry && $handle === 'tags' && $isRootLevel && $collectionUsesTaxonomy) {
             $this->assertInstanceOf(CollectionContract::class, $collection);
         } else {
             $this->assertNull($collection);
@@ -372,15 +378,25 @@ class TermsTest extends TestCase
     public function collectionAttachmentProvider()
     {
         return [
-            'parent is entry and handle matches taxonomy' => [true, 'tags', true],
-            'parent is entry and handle does not match taxonomy' => [true, 'related_tags', true],
-            'parent is not entry and handle matches taxonomy' => [false, 'tags', true],
-            'parent is not entry and handle does not match taxonomy' => [false, 'related_tags', true],
+            'parent is entry and handle matches taxonomy' => [true, 'tags', true, true],
+            'parent is entry and handle does not match taxonomy' => [true, 'related_tags', true, true],
+            'parent is not entry and handle matches taxonomy' => [false, 'tags', true, true],
+            'parent is not entry and handle does not match taxonomy' => [false, 'related_tags', true, true],
 
-            'parent is entry, handle matches taxonomy, nested field' => [true, 'tags', false],
-            'parent is entry, handle does not match taxonomy, nested field' => [true, 'related_tags', false],
-            'parent is not entry, handle matches taxonomy, nested field' => [false, 'tags', false],
-            'parent is not entry, handle does not match taxonomy, nested field' => [false, 'related_tags', false],
+            'parent is entry, handle matches taxonomy, nested field' => [true, 'tags', false, true],
+            'parent is entry, handle does not match taxonomy, nested field' => [true, 'related_tags', false, true],
+            'parent is not entry, handle matches taxonomy, nested field' => [false, 'tags', false, true],
+            'parent is not entry, handle does not match taxonomy, nested field' => [false, 'related_tags', false, true],
+
+            'parent is entry and handle matches taxonomy, collection doesnt use taxonomy' => [true, 'tags', true, false],
+            'parent is entry and handle does not match taxonomy, collection doesnt use taxonomy' => [true, 'related_tags', true, false],
+            'parent is not entry and handle matches taxonomy, collection doesnt use taxonomy' => [false, 'tags', true, false],
+            'parent is not entry and handle does not match taxonomy, collection doesnt use taxonomy' => [false, 'related_tags', true, false],
+
+            'parent is entry, handle matches taxonomy, nested field, collection doesnt use taxonomy' => [true, 'tags', false, false],
+            'parent is entry, handle does not match taxonomy, nested field, collection doesnt use taxonomy' => [true, 'related_tags', false, false],
+            'parent is not entry, handle matches taxonomy, nested field, collection doesnt use taxonomy' => [false, 'tags', false, false],
+            'parent is not entry, handle does not match taxonomy, nested field, collection doesnt use taxonomy' => [false, 'related_tags', false, false],
         ];
     }
 
