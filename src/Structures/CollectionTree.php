@@ -50,6 +50,7 @@ class CollectionTree extends Tree
 
     public function diff()
     {
+        dd($this->original);
         return CollectionTreeDiff::analyze(
             $this->original['tree'],
             $this->tree,

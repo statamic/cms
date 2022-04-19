@@ -314,13 +314,10 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function whereNested(Closure $callback, $boolean = 'and')
     {
-        call_user_func($callback, $query = $this->builder->getQuery()->forNestedWhere());
+        $query = (new (get_class($this))(clone $this->builder));
+        $callback($query);
 
-        foreach ($query->wheres as $index => $where) {
-            $query->wheres[$index]['column'] = $this->column($where['column']);
-        }
-
-        $this->builder->getQuery()->addNestedWhereQuery($query, $boolean);
+        $this->builder->getQuery()->addNestedWhereQuery($query->builder->getQuery(), $boolean);
 
         return $this;
     }
@@ -336,6 +333,37 @@ abstract class EloquentQueryBuilder implements Builder
                 }
             }
         }, $boolean);
+
+        return $this;
+    }
+
+    public function when($value, $callback, $default = null)
+    {
+        if ($value) {
+            return $callback($this, $value) ?: $this;
+        }
+
+        if ($default) {
+            return $default($this, $value) ?: $this;
+        }
+
+        return $this;
+    }
+
+    public function tap($callback)
+    {
+        return $this->when(true, $callback);
+    }
+
+    public function unless($value, $callback, $default = null)
+    {
+        if (! $value) {
+            return $callback($this, $value) ?: $this;
+        }
+
+        if ($default) {
+            return $default($this, $value) ?: $this;
+        }
 
         return $this;
     }
