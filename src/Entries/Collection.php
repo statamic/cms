@@ -722,14 +722,14 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function addPreviewTargets($targets)
     {
-        \Statamic\Facades\Collection::addPreviewTargets($this->handle, $targets);
+        Facades\Collection::addPreviewTargets($this->handle, $targets);
 
         return $this;
     }
 
     public function additionalPreviewTargets()
     {
-        return \Statamic\Facades\Collection::additionalPreviewTargets($this->handle);
+        return Facades\Collection::additionalPreviewTargets($this->handle);
     }
 
     private function defaultPreviewTargets()

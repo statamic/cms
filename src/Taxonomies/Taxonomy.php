@@ -363,14 +363,14 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function addPreviewTargets($targets)
     {
-        \Statamic\Facades\Taxonomy::addPreviewTargets($this->handle, $targets);
+        Facades\Taxonomy::addPreviewTargets($this->handle, $targets);
 
         return $this;
     }
 
     public function additionalPreviewTargets()
     {
-        return \Statamic\Facades\Taxonomy::additionalPreviewTargets($this->handle);
+        return Facades\Taxonomy::additionalPreviewTargets($this->handle);
     }
 
     private function defaultPreviewTargets()
