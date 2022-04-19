@@ -155,6 +155,9 @@ export default {
         },
 
         loadAsset(id) {
+            if(id === null)
+                return;
+
             let preloaded = _.find(this.$store.state.publish[this.storeName].preloadedAssets, asset => asset.id === id);
 
             if (preloaded) {
