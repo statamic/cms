@@ -670,12 +670,17 @@ class CollectionTest extends TestCase
         $collection->updateEntryUris(['one', 'two']);
     }
 
-    /** @test */
-    public function it_gets_base_preview_targets()
+    /**
+     * @test
+     * @dataProvider additionalPreviewTargetProvider
+     */
+    public function it_gets_and_sets_preview_targets($throughFacade)
     {
         $collection = (new Collection)->handle('test');
 
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->previewTargets());
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->basePreviewTargets());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->additionalPreviewTargets());
 
         $this->assertEquals([
             ['label' => 'Entry', 'format' => '{permalink}'],
@@ -691,51 +696,49 @@ class CollectionTest extends TestCase
         $this->assertEquals([
             ['label' => 'Foo', 'format' => '{foo}'],
             ['label' => 'Bar', 'format' => '{bar}'],
-        ], $collection->basePreviewTargets()->all());
-    }
+        ], $collection->previewTargets()->all());
 
-    /** @test */
-    public function it_gets_additional_preview_targets()
-    {
-        $collection = (new Collection)->handle('test');
-
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->additionalPreviewTargets());
-
-        $collection->previewTargets([
+        $this->assertEquals([
             ['label' => 'Foo', 'format' => '{foo}'],
-        ]);
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $collection->basePreviewTargets()->all());
 
         $this->assertEquals([], $collection->additionalPreviewTargets()->all());
 
-        $collection->addPreviewTargets([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
-        ]);
+        $extra = [
+            ['label' => 'Baz', 'format' => '{baz}'],
+            ['label' => 'Qux', 'format' => '{qux}'],
+        ];
+
+        if ($throughFacade) {
+            \Statamic\Facades\Collection::addPreviewTargets('test', $extra);
+        } else {
+            $collection->addPreviewTargets($extra);
+        }
 
         $this->assertEquals([
             ['label' => 'Foo', 'format' => '{foo}'],
             ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Baz', 'format' => '{baz}'],
+            ['label' => 'Qux', 'format' => '{qux}'],
+        ], $collection->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $collection->basePreviewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Baz', 'format' => '{baz}'],
+            ['label' => 'Qux', 'format' => '{qux}'],
         ], $collection->additionalPreviewTargets()->all());
     }
 
-    /** @test */
-    public function it_gets_all_preview_targets()
+    public function additionalPreviewTargetProvider()
     {
-        $collection = (new Collection)->handle('test');
-
-        $this->assertEquals([
-            ['label' => 'Entry', 'format' => '{permalink}'],
-        ], $collection->previewTargets()->all());
-
-        $collection->addPreviewTargets([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
-        ]);
-
-        $this->assertEquals([
-            ['label' => 'Entry', 'format' => '{permalink}'],
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
-        ], $collection->previewTargets()->all());
+        return [
+            'through object' => [false],
+            'through facade' => [true],
+        ];
     }
 }
