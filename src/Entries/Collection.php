@@ -726,7 +726,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             return \Statamic\Facades\Collection::extraPreviewTargets($this->handle);
         }
 
-        \Statamic\Facades\Collection::addExtraPreviewTargets($this->handle, $targets);
+        \Statamic\Facades\Collection::addPreviewTargets($this->handle, $targets);
 
         return $this;
     }

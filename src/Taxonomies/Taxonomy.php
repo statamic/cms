@@ -367,7 +367,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             return \Statamic\Facades\Taxonomy::extraPreviewTargets($this->handle);
         }
 
-        \Statamic\Facades\Taxonomy::addExtraPreviewTargets($this->handle, $targets);
+        \Statamic\Facades\Taxonomy::addPreviewTargets($this->handle, $targets);
 
         return $this;
     }

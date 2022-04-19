@@ -103,8 +103,8 @@ class CollectionRepositoryTest extends TestCase
             ['label' => 'Bar', 'format' => '{bar}'],
         ];
 
-        CollectionAPI::addExtraPreviewTargets('test', $previewTargetsCollection1);
-        CollectionAPI::addExtraPreviewTargets('test_2', $previewTargetsCollection2);
+        CollectionAPI::addPreviewTargets('test', $previewTargetsCollection1);
+        CollectionAPI::addPreviewTargets('test_2', $previewTargetsCollection2);
 
         $previewTargetsTest = CollectionAPI::extraPreviewTargets('test');
         $previewTargetsTest2 = CollectionAPI::extraPreviewTargets('test_2');

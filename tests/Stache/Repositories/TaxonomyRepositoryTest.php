@@ -112,8 +112,8 @@ class TaxonomyRepositoryTest extends TestCase
             ['label' => 'Bar', 'format' => '{bar}'],
         ];
 
-        TaxonomyAPI::addExtraPreviewTargets('test', $previewTargetsTaxonomy1);
-        TaxonomyAPI::addExtraPreviewTargets('test_2', $previewTargetsTaxonomy2);
+        TaxonomyAPI::addPreviewTargets('test', $previewTargetsTaxonomy1);
+        TaxonomyAPI::addPreviewTargets('test_2', $previewTargetsTaxonomy2);
 
         $previewTargetsTest = TaxonomyAPI::extraPreviewTargets('test');
         $previewTargetsTest2 = TaxonomyAPI::extraPreviewTargets('test_2');

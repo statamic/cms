@@ -101,7 +101,7 @@ class CollectionRepository implements RepositoryContract
         ];
     }
 
-    public function addExtraPreviewTargets($handle, $targets)
+    public function addPreviewTargets($handle, $targets)
     {
         $targets = collect($this->extraPreviewTargets[$handle] ?? [])
             ->merge($targets)

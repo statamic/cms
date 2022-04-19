@@ -97,7 +97,7 @@ class TaxonomyRepository implements RepositoryContract
         return $this->store->index('uri')->items()->flip()->get($uri);
     }
 
-    public function addExtraPreviewTargets($handle, $targets)
+    public function addPreviewTargets($handle, $targets)
     {
         $targets = collect($this->extraPreviewTargets[$handle] ?? [])
             ->merge($targets)
