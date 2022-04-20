@@ -76,13 +76,13 @@ abstract class Action implements Arrayable
 
     public function buttonText()
     {
-        /* @translation */
+        /** @translation */
         return 'Run action|Run action on :count items';
     }
 
     public function confirmationText()
     {
-        /* @translation */
+        /** @translation */
         return 'Are you sure you want to run this action?|Are you sure you want to run this action on :count items?';
     }
 
