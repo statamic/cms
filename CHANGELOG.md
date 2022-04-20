@@ -1,5 +1,28 @@
 # Release Notes
 
+## 3.3.8 (2022-04-20)
+
+### What's new
+- Actions can run JavaScript. [#5854](https://github.com/statamic/cms/issues/5854) by @duncanmcclean
+- Ability to copy a password reset link from the user listing dropdown menus. [#5854](https://github.com/statamic/cms/issues/5854) by @duncanmcclean
+- Ability to provide additional preview targets. [#5549](https://github.com/statamic/cms/issues/5549) by @aerni
+- Simplified Chinese translations. [#5847](https://github.com/statamic/cms/issues/5847) by @grandpalacko
+
+### What's improved
+- Starter kits will require multiple dependencies at once. [#5859](https://github.com/statamic/cms/issues/5859) by @jesseleite
+- Updated Dutch translations. [#5867](https://github.com/statamic/cms/issues/5867) by @robdekort
+- Runtime: Optimized `noparse` parsing. [#5848](https://github.com/statamic/cms/issues/5848) by @fdabek1
+
+### What's fixed
+- Fix issue where adding an image to Bard will make an needless, erroring AJAX request. [#5864](https://github.com/statamic/cms/issues/5864) by @fdabek1
+- Fix issue where the `terms` fieldtype filters out too much. [#5865](https://github.com/statamic/cms/issues/5865) by @jasonvarga
+- Fix `group_by` modifier not working with grids. [#5858](https://github.com/statamic/cms/issues/5858) by @jasonvarga
+- Runtime: Preserve builder instances when being supplied in dynamic bindings and modifiers, or when they've been scoped/nested. [#5807](https://github.com/statamic/cms/issues/5807) by @fdabek1
+- Runtime: Fix single letter variables without spaces skipping HTML content. [#5843](https://github.com/statamic/cms/issues/5843) by @fdabek1
+- Fix validation error when attempting to create a taxonomy that has the same handle as a collection. [#5850](https://github.com/statamic/cms/issues/5850) by @grandpalacko
+
+
+
 ## 3.3.7 (2022-04-14)
 
 ### What's new
