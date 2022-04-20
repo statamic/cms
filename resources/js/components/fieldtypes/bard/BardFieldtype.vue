@@ -116,6 +116,7 @@ import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
 import Image from './Image';
+import Small from './Small';
 import Subscript from './Subscript';
 import Superscript from './Superscript';
 import RemoveFormat from './RemoveFormat';
@@ -514,6 +515,7 @@ export default {
             if (btns.includes('bold')) exts.push(new Bold());
             if (btns.includes('italic')) exts.push(new Italic());
             if (btns.includes('strikethrough')) exts.push(new Strike());
+            if (btns.includes('small')) exts.push(new Small());
             if (btns.includes('underline')) exts.push(new Underline());
             if (btns.includes('subscript')) exts.push(new Subscript());
             if (btns.includes('superscript')) exts.push(new Superscript());
