@@ -3,6 +3,8 @@
 ## 3.3.8 (2022-04-20)
 
 ### What's new
+- Glide generated images can be stored on any filesystem. [#5725](https://github.com/statamic/cms/issues/5725) by @jasonvarga
+- Glide supports watermarks. [#5725](https://github.com/statamic/cms/issues/5725) by @jasonvarga
 - Actions can run JavaScript. [#5854](https://github.com/statamic/cms/issues/5854) by @duncanmcclean
 - Ability to copy a password reset link from the user listing dropdown menus. [#5854](https://github.com/statamic/cms/issues/5854) by @duncanmcclean
 - Ability to provide additional preview targets. [#5549](https://github.com/statamic/cms/issues/5549) by @aerni
