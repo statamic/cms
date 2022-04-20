@@ -14,7 +14,7 @@
         <publish-fields-container>
             <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, fieldPath(field.handle))"
                 :key="field.handle"
                 :field="field"
                 :meta="meta[field.handle]"
