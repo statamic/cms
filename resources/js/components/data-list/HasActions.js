@@ -18,11 +18,13 @@ export default {
             this.$events.$emit('clear-selections');
             this.$events.$emit('reset-action-modals');
 
-            response.alert
-                ? alert(response.message)
-                : this.$toast.success(
-                      response.message || __("Action completed")
-                  );
+            if (response.callback) {
+                Statamic.$callbacks.call(response.callback[0], ...response.callback.slice(1));
+            }
+
+            if (response.message !== false) {
+                this.$toast.success(response.message || __("Action completed"));
+            }
 
             this.request();
         }

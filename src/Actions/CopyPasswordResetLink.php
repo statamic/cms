@@ -50,8 +50,8 @@ class CopyPasswordResetLink extends Action
             : PasswordReset::url($user->generatePasswordResetToken(), PasswordReset::BROKER_ACTIVATIONS);
 
         return [
-            'message' => "Password Reset Link: {$passwordResetLink}",
-            'alert' => true,
+            'message' => false,
+            'callback' => ['copyPasswordResetLink', $passwordResetLink],
         ];
     }
 }
