@@ -744,6 +744,6 @@ EOT;
 {{ if configuration:privacy_statement_type == 'entry' }}Yes{{ else }}No{{ /if }}
 EOT;
 
-        $this->assertSame('Yes', (string)$this->parser()->cascade($cascade)->parse($template));
+        $this->assertSame('Yes', (string) $this->parser()->cascade($cascade)->parse($template));
     }
 }
