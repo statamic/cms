@@ -10,9 +10,12 @@ use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Query\Macroable;
 
 abstract class Builder implements Contract
 {
+    use Macroable;
+
     protected $columns;
     protected $limit;
     protected $offset = 0;
