@@ -10,6 +10,7 @@ use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
 use Statamic\Taxonomies\TermCollection;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
+use Statamic\View\Cascade;
 use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
 use Tests\Antlers\ParserTestCase;
 
@@ -727,5 +728,22 @@ EOT;
 
         $this->assertStringContainsString('<1-One><root value><2-Two><root value><1-One><root value>', $result);
         $this->assertStringContainsString('<else><1-One><root value><else><2-Two><root value><else><1-One><root value>', $result);
+    }
+
+    public function test_conditions_reach_into_the_cascade()
+    {
+        $cascade = $this->mock(Cascade::class, function ($m) {
+            $value = new LabeledValue('entry', 'Privacy Statement Type');
+
+            $m->shouldReceive('get')->with('configuration')->andReturn([
+                'privacy_statement_type' => $value,
+            ]);
+        });
+
+        $template = <<<'EOT'
+{{ if configuration:privacy_statement_type == 'entry' }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('Yes', (string)$this->parser()->cascade($cascade)->parse($template));
     }
 }

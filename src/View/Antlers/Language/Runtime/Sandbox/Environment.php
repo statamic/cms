@@ -181,6 +181,7 @@ class Environment
     {
         $this->nodeProcessor = $processor;
 
+        $this->cascade($processor->getCascade());
         $this->operatorManager->setNodeProcessor($this->nodeProcessor);
 
         return $this;
