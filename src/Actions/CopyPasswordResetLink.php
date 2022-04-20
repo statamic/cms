@@ -51,7 +51,7 @@ class CopyPasswordResetLink extends Action
 
         return [
             'message' => false,
-            'callback' => ['copyPasswordResetLink', $passwordResetLink],
+            'callback' => ['copyToClipboard', $passwordResetLink],
         ];
     }
 }

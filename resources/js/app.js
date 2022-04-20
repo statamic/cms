@@ -208,7 +208,7 @@ Statamic.app({
         const state = localStorage.getItem('statamic.nav') || 'open';
         this.navOpen = state === 'open';
 
-        Statamic.$callbacks.add('copyPasswordResetLink', async function (url) {
+        Statamic.$callbacks.add('copyToClipboard', async function (url) {
             try {
                 await navigator.clipboard.writeText(url);
                 Statamic.$toast.success(__('Copied to clipboard'));
