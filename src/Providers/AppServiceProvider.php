@@ -9,8 +9,6 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Facades;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Token;
-use Statamic\Fieldtypes\Bard\Augmentor;
-use Statamic\Fieldtypes\Bard\Marks\Small;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 
@@ -153,8 +151,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('statamic.imaging.guzzle', function () {
             return new \GuzzleHttp\Client;
         });
-
-        Augmentor::addMark(Small::class);
     }
 
     protected function registerMiddlewareGroup()
