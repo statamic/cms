@@ -2,12 +2,15 @@
 
 namespace Statamic\Stache\Query;
 
+use Illuminate\Support\Traits\Macroable;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
 
 abstract class Builder extends BaseBuilder
 {
+    use Macroable;
+
     protected $store;
     protected $randomize = false;
 

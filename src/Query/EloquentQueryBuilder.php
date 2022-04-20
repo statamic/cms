@@ -3,12 +3,15 @@
 namespace Statamic\Query;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\Traits\Macroable;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
+    use Macroable;
+
     protected $builder;
     protected $columns;
 
