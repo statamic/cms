@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Statamic\Entries\Collection;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 use Facades\Tests\Factories\EntryFactory;
 use Tests\FakesViews;
@@ -56,6 +57,6 @@ EOT;
 <3-Three><3>
 EOT;
 
-        $this->assertSame($expected, trim($response->content()));
+        $this->assertSame($expected, StringUtilities::normalizeLineEndings(trim($response->content())));
     }
 }
