@@ -1953,8 +1953,6 @@ class NodeProcessor
                                     $val = $this->addLoopIterationVariables($val);
                                 }
                             }
-
-
                         }
                         $executedParamModifiers = true;
 
