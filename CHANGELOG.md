@@ -1,5 +1,22 @@
 # Release Notes
 
+## 3.3.9 (2022-04-21)
+
+### What's new
+
+- Add “small” Bard button. [#5876](https://github.com/statamic/cms/pull/5876) by @edalzell
+
+### What's improved
+
+- Updated Russian translations. [#5879](https://github.com/statamic/cms/pull/5879) by @dragomano
+
+### What's fixed
+
+- Runtime: Fix conditions checking the Cascade. [#5875](https://github.com/statamic/cms/pull/5875) by @JohnathonKoster
+- Fix submitted data when fields are hidden by revealer fieldtype. [#5878](https://github.com/statamic/cms/pull/5878) by @jesseleite
+- Fix hidden field tracking in stacked grid rows. [#5877](https://github.com/statamic/cms/issues/5877) by @jesseleite
+
+
 ## 3.3.8 (2022-04-20)
 
 ### What's new
