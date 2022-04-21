@@ -5,7 +5,6 @@ namespace Tests\Query;
 use Tests\TestCase;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
-use BadMethodCallException;
 use Statamic\Facades\Entry;
 use Tests\PreventSavingStacheItemsToDisk;
 
@@ -31,7 +30,7 @@ class MacroableTest extends TestCase
             Term::query()->customTermQuery();
             User::query()->customUserQuery();
             $this->assertTrue(true);
-        } catch (BadMethodCallException) {
+        } catch (\BadMethodCallException $e) {
             $this->assertTrue(false);
         }
     }
@@ -46,7 +45,7 @@ class MacroableTest extends TestCase
         try {
             Term::query()->customEntryQuery();
             $this->assertTrue(false);
-        } catch (BadMethodCallException) {
+        } catch (\BadMethodCallException $e) {
             $this->assertTrue(true);
         }
     }
