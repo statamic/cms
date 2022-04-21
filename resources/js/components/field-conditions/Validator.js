@@ -260,4 +260,40 @@ export default class {
 
         return this.showOnPass ? passes : ! passes;
     }
+
+    getCheckedFieldPaths(dottedPrefix) {
+        let conditions = this.getConditions();
+
+        if (conditions === undefined || isString(conditions)) {
+            return false;
+        }
+
+        let checkedFields = this.converter
+            .fromBlueprint(conditions, this.field.prefix)
+            .map(field => field.field);
+
+        if (dottedPrefix) {
+            checkedFields = checkedFields.map(field => {
+                return field.startsWith('root.')
+                    ? field.replace(/^root\./, '')
+                    : dottedPrefix + '.' + field;
+            });
+        }
+
+        return checkedFields;
+    }
+
+    hasRevealerCondition(dottedPrefix) {
+        if (! this.store || ! this.storeName) {
+            return false;
+        }
+
+        let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
+
+        if (! revealerFields.length) {
+            return false;
+        }
+
+        return intersection(this.getCheckedFieldPaths(dottedPrefix), revealerFields).length;
+    }
 }
