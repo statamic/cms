@@ -98,6 +98,7 @@ export default {
                     values: initial.values,
                     hiddenFields: {},
                     jsonSubmittingFields: [],
+                    revealerFields: [],
                     meta: initial.meta,
                     localizedFields: initial.localizedFields,
                     site: initial.site,
@@ -120,6 +121,11 @@ export default {
                     setFieldSubmitsJson(state, dottedKey) {
                         if (state.jsonSubmittingFields.indexOf(dottedKey) === -1) {
                             state.jsonSubmittingFields.push(dottedKey);
+                        }
+                    },
+                    setRevealerFields(state, dottedKey) {
+                        if (state.revealerFields.indexOf(dottedKey) === -1) {
+                            state.revealerFields.push(dottedKey);
                         }
                     },
                     setMeta(state, meta) {
