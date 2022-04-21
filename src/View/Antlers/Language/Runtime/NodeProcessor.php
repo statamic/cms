@@ -1243,12 +1243,13 @@ class NodeProcessor
                                 $childDataToUse = $depths + $childData;
 
                                 if (! empty($recursiveParent->parameters)) {
+                                    $lockData = $this->data;
                                     foreach ($recursiveParent->parameters as $param) {
                                         if (ModifierManager::isModifier($param)) {
                                             $childDataToUse = $this->runModifier($param->name, $parentParameterValues, $childDataToUse, $rootData);
                                         }
                                     }
-
+                                    $this->data = $lockData;
                                     $childDataToUse = $childDataToUse + $rootData;
                                 } else {
                                     $childDataToUse = $childDataToUse + $rootData;
@@ -1844,6 +1845,7 @@ class NodeProcessor
                         if (! $shouldProcessAsTag && $val !== null) {
                             foreach ($node->parameters as $param) {
                                 if (ModifierManager::isModifier($param)) {
+                                    $lockData = $this->data;
                                     $activeData = $this->getActiveData();
                                     $paramValues = [];
 
@@ -1851,6 +1853,7 @@ class NodeProcessor
                                         $varValue = $node->getSingleParameterValue($param, $this, $activeData);
 
                                         if ($varValue == 'void::'.GlobalRuntimeState::$environmentId) {
+                                            $this->data = $lockData;
                                             continue;
                                         }
 
@@ -1919,6 +1922,7 @@ class NodeProcessor
                                     $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
 
                                     if ($val === null) {
+                                        $this->data = $lockData;
                                         break;
                                     }
                                 } else {
@@ -1939,6 +1943,8 @@ class NodeProcessor
                                         throw new ModifierNotFoundException($param->name);
                                     }
                                 }
+
+                                $this->data = $lockData;
                             }
 
                             if ($val instanceof Collection) {
@@ -1947,6 +1953,8 @@ class NodeProcessor
                                     $val = $this->addLoopIterationVariables($val);
                                 }
                             }
+
+
                         }
                         $executedParamModifiers = true;
 
@@ -2100,7 +2108,9 @@ class NodeProcessor
 
                         foreach ($node->parameters as $param) {
                             if (ModifierManager::isModifier($param)) {
+                                $lockData = $this->data;
                                 $val = $this->runModifier($param->name, array_values($node->getParameterValues($this, $curActiveData)), $val, $this->getActiveData());
+                                $this->data = $lockData;
                             }
                         }
                     }
