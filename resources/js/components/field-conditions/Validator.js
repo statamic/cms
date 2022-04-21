@@ -260,4 +260,27 @@ export default class {
 
         return this.showOnPass ? passes : ! passes;
     }
+
+    hasRevealerCondition(dottedPrefix) {
+        if (! this.store || ! this.storeName) {
+            return false;
+        }
+
+        let conditions = this.getConditions();
+        let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
+
+        if (conditions === undefined || isString(conditions) || ! revealerFields.length) {
+            return false;
+        }
+
+        let checkedFields = this.converter
+            .fromBlueprint(conditions, this.field.prefix)
+            .map(field => field.field);
+
+        if (dottedPrefix) {
+            checkedFields = checkedFields.map(field => dottedPrefix + '.' + field);
+        }
+
+        return intersection(checkedFields, revealerFields).length;
+    }
 }
