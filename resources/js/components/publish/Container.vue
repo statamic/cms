@@ -116,7 +116,10 @@ export default {
                         state.values = values;
                     },
                     setHiddenField(state, field) {
-                        state.hiddenFields[field.dottedKey] = field.hidden;
+                        state.hiddenFields[field.dottedKey] = {
+                            hidden: field.hidden,
+                            omitValue: field.omitValue,
+                        };
                     },
                     setFieldSubmitsJson(state, dottedKey) {
                         if (state.jsonSubmittingFields.indexOf(dottedKey) === -1) {
