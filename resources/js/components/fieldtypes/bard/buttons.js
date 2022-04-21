@@ -9,7 +9,7 @@ const availableButtons = () => [
     { name: 'italic', text: __('Italic'), command: 'italic', icon: 'italic' },
     { name: 'underline', text: __('Underline'), command: 'underline', icon: 'underline' },
     { name: 'strikethrough', text: __('Strikethrough'), command: 'strike', icon: 'strikethrough' },
-    { name: 'small', text: __('Small'), command: 'small', icon: 'strikethrough' },
+    { name: 'small', text: __('Small'), command: 'small', svg: 'small' },
     { name: 'unorderedlist', text: __('Unordered List'), command: 'bullet_list', icon: 'list-ul' },
     { name: 'orderedlist', text: __('Ordered List'), command: 'ordered_list', icon: 'list-ol' },
     { name: 'removeformat', text: __('Remove Formatting'), command: 'remove_format', icon: 'eraser' },
