@@ -284,6 +284,11 @@ class NodeProcessor
         return $this;
     }
 
+    public function getCascade()
+    {
+        return $this->cascade;
+    }
+
     /**
      * Sets whether the NodeProcessor should evaluate PHP code.
      *
