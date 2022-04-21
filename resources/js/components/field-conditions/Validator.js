@@ -261,15 +261,10 @@ export default class {
         return this.showOnPass ? passes : ! passes;
     }
 
-    hasRevealerCondition(dottedPrefix) {
-        if (! this.store || ! this.storeName) {
-            return false;
-        }
-
+    getCheckedFieldPaths(dottedPrefix) {
         let conditions = this.getConditions();
-        let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
 
-        if (conditions === undefined || isString(conditions) || ! revealerFields.length) {
+        if (conditions === undefined || isString(conditions)) {
             return false;
         }
 
@@ -278,9 +273,27 @@ export default class {
             .map(field => field.field);
 
         if (dottedPrefix) {
-            checkedFields = checkedFields.map(field => dottedPrefix + '.' + field);
+            checkedFields = checkedFields.map(field => {
+                return field.startsWith('root.')
+                    ? field.replace(/^root\./, '')
+                    : dottedPrefix + '.' + field;
+            });
         }
 
-        return intersection(checkedFields, revealerFields).length;
+        return checkedFields;
+    }
+
+    hasRevealerCondition(dottedPrefix) {
+        if (! this.store || ! this.storeName) {
+            return false;
+        }
+
+        let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
+
+        if (! revealerFields.length) {
+            return false;
+        }
+
+        return intersection(this.getCheckedFieldPaths(dottedPrefix), revealerFields).length;
     }
 }
