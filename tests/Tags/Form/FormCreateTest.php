@@ -712,7 +712,7 @@ EOT
         $this->assertEquals($form['attrs']['enctype'], 'multipart/form-data');
         $this->assertEquals($form['attrs']['id'], 'my-form');
 
-        $this->assertEquals($form['params']['redirect'], 'http://localhost/');
+        $this->assertEquals($form['meta']['redirect'], 'http://localhost/');
 
         $this->assertIsArray($form['errors']);
         $this->assertIsArray($form['fields']);

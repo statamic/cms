@@ -49,7 +49,7 @@ trait RendersForms
         return $html;
     }
 
-    protected function formAttrs($action, $method = 'POST', $knownTagParams = [], $additionalAttrs = [])
+    protected function formData($action, $method = 'POST', $knownTagParams = [], $additionalAttrs = [], $meta = [])
     {
         $formMethod = $method === 'GET' ? 'GET' : 'POST';
 
@@ -69,7 +69,20 @@ trait RendersForms
             })
             ->all();
 
-        return array_merge($attrs, $paramAttrs);
+        if ($this->params->bool('csrf', true)) {
+            $meta['_token'] = csrf_token();
+        }
+
+        $method = strtoupper($method);
+
+        if (! in_array($method, ['GET', 'POST'])) {
+            $meta['_method'] = $method;
+        }
+
+        return [
+            'attrs' => array_merge($attrs, $paramAttrs),
+            'meta' => $meta,
+        ];
     }
 
     protected function formMetaFields($meta)
