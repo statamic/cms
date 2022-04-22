@@ -102,7 +102,7 @@ class Tags extends BaseTags
 
         if (! $this->parser) {
             return array_merge([
-                'attrs' => $this->formAttrs($action, $method, $attrs),
+                'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
                 'params' => $params,
             ], $data);
         }
