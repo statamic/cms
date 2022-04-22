@@ -20,16 +20,7 @@ trait RendersForms
      */
     protected function formOpen($action, $method = 'POST', $knownTagParams = [], $additionalAttrs = [])
     {
-        $formMethod = $method === 'GET' ? 'GET' : 'POST';
-
-        $attrs = array_merge([
-            'method' => $formMethod,
-            'action' => $action,
-        ], $additionalAttrs);
-
-        if ($this->params->bool('files')) {
-            $attrs['enctype'] = 'multipart/form-data';
-        }
+        $attrs = $this->formAttrs($action, $method, $additionalAttrs);
 
         $attrs = $this->renderAttributes($attrs);
         $paramAttrs = $this->renderAttributesFromParams(array_merge(['method', 'action'], $knownTagParams));
@@ -47,6 +38,22 @@ trait RendersForms
         }
 
         return $html;
+    }
+
+    protected function formAttrs($action, $method = 'POST', $additionalAttrs = [])
+    {
+        $formMethod = $method === 'GET' ? 'GET' : 'POST';
+
+        $attrs = array_merge([
+            'method' => $formMethod,
+            'action' => $action,
+        ], $additionalAttrs);
+
+        if ($this->params->bool('files')) {
+            $attrs['enctype'] = 'multipart/form-data';
+        }
+
+        return $attrs;
     }
 
     protected function formMetaFields($meta)

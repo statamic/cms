@@ -90,8 +90,6 @@ class Tags extends BaseTags
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
 
-        $html = $this->formOpen($action, $method, $knownParams, $attrs);
-
         $params = [];
 
         if ($redirect = $this->getRedirectUrl()) {
@@ -101,6 +99,15 @@ class Tags extends BaseTags
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $attrs),
+                'params' => $params,
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams, $attrs);
 
         $html .= $this->formMetaFields($params);
 
