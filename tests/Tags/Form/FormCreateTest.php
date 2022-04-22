@@ -3,6 +3,7 @@
 namespace Tests\Tags\Form;
 
 use Statamic\Facades\Form;
+use Statamic\Statamic;
 
 class FormCreateTest extends FormTestCase
 {
@@ -694,5 +695,28 @@ EOT
 
         $this->assertEquals($expected, $errors[1]);
         $this->assertEquals($expectedInline, $inlineErrors[1]);
+    }
+
+    /** @test */
+    public function it_fetches_form_data()
+    {
+        $form = Statamic::tag('form:contact')->params([
+            'js' => 'alpine',
+            'files' => true,
+            'redirect' => 'http://localhost/',
+            'id' => 'my-form',
+        ])->fetch();
+
+        $this->assertEquals($form['attrs']['action'], 'http://localhost/!/forms/contact');
+        $this->assertEquals($form['attrs']['method'], 'POST');
+        $this->assertEquals($form['attrs']['enctype'], 'multipart/form-data');
+        $this->assertEquals($form['attrs']['id'], 'my-form');
+        
+        $this->assertEquals($form['params']['redirect'], 'http://localhost/');
+        
+        $this->assertIsArray($form['errors']);
+        $this->assertIsArray($form['fields']);
+        $this->assertEquals($form['honeypot'], 'winnie');
+        $this->assertEquals($form['js_driver'], 'alpine');
     }
 }
