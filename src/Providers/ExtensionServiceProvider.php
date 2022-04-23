@@ -24,6 +24,7 @@ use Statamic\Widgets\Widget;
 class ExtensionServiceProvider extends ServiceProvider
 {
     protected $actions = [
+        Actions\CopyAssetUrl::class,
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
