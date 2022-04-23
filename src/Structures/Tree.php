@@ -16,10 +16,11 @@ abstract class Tree implements Contract, Localization
 {
     use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
 
+    protected static $cachedFlattenedPages = [];
+    
     protected $handle;
     protected $locale;
     protected $tree = [];
-    protected $cachedFlattenedPages;
     protected $withEntries = false;
     protected $uriCacheEnabled = true;
     protected $syncOriginalProperties = ['tree'];
@@ -43,15 +44,20 @@ abstract class Tree implements Contract, Localization
 
     public function tree($tree = null)
     {
-        return $this->fluentlyGetOrSet('tree')
-            ->getter(function ($tree) {
-                $key = "structure-{$this->handle()}-{$this->locale()}-".md5(json_encode($tree));
+        if ($tree) {
+            $this->tree = $tree;
+            return $this;
+        }
 
-                return Blink::once($key, function () use ($tree) {
-                    return $this->structure()->validateTree($tree, $this->locale());
-                });
-            })
-            ->args(func_get_args());
+        if (count(func_get_args()) !== 0) {
+            return $this;
+        }
+
+        $key = "structure-{$this->handle()}-{$this->locale()}-{$this->treeHash()}";
+
+        return Blink::once($key, function () {
+            return $this->structure()->validateTree($this->tree, $this->locale());
+        });
     }
 
     public function root()
@@ -116,11 +122,13 @@ abstract class Tree implements Contract, Localization
 
     public function flattenedPages()
     {
-        if ($this->cachedFlattenedPages) {
-            return $this->cachedFlattenedPages;
+        $key = $this->treeHash();
+
+        if (array_key_exists($key, static::$cachedFlattenedPages)) {
+            return static::$cachedFlattenedPages[$key];
         }
 
-        return $this->cachedFlattenedPages = $this->pages()->flattenedPages();
+        return static::$cachedFlattenedPages[$key] = $this->pages()->flattenedPages();
     }
 
     public function uris()
@@ -165,13 +173,18 @@ abstract class Tree implements Contract, Localization
 
     public function save()
     {
-        $this->cachedFlattenedPages = null;
+        static::$cachedFlattenedPages[$this->treeHash()] = null;
 
         $this->repository()->save($this);
 
         $this->dispatchSavedEvent();
 
         $this->syncOriginal();
+    }
+    
+    protected function treeHash()
+    {
+        return md5(json_encode($this->tree));
     }
 
     public function delete()
