@@ -32,7 +32,6 @@ use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ExecutionBranch;
 use Statamic\View\Antlers\Language\Nodes\EscapedContentNode;
 use Statamic\View\Antlers\Language\Nodes\LiteralNode;
-use Statamic\View\Antlers\Language\Nodes\ModifierNameNode;
 use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\LeftAssignmentOperator;
 use Statamic\View\Antlers\Language\Nodes\RecursiveNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\DirectionGroup;
