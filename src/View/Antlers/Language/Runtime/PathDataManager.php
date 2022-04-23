@@ -142,6 +142,13 @@ class PathDataManager
      */
     private $isForArrayIndex = false;
 
+    /**
+     * Indicates if the data manager encountered a Builder instance on the final part of a variable path.
+     *
+     * @var bool
+     */
+    private $encounteredBuilderOnFinalPart = false;
+
     private function lockData()
     {
         if ($this->nodeProcessor != null) {
@@ -404,6 +411,16 @@ class PathDataManager
     }
 
     /**
+     * Gets if the data manager encountered a Builder instance on the last part of a variable path.
+     *
+     * @return bool
+     */
+    public function getEncounteredBuilderOnLastPath()
+    {
+        return $this->encounteredBuilderOnFinalPart;
+    }
+
+    /**
      * Checks the current path item and data to see if the resolved value should be intercepted.
      *
      * Builder instances will be sent to the Query tag to be resolved when they are encountered.
@@ -415,6 +432,10 @@ class PathDataManager
     private function checkForValueIntercept($pathItem)
     {
         if (! $this->shouldDoValueIntercept) {
+            if ($pathItem->isFinal) {
+                $this->encounteredBuilderOnFinalPart = true;
+            }
+
             return;
         }
 
@@ -454,6 +475,8 @@ class PathDataManager
      */
     public function getData(VariableReference $path, $data, $isForArrayIndex = false)
     {
+        $this->encounteredBuilderOnFinalPart = false;
+
         if (! $this->guardRuntimeAccess($path->normalizedReference)) {
             return null;
         }
@@ -599,12 +622,30 @@ class PathDataManager
                     }
                 }
 
+                $wasBuilderGoingIntoLast = false;
+
+                if ($pathItem->isFinal && $this->reducedVar instanceof Builder) {
+                    $wasBuilderGoingIntoLast = true;
+                }
+
                 $this->reduceVar($pathItem);
+
+                if ($pathItem->isFinal && $this->reducedVar instanceof Builder && ! $wasBuilderGoingIntoLast) {
+                    $this->encounteredBuilderOnFinalPart = true;
+                }
 
                 if ($this->doBreak) {
                     break;
                 }
             } elseif ($pathItem instanceof VariableReference) {
+                if ($this->reducedVar instanceof Builder) {
+                    $this->lockData();
+                    GlobalRuntimeState::$requiresRuntimeIsolation = true;
+                    $this->reducedVar = $this->reducedVar->get()->all();
+                    GlobalRuntimeState::$requiresRuntimeIsolation = false;
+                    $this->unlockData();
+                }
+
                 if (count($pathItem->pathParts) == 1 && is_numeric($pathItem->originalContent) &&
                     intval($pathItem->originalContent) == $pathItem->originalContent) {
                     $numericIndex = intval($pathItem->originalContent);
@@ -620,6 +661,7 @@ class PathDataManager
                         $this->compact(false);
                     }
 
+                    $this->doBreak = false;
                     continue;
                 } else {
                     $retriever = new PathDataManager();
@@ -715,7 +757,12 @@ class PathDataManager
                 $this->compact($path->isFinal);
             }
         } elseif (is_array($this->reducedVar)) {
-            if (array_key_exists($varPath, $this->reducedVar)) {
+            if (is_numeric($path) && Arr::isList($this->reducedVar) && $path < count($this->reducedVar)) {
+                $this->resolvedPath[] = $path;
+                $this->reducedVar = $this->reducedVar[$path];
+
+                $this->doBreak = true;
+            } else if (array_key_exists($varPath, $this->reducedVar)) {
                 $this->resolvedPath[] = $varPath;
                 $this->reducedVar = $this->reducedVar[$varPath];
 

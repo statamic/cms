@@ -43,6 +43,53 @@ EOT;
         $this->assertSame('FooBazBar', $this->renderString($template, $data));
     }
 
+    public function test_query_builder_array_plucking_on_tag_pairs()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Baz'],
+            ['title' => 'Bar'],
+        ]));
+
+        $builder->shouldReceive('orderBy')->withArgs(function ($field, $direction) {
+            return $field == 'title' && $direction == 'desc';
+        });
+
+        $data = [
+            'items' => $builder,
+            'nested' => [
+                'items' => $builder,
+                'level_two' => [
+                    'level-three' => [
+                        [ 'items' => [], ],
+                        [ 'items' => $builder, ],
+                        [ 'items' => [], ],
+                    ],
+                ],
+            ],
+            'pluck_item' => 2
+        ];
+
+        $template = <<<'EOT'
+<{{ items.0 }}{{ title }}{{ /items.0 }}>
+<{{ items[pluck_item] }}{{ title }}{{ /items[pluck_item] }}>
+<{{ nested:items.0 }}{{ title }}{{ /nested:items.0 }}>
+<{{ nested:items[pluck_item] }}{{ title }}{{ /nested:items[pluck_item] }}>
+{{ nested.level_two:level-three.1.items order_by="title:desc" }}<{{ title }}>{{ /nested.level_two:level-three.1.items }}
+EOT;
+
+        $expected = <<<'EOT'
+<Foo>
+<Bar>
+<Foo>
+<Bar>
+<Foo><Baz><Bar>
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data));
+    }
+
     public function test_query_builder_loops_receive_tag_parameters_and_can_be_scoped()
     {
         $builder = Mockery::mock(Builder::class);

@@ -44,6 +44,29 @@ class VariableReference
     public $isFinal = false;
 
     /**
+     * Determines if the provided path is a complex variable path or not.
+     *
+     * @return bool
+     */
+    public function isComplex()
+    {
+        if (empty ($this->pathParts)) { return false; }
+
+        foreach ($this->pathParts as $part) {
+            if ($part instanceof PathNode) {
+                // Handle the case of variable.5
+                if (intval($part->name) == $part->name) {
+                    return true;
+                }
+            } else if ($part instanceof VariableReference) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return VariableReference
      */
     public function clone()

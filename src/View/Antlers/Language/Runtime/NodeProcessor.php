@@ -546,7 +546,11 @@ class NodeProcessor
 
                 // If the path reference has more than one part,
                 // it is something like {{ products.0.name }}
-                if ($node->pathReference != null && count($node->pathReference->pathParts) > 1 && $node->isPaired() == false) {
+                if ($node->pathReference != null && $node->pathReference->isComplex()) {
+                    if ($this->pathDataManager->getEncounteredBuilderOnLastPath()) {
+                        return true;
+                    }
+
                     return false;
                 }
 
@@ -1581,7 +1585,6 @@ class NodeProcessor
 
                     $val = null;
                     $runtimeResolveLoopVar = false;
-                    $runtimeResolveModifiedValue = false;
 
                     if ($tagCallbackResult == null) {
                         if (count($node->parameters) == 0 && ! empty($node->runtimeNodes)) {
@@ -1616,10 +1619,6 @@ class NodeProcessor
                             if ($node->hasParsedRuntimeNodes == false) {
                                 // Parse will rebuild the modifier chain. Reset so we don't double up!
                                 foreach ($node->runtimeNodes as $runtimeNode) {
-                                    if ($runtimeNode instanceof ModifierNameNode) {
-                                        $runtimeResolveModifiedValue = true;
-                                    }
-
                                     $runtimeNode->modifierChain = null;
                                 }
 
@@ -1644,16 +1643,8 @@ class NodeProcessor
                             }
 
                             $runtimeResult = $environment->evaluate($node->parsedRuntimeNodes);
-                            $this->data = $restoreData;
 
-                            // If the environment processed modifiers for the current node
-                            // and the node does _not_ have parameters, we will set the
-                            // $runtimeResolveModifiedValue flag to true to prevent
-                            // the NodeProcessor from attempting to evaluate the
-                            // modifier chain again down below before loops.
-                            if (! $node->hasParameters && $environment->getDidEvaluateModifiers()) {
-                                $runtimeResolveModifiedValue = true;
-                            }
+                            $this->data = $restoreData;
 
                             if (is_string($runtimeResult) && $node->hasProcessedInterpolationRegions) {
                                 $interpolationScope = $this->getActiveData();
@@ -1780,7 +1771,6 @@ class NodeProcessor
                     } else {
                         $val = $tagCallbackResult;
                         $runtimeResolveLoopVar = true;
-                        $runtimeResolveModifiedValue = true;
                     }
 
                     $runLoopMagic = true;
@@ -1793,7 +1783,7 @@ class NodeProcessor
                         );
                     }
 
-                    if ($runtimeResolveLoopVar == false || $runtimeResolveModifiedValue == false) {
+                    if ($runtimeResolveLoopVar == false) {
                         if ($node->pathReference != null) {
                             $dataRetriever = new PathDataManager();
                             if (! empty(GlobalRuntimeState::$prefixState)) {

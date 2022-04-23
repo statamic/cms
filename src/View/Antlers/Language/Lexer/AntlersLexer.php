@@ -505,7 +505,7 @@ class AntlersLexer
                         continue;
                     } elseif ($parsedValue == LanguageKeywords::ConstTrue) {
                         $constTrue = new TrueConstant();
-                        $constTrue->content = LanguageKeywords::ConstNull;
+                        $constTrue->content = LanguageKeywords::ConstTrue;
                         $constTrue->startPosition = $startPosition;
                         $constTrue->endPosition = $endPosition;
 
