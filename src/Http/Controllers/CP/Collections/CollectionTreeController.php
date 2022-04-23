@@ -9,9 +9,9 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Structures\Tree;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Arr;
-use Statamic\Structures\Tree;
 
 class CollectionTreeController extends CpController
 {
