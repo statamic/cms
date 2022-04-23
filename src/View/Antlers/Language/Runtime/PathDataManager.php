@@ -757,7 +757,7 @@ class PathDataManager
                 $this->compact($path->isFinal);
             }
         } elseif (is_array($this->reducedVar)) {
-            if (is_numeric($path) && Arr::isList($this->reducedVar) && $path < count($this->reducedVar)) {
+            if (is_numeric($path) && ! Arr::isAssoc($this->reducedVar) && $path < count($this->reducedVar)) {
                 $this->resolvedPath[] = $path;
                 $this->reducedVar = $this->reducedVar[$path];
 
