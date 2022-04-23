@@ -10,7 +10,9 @@ class VariableNode extends AbstractNode
 
     public function getVariableContent()
     {
-        if (strlen($this->content) == 0) { return $this->name; }
+        if (strlen($this->content) == 0) {
+            return $this->name;
+        }
 
         return $this->content;
     }

@@ -50,7 +50,9 @@ class VariableReference
      */
     public function isComplex()
     {
-        if (empty ($this->pathParts)) { return false; }
+        if (empty($this->pathParts)) {
+            return false;
+        }
 
         foreach ($this->pathParts as $part) {
             if ($part instanceof PathNode) {
@@ -58,7 +60,7 @@ class VariableReference
                 if (intval($part->name) == $part->name) {
                     return true;
                 }
-            } else if ($part instanceof VariableReference) {
+            } elseif ($part instanceof VariableReference) {
                 return true;
             }
         }

@@ -762,7 +762,7 @@ class PathDataManager
                 $this->reducedVar = $this->reducedVar[$path];
 
                 $this->doBreak = true;
-            } else if (array_key_exists($varPath, $this->reducedVar)) {
+            } elseif (array_key_exists($varPath, $this->reducedVar)) {
                 $this->resolvedPath[] = $varPath;
                 $this->reducedVar = $this->reducedVar[$varPath];
 

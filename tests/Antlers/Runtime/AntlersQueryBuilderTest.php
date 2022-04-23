@@ -62,13 +62,13 @@ EOT;
                 'items' => $builder,
                 'level_two' => [
                     'level-three' => [
-                        [ 'items' => [], ],
-                        [ 'items' => $builder, ],
-                        [ 'items' => [], ],
+                        ['items' => []],
+                        ['items' => $builder],
+                        ['items' => []],
                     ],
                 ],
             ],
-            'pluck_item' => 2
+            'pluck_item' => 2,
         ];
 
         $template = <<<'EOT'
