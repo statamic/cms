@@ -17,7 +17,7 @@ abstract class Tree implements Contract, Localization
     use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
 
     protected static $cachedFlattenedPages = [];
-    
+
     protected $handle;
     protected $locale;
     protected $tree = [];
@@ -44,8 +44,9 @@ abstract class Tree implements Contract, Localization
 
     public function tree($tree = null)
     {
-        if ($tree) {
+        if (! is_null($tree)) {
             $this->tree = $tree;
+
             return $this;
         }
 
@@ -124,7 +125,7 @@ abstract class Tree implements Contract, Localization
     {
         $key = $this->treeHash();
 
-        if (array_key_exists($key, static::$cachedFlattenedPages)) {
+        if (! empty(static::$cachedFlattenedPages[$key])) {
             return static::$cachedFlattenedPages[$key];
         }
 
@@ -181,7 +182,12 @@ abstract class Tree implements Contract, Localization
 
         $this->syncOriginal();
     }
-    
+
+    public static function clearAllCachedFlattenedPages()
+    {
+        static::$cachedFlattenedPages = [];
+    }
+
     protected function treeHash()
     {
         return md5(json_encode($this->tree));

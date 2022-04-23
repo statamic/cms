@@ -11,6 +11,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Arr;
+use Statamic\Structures\Tree;
 
 class CollectionTreeController extends CpController
 {
@@ -38,6 +39,7 @@ class CollectionTreeController extends CpController
 
         // Clone the tree and add the submitted contents into it so we can
         // validate URI uniqueness without affecting the real object in memory.
+        Tree::clearAllCachedFlattenedPages();
         $this->validateUniqueUris((clone $tree)->disableUriCache()->tree($contents));
 
         // Validate the tree, which will add any missing entries or throw an exception
