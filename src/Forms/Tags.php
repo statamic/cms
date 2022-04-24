@@ -101,7 +101,10 @@ class Tags extends BaseTags
         }
 
         if (! $this->parser) {
-            return array_merge($this->formData($action, $method, $knownParams, $attrs, $params), $data);
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);

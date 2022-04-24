@@ -712,10 +712,12 @@ EOT
         $this->assertEquals($form['attrs']['enctype'], 'multipart/form-data');
         $this->assertEquals($form['attrs']['id'], 'my-form');
 
-        $this->assertEquals($form['meta']['redirect'], 'http://localhost/');
+        $this->assertEquals($form['params']['_redirect'], 'http://localhost/');
+        $this->assertArrayHasKey('_token', $form['params']);
 
         $this->assertIsArray($form['errors']);
         $this->assertIsArray($form['fields']);
+
         $this->assertEquals($form['honeypot'], 'winnie');
         $this->assertEquals($form['js_driver'], 'alpine');
     }

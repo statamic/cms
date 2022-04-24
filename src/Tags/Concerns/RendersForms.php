@@ -9,6 +9,44 @@ trait RendersForms
 {
     use RendersAttributes;
 
+    protected function formAttrs($action, $method = 'POST', $knownTagParams = [], $additionalAttrs = [])
+    {
+        $formMethod = $method === 'GET' ? 'GET' : 'POST';
+
+        $attrs = array_merge([
+            'method' => $formMethod,
+            'action' => $action,
+        ], $additionalAttrs);
+
+        if ($this->params->bool('files')) {
+            $attrs['enctype'] = 'multipart/form-data';
+        }
+
+        $paramAttrs = collect($this->params->all())
+            ->except(array_merge(['method', 'action'], $knownTagParams))
+            ->mapWithKeys(function ($value, $attribute) {
+                return [preg_replace('/^attr:/', '', $attribute) => $value];
+            })
+            ->all();
+
+        return array_merge($attrs, $paramAttrs);
+    }
+
+    protected function formParams($method, $params = [])
+    {
+        if ($this->params->bool('csrf', true)) {
+            $params['token'] = csrf_token();
+        }
+
+        $method = strtoupper($method);
+
+        if (! in_array($method, ['GET', 'POST'])) {
+            $params['method'] = $method;
+        }
+
+        return $params;
+    }
+
     /**
      * Open a form.
      *
@@ -49,40 +87,13 @@ trait RendersForms
         return $html;
     }
 
-    protected function formData($action, $method = 'POST', $knownTagParams = [], $additionalAttrs = [], $meta = [])
+    protected function formMetaPrefix($meta)
     {
-        $formMethod = $method === 'GET' ? 'GET' : 'POST';
-
-        $attrs = array_merge([
-            'method' => $formMethod,
-            'action' => $action,
-        ], $additionalAttrs);
-
-        if ($this->params->bool('files')) {
-            $attrs['enctype'] = 'multipart/form-data';
-        }
-
-        $paramAttrs = collect($this->params->all())
-            ->except(array_merge(['method', 'action'], $knownTagParams))
-            ->mapWithKeys(function ($value, $attribute) {
-                return [preg_replace('/^attr:/', '', $attribute) => $value];
+        return collect($meta)
+            ->mapWithKeys(function ($value, $key) {
+                return ['_'.$key => $value];
             })
             ->all();
-
-        if ($this->params->bool('csrf', true)) {
-            $meta['_token'] = csrf_token();
-        }
-
-        $method = strtoupper($method);
-
-        if (! in_array($method, ['GET', 'POST'])) {
-            $meta['_method'] = $method;
-        }
-
-        return [
-            'attrs' => array_merge($attrs, $paramAttrs),
-            'meta' => $meta,
-        ];
     }
 
     protected function formMetaFields($meta)
