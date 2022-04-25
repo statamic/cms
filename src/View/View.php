@@ -6,7 +6,9 @@ use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Events\ViewRendered;
 
 class View
@@ -58,7 +60,7 @@ class View
 
     public function layout($layout = null)
     {
-        if (count(func_get_args()) === 0) {
+        if (func_num_args() === 0) {
             return $this->layout;
         }
 
@@ -69,7 +71,7 @@ class View
 
     public function template($template = null)
     {
-        if (! $template) {
+        if (func_num_args() === 0) {
             return $this->template;
         }
 
@@ -82,12 +84,23 @@ class View
     {
         $cascade = $this->gatherData();
 
-        $contents = view($this->templateViewName(), $cascade);
-
         if ($this->shouldUseLayout()) {
+            GlobalRuntimeState::$containsLayout = true;
+
+            $contents = view($this->templateViewName(), $cascade);
+
+            if (Str::endsWith($this->layoutViewPath(), Engine::EXTENSIONS)) {
+                $contents = $contents->withoutExtractions();
+            }
+
+            $contents = $contents->render();
+            GlobalRuntimeState::$containsLayout = false;
+
             $contents = view($this->layoutViewName(), array_merge($cascade, [
-                'template_content' => $contents->withoutExtractions()->render(),
+                'template_content' => $contents,
             ]));
+        } else {
+            $contents = view($this->templateViewName(), $cascade);
         }
 
         ViewRendered::dispatch($this);

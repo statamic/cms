@@ -123,10 +123,14 @@ return [
     */
 
     'unique_entry_value' => '該值已被使用。',
+    'unique_term_value' => '該值已被使用。',
     'unique_user_value' => '該值已被使用。',
     'duplicate_field_handle' => '控點為 :handle 的欄位無法被使用超過一次。',
     'one_site_without_origin' => '至少必須有一個無來源的網站。',
     'origin_cannot_be_disabled' => '無法選擇一個已禁用的來源。',
+    'unique_uri' => '該 URI 已被使用。',
+    'duplicate_uri' => '重複的 URI :value',
+    'reserved' => '輸入值為保留字。',
 
     /*
     |--------------------------------------------------------------------------

@@ -47,7 +47,7 @@ return [
     'collections_mount_instructions' => 'Escolha uma entrada na qual esta coleção deve ser montada. Saiba mais na [documentação](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Activar o pedido manual via arrastar e soltar.',
     'collections_past_date_behavior_instructions' => 'Como as entradas datadas do passado devem se comportar.',
-    'collections_route_instructions' => 'A rota controla o padrão de URL das entradas.',
+    'collections_route_instructions' => 'A rota controla o padrão de URL das entradas. Saiba mais na [documentação](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'A direcção de classificação padrão.',
     'collections_taxonomies_instructions' => 'Ligue entradas nesta colecção a taxonomias. Os campos serão adicionados automaticamente aos formulários.',
     'email_utility_configuration_description' => 'As configurações de correio são definidas em <code>:path</code>',

@@ -178,6 +178,9 @@
     }
 }
 
+.bard-set.has-error > .replicator-set-header label {
+    color: $color_red;
+}
 
 /* The set selection options for each text block
   ========================================================================== */
@@ -225,6 +228,11 @@
 
         > p > code, > pre code {
             @apply bg-grey-30;
+        }
+        
+        // To remove min height from nested bard fields inside bard in fullscreen mode.
+        * > .ProseMirror { 
+            min-height: auto;
         }
     }
 
@@ -378,7 +386,15 @@
     }
 
     ol ol {
-        list-style-type: lower-roman;
+        list-style-type: decimal;
+    }
+
+    ul ol {
+        list-style-type: decimal;
+    }
+
+    ol ul {
+        list-style-type: circle;
     }
 
     blockquote {
@@ -415,6 +431,17 @@
                 @apply bg-grey-40 absolute inset-0 pointer-events-none opacity-25;
                 content: '';
             }
+        }
+
+        a {
+            @apply text-blue underline break-words;
+        }
+
+        a:active,
+        a:focus,
+        a:hover {
+            outline: 0;
+            text-decoration: underline;
         }
     }
 

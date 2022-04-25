@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Statamic\Facades\Form;
+use Statamic\Facades\User;
 use Statamic\Widgets\Widget as BaseWidget;
 
 class Widget extends BaseWidget
@@ -15,6 +16,10 @@ class Widget extends BaseWidget
 
         if (! $form) {
             return "Error: Form [$handle] doesn't exist.";
+        }
+
+        if (! User::current()->can('view', $form)) {
+            return;
         }
 
         return view('statamic::forms.widget', [

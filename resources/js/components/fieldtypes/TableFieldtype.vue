@@ -87,14 +87,10 @@ export default {
 
     data: function () {
         return {
-            data: [],
+            data: this.arrayToSortable(this.value || []),
             deletingRow: false,
             deletingColumn: false,
         }
-    },
-
-    created() {
-        this.data = this.arrayToSortable(this.value || []);
     },
 
     watch: {

@@ -28,10 +28,12 @@ class EmailTest extends TestCase
         Site::setConfig(['sites' => [
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
+            'three' => ['locale' => 'de_CH', 'lang' => 'de_CH', 'url' => '/three'],
         ]]);
 
         $this->assertEquals('en', $this->makeEmail(Site::get('one'))->locale);
         $this->assertEquals('fr', $this->makeEmail(Site::get('two'))->locale);
+        $this->assertEquals('de_CH', $this->makeEmail(Site::get('three'))->locale);
     }
 
     private function makeEmail($site = null)

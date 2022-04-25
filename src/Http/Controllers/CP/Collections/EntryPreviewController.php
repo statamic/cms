@@ -30,6 +30,6 @@ class EntryPreviewController extends PreviewController
             $entry->date($preview['date'] ?? now()->format('Y-m-d-Hi'));
         }
 
-        return $this->getDataResponse($request, $entry)->getContent();
+        return $this->tokenizeAndReturn($request, $entry);
     }
 }

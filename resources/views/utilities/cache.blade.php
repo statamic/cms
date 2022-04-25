@@ -26,10 +26,16 @@
                     <h2 class="font-bold">{{ __('Content Stache') }}</h2>
                     <p class="text-grey text-sm my-1">{{ __('statamic::messages.cache_utility_stache_description') }}</p>
                 </div>
-                <form method="POST" action="{{ cp_route('utilities.cache.clear', 'stache') }}">
-                    @csrf
-                    <button class="btn">{{ __('Clear') }}</button>
-                </form>
+                <div class="flex">
+                    <form method="POST" action="{{ cp_route('utilities.cache.warm', 'stache') }}" class="mr-1">
+                        @csrf
+                        <button class="btn">{{ __('Warm') }}</button>
+                    </form>
+                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'stache') }}">
+                        @csrf
+                        <button class="btn">{{ __('Clear') }}</button>
+                    </form>
+                </div>
             </div>
             <div class="text-sm text-grey flex">
                 <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Records') }}:</span> {{ $stache['records'] }}</div>
@@ -56,9 +62,9 @@
                 @endunless
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Strategy') }}:</span> {{ $static['strategy'] }}</div>
+                <div class="mr-2 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Strategy') }}:</span> {{ $static['strategy'] }}</div>
                 @if ($static['enabled'])
-                    <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Pages') }}:</span> {{ $static['count'] }}</div>
+                    <div class="mr-2 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Pages') }}:</span> {{ $static['count'] }}</div>
                 @endif
             </div>
         </div>
@@ -91,8 +97,8 @@
                 </form>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Cached images') }}:</span> {{ $images['count'] }}</div>
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Size') }}:</span> {{ $images['size'] }}</div>
+                <div class="mr-2 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Cached images') }}:</span> {{ $images['count'] }}</div>
+                <div class="mr-2 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Size') }}:</span> {{ $images['size'] }}</div>
             </div>
         </div>
     </div>

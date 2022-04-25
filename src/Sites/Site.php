@@ -39,6 +39,11 @@ class Site implements Augmentable
         return explode('-', str_replace('_', '-', $this->locale()))[0];
     }
 
+    public function lang()
+    {
+        return $this->config['lang'] ?? $this->shortLocale();
+    }
+
     public function url()
     {
         $url = $this->config['url'];
@@ -92,9 +97,11 @@ class Site implements Augmentable
         return [
             'handle' => $this->handle(),
             'name' => $this->name(),
+            'lang' => $this->lang(),
             'locale' => $this->locale(),
             'short_locale' => $this->shortLocale(),
             'url' => $this->url(),
+            'permalink' => $this->absoluteUrl(),
             'direction' => $this->direction(),
             'attributes' => $this->attributes(),
         ];

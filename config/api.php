@@ -70,4 +70,18 @@ return [
         'expiry' => 60,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Exclude Keys
+    |--------------------------------------------------------------------------
+    |
+    | Here you may provide an array of keys to be excluded from API responses.
+    | For example, you may want to hide things like edit_url, api_url, etc.
+    |
+    */
+
+    'excluded_keys' => [
+        //
+    ],
+
 ];

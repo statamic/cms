@@ -42,4 +42,14 @@ abstract class StructureTestCase extends TestCase
 
         $this->assertEquals($tree, $this->structure('test')->expectsRoot(false)->validateTree($tree, 'en'));
     }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $structure = $this->structure('test');
+
+        $structure
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $structure->{$key}));
+    }
 }

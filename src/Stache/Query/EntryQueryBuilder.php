@@ -49,6 +49,11 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return EntryCollection::make($items);
     }
 
+    protected function getItems($keys)
+    {
+        return Facades\Entry::applySubstitutions(parent::getItems($keys));
+    }
+
     protected function getFilteredKeys()
     {
         $collections = empty($this->collections)
@@ -76,22 +81,23 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
     protected function getKeysFromCollectionsWithWheres($collections, $wheres)
     {
         return collect($wheres)->reduce(function ($ids, $where) use ($collections) {
-            // Get a single array comprised of the items from the same index across all collections.
-            $items = collect($collections)->flatMap(function ($collection) use ($where) {
-                return $this->store->store($collection)
-                    ->index($where['column'])->items()
-                    ->mapWithKeys(function ($item, $key) use ($collection) {
-                        return ["{$collection}::{$key}" => $item];
-                    });
-            });
+            $keys = $where['type'] == 'Nested'
+                ? $this->getKeysFromCollectionsWithWheres($collections, $where['query']->wheres)
+                : $this->getKeysFromCollectionsWithWhere($collections, $where);
 
-            // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $method = 'filterWhere'.$where['type'];
-            $keys = $this->{$method}($items, $where)->keys();
-
-            // Continue intersecting the keys across the where clauses.
             return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
+    }
+
+    protected function getKeysFromCollectionsWithWhere($collections, $where)
+    {
+        $items = collect($collections)->flatMap(function ($collection) use ($where) {
+            return $this->getWhereColumnKeysFromStore($collection, $where);
+        });
+
+        $method = 'filterWhere'.$where['type'];
+
+        return $this->{$method}($items, $where)->keys();
     }
 
     protected function getOrderKeyValuesByIndex()
@@ -123,5 +129,16 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
             return $carry;
         }, collect());
+    }
+
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        $collections = empty($this->collections)
+            ? Facades\Collection::handles()
+            : $this->collections;
+
+        return collect($collections)->flatMap(function ($collection) use ($column) {
+            return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
+        });
     }
 }

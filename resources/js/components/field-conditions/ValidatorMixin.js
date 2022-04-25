@@ -8,10 +8,22 @@ export default {
     },
 
     methods: {
-        showField(field) {
-            let validator = new Validator(field, this.values, this.$store, this.storeName);
+        showField(field, dottedKey) {
+            let dottedPrefix = dottedKey
+                ? dottedKey.replace(new RegExp('\.'+field.handle+'$'), '')
+                : '';
 
-            return validator.passesConditions();
+            let validator = new Validator(field, this.values, this.$store, this.storeName);
+            let passes = validator.passesConditions();
+            let hiddenByRevealerField = validator.hasRevealerCondition(dottedPrefix);
+
+            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                dottedKey: dottedKey || field.handle,
+                hidden: ! passes,
+                omitValue: ! hiddenByRevealerField,
+            });
+
+            return passes;
         }
     }
 }

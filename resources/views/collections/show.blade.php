@@ -30,6 +30,11 @@
         :structure-show-slugs="{{ Statamic\Support\Str::bool($structure->showSlugs()) }}"
         @endif
     >
+        @if(
+            auth()->user()->can('edit', $collection)
+            || auth()->user()->can('delete', $collection)
+            || auth()->user()->can('configure fields')
+        )
         <template #twirldown>
             @can('edit', $collection)
                 <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
@@ -51,6 +56,7 @@
                 </dropdown-item>
             @endcan
         </template>
+        @endif
     </collection-view>
 
 @endsection

@@ -139,6 +139,9 @@ class TreeTest extends TestCase
 
         $this->assertInstanceOf(Pages::class, $pages);
         $this->assertCount(3, $pages->all());
+
+        $this->assertEquals(['test' => 'home'], $pages->all()[0]->pageData()->all());
+        $this->assertEquals(['test' => 'about'], $pages->all()[1]->pageData()->all());
     }
 
     /** @test */
@@ -160,9 +163,11 @@ class TreeTest extends TestCase
             [
                 'id' => 'root-id',
                 'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
                 'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
                         'id' => 'pages-board',
@@ -195,9 +200,11 @@ class TreeTest extends TestCase
             [
                 'id' => 'root-id',
                 'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
                 'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
                         'id' => 'pages-board',
@@ -235,9 +242,11 @@ class TreeTest extends TestCase
             [
                 'id' => 'root-id',
                 'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
                 'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
                         'id' => 'pages-board',
@@ -261,9 +270,11 @@ class TreeTest extends TestCase
         $tree = $this->tree($arr = [
             [
                 'id' => 'pages-home',
+                'data' => ['test' => 'home'],
             ],
             [
                 'id' => 'pages-about',
+                'data' => ['test' => 'about'],
                 'children' => [
                     [
                         'id' => 'pages-board',
@@ -529,9 +540,11 @@ class TreeTest extends TestCase
                 [
                     'id' => 'root-id',
                     'entry' => 'pages-home',
+                    'data' => ['test' => 'home'],
                 ],
                 [
                     'id' => 'pages-about',
+                    'data' => ['test' => 'about'],
                     'children' => [
                         [
                             'id' => 'pages-board',

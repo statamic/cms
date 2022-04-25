@@ -28,7 +28,7 @@
                     <template v-else>
                         <div v-if="canShowSvg"
                              class="svg-img"
-                             :style="'background-image:url('+asset.url+')'">
+                             :style="'background-image:url('+thumbnail+')'">
                         </div>
                         <file-icon v-else :extension="asset.extension" class="p-2 h-40 w-40" />
                     </template>

@@ -10,6 +10,7 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Routing\ResolveRedirect;
 use Statamic\Statamic;
+use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\View;
 
 class DataResponse implements Responsable
@@ -45,7 +46,7 @@ class DataResponse implements Responsable
             ->make($this->contents())
             ->withHeaders($this->headers);
 
-        ResponseCreated::dispatch($response);
+        ResponseCreated::dispatch($response, $this->data);
 
         return $response;
     }
@@ -192,7 +193,7 @@ class DataResponse implements Responsable
 
     protected function isLivePreview()
     {
-        return $this->request->headers->get('X-Statamic-Live-Preview');
+        return optional($this->request->statamicToken())->handler() === LivePreview::class;
     }
 
     protected function versionJavascriptModules($contents)

@@ -66,8 +66,14 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootMiddleware()
                 ->bootUpdateScripts()
                 ->bootViews()
-                ->bootPublishAfterInstall();
+                ->bootPublishAfterInstall()
+                ->bootAddon();
         });
+    }
+
+    public function bootAddon()
+    {
+        //
     }
 
     public function bootEvents()
@@ -160,9 +166,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootSchedule()
     {
         if ($this->app->runningInConsole()) {
-            $this->app->booted(function () {
-                $this->schedule($this->app->make(Schedule::class));
-            });
+            $this->schedule($this->app->make(Schedule::class));
         }
 
         return $this;
@@ -217,7 +221,12 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         $slug = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
-        $origin = "{$directory}resources/lang";
+        $origin = "{$directory}lang";
+
+        // Support older Laravel lang path convention within addons as well.
+        if (! file_exists($origin)) {
+            $origin = "{$directory}resources/lang";
+        }
 
         if (! $this->translations || ! file_exists($origin)) {
             return $this;
@@ -226,7 +235,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom($origin, $slug);
 
         $this->publishes([
-            $origin => resource_path("lang/vendor/{$slug}"),
+            $origin => app()->langPath("vendor/{$slug}"),
         ], "{$slug}-translations");
 
         return $this;

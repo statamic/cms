@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Facades\Statamic\CP\LivePreview;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -10,9 +11,11 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class FrontendTest extends TestCase
 {
+    use FakesContent;
     use FakesRoles;
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
@@ -230,10 +233,12 @@ class FrontendTest extends TestCase
     {
         $this->withStandardBlueprints();
 
-        $this->createPage('about')->published(false)->set('content', 'Testing 123')->save();
+        $page = tap($this->createPage('about')->published(false)->set('content', 'Testing 123'))->save();
+
+        LivePreview::tokenize('test-token', $page);
 
         $response = $this
-            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->get('/about?token=test-token')
             ->assertStatus(200)
             ->assertHeader('X-Statamic-Draft', true);
 
@@ -278,10 +283,12 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRendered('default', 'The template contents');
 
         tap($this->makeCollection()->dated(true)->futureDateBehavior('private'))->save();
-        tap($this->makePage('about')->date('2019-01-02'))->save();
+        $page = tap($this->makePage('about')->date('2019-01-02'))->save();
+
+        LivePreview::tokenize('test-token', $page);
 
         $this
-            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->get('/about?token=test-token')
             ->assertStatus(200)
             ->assertHeader('X-Statamic-Private', true);
     }
@@ -324,10 +331,12 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRendered('default', 'The template contents');
 
         tap($this->makeCollection()->dated(true)->pastDateBehavior('private'))->save();
-        tap($this->makePage('about')->date('2018-01-01'))->save();
+        $page = tap($this->makePage('about')->date('2018-01-01'))->save();
+
+        LivePreview::tokenize('test-token', $page);
 
         $this
-            ->get('/about', ['X-Statamic-Live-Preview' => true])
+            ->get('/about?token=test-token')
             ->assertStatus(200)
             ->assertHeader('X-Statamic-Private', true);
     }
@@ -348,7 +357,7 @@ class FrontendTest extends TestCase
         $keys = [
             'site', 'homepage', 'current_url', 'current_uri', 'current_date', 'now', 'today',
             'get', 'post', 'get_post', 'old', 'response_code',
-            'logged_in', 'logged_out', 'environment', 'xml_header', 'csrf_token', 'csrf_field', 'config',
+            'logged_in', 'logged_out', 'current_user', 'environment', 'xml_header', 'csrf_token', 'csrf_field', 'config',
         ];
 
         $cascade = $this->app['Statamic\View\Cascade']->toArray();
@@ -380,7 +389,7 @@ class FrontendTest extends TestCase
 
         $response = $this->get('about');
 
-        $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", trim($response->content()));
+        $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", StringUtilities::normalizeLineEndings(trim($response->content())));
     }
 
     /** @test */
@@ -670,28 +679,5 @@ class FrontendTest extends TestCase
 
         // Before the fix, you'd see "Service" instead of "Home", because the URI would also be /
         $this->get('/')->assertSee('Home');
-    }
-
-    private function createPage($slug, $attributes = [])
-    {
-        $this->makeCollection()->save();
-
-        return tap($this->makePage($slug, $attributes))->save();
-    }
-
-    private function makePage($slug, $attributes = [])
-    {
-        return EntryFactory::slug($slug)
-            ->id($slug)
-            ->collection('pages')
-            ->data($attributes['with'] ?? [])
-            ->make();
-    }
-
-    private function makeCollection()
-    {
-        return Collection::make('pages')
-            ->routes('{slug}')
-            ->template('default');
     }
 }

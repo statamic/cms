@@ -59,7 +59,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
             Route::post('{site}', 'EntriesController@store')->name('collections.entries.store');
 
-            Route::group(['prefix' => '{entry}/{slug}'], function () {
+            Route::group(['prefix' => '{entry}'], function () {
                 Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
                 Route::post('publish', 'PublishedEntriesController@store')->name('collections.entries.published.store');
                 Route::post('unpublish', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
@@ -141,7 +141,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('assets-fieldtype', 'FieldtypeController@index');
         Route::resource('assets', 'AssetsController')->parameters(['assets' => 'encoded_asset']);
         Route::get('assets/{encoded_asset}/download', 'AssetsController@download')->name('assets.download');
-        Route::get('thumbnails/{encoded_asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
+        Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
+        Route::get('svgs/{encoded_asset}', 'SvgController@show')->name('assets.svgs.show');
+        Route::get('pdfs/{encoded_asset}', 'PdfController@show')->name('assets.pdfs.show');
     });
 
     Route::group(['prefix' => 'fields', 'namespace' => 'Fields'], function () {

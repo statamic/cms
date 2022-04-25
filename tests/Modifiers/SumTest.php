@@ -6,6 +6,9 @@ use Statamic\Fields\Value;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
+/**
+ * @group array
+ */
 class SumTest extends TestCase
 {
     /**
@@ -14,7 +17,7 @@ class SumTest extends TestCase
      **/
     public function it_sums($sum, $key, $array)
     {
-        $this->assertEquals($sum, $this->modify($array, $key));
+        $this->assertSame($sum, $this->modify($array, $key));
     }
 
     public function sums()
@@ -22,6 +25,9 @@ class SumTest extends TestCase
         return [
             'list of ints' => [7, null, [1, 2, 3, 1]],
             'list of strings' => [7, null, ['1', '2', '3', '1']],
+            'list of floats, should return an integer' => [7, null, [1.5, 2.5, 3]],
+            'list of floats, should return a float' => [7.5, null, [1.5, 2, 3, 1]],
+            'list of strings with points' => [7.5, null, ['1.5', '2', '3', '1.0']],
             'associative array of ints' => [7, 'foo', [
                 ['foo' => 1],
                 ['foo' => 2],

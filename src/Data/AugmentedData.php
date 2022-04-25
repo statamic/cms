@@ -6,12 +6,12 @@ use Illuminate\Support\Collection;
 
 class AugmentedData extends AbstractAugmented
 {
-    protected $data;
     protected $array;
 
     public function __construct($data, $array)
     {
-        $this->data = $data;
+        parent::__construct($data);
+
         $this->array = $array instanceof Collection ? $array->all() : $array;
     }
 

@@ -87,6 +87,7 @@ class FieldsController extends CpController
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'text',
                 'width' => 50,
+                'autoselect' => true,
             ],
             'handle' => [
                 'display' => __('Handle'),
@@ -109,7 +110,7 @@ class FieldsController extends CpController
                     'below' => __('Below'),
                 ],
                 'default' => 'above',
-                'width' => 50,
+                'width' => 33,
             ],
             'listable' => [
                 'display' => __('Listable'),
@@ -122,10 +123,17 @@ class FieldsController extends CpController
                     'false' => __('Not listable'),
                 ],
                 'default' => 'hidden',
-                'width' => 50,
+                'width' => 33,
                 'unless' => [
                     'type' => 'section',
                 ],
+            ],
+            'read_only' => [
+                'display' => __('Read Only'),
+                'instructions' => __('statamic::messages.fields_read_only_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'width' => 33,
             ],
         ]);
 

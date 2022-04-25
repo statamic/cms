@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Taxonomy;
 
 use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Support\Arr;
@@ -65,6 +66,7 @@ class Terms
             $query->whereIn('collections', $this->collections->map->handle()->all());
         }
 
+        $this->querySite($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
@@ -124,6 +126,17 @@ class Terms
     protected function defaultOrderBy()
     {
         return 'title:asc';
+    }
+
+    protected function querySite($query)
+    {
+        $site = $this->params->get(['site', 'locale'], Site::current()->handle());
+
+        if ($site === '*' || ! Site::hasMultiple()) {
+            return;
+        }
+
+        return $query->where('site', $site);
     }
 
     protected function queryMinimumEntries($query)

@@ -20,7 +20,6 @@ class ApiController extends Controller
      * Abort if item is unpublished.
      *
      * @param  mixed  $item
-     * @return bool
      */
     protected function abortIfUnpublished($item)
     {

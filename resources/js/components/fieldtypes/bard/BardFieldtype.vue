@@ -89,7 +89,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble } from 'tiptap';
+import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble, Paragraph, Text } from 'tiptap';
 import {
     Blockquote,
     CodeBlock,
@@ -116,6 +116,7 @@ import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
 import Image from './Image';
+import Small from './Small';
 import Subscript from './Subscript';
 import Superscript from './Superscript';
 import RemoveFormat from './RemoveFormat';
@@ -147,6 +148,7 @@ export default {
     provide() {
         return {
             setConfigs: this.config.sets,
+            isReadOnly: this.readOnly,
         }
     },
 
@@ -218,10 +220,14 @@ export default {
             return indexes;
         },
 
-        site() {
-            if (! this.storeName) return this.$config.get('selectedSite');
+        storeState() {
+            if (! this.storeName) return undefined;
 
-            return this.$store.state.publish[this.storeName].site;
+            return this.$store.state.publish[this.storeName];
+        },
+
+        site() {
+            return this.storeState ? this.storeState.site : this.$config.get('selectedSite');
         },
 
         htmlWithReplacedLinks() {
@@ -234,6 +240,16 @@ export default {
 
                 return `"${linkData.permalink}"`;
             });
+        },
+
+        setsWithErrors() {
+            if (! this.storeState) return [];
+
+            return Object.values(this.setIndexes).filter((setIndex) => {
+                const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
+
+                return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
+            })
         }
 
     },
@@ -242,6 +258,7 @@ export default {
         this.initToolbarButtons();
 
         this.editor = new Editor({
+            useBuiltInExtensions: false,
             extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
@@ -270,6 +287,8 @@ export default {
         this.$nextTick(() => this.mounted = true);
 
         this.pageHeader = document.querySelector('.global-header');
+
+        this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
 
     beforeDestroy() {
@@ -281,7 +300,12 @@ export default {
         json(json) {
             if (!this.mounted) return;
 
-            // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
+            // Prosemirror's JSON will include spaces between tags.
+            // For example (this is not the actual json)...
+            // "<p>One <b>two</b> three</p>" becomes ['OneSPACE', '<b>two</b>', 'SPACEthree']
+            // But, Laravel's TrimStrings middleware would remove them.
+            // Those spaces need to be there, otherwise it would be rendered as <p>One<b>two</b>three</p>
+            // To combat this, we submit the JSON string instead of an object.
             this.updateDebounced(JSON.stringify(json));
         },
 
@@ -395,22 +419,30 @@ export default {
 
             // Get the configured buttons and swap them with corresponding objects
             let buttons = selectedButtons.map(button => {
-                return _.findWhere(availableButtons(), { name: button.toLowerCase() })
-                    || button;
+                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
             });
 
             // Let addons add, remove, or control the position of buttons.
             this.$bard.buttonCallbacks.forEach(callback => {
-                let returned = callback(buttons);
+                // Since the developer uses the same callback to add buttons to the field itself, and for the
+                // button configurator, we need to make the button conditional when on the Bard fieldtype
+                // but not in the button configurator. So here we'll filter it out if it's not selected.
+                const buttonFn = (button) => selectedButtons.includes(button.name) ? button : null;
 
-                // No return value means they intend to manipulate the
-                // buttons object manually. Just continue on.
-                if (! returned) return;
+                const addedButtons = callback(buttons, buttonFn);
+
+                // No return value means either they literally returned nothing, with the intention
+                // of manipulating the buttons object manually. Or, they used the button() and
+                // the button was not configured in the field so it was stripped out.
+                if (! addedButtons) return;
 
                 buttons = buttons.concat(
-                    Array.isArray(returned) ? returned : [returned]
+                    Array.isArray(addedButtons) ? addedButtons : [addedButtons]
                 );
             });
+
+            // Remove any nulls. This could happen if a developer-added button was not specified in this field's buttons array.
+            buttons = buttons.filter(button => !!button);
 
             // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
             buttons = buttons.filter(button => typeof button != 'string');
@@ -470,6 +502,8 @@ export default {
             let exts = [
                 new Doc(),
                 new Set({ bard: this }),
+                new Text(),
+                new Paragraph(),
                 new HardBreak(),
                 new History()
             ];
@@ -481,6 +515,7 @@ export default {
             if (btns.includes('bold')) exts.push(new Bold());
             if (btns.includes('italic')) exts.push(new Italic());
             if (btns.includes('strikethrough')) exts.push(new Strike());
+            if (btns.includes('small')) exts.push(new Small());
             if (btns.includes('underline')) exts.push(new Underline());
             if (btns.includes('subscript')) exts.push(new Subscript());
             if (btns.includes('superscript')) exts.push(new Superscript());
@@ -531,6 +566,14 @@ export default {
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
+            });
+
+            this.$bard.extensionReplacementCallbacks.forEach(({callback, name}) => {
+                let index = exts.findIndex(ext => ext.name === name);
+                if (index === -1) return;
+                let extension = exts[index];
+                let newExtension = callback({ bard: this, mark, node, extension });
+                exts[index] = newExtension;
             });
 
             return exts;

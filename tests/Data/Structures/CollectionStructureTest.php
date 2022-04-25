@@ -29,6 +29,8 @@ class CollectionStructureTest extends StructureTestCase
 
         $this->collection = $this->mock(Collection::class);
         $this->collection->shouldReceive('queryEntries')->andReturn($this->entryQueryBuilder);
+        $this->collection->shouldReceive('title')->andReturn('Test');
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->atMost(1)->andReturn($this->collection);
     }
 
     public function structure($handle = null)
@@ -57,15 +59,13 @@ class CollectionStructureTest extends StructureTestCase
     public function it_gets_the_collection()
     {
         $structure = $this->structure('test');
-        $collection = $this->mock(Collection::class);
-        Facades\Collection::shouldReceive('findByHandle')->with('test')->once()->andReturn($collection);
 
         $this->assertNull(Blink::get($blinkKey = 'collection-structure-collection-test'));
 
         // Do it twice combined with the once() in the mock to show blink works.
-        $this->assertEquals($collection, $structure->collection());
-        $this->assertEquals($collection, $structure->collection());
-        $this->assertSame($collection, Blink::get($blinkKey));
+        $this->assertEquals($this->collection, $structure->collection());
+        $this->assertEquals($this->collection, $structure->collection());
+        $this->assertSame($this->collection, Blink::get($blinkKey));
     }
 
     /** @test */
@@ -204,9 +204,7 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     public function it_gets_the_route_from_the_collection()
     {
-        $collection = $this->mock(Collection::class);
-        $collection->shouldReceive('route')->once()->andReturn('/the-route/{slug}');
-        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+        $this->collection->shouldReceive('route')->once()->andReturn('/the-route/{slug}');
 
         $this->assertEquals('/the-route/{slug}', $this->structure('test')->route('en'));
     }
@@ -214,13 +212,11 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     public function it_gets_the_route_from_the_collection_when_it_has_multiple()
     {
-        $collection = $this->mock(Collection::class);
-        $collection->shouldReceive('route')->with('en')->once()->andReturn('/en-route');
-        $collection->shouldReceive('route')->with('fr')->once()->andReturn('/fr-route');
-        $collection->shouldReceive('route')->with('de')->once()->andReturnNull();
+        $this->collection->shouldReceive('route')->with('en')->once()->andReturn('/en-route');
+        $this->collection->shouldReceive('route')->with('fr')->once()->andReturn('/fr-route');
+        $this->collection->shouldReceive('route')->with('de')->once()->andReturnNull();
 
         $structure = $this->structure('test');
-        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
 
         $this->assertEquals('/en-route', $structure->route('en'));
         $this->assertEquals('/fr-route', $structure->route('fr'));
@@ -337,10 +333,8 @@ class CollectionStructureTest extends StructureTestCase
     public function it_saves_through_the_collection()
     {
         $structure = $this->structure('test');
-        $collection = $this->mock(Collection::class);
-        $collection->shouldReceive('structure')->with($structure)->once()->ordered()->andReturnSelf();
-        $collection->shouldReceive('save')->once()->ordered()->andReturnTrue();
-        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+        $this->collection->shouldReceive('structure')->with($structure)->once()->ordered()->andReturnSelf();
+        $this->collection->shouldReceive('save')->once()->ordered()->andReturnTrue();
 
         $this->assertTrue($structure->save());
     }

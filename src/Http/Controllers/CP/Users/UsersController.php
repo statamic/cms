@@ -41,16 +41,27 @@ class UsersController extends CpController
         ]);
     }
 
+    protected function indexQuery()
+    {
+        $query = User::query();
+
+        if ($search = request('search')) {
+            $query->where('email', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
+        }
+
+        return $query;
+    }
+
     protected function json($request)
     {
         $query = $request->group
             ? UserGroup::find($request->group)->queryUsers()
-            : User::query();
+            : $this->indexQuery();
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters);
 
         $users = $query
-            ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
+            ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
 
         return (new Users($users))

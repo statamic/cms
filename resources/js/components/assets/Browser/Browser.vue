@@ -445,8 +445,10 @@ export default {
             this.loadingAssets = true;
         },
 
-        actionCompleted() {
-            this.$toast.success(__('Action completed'));
+        actionCompleted(success) {
+            if (success) {
+                this.$toast.success(__('Action completed'));
+            }
 
             this.$events.$emit('clear-selections');
 

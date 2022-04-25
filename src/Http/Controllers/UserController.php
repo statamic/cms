@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\Passwords\PasswordDefaults;
+use Statamic\Auth\ThrottlesLogins;
 use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
@@ -14,6 +15,8 @@ use Statamic\Facades\User;
 
 class UserController extends Controller
 {
+    use ThrottlesLogins;
+
     private $request;
 
     public function login(Request $request)
@@ -23,16 +26,23 @@ class UserController extends Controller
             'password' => 'required',
         ]);
 
-        $loggedIn = $validator->passes()
-            ? Auth::attempt($request->only('email', 'password'), $request->has('remember'))
-            : false;
+        if ($validator->passes()) {
+            if ($this->hasTooManyLoginAttempts($request)) {
+                $this->fireLockoutEvent($request);
 
-        $response = redirect($request->input('_redirect', '/'));
+                return $this->sendLockoutResponse($request);
+            }
+
+            if (Auth::attempt($request->only('email', 'password'), $request->has('remember'))) {
+                return redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'));
+            }
+
+            $this->incrementLoginAttempts($request);
+        }
+
         $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
 
-        return $loggedIn
-            ? $response->withSuccess(__('Login successful.'))
-            : $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
+        return $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
     }
 
     public function logout()
@@ -89,6 +99,11 @@ class UserController extends Controller
         Auth::login($user);
 
         return $this->userRegistrationSuccess();
+    }
+
+    public function username()
+    {
+        return 'email';
     }
 
     private function userRegistrationFailure($errors = null)
