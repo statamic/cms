@@ -23,9 +23,9 @@ class CopyAssetUrl extends Action
         return false;
     }
 
-    public function authorize($authed, $user)
+    public function authorize($authed, $asset)
     {
-        return $authed->can('sendPasswordReset', $user);
+        return $authed->can('view', $asset);
     }
 
     public function run($items, $values)
