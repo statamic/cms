@@ -33,4 +33,17 @@ return [
         //
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Post Message Data
+    |--------------------------------------------------------------------------
+    |
+    | This message data is used to communicate live preview updates
+    | to the iFrame using window messages. If set to null the
+    | iFrame's content will be replaced as usual instead.
+    |
+    */
+
+    'post_message_data' => 'live-preview.update',
+
 ];
