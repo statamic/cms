@@ -460,6 +460,7 @@ class AntlersLexer
                     }
 
                     $parsedValue = trim(implode('', $this->currentContent));
+                    $lowerParsedValue = strtolower($parsedValue);
                     $valueLen = mb_strlen($parsedValue);
                     $valueStartIndex = $this->currentIndex - $valueLen;
                     $startPosition = $node->relativeOffset($valueStartIndex);
@@ -467,7 +468,7 @@ class AntlersLexer
                     $this->currentContent = [];
 
                     // Check against internal keywords.
-                    if ($parsedValue == LanguageKeywords::LogicalAnd) {
+                    if ($lowerParsedValue == LanguageKeywords::LogicalAnd) {
                         $logicalAnd = new LogicalAndOperator();
                         $logicalAnd->content = LanguageKeywords::LogicalAnd;
                         $logicalAnd->startPosition = $startPosition;
@@ -476,7 +477,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $logicalAnd;
                         $this->lastNode = $logicalAnd;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::LogicalOr) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::LogicalOr) {
                         $logicalOr = new LogicalOrOperator();
                         $logicalOr->content = LanguageKeywords::LogicalOr;
                         $logicalOr->startPosition = $startPosition;
@@ -485,7 +486,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $logicalOr;
                         $this->lastNode = $logicalOr;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::LogicalXor) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::LogicalXor) {
                         $logicalXor = new LogicalXorOperator();
                         $logicalXor->content = LanguageKeywords::LogicalXor;
                         $logicalXor->startPosition = $startPosition;
@@ -494,7 +495,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $logicalXor;
                         $this->lastNode = $logicalXor;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::ConstNull) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::ConstNull) {
                         $constNull = new NullConstant();
                         $constNull->content = LanguageKeywords::ConstNull;
                         $constNull->startPosition = $startPosition;
@@ -503,7 +504,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $constNull;
                         $this->lastNode = $constNull;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::ConstTrue) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::ConstTrue) {
                         $constTrue = new TrueConstant();
                         $constTrue->content = LanguageKeywords::ConstNull;
                         $constTrue->startPosition = $startPosition;
@@ -512,7 +513,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $constTrue;
                         $this->lastNode = $constTrue;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::ConstFalse) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::ConstFalse) {
                         $constFalse = new FalseConstant();
                         $constFalse->content = LanguageKeywords::ConstFalse;
                         $constFalse->startPosition = $startPosition;
@@ -521,7 +522,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $constFalse;
                         $this->lastNode = $constFalse;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::LogicalNot) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::LogicalNot) {
                         $logicNegation = new LogicalNegationOperator();
                         $logicNegation->content = LanguageKeywords::LogicalNot;
                         $logicNegation->startPosition = $startPosition;
