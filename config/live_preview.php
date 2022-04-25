@@ -44,6 +44,6 @@ return [
     |
     */
 
-    'post_message_data' => 'live-preview.update',
+    'post_message_data' => null,
 
 ];
