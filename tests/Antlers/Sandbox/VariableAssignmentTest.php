@@ -6,10 +6,12 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class VariableAssignmentTest extends ParserTestCase
 {
+    use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
     public function test_simple_variable_is_set()
@@ -992,5 +994,21 @@ EOT;
 
         $results = trim($this->renderString($template, $data, true));
         $this->assertSame($expected, $results);
+    }
+
+    public function test_variable_assignment_do_not_leak()
+    {
+        $testTemplate = <<<'EOT'
+{{ arg = arg ?? 'default' }}{{ arg }}
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('test', $testTemplate);
+
+        $template = <<<'EOT'
+<{{ partial:test arg="foo" }}><{{ partial:test }}>
+EOT;
+
+        $this->assertSame('<foo><default>', trim($this->renderString($template)));
     }
 }
