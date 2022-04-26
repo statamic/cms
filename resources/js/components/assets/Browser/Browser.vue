@@ -254,10 +254,12 @@ import HasPagination from '../../data-list/HasPagination';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
+import HasActions from '../../data-list/HasActions';
 
 export default {
 
     mixins: [
+        HasActions,
         HasPagination,
         HasPreferences,
     ],
@@ -437,17 +439,7 @@ export default {
 
     methods: {
 
-        actionStarted() {
-            this.loadingAssets = true;
-        },
-
-        actionCompleted(success) {
-            if (success) {
-                this.$toast.success(__('Action completed'));
-            }
-
-            this.$events.$emit('clear-selections');
-
+        afterActionSuccessfullyCompleted() {
             this.loadAssets();
         },
 
