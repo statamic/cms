@@ -23,7 +23,11 @@ trait HasRequestedColumns
 
         return collect($requested)
             ->map(function ($field) use ($columns) {
-                return $columns->get($field)->visible(true);
+                if ($columns->get($field) !== null) {
+                    return $columns->get($field)->visible(true);
+                }
+
+                return false;
             })
             ->merge($columns->except($requested))
             ->values();
