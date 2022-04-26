@@ -746,4 +746,13 @@ EOT;
 
         $this->assertSame('Yes', (string) $this->parser()->cascade($cascade)->parse($template));
     }
+
+    public function test_uppercase_logical_keywords_in_conditions()
+    {
+        $template = <<<'EOT'
+{{ if true AND false }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('No', $this->renderString($template));
+    }
 }
