@@ -657,7 +657,7 @@ class DocumentParser
 
                     if (count($parseResults) > 1 && $parseResults[1] instanceof AntlersNode) {
                         $parseResults = [$parseResults[1]];
-                    } else if (count ($parseResults) == 1 && ($parseResults[0] instanceof AntlersNode) == false) {
+                    } elseif (count($parseResults) == 1 && ($parseResults[0] instanceof AntlersNode) == false) {
                         $parseResults = [];
                     }
 
@@ -1162,7 +1162,7 @@ class DocumentParser
     /**
      * @param $offset
      * @param $index
-     * @param false $isRelativeOffset
+     * @param  false  $isRelativeOffset
      * @return Position
      */
     public function positionFromOffset($offset, $index, $isRelativeOffset = false)
