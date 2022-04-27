@@ -9,7 +9,7 @@ trait QueriesScopes
     public function queryScopes($query)
     {
         $this->parseQueryScopes()->each(function ($handle) use ($query) {
-            $query->appplyScope($handle, $this->params);
+            $query->applyScope($handle, $this->params);
         });
     }
 

@@ -38,7 +38,7 @@ abstract class Builder implements Contract
 
     public function __call($method, $args)
     {
-        $this->appplyScope($method);
+        $this->applyScope($method);
 
         return $this;
     }

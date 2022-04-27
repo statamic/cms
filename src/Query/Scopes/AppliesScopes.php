@@ -6,7 +6,7 @@ use Statamic\Facades\Scope;
 
 trait AppliesScopes
 {
-    public function appplyScope($method, $context = [])
+    public function applyScope($method, $context = [])
     {
         // Throw an exception if the scope doesn't exist.
         if (! $scope = Scope::find(snake_case($method))) {

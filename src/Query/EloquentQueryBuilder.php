@@ -24,7 +24,7 @@ abstract class EloquentQueryBuilder implements Builder
     {
         $this->builder->$method(...$args);
 
-        $this->appplyScope($method);
+        $this->applyScope($method);
 
         return $this;
     }
