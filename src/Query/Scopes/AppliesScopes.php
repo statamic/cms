@@ -19,11 +19,11 @@ trait AppliesScopes
         }
 
         // Only apply the scope to the defined builders.
-        if ($scope->builders()->contains($this::class)) {
+        if ($scope->builders()->contains(get_class($this))) {
             return $scope->apply($this, $context);
         }
 
         // Throw an exception if a user is trying to access a scope that is not supported by this builder.
-        throw new \Exception("The [" . static::class . "] query builder does not support the [$method] scope.");
+        throw new \Exception("The [" . get_class($this) . "] query builder does not support the [$method] scope.");
     }
 }
