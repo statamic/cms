@@ -338,7 +338,7 @@ abstract class Builder extends BaseBuilder
         return $this;
     }
 
-    public function appplyScope($method)
+    public function appplyScope($method, $context = [])
     {
         // Throw an exception if the scope doesn't exist.
         if (! $scope = Scope::find(snake_case($method))) {
@@ -347,12 +347,12 @@ abstract class Builder extends BaseBuilder
 
         // Apply the scope to all builders if none were defined.
         if ($scope->builders()->isEmpty()) {
-            return $scope->apply($this, []);
+            return $scope->apply($this, $context);
         }
 
         // Only apply the scope to the defined builders.
-            return $scope->apply($this, []);
         if ($scope->builders()->contains($this::class)) {
+            return $scope->apply($this, $context);
         }
 
         // Throw an exception if a user is trying to access a scope that is not supported by this builder.

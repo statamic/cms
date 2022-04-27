@@ -8,15 +8,9 @@ trait QueriesScopes
 {
     public function queryScopes($query)
     {
-        $this->parseQueryScopes()
-            ->map(function ($handle) {
-                return app('statamic.scopes')->get($handle);
-            })
-            ->filter()
-            ->each(function ($class) use ($query) {
-                $scope = app($class);
-                $scope->apply($query, $this->params);
-            });
+        $this->parseQueryScopes()->each(function ($handle) use ($query) {
+            $query->appplyScope($handle, $this->params);
+        });
     }
 
     protected function parseQueryScopes()
