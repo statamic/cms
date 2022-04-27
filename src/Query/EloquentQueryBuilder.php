@@ -5,10 +5,13 @@ namespace Statamic\Query;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Query\Scopes\AppliesScopes;
 use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
+    use AppliesScopes;
+
     protected $builder;
     protected $columns;
 
@@ -20,6 +23,8 @@ abstract class EloquentQueryBuilder implements Builder
     public function __call($method, $args)
     {
         $this->builder->$method(...$args);
+
+        $this->appplyScope($method);
 
         return $this;
     }
