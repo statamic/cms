@@ -509,7 +509,7 @@ EOT;
         $this->assertInstanceOf(PathNode::class, $pathNode2);
         $this->assertSame('title', $pathNode2->name);
     }
-  
+
     public function test_uppercase_logical_keywords_are_parsed_into_keywords_and_not_variables()
     {
         $nodes = $this->getParsedRuntimeNodes('{{ TrUe AND FALSE oR something }}');
