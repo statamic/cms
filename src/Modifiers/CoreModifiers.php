@@ -2233,6 +2233,66 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Make str_pad() with padding available as a modifier.
+     *
+     * Example: {{ my_index | str_pad:2:0:left }}
+     *
+     * @param  string  $value  The value to be modified.
+     * @param  array  $params  Any parameters used in the modifier.
+     * @return string
+     */
+    public function strPad(string $value, array $params): string
+    {
+        $pad_length = Arr::get($params, 0);
+        $pad_string = Arr::get($params, 1, ' ');
+        $pad_type = constant('STR_PAD_'.Str::upper(Arr::get($params, 2, 'RIGHT')));
+
+        return str_pad($value, $pad_length, $pad_string, $pad_type);
+    }
+
+    /**
+     * Make str_pad() with both padding available as a modifier.
+     *
+     * Example: {{ my_index | str_pad_both:2:0 }}
+     *
+     * @param  string  $value  The value to be modified.
+     * @param  array  $params  Any parameters used in the modifier.
+     * @return string
+     */
+    public function strPadBoth(string $value, array $params): string
+    {
+        return $this->strPad($value, array_merge($params, [2 => 'BOTH']));
+    }
+
+    /**
+     * Make str_pad() with left padding available as a modifier.
+     *
+     * Example: {{ my_index | str_pad_left:2:0 }}
+     *
+     * @param  string  $value  The value to be modified.
+     * @param  array  $params  Any parameters used in the modifier.
+     * @return string
+     */
+    public function strPadLeft(string $value, array $params): string
+    {
+        return $this->strPad($value, array_merge($params, [2 => 'LEFT']));
+    }
+
+    /**
+     * Make str_pad() with right padding available as a modifier.
+     *
+     * Example: {{ my_index | str_pad_right:2:0 }}
+     *
+     * @param  string  $value  The value to be modified.
+     * @param  array  $params  Any parameters used in the modifier.
+     * @return string
+     */
+    public function strPadRight(string $value, array $params): string
+    {
+        return $this->strPad($value, array_merge($params, [2 => 'RIGHT']));
+    }
+
+    /**
      * Converts a string to StudlyCase.
      *
      * @param $value

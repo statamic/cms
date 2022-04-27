@@ -180,7 +180,7 @@ export default {
         },
 
         toggleEnabledState() {
-            Vue.set(this.values, 'enabled', ! this.values.enabled);
+            this.updated('enabled', ! this.values.enabled);
         },
 
         toggleCollapsedState() {
