@@ -2235,7 +2235,7 @@ class CoreModifiers extends Modifier
     /**
      * Make str_pad() with padding available as a modifier.
      *
-     * Example: {{ my_index | str_pad_both:2:0:left }}
+     * Example: {{ my_index | str_pad:2:0:left }}
      *
      * @param  string  $value  The value to be modified.
      * @param  array  $params  Any parameters used in the modifier.
