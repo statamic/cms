@@ -10,7 +10,15 @@ export default {
             const container = this.$refs.contents;
 
             if (container.firstChild) {
-                if (this.$config.get('livePreview.post_message_data')) {
+                const existingIFrameSource = new URL(container.firstChild.src);
+                const newIFrameSource = new URL(iframe.src);
+
+                existingIFrameSource.searchParams.delete('live-preview');
+                newIFrameSource.searchParams.delete('live-preview');
+
+                const iFrameSourceIsEqual = existingIFrameSource.toString() === newIFrameSource.toString();
+
+                if (this.$config.get('livePreview.post_message_data') && iFrameSourceIsEqual) {
                     const targetOrigin = /^https?:\/\//.test(url) ? (new URL(url))?.origin : window.origin;
                     container.firstChild.contentWindow.postMessage(
                         this.$config.get('livePreview.post_message_data'),
