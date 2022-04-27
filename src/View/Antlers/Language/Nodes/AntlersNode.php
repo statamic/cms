@@ -561,6 +561,25 @@ class AntlersNode extends AbstractNode
         return $this->parser->positionFromOffset($this->contentOffset->offset + $offset, $index);
     }
 
+    public function lexerRelativeOffset($offset)
+    {
+        if ($this->parser == null) {
+            $position = new Position();
+            $position->index = $offset;
+            $position->offset = $offset;
+
+            return $position;
+        }
+
+        $relativeIndex = $offset + strlen($this->rawStart);
+
+        if ($this->startPosition != null) {
+            $relativeIndex += $this->startPosition->index;
+        }
+
+        return $this->parser->positionFromOffset($relativeIndex, $relativeIndex, true);
+    }
+
     public function relativeOffset($offset, $index = null)
     {
         if ($index == null) {
