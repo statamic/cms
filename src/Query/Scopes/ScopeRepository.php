@@ -24,6 +24,11 @@ class ScopeRepository
         }
     }
 
+    public function register($class)
+    {
+        app('statamic.scopes')->put(app($class)->handle(), $class);
+    }
+
     public function filters($key, $context = [])
     {
         return $this->all()
