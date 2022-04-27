@@ -30,7 +30,7 @@ abstract class Scope
     public static function builders()
     {
         return collect(static::$builders)->map(function ($builder) {
-            return Statamic::query($builder)::class;
+            return get_class(Statamic::query($builder));
         });
     }
 }
