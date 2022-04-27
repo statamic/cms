@@ -7,13 +7,15 @@ use DateTimeInterface;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Statamic\Facades\Scope;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
+    use AppliesScopes;
+
     protected $columns;
     protected $limit;
     protected $offset = 0;
@@ -33,6 +35,13 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+
+    public function __call($method, $args)
+    {
+        $this->appplyScope($method);
+
+        return $this;
+    }
 
     public function select($columns = ['*'])
     {
@@ -648,33 +657,5 @@ abstract class Builder implements Contract
         $this->with = array_merge($this->with, Arr::wrap($relations));
 
         return $this;
-    }
-
-    public function __call($method, $args)
-    {
-        $this->appplyScope($method);
-
-        return $this;
-    }
-
-    public function appplyScope($method, $context = [])
-    {
-        // Throw an exception if the scope doesn't exist.
-        if (! $scope = Scope::find(snake_case($method))) {
-            throw new \Exception("The [$method] scope does not exist.");
-        }
-
-        // Apply the scope to all builders if none were defined.
-        if ($scope->builders()->isEmpty()) {
-            return $scope->apply($this, $context);
-        }
-
-        // Only apply the scope to the defined builders.
-        if ($scope->builders()->contains($this::class)) {
-            return $scope->apply($this, $context);
-        }
-
-        // Throw an exception if a user is trying to access a scope that is not supported by this builder.
-        throw new \Exception("The [" . static::class . "] query builder does not support the [$method] scope.");
     }
 }
