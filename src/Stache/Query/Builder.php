@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Query;
 
 use Statamic\Data\DataCollection;
+use Statamic\Facades\Scope;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
 
@@ -328,5 +329,33 @@ abstract class Builder extends BaseBuilder
     protected function getWhereColumnKeyValuesByIndex($column)
     {
         return $this->store->index($column)->items();
+    }
+
+    public function __call($method, $args)
+    {
+        $this->appplyScope($method);
+
+        return $this;
+    }
+
+    public function appplyScope($method)
+    {
+        // Throw an exception if the scope doesn't exist.
+        if (! $scope = Scope::find(snake_case($method))) {
+            throw new \Exception("The [$method] scope does not exist.");
+        }
+
+        // Apply the scope to all builders if none were defined.
+        if ($scope->builders()->isEmpty()) {
+            return $scope->apply($this, []);
+        }
+
+        // Only apply the scope to the defined builders.
+            return $scope->apply($this, []);
+        if ($scope->builders()->contains($this::class)) {
+        }
+
+        // Throw an exception if a user is trying to access a scope that is not supported by this builder.
+        throw new \Exception("The [" . static::class . "] query builder does not support the [$method] scope.");
     }
 }
