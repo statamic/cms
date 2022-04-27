@@ -75,6 +75,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
                 Route::get('preview', 'EntryPreviewController@show')->name('collections.entries.preview.popout');
                 Route::patch('/', 'EntriesController@update')->name('collections.entries.update');
             });
+            
+            // Provides backwards compatibility, in case an old URL will with a slug will be called
+            Route::get('{entry}/{slug}', function ($collection, $entry, $slug) {
+                return redirect($entry->editUrl(), 301);
+            });
         });
     });
 
