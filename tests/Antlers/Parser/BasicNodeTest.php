@@ -56,7 +56,7 @@ class BasicNodeTest extends ParserTestCase
 
     public function test_it_removes_tags_from_node_content()
     {
-        $nodes = $this->parseNodes('{{ meta_title["No Title Set"] param="Test" }}{{ /if }}');
+        $nodes = $this->parseNodes('{{ meta_title["No Title Set"] param="Test" }}');
         $this->assertSame(' meta_title["No Title Set"] ', $nodes[0]->getContent());
     }
 
