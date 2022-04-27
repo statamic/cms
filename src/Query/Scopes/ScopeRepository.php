@@ -13,8 +13,14 @@ class ScopeRepository
 
     public function find($key, $context = [])
     {
-        if ($scope = app('statamic.scopes')->get($key)) {
-            return app($scope)->context($context);
+        if ($class = app('statamic.scopes')->get($key)) {
+            $scope = app($class);
+
+            if ($scope instanceof Filter) {
+                $scope->context($context);
+            }
+
+            return $scope;
         }
     }
 
