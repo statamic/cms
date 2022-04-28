@@ -6,9 +6,9 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Site;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Permission;
+use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Utility;
 
