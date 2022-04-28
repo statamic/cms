@@ -81,7 +81,7 @@ return [
     |
     */
 
-    'blueprints_singular' => false,
+    'blueprint_singular' => false,
 
     /*
     |--------------------------------------------------------------------------

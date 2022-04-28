@@ -128,7 +128,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function fallbackTermBlueprint()
     {
-        $singular = config('statamic.system.blueprints_singular', false);
+        $singular = config('statamic.system.blueprint_singular', false);
 
         $blueprint = Blueprint::find('default')
             ->setHandle($singular ? Str::singular($this->handle()) : $this->handle())
