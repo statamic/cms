@@ -11,7 +11,7 @@ abstract class Scope
     use RegistersItself, HasHandle;
 
     protected static $binding = 'scopes';
-    protected static $builders = [];
+    protected static $builders;
 
     /**
      * Apply the scope to a given query builder.
