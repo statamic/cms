@@ -61,6 +61,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
             Route::group(['prefix' => '{entry}'], function () {
                 Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
+                Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
                 Route::post('publish', 'PublishedEntriesController@store')->name('collections.entries.published.store');
                 Route::post('unpublish', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
                 Route::post('localize', 'LocalizeEntryController')->name('collections.entries.localize');
@@ -74,11 +75,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
                 Route::post('preview', 'EntryPreviewController@edit')->name('collections.entries.preview.edit');
                 Route::get('preview', 'EntryPreviewController@show')->name('collections.entries.preview.popout');
                 Route::patch('/', 'EntriesController@update')->name('collections.entries.update');
-            });
-
-            // Provides backwards compatibility, in case an old URL will with a slug will be called
-            Route::get('{entry}/{slug}', function ($collection, $entry, $slug) {
-                return redirect($entry->editUrl(), 301);
             });
         });
     });
