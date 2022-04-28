@@ -3,6 +3,7 @@
 namespace Statamic\Policies;
 
 use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class CollectionPolicy
@@ -42,8 +43,11 @@ class CollectionPolicy
     public function view($user, $collection)
     {
         $user = User::fromUser($user);
+        $site = Site::selected();
 
-        return $user->hasPermission("view {$collection->handle()} entries");
+        return $user->hasPermission("view {$collection->handle()} entries") &&
+               $user->hasPermission("access {$site->handle()} site") &&
+               $collection->sites()->contains($site->handle());
     }
 
     public function edit($user, $collection)
