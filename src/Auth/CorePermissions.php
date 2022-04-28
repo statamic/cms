@@ -6,6 +6,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Permission;
 use Statamic\Facades\Taxonomy;
@@ -19,6 +20,10 @@ class CorePermissions
             $this->register('access cp');
             $this->register('configure fields');
             $this->register('configure addons');
+        });
+
+        $this->group('sites', function () {
+            $this->registerSites();
         });
 
         $this->group('collections', function () {
@@ -58,6 +63,17 @@ class CorePermissions
         });
 
         $this->register('resolve duplicate ids');
+    }
+
+    protected function registerSites()
+    {
+        $this->register('access {site} site', function ($permission) {
+            $permission->replacements('site', function () {
+                return Site::all()->map(function ($site) {
+                    return ['value' => $site->handle(), 'label' => $site->name().' ('.$site->handle().')', 'handle' => $site->handle()];
+                });
+            });
+        });
     }
 
     protected function registerCollections()

@@ -13,6 +13,9 @@ return [
     'configure_addons' => 'Configure Addons',
     'configure_addons_desc' => 'Ability to access the addon area to install and uninstall addons.',
 
+    'group_sites' => 'Sites',
+    'access_{site}_site' => 'Access :site site',
+
     'group_collections' => 'Collections',
     'configure_collections' => 'Configure Collections',
     'configure_collections_desc' => 'Grants access to all collection related permissions',
