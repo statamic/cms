@@ -12,6 +12,8 @@ class OrderedQueryBuilder implements Builder
     protected $builder;
     protected $order;
     protected $ordered = false;
+    protected $limit;
+    protected $offset;
 
     public function __construct(Builder $builder, $order = [])
     {
@@ -34,7 +36,7 @@ class OrderedQueryBuilder implements Builder
             $results = $this->performFallbackOrdering($results);
         }
 
-        return $results;
+        return $results->limit($this->limit)->skip($this->offset);
     }
 
     public function __call($method, $parameters)
@@ -64,5 +66,19 @@ class OrderedQueryBuilder implements Builder
 
             return $a <=> $b;
         })->values();
+    }
+
+    public function limit($value)
+    {
+        $this->limit = $value;
+
+        return $this;
+    }
+
+    public function offset($value)
+    {
+        $this->offset = max(0, $value);
+
+        return $this;
     }
 }
