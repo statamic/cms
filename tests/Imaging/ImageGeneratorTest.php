@@ -160,13 +160,14 @@ class ImageGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function without_a_mark_param_there_is_no_watermarks_disk()
+    public function the_watermark_disk_is_the_public_directory_by_default()
     {
         $generator = $this->makeGenerator();
 
         $filesystem = $this->getWatermarkFilesystem($generator);
 
-        $this->assertNull($filesystem);
+        $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($filesystem));
+        $this->assertEquals(public_path().DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
     }
 
     /** @test */
