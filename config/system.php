@@ -76,7 +76,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Default blueprint handles and titles will match the collection, and those
-    | valaues are typically plural. Setting this to true will change the default
+    | values are typically plural. Setting this to true will change the default
     | blueprint handles and titles to singular.
     |
     */
