@@ -25,6 +25,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayable
@@ -310,12 +311,14 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function fallbackEntryBlueprint()
     {
+        $singular = config('statamic.system.blueprints_singular', false);
+
         $blueprint = Blueprint::find('default')
-            ->setHandle($this->handle())
+            ->setHandle($singular ? Str::singular($this->handle()) : $this->handle())
             ->setNamespace('collections.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = $this->title();
+        $contents['title'] = $singular ? Str::singular($this->title()) : $this->title();
         $blueprint->setContents($contents);
 
         return $blueprint;

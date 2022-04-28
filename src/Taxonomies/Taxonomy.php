@@ -23,6 +23,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess, Arrayable
@@ -127,12 +128,14 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function fallbackTermBlueprint()
     {
+        $singular = config('statamic.system.blueprints_singular', false);
+
         $blueprint = Blueprint::find('default')
-            ->setHandle($this->handle())
+            ->setHandle($singular ? Str::singular($this->handle()) : $this->handle())
             ->setNamespace('taxonomies.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = $this->title();
+        $contents['title'] = $singular ? Str::singular($this->title()) : $this->title();
         $blueprint->setContents($contents);
 
         return $blueprint;
