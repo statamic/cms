@@ -2,17 +2,25 @@
 
 namespace Tests\Data\Entries;
 
-use Facades\Tests\Factories\EntryFactory;
+use Tests\TestCase;
+use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Site;
+use Statamic\Query\Scopes\Scope;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
-use Tests\TestCase;
 
 class EntryQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        app('statamic.scopes')[CustomScope::handle()] = CustomScope::class;
+    }
 
     private function createDummyCollectionAndEntries()
     {
@@ -648,5 +656,24 @@ class EntryQueryBuilderTest extends TestCase
         $found = Entry::findByUri('/posts/replaced-post-2', 'fr');
         $this->assertNotNull($found);
         $this->assertSame($found, $substituteFr);
+    }
+
+    /** @test **/
+    public function entries_are_found_using_scopes()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+
+        $entries = Entry::query()->customScope()->get();
+
+        $this->assertCount(1, $entries);
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('title', 'Post 1');
     }
 }

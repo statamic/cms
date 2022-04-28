@@ -2,20 +2,28 @@
 
 namespace Tests\Data\Taxonomies;
 
-use Facades\Tests\Factories\EntryFactory;
+use Tests\TestCase;
+use Statamic\Facades\Site;
+use Statamic\Facades\Term;
+use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Term;
+use Statamic\Query\Scopes\Scope;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
-use Tests\TestCase;
 
 class TermQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        app('statamic.scopes')[CustomScope::handle()] = CustomScope::class;
+    }
 
     /** @test */
     public function it_gets_terms()
@@ -233,39 +241,45 @@ class TermQueryBuilderTest extends TestCase
         Term::make('g')->taxonomy('cats')->data([])->save();
         Term::make('h')->taxonomy('cats')->data([])->save();
 
-        $this->assertEquals(['cats::f', 'cats::g', 'tags::a', 'tags::c'],
+        $this->assertEquals(
+            ['cats::f', 'cats::g', 'tags::a', 'tags::c'],
             Term::query()
                 ->where('collection', 'blog')
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(['tags::a', 'tags::c'],
+        $this->assertEquals(
+            ['tags::a', 'tags::c'],
             Term::query()
                 ->where('collection', 'blog')
                 ->where('taxonomy', 'tags')
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(['cats::f', 'cats::h', 'tags::a', 'tags::b'],
+        $this->assertEquals(
+            ['cats::f', 'cats::h', 'tags::a', 'tags::b'],
             Term::query()
                 ->where('collection', 'news')
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(['tags::a', 'tags::b'],
+        $this->assertEquals(
+            ['tags::a', 'tags::b'],
             Term::query()
                 ->where('collection', 'news')
                 ->where('taxonomy', 'tags')
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(['cats::f', 'cats::g', 'cats::h', 'tags::a', 'tags::b', 'tags::c'],
+        $this->assertEquals(
+            ['cats::f', 'cats::g', 'cats::h', 'tags::a', 'tags::b', 'tags::c'],
             Term::query()
                 ->whereIn('collection', ['blog', 'news'])
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(['tags::a', 'tags::b', 'tags::c'],
+        $this->assertEquals(
+            ['tags::a', 'tags::b', 'tags::c'],
             Term::query()
                 ->whereIn('collection', ['blog', 'news'])
                 ->where('taxonomy', 'tags')
@@ -565,5 +579,25 @@ class TermQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['2', '5'], $entries->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_scopes()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Post 1'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Post 2'])->save();
+
+        $entries = Term::query()->customScope()->get();
+
+        $this->assertCount(1, $entries);
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('title', 'Post 1');
     }
 }
