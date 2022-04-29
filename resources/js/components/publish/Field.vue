@@ -4,7 +4,6 @@
         :config="config"
         :initial-value="value"
         :initial-meta="meta"
-        v-if="isVisible"
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
@@ -141,10 +140,6 @@ export default {
             if (this.storeState.isRoot === false && !this.config.localizable) return true;
 
             return this.isLocked || this.readOnly || this.config.visibility === 'read_only' || false;
-        },
-
-        isVisible() {
-            return this.config.visibility !== 'hidden';
         },
 
         isLocalizable() {
