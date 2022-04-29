@@ -4,27 +4,44 @@
         @mouseenter="isHovering = true"
         @mouseleave="isHovering = false"
     >
-        <div class="field-width-label">{{ selected }}%</div>
+        <template v-if="! hidden">
+            <div class="field-width-label">{{ selected }}%</div>
 
-        <div
-            v-for="width in widths"
-            :key="width"
-            @mouseenter.stop="hoveringOver = width"
-            @click="$emit('input', width)"
-            :class="[
-                'field-width-notch',
-                'notch-' + width,
-                { 'filled': selected >= width, 'selected': selected == width }
-            ]"
-        >
-        </div>
+            <div
+                v-for="width in widths"
+                :key="width"
+                @mouseenter.stop="hoveringOver = width"
+                @click="$emit('input', width)"
+                :class="[
+                    'field-width-notch',
+                    'notch-' + width,
+                    { 'filled': selected >= width, 'selected': selected == width }
+                ]"
+            >
+            </div>
+        </template>
+        <template v-else>
+            <div class="field-width-hidden flex items-center justify-center">
+                <svg-icon name="hidden" class="h-4 w-4 opacity-50"></svg-icon>
+            </div>
+        </template>
     </div>
 </template>
 
 <script>
 export default {
 
-    props: ['value'],
+    props: ['value', 'hidden'],
+
+    props: {
+        value: {
+            default: 100,
+        },
+        hidden: {
+            type: Boolean,
+            default: false,
+        },
+    },
 
     data() {
         return {

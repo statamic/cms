@@ -10,7 +10,7 @@
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="flex-none pr-1 flex">
-                    <width-selector v-model="width" class="mr-1" />
+                    <width-selector v-model="width" :hidden="isHidden" class="mr-1" />
                     <button v-if="canDefineLocalizable"
                         class="hover:text-grey-100 mr-1 flex items-center"
                         :class="{ 'text-grey-100': localizable, 'text-grey-60': !localizable }"
@@ -99,6 +99,10 @@ export default {
                 if (field.type === 'reference') field.config_overrides.push('width');
                 this.$emit('updated', field);
             }
+        },
+
+        isHidden() {
+            return this.fieldConfig.visibility === 'hidden';
         },
 
         widthClass() {
