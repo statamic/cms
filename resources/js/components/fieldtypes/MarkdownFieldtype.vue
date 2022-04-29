@@ -566,6 +566,7 @@ export default {
             mode: 'gfm',
             dragDrop: false,
             keyMap: 'sublime',
+            direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             lineWrapping: true,
             viewportMargin: Infinity,
             tabindex: 0,

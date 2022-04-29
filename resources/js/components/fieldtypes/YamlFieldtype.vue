@@ -29,6 +29,7 @@ export default {
         this.codemirror = CodeMirror(this.$refs.codemirror, {
             value: this.value || '',
             mode: 'yaml',
+            direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             tabSize: 2,
             indentUnit: 2,
             autoRefresh: true,
