@@ -90,8 +90,9 @@ class Field implements Arrayable
 
     public function visibility()
     {
-        $visibility = array_get($this->config, 'visibility');
-        $legacyReadOnly = array_get($this->config, 'read_only');
+        $visibility = Arr::get($this->config, 'visibility');
+
+        $legacyReadOnly = Arr::get($this->config, 'read_only');
 
         if ($legacyReadOnly && ! $visibility) {
             return 'read_only';

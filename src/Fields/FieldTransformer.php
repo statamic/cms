@@ -162,9 +162,9 @@ class FieldTransformer
 
     protected static function normalizeVisibility($config)
     {
-        $legacyReadOnly = Arr::pull($config, 'read_only');
-
         $visibility = Arr::get($config, 'visibility');
+
+        $legacyReadOnly = Arr::pull($config, 'read_only');
 
         if ($legacyReadOnly && ! $visibility) {
             $config['visibility'] = 'read_only';
