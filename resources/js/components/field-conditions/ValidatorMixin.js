@@ -25,7 +25,7 @@ export default {
             this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
                 dottedKey: dottedKey || field.handle,
                 hidden: hideField,
-                omitValue: omitValue,
+                omitValue: hideField && omitValue,
             });
 
             return ! hideField;
