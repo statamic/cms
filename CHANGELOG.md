@@ -4,7 +4,7 @@
 
 ### What's new
 
-- Added str_pad() modifiers. [#5920](https://github.com/statamic/cms/issues/5920) by @FrittenKeeZ
+- Add `str_pad` modifiers. [#5920](https://github.com/statamic/cms/issues/5920) by @FrittenKeeZ
 - Add 'Copy URL' action to assets. [#5901](https://github.com/statamic/cms/issues/5901) by @duncanmcclean
 
 ### What's improved
