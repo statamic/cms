@@ -62,8 +62,8 @@ return [
     'group_forms' => 'Formulär',
     'configure_forms' => 'Konfigurera formulär',
     'configure_forms_desc' => 'Ger åtkomst till alla formulärrelaterade behörigheter',
-    'view_{form}_form_submissions' => 'Visa inlägg från :form',
-    'delete_{form}_form_submissions' => 'Radera inlägg från :form',
+    'view_{form}_form_submissions' => 'Visa inskickade formulär från :form',
+    'delete_{form}_form_submissions' => 'Radera inskickade formulär från :form',
 
     'group_users' => 'Användare',
     'view_users' => 'Visa användare',
