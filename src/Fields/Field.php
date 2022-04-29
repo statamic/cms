@@ -88,6 +88,18 @@ class Field implements Arrayable
         return array_get($this->config, 'instructions');
     }
 
+    public function visibility()
+    {
+        $visibility = array_get($this->config, 'visibility');
+        $legacyReadOnly = array_get($this->config, 'read_only');
+
+        if ($legacyReadOnly && ! $visibility) {
+            return 'read_only';
+        }
+
+        return $visibility ?? 'visible';
+    }
+
     public function rules()
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
@@ -208,6 +220,7 @@ class Field implements Arrayable
             'display' => $this->display(),
             'instructions' => $this->instructions(),
             'required' => $this->isRequired(),
+            'visibility' => $this->visibility(),
         ]);
     }
 
