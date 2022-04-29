@@ -84,7 +84,7 @@ class EntriesController extends CpController
         }
 
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
@@ -247,7 +247,7 @@ class EntriesController extends CpController
         }
 
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
         $values = [];
