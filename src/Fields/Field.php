@@ -222,6 +222,7 @@ class Field implements Arrayable
             'instructions' => $this->instructions(),
             'required' => $this->isRequired(),
             'visibility' => $this->visibility(),
+            'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
         ]);
     }
 
