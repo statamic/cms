@@ -184,7 +184,7 @@ class Field implements Arrayable
         return (bool) $this->get('listable');
     }
 
-    public function isVisible()
+    public function isVisibleOnListing()
     {
         if (is_null($this->get('listable'))) {
             return in_array($this->handle, ['title', 'slug', 'date', 'author']);
