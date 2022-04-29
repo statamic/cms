@@ -360,6 +360,7 @@ class BlueprintTest extends TestCase
                             'antlers' => false,
                             'default' => null,
                             'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                     ],
                 ],
@@ -382,6 +383,7 @@ class BlueprintTest extends TestCase
                             'antlers' => false,
                             'default' => null,
                             'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                     ],
                 ],
@@ -457,6 +459,7 @@ class BlueprintTest extends TestCase
                             'antlers' => false,
                             'default' => null,
                             'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                         [
                             'handle' => 'nested_deeper_two',
@@ -474,6 +477,7 @@ class BlueprintTest extends TestCase
                             'antlers' => false,
                             'default' => null,
                             'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                     ],
                 ],

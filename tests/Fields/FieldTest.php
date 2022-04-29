@@ -325,6 +325,7 @@ class FieldTest extends TestCase
             'required' => true,
             'validate' => 'required',
             'visibility' => 'visible',
+            'read_only' => false, // deprecated
             'component' => 'example',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',
