@@ -23,7 +23,7 @@ Omslut din kod med 3 accenttecken (<code>```</code>) på raden över och under.
 </p>
 
 <pre class="language-markdown"><code>```
-detta: aer_lite_kod
+this: is_some_code
 ```</code></pre>
 
 <p>Du kan även lägga till kod i raden genom att omsluta innehåll med <code>`</code> enskilda accenttecken.</p>
