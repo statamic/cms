@@ -82,6 +82,7 @@ class NestedFieldsTest extends TestCase
                 'handle' => 'image',
                 'prefix' => null,
                 'required' => true,
+                'visibility' => 'visible',
             ],
         ], $actual);
     }

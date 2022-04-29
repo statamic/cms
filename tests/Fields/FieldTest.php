@@ -324,6 +324,7 @@ class FieldTest extends TestCase
             'instructions' => 'Test instructions',
             'required' => true,
             'validate' => 'required',
+            'visibility' => 'visible',
             'component' => 'example',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',

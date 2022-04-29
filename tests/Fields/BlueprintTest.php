@@ -359,6 +359,7 @@ class BlueprintTest extends TestCase
                             'append' => null,
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
                         ],
                     ],
                 ],
@@ -380,6 +381,7 @@ class BlueprintTest extends TestCase
                             'component' => 'textarea',
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
                         ],
                     ],
                 ],
@@ -454,6 +456,7 @@ class BlueprintTest extends TestCase
                             'required' => false,
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
                         ],
                         [
                             'handle' => 'nested_deeper_two',
@@ -470,6 +473,7 @@ class BlueprintTest extends TestCase
                             'required' => false,
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
                         ],
                     ],
                 ],
@@ -563,7 +567,7 @@ class BlueprintTest extends TestCase
             ],
         ]]);
 
-        $fields = $blueprint->ensureFieldHasConfig('author', ['read_only' => true])->fields();
+        $fields = $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only'])->fields();
 
         $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
         $this->assertEquals(['type' => 'text'], $fields->get('content')->config());
@@ -571,7 +575,7 @@ class BlueprintTest extends TestCase
         $expectedConfig = [
             'type' => 'text',
             'do_not_touch_other_config' => true,
-            'read_only' => true,
+            'visibility' => 'read_only',
         ];
 
         $this->assertEquals($expectedConfig, $fields->get('author')->config());
