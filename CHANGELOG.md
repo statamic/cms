@@ -1,5 +1,34 @@
 # Release Notes
 
+## 3.3.10 (2022-04-29)
+
+### What's new
+
+- Added str_pad() modifiers. [#5920](https://github.com/statamic/cms/issues/5920) by @FrittenKeeZ
+- Add 'Copy URL' action to assets. [#5901](https://github.com/statamic/cms/issues/5901) by @duncanmcclean
+
+### What's improved
+
+- Swedish translations. [#5948](https://github.com/statamic/cms/issues/5948) by @adevade
+- French translations. [#5903](https://github.com/statamic/cms/issues/5903) by @ebeauchamps
+- Runtime: Better line and char numbers when reporting interpolation errors. [#5930](https://github.com/statamic/cms/issues/5930) by @JohnathonKoster
+- Move the HTML fieldtype into the proper "special" category. [#5959](https://github.com/statamic/cms/issues/5959) by @jackmcdade
+- Enable Glide presets to use watermarks. [#5925](https://github.com/statamic/cms/issues/5925) by @wesort
+- Asset browser uses HasActions mixin. [#5912](https://github.com/statamic/cms/issues/5912) by @jasonvarga
+
+### What's fixed
+
+- Runtime: Corrects parameter style modifier scope overwriting issue. [#5885](https://github.com/statamic/cms/issues/5885) by @JohnathonKoster
+- Runtime: Prevent variables from leaking out of tags. [#5884](https://github.com/statamic/cms/issues/5884) by @JohnathonKoster
+- Runtime: Adds support for uppercase logical keywords. [#5911](https://github.com/statamic/cms/issues/5911) by @JohnathonKoster
+- Add backwards compatibility to entry edit url. [#5924](https://github.com/statamic/cms/issues/5924) by @jonassiewertsen
+- Fix hidden code field. [#5923](https://github.com/statamic/cms/issues/5923) by @jasonvarga
+- Hook up CodeMirror's `direction` config property. [#5957](https://github.com/statamic/cms/issues/5957) by @jackmcdade
+- Update data when replicator set is toggled. [#5898](https://github.com/statamic/cms/issues/5898) by @edalzell
+- Bump composer/composer dependency. [#5921](https://github.com/statamic/cms/issues/5921) by @jasonvarga
+- Bump async from 2.6.3 to 2.6.4. [#5922](https://github.com/statamic/cms/issues/5922) by @dependabot
+
+
 ## 3.3.9 (2022-04-21)
 
 ### What's new
