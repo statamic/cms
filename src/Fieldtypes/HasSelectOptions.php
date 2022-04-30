@@ -85,12 +85,12 @@ trait HasSelectOptions
             return $value;
         }
 
-        if ($value == (int) $value) {
-            return (int) $value;
-        }
-
         if ($value == (float) $value) {
             return (string) $value;
+        }
+
+        if ($value == (int) $value) {
+            return (int) $value;
         }
 
         return $value;
