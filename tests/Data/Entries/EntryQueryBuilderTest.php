@@ -649,4 +649,19 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertNotNull($found);
         $this->assertSame($found, $substituteFr);
     }
+
+    /** @test */
+    public function entries_are_found_using_offset()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $entries = Entry::query()->get();
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->offset(1)->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
 }
