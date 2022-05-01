@@ -2,6 +2,8 @@
 
 namespace Statamic\Structures;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Structures\Tree as Contract;
 use Statamic\Data\ExistsAsFile;
@@ -54,10 +56,26 @@ abstract class Tree implements Contract, Localization
             return $this;
         }
 
-        $key = "structure-{$this->handle()}-{$this->locale()}-{$this->treeHash()}";
+        return $this->build();
+    }
 
-        return Blink::once($key, function () {
-            return $this->structure()->validateTree($this->tree, $this->locale());
+    public function getCacheKey()
+    {
+        return "structure-{$this->handle()}-{$this->locale()}-{$this->treeHash()}";
+    }
+
+    public function build(): ?array
+    {
+        $key = $this->getCacheKey();
+
+        return Blink::once($key, function () use ($key) {
+            return Cache::remember(
+                $key,
+                now()->addSeconds(Config::get('statamic.structures.cache_ttl')),
+                function () {
+                    return $this->structure()->validateTree($this->tree, $this->locale());
+                },
+            );
         });
     }
 

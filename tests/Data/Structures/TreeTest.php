@@ -2,6 +2,8 @@
 
 namespace Tests\Data\Structures;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Structures\Nav;
@@ -9,13 +11,11 @@ use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
 use Statamic\Structures\Structure;
 use Statamic\Structures\Tree;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tests\UnlinksPaths;
 
 class TreeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use UnlinksPaths;
 
     public function setUp(): void
@@ -531,6 +531,53 @@ class TreeTest extends TestCase
         ], $tree->tree());
     }
 
+    /**
+     * @test
+     * @group tree-caching
+     */
+    public function it_caches_validated_structures()
+    {
+        Config::set(['statamic.structures.cache_ttl' => 10]);
+
+        $tree = $this->tree();
+
+        $this->assertEquals(
+            $tree->structure()->validateTree($tree->tree(), $tree->locale()),
+            Cache::get($tree->getCacheKey())
+        );
+    }
+
+    /**
+     * @test
+     * @group tree-caching
+     */
+    public function cached_tree_is_the_new_tree()
+    {
+        $tree = $this->tree();
+
+        $originalTree = $tree->build();
+
+        $this->assertEquals(Cache::get($tree->getCacheKey()), $originalTree);
+
+        // Change the tree
+        $tree->tree(
+            [
+                'id' => 'root-id',
+                'entry' => 'pages-home',
+                'data' => ['test' => 'home'],
+            ],
+            [
+                'id' => 'pages-blog',
+            ]
+        );
+
+        $tree->save();
+
+        $modifiedTree = $tree->build();
+
+        $this->assertEquals(Cache::get($tree->getCacheKey()), $modifiedTree);
+    }
+
     protected function tree($tree = null)
     {
         return $this->newTree()
@@ -589,7 +636,13 @@ class TreeTest extends TestCase
 
             protected function repository()
             {
-                //
+                return new class
+                {
+                    public function save()
+                    {
+                        //
+                    }
+                };
             }
         };
     }
