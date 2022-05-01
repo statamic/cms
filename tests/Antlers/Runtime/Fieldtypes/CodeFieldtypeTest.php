@@ -29,6 +29,6 @@ class CodeFieldtypeTest extends ParserTestCase
 <{{ code_field }}>
 EOT;
 
-        $this->assertSame('<Hello, wilderness.>', $this->renderString($template, ['code_field' => $value, 'name' => 'wilderness',]));
+        $this->assertSame('<Hello, wilderness.>', $this->renderString($template, ['code_field' => $value, 'name' => 'wilderness']));
     }
 }
