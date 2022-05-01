@@ -81,13 +81,19 @@ class Value implements IteratorAggregate, JsonSerializable
     public function antlersValue(Parser $parser, $variables)
     {
         $value = $this->value();
+        $shouldParseAntlers = $this->shouldParseAntlers();
+        $isRuntime = config('statamic.antlers.version') === 'runtime';
+
+        if ($value instanceof  ArrayableString && $shouldParseAntlers && $isRuntime) {
+            $value = (string) $value;
+        }
 
         if (! is_string($value)) {
             return $value;
         }
 
-        if ($this->shouldParseAntlers()) {
-            if (config('statamic.antlers.version') === 'runtime') {
+        if ($shouldParseAntlers) {
+            if ($isRuntime) {
                 $value = (new DocumentTransformer())->correct($value);
             }
 
