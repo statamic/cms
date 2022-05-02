@@ -3,7 +3,7 @@
 namespace Statamic\Support;
 
 use Statamic\Facades\Compare;
-use Statamic\Facades\Config;
+use Statamic\Facades\Site;
 use Stringy\StaticStringy;
 use voku\helper\ASCII;
 
@@ -19,9 +19,7 @@ class Str extends \Illuminate\Support\Str
 
     public static function ascii($value, $language = 'en')
     {
-        $replace_extra_symbols = Config::get('statamic.sites.transliteration.symbols', false);
-
-        return ASCII::to_ascii((string) $value, $language, false, $replace_extra_symbols);
+        return ASCII::to_ascii((string) $value, $language, false, Site::current()->transliterateSymbols());
     }
 
     /**

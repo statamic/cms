@@ -23,18 +23,4 @@ return [
 
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Transliteration.
-    |--------------------------------------------------------------------------
-    |
-    | Settings controlling how transliteration is done.
-    | By default symbols like ampersand (&) are stripped out.
-    |
-    */
-
-    'transliteration' => [
-        'symbols' => false,
-    ],
-
 ];
