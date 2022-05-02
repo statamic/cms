@@ -82,9 +82,8 @@ class Value implements IteratorAggregate, JsonSerializable
     {
         $value = $this->value();
         $shouldParseAntlers = $this->shouldParseAntlers();
-        $isRuntime = config('statamic.antlers.version') === 'runtime';
 
-        if ($value instanceof  ArrayableString && $shouldParseAntlers && $isRuntime) {
+        if ($value instanceof  ArrayableString && $shouldParseAntlers) {
             $value = (string) $value;
         }
 
@@ -93,7 +92,7 @@ class Value implements IteratorAggregate, JsonSerializable
         }
 
         if ($shouldParseAntlers) {
-            if ($isRuntime) {
+            if (config('statamic.antlers.version') === 'runtime') {
                 $value = (new DocumentTransformer())->correct($value);
             }
 
