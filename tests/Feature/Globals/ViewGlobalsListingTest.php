@@ -102,6 +102,7 @@ class ViewGlobalsListingTest extends TestCase
                     && Arr::get($globals, '0.edit_url', url('/cp/globals/test_one?site=fr'));
             });
     }
+
     /** @test */
     public function it_filters_out_globals_in_sites_you_dont_have_permission_to_access()
     {
