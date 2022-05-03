@@ -30,6 +30,8 @@ trait QueriesOrderBys
 
         $piped = Arr::getFirst($this->params, ['order_by', 'sort'], $this->defaultOrderBy());
 
+        if ($piped === null) { return collect(); }
+
         return collect(explode('|', $piped))->filter()->map(function ($orderBy) {
             return OrderBy::parse($orderBy);
         });

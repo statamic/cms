@@ -85,6 +85,8 @@ class Str extends \Illuminate\Support\Str
 
     public static function slug($string, $separator = '-', $language = 'en')
     {
+        if ($string === null) { return ''; }
+
         // Statamic is a-OK with underscores in slugs.
         $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
 
