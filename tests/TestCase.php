@@ -85,6 +85,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'default' => 'en',
             'sites' => [
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+                'site-two' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/site-two'],
             ],
         ]);
         $app['config']->set('auth.providers.users.driver', 'statamic');
