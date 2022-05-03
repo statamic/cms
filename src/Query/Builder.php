@@ -584,8 +584,12 @@ abstract class Builder implements Contract
 
     protected function filterTestEquals($item, $value)
     {
-        if ($item === null && $value === null) { return true; }
-        if ($item === null || $value === null) { return false; }
+        if ($item === null && $value === null) {
+            return true;
+        }
+        if ($item === null || $value === null) {
+            return false;
+        }
 
         return strtolower($item) === strtolower($value);
     }
@@ -593,7 +597,9 @@ abstract class Builder implements Contract
     protected function filterTestNotEquals($item, $value)
     {
         if (is_string($item)) {
-            if ($value === null) { return true; }
+            if ($value === null) {
+                return true;
+            }
 
             return strtolower($item) !== strtolower($value);
         }
