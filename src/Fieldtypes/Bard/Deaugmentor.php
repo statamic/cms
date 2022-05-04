@@ -53,12 +53,12 @@ class Deaugmentor
 
     public static function addNode($node)
     {
-        static::$customNodes[] = $node;
+        static::$customNodes[$node] = $node;
     }
 
     public static function addMark($mark)
     {
-        static::$customMarks[] = $mark;
+        static::$customMarks[$mark] = $mark;
     }
 
     public static function replaceNode($searchNode, $replaceNode)
