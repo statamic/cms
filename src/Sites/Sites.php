@@ -2,6 +2,7 @@
 
 namespace Statamic\Sites;
 
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class Sites
@@ -22,6 +23,12 @@ class Sites
 
     public function default()
     {
+        if ($user = User::current()) {
+            return $this->sites->filter(function (Site $site) use ($user) {
+                return $user->hasPermission("access {$site->handle()} site");
+            })->first();
+        }
+
         return $this->sites->first();
     }
 
