@@ -7,34 +7,32 @@
         @dragend="ignorePageHeader(false)"
     >
 
-        <editor-menu-bar :editor="editor" v-if="!readOnly">
-            <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar" v-if="showFixedToolbar">
-                <div class="flex flex-wrap items-center no-select" v-if="toolbarIsFixed">
-                    <component
-                        v-for="button in visibleButtons(buttons, isActive)"
-                        :key="button.name"
-                        :is="button.component || 'BardToolbarButton'"
-                        :button="button"
-                        :active="buttonIsActive(isActive, button)"
-                        :config="config"
-                        :bard="_self"
-                        :editor="editor" />
-                </div>
-                <div class="flex items-center no-select">
-                <div class="h-10 -my-sm border-l pr-1 w-px" v-if="toolbarIsFixed && hasExtraButtons"></div>
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                        <svg-icon name="file-code" class="w-4 h-4 "/>
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
-                        <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                        <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
-                        <svg-icon name="expand" class="w-4 h-4" v-else />
-                    </button>
-                </div>
+        <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
+            <div class="flex flex-wrap items-center no-select" v-if="toolbarIsFixed">
+                <component
+                    v-for="button in visibleButtons(buttons)"
+                    :key="button.name"
+                    :is="button.component || 'BardToolbarButton'"
+                    :button="button"
+                    :active="buttonIsActive(button)"
+                    :config="config"
+                    :bard="_self"
+                    :editor="editor" />
             </div>
-        </editor-menu-bar>
+            <div class="flex items-center no-select">
+                <div class="h-10 -my-sm border-l pr-1 w-px" v-if="toolbarIsFixed && hasExtraButtons"></div>
+                <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
+                    <svg-icon name="file-code" class="w-4 h-4 "/>
+                </button>
+                <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
+                    <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
+                </button>
+                <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                    <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
+                    <svg-icon name="expand" class="w-4 h-4" v-else />
+                </button>
+            </div>
+        </div>
 
         <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar }" tabindex="0">
             <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating && !readOnly">
@@ -127,9 +125,9 @@ export default {
         /* EditorMenuBar,
         EditorFloatingMenu,
         EditorMenuBubble,
-        BardSource,
+        BardSource, */
         BardToolbarButton,
-        LinkToolbarButton, */
+        LinkToolbarButton,
     },
 
     provide() {
@@ -245,7 +243,6 @@ export default {
         this.initToolbarButtons();
 
         this.editor = new Editor({
-            /* useBuiltInExtensions: false, */
             extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
@@ -445,35 +442,34 @@ export default {
 
             if (_.findWhere(buttons, {name: 'table'})) {
                 buttons.push(
-                    { name: 'deletetable', text: __('Delete Table'), command: 'deleteTable', svg: 'delete-table', visibleWhenActive: 'table' },
-                    { name: 'addcolumnbefore', text: __('Add Column Before'), command: 'addColumnBefore', svg: 'add-col-before', visibleWhenActive: 'table' },
-                    { name: 'addcolumnafter', text: __('Add Column After'), command: 'addColumnAfter', svg: 'add-col-after', visibleWhenActive: 'table' },
-                    { name: 'deletecolumn', text: __('Delete Column'), command: 'deleteColumn', svg: 'delete-col', visibleWhenActive: 'table' },
-                    { name: 'addrowbefore', text: __('Add Row Before'), command: 'addRowBefore', svg: 'add-row-before', visibleWhenActive: 'table' },
-                    { name: 'addrowafter', text: __('Add Row After'), command: 'addRowAfter', svg: 'add-row-after', visibleWhenActive: 'table' },
-                    { name: 'deleterow', text: __('Delete Row'), command: 'deleteRow', svg: 'delete-row', visibleWhenActive: 'table' },
-                    { name: 'toggleheadercell', text: __('Toggle Header Cell'), command: 'toggleHeaderCell', svg: 'flip-vertical', visibleWhenActive: 'table' },
-                    { name: 'togglecellmerge', text: __('Merge Cells'), command: 'toggleCellMerge', svg: 'combine-cells', visibleWhenActive: 'table' },
+                    { name: 'deletetable', text: __('Delete Table'), command: (editor) => editor.commands.deleteTable(), svg: 'delete-table', visibleWhenActive: 'table' },
+                    { name: 'addcolumnbefore', text: __('Add Column Before'), command: (editor) => editor.commands.addColumnBefore(), svg: 'add-col-before', visibleWhenActive: 'table' },
+                    { name: 'addcolumnafter', text: __('Add Column After'), command: (editor) => editor.commands.addColumnAfter(), svg: 'add-col-after', visibleWhenActive: 'table' },
+                    { name: 'deletecolumn', text: __('Delete Column'), command: (editor) => editor.commands.deleteColumn(), svg: 'delete-col', visibleWhenActive: 'table' },
+                    { name: 'addrowbefore', text: __('Add Row Before'), command: (editor) => editor.commands.addRowBefore(), svg: 'add-row-before', visibleWhenActive: 'table' },
+                    { name: 'addrowafter', text: __('Add Row After'), command: (editor) => editor.commands.addRowAfter(), svg: 'add-row-after', visibleWhenActive: 'table' },
+                    { name: 'deleterow', text: __('Delete Row'), command: (editor) => editor.commands.deleteRow(), svg: 'delete-row', visibleWhenActive: 'table' },
+                    { name: 'toggleheadercell', text: __('Toggle Header Cell'), command: (editor) => editor.commands.toggleHeaderCell(), svg: 'flip-vertical', visibleWhenActive: 'table' },
+                    { name: 'togglecellmerge', text: __('Merge Cells'), command: (editor) => editor.commands.mergeCells(), svg: 'combine-cells', visibleWhenActive: 'table' },
                 )
             }
 
             this.buttons = buttons;
         },
 
-        buttonIsActive(isActive, button) {
-            const commandProperty = button.hasOwnProperty('activeCommand') ? 'activeCommand' : 'command';
-            const command = button[commandProperty];
-            if (! isActive.hasOwnProperty(command)) return false;
-            return isActive[command](button.args);
+        buttonIsActive(button) {
+            const nameProperty = button.hasOwnProperty('activeName') ? 'activeName' : 'name';
+            const name = button[nameProperty];
+            return this.editor.isActive(name, button.args);
         },
 
-        buttonIsVisible(isActive, button) {
+        buttonIsVisible(button) {
             if (! button.hasOwnProperty('visibleWhenActive')) return true;
-            return isActive[button.visibleWhenActive](button.args);
+            return this.editor.isActive(button.visibleWhenActive, button.args);
         },
 
-        visibleButtons(buttons, isActive) {
-            return buttons.filter(button => this.buttonIsVisible(isActive, button));
+        visibleButtons(buttons) {
+            return buttons.filter(button => this.buttonIsVisible(button));
         },
 
         valueToContent(value) {
