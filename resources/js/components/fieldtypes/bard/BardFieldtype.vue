@@ -96,9 +96,9 @@ import Table from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
+import BardSource from './Source.vue';
 /* import Set from './Set';
 import Doc from './Doc';
-import BardSource from './Source.vue';
 import Link from './Link';
 import Image from './Image';
 import Small from './Small';
@@ -124,8 +124,8 @@ export default {
         EditorContent,
         /* EditorMenuBar,
         EditorFloatingMenu,
-        EditorMenuBubble,
-        BardSource, */
+        EditorMenuBubble,*/
+        BardSource,
         BardToolbarButton,
         LinkToolbarButton,
     },
