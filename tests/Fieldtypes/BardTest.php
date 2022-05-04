@@ -542,7 +542,7 @@ EOT;
         $bard = $this->bard(['save_html' => true, 'sets' => null]);
 
         $html = '<p><small>Small text</small></p>';
-        
+
         $this->assertEquals($html, $bard->process($bard->preProcess($html)));
     }
 
@@ -552,7 +552,7 @@ EOT;
         $bard = $this->bard(['save_html' => true, 'sets' => null]);
 
         $html = '<p><a title="Title text" href="#">Link text</a></p>';
-        
+
         $this->assertEquals($html, $bard->process($bard->preProcess($html)));
     }
 
