@@ -1794,6 +1794,10 @@ class LanguageParser
                     $right = $this->wrapNumberInVariable($right);
                 }
 
+                if ($left instanceof NumberNode && $right instanceof VariableNode) {
+                    $left = $this->wrapNumberInVariable($left);
+                }
+
                 if ($left instanceof VariableNode && $right instanceof VariableNode && NodeHelpers::distance($left, $right) === 1) {
                     // Note: It is important when we do this merge
                     // that we start from the right, and merge
