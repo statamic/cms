@@ -372,6 +372,11 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function inSite(string $locale): bool
+    {
+        return $this->sites()->contains($locale);
+    }
+
     public function propagate($propagate = null)
     {
         return $this
