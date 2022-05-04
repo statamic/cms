@@ -6,8 +6,9 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\View\View;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
-use Statamic\Facades\Site;
+use Statamic\Facades\Site as SiteFacade;
 use Statamic\Facades\User;
+use Statamic\Sites\Site;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use voku\helper\ASCII;
@@ -40,7 +41,7 @@ class JavascriptComposer
             'translationLocale' => app('translator')->locale(),
             'translations' => app('translator')->toJson(),
             'sites' => $this->sites(),
-            'selectedSite' => Site::selected()->handle(),
+            'selectedSite' => SiteFacade::selected()->handle(),
             'ampEnabled' => config('statamic.amp.enabled'),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
@@ -53,7 +54,15 @@ class JavascriptComposer
 
     protected function sites()
     {
-        return Site::all()->map(function ($site) {
+        $user = User::current();
+
+        return SiteFacade::all()->filter(function (Site $site) use ($user) {
+            if ($user) {
+                return $user->hasPermission("access {$site['handle']} site");
+            }
+
+            return true;
+        })->map(function ($site) {
             return [
                 'name' => $site->name(),
                 'handle' => $site->handle(),
