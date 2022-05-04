@@ -103,8 +103,7 @@ import Link from './Link';
 import Image from './Image';
 import Small from './Small';
 import Subscript from './Subscript';
-import Superscript from './Superscript';
-import RemoveFormat from './RemoveFormat'; */
+import Superscript from './Superscript'; */
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
@@ -536,7 +535,6 @@ export default {
             /* exts.push(new Set({ bard: this }))
             if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('small')) exts.push(new Small());
-            if (btns.includes('removeformat')) exts.push(new RemoveFormat());
             if (btns.includes('image')) exts.push(new Image({ bard: this }));
             if (btns.includes('codeblock') || btns.includes('code')) {
                 exts.push(new CodeBlockHighlight({ languages: { javascript, css }}));

@@ -12,7 +12,7 @@ const availableButtons = () => [
     // { name: 'small', text: __('Small'), command: 'small', svg: 'small' },
     { name: 'unorderedlist', text: __('Unordered List'), command: (editor) => editor.chain().focus().toggleBulletList().run(), icon: 'list-ul' },
     { name: 'orderedlist', text: __('Ordered List'), command: (editor) => editor.chain().focus().toggleOrderedList().run(), icon: 'list-ol' },
-    // { name: 'removeformat', text: __('Remove Formatting'), command: 'remove_format', icon: 'eraser' },
+    { name: 'removeformat', text: __('Remove Formatting'), command: (editor) => editor.chain().focus().clearNodes().unsetAllMarks().run(), icon: 'eraser' },
     { name: 'quote', text: __('Blockquote'), command: (editor) => editor.chain().focus().toggleBlockquote().run(), icon: 'quote-right' },
     { name: 'superscript', text: __('Superscript'), command: (editor) => editor.chain().focus().toggleSuperscript().run(), icon: 'superscript' },
     { name: 'subscript', text: __('Subscript'), command: (editor) => editor.chain().focus().toggleSubscript().run(), icon: 'subscript' },
