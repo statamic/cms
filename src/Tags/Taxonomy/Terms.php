@@ -86,7 +86,7 @@ class Terms
     protected function parseTaxonomies()
     {
         $from = Arr::getFirst($this->params, ['from', 'in', 'folder', 'use', 'taxonomy']);
-        $not = Arr::getFirst($this->params, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_taxonomy']);
+        $not = Arr::getFirst($this->params, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_taxonomy'], '');
 
         $taxonomies = $from === '*'
             ? collect(Taxonomy::handles())
