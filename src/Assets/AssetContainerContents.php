@@ -79,10 +79,16 @@ class AssetContainerContents
         $lastModifiedMethod = $isFlysystemV1 ? 'getTimestamp' : 'lastModified';
         $fileSizeMethod = $isFlysystemV1 ? 'getSize' : 'fileSize';
 
-        // Use exception handling to avoid another `has()` API method call.
+        // Use exception handling to avoid another `has()` API method call if possible.
         try {
             $timestamp = $this->filesystem()->{$lastModifiedMethod}($path);
         } catch (\Exception $exception) {
+            $timestamp = null;
+        }
+
+        // Only perform explicit `has()` API file existence check as a fallback if timestamp ends
+        // up being null. This is needed when `add()`ing new directories to the files cache.
+        if ($timestamp === null && $this->filesystem()->has($path) === false) {
             return false;
         }
 
