@@ -11,6 +11,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Fieldtypes\Bard\Deaugmentor;
 use Statamic\GraphQL\Types\BardSetsType;
 use Statamic\GraphQL\Types\BardTextType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
@@ -233,9 +234,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
-            $value = str_replace('statamic://', '', $value);
-            $doc = (new \HtmlToProseMirror\Renderer)->render($value);
-            $value = $doc['content'];
+            $value = (new Deaugmentor($this))->deaugment($value);
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
         }
@@ -350,9 +349,8 @@ class Bard extends Replicator
                 if (empty($set['text'])) {
                     return;
                 }
-                $doc = (new \HtmlToProseMirror\Renderer)->render($set['text']);
 
-                return $doc['content'];
+                return (new Deaugmentor($this))->deaugment($set['text']);
             }
 
             return [

@@ -536,6 +536,26 @@ EOT;
         $this->assertEquals($expected, $bard->augment($html));
     }
 
+    /** @test */
+    public function it_deaugments_small_mark_when_stored_as_html()
+    {
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
+
+        $html = '<p><small>Small text</small></p>';
+        
+        $this->assertEquals($html, $bard->process($bard->preProcess($html)));
+    }
+
+    /** @test */
+    public function it_deaugments_link_mark_title_when_stored_as_html()
+    {
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
+
+        $html = '<p><a title="Title text" href="#">Link text</a></p>';
+        
+        $this->assertEquals($html, $bard->process($bard->preProcess($html)));
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
