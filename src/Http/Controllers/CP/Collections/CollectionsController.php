@@ -199,7 +199,7 @@ class CollectionsController extends CpController
             ->futureDateBehavior('private');
 
         if (Site::hasMultiple()) {
-            $collection->sites([Site::default()->handle()]);
+            $collection->sites([Site::selected()->handle()]);
         }
 
         $collection->save();
