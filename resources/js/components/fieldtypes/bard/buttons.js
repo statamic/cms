@@ -9,7 +9,7 @@ const availableButtons = () => [
     { name: 'italic', text: __('Italic'), command: (editor) => editor.chain().focus().toggleItalic().run(), icon: 'italic' },
     { name: 'underline', text: __('Underline'), command: (editor) => editor.chain().focus().toggleUnderline().run(), icon: 'underline' },
     { name: 'strikethrough', text: __('Strikethrough'), command: (editor) => editor.chain().focus().toggleStrike().run(), icon: 'strikethrough' },
-    // { name: 'small', text: __('Small'), command: 'small', svg: 'small' },
+    { name: 'small', text: __('Small'), command: (editor) => editor.chain().focus().toggleSmall().run(), svg: 'small' },
     { name: 'unorderedlist', text: __('Unordered List'), command: (editor) => editor.chain().focus().toggleBulletList().run(), icon: 'list-ul' },
     { name: 'orderedlist', text: __('Ordered List'), command: (editor) => editor.chain().focus().toggleOrderedList().run(), icon: 'list-ol' },
     { name: 'removeformat', text: __('Remove Formatting'), command: (editor) => editor.chain().focus().clearNodes().unsetAllMarks().run(), icon: 'eraser' },

@@ -93,11 +93,11 @@ import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import BardSource from './Source.vue';
+import { Small } from './Small';
 /* import Set from './Set';
 import Doc from './Doc';
 import Link from './Link';
-import Image from './Image';
-import Small from './Small'; */
+import Image from './Image'; */
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
@@ -513,6 +513,7 @@ export default {
             ];
 
             if (btns.includes('underline')) exts.push(Underline);
+            if (btns.includes('small')) exts.push(Small);
             if (btns.includes('subscript')) exts.push(Subscript);
             if (btns.includes('superscript')) exts.push(Superscript);
             if (btns.includes('codeblock')) exts.push(CodeBlockLowlight.configure({ lowlight }));
@@ -529,7 +530,7 @@ export default {
             // TODO: Add the following extensions
             /* exts.push(new Set({ bard: this }))
             if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
-            if (btns.includes('small')) exts.push(new Small());
+
             if (btns.includes('image')) exts.push(new Image({ bard: this }));*/
 
             this.$bard.extensionCallbacks.forEach(callback => {
