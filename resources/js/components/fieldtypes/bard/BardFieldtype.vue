@@ -89,29 +89,16 @@
 
 <script>
 import uniqid from 'uniqid';
-import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble, Paragraph, Text } from 'tiptap';
-import {
-    Blockquote,
-    CodeBlock,
-    HardBreak,
-    Heading,
-    HorizontalRule,
-    OrderedList,
-    BulletList,
-    ListItem,
-    Bold,
-    Code,
-    Italic,
-    Strike,
-    Underline,
-    Table,
-    TableHeader,
-    TableCell,
-    TableRow,
-    History,
-    CodeBlockHighlight
-} from 'tiptap-extensions';
-import Set from './Set';
+import { Editor, EditorContent } from '@tiptap/vue-2';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import Table from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+/* import Set from './Set';
 import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
@@ -119,7 +106,7 @@ import Image from './Image';
 import Small from './Small';
 import Subscript from './Subscript';
 import Superscript from './Superscript';
-import RemoveFormat from './RemoveFormat';
+import RemoveFormat from './RemoveFormat'; */
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
@@ -128,8 +115,8 @@ import javascript from 'highlight.js/lib/languages/javascript'
 import css from 'highlight.js/lib/languages/css'
 import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
-import mark from './Mark';
-import node from './Node';
+/* import mark from './Mark';
+import node from './Node'; */
 
 export default {
 
@@ -137,12 +124,12 @@ export default {
 
     components: {
         EditorContent,
-        EditorMenuBar,
+        /* EditorMenuBar,
         EditorFloatingMenu,
         EditorMenuBubble,
         BardSource,
         BardToolbarButton,
-        LinkToolbarButton,
+        LinkToolbarButton, */
     },
 
     provide() {
@@ -258,7 +245,7 @@ export default {
         this.initToolbarButtons();
 
         this.editor = new Editor({
-            useBuiltInExtensions: false,
+            /* useBuiltInExtensions: false, */
             extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
@@ -273,9 +260,9 @@ export default {
                     if (!this.$el.contains(document.activeElement)) this.$emit('blur');
                 }, 1);
             },
-            onUpdate: ({ getJSON, getHTML }) => {
-                this.json = getJSON().content;
-                this.html = getHTML();
+            onUpdate: () => {
+                this.json = this.editor.getJSON().content;
+                this.html = this.editor.getHTML();
             },
         });
 
@@ -499,67 +486,65 @@ export default {
         },
 
         getExtensions() {
-            let exts = [
-                new Doc(),
-                new Set({ bard: this }),
-                new Text(),
-                new Paragraph(),
-                new HardBreak(),
-                new History()
-            ];
-
             let btns = this.buttons.map(button => button.name);
 
-            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
-            if (btns.includes('quote')) exts.push(new Blockquote());
-            if (btns.includes('bold')) exts.push(new Bold());
-            if (btns.includes('italic')) exts.push(new Italic());
-            if (btns.includes('strikethrough')) exts.push(new Strike());
-            if (btns.includes('small')) exts.push(new Small());
-            if (btns.includes('underline')) exts.push(new Underline());
-            if (btns.includes('subscript')) exts.push(new Subscript());
-            if (btns.includes('superscript')) exts.push(new Superscript());
-            if (btns.includes('removeformat')) exts.push(new RemoveFormat());
-            if (btns.includes('image')) exts.push(new Image({ bard: this }));
-            if (btns.includes('horizontalrule')) exts.push(new HorizontalRule());
+            let levels = [];
+            if (btns.includes('h1')) levels.push(1);
+            if (btns.includes('h2')) levels.push(2);
+            if (btns.includes('h3')) levels.push(3);
+            if (btns.includes('h4')) levels.push(4);
+            if (btns.includes('h5')) levels.push(5);
+            if (btns.includes('h6')) levels.push(6);
 
-            if (btns.includes('orderedlist') || btns.includes('unorderedlist')) {
-                if (btns.includes('orderedlist')) exts.push(new OrderedList());
-                if (btns.includes('unorderedlist')) exts.push(new BulletList());
-                exts.push(new ListItem());
-            }
+            /* StarterKit extensions included as standard:
+            Nodes: Blockquote, BulletList, CodeBlock, Document, HardBreak, Heading, HorizontalRule, ListItem, OrderedList, Paragraph, Text
+            Marks: Bold, Code, Italic, Strike
+            Extensions: Dropcursor, Gapcursor, History */
+            let exts = [
+                StarterKit.configure({
+                    blockquote: btns.includes('quote'),
+                    bold: btns.includes('bold'),
+                    bulletList: btns.includes('unorderedlist'),
+                    code: btns.includes('code'),
+                    codeBlock: btns.includes('codeblock'),
+                    document: true,
+                    dropcursor: false,
+                    gapcursor: false,
+                    hardBreak: true,
+                    heading: levels.length ? { levels } : false,
+                    history: true,
+                    horizontalRule: btns.includes('horizontalrule'),
+                    italic: btns.includes('italic'),
+                    listItem: btns.includes('orderedlist') || btns.includes('unorderedlist'),
+                    orderedList: btns.includes('orderedlist'),
+                    paragraph: true,
+                    strike: btns.includes('strikethrough'),
+                    text: true
+                })
+            ];
 
-            if (btns.includes('codeblock') || btns.includes('code')) {
-                if (btns.includes('code')) exts.push(new Code());
-                if (btns.includes('codeblock')) exts.push(new CodeBlock());
-                exts.push(new CodeBlockHighlight({ languages: { javascript, css }}));
-            }
+            if (btns.includes('underline')) exts.push(Underline);
+            if (btns.includes('subscript')) exts.push(Subscript);
+            if (btns.includes('superscript')) exts.push(Superscript);
 
             if (btns.includes('table')) {
                 exts.push(
-                    new Table({ resizable: true }),
-                    new TableHeader(),
-                    new TableCell(),
-                    new TableRow(),
+                    Table.configure({ resizable: true }),
+                    TableHeader,
+                    TableCell,
+                    TableRow,
                 );
             }
 
-            if (btns.includes('h1') ||
-                btns.includes('h2') ||
-                btns.includes('h3') ||
-                btns.includes('h4') ||
-                btns.includes('h5') ||
-                btns.includes('h6')
-            ) {
-                let levels = [];
-                if (btns.includes('h1')) levels.push(1);
-                if (btns.includes('h2')) levels.push(2);
-                if (btns.includes('h3')) levels.push(3);
-                if (btns.includes('h4')) levels.push(4);
-                if (btns.includes('h5')) levels.push(5);
-                if (btns.includes('h6')) levels.push(6);
-                exts.push(new Heading({ levels }));
-            }
+            // TODO: Add the following extensions
+            /* exts.push(new Set({ bard: this }))
+            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
+            if (btns.includes('small')) exts.push(new Small());
+            if (btns.includes('removeformat')) exts.push(new RemoveFormat());
+            if (btns.includes('image')) exts.push(new Image({ bard: this }));
+            if (btns.includes('codeblock') || btns.includes('code')) {
+                exts.push(new CodeBlockHighlight({ languages: { javascript, css }}));
+            } */
 
             this.$bard.extensionCallbacks.forEach(callback => {
                 let returned = callback({ bard: this, mark, node });
