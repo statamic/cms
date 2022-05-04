@@ -285,8 +285,8 @@ EOT;
 
         $this->assertSame('<The Button Text>', $this->renderString($template, [
             404 => [
-                'button_text' => 'The Button Text'
-            ]
+                'button_text' => 'The Button Text',
+            ],
         ]));
     }
 }
