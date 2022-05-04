@@ -117,6 +117,7 @@
 .bard-floating-toolbar {
     @apply flex bg-black rounded-full absolute shadow-lg px-0 opacity-0 invisible;
     transform: translateX(-50%) translateY(-10px);
+    bottom: 5px;
     white-space: nowrap;
     z-index: 1000;
 
@@ -229,9 +230,9 @@
         > p > code, > pre code {
             @apply bg-grey-30;
         }
-        
+
         // To remove min height from nested bard fields inside bard in fullscreen mode.
-        * > .ProseMirror { 
+        * > .ProseMirror {
             min-height: auto;
         }
     }

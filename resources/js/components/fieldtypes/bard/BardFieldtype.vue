@@ -35,24 +35,19 @@
         </div>
 
         <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar }" tabindex="0">
-            <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating && !readOnly">
-                <div
-                    slot-scope="{ commands, isActive, menu }"
-                    class="bard-floating-toolbar"
-                    :class="{ 'active': menu.isActive }"
-                    :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
-                >
+            <bubble-menu :editor="editor" v-if="editor && toolbarIsFloating && !readOnly" :tippy-options="{ placement: 'auto-start' }">
+                <div class="bard-floating-toolbar active">
                     <component
-                        v-for="button in visibleButtons(buttons, isActive)"
+                        v-for="button in visibleButtons(buttons)"
                         :key="button.name"
                         :is="button.component || 'BardToolbarButton'"
                         :button="button"
-                        :active="buttonIsActive(isActive, button)"
+                        :active="buttonIsActive(button)"
                         :bard="_self"
                         :config="config"
                         :editor="editor" />
                 </div>
-            </editor-menu-bubble>
+            </bubble-menu>
 
             <editor-floating-menu :editor="editor">
                 <div
@@ -87,7 +82,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { Editor, EditorContent } from '@tiptap/vue-2';
+import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
 import StarterKit from '@tiptap/starter-kit';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Underline from '@tiptap/extension-underline';
@@ -120,12 +115,11 @@ export default {
     mixins: [Fieldtype, ManagesSetMeta],
 
     components: {
-        EditorContent,
-        /* EditorMenuBar,
-        EditorFloatingMenu,
-        EditorMenuBubble,*/
+        //EditorFloatingMenu,
+        BubbleMenu,
         BardSource,
         BardToolbarButton,
+        EditorContent,
         LinkToolbarButton,
     },
 
