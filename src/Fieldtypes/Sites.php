@@ -2,7 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\Site;
+use Statamic\Facades\Site as SiteFacade;
+use Statamic\Facades\User;
+use Statamic\Sites\Site;
 
 class Sites extends Relationship
 {
@@ -10,7 +12,7 @@ class Sites extends Relationship
 
     public function toItemArray($id)
     {
-        if ($site = Site::get($id)) {
+        if ($site = SiteFacade::get($id)) {
             return [
                 'id' => $id,
                 'title' => $site->name(),
@@ -22,7 +24,9 @@ class Sites extends Relationship
 
     public function getIndexItems($request)
     {
-        return Site::all()->map(function ($site) {
+        return SiteFacade::all()->filter(function (Site $site) {
+            return User::current()->can('view', $site);
+        })->map(function ($site) {
             return [
                 'id' => $site->handle(),
                 'title' => $site->name(),
@@ -32,7 +36,7 @@ class Sites extends Relationship
 
     public function augmentValue($value)
     {
-        return Site::get($value);
+        return SiteFacade::get($value);
     }
 
     public function preProcessIndex($data)
