@@ -2,16 +2,23 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Facades\Collection;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class CollectionPolicy
 {
-    public function before($user, $ability)
+    public function before($user, $ability, $collection)
     {
         $user = User::fromUser($user);
+        $site = Site::selected();
 
+        if (
+            $collection instanceof Collection &&
+            ! $collection->inSite($site->handle())) {
+            return false;
+        }
         if ($user->hasPermission('configure collections')) {
             return true;
         }
@@ -25,19 +32,25 @@ class CollectionPolicy
             return true;
         }
 
-        return ! Collection::all()->filter(function ($collection) use ($user) {
+        return ! CollectionFacade::all()->filter(function ($collection) use ($user) {
             return $this->view($user, $collection);
         })->isEmpty();
     }
 
     public function create($user)
     {
-        // handled by before()
+        $user = User::fromUser($user);
+        $site = Site::selected();
+
+        return  $user->hasPermission('configure collections') && $user->hasPermission("access {$site->handle()} site");
     }
 
     public function store($user)
     {
-        // handled by before()
+        $user = User::fromUser($user);
+        $site = Site::selected();
+
+        return  $user->hasPermission('configure collections') && $user->hasPermission("access {$site->handle()} site");
     }
 
     public function view($user, $collection)
@@ -45,9 +58,9 @@ class CollectionPolicy
         $user = User::fromUser($user);
         $site = Site::selected();
 
-        return $user->hasPermission("view {$collection->handle()} entries") &&
+        return ($user->hasPermission('configure collections') || $user->hasPermission("view {$collection->handle()} entries")) &&
                $user->hasPermission("access {$site->handle()} site") &&
-               $collection->sites()->contains($site->handle());
+               $collection->inSite($site->handle());
     }
 
     public function edit($user, $collection)
