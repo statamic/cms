@@ -89,6 +89,7 @@
 import uniqid from 'uniqid';
 import { Editor, EditorContent } from '@tiptap/vue-2';
 import StarterKit from '@tiptap/starter-kit';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Underline from '@tiptap/extension-underline';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
@@ -101,13 +102,12 @@ import BardSource from './Source.vue';
 import Doc from './Doc';
 import Link from './Link';
 import Image from './Image';
-import Small from './Small';
-import Subscript from './Subscript';
-import Superscript from './Superscript'; */
+import Small from './Small'; */
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
+import { lowlight } from 'lowlight/lib/common.js';
 import javascript from 'highlight.js/lib/languages/javascript'
 import css from 'highlight.js/lib/languages/css'
 import hljs from 'highlight.js/lib/highlight';
@@ -501,7 +501,7 @@ export default {
                     bold: btns.includes('bold'),
                     bulletList: btns.includes('unorderedlist'),
                     code: btns.includes('code'),
-                    codeBlock: btns.includes('codeblock'),
+                    codeBlock: false,
                     document: true,
                     dropcursor: false,
                     gapcursor: false,
@@ -521,6 +521,7 @@ export default {
             if (btns.includes('underline')) exts.push(Underline);
             if (btns.includes('subscript')) exts.push(Subscript);
             if (btns.includes('superscript')) exts.push(Superscript);
+            if (btns.includes('codeblock')) exts.push(CodeBlockLowlight.configure({ lowlight }));
 
             if (btns.includes('table')) {
                 exts.push(
@@ -535,10 +536,7 @@ export default {
             /* exts.push(new Set({ bard: this }))
             if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('small')) exts.push(new Small());
-            if (btns.includes('image')) exts.push(new Image({ bard: this }));
-            if (btns.includes('codeblock') || btns.includes('code')) {
-                exts.push(new CodeBlockHighlight({ languages: { javascript, css }}));
-            } */
+            if (btns.includes('image')) exts.push(new Image({ bard: this }));*/
 
             this.$bard.extensionCallbacks.forEach(callback => {
                 let returned = callback({ bard: this, mark, node });
