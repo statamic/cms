@@ -18,7 +18,7 @@ const availableButtons = () => [
     { name: 'subscript', text: __('Subscript'), command: (editor) => editor.chain().focus().toggleSubscript().run(), icon: 'subscript' },
     // { name: 'anchor', text: __('Link'), command: 'link', icon: 'link', component: 'LinkToolbarButton' },
     { name: 'table', text: __('Table'), command: (editor, args) => editor.commands.insertTable(args), args: { rowsCount: 3, colsCount: 3, withHeaderRow: false }, svg: 'add-table' },
-    // { name: 'image', text: __('Image'), command: 'image', args: { src: '' }, icon: 'picture-o', condition: (config) => config.container },
+    { name: 'image', text: __('Image'), command: (editor) => editor.commands.insertImage(), args: { src: '' }, icon: 'picture-o', condition: (config) => config.container },
     { name: 'code', text: __('Inline Code'), command: (editor) => editor.commands.toggleCode(), svg: 'angle-brackets-bold' },
     { name: 'codeblock', text: __('Code Block'), command: (editor) => editor.commands.toggleCodeBlock(), svg: 'code-block' },
     { name: 'horizontalrule', text: __('Horizontal Rule'), command: (editor) => editor.commands.setHorizontalRule(), svg: 'range' },

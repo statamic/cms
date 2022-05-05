@@ -94,10 +94,10 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import BardSource from './Source.vue';
 import { Small } from './Small';
+import { Image } from './Image';
 /* import Set from './Set';
 import Doc from './Doc';
-import Link from './Link';
-import Image from './Image'; */
+import Link from './Link'; */
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
@@ -512,11 +512,12 @@ export default {
                 })
             ];
 
+            if (btns.includes('codeblock')) exts.push(CodeBlockLowlight.configure({ lowlight }));
+            if (btns.includes('image')) exts.push(Image.configure({ bard: this }));
             if (btns.includes('underline')) exts.push(Underline);
             if (btns.includes('small')) exts.push(Small);
             if (btns.includes('subscript')) exts.push(Subscript);
             if (btns.includes('superscript')) exts.push(Superscript);
-            if (btns.includes('codeblock')) exts.push(CodeBlockLowlight.configure({ lowlight }));
 
             if (btns.includes('table')) {
                 exts.push(
