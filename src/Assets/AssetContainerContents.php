@@ -86,8 +86,9 @@ class AssetContainerContents
             $timestamp = null;
         }
 
-        // Only perform explicit `has()` API file existence check as a fallback if timestamp ends
-        // up being null. This is needed when `add()`ing new directories to the files cache.
+        // Only perform explicit `has()` API file existence check as a fallback
+        // if timestamp ends up as null. This is needed when `add()`ing new
+        // directories to the files cache with the flysystem S3 driver.
         if ($timestamp === null && $this->filesystem()->has($path) === false) {
             return false;
         }
