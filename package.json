@@ -57,6 +57,7 @@
     "pdfobject": "^2.2.7",
     "portal-vue": "^1.5.1",
     "pretty": "^2.0.0",
+    "prosemirror-state": "^1.3.4",
     "pusher-js": "^4.4.0",
     "qs": "^6.9.1",
     "rangy": "^1.3.0",

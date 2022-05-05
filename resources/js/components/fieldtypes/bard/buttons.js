@@ -16,7 +16,7 @@ const availableButtons = () => [
     { name: 'quote', text: __('Blockquote'), command: (editor) => editor.chain().focus().toggleBlockquote().run(), icon: 'quote-right' },
     { name: 'superscript', text: __('Superscript'), command: (editor) => editor.chain().focus().toggleSuperscript().run(), icon: 'superscript' },
     { name: 'subscript', text: __('Subscript'), command: (editor) => editor.chain().focus().toggleSubscript().run(), icon: 'subscript' },
-    // { name: 'anchor', text: __('Link'), command: 'link', icon: 'link', component: 'LinkToolbarButton' },
+    { name: 'anchor', text: __('Link'), command: (editor) => editor.commands.setLink(), icon: 'link', component: 'LinkToolbarButton' },
     { name: 'table', text: __('Table'), command: (editor, args) => editor.commands.insertTable(args), args: { rowsCount: 3, colsCount: 3, withHeaderRow: false }, svg: 'add-table' },
     { name: 'image', text: __('Image'), command: (editor) => editor.commands.insertImage(), args: { src: '' }, icon: 'picture-o', condition: (config) => config.container },
     { name: 'code', text: __('Inline Code'), command: (editor) => editor.commands.toggleCode(), svg: 'angle-brackets-bold' },

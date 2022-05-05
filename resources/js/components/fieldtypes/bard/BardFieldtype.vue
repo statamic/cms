@@ -95,9 +95,9 @@ import TableHeader from '@tiptap/extension-table-header';
 import BardSource from './Source.vue';
 import { Small } from './Small';
 import { Image } from './Image';
+import { Link } from './Link';
 /* import Set from './Set';
-import Doc from './Doc';
-import Link from './Link'; */
+import Doc from './Doc'; */
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
@@ -512,6 +512,7 @@ export default {
                 })
             ];
 
+            if (btns.includes('anchor')) exts.push(Link.configure({ vm: this }));
             if (btns.includes('codeblock')) exts.push(CodeBlockLowlight.configure({ lowlight }));
             if (btns.includes('image')) exts.push(Image.configure({ bard: this }));
             if (btns.includes('underline')) exts.push(Underline);
@@ -529,10 +530,7 @@ export default {
             }
 
             // TODO: Add the following extensions
-            /* exts.push(new Set({ bard: this }))
-            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
-
-            if (btns.includes('image')) exts.push(new Image({ bard: this }));*/
+            // exts.push(new Set({ bard: this }))
 
             this.$bard.extensionCallbacks.forEach(callback => {
                 let returned = callback({ bard: this, mark, node });
