@@ -1,39 +1,62 @@
-import { Node } from 'tiptap';
-import Set from './Set.vue';
+import { Node } from '@tiptap/core';
+import { VueNodeViewRenderer } from '@tiptap/vue-2'
+import SetComponent from './Set.vue';
 
-export default class SetNode extends Node {
+export const Set = Node.create({
 
-    get name() {
-        return 'set';
-    }
+    name: 'set',
 
-    get view() {
-        return Set;
-    }
+    addNodeView() {
+        return VueNodeViewRenderer(SetComponent)
+    },
 
-    get schema() {
+    draggable: true,
+
+    addAttributes() {
         return {
-            attrs: {
-                id: {},
-                enabled: { default: true },
-                values: {},
+            id: {
+                default: null,
+                parseHTML: element => element.querySelector('div')?.getAttribute('id'),
             },
-            draggable: true,
-            parseDOM: [{
+            enabled: {
+                default: true,
+                parseHTML: element => element.querySelector('div')?.getAttribute('enabled'),
+            },
+            values: {
+                default: null,
+                parseHTML: element => element.querySelector('a')?.getAttribute('values'),
+            },
+        }
+    },
+
+    parseHTML() {
+        return [
+            {
                 tag: 'bard-set',
                 getAttrs: dom => JSON.parse(dom.innerHTML)
-            }],
-            toDOM: node => ['bard-set', {}, JSON.stringify(node.attrs)]
+            }
+        ]
+    },
+
+    renderHTML({ HTMLAttributes }) {
+        return [
+            'bard-set',
+            {},
+            JSON.stringify(HTMLAttributes)
+        ]
+    },
+
+    addCommands() {
+        return {
+            set: (attrs) => ({ tr, dispatch }) => {
+                const { selection } = tr;
+                const node = this.type.create(attrs);
+                if (dispatch) {
+                    const transaction = tr.insert(selection.$cursor.pos - 1, node);
+                    dispatch(transaction);
+                }
+            },
         }
-    }
+    },
 
-    commands({ type, schema }) {
-        return attrs => (state, dispatch) => {
-            const { selection } = state;
-            const node = type.create(attrs);
-            const transaction = state.tr.insert(selection.$cursor.pos - 1, node);
-            dispatch(transaction);
-        };
-    }
-
-}
+})

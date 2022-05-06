@@ -22,6 +22,7 @@
     "@simonwep/pickr": "^1.7.4",
     "@tiptap/core": "^2.0.0-beta.175",
     "@tiptap/extension-code-block-lowlight": "^2.0.0-beta.68",
+    "@tiptap/extension-document": "^2.0.0-beta.15",
     "@tiptap/extension-subscript": "^2.0.0-beta.10",
     "@tiptap/extension-superscript": "^2.0.0-beta.10",
     "@tiptap/extension-table": "^2.0.0-beta.48",

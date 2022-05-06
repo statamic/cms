@@ -49,12 +49,11 @@
                 </div>
             </bubble-menu>
 
-            <editor-floating-menu :editor="editor">
+            <floating-menu v-if="editor" :editor="editor" >
                 <div
-                    slot-scope="{ menu }"
                     class="bard-set-selector"
-                    :class="config.sets.length && (config.always_show_set_button || menu.isActive) ? 'visible' : 'invisible'"
-                    :style="`top: ${menu.top}px`"
+                    :class="config.sets.length ? 'visible' : 'invisible'"
+                    :style="`top: -5px`"
                 >
                     <dropdown-list>
                         <template v-slot:trigger>
@@ -68,7 +67,7 @@
                         </div>
                     </dropdown-list>
                 </div>
-            </editor-floating-menu>
+            </floating-menu>
 
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
@@ -82,7 +81,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
+import { BubbleMenu, Editor, EditorContent, FloatingMenu } from '@tiptap/vue-2';
 import StarterKit from '@tiptap/starter-kit';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Underline from '@tiptap/extension-underline';
@@ -93,11 +92,11 @@ import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import BardSource from './Source.vue';
+import Document from './Document';
+import { Set } from './Set'
 import { Small } from './Small';
 import { Image } from './Image';
 import { Link } from './Link';
-/* import Set from './Set';
-import Doc from './Doc'; */
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
@@ -115,11 +114,11 @@ export default {
     mixins: [Fieldtype, ManagesSetMeta],
 
     components: {
-        //EditorFloatingMenu,
         BubbleMenu,
         BardSource,
         BardToolbarButton,
         EditorContent,
+        FloatingMenu,
         LinkToolbarButton,
     },
 
@@ -496,7 +495,7 @@ export default {
                     bulletList: btns.includes('unorderedlist'),
                     code: btns.includes('code'),
                     codeBlock: false,
-                    document: true,
+                    document: false,
                     dropcursor: false,
                     gapcursor: false,
                     hardBreak: true,
@@ -509,7 +508,9 @@ export default {
                     paragraph: true,
                     strike: btns.includes('strikethrough'),
                     text: true
-                })
+                }),
+                Document,
+                Set.configure({ bard: this })
             ];
 
             if (btns.includes('anchor')) exts.push(Link.configure({ vm: this }));
@@ -528,9 +529,6 @@ export default {
                     TableRow,
                 );
             }
-
-            // TODO: Add the following extensions
-            // exts.push(new Set({ bard: this }))
 
             this.$bard.extensionCallbacks.forEach(callback => {
                 let returned = callback({ bard: this, mark, node });
