@@ -30,7 +30,7 @@
         "symfony/var-exporter": "^4.3 || ^5.1",
         "symfony/yaml": "^4.1 || ^5.1 || ^6.0",
         "ueberdosis/html-to-prosemirror": "^1.3",
-        "ueberdosis/prosemirror-to-html": "^2.6",
+        "ueberdosis/prosemirror-to-html": "^2.7",
         "voku/portable-ascii": "^1.6.1 || ^2.0",
         "wilderborn/partyline": "^1.0"
     },
