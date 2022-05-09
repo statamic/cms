@@ -151,7 +151,8 @@ class PageTest extends TestCase
     /** @test */
     public function it_builds_a_uri_based_on_the_position_in_the_structure_when_the_structure_has_a_collection()
     {
-        $entry = new class extends Entry {
+        $entry = new class extends Entry
+        {
             public function id($id = null)
             {
                 return 'a';
@@ -484,7 +485,8 @@ class PageTest extends TestCase
 
     protected function newTree()
     {
-        return new class extends Tree {
+        return new class extends Tree
+        {
             private $structure;
 
             public function path()
