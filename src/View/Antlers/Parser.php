@@ -405,7 +405,7 @@ class Parser implements ParserContract
         // Null coalescence through "or", "??" or "?:"
         if (Str::contains($var, [' or ', ' ?? ', ' ?: '])) {
             $isCoalesce = true;
-            $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, null, PREG_SPLIT_NO_EMPTY);
+            $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, -1, PREG_SPLIT_NO_EMPTY);
         } else {
             $isCoalesce = false;
             $vars = [$var];
@@ -651,7 +651,7 @@ class Parser implements ParserContract
                 $replacement = $this->valueToLiteral($replacement);
             }
 
-            $text = $this->preg_replace('/'.preg_quote($tag, '/').'/m', addcslashes($replacement, '\\$'), $text, 1);
+            $text = $this->preg_replace('/'.preg_quote($tag, '/').'/m', addcslashes((string) $replacement, '\\$'), $text, 1);
             $text = $this->injectExtractions($text, 'nested_tag_pair');
         }
 

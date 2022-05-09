@@ -2141,7 +2141,7 @@ class CoreModifiers extends Modifier
     public function sort($value, $params)
     {
         $key = Arr::get($params, 0, 'true');
-        $desc = strtolower(Arr::get($params, 1)) == 'desc';
+        $desc = strtolower(Arr::get($params, 1, 'asc')) == 'desc';
 
         $value = $value instanceof Collection ? $value : collect($value);
 
@@ -2445,7 +2445,7 @@ class CoreModifiers extends Modifier
      */
     public function toJson($value, $params)
     {
-        $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : null;
+        $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : 0;
 
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
