@@ -82,15 +82,28 @@
 <script>
 import uniqid from 'uniqid';
 import { BubbleMenu, Editor, EditorContent, FloatingMenu } from '@tiptap/vue-2';
-import StarterKit from '@tiptap/starter-kit';
+import Blockquote from '@tiptap/extension-blockquote';
+import Bold from '@tiptap/extension-bold';
+import BulletList from '@tiptap/extension-bullet-list';
+import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import Underline from '@tiptap/extension-underline';
+import HardBreak from '@tiptap/extension-hard-break';
+import Heading from '@tiptap/extension-heading';
+import History from '@tiptap/extension-history';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import Italic from '@tiptap/extension-italic';
+import ListItem from '@tiptap/extension-list-item';
+import OrderedList from '@tiptap/extension-ordered-list';
+import Paragraph from '@tiptap/extension-paragraph';
+import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import Table from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
+import Text from '@tiptap/extension-text';
+import Underline from '@tiptap/extension-underline';
 import BardSource from './Source.vue';
 import Document from './Document';
 import { Set } from './Set'
@@ -106,8 +119,10 @@ import javascript from 'highlight.js/lib/languages/javascript'
 import css from 'highlight.js/lib/languages/css'
 import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
-/* import mark from './Mark';
-import node from './Node'; */
+
+/** @deprecated */
+// import mark from './Mark';
+// import node from './Node';
 
 export default {
 
@@ -474,7 +489,33 @@ export default {
         },
 
         getExtensions() {
+            let exts = [
+                Document,
+                HardBreak,
+                History,
+                Paragraph,
+                Set.configure({ bard: this }),
+                Text
+            ];
+
             let btns = this.buttons.map(button => button.name);
+
+            if (btns.includes('anchor')) exts.push(Link.configure({ vm: this }));
+            if (btns.includes('bold')) exts.push(Bold);
+            if (btns.includes('code')) exts.push(Code);
+            if (btns.includes('codeblock')) exts.push(CodeBlockLowlight.configure({ lowlight }));
+            if (btns.includes('horizontalrule')) exts.push(HorizontalRule);
+            if (btns.includes('image')) exts.push(Image.configure({ bard: this }));
+            if (btns.includes('italic')) exts.push(Italic);
+            if (btns.includes('quote')) exts.push(Blockquote);
+            if (btns.includes('orderedlist')) exts.push(OrderedList);
+            if (btns.includes('orderedlist') || btns.includes('unorderedlist')) exts.push(ListItem);
+            if (btns.includes('underline')) exts.push(Underline);
+            if (btns.includes('unorderedlist')) exts.push(BulletList);
+            if (btns.includes('small')) exts.push(Small);
+            if (btns.includes('strikethrough')) exts.push(Strike);
+            if (btns.includes('subscript')) exts.push(Subscript);
+            if (btns.includes('superscript')) exts.push(Superscript);
 
             let levels = [];
             if (btns.includes('h1')) levels.push(1);
@@ -483,43 +524,9 @@ export default {
             if (btns.includes('h4')) levels.push(4);
             if (btns.includes('h5')) levels.push(5);
             if (btns.includes('h6')) levels.push(6);
-
-            /* StarterKit extensions included as standard:
-            Nodes: Blockquote, BulletList, CodeBlock, Document, HardBreak, Heading, HorizontalRule, ListItem, OrderedList, Paragraph, Text
-            Marks: Bold, Code, Italic, Strike
-            Extensions: Dropcursor, Gapcursor, History */
-            let exts = [
-                StarterKit.configure({
-                    blockquote: btns.includes('quote'),
-                    bold: btns.includes('bold'),
-                    bulletList: btns.includes('unorderedlist'),
-                    code: btns.includes('code'),
-                    codeBlock: false,
-                    document: false,
-                    dropcursor: false,
-                    gapcursor: false,
-                    hardBreak: true,
-                    heading: levels.length ? { levels } : false,
-                    history: true,
-                    horizontalRule: btns.includes('horizontalrule'),
-                    italic: btns.includes('italic'),
-                    listItem: btns.includes('orderedlist') || btns.includes('unorderedlist'),
-                    orderedList: btns.includes('orderedlist'),
-                    paragraph: true,
-                    strike: btns.includes('strikethrough'),
-                    text: true
-                }),
-                Document,
-                Set.configure({ bard: this })
-            ];
-
-            if (btns.includes('anchor')) exts.push(Link.configure({ vm: this }));
-            if (btns.includes('codeblock')) exts.push(CodeBlockLowlight.configure({ lowlight }));
-            if (btns.includes('image')) exts.push(Image.configure({ bard: this }));
-            if (btns.includes('underline')) exts.push(Underline);
-            if (btns.includes('small')) exts.push(Small);
-            if (btns.includes('subscript')) exts.push(Subscript);
-            if (btns.includes('superscript')) exts.push(Superscript);
+            if (levels.length) {
+                exts.push(Heading.configure({ levels }));
+            }
 
             if (btns.includes('table')) {
                 exts.push(
@@ -531,7 +538,7 @@ export default {
             }
 
             this.$bard.extensionCallbacks.forEach(callback => {
-                let returned = callback({ bard: this, mark, node });
+                let returned = callback({ bard: this});
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
@@ -541,7 +548,7 @@ export default {
                 let index = exts.findIndex(ext => ext.name === name);
                 if (index === -1) return;
                 let extension = exts[index];
-                let newExtension = callback({ bard: this, mark, node, extension });
+                let newExtension = callback({ bard: this, extension });
                 exts[index] = newExtension;
             });
 

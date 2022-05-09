@@ -1,12 +1,3 @@
-import * as core from 'tiptap';
-import * as commands from 'tiptap-commands';
-import * as utils from 'tiptap-utils';
-import * as extensions from 'tiptap-extensions';
-import Link from './fieldtypes/bard/Link';
-import Image from './fieldtypes/bard/Image';
-import Subscript from './fieldtypes/bard/Subscript';
-import Superscript from './fieldtypes/bard/Superscript';
-
 class Bard {
     constructor(instance) {
         this.instance = instance;
@@ -32,7 +23,8 @@ class Bard {
         this.buttonCallbacks.push(callback);
     }
 
-    get tiptap() {
+    /** @deprecated */
+    /* get tiptap() {
         return {
             core,
             commands,
@@ -45,7 +37,7 @@ class Bard {
                 Superscript,
             },
          };
-    }
+    } */
 }
 
 export default Bard;
