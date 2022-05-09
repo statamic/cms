@@ -35,18 +35,16 @@
         </div>
 
         <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar }" tabindex="0">
-            <bubble-menu :editor="editor" v-if="editor && toolbarIsFloating && !readOnly" :tippy-options="{ placement: 'auto-start' }">
-                <div class="bard-floating-toolbar active">
-                    <component
-                        v-for="button in visibleButtons(buttons)"
-                        :key="button.name"
-                        :is="button.component || 'BardToolbarButton'"
-                        :button="button"
-                        :active="buttonIsActive(button)"
-                        :bard="_self"
-                        :config="config"
-                        :editor="editor" />
-                </div>
+            <bubble-menu :editor="editor" class="bard-floating-toolbar" :tippy-options="{ maxWidth: 'none' }" v-if="editor && toolbarIsFloating && !readOnly">
+                <component
+                    v-for="button in visibleButtons(buttons)"
+                    :key="button.name"
+                    :is="button.component || 'BardToolbarButton'"
+                    :button="button"
+                    :active="buttonIsActive(button)"
+                    :bard="_self"
+                    :config="config"
+                    :editor="editor" />
             </bubble-menu>
 
             <floating-menu v-if="editor" :editor="editor" >

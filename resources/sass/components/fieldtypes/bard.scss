@@ -115,15 +115,9 @@
 }
 
 .bard-floating-toolbar {
-    @apply flex bg-black rounded-full absolute shadow-lg px-0 opacity-0 invisible;
-    transform: translateX(-50%) translateY(-10px);
-    bottom: 5px;
+    @apply flex bg-black rounded-full shadow-lg px-0;
     white-space: nowrap;
     z-index: 1000;
-
-    &.active {
-        @apply opacity-100 visible;
-    }
 
     &:before {
         content: '';
