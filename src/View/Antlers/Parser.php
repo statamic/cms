@@ -771,7 +771,7 @@ class Parser implements ParserContract
                     [$if_true, $if_false] = explode(': ', $bits[1]);
 
                     // Build a PHP string to evaluate
-                    $conditional = '<?php echo('.$condition.') ? "'.addslashes($this->getVariable(trim($if_true), $data)).'" : "'.addslashes($this->getVariable(trim($if_false), $data)).'"; ?>';
+                    $conditional = '<?php echo('.$condition.') ? "'.addslashes($this->getVariable(trim($if_true), $data, '')).'" : "'.addslashes($this->getVariable(trim($if_false), $data, '')).'"; ?>';
 
                     // Do the evaluation
                     $output = stripslashes($this->parsePhp($conditional));
