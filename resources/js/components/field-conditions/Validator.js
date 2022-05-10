@@ -294,6 +294,6 @@ export default class {
             return false;
         }
 
-        return intersection(this.getCheckedFieldPaths(dottedPrefix), revealerFields).length;
+        return intersection(this.getCheckedFieldPaths(dottedPrefix), revealerFields).length > 0;
     }
 }
