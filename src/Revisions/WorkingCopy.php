@@ -3,6 +3,7 @@
 namespace Statamic\Revisions;
 
 use Statamic\Facades\Revision as Revisions;
+use Statamic\Contracts\Revisions\Revision as RevisonContract;
 
 class WorkingCopy extends Revision
 {
@@ -14,7 +15,7 @@ class WorkingCopy extends Revision
         ]);
     }
 
-    public static function fromRevision(Revision $revision)
+    public static function fromRevision(RevisonContract $revision)
     {
         return (new self)
             ->id($revision->id() ?? false)
