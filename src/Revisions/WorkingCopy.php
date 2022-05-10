@@ -2,8 +2,8 @@
 
 namespace Statamic\Revisions;
 
-use Statamic\Facades\Revision as Revisions;
 use Statamic\Contracts\Revisions\Revision as RevisonContract;
+use Statamic\Facades\Revision as Revisions;
 
 class WorkingCopy extends Revision
 {
