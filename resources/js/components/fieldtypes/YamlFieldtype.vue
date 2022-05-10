@@ -38,6 +38,7 @@ export default {
             lineWrapping: true,
             readOnly: this.readOnlyOption,
             theme: this.config.theme || 'material',
+            inputStyle: 'contenteditable',
         });
 
         this.codemirror.on('change', (cm) => {
