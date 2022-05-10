@@ -1,5 +1,27 @@
 # Release Notes
 
+## 3.3.11 (2022-05-10)
+
+### What's improved
+
+- Swedish translations. [#5975](http://github.com/statamic/cms/issues/5975) by @adevade
+- Remove unused assets (mostly `.png`s). [#6006](http://github.com/statamic/cms/issues/6006) by @adevade
+- Update default url to use `https` in markdown fields. [#5971](http://github.com/statamic/cms/issues/5971) by @adevade
+- Enable spellcheck in markdown fields, improve CodeMirror field accessibility. [#6016](http://github.com/statamic/cms/issues/6016) by @jacksleight
+- Allow overwriting the `getAddon` method. [#5935](http://github.com/statamic/cms/issues/5935) by @jonassiewertsen
+
+### What's fixed
+
+- Fix hidden data when replicator sets are collapsed by default. [#6021](http://github.com/statamic/cms/issues/6021) by @jesseleite
+- Fix adding new s3 folder to asset listing cache with stache watcher disabled. [#5996](http://github.com/statamic/cms/issues/5996) by @jesseleite
+- Fix overzealous deleting from asset listing cache with stache watcher disabled. [#5998](http://github.com/statamic/cms/issues/5998) by @jesseleite
+- Move route to fix live preview pop out. [#5968](http://github.com/statamic/cms/issues/5968) by @jasonvarga
+- Fix limit and offset on ordered query builders. [#5932](http://github.com/statamic/cms/issues/5932) by @jasonvarga
+- Fix indexing of query builder results. [#5961](http://github.com/statamic/cms/issues/5961) by @jasonvarga
+- Runtime: Fix numeric variables inside parameters and shares cascade data. [#5995](http://github.com/statamic/cms/issues/5995) by @JohnathonKoster
+- Runtime: Evaluate Antlers within `code` fieldtype when `antlers: true` is set. [#5966](http://github.com/statamic/cms/issues/5966) by @JohnathonKoster
+
+
 ## 3.3.10 (2022-04-29)
 
 ### What's new
