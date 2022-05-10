@@ -2,7 +2,15 @@
 
 namespace Statamic\Fieldtypes;
 
-use ProseMirrorToHtml\Renderer;
+use Tiptap\Editor;
+use Tiptap\Extensions\StarterKit;
+use Tiptap\Marks\Link;
+use Tiptap\Marks\Subscript;
+use Tiptap\Marks\Superscript;
+use Tiptap\Nodes\Table;
+use Tiptap\Nodes\TableCell;
+use Tiptap\Nodes\TableHeader;
+use Tiptap\Nodes\TableRow;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -234,7 +242,18 @@ class Bard extends Replicator
 
         if (is_string($value)) {
             $value = str_replace('statamic://', '', $value);
-            $doc = (new \HtmlToProseMirror\Renderer)->render($value);
+            $doc = (new Editor([
+                'extensions' => [
+                    new Link,
+                    new StarterKit,
+                    new Subscript,
+                    new Superscript,
+                    new Table,
+                    new TableCell,
+                    new TableHeader,
+                    new TableRow,
+                ]
+            ]))->setContent($value)->getDocument();
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
