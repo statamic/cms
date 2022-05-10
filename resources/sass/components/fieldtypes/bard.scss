@@ -117,7 +117,6 @@
 .bard-floating-toolbar {
     @apply flex bg-black rounded-full shadow-lg px-0;
     white-space: nowrap;
-    z-index: 1000;
 
     &:before {
         content: '';
@@ -181,10 +180,6 @@
   ========================================================================== */
 
 .bard-set-selector {
-    position: absolute;
-    left: -20px;
-    margin-top: -6px;
-    z-index: 6;
     // transition: all .15s ease-in-out;
 
     .dropdown-menu {
