@@ -731,6 +731,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             $str = $str->replace($from, $to);
         }
 
+        if (config('statamic.assets.lowercase')) {
+            $str = strtolower($str);
+        }
+
         return (string) $str;
     }
 
