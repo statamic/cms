@@ -1008,6 +1008,40 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_lowercases_uploaded_filenames_by_default()
+    {
+        Event::fake();
+        $asset = $this->container->makeAsset('path/to/asset.jpg');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->image('lowercase-THIS-asset.jpg'));
+
+        Storage::disk('test')->assertExists('path/to/lowercase-this-asset.jpg');
+        $this->assertEquals('path/to/lowercase-this-asset.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+    }
+
+    /** @test */
+    public function it_doesnt_lowercase_uploaded_filenames_when_configured()
+    {
+        config(['statamic.assets.lowercase' => false]);
+
+        Event::fake();
+        $asset = $this->container->makeAsset('path/to/asset.jpg');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->image('do-NOT-lowercase-THIS-asset.jpg'));
+
+        Storage::disk('test')->assertExists('path/to/do-not-lowercase-this-asset.jpg');
+        $this->assertEquals('path/to/do-NOT-lowercase-THIS-asset.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+    }
+
+    /** @test */
     public function it_gets_the_url_when_the_container_has_a_relative_url()
     {
         $container = $this->mock(AssetContainer::class);
