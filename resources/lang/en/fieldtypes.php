@@ -109,6 +109,7 @@ return [
     'replicator.config.collapse.disabled' => 'All sets expanded by default',
     'replicator.config.collapse.enabled' => 'All sets collapsed by default',
     'replicator.config.max_sets' => 'The maximum number of sets.',
+    'replicator.config.preview' => 'Hide all set fields from the preview',
     'replicator.title' => 'Replicator',
     'revealer.title' => 'Revealer',
     'section.title' => 'Section',
