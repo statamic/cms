@@ -277,6 +277,42 @@ class UserTags extends Tags
     }
 
     /**
+     * Output a update form.
+     *
+     * Maps to {{ user:update_form }}
+     *
+     * @return string
+     */
+    public function updateForm()
+    {
+        if (session()->has('status')) {
+            return $this->parse(['success' => true]);
+        }
+
+        $data = $this->getFormSession();
+
+        if (! $this->params->has('redirect')) {
+            $this->params->put('redirect', request()->getPathInfo());
+        }
+
+        $knownParams = ['redirect'];
+
+        $html = $this->formOpen(route('statamic.user.update'), 'POST', $knownParams);
+
+        $html .= '<input type="hidden" name="token" value="'.request('token').'" />';
+
+        if ($redirect = $this->params->get('redirect')) {
+            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+        }
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
      * Displays content if a user has permission.
      *
      * Maps to {{ user:can }}
@@ -424,7 +460,7 @@ class UserTags extends Tags
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function eventUrl($url, $relative = false)
     {
