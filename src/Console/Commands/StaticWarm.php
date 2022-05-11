@@ -66,7 +66,7 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client(['verify' => !$this->laravel->isLocal()]);
+        $client = new Client(['verify' => ! $this->laravel->isLocal()]);
 
         $this->output->newLine();
         $this->line('Compiling URLs...');
