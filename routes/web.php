@@ -34,6 +34,7 @@ Route::name('statamic.')->group(function () {
             Route::post('login', 'UserController@login')->name('login');
             Route::get('logout', 'UserController@logout')->name('logout');
             Route::post('register', 'UserController@register')->name('register');
+            Route::post('update', 'UserController@update')->name('user.update');
 
             Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
             Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
