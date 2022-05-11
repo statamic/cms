@@ -34,9 +34,9 @@ class Replicator extends Fieldtype
                 ],
                 'default' => false,
             ],
-            'preview' => [
-                'display' => __('Preview'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.preview'),
+            'preview_fields' => [
+                'display' => __('Preview Fields'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.preview_fields'),
                 'type' => 'toggle',
                 'width' => 33,
                 'default' => false,
