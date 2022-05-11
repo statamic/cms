@@ -1016,7 +1016,7 @@ class AssetTest extends TestCase
 
         $asset->upload(UploadedFile::fake()->image('lowercase-THIS-asset.jpg'));
 
-        Storage::disk('test')->assertExists('path/to/lowercase-this-asset.jpg');
+        Storage::disk('test')->assertExists('path/to/lowercase-THIS-asset.jpg');
         $this->assertEquals('path/to/lowercase-this-asset.jpg', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
@@ -1034,7 +1034,7 @@ class AssetTest extends TestCase
 
         $asset->upload(UploadedFile::fake()->image('do-NOT-lowercase-THIS-asset.jpg'));
 
-        Storage::disk('test')->assertExists('path/to/do-not-lowercase-this-asset.jpg');
+        Storage::disk('test')->assertExists('path/to/do-NOT-lowercase-THIS-asset.jpg');
         $this->assertEquals('path/to/do-NOT-lowercase-THIS-asset.jpg', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
