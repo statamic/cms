@@ -2,15 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Tiptap\Editor;
-use Tiptap\Extensions\StarterKit;
-use Tiptap\Marks\Link;
-use Tiptap\Marks\Subscript;
-use Tiptap\Marks\Superscript;
-use Tiptap\Nodes\Table;
-use Tiptap\Nodes\TableCell;
-use Tiptap\Nodes\TableHeader;
-use Tiptap\Nodes\TableRow;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -242,18 +233,7 @@ class Bard extends Replicator
 
         if (is_string($value)) {
             $value = str_replace('statamic://', '', $value);
-            $doc = (new Editor([
-                'extensions' => [
-                    new Link,
-                    new StarterKit,
-                    new Subscript,
-                    new Superscript,
-                    new Table,
-                    new TableCell,
-                    new TableHeader,
-                    new TableRow,
-                ]
-            ]))->setContent($value)->getDocument();
+            $doc = (new Augmentor($this))->renderHtmlToProsemirror($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
@@ -298,9 +278,7 @@ class Bard extends Replicator
             return $value['type'] === 'set';
         })->values();
 
-        $renderer = new Renderer;
-
-        return $renderer->render([
+        return (new Augmentor($this))->renderProsemirrorToHtml([
             'type' => 'doc',
             'content' => $data,
         ]);
@@ -369,7 +347,7 @@ class Bard extends Replicator
                 if (empty($set['text'])) {
                     return;
                 }
-                $doc = (new \HtmlToProseMirror\Renderer)->render($set['text']);
+                $doc = (new Augmentor($this))->renderHtmlToProsemirror($set['text']);
 
                 return $doc['content'];
             }

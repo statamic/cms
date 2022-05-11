@@ -10,6 +10,6 @@ class BardServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        Augmentor::addMark(Small::class);
+        Augmentor::addMark(new Small);
     }
 }

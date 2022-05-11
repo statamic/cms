@@ -2,14 +2,21 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use ProseMirrorToHtml\Marks\Link as DefaultLinkMark;
-use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
-use ProseMirrorToHtml\Renderer;
+use Tiptap\Editor;
+use Tiptap\Extensions\StarterKit;
+use Tiptap\Marks\Subscript;
+use Tiptap\Marks\Superscript;
+use Tiptap\Nodes\Table;
+use Tiptap\Nodes\TableCell;
+use Tiptap\Nodes\TableHeader;
+use Tiptap\Nodes\TableRow;
+use Statamic\Fieldtypes\Bard\ImageNode;
+use Statamic\Fieldtypes\Bard\StatamicImageNode;
+use Statamic\Fieldtypes\Bard\LinkMark;
+use Statamic\Fieldtypes\Bard\SetNode;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
-use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
-use Statamic\Fieldtypes\Bard\LinkMark as CustomLinkMark;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 
@@ -23,8 +30,6 @@ class Augmentor
 
     protected static $customMarks = [];
     protected static $customNodes = [];
-    protected static $replaceMarks = [];
-    protected static $replaceNodes = [];
 
     public function __construct($fieldtype)
     {
@@ -105,24 +110,7 @@ class Augmentor
 
     public function convertToHtml($value)
     {
-        $customImageNode = $this->withStatamicImageUrls ? StatamicImageNode::class : CustomImageNode::class;
-
-        $renderer = (new Renderer)
-            ->replaceNode(DefaultImageNode::class, $customImageNode)
-            ->replaceMark(DefaultLinkMark::class, CustomLinkMark::class)
-            ->addNode(SetNode::class)
-            ->addNodes(static::$customNodes)
-            ->addMarks(static::$customMarks);
-
-        foreach (static::$replaceNodes as $searchNode => $replaceNode) {
-            $renderer->replaceNode($searchNode, $replaceNode);
-        }
-
-        foreach (static::$replaceMarks as $searchMark => $replaceMark) {
-            $renderer->replaceMark($searchMark, $replaceMark);
-        }
-
-        return $renderer->render(['type' => 'doc', 'content' => $value]);
+        return $this->renderProsemirrorToHtml(['type' => 'doc', 'content' => $value]);
     }
 
     public static function addNode($node)
@@ -133,16 +121,6 @@ class Augmentor
     public static function addMark($mark)
     {
         static::$customMarks[] = $mark;
-    }
-
-    public static function replaceNode($searchNode, $replaceNode)
-    {
-        static::$replaceNodes[$searchNode] = $replaceNode;
-    }
-
-    public static function replaceMark($searchMark, $replaceMark)
-    {
-        static::$replaceMarks[$searchMark] = $replaceMark;
     }
 
     protected function convertToSets($html)
@@ -180,5 +158,37 @@ class Augmentor
 
             return array_merge($values, ['type' => $set['type']]);
         })->all();
+    }
+
+    public function renderHtmlToProsemirror(string $value)
+    {
+        return (new Editor(['extensions' => $this->extensions()]))->setContent($value)->getDocument();
+    }
+
+    public function renderProsemirrorToHtml(array $value)
+    {
+        return (new Editor(['extensions' => $this->extensions()]))->setContent($value)->getHTML();
+    }
+
+    protected function extensions()
+    {
+        $customImageNode = $this->withStatamicImageUrls ? new StatamicImageNode : new ImageNode;
+
+        return array_merge(
+            [
+                $customImageNode,
+                new LinkMark,
+                new SetNode,
+                new StarterKit,
+                new Subscript,
+                new Superscript,
+                new Table,
+                new TableCell,
+                new TableHeader,
+                new TableRow,
+            ],
+            static::$customMarks,
+            static::$customNodes
+        );
     }
 }
