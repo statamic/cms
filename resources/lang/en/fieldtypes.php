@@ -24,6 +24,7 @@ return [
     'bard.config.link_collections' => 'Entries from these collections will be available in the link selector. Leaving this empty will make all entries available.',
     'bard.config.link_noopener' => 'Set `rel="noopener"` on all links.',
     'bard.config.link_noreferrer' => 'Set `rel="noreferrer"` on all links.',
+    'bard.config.preview_fields' => 'Hide all set fields from the preview',
     'bard.config.reading_time' => 'Show estimated reading time at the bottom of the field.',
     'bard.config.save_html' => 'Save HTML instead of structured data. This simplifies but limits control of your template markup.',
     'bard.config.sets' => 'Sets are configurable blocks of fields that can be inserted anywhere in your Bard content.',

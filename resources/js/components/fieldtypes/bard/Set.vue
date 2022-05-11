@@ -128,6 +128,10 @@ export default {
 
         hasError() {
             return this.options.bard.setsWithErrors.includes(this.index);
+        },
+
+        previewFields() {
+            return this.options.bard.config.preview_fields;
         }
 
     },
