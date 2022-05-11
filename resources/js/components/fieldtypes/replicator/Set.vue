@@ -120,6 +120,9 @@ export default {
         },
         isReadOnly: Boolean,
         previews: Object,
+        hidePreviews: {
+            type: Boolean
+        }
     },
 
     computed: {
