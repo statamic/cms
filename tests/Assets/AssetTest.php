@@ -1011,7 +1011,7 @@ class AssetTest extends TestCase
     public function it_lowercases_uploaded_filenames_by_default()
     {
         Event::fake();
-        $asset = $this->container->makeAsset('path/to/asset.jpg');
+        $asset = $this->container->makeAsset('path/to/lowercase-THIS-asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
 
         $asset->upload(UploadedFile::fake()->image('lowercase-THIS-asset.jpg'));
@@ -1029,7 +1029,7 @@ class AssetTest extends TestCase
         config(['statamic.assets.lowercase' => false]);
 
         Event::fake();
-        $asset = $this->container->makeAsset('path/to/asset.jpg');
+        $asset = $this->container->makeAsset('path/to/do-NOT-lowercase-THIS-asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
 
         $asset->upload(UploadedFile::fake()->image('do-NOT-lowercase-THIS-asset.jpg'));
