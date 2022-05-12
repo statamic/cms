@@ -66,7 +66,7 @@ export const Link = Mark.create({
                 }),
             }),
         ]
-      },
+    },
 
     addProseMirrorPlugins() {
         const vm = this.options.vm;
