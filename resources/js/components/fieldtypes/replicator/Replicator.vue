@@ -33,7 +33,7 @@
                     :field-path-prefix="fieldPathPrefix || handle"
                     :has-error="setHasError(index)"
                     :previews="previews[set._id]"
-                    :preview-fields="config.preview_fields"
+                    :show-field-previews="config.show_field_previews"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
                     @updated="updated"

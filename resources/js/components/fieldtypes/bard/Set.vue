@@ -130,8 +130,8 @@ export default {
             return this.options.bard.setsWithErrors.includes(this.index);
         },
 
-        previewFields() {
-            return this.options.bard.config.preview_fields;
+        showFieldPreviews() {
+            return this.options.bard.config.show_field_previews;
         }
 
     },

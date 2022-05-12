@@ -120,7 +120,7 @@ export default {
         },
         isReadOnly: Boolean,
         previews: Object,
-        previewFields: {
+        showFieldPreviews: {
             type: Boolean
         }
     },

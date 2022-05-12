@@ -34,12 +34,12 @@ class Replicator extends Fieldtype
                 ],
                 'default' => false,
             ],
-            'preview_fields' => [
-                'display' => __('Preview Fields'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.preview_fields'),
+            'show_field_previews' => [
+                'display' => __('Show Field Previews'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.show_field_previews'),
                 'type' => 'toggle',
                 'width' => 33,
-                'default' => false,
+                'default' => true,
             ],
             'max_sets' => [
                 'display' => __('Max Sets'),
