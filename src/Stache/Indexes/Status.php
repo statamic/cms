@@ -2,8 +2,8 @@
 
 namespace Statamic\Stache\Indexes;
 
-use Statamic\Facades\Entry;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Entry;
 
 class Status extends Value
 {
