@@ -35,6 +35,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     protected $allowMoving;
     protected $allowRenaming;
     protected $createFolders;
+    protected $glide;
     protected $searchIndex;
 
     public function id($id = null)
@@ -444,6 +445,22 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             ->args(func_get_args());
     }
 
+    /**
+     * The glide parameters to be applied on image upload.
+     *
+     * @param  array|null  $glide
+     * @return array|$this
+     */
+    public function glide($glide = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('glide')
+            ->getter(function ($glide) {
+                return (array) ($glide ?? []);
+            })
+            ->args(func_get_args());
+    }
+
     public function fileData()
     {
         return [
@@ -455,6 +472,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             'allow_renaming' => $this->allowRenaming,
             'allow_moving' => $this->allowMoving,
             'create_folders' => $this->createFolders,
+            'glide' => $this->glide,
         ];
     }
 

@@ -29,6 +29,7 @@ class AssetContainersController extends CpController
                 'allow_renaming' => $container->allowRenaming(),
                 'allow_uploads' => $container->allowUploads(),
                 'create_folders' => $container->createFolders(),
+                'glide' => $container->glide(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
                 'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
@@ -61,6 +62,7 @@ class AssetContainersController extends CpController
             'allow_renaming' => $container->allowRenaming(),
             'allow_moving' => $container->allowMoving(),
             'create_folders' => $container->createFolders(),
+            'glide' => $container->glide(),
         ];
 
         $fields = ($blueprint = $this->formBlueprint($container))
@@ -93,7 +95,8 @@ class AssetContainersController extends CpController
             ->allowRenaming($values['allow_renaming'])
             ->allowMoving($values['allow_moving'])
             ->allowUploads($values['allow_uploads'])
-            ->createFolders($values['create_folders']);
+            ->createFolders($values['create_folders'])
+            ->glide($values['glide']);
 
         $container->save();
 
@@ -139,7 +142,8 @@ class AssetContainersController extends CpController
             ->title($values['title'])
             ->disk($values['disk'])
             ->allowUploads($values['allow_uploads'])
-            ->createFolders($values['create_folders']);
+            ->createFolders($values['create_folders'])
+            ->glide($values['glide']);
 
         $container->save();
 
