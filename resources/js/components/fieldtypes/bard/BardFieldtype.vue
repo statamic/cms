@@ -530,9 +530,7 @@ export default {
             if (btns.includes('h4')) levels.push(4);
             if (btns.includes('h5')) levels.push(5);
             if (btns.includes('h6')) levels.push(6);
-            if (levels.length) {
-                exts.push(Heading.configure({ levels }));
-            }
+            if (levels.length) exts.push(Heading.configure({ levels }));
 
             if (btns.includes('table')) {
                 exts.push(
@@ -543,14 +541,14 @@ export default {
                 );
             }
 
-            this.$bard.extensionCallbacks.forEach(({callback})=> {
+            this.$bard.extensionCallbacks.forEach(({ callback })=> {
                 let returned = callback({ bard: this});
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
             });
 
-            this.$bard.extensionReplacementCallbacks.forEach(({callback, name}) => {
+            this.$bard.extensionReplacementCallbacks.forEach(({ callback, name }) => {
                 let index = exts.findIndex(ext => ext.name === name);
                 if (index === -1) return;
                 let extension = exts[index];

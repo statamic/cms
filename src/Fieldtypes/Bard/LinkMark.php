@@ -35,9 +35,8 @@ class LinkMark extends Link
             ],
             'target' => [
                 'renderHTML' => function ($attributes) {
-                    $target = $attributes->target;
                     return [
-                        'target' => $target ?? ''
+                        'target' => $attributes->target ?? ''
                     ];
                 },
             ],
