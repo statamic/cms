@@ -682,8 +682,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     {
         $path = $this->getSafeUploadPath($file);
 
-        // TODO: Check container for glide params...
-        $glide = false;
+        $glide = $this->container()->glide();
 
         $sourcePath = $glide
             ? $this->glideProcessUploadedFile($file, $glide)
