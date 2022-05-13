@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use ArrayAccess;
 use Facades\Statamic\Assets\Attributes;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -681,6 +682,13 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     {
         $path = $this->getSafeUploadPath($file);
 
+        // TODO: Check container for glide params...
+        $glide = false;
+
+        $sourcePath = $glide
+            ? $this->glideProcessUploadedFile($file, $glide)
+            : $file->getRealPath();
+
         $this->putFileOnDisk($sourcePath, $path);
 
         $this->path($path)->syncOriginal();
@@ -890,5 +898,42 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    /**
+     * Get temporary glide cache path in storage for processing uploads.
+     *
+     * @return string
+     */
+    private function glideTmpPath()
+    {
+        return storage_path('statamic/glide/tmp');
+    }
+
+    /**
+     * Process UploadedFile instance using glide and return cached path.
+     *
+     * @param UploadedFile $file
+     * @param array $params
+     * @param string
+     */
+    private function glideProcessUploadedFile(UploadedFile $file, $params)
+    {
+        $glideTmpPath = $this->glideTmpPath();
+
+        $server = \League\Glide\ServerFactory::create([
+            'source' => $file->getPath(),
+            'cache' => $glideTmpPath,
+        ]);
+
+        $server->makeImage($file->getFilename(), $params);
+
+        $local = app(Filesystem::class);
+
+        $newFilePath = collect($local->files($glideTmpPath.'/'.$file->getFilename()))
+            ->first()
+            ->getRealPath();
+
+        return $newFilePath;
     }
 }
