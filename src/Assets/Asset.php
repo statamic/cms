@@ -681,11 +681,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     {
         $path = $this->getSafeUploadPath($file);
 
-        $stream = fopen($file->getRealPath(), 'r');
-        $this->disk()->put($path, $stream);
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
+        $this->putFileOnDisk($sourcePath, $path);
 
         $this->path($path)->syncOriginal();
 
@@ -745,6 +741,23 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         return (string) $str;
+    }
+
+    /**
+     * Put file on destination disk.
+     *
+     * @param string $sourcePath
+     * @param string $destinationPath
+     */
+    private function putFileOnDisk($sourcePath, $destinationPath)
+    {
+        $stream = fopen($sourcePath, 'r');
+
+        $this->disk()->put($destinationPath, $stream);
+
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
     }
 
     /**
