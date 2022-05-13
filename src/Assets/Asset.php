@@ -679,19 +679,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function upload(UploadedFile $file)
     {
-        $ext = $file->getClientOriginalExtension();
-        $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-
-        $directory = $this->folder();
-        $directory = ($directory === '.') ? '/' : $directory;
-        $path = Path::tidy($directory.'/'.$filename.'.'.$ext);
-        $path = ltrim($path, '/');
-
-        // If the file exists, we'll append a timestamp to prevent overwriting.
-        if ($this->disk()->exists($path)) {
-            $basename = $filename.'-'.Carbon::now()->timestamp.'.'.$ext;
-            $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
-        }
+        $path = $this->getSafeUploadPath($file);
 
         $stream = fopen($file->getRealPath(), 'r');
         $this->disk()->put($path, $stream);
@@ -716,6 +704,31 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     public function download(string $name = null, array $headers = [])
     {
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
+    }
+
+    /**
+     * Get safe upload path for UploadedFile.
+     *
+     * @param UploadedFile $file
+     * @return string
+     */
+    private function getSafeUploadPath(UploadedFile $file)
+    {
+        $ext = $file->getClientOriginalExtension();
+        $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+
+        $directory = $this->folder();
+        $directory = ($directory === '.') ? '/' : $directory;
+        $path = Path::tidy($directory.'/'.$filename.'.'.$ext);
+        $path = ltrim($path, '/');
+
+        // If the file exists, we'll append a timestamp to prevent overwriting.
+        if ($this->disk()->exists($path)) {
+            $basename = $filename.'-'.Carbon::now()->timestamp.'.'.$ext;
+            $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
+        }
+
+        return $path;
     }
 
     private function getSafeFilename($string)
