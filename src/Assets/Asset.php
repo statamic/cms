@@ -848,7 +848,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Get safe upload path for UploadedFile.
      *
-     * @param UploadedFile $file
+     * @param  UploadedFile  $file
      * @return string
      */
     private function getSafeUploadPath(UploadedFile $file)
@@ -873,7 +873,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Get safe filename.
      *
-     * @param string $string
+     * @param  string  $string
      * @return string
      */
     private function getSafeFilename($string)
@@ -895,8 +895,8 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Put file on destination disk.
      *
-     * @param string $sourcePath
-     * @param string $destinationPath
+     * @param  string  $sourcePath
+     * @param  string  $destinationPath
      */
     private function putFileOnDisk($sourcePath, $destinationPath)
     {
@@ -922,8 +922,8 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Process UploadedFile instance using glide and return cached path.
      *
-     * @param UploadedFile $file
-     * @param array $params
+     * @param  UploadedFile  $file
+     * @param  array  $params
      * @param string
      */
     private function glideProcessUploadedFile(UploadedFile $file, $params)
