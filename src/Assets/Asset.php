@@ -691,6 +691,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         $this->putFileOnDisk($sourcePath, $path);
 
+        if ($glide) {
+            $this->glideClearTmpCache();
+        }
+
         $this->path($path)->syncOriginal();
 
         $this->save();
@@ -935,5 +939,19 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             ->getRealPath();
 
         return $newFilePath;
+    }
+
+    /**
+     * Clear tmp glide cache.
+     */
+    private function glideClearTmpCache()
+    {
+        $glideTmpPath = $this->glideTmpPath();
+
+        $local = app(Filesystem::class);
+
+        if ($local->exists($glideTmpPath)) {
+            $local->deleteDirectory($glideTmpPath);
+        }
     }
 }
