@@ -715,64 +715,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
-     * Get safe upload path for UploadedFile.
-     *
-     * @param UploadedFile $file
-     * @return string
-     */
-    private function getSafeUploadPath(UploadedFile $file)
-    {
-        $ext = $file->getClientOriginalExtension();
-        $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-
-        $directory = $this->folder();
-        $directory = ($directory === '.') ? '/' : $directory;
-        $path = Path::tidy($directory.'/'.$filename.'.'.$ext);
-        $path = ltrim($path, '/');
-
-        // If the file exists, we'll append a timestamp to prevent overwriting.
-        if ($this->disk()->exists($path)) {
-            $basename = $filename.'-'.Carbon::now()->timestamp.'.'.$ext;
-            $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
-        }
-
-        return $path;
-    }
-
-    private function getSafeFilename($string)
-    {
-        $replacements = [
-            ' ' => '-',
-            '#' => '-',
-        ];
-
-        $str = Stringy::create(urldecode($string))->toAscii();
-
-        foreach ($replacements as $from => $to) {
-            $str = $str->replace($from, $to);
-        }
-
-        return (string) $str;
-    }
-
-    /**
-     * Put file on destination disk.
-     *
-     * @param string $sourcePath
-     * @param string $destinationPath
-     */
-    private function putFileOnDisk($sourcePath, $destinationPath)
-    {
-        $stream = fopen($sourcePath, 'r');
-
-        $this->disk()->put($destinationPath, $stream);
-
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-    }
-
-    /**
      * Get the asset file contents.
      *
      * @return mixed
@@ -902,6 +844,70 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    /**
+     * Get safe upload path for UploadedFile.
+     *
+     * @param UploadedFile $file
+     * @return string
+     */
+    private function getSafeUploadPath(UploadedFile $file)
+    {
+        $ext = $file->getClientOriginalExtension();
+        $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+
+        $directory = $this->folder();
+        $directory = ($directory === '.') ? '/' : $directory;
+        $path = Path::tidy($directory.'/'.$filename.'.'.$ext);
+        $path = ltrim($path, '/');
+
+        // If the file exists, we'll append a timestamp to prevent overwriting.
+        if ($this->disk()->exists($path)) {
+            $basename = $filename.'-'.Carbon::now()->timestamp.'.'.$ext;
+            $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
+        }
+
+        return $path;
+    }
+
+    /**
+     * Get safe filename.
+     *
+     * @param string $string
+     * @return string
+     */
+    private function getSafeFilename($string)
+    {
+        $replacements = [
+            ' ' => '-',
+            '#' => '-',
+        ];
+
+        $str = Stringy::create(urldecode($string))->toAscii();
+
+        foreach ($replacements as $from => $to) {
+            $str = $str->replace($from, $to);
+        }
+
+        return (string) $str;
+    }
+
+    /**
+     * Put file on destination disk.
+     *
+     * @param string $sourcePath
+     * @param string $destinationPath
+     */
+    private function putFileOnDisk($sourcePath, $destinationPath)
+    {
+        $stream = fopen($sourcePath, 'r');
+
+        $this->disk()->put($destinationPath, $stream);
+
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
     }
 
     /**
