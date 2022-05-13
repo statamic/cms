@@ -2,8 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\User;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 
 class UserLocale extends Relationship
 {
