@@ -3,18 +3,16 @@
 namespace Tests\Query;
 
 use Exception;
-use Tests\TestCase;
-use Statamic\Statamic;
+use Illuminate\Support\Facades\Storage;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
-use Statamic\Facades\Asset;
-use Statamic\Facades\Entry;
-use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Scope;
-use Illuminate\Support\Collection;
-use Statamic\Facades\AssetContainer;
-use Illuminate\Support\Facades\Storage;
+use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class ScopeTest extends TestCase
 {

@@ -2,14 +2,14 @@
 
 namespace Tests\Data\Entries;
 
-use Tests\TestCase;
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
+use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Query\Scopes\Scope;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class EntryQueryBuilderTest extends TestCase
 {

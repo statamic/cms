@@ -2,9 +2,9 @@
 
 namespace Statamic\Query\Scopes;
 
-use Statamic\Statamic;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Statamic;
 
 abstract class Scope
 {

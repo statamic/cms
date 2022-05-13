@@ -2,13 +2,13 @@
 
 namespace Tests\Data\Assets;
 
-use Tests\TestCase;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Query\Scopes\Scope;
-use Statamic\Facades\AssetContainer;
-use Illuminate\Support\Facades\Storage;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class AssetQueryBuilderTest extends TestCase
 {

@@ -2,17 +2,17 @@
 
 namespace Tests\Data\Taxonomies;
 
-use Tests\TestCase;
-use Statamic\Facades\Site;
-use Statamic\Facades\Term;
-use Statamic\Facades\Taxonomy;
+use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class TermQueryBuilderTest extends TestCase
 {

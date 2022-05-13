@@ -2,10 +2,10 @@
 
 namespace Tests\Data\Users;
 
-use Tests\TestCase;
 use Statamic\Facades\User;
 use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class UserQueryBuilderTest extends TestCase
 {
