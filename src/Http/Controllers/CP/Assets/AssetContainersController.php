@@ -257,6 +257,13 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                         'default' => true,
                     ],
+                    'glide' => [
+                        'type' => 'array',
+                        'display' => __('Glide Processing'),
+                        'instructions' => __('When enabled, images will be permanently processed with these glide parameters on upload.'),
+                        'key_header' => __('Param'),
+                        'add_button' => __('Add Param'),
+                    ],
                 ],
             ],
         ]);
