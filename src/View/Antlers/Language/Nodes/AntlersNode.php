@@ -388,6 +388,7 @@ class AntlersNode extends AbstractNode
                 $pathParser = new PathParser();
                 $retriever = new PathDataManager();
                 $retriever->setIsPaired(false)->setReduceFinal(false)
+                    ->cascade($processor->getCascade())
                     ->setShouldDoValueIntercept(false);
                 $value = $retriever->getData($pathParser->parse($pathToParse), $data);
             }
@@ -419,9 +420,10 @@ class AntlersNode extends AbstractNode
                 if (array_key_exists($interpolationVar, $param->parent->processedInterpolationRegions)) {
                     $interpolationResult = $processor->cloneProcessor()
                         ->setData($data)
+                        ->cascade($processor->getCascade())
                         ->setIsInterpolationProcessor(true)
                         ->setIsProvidingParameterContent(true)
-                        ->render($param->parent->processedInterpolationRegions[$interpolationVar]);
+                        ->reduce($param->parent->processedInterpolationRegions[$interpolationVar]);
 
                     if ((is_object($interpolationResult) || is_array($interpolationResult)) && count($param->interpolations) == 1) {
                         return $interpolationResult;
@@ -559,6 +561,25 @@ class AntlersNode extends AbstractNode
     public function relativePositionFromOffset($offset, $index)
     {
         return $this->parser->positionFromOffset($this->contentOffset->offset + $offset, $index);
+    }
+
+    public function lexerRelativeOffset($offset)
+    {
+        if ($this->parser == null) {
+            $position = new Position();
+            $position->index = $offset;
+            $position->offset = $offset;
+
+            return $position;
+        }
+
+        $relativeIndex = $offset + strlen($this->rawStart);
+
+        if ($this->startPosition != null) {
+            $relativeIndex += $this->startPosition->index;
+        }
+
+        return $this->parser->positionFromOffset($relativeIndex, $relativeIndex, true);
     }
 
     public function relativeOffset($offset, $index = null)

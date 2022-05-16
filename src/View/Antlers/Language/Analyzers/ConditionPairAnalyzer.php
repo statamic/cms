@@ -159,10 +159,16 @@ class ConditionPairAnalyzer
                     }
 
                     if ($curNode->isClosedBy == null && self::requiresClose($curNode)) {
+                        $errorMessage = 'Unclosed "'.NodeHelpers::getTrueName($curNode).'" control structure.';
+
+                        if ($curNode->isInterpolationNode) {
+                            $errorMessage .= ' Tag pairs are not supported within Antlers tags.';
+                        }
+
                         throw ErrorFactory::makeSyntaxError(
                             AntlersErrorCodes::TYPE_PARSE_UNCLOSED_CONDITIONAL,
                             $curNode,
-                            'Unclosed "'.NodeHelpers::getTrueName($curNode).'" control structure.'
+                            $errorMessage
                         );
                     }
                 }

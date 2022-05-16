@@ -424,7 +424,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this->getAddon()->namespace();
     }
 
-    private function getAddon()
+    protected function getAddon()
     {
         throw_unless($this->app->isBooted(), new NotBootedException);
 

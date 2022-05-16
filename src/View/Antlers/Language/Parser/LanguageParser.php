@@ -1794,8 +1794,13 @@ class LanguageParser
                     $right = $this->wrapNumberInVariable($right);
                 }
 
+
                 if (($right instanceof NullConstant || $right instanceof TrueConstant || $right instanceof FalseConstant) && NodeHelpers::distance($left, $right) === 1) {
                     $right = $this->wrapConstantInVariable($right);
+                }
+
+                if ($left instanceof NumberNode && $right instanceof VariableNode) {
+                    $left = $this->wrapNumberInVariable($left);
                 }
 
                 if ($left instanceof VariableNode && $right instanceof VariableNode && NodeHelpers::distance($left, $right) === 1) {
