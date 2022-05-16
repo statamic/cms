@@ -40,11 +40,12 @@ class GlobalSearchTest extends TestCase
         $index = $this->mock(Index::class);
         $index->shouldReceive('ensureExists')->once()->andReturnSelf();
         $index->shouldReceive('search')->with('test')->once()->andReturn($builder);
+        $testUser = User::make()->assignRole('test')->save();
         Search::shouldReceive('index')->once()->andReturn($index);
 
         $this->setTestRoles(['test' => ['access cp', 'view test-collection-1 entries']]);
         $this
-            ->actingAs(tap(User::make()->assignRole('test'))->save())
+            ->actingAs($testUser)
             ->get('/cp/search?q=test')
             ->assertOk()
             ->assertJsonCount(1)
