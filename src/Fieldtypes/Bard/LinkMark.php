@@ -2,9 +2,9 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Tiptap\Marks\Link;
 use Statamic\Facades\Data;
 use Statamic\Support\Str;
+use Tiptap\Marks\Link;
 
 class LinkMark extends Link
 {
@@ -13,7 +13,7 @@ class LinkMark extends Link
         return [
             'HTMLAttributes' => [
                 'rel' => '',
-                'target' => '_blank'
+                'target' => '_blank',
             ],
         ];
     }
@@ -24,19 +24,19 @@ class LinkMark extends Link
             'href' => [
                 'renderHTML' => function ($attributes) {
                     $href = $attributes->href;
-                    if (!isset($href)) {
+                    if (! isset($href)) {
                         return null;
                     }
 
                     return [
-                        'href' => $this->convertHref($href) ?? ''
+                        'href' => $this->convertHref($href) ?? '',
                     ];
                 },
             ],
             'target' => [
                 'renderHTML' => function ($attributes) {
                     return [
-                        'target' => $attributes->target ?? ''
+                        'target' => $attributes->target ?? '',
                     ];
                 },
             ],

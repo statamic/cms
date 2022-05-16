@@ -2,6 +2,11 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
+use Statamic\Fields\Field;
+use Statamic\Fields\Value;
+use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Text;
+use Statamic\Support\Arr;
 use Tiptap\Editor;
 use Tiptap\Extensions\StarterKit;
 use Tiptap\Marks\Subscript;
@@ -14,11 +19,6 @@ use Statamic\Fieldtypes\Bard\ImageNode;
 use Statamic\Fieldtypes\Bard\StatamicImageNode;
 use Statamic\Fieldtypes\Bard\LinkMark;
 use Statamic\Fieldtypes\Bard\SetNode;
-use Statamic\Fields\Field;
-use Statamic\Fields\Value;
-use Statamic\Fields\Values;
-use Statamic\Fieldtypes\Text;
-use Statamic\Support\Arr;
 
 class Augmentor
 {
