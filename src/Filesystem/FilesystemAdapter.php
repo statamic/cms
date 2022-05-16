@@ -3,6 +3,7 @@
 namespace Statamic\Filesystem;
 
 use Illuminate\Filesystem\Filesystem;
+use RuntimeException;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\Finder;
@@ -28,8 +29,8 @@ class FilesystemAdapter extends AbstractAdapter
 
     public function normalizePath($path)
     {
-        if (is_null($path)) {
-            $path = '/';
+        if (! is_string($path)) {
+            throw new RuntimeException('Path must be a string.');
         }
 
         // If given an absolute path, just tidy it (to adjust the slashes) and return it.

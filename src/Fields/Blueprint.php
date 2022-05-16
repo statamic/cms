@@ -2,10 +2,13 @@
 
 namespace Statamic\Fields;
 
+use ArrayAccess;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Data\ExistsAsFile;
@@ -19,7 +22,7 @@ use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Blueprint implements Augmentable
+class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 {
     use HasAugmentedData, ExistsAsFile;
 
@@ -105,7 +108,7 @@ class Blueprint implements Augmentable
     {
         return Path::tidy(vsprintf('%s/%s/%s.yaml', [
             Facades\Blueprint::directory(),
-            str_replace('.', '/', $this->namespace()),
+            str_replace('.', '/', (string) $this->namespace()),
             $this->handle(),
         ]));
     }
@@ -545,5 +548,10 @@ class Blueprint implements Augmentable
     public function addGqlTypes()
     {
         $this->fields()->all()->map->fieldtype()->each->addGqlTypes();
+    }
+
+    public function toQueryableValue()
+    {
+        return $this->handle();
     }
 }

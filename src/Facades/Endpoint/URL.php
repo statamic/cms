@@ -221,7 +221,7 @@ class URL
      */
     public function isExternal($url)
     {
-        if (Str::startsWith($url, '/')) {
+        if (Str::startsWith($url, ['/', '#'])) {
             return false;
         }
 

@@ -26,11 +26,13 @@ abstract class Fieldtype implements Arrayable
     protected $defaultable = true;
     protected $selectable = true;
     protected $selectableInForms = false;
+    protected $relationship = false;
     protected $categories = [];
     protected $rules = [];
     protected $extraRules = [];
     protected $defaultValue;
     protected $configFields = [];
+    protected static $extraConfigFields = [];
     protected $icon;
 
     public static function title()
@@ -130,6 +132,11 @@ abstract class Fieldtype implements Arrayable
         return array_map([Validator::class, 'explodeRules'], $this->extraRules);
     }
 
+    public function extraValidationAttributes(): array
+    {
+        return [];
+    }
+
     public function preProcessValidatable($value)
     {
         return $value;
@@ -173,9 +180,11 @@ abstract class Fieldtype implements Arrayable
 
     public function configFields(): Fields
     {
-        $fields = collect($this->configFieldItems())->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        });
+        $fields = collect($this->configFieldItems())
+            ->merge($this->extraConfigFieldItems())
+            ->map(function ($field, $handle) {
+                return compact('handle', 'field');
+            });
 
         return new ConfigFields($fields);
     }
@@ -183,6 +192,23 @@ abstract class Fieldtype implements Arrayable
     protected function configFieldItems(): array
     {
         return $this->configFields;
+    }
+
+    protected function extraConfigFieldItems(): array
+    {
+        return self::$extraConfigFields[static::class] ?? [];
+    }
+
+    public static function appendConfigFields(array $config): void
+    {
+        $existingConfig = self::$extraConfigFields[static::class] ?? [];
+
+        self::$extraConfigFields[static::class] = array_merge($existingConfig, $config);
+    }
+
+    public static function appendConfigField(string $field, array $config): void
+    {
+        self::appendConfigFields([$field => $config]);
     }
 
     public function icon()
@@ -253,5 +279,15 @@ abstract class Fieldtype implements Arrayable
     public function addGqlTypes()
     {
         //
+    }
+
+    public function isRelationship(): bool
+    {
+        return $this->relationship;
+    }
+
+    public function toQueryableValue($value)
+    {
+        return $value;
     }
 }

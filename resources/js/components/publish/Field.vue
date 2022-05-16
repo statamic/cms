@@ -61,7 +61,7 @@
                 :meta="meta"
                 :handle="config.handle"
                 :name-prefix="namePrefix"
-                :error-key-prefix="errorKeyPrefix"
+                :field-path-prefix="fieldPathPrefix"
                 :read-only="isReadOnly"
                 @input="$emit('input', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -102,7 +102,7 @@ export default {
         readOnly: Boolean,
         syncable: Boolean,
         namePrefix: String,
-        errorKeyPrefix: String,
+        fieldPathPrefix: String,
         canToggleLabel: Boolean,
     },
 
@@ -191,7 +191,7 @@ export default {
         },
 
         hasNestedError() {
-            const prefix = `${this.errorKeyPrefix || this.config.handle}.`;
+            const prefix = `${this.fieldPathPrefix || this.config.handle}.`;
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },

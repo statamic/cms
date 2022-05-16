@@ -30,7 +30,7 @@
                     :sortable-handle-class="sortableHandleClass"
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
-                    :error-key-prefix="errorKeyPrefix || handle"
+                    :field-path-prefix="fieldPathPrefix || handle"
                     :has-error="setHasError(index)"
                     :previews="previews[set._id]"
                     @collapsed="collapseSet(set._id)"
@@ -90,7 +90,7 @@ export default {
     },
 
     computed: {
-        
+
         previews() {
             return this.meta.previews;
         },
@@ -150,7 +150,11 @@ export default {
 
             this.updateSetMeta(set._id, this.meta.new[handle]);
 
-            this.update([...this.value, set]);
+            this.update([
+                ...this.value.slice(0, index),
+                set,
+                ...this.value.slice(index)
+            ]);
 
             this.expandSet(set._id);
         },
@@ -200,7 +204,7 @@ export default {
         },
 
         setHasError(index) {
-            const prefix = `${this.errorKeyPrefix || this.handle}.${index}.`;
+            const prefix = `${this.fieldPathPrefix || this.handle}.${index}.`;
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },

@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Assets\QueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Field;
@@ -26,22 +27,31 @@ class AssetsTest extends TestCase
     {
         parent::setUp();
 
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('foo/one.txt', '');
         Storage::disk('test')->put('bar/two.txt', '');
+
         AssetContainer::make('test')->disk('test')->save();
     }
 
     /** @test */
-    public function it_augments_to_a_collection_of_assets()
+    public function it_augments_to_a_query_builder()
     {
         $augmented = $this->fieldtype()->augment(['foo/one.txt', 'bar/two.txt', 'unknown.txt']);
 
-        $this->assertInstanceOf(Collection::class, $augmented);
-        $this->assertCount(2, $augmented); // invalid assets get removed
-        $this->assertEveryItemIsInstanceOf(Asset::class, $augmented);
-        $this->assertEquals(['foo/one.txt', 'bar/two.txt'], $augmented->map->path()->all());
-        $this->assertEquals(['one.txt', 'two.txt'], $augmented->map->basename()->all());
+        $this->assertInstanceOf(QueryBuilder::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(Asset::class, $augmented->get());
+        $this->assertEquals(['foo/one.txt', 'bar/two.txt'], $augmented->get()->map->path()->all());
+        $this->assertEquals(['one.txt', 'two.txt'], $augmented->get()->map->basename()->all());
+    }
+
+    /** @test */
+    public function it_augments_to_a_query_builder_when_theres_no_value()
+    {
+        $augmented = $this->fieldtype()->augment(null);
+
+        $this->assertInstanceOf(QueryBuilder::class, $augmented);
+        $this->assertCount(0, $augmented->get());
     }
 
     /** @test */

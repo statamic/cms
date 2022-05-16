@@ -19,7 +19,8 @@ class HasAvatarTest extends TestCase
     {
         parent::setUp();
 
-        tap(Storage::fake('avatars'))->getDriver()->getConfig()->set('url', '/avatars');
+        Storage::fake('avatars', ['url' => '/avatars']);
+
         AssetContainer::make('avatars')->disk('avatars')->save();
     }
 
@@ -75,8 +76,10 @@ class HasAvatarTest extends TestCase
     {
         $user = $this->withAvatarField()->withGravatar()->userWithUploadedAvatar();
 
-        $this->assertEquals('/avatars/john.jpg', $user->avatar());
-        $this->assertEquals('/avatars/john.jpg', $user->avatar(64));
+        $this->assertEquals('/avatars/john.jpg', $user->avatarFieldUrl());
+        $this->assertEquals('/avatars/john.jpg', $user->avatarFieldUrl(64));
+        $this->assertEquals('http://localhost/cp/thumbnails/YXZhdGFyczo6am9obi5qcGc=/small/square', $user->avatar());
+        $this->assertEquals('http://localhost/cp/thumbnails/YXZhdGFyczo6am9obi5qcGc=/small/square', $user->avatar(64));
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=64', $user->gravatarUrl());
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=64', $user->gravatarUrl(64));
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->gravatarUrl(128));

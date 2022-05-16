@@ -2,6 +2,7 @@
 
 namespace Tests\Auth;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Auth\File\Role;
 use Tests\TestCase;
@@ -111,5 +112,28 @@ class RoleTest extends TestCase
     public function it_can_be_deleted()
     {
         $this->markTestIncomplete();
+    }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $role = (new Role)->handle('test')->title('Test');
+
+        $role
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $role->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $role[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $role = (new Role)->handle('test')->title('Test');
+
+        $this->assertInstanceOf(Arrayable::class, $role);
+
+        collect($role->toArray())
+            ->each(fn ($value, $key) => $this->assertEquals($value, $role->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value, $role[$key]));
     }
 }

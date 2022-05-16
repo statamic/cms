@@ -49,6 +49,11 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return EntryCollection::make($items);
     }
 
+    protected function getItems($keys)
+    {
+        return Facades\Entry::applySubstitutions(parent::getItems($keys));
+    }
+
     protected function getFilteredKeys()
     {
         $collections = empty($this->collections)

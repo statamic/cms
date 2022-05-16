@@ -6,10 +6,13 @@ use Illuminate\Support\Collection;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
+/**
+ * @group array
+ */
 class LimitTest extends TestCase
 {
     /** @test */
-    public function it_limits_arrays()
+    public function it_limits_arrays(): void
     {
         $arr = ['one', 'two', 'three', 'four', 'five'];
 
@@ -18,7 +21,7 @@ class LimitTest extends TestCase
     }
 
     /** @test */
-    public function it_limits_collections()
+    public function it_limits_collections(): void
     {
         $collection = collect(['one', 'two', 'three', 'four', 'five']);
 

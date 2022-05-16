@@ -124,8 +124,9 @@ class AssetFolder implements Contract, Arrayable
         $this->disk()->delete($this->path());
 
         $cache = $this->container->contents();
+
         $cache->all()->keys()->filter(function ($path) {
-            return Str::startsWith($path, $this->path());
+            return Str::startsWith($path.'/', $this->path().'/');
         })->each(function ($path) use ($cache) {
             $cache->forget($path);
         });
@@ -164,7 +165,7 @@ class AssetFolder implements Contract, Arrayable
             throw new \Exception('Folder cannot be moved to its own subfolder.');
         }
 
-        $name = $name ?: $this->basename();
+        $name = $name ?? $this->basename();
         $oldPath = $this->path();
         $newPath = Str::removeLeft(Path::tidy($parent.'/'.$name), '/');
 
@@ -207,10 +208,10 @@ class AssetFolder implements Contract, Arrayable
     public function toArray()
     {
         return [
-            'title' => $this->title(),
-            'path' => $this->path(),
-            'parent_path' => optional($this->parent())->path(),
-            'basename' => $this->basename(),
+            'title' => (string) $this->title(),
+            'path' => (string) $this->path(),
+            'parent_path' => $this->parent() ? (string) $this->parent()->path() : null,
+            'basename' => (string) $this->basename(),
         ];
     }
 }

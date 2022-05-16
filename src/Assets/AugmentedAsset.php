@@ -48,12 +48,19 @@ class AugmentedAsset extends AbstractAugmented
                 'last_modified_timestamp',
                 'last_modified_instance',
                 'focus',
+                'has_focus',
                 'focus_css',
                 'height',
                 'width',
                 'orientation',
                 'ratio',
                 'mime_type',
+                'duration',
+                'duration_seconds',
+                'duration_minutes',
+                'duration_sec',
+                'duration_min',
+                'playtime',
             ]);
         }
 
@@ -130,8 +137,51 @@ class AugmentedAsset extends AbstractAugmented
         return $this->data->get('focus', '50-50-1');
     }
 
+    protected function hasFocus()
+    {
+        return $this->data->has('focus');
+    }
+
     protected function focusCss()
     {
         return Modify::value($this->get('focus'))->backgroundPosition()->fetch();
+    }
+
+    protected function duration()
+    {
+        return round($this->data->duration() ?? 0);
+    }
+
+    protected function durationSeconds()
+    {
+        return $this->duration();
+    }
+
+    protected function durationSec()
+    {
+        return $this->duration();
+    }
+
+    protected function durationMinutes()
+    {
+        if (! $seconds = $this->duration()) {
+            return null;
+        }
+
+        return floor($seconds / 60).':'.$seconds % 60;
+    }
+
+    protected function durationMin()
+    {
+        return $this->durationMinutes();
+    }
+
+    protected function playtime()
+    {
+        if ($this->duration() >= 3600) {
+            return date('H:i:s', $this->duration());
+        }
+
+        return date('i:s', $this->duration());
     }
 }

@@ -141,6 +141,7 @@ class EntriesController extends CpController
             'revisionsEnabled' => $entry->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish', $entry),
+            'previewTargets' => $collection->previewTargets()->all(),
         ];
 
         if ($request->wantsJson()) {
@@ -297,6 +298,7 @@ class EntriesController extends CpController
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
+            'previewTargets' => $collection->previewTargets()->all(),
         ];
 
         if ($request->wantsJson()) {

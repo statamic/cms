@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\CollectionTreeDeleted;
 use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;

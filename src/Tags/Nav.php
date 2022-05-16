@@ -51,6 +51,10 @@ class Nav extends Structure
             return $crumb;
         });
 
+        if (! $this->parser) {
+            return $crumbs;
+        }
+
         $output = $this->parseLoop($crumbs->toAugmentedArray());
 
         if ($backspaces = $this->params->int('backspace', 0)) {
