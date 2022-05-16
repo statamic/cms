@@ -36,7 +36,10 @@ class OrderedQueryBuilder implements Builder
             $results = $this->performFallbackOrdering($results);
         }
 
-        return $results->take($this->limit)->skip($this->offset)->values();
+        return $results
+            ->when($this->limit, fn ($results) => $results->take($this->limit))
+            ->when($this->offset, fn ($results) => $results->skip($this->offset))
+            ->values();
     }
 
     public function __call($method, $parameters)
