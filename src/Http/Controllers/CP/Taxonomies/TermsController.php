@@ -130,6 +130,7 @@ class TermsController extends CpController
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $term->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
+            'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
 
         if ($request->wantsJson()) {
@@ -235,6 +236,7 @@ class TermsController extends CpController
                 ];
             })->all(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
+            'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
 
         if ($request->wantsJson()) {

@@ -1,15 +1,22 @@
 import { OPERATORS, ALIASES } from './Constants.js';
+import map from 'underscore/modules/map.js'
+import each from 'underscore/modules/each.js'
+import filter from 'underscore/modules/filter.js'
+import chain from 'underscore/modules/chain.js'
+import chainable from 'underscore/modules/mixin.js'
+
+chainable({ chain, filter, each });
 
 export default class {
 
     fromBlueprint(conditions, prefix=null) {
-        return _.map(conditions, (condition, field) => this.splitRhs(field, condition, prefix));
+        return map(conditions, (condition, field) => this.splitRhs(field, condition, prefix));
     }
 
     toBlueprint(conditions) {
         let converted = {};
 
-        _.each(conditions, condition => {
+        each(conditions, condition => {
             converted[condition.field] = this.combineRhs(condition);
         });
 
@@ -35,7 +42,7 @@ export default class {
     getOperatorFromRhs(condition) {
         let operator = '==';
 
-        _.chain(this.getOperatorsAndAliases())
+        chain(this.getOperatorsAndAliases())
             .filter(value => new RegExp(`^${value} [^=]`).test(this.normalizeConditionString(condition)))
             .each(value => operator = value);
 
@@ -51,7 +58,7 @@ export default class {
     getValueFromRhs(condition) {
         let rhs = this.normalizeConditionString(condition);
 
-        _.chain(this.getOperatorsAndAliases())
+        chain(this.getOperatorsAndAliases())
             .filter(value => new RegExp(`^${value} [^=]`).test(rhs))
             .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
 

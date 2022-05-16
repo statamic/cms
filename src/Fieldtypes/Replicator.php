@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Values;
 use Statamic\GraphQL\Types\ReplicatorSetsType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
@@ -112,9 +113,6 @@ class Replicator extends Fieldtype
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index).'.',
             ])
-            ->withReplacements([
-                'this' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index),
-            ])
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
@@ -145,11 +143,6 @@ class Replicator extends Fieldtype
         })->all();
     }
 
-    protected function setConfig($handle)
-    {
-        return array_get($this->getFieldConfig('sets'), $handle);
-    }
-
     public function augment($values)
     {
         return $this->performAugmentation($values, false);
@@ -173,7 +166,7 @@ class Replicator extends Fieldtype
 
             $values = $this->fields($set['type'])->addValues($set)->{$augmentMethod}()->values();
 
-            return $values->merge(['type' => $set['type']])->all();
+            return new Values($values->merge(['type' => $set['type']])->all());
         })->values()->all();
     }
 

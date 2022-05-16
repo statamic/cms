@@ -96,6 +96,9 @@ export default {
                 state: {
                     blueprint: initial.blueprint,
                     values: initial.values,
+                    hiddenFields: {},
+                    jsonSubmittingFields: [],
+                    revealerFields: [],
                     meta: initial.meta,
                     localizedFields: initial.localizedFields,
                     site: initial.site,
@@ -111,6 +114,22 @@ export default {
                     },
                     setValues(state, values) {
                         state.values = values;
+                    },
+                    setHiddenField(state, field) {
+                        state.hiddenFields[field.dottedKey] = {
+                            hidden: field.hidden,
+                            omitValue: field.omitValue,
+                        };
+                    },
+                    setFieldSubmitsJson(state, dottedKey) {
+                        if (state.jsonSubmittingFields.indexOf(dottedKey) === -1) {
+                            state.jsonSubmittingFields.push(dottedKey);
+                        }
+                    },
+                    setRevealerFields(state, dottedKey) {
+                        if (state.revealerFields.indexOf(dottedKey) === -1) {
+                            state.revealerFields.push(dottedKey);
+                        }
                     },
                     setMeta(state, meta) {
                         state.meta = meta;

@@ -59,11 +59,10 @@ class Select extends Fieldtype
                 'width' => 50,
             ],
             'taggable' => [
-                'display' => __('Taggable'),
+                'display' => __('Allow additions'),
                 'instructions' => __('statamic::fieldtypes.select.config.taggable'),
                 'type' => 'toggle',
                 'default' => false,
-                'display' => __('Allow additions'),
                 'width' => 50,
             ],
             'push_tags' => [

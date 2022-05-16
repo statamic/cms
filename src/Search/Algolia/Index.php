@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Arr;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
+use Statamic\Search\IndexNotFoundException;
 use Statamic\Support\Str;
 
 class Index extends BaseIndex

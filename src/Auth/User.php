@@ -2,10 +2,12 @@
 
 namespace Statamic\Auth;
 
+use ArrayAccess;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
@@ -17,6 +19,7 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
 use Statamic\Facades;
@@ -33,9 +36,11 @@ abstract class User implements
     Augmentable,
     AuthorizableContract,
     ResolvesValuesContract,
-    HasLocalePreference
+    HasLocalePreference,
+    ArrayAccess,
+    Arrayable
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar, ResolvesValues;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues;
 
     abstract public function get($key, $fallback = null);
 
@@ -65,7 +70,7 @@ abstract class User implements
                 [$name, $surname] = explode(' ', $name);
             }
         } else {
-            $name = $this->email();
+            $name = (string) $this->email();
         }
 
         return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
@@ -228,6 +233,11 @@ abstract class User implements
     public function shallowAugmentedArrayKeys()
     {
         return ['id', 'name', 'email', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
     }
 
     public function preferredLocale()

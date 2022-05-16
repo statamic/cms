@@ -35,20 +35,20 @@ class AssetsUploader
     }
 
     /**
-     * Upload the files and return their paths.
+     * Upload the files and return their IDs.
      *
      * @param  mixed  $files
      * @return array|string
      */
     public function upload($files)
     {
-        $paths = $this->getUploadableFiles($files)->map(function ($file) {
-            return $this->createAsset($file)->path();
+        $ids = $this->getUploadableFiles($files)->map(function ($file) {
+            return $this->createAsset($file)->id();
         });
 
         return $this->isSingleFile()
-            ? $paths->first()
-            : $paths->all();
+            ? $ids->first()
+            : $ids->all();
     }
 
     /**

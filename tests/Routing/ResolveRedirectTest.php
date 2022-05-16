@@ -3,6 +3,7 @@
 namespace Tests\Routing;
 
 use Mockery;
+use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Routing\ResolveRedirect;
@@ -141,6 +142,17 @@ class ResolveRedirectTest extends TestCase
         Facades\Entry::shouldReceive('find')->with('123')->once()->andReturn($entry);
 
         $this->assertEquals('/the-entry', $resolver('entry::123'));
+    }
+
+    /** @test */
+    public function it_resolves_references_to_assets()
+    {
+        $resolver = new ResolveRedirect;
+
+        $asset = Mockery::mock(Asset::class)->shouldReceive('url')->once()->andReturn('/assets/foo/bar/baz.jpg')->getMock();
+        Facades\Asset::shouldReceive('find')->with('foo::bar/baz.jpg')->once()->andReturn($asset);
+
+        $this->assertEquals('/assets/foo/bar/baz.jpg', $resolver('asset::foo::bar/baz.jpg'));
     }
 
     /** @test */

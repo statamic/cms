@@ -18,7 +18,7 @@ class ThumbnailController extends Controller
     protected $server;
 
     /**
-     * @var Generator
+     * @var ImageGenerator
      */
     protected $generator;
 
@@ -31,6 +31,11 @@ class ThumbnailController extends Controller
      * @var string
      */
     protected $size;
+
+    /**
+     * @var string
+     */
+    protected $orientation;
 
     /**
      * @var string
@@ -52,11 +57,13 @@ class ThumbnailController extends Controller
      *
      * @param  string  $asset
      * @param  string  $size
+     * @param  string  $orientation
      * @return \Illuminate\Http\Response
      */
-    public function show($asset, $size = null)
+    public function show($asset, $size = null, $orientation = null)
     {
         $this->size = $size;
+        $this->orientation = $orientation;
         $this->asset = $this->asset($asset);
 
         if ($placeholder = $this->getPlaceholderResponse()) {
@@ -107,9 +114,28 @@ class ThumbnailController extends Controller
         return $path;
     }
 
-    public function getPreset()
+    /**
+     * Get control panel thumbnail image preset name.
+     *
+     * Statamic has few control panel specific image presets
+     *
+     * @see \Statamic\Imaging\Manager::cpManipulationPresets
+     *
+     * @return string
+     */
+    private function getPreset()
     {
-        return "cp_thumbnail_{$this->size}_{$this->asset->orientation()}";
+        return "cp_thumbnail_{$this->size}_{$this->getOrientation()}";
+    }
+
+    /**
+     * Get orientation override from URL path or directly from asset.
+     *
+     * @return string|null
+     */
+    private function getOrientation()
+    {
+        return $this->orientation ?? $this->asset->orientation();
     }
 
     /**
@@ -152,6 +178,6 @@ class ThumbnailController extends Controller
             return;
         }
 
-        return redirect(Statamic::cpAssetUrl('img/filetypes/'.$this->asset->extension().'.png'));
+        return redirect(Statamic::cpAssetUrl('svg/filetypes/picture.svg'));
     }
 }

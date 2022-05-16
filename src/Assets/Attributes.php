@@ -3,8 +3,6 @@
 namespace Statamic\Assets;
 
 use Facades\Statamic\Assets\ExtractInfo;
-use Illuminate\Support\Facades\Storage;
-use League\Flysystem\MountManager;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Arr;
 
@@ -77,31 +75,7 @@ class Attributes
      */
     private function getImageAttributes()
     {
-        // Since assets may be located on external platforms like Amazon S3, we can't simply
-        // grab the attributes. So we'll copy it locally and read the attributes from there.
-        $manager = new MountManager([
-            'source' => $this->asset->disk()->filesystem()->getDriver(),
-            'cache' => $cache = $this->getCacheFlysystem(),
-        ]);
-
-        $cachePath = "{$this->asset->containerId()}/{$this->asset->path()}";
-
-        if ($manager->has($destination = "cache://{$cachePath}")) {
-            $manager->delete($destination);
-        }
-
-        $manager->copy("source://{$this->asset->path()}", $destination);
-
-        try {
-            [$width, $height] = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
-            $size = compact('width', 'height');
-        } catch (\Exception $e) {
-            $size = [];
-        } finally {
-            $cache->delete($cachePath);
-        }
-
-        return $size;
+        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem()->getDriver(), $this->asset->path());
     }
 
     /**
@@ -111,36 +85,7 @@ class Attributes
      */
     private function getSvgAttributes()
     {
-        // Since assets may be located on external platforms like Amazon S3, we can't simply
-        // grab the attributes. So we'll copy it locally and read the attributes from there.
-        $manager = new MountManager([
-            'source' => $this->asset->disk()->filesystem()->getDriver(),
-            'cache' => $cache = $this->getCacheFlysystem(),
-        ]);
-
-        $cachePath = "{$this->asset->containerId()}/{$this->asset->path()}";
-
-        if ($manager->has($destination = "cache://{$cachePath}")) {
-            $manager->delete($destination);
-        }
-
-        $manager->copy("source://{$this->asset->path()}", $destination);
-
-        $svg = simplexml_load_file($cache->getAdapter()->getPathPrefix().$cachePath);
-
-        $cache->delete($cachePath);
-
-        if ($svg['width'] && $svg['height']
-            && is_numeric((string) $svg['width'])
-            && is_numeric((string) $svg['height'])) {
-            return ['width' => (float) $svg['width'], 'height' => (float) $svg['height']];
-        } elseif ($svg['viewBox']) {
-            [,,$width, $height] = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
-
-            return compact('width', 'height');
-        }
-
-        return ['width' => 300, 'height' => 150];
+        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem()->getDriver(), $this->asset->path());
     }
 
     /**
@@ -157,17 +102,5 @@ class Attributes
             'height' => Arr::get($id3, 'video.resolution_y'),
             'duration' => Arr::get($id3, 'playtime_seconds'),
         ];
-    }
-
-    private function getCacheFlysystem()
-    {
-        $disk = 'attributes-cache';
-
-        config(["filesystems.disks.{$disk}" => [
-            'driver' => 'local',
-            'root' => storage_path('statamic/attributes-cache'),
-        ]]);
-
-        return Storage::disk($disk)->getDriver();
     }
 }

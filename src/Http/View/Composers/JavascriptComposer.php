@@ -10,6 +10,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use voku\helper\ASCII;
 
 class JavascriptComposer
 {
@@ -46,6 +47,7 @@ class JavascriptComposer
             'locale' => config('app.locale'),
             'permissions' => $this->permissions($user),
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
+            'charmap' => ASCII::charsArray(),
         ]);
     }
 
@@ -55,6 +57,7 @@ class JavascriptComposer
             return [
                 'name' => $site->name(),
                 'handle' => $site->handle(),
+                'lang' => $site->lang(),
             ];
         })->values();
     }

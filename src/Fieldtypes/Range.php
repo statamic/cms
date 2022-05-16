@@ -38,9 +38,10 @@ class Range extends Fieldtype
                 'width' => 50,
             ],
             'default' => [
-                'display' => __('Default'),
-                'instructions' => __('statamic::fieldtypes.any.config.default'),
-                'type' => 'integer',
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'input_type' => 'number',
                 'default' => null,
                 'width' => 50,
             ],
@@ -56,13 +57,12 @@ class Range extends Fieldtype
                 'type' => 'text',
                 'width' => 50,
             ],
-            'default' => [
-                'display' => __('Default Value'),
-                'instructions' => __('statamic::messages.fields_default_instructions'),
-                'type' => 'text',
-                'width' => 50,
-            ],
         ];
+    }
+
+    public function process($data)
+    {
+        return (int) $data;
     }
 
     public function toGqlType()

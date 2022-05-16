@@ -25,6 +25,12 @@ export default {
 
     },
 
+    inject: ['storeName'],
+
+    mounted() {
+        this.$store.commit(`publish/${this.storeName}/setRevealerFields`, this.fieldPathPrefix || this.handle);
+    },
+
     methods: {
 
         reveal() {

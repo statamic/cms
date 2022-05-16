@@ -335,6 +335,20 @@ class Field implements Arrayable
         return $this->config;
     }
 
+    public function conditions(): array
+    {
+        return collect($this->config)->only([
+            'if',
+            'if_any',
+            'show_when',
+            'show_when_any',
+            'unless',
+            'unless_any',
+            'hide_when',
+            'hide_when_any',
+        ])->all();
+    }
+
     public function get(string $key, $fallback = null)
     {
         return array_get($this->config, $key, $fallback);
@@ -373,5 +387,10 @@ class Field implements Arrayable
         }
 
         return $type;
+    }
+
+    public function isRelationship(): bool
+    {
+        return $this->fieldtype()->isRelationship();
     }
 }
