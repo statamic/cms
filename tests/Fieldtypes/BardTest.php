@@ -236,9 +236,7 @@ class BardTest extends TestCase
                     ]],
                     ['type' => 'text', 'text' => '. '],
                     ['type' => 'image', 'attrs' => [
-                        'alt' => null,
                         'src' => 'asset::assets::lagoa.jpg',
-                        'title' => null,
                     ]],
                 ],
             ],

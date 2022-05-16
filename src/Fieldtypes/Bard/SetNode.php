@@ -16,4 +16,9 @@ class SetNode extends Node
             ],
         ];
     }
+
+    public function renderHTML($node, $HTMLAttributes = [])
+    {
+        return ['content' => "<set>{$node->index}</set>"];
+    }
 }
