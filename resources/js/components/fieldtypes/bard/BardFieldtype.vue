@@ -541,7 +541,7 @@ export default {
                 );
             }
 
-            this.$bard.extensionCallbacks.forEach(({ callback })=> {
+            this.$bard.extensionCallbacks.forEach((callback) => {
                 let returned = callback({ bard: this});
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
