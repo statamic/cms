@@ -15,10 +15,6 @@ use Tiptap\Nodes\Table;
 use Tiptap\Nodes\TableCell;
 use Tiptap\Nodes\TableHeader;
 use Tiptap\Nodes\TableRow;
-use Statamic\Fieldtypes\Bard\ImageNode;
-use Statamic\Fieldtypes\Bard\StatamicImageNode;
-use Statamic\Fieldtypes\Bard\LinkMark;
-use Statamic\Fieldtypes\Bard\SetNode;
 
 class Augmentor
 {
