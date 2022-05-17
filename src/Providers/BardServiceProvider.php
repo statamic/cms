@@ -37,5 +37,3 @@ class BardServiceProvider extends ServiceProvider
         ]);
     }
 }
-
-

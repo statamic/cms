@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Illuminate\Support\Arr as SupportArr;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
@@ -175,7 +174,7 @@ class Augmentor
         }
 
         Arr::removeNullValues(self::$extensions);
-        
+
         return self::$extensions;
     }
 
