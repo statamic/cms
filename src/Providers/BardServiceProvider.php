@@ -20,6 +20,7 @@ class BardServiceProvider extends ServiceProvider
             'hard-break' => new \Tiptap\Nodes\HardBreak(),
             'heading' => new \Tiptap\Nodes\Heading(),
             'horizontal-rule' => new \Tiptap\Nodes\HorizontalRule(),
+            // An 'image' is defined as well. @see Statamic\Fieldtypes\Bard;
             'italic' => new \Tiptap\Marks\Italic(),
             'link' => new \Statamic\Fieldtypes\Bard\LinkMark(),
             'list-item' => new \Tiptap\Nodes\ListItem(),
