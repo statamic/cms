@@ -8,13 +8,6 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 use Tiptap\Editor;
-use Tiptap\Extensions\StarterKit;
-use Tiptap\Marks\Subscript;
-use Tiptap\Marks\Superscript;
-use Tiptap\Nodes\Table;
-use Tiptap\Nodes\TableCell;
-use Tiptap\Nodes\TableHeader;
-use Tiptap\Nodes\TableRow;
 
 class Augmentor
 {
@@ -23,9 +16,8 @@ class Augmentor
     protected $includeDisabledSets = false;
     protected $augmentSets = true;
     protected $withStatamicImageUrls = false;
-
-    protected static $customMarks = [];
-    protected static $customNodes = [];
+    protected static $replaceExtensions = [];
+    private static $extensions = [];
 
     public function __construct($fieldtype)
     {
@@ -109,14 +101,21 @@ class Augmentor
         return $this->renderProsemirrorToHtml(['type' => 'doc', 'content' => $value]);
     }
 
-    public static function addNode($node)
+    public static function addExtensions($extensions)
     {
-        static::$customNodes[] = $node;
+        foreach ($extensions as $name => $extension) {
+            static::addExtension($name, $extension);
+        }
     }
 
-    public static function addMark($mark)
+    public static function addExtension($name, $extension)
     {
-        static::$customMarks[] = $mark;
+        static::$extensions[$name] = $extension;
+    }
+
+    public function replaceExtension($search, $replacement)
+    {
+        static::$replaceExtensions[$search] = $replacement;
     }
 
     protected function convertToSets($html)
@@ -168,23 +167,13 @@ class Augmentor
 
     protected function extensions()
     {
-        $customImageNode = $this->withStatamicImageUrls ? new StatamicImageNode : new ImageNode;
+        $this->addExtension('image', $this->withStatamicImageUrls ? new StatamicImageNode : new ImageNode);
 
-        return array_merge(
-            [
-                $customImageNode,
-                new LinkMark,
-                new SetNode,
-                new StarterKit,
-                new Subscript,
-                new Superscript,
-                new Table,
-                new TableCell,
-                new TableHeader,
-                new TableRow,
-            ],
-            static::$customMarks,
-            static::$customNodes
-        );
+        foreach (self::$replaceExtensions as $name => $replacement) {
+            self::$extensions[$name] = $replacement;
+        }
+        
+        return self::$extensions;
     }
+
 }
