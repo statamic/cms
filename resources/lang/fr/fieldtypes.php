@@ -139,6 +139,7 @@ return [
     'textarea.title' => 'Textarea',
     'time.config.seconds_enabled' => 'Afficher les secondes dans le sélecteur d’horaire.',
     'time.title' => 'Time',
+    'toggle.config.inline_label' => 'Définissez une étiquette à afficher en ligne à côté du commutateur.',
     'toggle.title' => 'Toggle',
     'user_groups.title' => 'User Groups',
     'user_roles.title' => 'User Roles',

@@ -4,7 +4,6 @@ namespace Statamic\Tags;
 
 use ArrayIterator;
 use Statamic\Support\Str;
-use Statamic\View\Antlers\Parser;
 use Traversable;
 
 class FluentTag implements \IteratorAggregate, \ArrayAccess
@@ -105,7 +104,7 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
         }
 
         $tag = app(Loader::class)->load($name, [
-            'parser'     => app(Parser::class),
+            'parser'     => null,
             'params'     => $this->params,
             'content'    => '',
             'context'    => $this->context,

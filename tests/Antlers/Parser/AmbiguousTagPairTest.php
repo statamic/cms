@@ -98,6 +98,49 @@ EOT;
         $this->assertInstanceOf(LiteralNode::class, $parsedNodes[14]);
     }
 
+    public function test_parser_correctly_associates_ambiguous_tags_with_self_closing_tags()
+    {
+        $template = <<<'EOT'
+{{ partial src="wrapper" }}
+    {{ partial src="second_wrapper" }}
+        {{ partial src="content" /}}
+    {{ /partial }}
+{{ /partial }}
+EOT;
+
+        /** @var AbstractNode[] $nodes */
+        $nodes = $this->parseNodes($template);
+
+        /** @var AntlersNode $firstPartial */
+        $firstPartial = $nodes[0];
+        /** @var AntlersNode $firstPartialClose */
+        $firstPartialClose = $nodes[8];
+
+        $this->assertSame(' partial src="wrapper" ', $firstPartial->content);
+        $this->assertSame(' /partial ', $firstPartialClose->content);
+        $this->assertSame($firstPartial, $firstPartialClose->isOpenedBy);
+        $this->assertSame($firstPartialClose, $firstPartial->isClosedBy);
+
+        /** @var AntlersNode $secondPartial */
+        $secondPartial = $nodes[2];
+        /** @var AntlersNode $secondPartialClose */
+        $secondPartialClose = $nodes[6];
+
+        $this->assertSame(' partial src="second_wrapper" ', $secondPartial->content);
+        $this->assertSame(' /partial ', $secondPartialClose->content);
+        $this->assertSame($secondPartial, $secondPartialClose->isOpenedBy);
+        $this->assertSame($secondPartialClose, $secondPartial->isClosedBy);
+
+        /** @var AntlersNode $thirdPartial */
+        $thirdPartial = $nodes[4];
+        $this->assertSame(' partial src="content" ', $thirdPartial->content);
+        $this->assertNull($thirdPartial->isClosedBy);
+        $this->assertNull($thirdPartial->isOpenedBy);
+        $this->assertTrue($thirdPartial->isSelfClosing);
+
+        $this->assertCount(9, $nodes);
+    }
+
     public function test_parser_correctly_associates_nested_collection_tag_pairs()
     {
         $template = <<<'EOT'

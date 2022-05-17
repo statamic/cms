@@ -338,8 +338,14 @@ class TermsTest extends TestCase
      * @test
      * @dataProvider collectionAttachmentProvider
      **/
-    public function it_attaches_collection_during_augmentation($parentIsEntry, $handle, $isRootLevel)
+    public function it_attaches_collection_during_augmentation($expectCollection, $parentIsEntry, $handle, $isRootLevel, $collectionUsesTaxonomy)
     {
+        if ($collectionUsesTaxonomy) {
+            Facades\Collection::find('blog')->taxonomies(['tags'])->save();
+        } else {
+            Facades\Collection::find('blog')->taxonomies([])->save();
+        }
+
         // Make sure there is an entry that uses the term.
         EntryFactory::collection('blog')->data(['tags' => ['one']])->create();
 
@@ -362,7 +368,7 @@ class TermsTest extends TestCase
 
         $collection = $augmented->first()->collection();
 
-        if ($parentIsEntry && $handle === 'tags' && $isRootLevel) {
+        if ($expectCollection) {
             $this->assertInstanceOf(CollectionContract::class, $collection);
         } else {
             $this->assertNull($collection);
@@ -371,16 +377,60 @@ class TermsTest extends TestCase
 
     public function collectionAttachmentProvider()
     {
-        return [
-            'parent is entry and handle matches taxonomy' => [true, 'tags', true],
-            'parent is entry and handle does not match taxonomy' => [true, 'related_tags', true],
-            'parent is not entry and handle matches taxonomy' => [false, 'tags', true],
-            'parent is not entry and handle does not match taxonomy' => [false, 'related_tags', true],
+        $expectCollection = $parentIsEntry = $isRootLevel = $collectionUsesTaxonomy = true;
+        $dontExpectCollection = $parentIsNotEntry = $isNested = $collectionDoesNotUseTaxonomy = false;
+        $fieldHandleMatchesTaxonomy = 'tags';
+        $fieldHandleDoesNotMatchTaxonomy = 'related_tags';
 
-            'parent is entry, handle matches taxonomy, nested field' => [true, 'tags', false],
-            'parent is entry, handle does not match taxonomy, nested field' => [true, 'related_tags', false],
-            'parent is not entry, handle matches taxonomy, nested field' => [false, 'tags', false],
-            'parent is not entry, handle does not match taxonomy, nested field' => [false, 'related_tags', false],
+        return [
+            'parent is entry and handle matches taxonomy' => [
+                $expectCollection, $parentIsEntry, $fieldHandleMatchesTaxonomy, $isRootLevel, $collectionUsesTaxonomy,
+            ],
+            'parent is entry and handle does not match taxonomy' => [
+                $dontExpectCollection, $parentIsEntry, $fieldHandleDoesNotMatchTaxonomy, $isRootLevel, $collectionUsesTaxonomy,
+            ],
+            'parent is not entry and handle matches taxonomy' => [
+                $dontExpectCollection, $parentIsNotEntry, $fieldHandleMatchesTaxonomy, $isRootLevel, $collectionUsesTaxonomy,
+            ],
+            'parent is not entry and handle does not match taxonomy' => [
+                $dontExpectCollection, $parentIsNotEntry, $fieldHandleDoesNotMatchTaxonomy, $isRootLevel, $collectionUsesTaxonomy,
+            ],
+            'parent is entry, handle matches taxonomy, nested field' => [
+                $dontExpectCollection, $parentIsEntry, $fieldHandleMatchesTaxonomy, $isNested, $collectionUsesTaxonomy,
+            ],
+            'parent is entry, handle does not match taxonomy, nested field' => [
+                $dontExpectCollection, $parentIsEntry, $fieldHandleDoesNotMatchTaxonomy, $isNested, $collectionUsesTaxonomy,
+            ],
+            'parent is not entry, handle matches taxonomy, nested field' => [
+                $dontExpectCollection, $parentIsNotEntry, $fieldHandleMatchesTaxonomy, $isNested, $collectionUsesTaxonomy,
+            ],
+            'parent is not entry, handle does not match taxonomy, nested field' => [
+                $dontExpectCollection, $parentIsNotEntry, $fieldHandleDoesNotMatchTaxonomy, $isNested, $collectionUsesTaxonomy,
+            ],
+            'parent is entry and handle matches taxonomy, collection doesnt use taxonomy' => [
+                $dontExpectCollection, $parentIsEntry, $fieldHandleMatchesTaxonomy, $isRootLevel, $collectionDoesNotUseTaxonomy,
+            ],
+            'parent is entry and handle does not match taxonomy, collection doesnt use taxonomy' => [
+                $dontExpectCollection, $parentIsEntry, $fieldHandleDoesNotMatchTaxonomy, $isRootLevel, $collectionDoesNotUseTaxonomy,
+            ],
+            'parent is not entry and handle matches taxonomy, collection doesnt use taxonomy' => [
+                $dontExpectCollection, $parentIsNotEntry, $fieldHandleMatchesTaxonomy, $isRootLevel, $collectionDoesNotUseTaxonomy,
+            ],
+            'parent is not entry and handle does not match taxonomy, collection doesnt use taxonomy' => [
+                $dontExpectCollection, $parentIsNotEntry, $fieldHandleDoesNotMatchTaxonomy, $isRootLevel, $collectionDoesNotUseTaxonomy,
+            ],
+            'parent is entry, handle matches taxonomy, nested field, collection doesnt use taxonomy' => [
+                $dontExpectCollection, $parentIsEntry, $fieldHandleMatchesTaxonomy, $isNested, $collectionDoesNotUseTaxonomy,
+            ],
+            'parent is entry, handle does not match taxonomy, nested field, collection doesnt use taxonomy' => [
+                $dontExpectCollection, $parentIsEntry, $fieldHandleDoesNotMatchTaxonomy, $isNested, $collectionDoesNotUseTaxonomy,
+            ],
+            'parent is not entry, handle matches taxonomy, nested field, collection doesnt use taxonomy' => [
+                $dontExpectCollection, $parentIsNotEntry, $fieldHandleMatchesTaxonomy, $isNested, $collectionDoesNotUseTaxonomy,
+            ],
+            'parent is not entry, handle does not match taxonomy, nested field, collection doesnt use taxonomy' => [
+                $dontExpectCollection, $parentIsNotEntry, $fieldHandleDoesNotMatchTaxonomy, $isNested, $collectionDoesNotUseTaxonomy,
+            ],
         ];
     }
 

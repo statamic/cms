@@ -48,7 +48,7 @@ return [
     'collections_default_publish_state_instructions' => 'Lors de la création de nouvelles entrées dans cette collection, l’indicateur de publication basculera par défaut sur **true** plutôt que sur **false** (brouillon).',
     'collections_future_date_behavior_instructions' => 'Conditions d’accès aux entrées datées dans le futur.',
     'collections_links_instructions' => 'Les entrées de cette collection peuvent contenir des liens (redirections) vers d’autres entrées ou URLs.',
-    'collections_mount_instructions' => 'Choisissez une entrée sur laquelle cette collection doit être montée. Apprenez-en plus dans la [documentation](https://statamic.dev/collections-and-entries#mounting).',
+    'collections_mount_instructions' => 'Choisissez une entrée sur laquelle cette collection doit être montée. Apprenez-en plus dans la [documentation](https://statamic.dev/collections#mounting).',
     'collections_orderable_instructions' => 'Activez le réordonnancement manuel par glisser-déposer.',
     'collections_past_date_behavior_instructions' => 'Conditions d’accès aux entrées datées ayant expiré.',
     'collections_preview_targets_instructions' => 'Les URLs qui seront visibles dans l’Aperçu en direct. Apprenez-en plus dans la [documentation](https://statamic.dev/live-preview#preview-targets).',

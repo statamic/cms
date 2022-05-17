@@ -168,16 +168,21 @@ class TaxonomyTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value, $taxonomy[$key]));
     }
 
-    /** @test */
-    public function it_gets_preview_targets()
+    /**
+     * @test
+     * @dataProvider additionalPreviewTargetProvider
+     */
+    public function it_gets_and_sets_preview_targets($throughFacade)
     {
-        $taxonomy = (new Taxonomy)->handle('test');
+        $taxonomy = (new Taxonomy)->handle('tags');
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->previewTargets());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->basePreviewTargets());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->additionalPreviewTargets());
 
         $this->assertEquals([
             ['label' => 'Term', 'format' => '{permalink}'],
-        ], $taxonomy->previewTargets()->all());
+        ], $taxonomy->basePreviewTargets()->all());
 
         $return = $taxonomy->previewTargets([
             ['label' => 'Foo', 'format' => '{foo}'],
@@ -190,5 +195,48 @@ class TaxonomyTest extends TestCase
             ['label' => 'Foo', 'format' => '{foo}'],
             ['label' => 'Bar', 'format' => '{bar}'],
         ], $taxonomy->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $taxonomy->basePreviewTargets()->all());
+
+        $this->assertEquals([], $taxonomy->additionalPreviewTargets()->all());
+
+        $extra = [
+            ['label' => 'Baz', 'format' => '{baz}'],
+            ['label' => 'Qux', 'format' => '{qux}'],
+        ];
+
+        if ($throughFacade) {
+            \Statamic\Facades\Taxonomy::addPreviewTargets('tags', $extra);
+        } else {
+            $taxonomy->addPreviewTargets($extra);
+        }
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Baz', 'format' => '{baz}'],
+            ['label' => 'Qux', 'format' => '{qux}'],
+        ], $taxonomy->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $taxonomy->basePreviewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Baz', 'format' => '{baz}'],
+            ['label' => 'Qux', 'format' => '{qux}'],
+        ], $taxonomy->additionalPreviewTargets()->all());
+    }
+
+    public function additionalPreviewTargetProvider()
+    {
+        return [
+            'through object' => [false],
+            'through facade' => [true],
+        ];
     }
 }

@@ -1742,9 +1742,9 @@ EOT;
     public function it_can_reach_into_the_cascade()
     {
         $cascade = $this->mock(Cascade::class, function ($m) {
-            $m->shouldReceive('get')->with('page')->once()->andReturn(['drink' => 'juice']);
-            $m->shouldReceive('get')->with('global')->once()->andReturn(['drink' => 'water']);
-            $m->shouldReceive('get')->with('menu')->once()->andReturn(['drink' => 'vodka']);
+            $m->shouldReceive('get')->with('page')->andReturn(['drink' => 'juice']);
+            $m->shouldReceive('get')->with('global')->andReturn(['drink' => 'water']);
+            $m->shouldReceive('get')->with('menu')->andReturn(['drink' => 'vodka']);
             $m->shouldNotReceive('get')->with('nested');
             $m->shouldNotReceive('get')->with('augmented');
         });

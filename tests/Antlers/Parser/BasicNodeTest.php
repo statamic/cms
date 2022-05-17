@@ -3,13 +3,19 @@
 namespace Tests\Antlers\Parser;
 
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
+use Statamic\View\Antlers\Language\Nodes\Constants\FalseConstant;
+use Statamic\View\Antlers\Language\Nodes\Constants\TrueConstant;
 use Statamic\View\Antlers\Language\Nodes\LiteralNode;
 use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\EqualCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalAndOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalOrOperator;
 use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Tests\Antlers\Fixtures\Addon\Tags\EchoMethod;
 use Tests\Antlers\ParserTestCase;
 
 class BasicNodeTest extends ParserTestCase
@@ -50,7 +56,7 @@ class BasicNodeTest extends ParserTestCase
 
     public function test_it_removes_tags_from_node_content()
     {
-        $nodes = $this->parseNodes('{{ meta_title["No Title Set"] param="Test" }}{{ /if }}');
+        $nodes = $this->parseNodes('{{ meta_title["No Title Set"] param="Test" }}');
         $this->assertSame(' meta_title["No Title Set"] ', $nodes[0]->getContent());
     }
 
@@ -209,5 +215,291 @@ EOT;
         $result = $this->renderString($template, ['subtitle' => 'test']);
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), $result);
+    }
+
+    public function test_nodes_with_length_five_do_not_skip_literals()
+    {
+        // Note: 5 is the number of characters the document retrieves at a time.
+        $template = '    {{a}} end';
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(3, $nodes);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[0]);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[1]);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
+
+        /** @var LiteralNode $firstLiteral */
+        $firstLiteral = $nodes[0];
+        $this->assertSame('    ', $firstLiteral->content);
+
+        /** @var AntlersNode $antlersNode */
+        $antlersNode = $nodes[1];
+        $this->assertSame('a', $antlersNode->content);
+
+        /** @var LiteralNode $secondLiteral */
+        $secondLiteral = $nodes[2];
+        $this->assertSame(' end', $secondLiteral->content);
+
+        $template = <<<'EOT'
+<one>{{ a = "A" b = "B" c = "C" d = "D" }}<two>
+{{a}}<three>{{b}}<four>{{c}}<five>{{d}}<six>
+EOT;
+
+        $expected = <<<'EOT'
+<one><two>
+A<three>B<four>C<five>D<six>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template)));
+
+        EchoMethod::register();
+
+        // All together now.
+        $data = [
+            'a' => 'A',
+            'b' => 'B',
+            'c' => 'C',
+            'd' => 'D',
+            'e' => 'E',
+            'g' => 'G',
+            'url' => 'https://en.wikipedia.org/wiki/Count_von_Count',
+            'method' => 'some_method',
+            'title' => 'The Title',
+            'articles' => [
+                ['title' => 'one'],
+                ['title' => 'two'],
+                ['title' => 'three'],
+            ],
+        ];
+
+        // The missing "F" in the output is not an accident.
+        $template = <<<'EOT'
+<one>     {{ title }}<two>{{a}}<three>
+{{echo_method:{{a}}}}<four>{{ echo_method:{{method}}  }}|abc {{b}}{{c}}
+{{a}}-{{b}}-{{c}}-{{d}}-{{e}}-{{method}}
+{{ articles }}<{{title}}>{{ /articles }}
+{{ echo_method:parameter param="{{a}}{{b}}{{c}}{{d}}{{e}}{{f}}{{g}}--just-to-be-sure--{ echo_method:parameter param="{{a}}{{b}}{{c}}{{d}}{{e}}{{f}}{{g}}" }--after" }}<five>{{ articles}}<six>
+<title:{{ title }}>{{ echo_method:{{title}}}}{{a}}
+     {{ /articles }}<seven>{{ url }}{{ title }}
+Just to test ASCII stuff within this madness.{{ my_counter = 0; }}
+{{ articles }}{{ my_counter += 1; }}
+<{{my_counter}}:{{ another_var = 'aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz' + '<{title}>'; another_var }}>
+{{ /articles }}
+{{ a = "a"; b = "b"; c = "c"; d = "d";
+   e = "e"; f = "f"; g = "g"; h = "h";
+   i = "i"; j = "j"; k = "k"; l = "l";
+   m = "m"; n = "n"; o = "o"; p = "p";
+   q = "q"; r = "r"; s = "s"; t = "t";
+   u = "u"; v = "v"; w = "w"; x = "x";
+   y = "y"; z = "z";
+   
+   A = "A"; B = "B"; C = "C"; D = "D";
+   E = "E"; F = "F"; G = "G"; H = "H";
+   I = "I"; J = "J"; K = "K"; L = "L";
+   M = "M"; N = "N"; O = "O"; P = "P";
+   Q = "Q"; R = "R"; S = "S"; T = "T";
+   U = "U"; V = "V"; W = "W"; X = "X";
+   Y = "Y"; Z = "Z";
+}}
+{{# Comments {{articles}}{{ title }}{{ /articles}} #}}
+{{ echo_method:parameter param="{a}{b}{c}{d}{e}{f}{g}{h}{i}{j}{k}{l}{m}{n}{o}{p}{q}{r}{s}{t}{u}{v}{w}{x}{y}{z}" }}
+{{ echo_method:parameter param="{A}{B}{C}{D}{E}{F}{G}{H}{I}{J}{K}{L}{M}{N}{O}{P}{Q}{R}{S}{T}{U}{V}{W}{X}{Y}{Z}" }}
+{{ result = '🥳🥳' }}-{{a}}-{{b}}-{{c}}{{ result }} <end>
+
+<start-noparse>
+{{ noparse }}
+<one>     {{ title }}<two>{{a}}<three>
+{{echo_method:{{a}}}}<four>{{ echo_method:{{method}}  }}|abc {{b}}{{c}}
+{{a}}-{{b}}-{{c}}-{{d}}-{{e}}-{{method}}
+{{ articles }}<{{title}}>{{ /articles }}
+{{ echo_method:parameter param="{{a}}{{b}}{{c}}{{d}}{{e}}{{f}}{{g}}--just-to-be-sure--{ echo_method:parameter param="{{a}}{{b}}{{c}}{{d}}{{e}}{{f}}{{g}}" }--after" }}<five>{{ articles}}<six>
+<title:{{ title }}>{{ echo_method:{{title}}}}{{a}}
+     {{ /articles }}<seven>{{ url }}{{ title }}
+Just to test ASCII stuff within this madness.{{ my_counter = 0; }}
+{{ articles }}{{ my_counter += 1; }}
+<{{my_counter}}:{{ another_var = 'aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz' + '<{title}>'; another_var }}>
+{{ /articles }}
+{{ a = "a"; b = "b"; c = "c"; d = "d";
+   e = "e"; f = "f"; g = "g"; h = "h";
+   i = "i"; j = "j"; k = "k"; l = "l";
+   m = "m"; n = "n"; o = "o"; p = "p";
+   q = "q"; r = "r"; s = "s"; t = "t";
+   u = "u"; v = "v"; w = "w"; x = "x";
+   y = "y"; z = "z";
+   
+   A = "A"; B = "B"; C = "C"; D = "D";
+   E = "E"; F = "F"; G = "G"; H = "H";
+   I = "I"; J = "J"; K = "K"; L = "L";
+   M = "M"; N = "N"; O = "O"; P = "P";
+   Q = "Q"; R = "R"; S = "S"; T = "T";
+   U = "U"; V = "V"; W = "W"; X = "X";
+   Y = "Y"; Z = "Z";
+}}
+{{# Comments {{articles}}{{ title }}{{ /articles}} #}}
+{{ echo_method:parameter param="{a}{b}{c}{d}{e}{f}{g}{h}{i}{j}{k}{l}{m}{n}{o}{p}{q}{r}{s}{t}{u}{v}{w}{x}{y}{z}" }}
+{{ echo_method:parameter param="{A}{B}{C}{D}{E}{F}{G}{H}{I}{J}{K}{L}{M}{N}{O}{P}{Q}{R}{S}{T}{U}{V}{W}{X}{Y}{Z}" }}
+{{ result = '🥳🥳' }}-{{a}}-{{b}}-{{c}}{{ result }} <end>
+{{ /noparse }}
+<end-noparse>
+
+and again
+{{# Rest values to initial. #}}
+{{ a = 'A' b = 'B' c = 'C' d = 'D' e = 'E' f = null g = 'G' }}
+<one>     {{ title }}<two>{{a}}<three>
+{{echo_method:{{a}}}}<four>{{ echo_method:{{method}}  }}|abc {{b}}{{c}}
+{{a}}-{{b}}-{{c}}-{{d}}-{{e}}-{{method}}
+{{ articles }}<{{title}}>{{ /articles }}
+{{ echo_method:parameter param="{{a}}{{b}}{{c}}{{d}}{{e}}{{f}}{{g}}--just-to-be-sure--{ echo_method:parameter param="{{a}}{{b}}{{c}}{{d}}{{e}}{{f}}{{g}}" }--after" }}<five>{{ articles}}<six>
+<title:{{ title }}>{{ echo_method:{{title}}}}{{a}}
+     {{ /articles }}<seven>{{ url }}{{ title }}
+Just to test ASCII stuff within this madness.{{ my_counter = 0; }}
+{{ articles }}{{ my_counter += 1; }}
+<{{my_counter}}:{{ another_var = 'aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz' + '<{title}>'; another_var }}>
+{{ /articles }}
+{{ a = "a"; b = "b"; c = "c"; d = "d";
+   e = "e"; f = "f"; g = "g"; h = "h";
+   i = "i"; j = "j"; k = "k"; l = "l";
+   m = "m"; n = "n"; o = "o"; p = "p";
+   q = "q"; r = "r"; s = "s"; t = "t";
+   u = "u"; v = "v"; w = "w"; x = "x";
+   y = "y"; z = "z";
+   
+   A = "A"; B = "B"; C = "C"; D = "D";
+   E = "E"; F = "F"; G = "G"; H = "H";
+   I = "I"; J = "J"; K = "K"; L = "L";
+   M = "M"; N = "N"; O = "O"; P = "P";
+   Q = "Q"; R = "R"; S = "S"; T = "T";
+   U = "U"; V = "V"; W = "W"; X = "X";
+   Y = "Y"; Z = "Z";
+}}
+{{# Comments {{articles}}{{ title }}{{ /articles}} #}}
+{{ echo_method:parameter param="{a}{b}{c}{d}{e}{f}{g}{h}{i}{j}{k}{l}{m}{n}{o}{p}{q}{r}{s}{t}{u}{v}{w}{x}{y}{z}" }}
+{{ echo_method:parameter param="{A}{B}{C}{D}{E}{F}{G}{H}{I}{J}{K}{L}{M}{N}{O}{P}{Q}{R}{S}{T}{U}{V}{W}{X}{Y}{Z}" }}
+{{ result = '🥳🥳' }}-{{a}}-{{b}}-{{c}}{{ result }} <end>{{noparse}}{{a}}{{/noparse}}<the-end>
+EOT;
+
+        $expected = <<<'EOT'
+<one>     The Title<two>A<three>
+A<four>some_method|abc BC
+A-B-C-D-E-some_method
+<one><two><three>
+ABCDEG--just-to-be-sure--ABCDEG--after<five><six>
+<title:one>oneA
+     <six>
+<title:two>twoA
+     <six>
+<title:three>threeA
+     <seven>https://en.wikipedia.org/wiki/Count_von_CountThe Title
+Just to test ASCII stuff within this madness.
+
+<1:aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz<one>>
+
+<2:aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz<two>>
+
+<3:aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz<three>>
+
+
+
+abcdefghijklmnopqrstuvwxyz
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+-a-b-c🥳🥳 <end>
+
+<start-noparse>
+
+<one>     {{ title }}<two>{{a}}<three>
+{{echo_method:{{a}}}}<four>{{ echo_method:{{method}}  }}|abc {{b}}{{c}}
+{{a}}-{{b}}-{{c}}-{{d}}-{{e}}-{{method}}
+{{ articles }}<{{title}}>{{ /articles }}
+{{ echo_method:parameter param="{{a}}{{b}}{{c}}{{d}}{{e}}{{f}}{{g}}--just-to-be-sure--{ echo_method:parameter param="{{a}}{{b}}{{c}}{{d}}{{e}}{{f}}{{g}}" }--after" }}<five>{{ articles}}<six>
+<title:{{ title }}>{{ echo_method:{{title}}}}{{a}}
+     {{ /articles }}<seven>{{ url }}{{ title }}
+Just to test ASCII stuff within this madness.{{ my_counter = 0; }}
+{{ articles }}{{ my_counter += 1; }}
+<{{my_counter}}:{{ another_var = 'aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz' + '<{title}>'; another_var }}>
+{{ /articles }}
+{{ a = "a"; b = "b"; c = "c"; d = "d";
+   e = "e"; f = "f"; g = "g"; h = "h";
+   i = "i"; j = "j"; k = "k"; l = "l";
+   m = "m"; n = "n"; o = "o"; p = "p";
+   q = "q"; r = "r"; s = "s"; t = "t";
+   u = "u"; v = "v"; w = "w"; x = "x";
+   y = "y"; z = "z";
+   
+   A = "A"; B = "B"; C = "C"; D = "D";
+   E = "E"; F = "F"; G = "G"; H = "H";
+   I = "I"; J = "J"; K = "K"; L = "L";
+   M = "M"; N = "N"; O = "O"; P = "P";
+   Q = "Q"; R = "R"; S = "S"; T = "T";
+   U = "U"; V = "V"; W = "W"; X = "X";
+   Y = "Y"; Z = "Z";
+}}
+{{# Comments {{articles}}{{ title }}{{ /articles}} #}}
+{{ echo_method:parameter param="{a}{b}{c}{d}{e}{f}{g}{h}{i}{j}{k}{l}{m}{n}{o}{p}{q}{r}{s}{t}{u}{v}{w}{x}{y}{z}" }}
+{{ echo_method:parameter param="{A}{B}{C}{D}{E}{F}{G}{H}{I}{J}{K}{L}{M}{N}{O}{P}{Q}{R}{S}{T}{U}{V}{W}{X}{Y}{Z}" }}
+{{ result = '🥳🥳' }}-{{a}}-{{b}}-{{c}}{{ result }} <end>
+
+<end-noparse>
+
+and again
+
+
+<one>     The Title<two>A<three>
+A<four>some_method|abc BC
+A-B-C-D-E-some_method
+<one><two><three>
+ABCDEG--just-to-be-sure--ABCDEG--after<five><six>
+<title:one>oneA
+     <six>
+<title:two>twoA
+     <six>
+<title:three>threeA
+     <seven>https://en.wikipedia.org/wiki/Count_von_CountThe Title
+Just to test ASCII stuff within this madness.
+
+<1:aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz<one>>
+
+<2:aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz<two>>
+
+<3:aaa ’“”•–—˜™š›œ žŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿzzz<three>>
+
+
+
+abcdefghijklmnopqrstuvwxyz
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+-a-b-c🥳🥳 <end>{{a}}<the-end>
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
+
+    public function test_uppercase_logical_keywords_are_parsed_into_keywords_and_not_variables()
+    {
+        $nodes = $this->getParsedRuntimeNodes('{{ TrUe AND FALSE oR something }}');
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(SemanticGroup::class, $nodes[0]);
+
+        /** @var SemanticGroup $semanticGroupWrapper */
+        $semanticGroupWrapper = $nodes[0];
+        $this->assertCount(1, $semanticGroupWrapper->nodes);
+        $this->assertInstanceOf(LogicGroup::class, $semanticGroupWrapper->nodes[0]);
+
+        /** @var LogicGroup $logicWrapper */
+        $logicWrapper = $semanticGroupWrapper->nodes[0];
+        $this->assertCount(3, $logicWrapper->nodes);
+
+        $this->assertInstanceOf(LogicGroup::class, $logicWrapper->nodes[0]);
+        $this->assertInstanceOf(LogicalOrOperator::class, $logicWrapper->nodes[1]);
+        $this->assertInstanceOf(VariableNode::class, $logicWrapper->nodes[2]);
+
+        /** @var LogicGroup $innerGroup */
+        $innerGroup = $logicWrapper->nodes[0];
+        $this->assertCount(3, $innerGroup->nodes);
+        $this->assertInstanceOf(TrueConstant::class, $innerGroup->nodes[0]);
+        $this->assertInstanceOf(LogicalAndOperator::class, $innerGroup->nodes[1]);
+        $this->assertInstanceOf(FalseConstant::class, $innerGroup->nodes[2]);
+
+        /** @var VariableNode $var */
+        $var = $logicWrapper->nodes[2];
+        $this->assertSame('something', $var->name);
     }
 }

@@ -9,6 +9,7 @@ use Statamic\Entries\Entry;
 use Statamic\Fields\Value;
 use Statamic\Globals\Variables;
 use Statamic\Sites\Site;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
 class RuntimeValueCache
 {
@@ -51,19 +52,28 @@ class RuntimeValueCache
         return serialize($value);
     }
 
+    public static function resolveWithRuntimeIsolation($augmentable)
+    {
+        GlobalRuntimeState::$requiresRuntimeIsolation = true;
+        $value = $augmentable->toAugmentedArray();
+        GlobalRuntimeState::$requiresRuntimeIsolation = false;
+
+        return $value;
+    }
+
     public static function getAugmentableValue(Augmentable $augmentable)
     {
         $augmentKey = self::getAugmentableKey($augmentable);
 
         if ($augmentKey != null) {
             if (! array_key_exists($augmentKey, self::$runtimeValueCache)) {
-                self::$runtimeValueCache[$augmentKey] = $augmentable->toAugmentedArray();
+                self::$runtimeValueCache[$augmentKey] = self::resolveWithRuntimeIsolation($augmentable);
             }
 
             return self::$runtimeValueCache[$augmentKey];
         }
 
-        return $augmentable->toAugmentedArray();
+        return self::resolveWithRuntimeIsolation($augmentable);
     }
 
     public static function getValue(Value $value)
