@@ -113,7 +113,7 @@ class Augmentor
         static::$extensions[$name] = $extension;
     }
 
-    public function replaceExtension($search, $replacement)
+    public static function replaceExtension($search, $replacement)
     {
         static::$replaceExtensions[$search] = $replacement;
     }
