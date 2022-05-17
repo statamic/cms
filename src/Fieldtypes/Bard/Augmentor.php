@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
+use Illuminate\Support\Arr as SupportArr;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
@@ -172,6 +173,8 @@ class Augmentor
         foreach (self::$replaceExtensions as $name => $replacement) {
             self::$extensions[$name] = $replacement;
         }
+
+        Arr::removeNullValues(self::$extensions);
         
         return self::$extensions;
     }
