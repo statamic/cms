@@ -177,5 +177,4 @@ class Augmentor
 
         return self::$extensions;
     }
-
 }
