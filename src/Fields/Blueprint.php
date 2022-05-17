@@ -106,7 +106,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     public function path()
     {
         $path = Facades\Blueprint::path(ltrim(vsprintf('%s/%s', [
-            $this->namespace(),
+            str_replace('.', '/', (string) $this->namespace()),
             $this->handle(),
         ]), '/'));
 
