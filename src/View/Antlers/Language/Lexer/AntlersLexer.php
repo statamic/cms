@@ -668,7 +668,7 @@ class AntlersLexer
                 // -
                 if ($this->isParsingModifierName == false && $this->cur == DocumentParser::Punctuation_Minus) {
                     if (ctype_digit($this->next) && (
-                            ctype_digit($this->prev) == false &&
+                            ctype_digit((string) $this->prev) == false &&
                             $this->prev != DocumentParser::RightParent) && $this->isRightOfInterpolationRegion() == false) {
                         $this->currentContent[] = $this->cur;
                         continue;
