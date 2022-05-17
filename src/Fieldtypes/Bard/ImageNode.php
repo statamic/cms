@@ -2,10 +2,10 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Tiptap\Core\Node;
-use Tiptap\Utils\HTML;
 use Statamic\Facades\Asset;
 use Statamic\Support\Str;
+use Tiptap\Core\Node;
+use Tiptap\Utils\HTML;
 
 class ImageNode extends Node
 {
@@ -33,7 +33,7 @@ class ImageNode extends Node
             'src' => [
                 'renderHTML' => function ($attributes) {
                     $src = $attributes->src;
-                    if (!isset($src)) {
+                    if (! isset($src)) {
                         return null;
                     }
 
