@@ -372,9 +372,8 @@ class NodeProcessor
      * Updates the current scope with any new variable assignments.
      *
      * @param  array  $assignments  The assignments.
-     * @param  array  $lockData
      */
-    private function processAssignments($assignments, &$lockData = null)
+    private function processAssignments($assignments)
     {
         $this->clearInterpolationCache();
 
@@ -382,11 +381,6 @@ class NodeProcessor
             if (array_key_exists($path, $this->previousAssignments) == false) {
                 $this->previousAssignments[$path] = count($this->data) - 1;
                 Arr::set($this->data[count($this->data) - 1], $path, $value);
-
-                if ($lockData != null) {
-                    $this->previousAssignments[$path] = count($lockData) - 1;
-                    Arr::set($lockData[count($lockData) - 1], $path, $value);
-                }
             } else {
                 $start = $this->previousAssignments[$path];
 
@@ -398,12 +392,6 @@ class NodeProcessor
                     $targetIndex = count($this->data) - 1;
                     Arr::set($this->data[$targetIndex], $path, $value);
                     $this->previousAssignments[$path] = $targetIndex;
-                }
-
-                if ($lockData != null) {
-                    for ($i = $start; $i < count($lockData); $i++) {
-                        Arr::set($lockData[$i], $path, $value);
-                    }
                 }
             }
         }
@@ -793,6 +781,8 @@ class NodeProcessor
     {
         $processor = new NodeProcessor($this->loader, $this->envDetails);
         $processor->allowPhp($this->allowPhp);
+        $processor->setRuntimeAssignments($this->runtimeAssignments);
+
         if ($this->antlersParser != null) {
             $processor->setAntlersParserInstance($this->antlersParser);
         }
@@ -1243,12 +1233,13 @@ class NodeProcessor
                                 $childDataToUse = $depths + $childData;
 
                                 if (! empty($recursiveParent->parameters)) {
+                                    $lockData = $this->data;
                                     foreach ($recursiveParent->parameters as $param) {
                                         if (ModifierManager::isModifier($param)) {
                                             $childDataToUse = $this->runModifier($param->name, $parentParameterValues, $childDataToUse, $rootData);
                                         }
                                     }
-
+                                    $this->data = $lockData;
                                     $childDataToUse = $childDataToUse + $rootData;
                                 } else {
                                     $childDataToUse = $childDataToUse + $rootData;
@@ -1386,7 +1377,15 @@ class NodeProcessor
                             $methodToCall = 'index';
                         }
 
+                        $beforeAssignments = $this->runtimeAssignments;
                         $output = call_user_func([$tag, $methodToCall]);
+                        $afterAssignments = $this->runtimeAssignments;
+
+                        foreach ($afterAssignments as $assignedVar => $val) {
+                            if (! array_key_exists($assignedVar, $beforeAssignments)) {
+                                unset($this->runtimeAssignments[$assignedVar]);
+                            }
+                        }
 
                         // While the PathDataManager can resolve builder instances,
                         // we will handle this case here so that the values can
@@ -1844,6 +1843,7 @@ class NodeProcessor
                         if (! $shouldProcessAsTag && $val !== null) {
                             foreach ($node->parameters as $param) {
                                 if (ModifierManager::isModifier($param)) {
+                                    $lockData = $this->data;
                                     $activeData = $this->getActiveData();
                                     $paramValues = [];
 
@@ -1851,6 +1851,7 @@ class NodeProcessor
                                         $varValue = $node->getSingleParameterValue($param, $this, $activeData);
 
                                         if ($varValue == 'void::'.GlobalRuntimeState::$environmentId) {
+                                            $this->data = $lockData;
                                             continue;
                                         }
 
@@ -1919,6 +1920,7 @@ class NodeProcessor
                                     $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
 
                                     if ($val === null) {
+                                        $this->data = $lockData;
                                         break;
                                     }
                                 } else {
@@ -1939,6 +1941,8 @@ class NodeProcessor
                                         throw new ModifierNotFoundException($param->name);
                                     }
                                 }
+
+                                $this->data = $lockData;
                             }
 
                             if ($val instanceof Collection) {
@@ -2023,7 +2027,7 @@ class NodeProcessor
                                     $processor->allowPhp($this->allowPhp);
                                     $processor->cascade($this->cascade);
                                     $processor->setAntlersParserInstance($this->antlersParser);
-                                    $processor->setRuntimeAssignments($this->runtimeAssignments, $this->previousAssignments);
+                                    $processor->setRuntimeAssignments($this->runtimeAssignments);
 
                                     if ($this->runtimeConfiguration != null) {
                                         $processor->setRuntimeConfiguration($this->runtimeConfiguration);
@@ -2075,7 +2079,7 @@ class NodeProcessor
                                         }
                                     }
 
-                                    $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
+                                    $this->processAssignments($runtimeAssignmentsToProcess);
                                     $lockData = $this->data;
 
                                     $buffer .= $this->measureBufferAppend($node, $loopBuffer);
@@ -2100,7 +2104,9 @@ class NodeProcessor
 
                         foreach ($node->parameters as $param) {
                             if (ModifierManager::isModifier($param)) {
+                                $lockData = $this->data;
                                 $val = $this->runModifier($param->name, array_values($node->getParameterValues($this, $curActiveData)), $val, $this->getActiveData());
+                                $this->data = $lockData;
                             }
                         }
                     }

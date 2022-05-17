@@ -74,6 +74,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
                 Route::post('preview', 'EntryPreviewController@edit')->name('collections.entries.preview.edit');
                 Route::get('preview', 'EntryPreviewController@show')->name('collections.entries.preview.popout');
                 Route::patch('/', 'EntriesController@update')->name('collections.entries.update');
+                Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
             });
         });
     });
