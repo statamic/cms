@@ -170,7 +170,7 @@ export default {
             }, 1);
         },
 
-         toggleCollapsedState() {
+        toggleCollapsedState() {
             if (this.collapsed) {
                 this.expand();
             } else {
