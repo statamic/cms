@@ -2,21 +2,19 @@
 
     <div>
         <template v-if="isToggleMode">
-            <label class="block pb-1">{{ config.display }}</label>
             <div class="toggle-fieldtype-wrapper">
                 <toggle-input :value="isRevealed" @input="update" :read-only="isReadOnly" />
-                <label v-if="config.inline_label" class="ml-1 font-normal">{{ config.inline_label }}</label>
+                <label v-if="config.input_label" class="ml-1 font-normal">{{ config.input_label }}</label>
             </div>
         </template>
 
         <template v-else>
             <button
-                v-if="! isRevealed"
                 @click="reveal"
                 class="btn"
                 :disabled="isReadOnly"
                 :v-tooltip="config.instructions"
-                v-text="config.display" />
+                v-text="config.input_label || __('Show Fields')" />
         </template>
     </div>
 
