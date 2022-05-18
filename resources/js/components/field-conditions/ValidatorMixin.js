@@ -1,4 +1,5 @@
 import Validator from './Validator.js';
+import { data_get } from  '../../bootstrap/globals.js'
 
 export default {
     inject: {
