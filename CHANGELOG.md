@@ -1,5 +1,21 @@
 # Release Notes
 
+## 3.3.12 (2022-05-18)
+
+### What's improved
+
+- Add `toggle` mode to revealer fieldtype. [#6052](http://github.com/statamic/cms/issues/6052) by @jesseleite
+- Allow eloquent query builder to accept page parameters. [#6056](http://github.com/statamic/cms/issues/6056) by @ryanmitchell
+- Clean up deprecations. [#6014](http://github.com/statamic/cms/issues/6014) by @jasonvarga
+- Expect the `RevisionContract` inside WorkingCopy. [#6017](http://github.com/statamic/cms/issues/6017) by @jonassiewertsen
+- Disable SSL certificate verification locally for `static:warm` command. [#6028](http://github.com/statamic/cms/issues/6028) by @FrittenKeeZ
+
+### What's fixed
+
+- Fix for revealers nested within grids with `mode: stacked` enabled. [#6047](http://github.com/statamic/cms/issues/6047) by @jesseleite
+- Fix file uploads in front end form submissions. [#6061](http://github.com/statamic/cms/issues/6061) by @jesseleite
+
+
 ## 3.3.11 (2022-05-10)
 
 ### What's improved
