@@ -10,7 +10,7 @@
 
         <template v-else>
             <button
-                @click="reveal"
+                @click="buttonReveal"
                 class="btn"
                 :disabled="isReadOnly"
                 :v-tooltip="config.instructions"
@@ -35,20 +35,32 @@ export default {
             return data_get(this.config, 'mode') === 'toggle';
         },
 
+        fieldPath() {
+            return this.fieldPathPrefix || this.handle;
+        },
+
     },
 
     inject: ['storeName'],
 
     mounted() {
-        this.$store.commit(`publish/${this.storeName}/setRevealerFields`, this.fieldPathPrefix || this.handle);
+        this.$store.commit(`publish/${this.storeName}/setRevealerFields`, this.fieldPath);
     },
 
     methods: {
 
-        reveal() {
-            if (! this.isReadOnly) {
-                this.update(true)
+        buttonReveal() {
+            if (this.isReadOnly) {
+                return;
             }
+
+            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                dottedKey: this.fieldPath,
+                hidden: 'force',
+                omitValue: true,
+            });
+
+            this.update(true)
         }
 
     }
