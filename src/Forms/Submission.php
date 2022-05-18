@@ -111,8 +111,8 @@ class Submission implements SubmissionContract, Augmentable
      */
     public function uploadFiles($uploadedFiles)
     {
-        return collect($uploadedFiles)->map(function ($config, $handle) {
-            return AssetsUploader::field($config)->upload(request()->file($handle));
+        return collect($uploadedFiles)->map(function ($files, $handle) {
+            return AssetsUploader::field($this->fields()->get($handle))->upload($files);
         })->all();
     }
 
