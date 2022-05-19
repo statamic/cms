@@ -14,6 +14,7 @@ class Uploader
 {
     private $asset;
     private $files;
+    private $glideTmpPath;
 
     /**
      * Instantiate asset uploader.
@@ -24,6 +25,7 @@ class Uploader
     {
         $this->asset = $asset;
         $this->files = app(Filesystem::class);
+        $this->glideTmpPath = storage_path('statamic/glide/tmp');
     }
 
     /**
@@ -137,16 +139,6 @@ class Uploader
     }
 
     /**
-     * Get temporary glide cache path in storage for processing uploads.
-     *
-     * @return string
-     */
-    private function glideTmpPath()
-    {
-        return storage_path('statamic/glide/tmp');
-    }
-
-    /**
      * Process UploadedFile instance using glide and return cached path.
      *
      * @param  UploadedFile  $file
@@ -155,18 +147,16 @@ class Uploader
      */
     private function glideProcessUploadedFile(UploadedFile $file, $params)
     {
-        $glideTmpPath = $this->glideTmpPath();
-
         $server = ServerFactory::create([
             'source' => $file->getPath(),
-            'cache' => $glideTmpPath,
+            'cache' => $this->glideTmpPath,
             'driver' => config('statamic.assets.image_manipulation.driver'),
             // 'cache_with_file_extensions' => true, // TODO: What is this doing?
         ]);
 
         $server->makeImage($file->getFilename(), $params);
 
-        $newFilePath = collect($this->files->files($glideTmpPath.'/'.$file->getFilename()))
+        $newFilePath = collect($this->files->files($this->glideTmpPath.'/'.$file->getFilename()))
             ->first()
             ->getRealPath();
 
@@ -178,10 +168,8 @@ class Uploader
      */
     private function glideClearTmpCache()
     {
-        $glideTmpPath = $this->glideTmpPath();
-
-        if ($this->files->exists($glideTmpPath)) {
-            $this->files->deleteDirectory($glideTmpPath);
+        if ($this->files->exists($this->glideTmpPath)) {
+            $this->files->deleteDirectory($this->glideTmpPath);
         }
     }
 }

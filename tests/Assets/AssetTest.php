@@ -1006,6 +1006,7 @@ class AssetTest extends TestCase
         $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 20, 30));
 
         $this->assertEquals($asset, $return);
+        $this->assertDirectoryNotExists(storage_path('statamic/glide/tmp'));
         Storage::disk('test')->assertExists('path/to/asset.jpg');
         $this->assertEquals('path/to/asset.jpg', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
@@ -1036,6 +1037,7 @@ class AssetTest extends TestCase
         $return = $asset->upload(UploadedFile::fake()->create('readme.md'));
 
         $this->assertEquals($asset, $return);
+        $this->assertDirectoryNotExists(storage_path('statamic/glide/tmp'));
         Storage::disk('test')->assertExists('path/to/readme.md');
         $this->assertEquals('path/to/readme.md', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
