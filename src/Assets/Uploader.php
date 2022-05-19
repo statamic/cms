@@ -154,7 +154,11 @@ class Uploader
             // 'cache_with_file_extensions' => true, // TODO: What is this doing?
         ]);
 
-        $server->makeImage($file->getFilename(), $params);
+        try {
+            $server->makeImage($file->getFilename(), $params);
+        } catch (\Exception $exception) {
+            return $file->getRealPath();
+        }
 
         $newFilePath = collect($this->files->files($this->glideTmpPath.'/'.$file->getFilename()))
             ->first()
