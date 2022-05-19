@@ -4,6 +4,7 @@ namespace Statamic\Assets;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
+use League\Glide\ServerFactory;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Stringy\Stringy;
@@ -156,7 +157,7 @@ class Uploader
     {
         $glideTmpPath = $this->glideTmpPath();
 
-        $server = \League\Glide\ServerFactory::create([
+        $server = ServerFactory::create([
             'source' => $file->getPath(),
             'cache' => $glideTmpPath,
             'driver' => config('statamic.assets.image_manipulation.driver'),
