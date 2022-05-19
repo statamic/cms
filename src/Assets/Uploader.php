@@ -160,7 +160,7 @@ class Uploader
             'source' => $file->getPath(),
             'cache' => $glideTmpPath,
             'driver' => config('statamic.assets.image_manipulation.driver'),
-            'cache_with_file_extensions' => true,
+            // 'cache_with_file_extensions' => true, // TODO: What is this doing?
         ]);
 
         $server->makeImage($file->getFilename(), $params);
