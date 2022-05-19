@@ -152,6 +152,7 @@ class Uploader
             'cache' => $this->glideTmpPath,
             'driver' => config('statamic.assets.image_manipulation.driver'),
             // 'cache_with_file_extensions' => true, // TODO: What is this doing?
+            'watermarks' => public_path(),
         ]);
 
         try {
