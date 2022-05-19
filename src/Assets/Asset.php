@@ -933,6 +933,8 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $server = \League\Glide\ServerFactory::create([
             'source' => $file->getPath(),
             'cache' => $glideTmpPath,
+            'driver' => config('statamic.assets.image_manipulation.driver'),
+            'cache_with_file_extensions' => true,
         ]);
 
         $server->makeImage($file->getFilename(), $params);
