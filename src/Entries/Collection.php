@@ -734,7 +734,14 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     private function defaultPreviewTargets()
     {
-        return [['label' => 'Entry', 'format' => '{permalink}']];
+        return [
+            [
+                'label' => 'Entry',
+                'format' => '{permalink}',
+                'use_post_message' => false,
+                'post_message_data' => 'live-preview-update',
+            ],
+        ];
     }
 
     private function previewTargetsForFile()
@@ -753,6 +760,8 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             return [
                 'label' => $target['label'],
                 'url' => $target['format'],
+                'use_post_message' => $target['use_post_message'],
+                'post_message_data' => $target['post_message_data'] ?? 'live-preview-update',
             ];
         })->filter()->values()->all();
     }

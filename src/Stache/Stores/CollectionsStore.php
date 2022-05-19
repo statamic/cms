@@ -117,6 +117,8 @@ class CollectionsStore extends BasicStore
             return [
                 'format' => $target['url'],
                 'label' => $target['label'],
+                'use_post_message' => $target['use_post_message'],
+                'post_message_data' => $target['post_message_data'],
             ];
         })->all();
     }

@@ -1,6 +1,6 @@
 export default {
     methods: {
-        updateIframeContents(url) {
+        updateIframeContents(url, target) {
             const iframe = document.createElement('iframe');
             iframe.setAttribute('frameborder', '0');
             iframe.setAttribute('src', url);
@@ -18,10 +18,16 @@ export default {
 
                 const iFrameSourceIsEqual = existingIFrameSource.toString() === newIFrameSource.toString();
 
-                if (this.$config.get('livePreview.post_message_data') && iFrameSourceIsEqual) {
+                if (target?.use_post_message && iFrameSourceIsEqual) {
+                    let postMessageData = target.post_message_data;
+                    try {
+                        postMessageData = JSON.parse(target.post_message_data);
+                    } catch(e) {}
+
                     const targetOrigin = /^https?:\/\//.test(url) ? (new URL(url))?.origin : window.origin;
+
                     container.firstChild.contentWindow.postMessage(
-                        this.$config.get('livePreview.post_message_data'),
+                        postMessageData,
                         targetOrigin
                     );
                 } else {

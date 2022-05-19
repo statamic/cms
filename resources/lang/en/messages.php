@@ -52,6 +52,8 @@ return [
     'collections_orderable_instructions' => 'Enable manual ordering via drag & drop.',
     'collections_past_date_behavior_instructions' => 'How past dated entries should behave.',
     'collections_preview_targets_instructions' => 'The URLs to be viewable within Live Preview. Learn more in the [documentation](https://statamic.dev/live-preview#preview-targets).',
+    'collections_use_post_message_instructions' => 'Post a message to the iFrame instead of hard reloading the page.',
+    'collections_post_message_data_instructions' => 'Enter a string or JSON data to be sent to the iFrame.',
     'collections_route_instructions' => 'The route controls entries URL pattern. Learn more in the [documentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'The default sort direction.',
     'collections_taxonomies_instructions' => 'Connect entries in this collection to taxonomies. Fields will be automatically added to publish forms.',

@@ -238,9 +238,10 @@ export default {
             this.$axios.post(this.tokenizedUrl, this.payload, { cancelToken: source.token }).then(response => {
                 this.token = response.data.token;
                 const url = response.data.url;
+                const target = this.targets[this.target];
                 this.poppedOut
-                    ? this.channel.postMessage({ event: 'updated', url })
-                    : this.updateIframeContents(url);
+                    ? this.channel.postMessage({ event: 'updated', url, target })
+                    : this.updateIframeContents(url, target);
                 this.loading = false;
             }).catch(e => {
                 if (this.$axios.isCancel(e)) return;
