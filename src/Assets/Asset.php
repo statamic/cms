@@ -31,7 +31,6 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
@@ -680,23 +679,12 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function upload(UploadedFile $file)
     {
-        $path = $this->getSafeUploadPath($file);
+        $path = Uploader::asset($this)->upload($file);
 
-        $glide = $this->container()->glide();
-
-        $sourcePath = $glide
-            ? $this->glideProcessUploadedFile($file, $glide)
-            : $file->getRealPath();
-
-        $this->putFileOnDisk($sourcePath, $path);
-
-        if ($glide) {
-            $this->glideClearTmpCache();
-        }
-
-        $this->path($path)->syncOriginal();
-
-        $this->save();
+        $this
+            ->path($path)
+            ->syncOriginal()
+            ->save();
 
         AssetUploaded::dispatch($this);
 
@@ -843,122 +831,5 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
-    }
-
-    /**
-     * Get safe upload path for UploadedFile.
-     *
-     * @param  UploadedFile  $file
-     * @return string
-     */
-    private function getSafeUploadPath(UploadedFile $file)
-    {
-        $ext = $file->getClientOriginalExtension();
-        $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-
-        $directory = $this->folder();
-        $directory = ($directory === '.') ? '/' : $directory;
-        $path = Path::tidy($directory.'/'.$filename.'.'.$ext);
-        $path = ltrim($path, '/');
-
-        // If the file exists, we'll append a timestamp to prevent overwriting.
-        if ($this->disk()->exists($path)) {
-            $basename = $filename.'-'.Carbon::now()->timestamp.'.'.$ext;
-            $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
-        }
-
-        return $path;
-    }
-
-    /**
-     * Get safe filename.
-     *
-     * @param  string  $string
-     * @return string
-     */
-    private function getSafeFilename($string)
-    {
-        $replacements = [
-            ' ' => '-',
-            '#' => '-',
-        ];
-
-        $str = Stringy::create(urldecode($string))->toAscii();
-
-        foreach ($replacements as $from => $to) {
-            $str = $str->replace($from, $to);
-        }
-
-        return (string) $str;
-    }
-
-    /**
-     * Put file on destination disk.
-     *
-     * @param  string  $sourcePath
-     * @param  string  $destinationPath
-     */
-    private function putFileOnDisk($sourcePath, $destinationPath)
-    {
-        $stream = fopen($sourcePath, 'r');
-
-        $this->disk()->put($destinationPath, $stream);
-
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-    }
-
-    /**
-     * Get temporary glide cache path in storage for processing uploads.
-     *
-     * @return string
-     */
-    private function glideTmpPath()
-    {
-        return storage_path('statamic/glide/tmp');
-    }
-
-    /**
-     * Process UploadedFile instance using glide and return cached path.
-     *
-     * @param  UploadedFile  $file
-     * @param  array  $params
-     * @param string
-     */
-    private function glideProcessUploadedFile(UploadedFile $file, $params)
-    {
-        $glideTmpPath = $this->glideTmpPath();
-
-        $server = \League\Glide\ServerFactory::create([
-            'source' => $file->getPath(),
-            'cache' => $glideTmpPath,
-            'driver' => config('statamic.assets.image_manipulation.driver'),
-            'cache_with_file_extensions' => true,
-        ]);
-
-        $server->makeImage($file->getFilename(), $params);
-
-        $local = app(Filesystem::class);
-
-        $newFilePath = collect($local->files($glideTmpPath.'/'.$file->getFilename()))
-            ->first()
-            ->getRealPath();
-
-        return $newFilePath;
-    }
-
-    /**
-     * Clear tmp glide cache.
-     */
-    private function glideClearTmpCache()
-    {
-        $glideTmpPath = $this->glideTmpPath();
-
-        $local = app(Filesystem::class);
-
-        if ($local->exists($glideTmpPath)) {
-            $local->deleteDirectory($glideTmpPath);
-        }
     }
 }
