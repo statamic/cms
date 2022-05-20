@@ -182,7 +182,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::bind('revision', function ($reference, $route) {
             if (! $this->isCpOrApiRoute($route)) {
-                return $handle;
+                return $reference;
             }
 
             if ($route->hasParameter('entry')) {
