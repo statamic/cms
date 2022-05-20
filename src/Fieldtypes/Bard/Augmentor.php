@@ -173,8 +173,6 @@ class Augmentor
             self::$extensions[$name] = $replacement;
         }
 
-        Arr::removeNullValues(self::$extensions);
-
-        return self::$extensions;
+        return Arr::removeNullValues(self::$extensions);
     }
 }
