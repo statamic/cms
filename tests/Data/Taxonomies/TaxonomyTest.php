@@ -181,31 +181,31 @@ class TaxonomyTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->additionalPreviewTargets());
 
         $this->assertEquals([
-            ['label' => 'Term', 'format' => '{permalink}'],
+            ['label' => 'Term', 'format' => '{permalink}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
         ], $taxonomy->basePreviewTargets()->all());
 
         $return = $taxonomy->previewTargets([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
+            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
         ]);
 
         $this->assertSame($taxonomy, $return);
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
+            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
         ], $taxonomy->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
+            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
         ], $taxonomy->basePreviewTargets()->all());
 
         $this->assertEquals([], $taxonomy->additionalPreviewTargets()->all());
 
         $extra = [
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Baz', 'format' => '{baz}', 'use_post_message' => true, 'post_message_data' => 'data-updated'],
+            ['label' => 'Qux', 'format' => '{qux}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
         ];
 
         if ($throughFacade) {
@@ -215,20 +215,20 @@ class TaxonomyTest extends TestCase
         }
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
+            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
+            ['label' => 'Baz', 'format' => '{baz}', 'use_post_message' => true, 'post_message_data' => 'data-updated'],
+            ['label' => 'Qux', 'format' => '{qux}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
         ], $taxonomy->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
+            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
         ], $taxonomy->basePreviewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Baz', 'format' => '{baz}', 'use_post_message' => true, 'post_message_data' => 'data-updated'],
+            ['label' => 'Qux', 'format' => '{qux}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
         ], $taxonomy->additionalPreviewTargets()->all());
     }
 

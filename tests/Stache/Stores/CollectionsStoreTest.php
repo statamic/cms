@@ -72,15 +72,15 @@ class CollectionsStoreTest extends TestCase
 
         $contents = <<<'YAML'
 preview_targets:
-  - { label: Foo, url: '/{bar}' }
-  - { label: Baz, url: '/{qux}' }
+  - { label: Foo, url: '/{bar}', use_post_message: true, post_message_data: '{"foo":"bar"}' }
+  - { label: Baz, url: '/{qux}', use_post_message: false, post_message_data: 'live-preview-update' }
 YAML;
 
         $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', $contents);
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '/{bar}'],
-            ['label' => 'Baz', 'format' => '/{qux}'],
+            ['label' => 'Foo', 'format' => '/{bar}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
+            ['label' => 'Baz', 'format' => '/{qux}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
         ], $item->previewTargets()->all());
     }
 
