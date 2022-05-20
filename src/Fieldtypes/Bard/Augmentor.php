@@ -165,7 +165,7 @@ class Augmentor
         return (new Editor(['extensions' => $this->extensions()]))->setContent($value)->getHTML();
     }
 
-    protected function extensions()
+    public function extensions()
     {
         $this->addExtension('image', $this->withStatamicImageUrls ? new StatamicImageNode : new ImageNode);
 
