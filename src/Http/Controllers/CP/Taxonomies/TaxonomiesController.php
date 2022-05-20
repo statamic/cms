@@ -304,7 +304,7 @@ class TaxonomiesController extends CpController
                                     'display' => __('Prevent Page Reload'),
                                     'type' => 'toggle',
                                     'width' => 33,
-                                    'instructions' => __('statamic::messages.collections_use_post_message_instructions'),
+                                    'instructions' => __('statamic::messages.taxonomies_use_post_message_instructions'),
                                     'instructions_position' => 'below',
                                 ],
                             ],
@@ -313,7 +313,7 @@ class TaxonomiesController extends CpController
                                 'field' => [
                                     'display' => __('Post Message Data'),
                                     'type' => 'code',
-                                    'instructions' => __('statamic::messages.collections_post_message_data_instructions'),
+                                    'instructions' => __('statamic::messages.taxonomies_post_message_data_instructions'),
                                     'default' => 'live-preview-update',
                                     'if' => [
                                         'use_post_message' => true,
