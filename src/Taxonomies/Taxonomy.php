@@ -375,7 +375,14 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     private function defaultPreviewTargets()
     {
-        return [['label' => 'Term', 'format' => '{permalink}']];
+        return [
+            [
+                'label' => 'Term',
+                'format' => '{permalink}',
+                'use_post_message' => false,
+                'post_message_data' => 'live-preview-update',
+            ],
+        ];
     }
 
     private function previewTargetsForFile()
@@ -394,6 +401,8 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             return [
                 'label' => $target['label'],
                 'url' => $target['format'],
+                'use_post_message' => $target['use_post_message'],
+                'post_message_data' => $target['post_message_data'] ?? 'live-preview-update',
             ];
         })->filter()->values()->all();
     }

@@ -173,6 +173,8 @@ return [
     'taxonomies_blueprints_instructions' => 'Terms in this taxonomy may use any of these blueprints.',
     'taxonomies_collections_instructions' => 'The collections that use this taxonomy.',
     'taxonomies_preview_targets_instructions' => 'The URLs to be viewable within Live Preview. Learn more in the [documentation](https://statamic.dev/live-preview#preview-targets).',
+    'taxonomies_use_post_message_instructions' => 'Post a message to the iFrame instead of hard reloading the page.',
+    'taxonomies_post_message_data_instructions' => 'Enter a string or JSON data to be sent to the iFrame.',
     'taxonomy_configure_handle_instructions' => 'Used to reference this taxonomy on the frontend. It\'s non-trivial to change later.',
     'taxonomy_configure_intro' => 'A taxonomy is a system of classifying data around a set of unique characteristics, such as category or color.',
     'taxonomy_configure_title_instructions' => 'We recommend using a plural noun, like "Categories" or "Tags".',
