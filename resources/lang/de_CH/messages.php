@@ -52,6 +52,8 @@ return [
     'collections_orderable_instructions' => 'Manuelle Reihenfolge per Drag & Drop aktivieren.',
     'collections_past_date_behavior_instructions' => 'Wie sollen sich in der Vergangenheit liegende Einträge verhalten?',
     'collections_preview_targets_instructions' => 'Die URLs, die in der Live-Vorschau angezeigt werden können. Erfahre mehr in der [Dokumentation](https://statamic.dev/live-preview#preview-targets).',
+    'collections_use_post_message_instructions' => 'Sende dem iFrame eine Nachricht, statt die Seite neu zu laden.',
+    'collections_post_message_data_instructions' => 'Füge einen String oder JSON Daten ein, welche dem iFrame gesendet werden.',
     'collections_route_instructions' => 'Die Route steuert das URL-Schema der Einträge. Weitere Infos dazu findest du in der [Dokumentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Die voreingestellte Sortierrichtung.',
     'collections_taxonomies_instructions' => 'Einträge in dieser Sammlung mit Taxonomien verknüpfen. Die Felder werden automatisch den Eingabemasken hinzugefügt.',
