@@ -166,4 +166,33 @@ TEMPLATE;
 
         $this->assertSame('Home Page', trim($response->getContent()));
     }
+
+    public function test_stack_replacements_are_removed_if_nothing_is_pushed_to_them_on_not_found()
+    {
+        $layoutTemplate = <<<'LAYOUT'
+{{ stack:head }}
+{{ template_content }}
+{{ stack:footer }}
+LAYOUT;
+
+        $templateTemplate = <<<'TEMPLATE'
+{{ not_found }}
+TEMPLATE;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', $layoutTemplate);
+        $this->viewShouldReturnRaw('errors.404', '404');
+        $this->viewShouldReturnRaw('home', $templateTemplate);
+
+        $this->createPage('home', [
+            'with' => [
+                'title' => 'Home Page',
+                'template' => 'home',
+            ],
+        ]);
+
+        $response = $this->get('/home');
+
+        $this->assertSame('404', trim($response->getContent()));
+    }
 }
