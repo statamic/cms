@@ -1794,6 +1794,10 @@ class LanguageParser
                     $right = $this->wrapNumberInVariable($right);
                 }
 
+                if (($right instanceof NullConstant || $right instanceof TrueConstant || $right instanceof FalseConstant) && NodeHelpers::distance($left, $right) === 1) {
+                    $right = $this->wrapConstantInVariable($right);
+                }
+
                 if ($left instanceof NumberNode && $right instanceof VariableNode) {
                     $left = $this->wrapNumberInVariable($left);
                 }
@@ -1892,7 +1896,7 @@ class LanguageParser
 
                 if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) < 1) {
                     array_pop($newNodes);
-                    NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
+                    NodeHelpers::mergeVarContentLeft($node->getVariableContent(), $node, $left);
                     $newNodes[] = $left;
                 } else {
                     $newNodes[] = $node;
@@ -2108,6 +2112,21 @@ class LanguageParser
         $variableNode->endPosition = $node->endPosition;
         $variableNode->name = strval($node->value);
         $variableNode->content = strval($node->value);
+        $variableNode->originalAbstractNode = $node;
+        $variableNode->refId = $node->refId;
+        $variableNode->modifierChain = $node->modifierChain;
+        $variableNode->index = $node->index;
+
+        return $variableNode;
+    }
+
+    private function wrapConstantInVariable(AbstractNode $node)
+    {
+        $variableNode = new VariableNode();
+        $variableNode->startPosition = $node->startPosition;
+        $variableNode->endPosition = $node->endPosition;
+        $variableNode->name = strval($node->content);
+        $variableNode->content = strval($node->content);
         $variableNode->originalAbstractNode = $node;
         $variableNode->refId = $node->refId;
         $variableNode->modifierChain = $node->modifierChain;
