@@ -125,7 +125,7 @@ class Structure extends Tags
         $pages = collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
             $keys = $this->getQuerySelectKeys($page);
-            
+
             $ref = $page->id() ?? $page->reference();
 
             $data = $this->remember(
