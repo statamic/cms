@@ -316,6 +316,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             Blink::store('structure-entries')->forget($this->id());
         }
 
+        if ($this->hasStructure()) {
+            $this->structure()->in($this->locale())->clearTreeCache();
+        }
+
         $this->taxonomize();
 
         optional(Collection::findByMount($this))->updateEntryUris();

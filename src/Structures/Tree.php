@@ -45,13 +45,22 @@ abstract class Tree implements Contract, Localization
     {
         return $this->fluentlyGetOrSet('tree')
             ->getter(function ($tree) {
-                $key = "structure-{$this->handle()}-{$this->locale()}-".md5(json_encode($tree));
-
-                return Blink::once($key, function () use ($tree) {
+                return Blink::once($this->treeCacheKey(), function () use ($tree) {
                     return $this->structure()->validateTree($tree, $this->locale());
                 });
             })
             ->args(func_get_args());
+    }
+
+    public function clearTreeCache()
+    {
+        Blink::forget($this->treeCacheKey());
+        return $this;
+    }
+
+    public function treeCacheKey()
+    {
+        return "structure-{$this->handle()}-{$this->locale()}-".md5(json_encode($this->tree));
     }
 
     public function root()

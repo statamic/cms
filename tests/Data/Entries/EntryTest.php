@@ -1810,5 +1810,20 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
     }
 
+    /** @test */
+    public function it_clears_the_tree_cache_when_saving_an_entry()
+    {
+        $collection = (new Collection)->handle('pages')->routes('{parent_uri}/{slug}');
+        $collection->save();
+
+        $a = tap(Entry::make()->collection('pages')->slug('one')->merge(['title' => 1]))->save();
+        $b = tap(Entry::make()->collection('pages')->slug('two')->merge(['title' => 2]))->save();
+        $c = tap(Entry::make()->collection('pages')->slug('three')->merge(['title' => 3]))->save();
+
+        $this->assertEquals($a->url(), '/one');
+        $this->assertEquals($b->url(), '/two');
+        $this->assertEquals($c->url(), '/three');
+    }
+
     // todo: add tests for localization things. in(), descendants(), addLocalization(), etc
 }
