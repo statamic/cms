@@ -228,6 +228,10 @@ class CoreModifiers extends Modifier
      */
     public function chunk($value, $params)
     {
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         return collect($value)
             ->chunk(Arr::get($params, 0))
             ->map(function ($chunk) {
