@@ -1633,7 +1633,7 @@ class CoreModifiers extends Modifier
             'basename'  => PATHINFO_BASENAME,
             'extension' => PATHINFO_EXTENSION,
             'filename'  => PATHINFO_FILENAME,
-        ][$key] : PATHINFO_ALL;
+        ][$key] : (defined('PATHINFO_ALL') ? PATHINFO_ALL : 15);
 
         return pathinfo($value, $component);
     }
