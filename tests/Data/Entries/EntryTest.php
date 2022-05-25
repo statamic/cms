@@ -1043,6 +1043,32 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_saves_quietly_and_then_not_quietly()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
+        Facades\Entry::shouldReceive('save')->with($entry);
+        Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        Facades\Entry::shouldReceive('find')->with('a')->andReturnNull();
+
+        $return = $entry->saveQuietly();
+
+        $this->assertTrue($return);
+        Event::assertNotDispatched(EntrySaving::class);
+        Event::assertNotDispatched(EntrySaved::class);
+        Event::assertNotDispatched(EntryCreated::class);
+
+        $return = $entry->save();
+
+        $this->assertTrue($return);
+        Event::assertDispatched(EntrySaving::class);
+        Event::assertDispatched(EntrySaved::class);
+        Event::assertDispatched(EntryCreated::class);
+    }
+
+    /** @test */
     public function it_clears_blink_caches_when_saving()
     {
         $collection = tap(Collection::make('test')->structure(new CollectionStructure))->save();
