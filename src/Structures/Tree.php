@@ -55,6 +55,7 @@ abstract class Tree implements Contract, Localization
     public function clearTreeCache()
     {
         Blink::forget($this->treeCacheKey());
+
         return $this;
     }
 
