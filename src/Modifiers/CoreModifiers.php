@@ -1624,14 +1624,16 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function path_info($value, $params)
+    public function pathinfo($value, $params)
     {
-        $component = [
-            'dirname'  => PATHINFO_DIRNAME,
-            'basename' => PATHINFO_BASENAME,
-            'extname'  => PATHINFO_EXTENSION,
-            'filename' => PATHINFO_FILENAME,
-        ][Arr::get($params, 0)];
+        $key = Arr::get($params, 0);
+
+        $component = $key ? [
+            'dirname'   => PATHINFO_DIRNAME,
+            'basename'  => PATHINFO_BASENAME,
+            'extension' => PATHINFO_EXTENSION,
+            'filename'  => PATHINFO_FILENAME,
+        ][$key] : PATHINFO_ALL;
 
         return pathinfo($value, $component);
     }
@@ -2696,9 +2698,11 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function url_info($value, $params)
+    public function parse_url($value, $params)
     {
-        $component = [
+        $key = Arr::get($params, 0);
+
+        $component = $key ? [
             'scheme'   => PHP_URL_SCHEME,
             'host'     => PHP_URL_HOST,
             'port'     => PHP_URL_PORT,
@@ -2707,7 +2711,7 @@ class CoreModifiers extends Modifier
             'path'     => PHP_URL_PATH,
             'query'    => PHP_URL_QUERY,
             'fragment' => PHP_URL_FRAGMENT,
-        ][Arr::get($params, 0)];
+        ][$key] : -1;
 
         return parse_url($value, $component);
     }

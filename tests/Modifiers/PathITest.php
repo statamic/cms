@@ -20,6 +20,6 @@ class PathInfoTest extends TestCase
 
     public function modify($arr, ...$args)
     {
-        return Modify::value($arr)->pathInfo($args)->fetch();
+        return Modify::value($arr)->pathinfo($args)->fetch();
     }
 }
