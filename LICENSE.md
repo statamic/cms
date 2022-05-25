@@ -1,4 +1,4 @@
-Copyright © Wilderborn, LLC.
+Copyright © Statamic, LLC.
 
 Permission is hereby granted to any person obtaining a copy of this software (the “Software”) to use, copy, modify, merge, publish and/or distribute copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -8,7 +8,7 @@ Permission is hereby granted to any person obtaining a copy of this software (th
 
 3. **Do not alter the licensing features.** Software features related to licensing shall not be altered or circumvented in any way, including (but not limited to) license validation, feature or edition restrictions, and update eligibility.
 
-4. **Not for reuse.** The Software and the propritary code therein, not limited to but including  designs, components, classes, and patterns, may not be resused in other projects without the express written consent of Wilderborn, LLC.
+4. **Not for reuse.** The Software and the proprietary code therein, not limited to but including  designs, components, classes, and patterns, may not be reused in other projects without the express written consent of Statamic, LLC.
 
 5. **Follow the law.** All use of the Software shall not violate any applicable law or regulation, nor infringe the rights of any other person or entity.
 
