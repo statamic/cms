@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\NavigationNotFoundException;
@@ -123,11 +125,16 @@ class Structure extends Tags
         $pages = collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
             $keys = $this->getQuerySelectKeys($page);
-            $data = $page->toAugmentedArray($keys);
+
+            $data = $this->remember(
+                "pages:augmented:{$page->id()}" . md5(json_encode($keys)),
+                fn () => $page->toAugmentedArray($keys)
+            );
+
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
-            $url = $page->urlWithoutRedirect();
-            $absoluteUrl = $page->absoluteUrl();
+            $url = $this->remember("pages:urls:relative:{$page->id()}", fn () => $page->urlWithoutRedirect());
+            $absoluteUrl = $this->remember("pages:urls:absolute:{$page->id()}", fn () => $page->absoluteUrl());
 
             return array_merge($data, [
                 'children'    => $children,
@@ -146,6 +153,15 @@ class Structure extends Tags
         $this->updateIsParent($pages);
 
         return $pages->all();
+    }
+
+    protected function remember($key, $callable)
+    {
+        return Cache::remember(
+            $key,
+            now()->addSeconds(Config::get('statamic.structures.cache_ttl')),
+            $callable
+        );
     }
 
     protected function updateIsParent($pages, &$parent = null)
