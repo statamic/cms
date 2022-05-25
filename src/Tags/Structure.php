@@ -127,7 +127,7 @@ class Structure extends Tags
             $keys = $this->getQuerySelectKeys($page);
 
             $data = $this->remember(
-                "pages:augmented:{$page->id()}" . md5(json_encode($keys)),
+                "pages:augmented:{$page->id()}".md5(json_encode($keys)),
                 fn () => $page->toAugmentedArray($keys)
             );
 
