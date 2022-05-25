@@ -17,10 +17,12 @@ class VariableCollector extends ConfigCollector
 
     public function useHtmlVarDumper($value = true)
     {
-        if (config('statamic.antlers.debugbar.prettyPrintVariables', true)) {
-            $this->useHtmlVarDumper = $value;
+        if (! config('statamic.antlers.debugbar.prettyPrintVariables', true)) {
+            $this->useHtmlVarDumper = false;
+
+            return $this;
         }
 
-        return $this;
+        return parent::useHtmlVarDumper($value);
     }
 }
