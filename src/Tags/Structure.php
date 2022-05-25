@@ -125,16 +125,18 @@ class Structure extends Tags
         $pages = collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
             $keys = $this->getQuerySelectKeys($page);
+            
+            $ref = $page->id() ?? $page->reference();
 
             $data = $this->remember(
-                "pages:augmented:{$page->id()}".md5(json_encode($keys)),
+                "pages:augmented:{$ref}".md5(json_encode($keys)),
                 fn () => $page->toAugmentedArray($keys)
             );
 
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
-            $url = $this->remember("pages:urls:relative:{$page->id()}", fn () => $page->urlWithoutRedirect());
-            $absoluteUrl = $this->remember("pages:urls:absolute:{$page->id()}", fn () => $page->absoluteUrl());
+            $url = $this->remember("pages:urls:relative:{$ref}", fn () => $page->urlWithoutRedirect());
+            $absoluteUrl = $this->remember("pages:urls:absolute:{$ref}", fn () => $page->absoluteUrl());
 
             return array_merge($data, [
                 'children'    => $children,
