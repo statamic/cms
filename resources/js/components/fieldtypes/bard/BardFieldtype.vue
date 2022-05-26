@@ -259,7 +259,7 @@ export default {
                 const next = stack.shift();
                 if (next.type === 'text') {
                     text += ` ${next.text || ''}`;
-                    if (text.length > 120) {
+                    if (text.length > 150) {
                         break;
                     }
                 } else if (next.content) {
