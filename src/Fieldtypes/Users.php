@@ -83,21 +83,23 @@ class Users extends Relationship
             $query->whereNotIn('id', $request->exclusions);
         }
 
+        $userFields = function ($user) {
+            return [
+                'id' => $user->id(),
+                'title' => $user->name(),
+                'email' => $user->email(),
+            ];
+        };
+
         if ($request->boolean('paginate', true)) {
             $users = $query->paginate();
 
-            $users->getCollection()->transform(function ($user) {
-                return [
-                    'id' => $user->id(),
-                    'title' => $user->name(),
-                    'email' => $user->email(),
-                ];
-            });
+            $users->getCollection()->transform($userFields);
 
             return $users;
         }
 
-        return $query->get();
+        return $query->get()->map($userFields);
     }
 
     protected function getColumns()
