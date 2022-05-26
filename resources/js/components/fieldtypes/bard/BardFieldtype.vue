@@ -250,7 +250,24 @@ export default {
 
                 return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
             })
-        }
+        },
+
+        replicatorPreview() {
+            const stack = JSON.parse(this.value);
+            let text = '';
+            while (stack.length) {
+                const next = stack.shift();
+                if (next.type === 'text') {
+                    text += ` ${next.text || ''}`;
+                    if (text.length > 120) {
+                        break;
+                    }
+                } else if (next.content) {
+                    stack.unshift(...next.content);
+                }
+            }
+            return text;
+        },
 
     },
 
