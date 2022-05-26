@@ -57,19 +57,4 @@ return [
 
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | DebugBar Integration
-    |--------------------------------------------------------------------------
-    |
-    | Antlers integrates with Laravel DebugBar to bring more detail to your
-    | debugging experience. On complex pages however, this can be slow.
-    | Feel free to disable this setting for a snappier DebugBar.
-    |
-    */
-
-    'debugbar' => [
-        'prettyPrintVariables' => true,
-    ],
-
 ];
