@@ -102,6 +102,13 @@ code.parent-url {
     }
 }
 
+@screen md {
+    .publish-sidebar .publish-section {
+        position: sticky;
+        top: 72px; // 52px header + 20px gap
+    }
+}
+
 .publish-section-actions-footer {
     @apply mt-3;
 }
