@@ -29,6 +29,14 @@
                         v-bind="attributes"
                     >
                 </template>
+                <template #option="{ label }">
+                    <div v-if="config.label_html" v-html="label"></div>
+                    <template v-else v-text="label"></template>
+                </template>
+                <template #selected-option="{ label }">
+                    <div v-if="config.label_html" v-html="label"></div>
+                    <template v-else v-text="label"></template>
+                </template>
                 <template #no-options>
                     <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
                 </template>
