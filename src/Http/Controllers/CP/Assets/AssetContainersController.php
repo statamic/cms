@@ -261,17 +261,64 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                         'default' => true,
                     ],
-                    'glide' => [
-                        'type' => 'array',
-                        'display' => __('Glide Processing'),
-                        'instructions' => __('When enabled, images will be permanently processed with these glide parameters on upload.'),
-                        'key_header' => __('Param'),
-                        'add_button' => __('Add Param'),
+                ],
+            ],
+        ]);
+
+        $fields = array_merge($fields, [
+            'image_manipulation' => [
+                'display' => __('Image Manipulation'),
+                'fields' => [
+                    'glide_source_preset' => [
+                        'type' => 'select',
+                        'display' => __('Process Source Images'),
+                        'label_html' => true,
+                        'instructions' => __('When enabled, source images will be permanently processed with this image manipulation preset on upload.'),
+                        'options' => $this->expandedGlidePresetOptions(),
+                        'clearable' => true,
+                    ],
+                    'glide_warm_all_presets' => [
+                        'type' => 'toggle',
+                        'display' => __('Intelligently Warm Glide Caches'),
+                        'instructions' => __('When enabled, intelligently warm glide caches on upload.'),
+                        'default' => true,
+                    ],
+                    'glide_warm_presets' => [
+                        'type' => 'select',
+                        'display' => __('Warm Specific Glide Caches'),
+                        'instructions' => __('Specify which glide presets to warm on upload.'),
+                        'multiple' => true,
+                        'options' => array_keys(config('statamic.assets.image_manipulation.presets')),
+                        'label_html' => true,
+                        'if' => [
+                            'glide_warm_all_presets' => false,
+                        ],
                     ],
                 ],
             ],
         ]);
 
         return Blueprint::makeFromSections($fields);
+    }
+
+    private function expandedGlidePresetOptions()
+    {
+        return collect(config('statamic.assets.image_manipulation.presets'))
+            ->mapWithKeys(function ($params, $handle) {
+                return [$handle => $this->expandedGlidePresetLabel($handle, $params)];
+            });
+    }
+
+    private function expandedGlidePresetLabel($handle, $params)
+    {
+        $separator = '<span class="text-grey-50">-</span>';
+
+        $params = collect($params)
+            ->map(function ($value, $param) {
+                return "<code>{$param}: {$value}</code>";
+            })
+            ->implode(' ');
+
+        return "{$handle} {$separator} {$params}";
     }
 }
