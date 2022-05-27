@@ -250,7 +250,29 @@ export default {
 
                 return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
             })
-        }
+        },
+
+        replicatorPreview() {
+            const stack = JSON.parse(this.value);
+            let text = '';
+            while (stack.length) {
+                const node = stack.shift();
+                if (node.type === 'text') {
+                    text += ` ${node.text || ''}`;
+                } else if (node.type === 'set') {
+                    const handle = node.attrs.values.type;
+                    const set = this.config.sets.find(set => set.handle === handle);
+                    text += ` [${set ? set.display : handle}]`;
+                }
+                if (text.length > 150) {
+                    break;
+                }
+                if (node.content) {
+                    stack.unshift(...node.content);
+                }
+            }
+            return text;
+        },
 
     },
 
