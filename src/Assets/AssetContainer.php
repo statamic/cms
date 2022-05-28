@@ -35,7 +35,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     protected $allowMoving;
     protected $allowRenaming;
     protected $createFolders;
-    protected $glide;
+    protected $glideSourcePreset;
+    protected $glideWarmPresets;
     protected $searchIndex;
 
     public function id($id = null)
@@ -446,17 +447,35 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     }
 
     /**
-     * The glide parameters to be applied on image upload.
+     * The glide source preset to be permanently applied to source image on upload.
      *
-     * @param  array|null  $glide
-     * @return array|$this
+     * @param  string|null  $preset
+     * @return string|null|$this
      */
-    public function glide($glide = null)
+    public function glideSourcePreset($preset = null)
     {
         return $this
-            ->fluentlyGetOrSet('glide')
-            ->getter(function ($glide) {
-                return (array) ($glide ?? []);
+            ->fluentlyGetOrSet('glideSourcePreset')
+            ->getter(function ($preset) {
+                return $preset ?? null;
+            })
+            ->args(func_get_args());
+    }
+
+    /**
+     * The specific glide presets to be used when warming glide image cache on upload,
+     * otherwise we intelligently generate image cache for all configured presets,
+     * with the exception of the glide source preset, if one is configured.
+     *
+     * @param  array|null  $presets
+     * @return array|null|$this
+     */
+    public function glideWarmPresets($preset = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('glideWarmPresets')
+            ->getter(function ($presets) {
+                return $presets !== [] ? $presets : null;
             })
             ->args(func_get_args());
     }
@@ -472,7 +491,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             'allow_renaming' => $this->allowRenaming,
             'allow_moving' => $this->allowMoving,
             'create_folders' => $this->createFolders,
-            'glide' => $this->glide,
+            'glide_source_preset' => $this->glideSourcePreset,
+            'glide_warm_presets' => $this->glideWarmPresets,
         ];
     }
 

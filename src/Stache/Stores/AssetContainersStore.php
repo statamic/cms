@@ -25,7 +25,8 @@ class AssetContainersStore extends BasicStore
             ->allowRenaming(array_get($data, 'allow_renaming'))
             ->allowUploads(array_get($data, 'allow_uploads'))
             ->createFolders(array_get($data, 'create_folders'))
-            ->glide(array_get($data, 'glide'))
+            ->glideSourcePreset(array_get($data, 'glide_source_preset'))
+            ->glideWarmPresets(array_get($data, 'glide_warm_presets'))
             ->searchIndex(array_get($data, 'search_index'));
     }
 }
