@@ -364,7 +364,7 @@ class AntlersNode extends AbstractNode
         foreach ($this->parameters as $param) {
             $value = $this->getSingleParameterValue($param, $processor, $data);
 
-            if (is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId) {
+            if ($this->isVoidValue($value)) {
                 continue;
             }
 
@@ -372,6 +372,45 @@ class AntlersNode extends AbstractNode
         }
 
         return $values;
+    }
+
+    protected function isVoidValue($value)
+    {
+        return is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId;
+    }
+
+    /**
+     * Returns the value of a single parameter by name.
+     *
+     * @param $parameterName
+     * @param NodeProcessor $processor
+     * @param $data
+     * @param $default
+     * @return array|mixed|\Statamic\Contracts\Query\Builder|string|string[]|null
+     */
+    public function getSingleParameterValueByName($parameterName, NodeProcessor $processor, $data, $default = null)
+    {
+        $result = $default;
+
+        if (empty($this->parameters)) {
+            return $result;
+        }
+
+        foreach ($this->parameters as $param) {
+            if ($param->name == $parameterName) {
+                $value = $this->getSingleParameterValue($param, $processor, $data);
+
+                if ($this->isVoidValue($value)) {
+                    break;
+                }
+
+                $result = $value;
+
+                break;
+            }
+        }
+
+        return $result;
     }
 
     public function getSingleParameterValue(ParameterNode $param, NodeProcessor $processor, $data = [])

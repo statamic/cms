@@ -166,4 +166,72 @@ TEMPLATE;
 
         $this->assertSame('Home Page', trim($response->getContent()));
     }
+
+    public function test_whitespace_can_be_preserved_inside_stacks()
+    {
+        $template = <<<'EOT'
+<body class="{{ stack:modifiers }}">
+
+{{ push:modifiers trim="false" }} class-one{{ /push:modifiers }}
+{{ push:modifiers trim="false" }} class-two{{ /push:modifiers }}
+</body>
+EOT;
+
+        $this->assertStringContainsString('<body class=" class-one class-two">', $this->renderString($template, []));
+    }
+
+    public function test_stack_items_can_be_retrieved()
+    {
+        $template = <<<'EOT'
+<body class="{{ stack:modifiers }}{{ unless first }} {{ /unless }}{{ value }}{{ /stack:modifiers }}">
+
+{{ push:modifiers }}class-one{{ /push:modifiers }}
+{{ push:modifiers }}class-two{{ /push:modifiers }}
+EOT;
+
+        $this->assertStringContainsString('<body class="class-one class-two">', $this->renderString($template, []));
+    }
+
+    public function test_array_stack_items_can_be_used_in_multiple_places()
+    {
+        $template = <<<'EOT'
+{{ stack:items }}<a:{{ value }}>{{ /stack:items }}
+
+{{ push:items }}item-one{{ /push:items }}
+{{ push:items }}item-two{{ /push:items }}
+
+{{ stack:items }}<b:{{ value }}>{{ /stack:items }}
+EOT;
+
+        $result = $this->renderString($template);
+
+        $this->assertStringContainsString('<a:item-one><a:item-two>', $result);
+        $this->assertStringContainsString('<b:item-one><b:item-two>', $result);
+    }
+
+    public function test_array_stacks_when_not_pushed()
+    {
+        $template = <<<'EOT'
+{{ stack:items }}<a:{{ value }}>{{ /stack:items }}
+
+
+{{ stack:items }}<b:{{ value }}>{{ /stack:items }}
+EOT;
+
+        $this->assertSame('', trim($this->renderString($template)));
+    }
+
+    public function test_array_stacks_when_only_pushing_to_one()
+    {
+        $template = <<<'EOT'
+{{ stack:items }}<a:{{ value }}>{{ /stack:items }}
+
+{{ push:items }}item-one{{ /push:items }}
+{{ push:items }}item-two{{ /push:items }}
+
+{{ stack:items_two }}<b:{{ value }}>{{ /stack:items_two }}
+EOT;
+
+        $this->assertSame('<a:item-one><a:item-two>', trim($this->renderString($template)));
+    }
 }

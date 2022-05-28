@@ -46,6 +46,7 @@ use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
@@ -207,6 +208,8 @@ class NodeProcessor
 
     private $lockedData = [];
 
+    private $doStackIntercept = true;
+
     public function __construct(Loader $loader, EnvironmentDetails $envDetails)
     {
         $this->loader = $loader;
@@ -347,6 +350,19 @@ class NodeProcessor
         if ($this->isTracingEnabled()) {
             $this->runtimeConfiguration->traceManager->traceRenderComplete();
         }
+    }
+
+    /**
+     * Sets whether the processor will treat "stack" as a tag or variable.
+     *
+     * @param bool $doIntercept
+     * @return $this
+     */
+    public function setDoStackIntercept($doIntercept = true)
+    {
+        $this->doStackIntercept = $doIntercept;
+
+        return $this;
     }
 
     /**
@@ -789,7 +805,7 @@ class NodeProcessor
         if ($this->antlersParser != null) {
             $processor->setAntlersParserInstance($this->antlersParser);
         }
-        $processor->cascade($this->cascade);
+        $processor->cascade($this->cascade)->setDoStackIntercept($this->doStackIntercept);
 
         if ($this->runtimeConfiguration != null) {
             $processor->setRuntimeConfiguration($this->runtimeConfiguration);
@@ -1136,24 +1152,37 @@ class NodeProcessor
                         continue;
                     }
 
-                    if ($node->name->name == 'stack' && ($node->isSelfClosing || $node->isClosedBy == null)) {
-                        $registeredStack = StackReplacementManager::registerStack($node->name->methodPart);
+                    if ($this->doStackIntercept && $node->name->name == 'stack') {
+                        if ($node->isClosingTag) {
+                            continue;
+                        }
+
+                        if ($node->isSelfClosing || $node->isClosedBy == null) {
+                            $registeredStack = StackReplacementManager::registerStack($node->name->methodPart);
+                        } else {
+                            $registeredStack = StackReplacementManager::registerArrayStack(
+                                $node->name->methodPart,
+                                $node,
+                                $this->cloneProcessor()->setData($this->getActiveData())->setDoStackIntercept(false)
+                            );
+                        }
 
                         $buffer .= $registeredStack;
                         continue;
-                    } elseif ($node->name->name == 'push' && $node->isClosedBy != null) {
-                        $stackContent = $this->cloneProcessor()->setData($this->getActiveData())->reduce($node->children);
+                    } elseif (($node->name->name == 'push' || $node->name->name == 'prepend') && $node->isClosedBy != null) {
+                        $currentData = $this->getActiveData();
 
-                        StackReplacementManager::pushStack($node->name->methodPart, $stackContent);
+                        $trimContentWhitespace = TypeCoercion::coerceBool($node->getSingleParameterValueByName(
+                            'trim', $this->cloneProcessor(), $currentData, true
+                        ));
 
-                        if ($this->isTracingEnabled()) {
-                            $this->runtimeConfiguration->traceManager->traceOnExit($node, $stackContent);
+                        $stackContent = $this->cloneProcessor()->setData($currentData)->reduce($node->children);
+
+                        if ($node->name->name == 'push') {
+                            StackReplacementManager::pushStack($node->name->methodPart, $stackContent, $trimContentWhitespace);
+                        } else {
+                            StackReplacementManager::prependStack($node->name->methodPart, $stackContent, $trimContentWhitespace);
                         }
-                        continue;
-                    } elseif ($node->name->name == 'prepend' && $node->isClosedBy != null) {
-                        $stackContent = $this->cloneProcessor()->setData($this->getActiveData())->reduce($node->children);
-
-                        StackReplacementManager::prependStack($node->name->methodPart, $stackContent);
 
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, $stackContent);
