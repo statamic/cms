@@ -29,7 +29,8 @@ class AssetContainersController extends CpController
                 'allow_renaming' => $container->allowRenaming(),
                 'allow_uploads' => $container->allowUploads(),
                 'create_folders' => $container->createFolders(),
-                'glide' => $container->glide(),
+                'glide_source_preset' => $container->glideSourcePreset(),
+                'glide_warm_presets' => $container->glideWarmPresets(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
                 'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
@@ -62,7 +63,9 @@ class AssetContainersController extends CpController
             'allow_renaming' => $container->allowRenaming(),
             'allow_moving' => $container->allowMoving(),
             'create_folders' => $container->createFolders(),
-            'glide' => $container->glide(),
+            'glide_source_preset' => $container->glideSourcePreset(),
+            'glide_warm_intelligent' => $container->glideWarmPresets() === null,
+            'glide_warm_presets' => $container->glideWarmPresets(),
         ];
 
         $fields = ($blueprint = $this->formBlueprint($container))
@@ -96,7 +99,8 @@ class AssetContainersController extends CpController
             ->allowMoving($values['allow_moving'])
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders'])
-            ->glide($values['glide']);
+            ->glideSourcePreset($values['glide_source_preset'])
+            ->glideWarmPresets($values['glide_warm_intelligent'] ? null : $values['glide_warm_presets']);
 
         $container->save();
 
@@ -143,7 +147,8 @@ class AssetContainersController extends CpController
             ->disk($values['disk'])
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders'])
-            ->glide($values['glide']);
+            ->glideSourcePreset($values['glide_source_preset'])
+            ->glideWarmPresets($values['glide_warm_intelligent'] ? null : $values['glide_warm_presets']);
 
         $container->save();
 
@@ -277,7 +282,7 @@ class AssetContainersController extends CpController
                         'options' => $this->expandedGlidePresetOptions(),
                         'clearable' => true,
                     ],
-                    'glide_warm_all_presets' => [
+                    'glide_warm_intelligent' => [
                         'type' => 'toggle',
                         'display' => __('Intelligently Warm Glide Caches'),
                         'instructions' => __('When enabled, intelligently warm glide caches on upload.'),
@@ -289,9 +294,8 @@ class AssetContainersController extends CpController
                         'instructions' => __('Specify which glide presets to warm on upload.'),
                         'multiple' => true,
                         'options' => array_keys(config('statamic.assets.image_manipulation.presets')),
-                        'label_html' => true,
                         'if' => [
-                            'glide_warm_all_presets' => false,
+                            'glide_warm_intelligent' => false,
                         ],
                     ],
                 ],
