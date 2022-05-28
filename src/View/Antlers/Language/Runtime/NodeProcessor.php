@@ -513,8 +513,13 @@ class NodeProcessor
 
         $this->pathDataManager->setIsPaired(false);
         $this->pathDataManager->setReduceFinal(false);
+
+        $currentData = $this->getActiveData();
+
         $managerResults = $this->pathDataManager->cascade($this->cascade)
-            ->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
+            ->setInterpolations($node->processedInterpolationRegions)
+            ->setNodeProcessor($this->cloneProcessor()->setData($currentData))
+            ->getDataWithExistence($node->pathReference, $currentData, true);
         $this->pathDataManager->setIsPaired($cur);
         $this->pathDataManager->setReduceFinal($curReduce);
 
