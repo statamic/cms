@@ -43,9 +43,9 @@ EOT;
 
         $data = [
             'items' => [
-                [ 'title' => 'One', ],
-                [ 'title' => 'Two', ],
-                [ 'title' => 'Three', ],
+                ['title' => 'One'],
+                ['title' => 'Two'],
+                ['title' => 'Three'],
             ],
             'chars' => [
                 't', 'i', 't', 'l', 'e',

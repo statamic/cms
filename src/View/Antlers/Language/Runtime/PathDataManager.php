@@ -735,7 +735,7 @@ class PathDataManager
      * Reduces the provided path data element.
      *
      * @param  PathNode|string  $path  The path element.
-     * @param array $processorData
+     * @param  array  $processorData
      */
     private function reduceVar($path, $processorData = [])
     {
