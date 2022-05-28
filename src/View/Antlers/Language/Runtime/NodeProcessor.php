@@ -355,7 +355,7 @@ class NodeProcessor
     /**
      * Sets whether the processor will treat "stack" as a tag or variable.
      *
-     * @param bool $doIntercept
+     * @param  bool  $doIntercept
      * @return $this
      */
     public function setDoStackIntercept($doIntercept = true)
