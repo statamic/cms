@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use League\Glide\ServerFactory;
+use Statamic\Facades\Config;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Stringy\Stringy;
@@ -49,17 +50,17 @@ class Uploader
     {
         $path = $this->getSafeUploadPath($file);
 
-        $glide = $this->asset->container()->glide();
+        if ($preset = $this->asset->container()->glideSourcePreset()) {
+            $params = Config::get("statamic.assets.image_manipulation.presets.{$preset}", []);
+        }
 
-        $sourcePath = $glide
-            ? $this->glideProcessUploadedFile($file, $glide)
+        $sourcePath = $preset && $params
+            ? $this->glideProcessUploadedFile($file, $params)
             : $file->getRealPath();
 
         $this->putFileOnDisk($sourcePath, $path);
 
-        if ($glide) {
-            $this->glideClearTmpCache();
-        }
+        $this->glideClearTmpCache();
 
         return $path;
     }
