@@ -33,9 +33,9 @@ class StackReplacementManager
     }
 
     /**
-     * @param string $name
-     * @param AntlersNode $node
-     * @param Position $processor
+     * @param  string  $name
+     * @param  AntlersNode  $node
+     * @param  Position  $processor
      * @return string
      */
     public static function registerArrayStack($name, $node, $processor)
@@ -123,22 +123,22 @@ class StackReplacementManager
                     $stackItems = self::$stackContents[GlobalRuntimeState::$environmentId][$stackName];
                 }
 
-               foreach ($arrayStackDetails as $arrayDetails) {
-                   /** @var AntlersNode $node */
-                   $node = $arrayDetails[0];
+                foreach ($arrayStackDetails as $arrayDetails) {
+                    /** @var AntlersNode $node */
+                    $node = $arrayDetails[0];
 
-                   /** @var NodeProcessor $processor */
-                   $processor = $arrayDetails[1];
-                   $data = $processor->getActiveData();
-                   $data['stack'] = [
-                       $node->name->methodPart => $stackItems,
-                   ];
+                    /** @var NodeProcessor $processor */
+                    $processor = $arrayDetails[1];
+                    $data = $processor->getActiveData();
+                    $data['stack'] = [
+                        $node->name->methodPart => $stackItems,
+                    ];
 
-                   $result = (string)$processor->setData($data)->reduce([$node]);
+                    $result = (string) $processor->setData($data)->reduce([$node]);
 
-                   $content = str_replace($stackName.$arrayDetails[2], $result, $content);
-               }
-            } else if (array_key_exists($stackName, self::$stackContents[GlobalRuntimeState::$environmentId])) {
+                    $content = str_replace($stackName.$arrayDetails[2], $result, $content);
+                }
+            } elseif (array_key_exists($stackName, self::$stackContents[GlobalRuntimeState::$environmentId])) {
                 $stackedContent = self::$stackContents[GlobalRuntimeState::$environmentId][$stackName];
 
                 foreach ($stackedContent as $stackContent) {
