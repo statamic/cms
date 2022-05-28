@@ -33,8 +33,10 @@
                     :field-path-prefix="fieldPathPrefix || handle"
                     :has-error="setHasError(index)"
                     :previews="previews[set._id]"
+                    :can-add-set="canAddSet"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
+                    @duplicate="duplicateSet(set._id)"
                     @updated="updated"
                     @meta-updated="updateSetMeta(set._id, $event)"
                     @removed="removed(set, index)"
@@ -156,6 +158,27 @@ export default {
                 ...this.value.slice(index)
             ]);
 
+            this.expandSet(set._id);
+        },
+
+        duplicateSet(old_id) {
+            const index = this.value.findIndex(v => v._id === old_id);
+            const old = this.value[index];
+            const set = {
+                ...old,
+                _id: `set-${uniqid()}`,
+            };
+
+            this.updateSetPreviews(set._id, {});
+
+            this.updateSetMeta(set._id, this.meta.existing[old_id]);
+
+            this.update([
+                ...this.value.slice(0, index + 1),
+                set,
+                ...this.value.slice(index + 1)
+            ]);
+            
             this.expandSet(set._id);
         },
 
