@@ -994,10 +994,12 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        $this->container->glide([
+        config(['statamic.assets.image_manipulation.presets.small' => [
             'w' => '15',
             'h' => '15',
-        ]);
+        ]]);
+
+        $this->container->glideSourcePreset('small');
 
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
 
@@ -1025,10 +1027,12 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        $this->container->glide([
+        config(['statamic.assets.image_manipulation.presets.small' => [
             'w' => '15',
             'h' => '15',
-        ]);
+        ]]);
+
+        $this->container->glideSourcePreset('small');
 
         $asset = (new Asset)->container($this->container)->path('path/to/readme.md')->syncOriginal();
 
