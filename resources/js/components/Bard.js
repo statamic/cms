@@ -1,3 +1,5 @@
+import * as core from '@tiptap/core';
+
 class Bard {
     constructor(instance) {
         this.instance = instance;
@@ -23,21 +25,9 @@ class Bard {
         this.buttonCallbacks.push(callback);
     }
 
-    /** @deprecated */
-    /* get tiptap() {
-        return {
-            core,
-            commands,
-            utils,
-            extensions: {
-                ...extensions,
-                Link,
-                Image,
-                Subscript,
-                Superscript,
-            },
-         };
-    } */
+    get tiptap() {
+        return { core };
+    }
 }
 
 export default Bard;
