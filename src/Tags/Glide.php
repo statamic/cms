@@ -2,16 +2,17 @@
 
 namespace Statamic\Tags;
 
+use Facades\Statamic\Imaging\Attributes;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Config;
+use Statamic\Facades\Glide as GlideManager;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
-use Statamic\Imaging\GlideServer;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
@@ -107,13 +108,9 @@ class Glide extends Tags
             $data = ['url' => $this->generateGlideUrl($item)];
 
             if ($this->isResizable($item)) {
-                $pathPrefix = (new GlideServer)->cachePath();
                 $path = $this->generateImage($item);
-
-                [$width, $height] = getimagesize(Path::tidy($pathPrefix.'/'.$path));
-
-                $data['width'] = $width;
-                $data['height'] = $height;
+                $attrs = Attributes::from(GlideManager::cacheDisk()->getDriver(), $path);
+                $data = array_merge($data, $attrs);
             }
 
             if ($item instanceof Augmentable) {
@@ -180,7 +177,7 @@ class Glide extends Tags
             return;
         }
 
-        $url = ($this->params->bool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+        $url = ($this->params->bool('absolute', $this->useAbsoluteUrls())) ? URL::makeAbsolute($url) : URL::makeRelative($url);
 
         return $url;
     }
@@ -318,5 +315,10 @@ class Glide extends Tags
         }
 
         throw new \Exception("Unsupported image manipulation driver [$driver]");
+    }
+
+    private function useAbsoluteUrls()
+    {
+        return Str::startsWith(GlideManager::url(), ['http://', 'https://']);
     }
 }

@@ -705,14 +705,31 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     {
         return $this
             ->fluentlyGetOrSet('previewTargets')
-            ->getter(function ($targets) {
-                if (empty($targets)) {
-                    $targets = $this->defaultPreviewTargets();
-                }
-
-                return collect($targets);
+            ->getter(function () {
+                return $this->basePreviewTargets()->merge($this->additionalPreviewTargets());
             })
             ->args(func_get_args());
+    }
+
+    public function basePreviewTargets()
+    {
+        $targets = empty($this->previewTargets)
+            ? $this->defaultPreviewTargets()
+            : $this->previewTargets;
+
+        return collect($targets);
+    }
+
+    public function addPreviewTargets($targets)
+    {
+        Facades\Collection::addPreviewTargets($this->handle, $targets);
+
+        return $this;
+    }
+
+    public function additionalPreviewTargets()
+    {
+        return Facades\Collection::additionalPreviewTargets($this->handle);
     }
 
     private function defaultPreviewTargets()

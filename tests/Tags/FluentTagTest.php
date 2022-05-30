@@ -9,7 +9,6 @@ use Statamic\Support\Arr;
 use Statamic\Tags\FluentTag;
 use Statamic\Tags\Loader;
 use Statamic\Tags\Tags;
-use Statamic\View\Antlers\Parser;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -47,7 +46,7 @@ class FluentTagTest extends TestCase
             ->withArgs(function ($arg1, $arg2) use ($expectedTag, $expectedTagName, $expectedTagMethod) {
                 return $arg1 === $expectedTagName
                     && is_array($arg2)
-                    && $arg2['parser'] instanceof Parser
+                    && is_null($arg2['parser'])
                     && Arr::except($arg2, 'parser') === [
                         'params' => [
                             'sort' => 'slug:desc',

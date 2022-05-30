@@ -92,4 +92,49 @@ class OrderedQueryBuilderTest extends TestCase
 
         $this->assertEquals('paginator', $results);
     }
+
+    /** @test */
+    public function it_limits_after_the_results_have_been_retrieved()
+    {
+        $builder = $this->mock(Builder::class);
+        $builder->shouldReceive('limit')->never();
+        $builder->shouldReceive('get')->once()->andReturn(collect([
+            ['id' => '1'],
+            ['id' => '2'],
+            ['id' => '3'],
+            ['id' => '4'],
+            ['id' => '5'],
+        ]));
+
+        $results = (new OrderedQueryBuilder($builder, [4, 5, 2, 1, 3]))->limit(3)->get();
+
+        $this->assertEquals([
+            ['id' => '4'],
+            ['id' => '5'],
+            ['id' => '2'],
+        ], $results->all());
+    }
+
+    /** @test */
+    public function it_offsets_after_the_results_have_been_retrieved()
+    {
+        $builder = $this->mock(Builder::class);
+        $builder->shouldReceive('offset')->never();
+        $builder->shouldReceive('get')->once()->andReturn(collect([
+            ['id' => '1'],
+            ['id' => '2'],
+            ['id' => '3'],
+            ['id' => '4'],
+            ['id' => '5'],
+        ]));
+
+        $results = (new OrderedQueryBuilder($builder, [4, 5, 2, 1, 3]))->offset(1)->get();
+
+        $this->assertEquals([
+            ['id' => '5'],
+            ['id' => '2'],
+            ['id' => '1'],
+            ['id' => '3'],
+        ], $results->all());
+    }
 }

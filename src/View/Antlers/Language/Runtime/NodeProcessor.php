@@ -32,7 +32,6 @@ use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ExecutionBranch;
 use Statamic\View\Antlers\Language\Nodes\EscapedContentNode;
 use Statamic\View\Antlers\Language\Nodes\LiteralNode;
-use Statamic\View\Antlers\Language\Nodes\ModifierNameNode;
 use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\LeftAssignmentOperator;
 use Statamic\View\Antlers\Language\Nodes\RecursiveNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\DirectionGroup;
@@ -284,6 +283,11 @@ class NodeProcessor
         return $this;
     }
 
+    public function getCascade()
+    {
+        return $this->cascade;
+    }
+
     /**
      * Sets whether the NodeProcessor should evaluate PHP code.
      *
@@ -367,9 +371,8 @@ class NodeProcessor
      * Updates the current scope with any new variable assignments.
      *
      * @param  array  $assignments  The assignments.
-     * @param  array  $lockData
      */
-    private function processAssignments($assignments, &$lockData = null)
+    private function processAssignments($assignments)
     {
         $this->clearInterpolationCache();
 
@@ -377,11 +380,6 @@ class NodeProcessor
             if (array_key_exists($path, $this->previousAssignments) == false) {
                 $this->previousAssignments[$path] = count($this->data) - 1;
                 Arr::set($this->data[count($this->data) - 1], $path, $value);
-
-                if ($lockData != null) {
-                    $this->previousAssignments[$path] = count($lockData) - 1;
-                    Arr::set($lockData[count($lockData) - 1], $path, $value);
-                }
             } else {
                 $start = $this->previousAssignments[$path];
 
@@ -393,12 +391,6 @@ class NodeProcessor
                     $targetIndex = count($this->data) - 1;
                     Arr::set($this->data[$targetIndex], $path, $value);
                     $this->previousAssignments[$path] = $targetIndex;
-                }
-
-                if ($lockData != null) {
-                    for ($i = $start; $i < count($lockData); $i++) {
-                        Arr::set($lockData[$i], $path, $value);
-                    }
                 }
             }
         }
@@ -521,7 +513,8 @@ class NodeProcessor
 
         $this->pathDataManager->setIsPaired(false);
         $this->pathDataManager->setReduceFinal(false);
-        $managerResults = $this->pathDataManager->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
+        $managerResults = $this->pathDataManager->cascade($this->cascade)
+            ->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
         $this->pathDataManager->setIsPaired($cur);
         $this->pathDataManager->setReduceFinal($curReduce);
 
@@ -540,7 +533,11 @@ class NodeProcessor
 
                 // If the path reference has more than one part,
                 // it is something like {{ products.0.name }}
-                if ($node->pathReference != null && count($node->pathReference->pathParts) > 1) {
+                if ($node->pathReference != null && $node->pathReference->isComplex()) {
+                    if ($this->pathDataManager->getEncounteredBuilderOnLastPath()) {
+                        return true;
+                    }
+
                     return false;
                 }
 
@@ -697,6 +694,8 @@ class NodeProcessor
      * @param  AntlersNode  $node  The reference node.
      * @param  mixed  $value  The runtime value.
      * @return bool
+     *
+     * @throws RuntimeException
      */
     private function guardRuntime(AntlersNode $node, $value)
     {
@@ -720,6 +719,15 @@ class NodeProcessor
             }
 
             $varName = $node->name->getContent();
+
+            if ($this->runtimeConfiguration != null && $this->runtimeConfiguration->fatalErrorOnStringObject) {
+                throw ErrorFactory::makeRuntimeError(
+                    AntlersErrorCodes::TYPE_RUNTIME_ATTEMPTING_TO_RENDER_OBJECT_AS_STRING,
+                    $node,
+                    'Fatal Error: Attempting to render object as string.'
+                );
+            }
+
             Log::debug("Cannot render an object variable as a string: {{ {$varName} }}");
 
             return false;
@@ -776,7 +784,11 @@ class NodeProcessor
     {
         $processor = new NodeProcessor($this->loader, $this->envDetails);
         $processor->allowPhp($this->allowPhp);
-        $processor->setAntlersParserInstance($this->antlersParser);
+        $processor->setRuntimeAssignments($this->runtimeAssignments);
+
+        if ($this->antlersParser != null) {
+            $processor->setAntlersParserInstance($this->antlersParser);
+        }
         $processor->cascade($this->cascade);
 
         if ($this->runtimeConfiguration != null) {
@@ -850,6 +862,8 @@ class NodeProcessor
             $parameters = $node->getParameterValues($this, $this->getActiveData());
             $runtimeContent = $node->runtimeContent;
         }
+
+        $parameters = array_merge($parameters, $additionalData);
 
         /** @var Tags $tag */
         $tag = $this->loader->load($tagName, [
@@ -1222,12 +1236,13 @@ class NodeProcessor
                                 $childDataToUse = $depths + $childData;
 
                                 if (! empty($recursiveParent->parameters)) {
+                                    $lockData = $this->data;
                                     foreach ($recursiveParent->parameters as $param) {
                                         if (ModifierManager::isModifier($param)) {
                                             $childDataToUse = $this->runModifier($param->name, $parentParameterValues, $childDataToUse, $rootData);
                                         }
                                     }
-
+                                    $this->data = $lockData;
                                     $childDataToUse = $childDataToUse + $rootData;
                                 } else {
                                     $childDataToUse = $childDataToUse + $rootData;
@@ -1258,18 +1273,23 @@ class NodeProcessor
                     $currentProcessorCanHandleTagValue = false;
                     $tagCallbackResult = null;
 
-                    if ($this->shouldProcessAsTag($node)) {
+                    $lockData = $this->data;
+                    $shouldProcessAsTag = $this->shouldProcessAsTag($node);
+                    $this->data = $lockData;
+
+                    if ($shouldProcessAsTag) {
                         $tagName = $node->name->getCompoundTagName();
                         $tagMethod = $node->name->getMethodName();
 
-                        if (array_key_exists($tagMethod, $node->processedInterpolationRegions)) {
-                            if (! empty($node->processedInterpolationRegions)) {
-                                foreach ($node->processedInterpolationRegions as $region => $regionNodes) {
-                                    $this->canHandleInterpolations[$region] = $regionNodes;
+                        if (! empty($node->processedInterpolationRegions)) {
+                            foreach ($node->processedInterpolationRegions as $region => $regionNodes) {
+                                $this->canHandleInterpolations[$region] = $regionNodes;
+
+                                if (Str::contains($tagMethod, $region)) {
+                                    $tagMethod = str_replace($region, $this->evaluateDeferredInterpolation($region), $tagMethod);
                                 }
                             }
 
-                            $tagMethod = $this->evaluateDeferredInterpolation($tagMethod);
                             $tagName = $node->name->name.':'.$tagMethod;
                         }
 
@@ -1354,7 +1374,21 @@ class NodeProcessor
                             'tag_method' => $tagMethod,
                         ]);
 
-                        $output = call_user_func([$tag, $node->name->getRuntimeMethodName()]);
+                        $methodToCall = $node->name->getRuntimeMethodName();
+
+                        if ($this->encounteredBuilder) {
+                            $methodToCall = 'index';
+                        }
+
+                        $beforeAssignments = $this->runtimeAssignments;
+                        $output = call_user_func([$tag, $methodToCall]);
+                        $afterAssignments = $this->runtimeAssignments;
+
+                        foreach ($afterAssignments as $assignedVar => $val) {
+                            if (! array_key_exists($assignedVar, $beforeAssignments)) {
+                                unset($this->runtimeAssignments[$assignedVar]);
+                            }
+                        }
 
                         // While the PathDataManager can resolve builder instances,
                         // we will handle this case here so that the values can
@@ -1549,7 +1583,6 @@ class NodeProcessor
 
                     $val = null;
                     $runtimeResolveLoopVar = false;
-                    $runtimeResolveModifiedValue = false;
 
                     if ($tagCallbackResult == null) {
                         if (count($node->parameters) == 0 && ! empty($node->runtimeNodes)) {
@@ -1584,10 +1617,6 @@ class NodeProcessor
                             if ($node->hasParsedRuntimeNodes == false) {
                                 // Parse will rebuild the modifier chain. Reset so we don't double up!
                                 foreach ($node->runtimeNodes as $runtimeNode) {
-                                    if ($runtimeNode instanceof ModifierNameNode) {
-                                        $runtimeResolveModifiedValue = true;
-                                    }
-
                                     $runtimeNode->modifierChain = null;
                                 }
 
@@ -1612,6 +1641,7 @@ class NodeProcessor
                             }
 
                             $runtimeResult = $environment->evaluate($node->parsedRuntimeNodes);
+
                             $this->data = $restoreData;
 
                             if (is_string($runtimeResult) && $node->hasProcessedInterpolationRegions) {
@@ -1697,6 +1727,10 @@ class NodeProcessor
                                 $val = $runtimeResult;
                             } else {
                                 if (! $runtimeResult instanceof Builder) {
+                                    if ($runtimeResult === null) {
+                                        continue;
+                                    }
+
                                     if ($this->guardRuntime($node, $runtimeResult)) {
                                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($runtimeResult));
                                     }
@@ -1735,7 +1769,6 @@ class NodeProcessor
                     } else {
                         $val = $tagCallbackResult;
                         $runtimeResolveLoopVar = true;
-                        $runtimeResolveModifiedValue = true;
                     }
 
                     $runLoopMagic = true;
@@ -1748,7 +1781,7 @@ class NodeProcessor
                         );
                     }
 
-                    if ($runtimeResolveLoopVar == false || $runtimeResolveModifiedValue == false) {
+                    if ($runtimeResolveLoopVar == false) {
                         if ($node->pathReference != null) {
                             $dataRetriever = new PathDataManager();
                             if (! empty(GlobalRuntimeState::$prefixState)) {
@@ -1796,9 +1829,10 @@ class NodeProcessor
                         $this->pathDataManager->setIsPaired($curIsPaired);
                         $this->pathDataManager->setReduceFinal($curReduceFinal);
 
-                        if (! $this->shouldProcessAsTag($node) && $val !== null) {
+                        if (! $shouldProcessAsTag && $val !== null) {
                             foreach ($node->parameters as $param) {
                                 if (ModifierManager::isModifier($param)) {
+                                    $lockData = $this->data;
                                     $activeData = $this->getActiveData();
                                     $paramValues = [];
 
@@ -1806,6 +1840,7 @@ class NodeProcessor
                                         $varValue = $node->getSingleParameterValue($param, $this, $activeData);
 
                                         if ($varValue == 'void::'.GlobalRuntimeState::$environmentId) {
+                                            $this->data = $lockData;
                                             continue;
                                         }
 
@@ -1846,15 +1881,20 @@ class NodeProcessor
                                     if ($val instanceof  Value) {
                                         if ($val->shouldParseAntlers()) {
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             GlobalRuntimeState::$userContentEvalState = [
                                                 $val,
                                                 $node,
                                             ];
+
                                             $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
                                             GlobalRuntimeState::$userContentEvalState = null;
                                             GlobalRuntimeState::$isEvaluatingUserData = false;
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         } else {
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->value();
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         }
                                     }
 
@@ -1869,22 +1909,29 @@ class NodeProcessor
                                     $val = $this->runModifier($param->name, $paramValues, $val, $activeData);
 
                                     if ($val === null) {
+                                        $this->data = $lockData;
                                         break;
                                     }
                                 } else {
                                     if ($param->name === 'raw') {
                                         if ($val instanceof Value) {
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->raw();
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         }
                                     } elseif ($param->name === 'noparse') {
                                         if ($val instanceof Value) {
+                                            GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->value();
+                                            GlobalRuntimeState::$isEvaluatingData = false;
                                         }
                                     } else {
                                         // Throw an exception here to maintain consistent behavior with the regex parser.
                                         throw new ModifierNotFoundException($param->name);
                                     }
                                 }
+
+                                $this->data = $lockData;
                             }
 
                             if ($val instanceof Collection) {
@@ -1969,7 +2016,7 @@ class NodeProcessor
                                     $processor->allowPhp($this->allowPhp);
                                     $processor->cascade($this->cascade);
                                     $processor->setAntlersParserInstance($this->antlersParser);
-                                    $processor->setRuntimeAssignments($this->runtimeAssignments, $this->previousAssignments);
+                                    $processor->setRuntimeAssignments($this->runtimeAssignments);
 
                                     if ($this->runtimeConfiguration != null) {
                                         $processor->setRuntimeConfiguration($this->runtimeConfiguration);
@@ -2021,7 +2068,7 @@ class NodeProcessor
                                         }
                                     }
 
-                                    $this->processAssignments($runtimeAssignmentsToProcess, $lockData);
+                                    $this->processAssignments($runtimeAssignmentsToProcess);
                                     $lockData = $this->data;
 
                                     $buffer .= $this->measureBufferAppend($node, $loopBuffer);
@@ -2046,7 +2093,9 @@ class NodeProcessor
 
                         foreach ($node->parameters as $param) {
                             if (ModifierManager::isModifier($param)) {
+                                $lockData = $this->data;
                                 $val = $this->runModifier($param->name, array_values($node->getParameterValues($this, $curActiveData)), $val, $this->getActiveData());
+                                $this->data = $lockData;
                             }
                         }
                     }

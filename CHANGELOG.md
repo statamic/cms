@@ -1,5 +1,159 @@
 # Release Notes
 
+## 3.3.12 (2022-05-18)
+
+### What's improved
+
+- Add `toggle` mode to revealer fieldtype. [#6052](http://github.com/statamic/cms/issues/6052) by @jesseleite
+- Allow eloquent query builder to accept page parameters. [#6056](http://github.com/statamic/cms/issues/6056) by @ryanmitchell
+- Clean up deprecations. [#6014](http://github.com/statamic/cms/issues/6014) by @jasonvarga
+- Expect the `RevisionContract` inside WorkingCopy. [#6017](http://github.com/statamic/cms/issues/6017) by @jonassiewertsen
+- Disable SSL certificate verification locally for `static:warm` command. [#6028](http://github.com/statamic/cms/issues/6028) by @FrittenKeeZ
+
+### What's fixed
+
+- Fix for revealers nested within grids with `mode: stacked` enabled. [#6047](http://github.com/statamic/cms/issues/6047) by @jesseleite
+- Fix file uploads in front end form submissions. [#6061](http://github.com/statamic/cms/issues/6061) by @jesseleite
+
+
+## 3.3.11 (2022-05-10)
+
+### What's improved
+
+- Swedish translations. [#5975](http://github.com/statamic/cms/issues/5975) by @adevade
+- Remove unused assets (mostly `.png`s). [#6006](http://github.com/statamic/cms/issues/6006) by @adevade
+- Update default url to use `https` in markdown fields. [#5971](http://github.com/statamic/cms/issues/5971) by @adevade
+- Enable spellcheck in markdown fields, improve CodeMirror field accessibility. [#6016](http://github.com/statamic/cms/issues/6016) by @jacksleight
+- Allow overwriting the `getAddon` method. [#5935](http://github.com/statamic/cms/issues/5935) by @jonassiewertsen
+
+### What's fixed
+
+- Fix hidden data when replicator sets are collapsed by default. [#6021](http://github.com/statamic/cms/issues/6021) by @jesseleite
+- Fix adding new s3 folder to asset listing cache with stache watcher disabled. [#5996](http://github.com/statamic/cms/issues/5996) by @jesseleite
+- Fix overzealous deleting from asset listing cache with stache watcher disabled. [#5998](http://github.com/statamic/cms/issues/5998) by @jesseleite
+- Move route to fix live preview pop out. [#5968](http://github.com/statamic/cms/issues/5968) by @jasonvarga
+- Fix limit and offset on ordered query builders. [#5932](http://github.com/statamic/cms/issues/5932) by @jasonvarga
+- Fix indexing of query builder results. [#5961](http://github.com/statamic/cms/issues/5961) by @jasonvarga
+- Runtime: Fix numeric variables inside parameters and shares cascade data. [#5995](http://github.com/statamic/cms/issues/5995) by @JohnathonKoster
+- Runtime: Evaluate Antlers within `code` fieldtype when `antlers: true` is set. [#5966](http://github.com/statamic/cms/issues/5966) by @JohnathonKoster
+
+
+## 3.3.10 (2022-04-29)
+
+### What's new
+
+- Add `str_pad` modifiers. [#5920](https://github.com/statamic/cms/issues/5920) by @FrittenKeeZ
+- Add 'Copy URL' action to assets. [#5901](https://github.com/statamic/cms/issues/5901) by @duncanmcclean
+
+### What's improved
+
+- Swedish translations. [#5948](https://github.com/statamic/cms/issues/5948) by @adevade
+- French translations. [#5903](https://github.com/statamic/cms/issues/5903) by @ebeauchamps
+- Runtime: Better line and char numbers when reporting interpolation errors. [#5930](https://github.com/statamic/cms/issues/5930) by @JohnathonKoster
+- Move the HTML fieldtype into the proper "special" category. [#5959](https://github.com/statamic/cms/issues/5959) by @jackmcdade
+- Enable Glide presets to use watermarks. [#5925](https://github.com/statamic/cms/issues/5925) by @wesort
+- Asset browser uses HasActions mixin. [#5912](https://github.com/statamic/cms/issues/5912) by @jasonvarga
+
+### What's fixed
+
+- Runtime: Corrects parameter style modifier scope overwriting issue. [#5885](https://github.com/statamic/cms/issues/5885) by @JohnathonKoster
+- Runtime: Prevent variables from leaking out of tags. [#5884](https://github.com/statamic/cms/issues/5884) by @JohnathonKoster
+- Runtime: Adds support for uppercase logical keywords. [#5911](https://github.com/statamic/cms/issues/5911) by @JohnathonKoster
+- Add backwards compatibility to entry edit url. [#5924](https://github.com/statamic/cms/issues/5924) by @jonassiewertsen
+- Fix hidden code field. [#5923](https://github.com/statamic/cms/issues/5923) by @jasonvarga
+- Hook up CodeMirror's `direction` config property. [#5957](https://github.com/statamic/cms/issues/5957) by @jackmcdade
+- Update data when replicator set is toggled. [#5898](https://github.com/statamic/cms/issues/5898) by @edalzell
+- Bump composer/composer dependency. [#5921](https://github.com/statamic/cms/issues/5921) by @jasonvarga
+- Bump async from 2.6.3 to 2.6.4. [#5922](https://github.com/statamic/cms/issues/5922) by @dependabot
+
+
+## 3.3.9 (2022-04-21)
+
+### What's new
+
+- Add “small” Bard button. [#5876](https://github.com/statamic/cms/pull/5876) by @edalzell
+
+### What's improved
+
+- Updated Russian translations. [#5879](https://github.com/statamic/cms/pull/5879) by @dragomano
+
+### What's fixed
+
+- Runtime: Fix conditions checking the Cascade. [#5875](https://github.com/statamic/cms/pull/5875) by @JohnathonKoster
+- Fix submitted data when fields are hidden by revealer fieldtype. [#5878](https://github.com/statamic/cms/pull/5878) by @jesseleite
+- Fix hidden field tracking in stacked grid rows. [#5877](https://github.com/statamic/cms/issues/5877) by @jesseleite
+
+
+## 3.3.8 (2022-04-20)
+
+### What's new
+- Glide generated images can be stored on any filesystem. [#5725](https://github.com/statamic/cms/issues/5725) by @jasonvarga
+- Glide supports watermarks. [#5725](https://github.com/statamic/cms/issues/5725) by @jasonvarga
+- Actions can run JavaScript. [#5854](https://github.com/statamic/cms/issues/5854) by @duncanmcclean
+- Ability to copy a password reset link from the user listing dropdown menus. [#5854](https://github.com/statamic/cms/issues/5854) by @duncanmcclean
+- Ability to provide additional preview targets. [#5549](https://github.com/statamic/cms/issues/5549) by @aerni
+- Simplified Chinese translations. [#5847](https://github.com/statamic/cms/issues/5847) by @grandpalacko
+
+### What's improved
+- Starter kits will require multiple dependencies at once. [#5859](https://github.com/statamic/cms/issues/5859) by @jesseleite
+- Updated Dutch translations. [#5867](https://github.com/statamic/cms/issues/5867) by @robdekort
+- Runtime: Optimized `noparse` parsing. [#5848](https://github.com/statamic/cms/issues/5848) by @fdabek1
+
+### What's fixed
+- Fix issue where adding an image to Bard will make an needless, erroring AJAX request. [#5864](https://github.com/statamic/cms/issues/5864) by @fdabek1
+- Fix issue where the `terms` fieldtype filters out too much. [#5865](https://github.com/statamic/cms/issues/5865) by @jasonvarga
+- Fix `group_by` modifier not working with grids. [#5858](https://github.com/statamic/cms/issues/5858) by @jasonvarga
+- Runtime: Preserve builder instances when being supplied in dynamic bindings and modifiers, or when they've been scoped/nested. [#5807](https://github.com/statamic/cms/issues/5807) by @fdabek1
+- Runtime: Fix single letter variables without spaces skipping HTML content. [#5843](https://github.com/statamic/cms/issues/5843) by @fdabek1
+- Fix validation error when attempting to create a taxonomy that has the same handle as a collection. [#5850](https://github.com/statamic/cms/issues/5850) by @grandpalacko
+
+
+
+## 3.3.7 (2022-04-14)
+
+### What's new
+- The `toggle` fieldtype is available in frontend forms. [#5789](https://github.com/statamic/cms/issues/5789) by @jesseleite
+- Added an `inline_label` option to the `toggle` fieldtype. [#5789](https://github.com/statamic/cms/issues/5789) by @jesseleite
+
+### What's improved
+- User avatars in the CP header are cropped appropriately. [#5731](https://github.com/statamic/cms/issues/5731) by @ncla
+
+### What's fixed
+- Fix handling of hidden nested fields in publish forms. [#5805](https://github.com/statamic/cms/issues/5805) by @jesseleite
+- Runtime: Prevent modifiers on tag pairs being evaluated twice. [#5828](https://github.com/statamic/cms/issues/5828) by @JohnathonKoster
+- Runtime: Prevent a log when looping over a null. [#5832](https://github.com/statamic/cms/issues/5832) by @JohnathonKoster
+- Adjusted docs link in French translation. [#5835](https://github.com/statamic/cms/issues/5835) by @ebeauchamps
+- Another ReturnTypeWillChange annotation. [#5839](https://github.com/statamic/cms/issues/5839) by @jasonvarga
+
+
+
+## 3.3.6 (2022-04-11)
+
+### What's new
+- The Markdown `Parser` class is macroable. [#5797](https://github.com/statamic/cms/issues/5797) by @jacksleight
+
+### What's improved
+- Dutch translations. [#5801](https://github.com/statamic/cms/issues/5801) by @robdekort
+- Norwegian translations. [#5798](https://github.com/statamic/cms/issues/5798) by @espenlg
+
+### What's fixed
+- The `nav:breadcrumbs` tag can now be used in Blade. [#5599](https://github.com/statamic/cms/issues/5599) by @jasonvarga
+- Collections are counted more efficiently in the `length` modifier. [#5802](https://github.com/statamic/cms/issues/5802) by @jasonvarga
+- Fix issue when using a single `assets` field named `asset`. [#5799](https://github.com/statamic/cms/issues/5799) by @jasonvarga
+- Fix `entries` fieldtype in select mode pushing the content area wider. [#5787](https://github.com/statamic/cms/issues/5787) by @jackmcdade
+- Runtime: Support for multiple interpolations in tag method names. [#5800](https://github.com/statamic/cms/issues/5800) by @JohnathonKoster
+- Runtime: Isolate scope when resolving values to prevent overriding page data. [#5668](https://github.com/statamic/cms/issues/5668) by @JohnathonKoster
+- Runtime: Correct self closing tags. [#5781](https://github.com/statamic/cms/issues/5781) by @JohnathonKoster
+- Runtime: Fix issue when using recursion and conditions. [#5779](https://github.com/statamic/cms/issues/5779) by @JohnathonKoster
+- Runtime: Fix `noparse` behavior. [#5778](https://github.com/statamic/cms/issues/5778) by @JohnathonKoster
+- Runtime: Fix modifier chains and null values. [#5780](https://github.com/statamic/cms/issues/5780) by @JohnathonKoster
+- Runtime: Prevent literal from being removed when using multiple nested double braces in a parameter. [#5777](https://github.com/statamic/cms/issues/5777) by @JohnathonKoster
+- Runtime: Removes ctype_space null deprecation warning. [#5776](https://github.com/statamic/cms/issues/5776) by @JohnathonKoster
+- Bump `minimist` from 1.2.5 to 1.2.6 [#5808](https://github.com/statamic/cms/issues/5808) by @dependabot
+- Bump `moment` from 2.27.0 to 2.29.2 [#5806](https://github.com/statamic/cms/issues/5806) by @dependabot
+
+
+
 ## 3.3.5 (2022-04-06)
 
 ### What's new

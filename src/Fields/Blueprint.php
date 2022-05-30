@@ -108,7 +108,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     {
         return Path::tidy(vsprintf('%s/%s/%s.yaml', [
             Facades\Blueprint::directory(),
-            str_replace('.', '/', $this->namespace()),
+            str_replace('.', '/', (string) $this->namespace()),
             $this->handle(),
         ]));
     }
