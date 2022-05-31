@@ -278,20 +278,20 @@ class AssetContainersController extends CpController
                         'type' => 'select',
                         'display' => __('Process Source Images'),
                         'label_html' => true,
-                        'instructions' => __('When enabled, source images will be permanently processed with this image manipulation preset on upload.'),
+                        'instructions' => __('statamic::messages.asset_container_glide_source_preset_instructions'),
                         'options' => $this->expandedGlidePresetOptions(),
                         'clearable' => true,
                     ],
                     'glide_warm_intelligent' => [
                         'type' => 'toggle',
                         'display' => __('Intelligently Warm Glide Caches'),
-                        'instructions' => __('When enabled, intelligently warm glide caches on upload.'),
+                        'instructions' => __('statamic::messages.asset_container_glide_warm_intelligent_instructions'),
                         'default' => true,
                     ],
                     'glide_warm_presets' => [
                         'type' => 'select',
                         'display' => __('Warm Specific Glide Caches'),
-                        'instructions' => __('Specify which glide presets to warm on upload.'),
+                        'instructions' => __('statamic::messages.asset_container_glide_warm_presets_instructions'),
                         'multiple' => true,
                         'options' => array_keys(config('statamic.assets.image_manipulation.presets')),
                         'if' => [
