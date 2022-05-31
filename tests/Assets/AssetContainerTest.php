@@ -190,6 +190,42 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_whether_renaming_is_allowed()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->allowRenaming());
+
+        $return = $container->allowRenaming(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->allowRenaming());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_whether_moving_is_allowed()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->allowMoving());
+
+        $return = $container->allowMoving(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->allowMoving());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_whether_downloading_is_allowed()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->allowDownloading());
+
+        $return = $container->allowDownloading(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->allowDownloading());
+    }
+
+    /** @test */
     public function it_saves_the_container_through_the_api()
     {
         Facades\AssetContainer::spy();
