@@ -495,7 +495,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 
         // If `glide_warm_presets` is an array, ignore based on explicit container setting.
         if (is_array($this->glideWarmPresets)) {
-            return array_diff($presets, $this->glideWarmPresets);
+            return array_values(array_diff($presets, $this->glideWarmPresets));
         }
 
         // If `glide_source_preset` is set, ignore this preset because uploads will already be processed by it.
