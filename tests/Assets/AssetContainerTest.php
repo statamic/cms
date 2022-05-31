@@ -226,6 +226,114 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_glide_source_preset_for_upload_processing()
+    {
+        $container = new AssetContainer;
+        $this->assertNull($container->glideSourcePreset());
+
+        $return = $container->glideSourcePreset('watermarked');
+
+        $this->assertEquals($container, $return);
+        $this->assertEquals('watermarked', $container->glideSourcePreset());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_explicit_glide_warm_presets_config()
+    {
+        $container = new AssetContainer;
+        $this->assertNull($container->glideWarmPresets());
+
+        // Set explicit presets to warm.
+        $return = $container->glideWarmPresets(['small', 'medium']);
+
+        $this->assertEquals($container, $return);
+        $this->assertEquals(['small', 'medium'], $container->glideWarmPresets());
+
+        // Set `false` to disable warming of presets.
+        $return = $container->glideWarmPresets(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertEquals([], $container->glideWarmPresets());
+
+        // Ensure passing `null` properly clears this config, because `null` should
+        // allow for Statamic to intelligently determine which presets to warm.
+        $return = $container->glideWarmPresets(null);
+
+        $this->assertEquals($container, $return);
+        $this->assertNull($container->glideWarmPresets());
+    }
+
+    /** @test */
+    public function it_doesnt_ignore_any_glide_presets_when_warming_by_default()
+    {
+        $container = new AssetContainer;
+
+        config(['statamic.assets.image_manipulation.presets' => [
+            'small' => ['w' => '15', 'h' => '15'],
+            'medium' => ['w' => '500', 'h' => '500'],
+            'large' => ['w' => '1000', 'h' => '1000'],
+            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
+        ]]);
+
+        $this->assertEquals([], $container->glideIgnoredPresets());
+    }
+
+    /** @test */
+    public function it_ignores_source_preset_when_warming_because_upload_will_already_have_been_processed()
+    {
+        $container = new AssetContainer;
+
+        config(['statamic.assets.image_manipulation.presets' => [
+            'small' => ['w' => '15', 'h' => '15'],
+            'medium' => ['w' => '500', 'h' => '500'],
+            'large' => ['w' => '1000', 'h' => '1000'],
+            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
+        ]]);
+
+        $container->glideSourcePreset('max');
+
+        $this->assertEquals(['max'], $container->glideIgnoredPresets());
+    }
+
+    /** @test */
+    public function it_ignores_presets_based_on_explicitly_configured_presets_setting()
+    {
+        $container = new AssetContainer;
+
+        config(['statamic.assets.image_manipulation.presets' => [
+            'small' => ['w' => '15', 'h' => '15'],
+            'medium' => ['w' => '500', 'h' => '500'],
+            'large' => ['w' => '1000', 'h' => '1000'],
+            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
+        ]]);
+
+        $container
+            ->glideSourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
+            ->glideWarmPresets(['medium', 'max']); // but this config should override which presets the user wants to warm
+
+        $this->assertEquals(['small', 'large'], $container->glideIgnoredPresets());
+    }
+
+    /** @test */
+    public function it_ignores_all_presets_if_explicitly_configured()
+    {
+        $container = new AssetContainer;
+
+        config(['statamic.assets.image_manipulation.presets' => [
+            'small' => ['w' => '15', 'h' => '15'],
+            'medium' => ['w' => '500', 'h' => '500'],
+            'large' => ['w' => '1000', 'h' => '1000'],
+            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
+        ]]);
+
+        $container
+            ->glideSourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
+            ->glideWarmPresets(false); // but this config should override to ensure all the above configured presets are ignored
+
+        $this->assertEquals(['small', 'medium', 'large', 'max'], $container->glideIgnoredPresets());
+    }
+
+    /** @test */
     public function it_saves_the_container_through_the_api()
     {
         Facades\AssetContainer::spy();
