@@ -456,9 +456,6 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     {
         return $this
             ->fluentlyGetOrSet('glideSourcePreset')
-            ->getter(function ($preset) {
-                return $preset ?? null;
-            })
             ->args(func_get_args());
     }
 
