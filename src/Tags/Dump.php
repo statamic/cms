@@ -9,7 +9,13 @@ class Dump extends Tags
      */
     public function index()
     {
-        dump($this->context->except(['__env', 'app'])->all());
+        dump(
+            $this
+                ->context
+                ->except(['__env', 'app'])
+                ->sortKeys()
+                ->all()
+        );
     }
 
     /**
