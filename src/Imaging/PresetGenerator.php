@@ -35,12 +35,16 @@ class PresetGenerator
      */
     public function generate(Asset $asset, $preset = null)
     {
-        $presets = ($preset)
-            ? [$preset => []]
-            : $this->presets;
+        $presets = $preset ?: array_keys($this->presets);
 
-        foreach ($presets as $name => $params) {
-            $this->generator->generateByAsset($asset, ['p' => $name]);
-        }
+        $ignoredPresets = $asset->container()->glideIgnoredPresets();
+
+        collect($presets)
+            ->reject(function ($preset) use ($ignoredPresets) {
+                return in_array($preset, $ignoredPresets);
+            })
+            ->each(function ($preset) use ($asset) {
+                $this->generator->generateByAsset($asset, ['p' => $preset]);
+            });
     }
 }
