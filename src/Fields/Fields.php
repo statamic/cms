@@ -51,7 +51,7 @@ class Fields
         $this->parent = $parent;
 
         if ($this->fields) {
-            $this->fields->each(fn ($field) => $field->setParent($parent));
+            $this->fields->each(fn ($f) => $f->setParent($parent));
         }
 
         return $this;
@@ -62,7 +62,7 @@ class Fields
         $this->parentField = $field;
 
         if ($this->fields) {
-            $this->fields->each(fn ($field) => $field->setParentField($field));
+            $this->fields->each(fn ($f) => $f->setParentField($field));
         }
 
         return $this;
