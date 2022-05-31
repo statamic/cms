@@ -16,6 +16,7 @@ use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
@@ -476,6 +477,33 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
                 return $presets === [] ? false : $presets;
             })
             ->args(func_get_args());
+    }
+
+    /**
+     * Intelligently determine which glide presets to ignore, based on the `glide_warm_presets` configuration.
+     *
+     * @return array
+     */
+    public function glideIgnoredPresets()
+    {
+        $presets = array_keys(Config::get('statamic.assets.image_manipulation.presets', []));
+
+        // If `glide_warm_presets: false`, ignore all user configured presets.
+        if ($this->glideWarmPresets === false) {
+            return $presets;
+        }
+
+        // If `glide_warm_presets` is an array, ignore based on explicit container setting.
+        if (is_array($this->glideWarmPresets)) {
+            return array_diff($presets, $this->glideWarmPresets);
+        }
+
+        // If `glide_source_preset` is set, ignore this preset because uploads will already be processed by it.
+        if ($this->glideSourcePreset) {
+            return [$this->glideSourcePreset];
+        }
+
+        return [];
     }
 
     public function fileData()
