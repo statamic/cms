@@ -1051,6 +1051,93 @@ class AssetTest extends TestCase
         Event::assertDispatched(AssetSaved::class);
     }
 
+    protected function configureGlidePresets($app)
+    {
+        $app->config->set('statamic.assets.image_manipulation.presets', [
+            'small' => ['w' => '15', 'h' => '15'],
+            'medium' => ['w' => '500', 'h' => '500'],
+            'large' => ['w' => '1000', 'h' => '1000'],
+            'max' => ['w' => '3000', 'h' => '3000'],
+        ]);
+    }
+
+    /**
+     * @test
+     * @define-env configureGlidePresets
+     **/
+    public function it_generates_glide_cache_for_all_presets_by_default()
+    {
+        $cacheFolder = $this->uploadImageAndAssertGlideCache();
+
+        // Should be 3 cp presets, and 4 of our custom presets
+        $this->assertCount(7, File::getFiles($cacheFolder));
+    }
+
+    /**
+     * @test
+     * @define-env configureGlidePresets
+     **/
+    public function it_generates_glide_cache_for_all_presets_except_configured_source_preset_on_upload()
+    {
+        $this->container->glideSourcePreset('max');
+
+        $cacheFolder = $this->uploadImageAndAssertGlideCache();
+
+        // Should be 3 cp presets, and 3 of our custom presets, discluding the configured source/upload preset
+        $this->assertCount(6, File::getFiles($cacheFolder));
+    }
+
+    /**
+     * @test
+     * @define-env configureGlidePresets
+     **/
+    public function it_generates_glide_cache_for_explicitly_set_presets()
+    {
+        $this->container
+            ->glideSourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
+            ->glideWarmPresets(['max']); // but this config should override which presets the user wants to warm
+
+        $cacheFolder = $this->uploadImageAndAssertGlideCache();
+
+        // Should be 3 cp presets, and 1 of our custom presets, since we explicitly configured only one this time
+        $this->assertCount(4, File::getFiles($cacheFolder));
+    }
+
+    /**
+     * @test
+     * @define-env configureGlidePresets
+     **/
+    public function it_doesnt_generates_glide_cache_for_disabled_user_presets()
+    {
+        $this->container->glideSourcePreset('max')->glideWarmPresets(false);
+
+        $cacheFolder = $this->uploadImageAndAssertGlideCache();
+
+        // Should be 3 cp presets only, discluding all user presets
+        $this->assertCount(3, File::getFiles($cacheFolder));
+    }
+
+    private function uploadImageAndAssertGlideCache()
+    {
+        $this->artisan('statamic:glide:clear');
+
+        $cacheFolder = storage_path('statamic/glide/containers/test_container/path/to/asset.jpg');
+
+        $this->assertDirectoryNotExists($cacheFolder);
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/asset.jpg')
+            ->syncOriginal()
+            ->upload(UploadedFile::fake()->image('asset.jpg', 20, 30));
+
+        $this->assertDirectoryExists($cacheFolder);
+
+        return $cacheFolder;
+    }
+
     /** @test */
     public function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
     {
