@@ -385,6 +385,22 @@ export default {
             });
         },
 
+        duplicateSet(old_id, attrs, pos) {
+            const id = `set-${uniqid()}`;
+            const enabled = attrs.enabled;
+            const values = Object.assign({}, attrs.values);
+
+            let previews = Object.assign({}, this.previews[old_id]);
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
+            this.updateSetMeta(id, this.meta.existing[old_id]);
+
+            // Perform this in nextTick because the meta data won't be ready until then.
+            this.$nextTick(() => {
+                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos });
+            });
+        },
+
         collapseSet(id) {
             if (!this.collapsed.includes(id)) {
                 this.collapsed.push(id)
