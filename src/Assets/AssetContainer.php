@@ -460,9 +460,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     }
 
     /**
-     * The specific glide presets to be used when warming glide image cache on upload,
-     * otherwise we intelligently generate image cache for all configured presets,
-     * with the exception of the glide source preset, if one is configured.
+     * The specific glide presets to be used when warming glide image cache on upload.
      *
      * @param  array|null  $presets
      * @return array|null|$this
@@ -472,7 +470,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         return $this
             ->fluentlyGetOrSet('glideWarmPresets')
             ->getter(function ($presets) {
-                return $presets !== [] ? $presets : null;
+                return $presets === false ? [] : $presets;
+            })
+            ->setter(function ($presets) {
+                return $presets === [] ? false : $presets;
             })
             ->args(func_get_args());
     }
