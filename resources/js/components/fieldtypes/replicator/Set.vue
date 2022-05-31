@@ -205,7 +205,7 @@ export default {
         },
 
         duplicate() {
-            this.$emit('duplicate');
+            this.$emit('duplicated');
         },
 
         fieldPath(field) {

@@ -36,7 +36,7 @@
                     :can-add-set="canAddSet"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
-                    @duplicate="duplicateSet(set._id)"
+                    @duplicated="duplicateSet(set._id)"
                     @updated="updated"
                     @meta-updated="updateSetMeta(set._id, $event)"
                     @removed="removed(set, index)"
