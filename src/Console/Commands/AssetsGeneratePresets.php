@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Image;
 use Statamic\Jobs\GeneratePresetImageManipulation;
 
@@ -96,6 +97,8 @@ class AssetsGeneratePresets extends Command
      */
     private function generatePresets($presets)
     {
+        $ignoredPresetsByContainer = AssetContainer::all()->keyBy->handle()->map->glideIgnoredPresets();
+
         foreach ($presets as $preset => $params) {
             $bar = $this->output->createProgressBar($this->imageAssets->count());
 
@@ -103,7 +106,11 @@ class AssetsGeneratePresets extends Command
             $bar->setFormat("[%current%/%max%] $verb <comment>$preset</comment>... %filename%");
 
             foreach ($this->imageAssets as $asset) {
-                $bar->setMessage($asset->basename(), 'filename');
+                $appendStatus = in_array($preset, $ignoredPresetsByContainer->get($asset->containerHandle()))
+                    ? ' (skipping)'
+                    : '';
+
+                $bar->setMessage($asset->basename().$appendStatus, 'filename');
 
                 $dispatchMethod = $this->shouldQueue
                     ? 'dispatch'
