@@ -50,13 +50,6 @@ class DefaultInvalidator implements Invalidator
         );
     }
 
-    private function splitUrlAndDomain($url)
-    {
-        $parsed = parse_url($url);
-
-        return [$parsed['path'], $parsed['scheme'].'://'.$parsed['host']];
-    }
-
     protected function invalidateTermUrls($term)
     {
         if ($url = $term->url()) {
@@ -93,5 +86,12 @@ class DefaultInvalidator implements Invalidator
         if ($url = $collection->url()) {
             $this->cacher->invalidateUrl($url);
         }
+    }
+
+    private function splitUrlAndDomain($url)
+    {
+        $parsed = parse_url($url);
+
+        return [$parsed['path'], $parsed['scheme'].'://'.$parsed['host']];
     }
 }
