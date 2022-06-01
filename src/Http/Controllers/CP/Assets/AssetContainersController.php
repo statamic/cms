@@ -277,8 +277,8 @@ class AssetContainersController extends CpController
                     'glide_source_preset' => [
                         'type' => 'select',
                         'display' => __('Process Source Images'),
-                        'label_html' => true,
                         'instructions' => __('statamic::messages.asset_container_glide_source_preset_instructions'),
+                        'label_html' => true,
                         'options' => $this->expandedGlidePresetOptions(),
                         'clearable' => true,
                     ],
@@ -293,7 +293,8 @@ class AssetContainersController extends CpController
                         'display' => __('Warm Specific Glide Caches'),
                         'instructions' => __('statamic::messages.asset_container_glide_warm_presets_instructions'),
                         'multiple' => true,
-                        'options' => array_keys(config('statamic.assets.image_manipulation.presets')),
+                        'label_html' => true,
+                        'options' => $this->expandedGlidePresetOptions(),
                         'if' => [
                             'glide_warm_intelligent' => false,
                         ],
@@ -315,11 +316,11 @@ class AssetContainersController extends CpController
 
     private function expandedGlidePresetLabel($handle, $params)
     {
-        $separator = '<span class="text-grey-50">-</span>';
+        $separator = '<span class="hidden-outside text-grey-50">-</span>';
 
         $params = collect($params)
             ->map(function ($value, $param) {
-                return "<code>{$param}: {$value}</code>";
+                return sprintf('<code class="hidden-outside">%s: %s</code>', $param, $value);
             })
             ->implode(' ');
 
