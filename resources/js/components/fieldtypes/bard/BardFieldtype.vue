@@ -112,10 +112,6 @@ import css from 'highlight.js/lib/languages/css'
 import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
 
-/** @deprecated */
-// import mark from './Mark';
-// import node from './Node';
-
 export default {
 
     mixins: [Fieldtype, ManagesSetMeta],
