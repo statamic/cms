@@ -213,6 +213,7 @@ class Path
     public function extension($path)
     {
         $path = Str::before($path, '?');
+
         return array_get(pathinfo($path), 'extension');
     }
 
