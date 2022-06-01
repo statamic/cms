@@ -9,6 +9,6 @@ class UserGroup extends BaseUserGroup
 {
     public function queryUsers()
     {
-        return User::query()->where('groups/'.$this->handle(), true);
+        return User::query()->where('groups->'.$this->handle(), true);
     }
 }

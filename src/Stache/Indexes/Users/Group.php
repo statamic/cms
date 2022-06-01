@@ -9,7 +9,7 @@ class Group extends Value
 {
     public function getItemValue($item)
     {
-        $group = Str::after($this->name(), 'groups/');
+        $group = Str::after($this->name(), 'groups->');
 
         return $item->isInGroup($group);
     }

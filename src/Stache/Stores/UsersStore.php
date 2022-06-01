@@ -12,7 +12,7 @@ class UsersStore extends BasicStore
     protected function storeIndexes()
     {
         return UserGroup::all()->mapWithKeys(function ($group) {
-            return ['groups/'.$group->handle() => Group::class];
+            return ['groups->'.$group->handle() => Group::class];
         })
         ->push('email')
         ->all();
