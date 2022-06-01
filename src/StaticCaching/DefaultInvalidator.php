@@ -41,13 +41,20 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateEntryUrls($entry)
     {
-        if ($url = $entry->url()) {
-            $this->cacher->invalidateUrl($url);
+        if ($url = $entry->absoluteUrl()) {
+            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
         }
 
         $this->cacher->invalidateUrls(
             Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
         );
+    }
+
+    private function splitUrlAndDomain($url)
+    {
+        $parsed = parse_url($url);
+
+        return [$parsed['path'], $parsed['scheme'].'://'.$parsed['host']];
     }
 
     protected function invalidateTermUrls($term)

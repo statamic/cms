@@ -96,11 +96,12 @@ class ApplicationCacher extends AbstractCacher
      * Invalidate a URL.
      *
      * @param  string  $url
+     * @param  string|null  $domain
      * @return void
      */
-    public function invalidateUrl($url)
+    public function invalidateUrl($url, $domain = null)
     {
-        if (! $key = $this->getUrls()->flip()->get($url)) {
+        if (! $key = $this->getUrls($domain)->flip()->get($url)) {
             // URL doesn't exist, nothing to invalidate.
             return;
         }
