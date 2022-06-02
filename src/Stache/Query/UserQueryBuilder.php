@@ -32,16 +32,6 @@ class UserQueryBuilder extends Builder
             ->store('users')
             ->index($where['column'])->items();
 
-        if (in_array($where['column'], ['groups', 'roles'])) {
-            $items = $items->map(function ($item) {
-                return $item->map->handle()->values()->toArray();
-            });
-
-            if (is_array($where['values'])) {
-                $where['type'] = 'JsonContains';
-            }
-        }
-
         $method = 'filterWhere'.$where['type'];
 
         return $this->{$method}($items, $where)->keys();
