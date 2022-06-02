@@ -198,7 +198,6 @@ TEMPLATE;
 
     public function test_subsequent_requests_clears_stack_state()
     {
-
         $layoutTemplate = <<<'LAYOUT'
 {{ stack:head }}
 {{ template_content }}
