@@ -1173,7 +1173,7 @@ class NodeProcessor
                         $currentData = $this->getActiveData();
 
                         $trimContentWhitespace = TypeCoercion::coerceBool($node->getSingleParameterValueByName(
-                            'trim', $this->cloneProcessor(), $currentData, true
+                            'trim', $this->cloneProcessor(), $currentData, false
                         ));
 
                         $stackContent = $this->cloneProcessor()->setData($currentData)->reduce($node->children);

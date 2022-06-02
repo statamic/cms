@@ -16,19 +16,19 @@ class StacksTest extends ParserTestCase
         $template = <<<'EOT'
 BEFORE{{ stack:scripts }}AFTER
 
-{{ push:scripts }}
+{{ push:scripts trim="true" }}
 Push 1
 {{ /push:scripts }}
 
-{{ prepend:scripts }}
+{{ prepend:scripts trim="true" }}
 Prepend 1
 {{ /prepend:scripts }}
 
-{{ push:scripts }}
+{{ push:scripts trim="true" }}
 Push 2
 {{ /push:scripts }}
 
-{{ prepend:scripts }}
+{{ prepend:scripts trim="true" }}
 Prepend 2
 {{ /prepend:scripts }}
 EOT;
@@ -86,28 +86,16 @@ EOT;
     public function test_stacks_can_be_created_out_of_order()
     {
         $layoutTemplate = <<<'LAYOUT'
-{{ push:example }}
-Layout Push 1
-{{ /push:example }}
-{{ push:example }}
-Layout Push 2
-{{ /push:example }}
+{{ push:example }}Layout Push 1{{ /push:example }}
+{{ push:example }}Layout Push 2{{ /push:example }}
 {{ template_content }}
-{{ push:example }}
-Layout Push 3
-{{ /push:example }}
-{{ push:example }}
-Layout Push 4
-{{ /push:example }}
+{{ push:example }}Layout Push 3{{ /push:example }}
+{{ push:example }}Layout Push 4{{ /push:example }}
 LAYOUT;
 
         $templateTemplate = <<<'TEMPLATE'
-{{ push:example }}
-Template Push 1
-{{ /push:example  }}
-{{ push:example }}
-Template Push 2
-{{ /push:example  }}
+{{ push:example }}Template Push 1{{ /push:example  }}
+{{ push:example }}Template Push 2{{ /push:example  }}
 {{ content }}
 {{ stack:example }}
 
@@ -172,8 +160,8 @@ TEMPLATE;
         $template = <<<'EOT'
 <body class="{{ stack:modifiers }}">
 
-{{ push:modifiers trim="false" }} class-one{{ /push:modifiers }}
-{{ push:modifiers trim="false" }} class-two{{ /push:modifiers }}
+{{ push:modifiers }} class-one{{ /push:modifiers }}
+{{ push:modifiers }} class-two{{ /push:modifiers }}
 </body>
 EOT;
 

@@ -53,7 +53,7 @@ class StackReplacementManager
         return $name.$contentHash;
     }
 
-    public static function prependStack($stackName, $content, $trimContentWhitespace = true)
+    public static function prependStack($stackName, $content, $trimContentWhitespace = false)
     {
         $name = self::getStackReplacement($stackName);
 
