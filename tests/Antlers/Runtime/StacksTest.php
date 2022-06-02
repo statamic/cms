@@ -195,4 +195,52 @@ TEMPLATE;
 
         $this->assertSame('404', trim($response->getContent()));
     }
+
+    public function test_subsequent_requests_clears_stack_state()
+    {
+
+        $layoutTemplate = <<<'LAYOUT'
+{{ stack:head }}
+{{ template_content }}
+{{ stack:footer }}
+LAYOUT;
+
+        $templateTemplate = <<<'TEMPLATE'
+{{ title }}
+{{ push:head}}value-1{{ /push:head }}
+{{ push:footer}}value-2{{ /push:footer }}
+TEMPLATE;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', $layoutTemplate);
+        $this->viewShouldReturnRaw('home', $templateTemplate);
+
+        $this->createPage('home', [
+            'with' => [
+                'title' => 'Home Page',
+                'content' => 'This is the home page.',
+                'template' => 'home',
+            ],
+        ]);
+
+        $response = $this->get('/home')
+            ->assertStatus(200);
+
+        $responseOneContent = trim($response->getContent());
+
+        $responseTwo = $this->get('/home')->assertStatus(200);
+
+        $responseTwoContent = trim($responseTwo->getContent());
+
+        $expected = <<<'EOT'
+value-1
+Home Page
+
+
+value-2
+EOT;
+
+        $this->assertSame($expected, $responseOneContent);
+        $this->assertSame($expected, $responseTwoContent);
+    }
 }
