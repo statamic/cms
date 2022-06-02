@@ -121,7 +121,7 @@ class ParserTestCase extends TestCase
         $expectedResults = file_get_contents(__DIR__.'/../__fixtures__/fieldtype_tests/'.$testTemplate.'/expected.txt');
 
         $testData = [
-            $handle => $value
+            $handle => $value,
         ];
 
         foreach ($additionalValues as $valueName) {
