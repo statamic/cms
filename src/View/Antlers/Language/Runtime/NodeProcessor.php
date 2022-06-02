@@ -2092,6 +2092,9 @@ class NodeProcessor
 
                                             $runtimeData = array_merge($runtimeData, $runtimeAssignmentsToProcess);
                                         }
+
+                                        $processor->setRuntimeAssignments($runtimeAssignments);
+
                                         if (count($this->data) > $dataCount) {
                                             $this->popLoopScope();
                                         }

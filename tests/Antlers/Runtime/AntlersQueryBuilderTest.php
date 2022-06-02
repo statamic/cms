@@ -365,4 +365,46 @@ EOT;
 
         $this->assertSame($expected, $this->renderString($template, $data));
     }
+
+    public function test_nested_query_builders_process_assignments_correctly()
+    {
+        $totals = [];
+        GlobalRuntimeState::$peekCallbacks = [];
+        GlobalRuntimeState::$peekCallbacks[] = function (NodeProcessor $processor) use (&$totals) {
+            $data = $processor->getActiveData();
+            $totals[] = intval($data['total_time']);
+        };
+
+        $builderOne = Mockery::mock(Builder::class);
+        $builderTwo = Mockery::mock(Builder::class);
+
+        $builderTwo->shouldReceive('get')->andReturn(collect([
+            ['title' => 'Builder-2 One', 'duration' => 10],
+            ['title' => 'Builder-2 Two', 'duration' => 10],
+        ]));
+
+        $builderOne->shouldReceive('get')->andReturn(collect([
+            ['title' => 'Builder-1 One', 'nested_builder' => $builderTwo],
+            ['title' => 'Builder-1 Two', 'nested_builder' => $builderTwo],
+            ['title' => 'Builder-1 Three', 'nested_builder' => $builderTwo],
+        ]));
+
+        $data = [
+            'items' => $builderOne,
+        ];
+
+        $template = <<<'EOT'
+{{ total_time = 0 }}
+{{ items }}
+    {{ nested_builder }}
+        {{ total_time += duration }}
+        {{ ___internal_debug:peek }}
+    {{ /nested_builder }}
+{{ /items }}
+Total: {{ total_time }}
+EOT;
+
+        $this->assertSame('Total: 60', trim($this->renderString($template, $data)));
+        $this->assertSame([10, 20, 30, 40, 50, 60], $totals);
+    }
 }
