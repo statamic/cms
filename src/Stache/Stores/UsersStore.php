@@ -4,8 +4,10 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
+use Statamic\Facades\Role as RoleFacade;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
+use Statamic\Stache\Indexes\Users\Role;
 
 class UsersStore extends BasicStore
 {
@@ -14,6 +16,9 @@ class UsersStore extends BasicStore
         return UserGroup::all()->mapWithKeys(function ($group) {
             return ['groups/'.$group->handle() => Group::class];
         })
+        ->merge(RoleFacade::all()->mapWithKeys(function ($role) {
+            return ['roles/'.$role->handle() => Role::class];
+        }))
         ->push('email')
         ->all();
     }

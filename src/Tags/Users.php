@@ -27,8 +27,12 @@ class Users extends Tags
             });
         }
 
-        if ($role = $this->params->get('role')) {
-            $query->where('role', $role);
+        if ($roles = $this->params->explode('role', [])) {
+            $query->where(function ($query) use ($roles) {
+                foreach ($roles as $role) {
+                    $query->orWhere('roles/'.$role, true);
+                }
+            });
         }
 
         return $this->output($this->results($query));
