@@ -110,7 +110,7 @@ class ParserTestCase extends TestCase
         return $documentParser->getNodes();
     }
 
-    protected function runFieldTypeTest($handle, $testTemplate = null)
+    protected function runFieldTypeTest($handle, $testTemplate = null, $additionalValues = [])
     {
         if ($testTemplate == null) {
             $testTemplate = $handle;
@@ -120,8 +120,16 @@ class ParserTestCase extends TestCase
         $template = file_get_contents(__DIR__.'/../__fixtures__/fieldtype_tests/'.$testTemplate.'/template.antlers.html');
         $expectedResults = file_get_contents(__DIR__.'/../__fixtures__/fieldtype_tests/'.$testTemplate.'/expected.txt');
 
+        $testData = [
+            $handle => $value
+        ];
+
+        foreach ($additionalValues as $valueName) {
+            $testData[$valueName] = $this->getTestValue($valueName);
+        }
+
         $this->assertSame($this->normalize($expectedResults), $this->normalize(
-            $this->renderString($template, [$handle => $value], true)
+            $this->renderString($template, $testData, true)
         ), 'Field Type Test: '.$handle);
     }
 

@@ -751,6 +751,11 @@ class NodeProcessor
         $this->runtimeAssignments = $assignments;
     }
 
+    public function mergeRuntimeAssignments($assignments)
+    {
+        $this->runtimeAssignments = array_merge($this->runtimeAssignments, $assignments);
+    }
+
     /**
      * Tests if the node sequence represents an iterable assignment.
      *
@@ -1362,7 +1367,10 @@ class NodeProcessor
 
                         if (! empty($this->runtimeAssignments)) {
                             GlobalRuntimeState::$traceTagAssignments = true;
-                            GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
+                            GlobalRuntimeState::$tracedRuntimeAssignments = array_merge(
+                                $this->runtimeAssignments,
+                                GlobalRuntimeState::$tracedRuntimeAssignments
+                            );
                         }
                         /** @var Tags $tag */
                         $tag = $this->loader->load($tagToLoad, [
