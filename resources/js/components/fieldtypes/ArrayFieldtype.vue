@@ -1,7 +1,30 @@
 <template>
     <div class="array-fieldtype-container">
 
-        <table v-if="isKeyed" class="array-table">
+        <div v-if="isSingle" class="flex items-center">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                     <select class="bg-transparent shadow-none outline-none border-0 text-sm" @input="setKey($event.target.value)">
+                        <option
+                            v-for="(element, index) in keyedData"
+                            v-text="config.keys[element.key] || element.key"
+                            :key="element._id"
+                            :value="element.key"
+                            :selected="element.key === selectedKey" />
+                    </select>
+                </div>
+                    <input
+                        type="text"
+                        class="input-text"
+                        v-for="(element, index) in keyedData"
+                        :key="element._id"
+                        v-if="element.key === selectedKey"
+                        :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly"
+                    />
+            </div>
+        </div>
+
+        <table v-else-if="isKeyed" class="array-table">
             <tbody>
                 <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
                     <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] || element.key }}</label></th>
@@ -82,6 +105,7 @@ export default {
     data() {
         return {
             data: this.objectToSortable(this.value || []),
+            selectedKey:  Object.keys(this.value)[0],
             deleting: false
         }
     },
@@ -107,6 +131,10 @@ export default {
 
         isDynamic() {
             return ! this.isKeyed;
+        },
+
+        isSingle() {
+            return this.config.mode === 'single';
         },
 
         keyedData() {
@@ -171,6 +199,10 @@ export default {
 
         deleteCancelled() {
             this.deleting = false;
+        },
+
+        setKey(key) {
+            this.selectedKey = key
         }
     }
 
