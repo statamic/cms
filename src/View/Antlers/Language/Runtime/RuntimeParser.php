@@ -378,6 +378,7 @@ class RuntimeParser implements Parser
             $this->nodeProcessor->setAntlersParserInstance($this);
             $this->nodeProcessor->cascade($this->cascade);
 
+            $this->nodeProcessor->mergeRuntimeAssignments(GlobalRuntimeState::$tracedRuntimeAssignments);
             $bufferContent = $this->nodeProcessor->render($renderNodes);
 
             $this->nodeProcessor->triggerRenderComplete();
