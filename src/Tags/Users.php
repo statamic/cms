@@ -19,8 +19,12 @@ class Users extends Tags
     {
         $query = $this->query();
 
-        if ($group = $this->params->get('group')) {
-            $query->where('group', $group);
+        if ($groups = $this->params->explode('group', [])) {
+            $query->where(function($query) use ($groups) {
+                foreach ($groups as $group) {
+                    $query->orWhere('groups/'.$group, true);
+                }
+            });
         }
 
         if ($role = $this->params->get('role')) {
