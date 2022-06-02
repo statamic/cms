@@ -20,7 +20,7 @@ class Users extends Tags
         $query = $this->query();
 
         if ($groups = $this->params->explode('group', [])) {
-            $query->where(function($query) use ($groups) {
+            $query->where(function ($query) use ($groups) {
                 foreach ($groups as $group) {
                     $query->orWhere('groups/'.$group, true);
                 }
