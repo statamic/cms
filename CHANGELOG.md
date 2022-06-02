@@ -1,5 +1,40 @@
 # Release Notes
 
+## 3.3.13 (2022-06-02)
+
+### What's new
+- Ability to duplicate Replicator and Bard sets. [#6111](https://github.com/statamic/cms/issues/6111) by @jacksleight
+- Add `pathinfo` and `parse_url` modifiers. [#6078](https://github.com/statamic/cms/issues/6078) by @jacksleight
+- Add `actionUrl` method to `Form` class. [#6113](https://github.com/statamic/cms/issues/6113) by @michaelr0
+- Ability to disable pretty Debugbar variables for performance. [#6094](https://github.com/statamic/cms/issues/6094) by @simonhamp
+- Runtime: Ability to control stack content whitespace, and access stack contents as an array. [#6110](https://github.com/statamic/cms/issues/6110) by @JohnathonKoster
+
+### What's improved
+- Improve Bard replicator preview. [#6098](https://github.com/statamic/cms/issues/6098) by @jacksleight
+- Runtime: improves interpolated variable dynamic access [#6109](https://github.com/statamic/cms/issues/6109) by @JohnathonKoster
+- Improve blueprint performance. [#6108](https://github.com/statamic/cms/issues/6108) by @jasonvarga
+- Alphabetize the `dd` & `dump` modifier output. [#6121](https://github.com/statamic/cms/issues/6121) by @edalzell
+- Improve active toggle field state when it's read-only.  [#6079](https://github.com/statamic/cms/issues/6079) by @jacksleight
+- Update French translations. [#6120](https://github.com/statamic/cms/issues/6120) by @ebeauchamps
+- Update Norwegian translations. [#6066](https://github.com/statamic/cms/issues/6066) by @hgrimelid
+
+### What's fixed
+- Support query strings in `Path::extension()`. [#6132](https://github.com/statamic/cms/issues/6132) by @ryanmitchell
+- Fix static caching invalidation when using separate domains. [#6138](https://github.com/statamic/cms/issues/6138) by @jasonvarga
+- Fix error when using taxonomy terms fieldtype with multiple taxonomies. [#6103](https://github.com/statamic/cms/issues/6103) by @ryanmitchell
+- Support query builder in `chunk` modifier. [#6084](https://github.com/statamic/cms/issues/6084) by @ryanmitchell
+- Ensure route bindings only apply to Statamic routes. [#5775](https://github.com/statamic/cms/issues/5775) by @ryanmitchell
+- Runtime: Fix variable scope across parser boundaries. [#6139](https://github.com/statamic/cms/issues/6139) by @JohnathonKoster
+- Runtime: Reset stack state when rendering final view. [#6140](https://github.com/statamic/cms/issues/6140) by @JohnathonKoster
+- Runtime: Remove literal/stack replacements on 404/error. [#6073](https://github.com/statamic/cms/issues/6073) by @JohnathonKoster
+- Runtime: Corrects assignments across query builder scopes. [#6136](https://github.com/statamic/cms/issues/6136) by @JohnathonKoster
+- Runtime: improve variable parsing and Builder array plucking [#5902](https://github.com/statamic/cms/issues/5902) by @JohnathonKoster
+- Bump eventsource from 1.1.0 to 1.1.1 [#6128](dhttps://github.com/statamic/cms/issues/6128) by @dependabot
+- Remove unnecessary code from the Glide tag. [#6087](https://github.com/statamic/cms/issues/6087) by @ryanmitchell
+- Tidy up some more Blade echo statements. [#6126](https://github.com/statamic/cms/issues/6126) by @michaelr0
+
+
+
 ## 3.3.12 (2022-05-18)
 
 ### What's improved
