@@ -3,7 +3,6 @@
 ## 3.3.12 (2022-05-18)
 
 ### What's improved
-
 - Add `toggle` mode to revealer fieldtype. [#6052](http://github.com/statamic/cms/issues/6052) by @jesseleite
 - Allow eloquent query builder to accept page parameters. [#6056](http://github.com/statamic/cms/issues/6056) by @ryanmitchell
 - Clean up deprecations. [#6014](http://github.com/statamic/cms/issues/6014) by @jasonvarga
@@ -11,7 +10,6 @@
 - Disable SSL certificate verification locally for `static:warm` command. [#6028](http://github.com/statamic/cms/issues/6028) by @FrittenKeeZ
 
 ### What's fixed
-
 - Fix for revealers nested within grids with `mode: stacked` enabled. [#6047](http://github.com/statamic/cms/issues/6047) by @jesseleite
 - Fix file uploads in front end form submissions. [#6061](http://github.com/statamic/cms/issues/6061) by @jesseleite
 
@@ -19,7 +17,6 @@
 ## 3.3.11 (2022-05-10)
 
 ### What's improved
-
 - Swedish translations. [#5975](http://github.com/statamic/cms/issues/5975) by @adevade
 - Remove unused assets (mostly `.png`s). [#6006](http://github.com/statamic/cms/issues/6006) by @adevade
 - Update default url to use `https` in markdown fields. [#5971](http://github.com/statamic/cms/issues/5971) by @adevade
@@ -27,7 +24,6 @@
 - Allow overwriting the `getAddon` method. [#5935](http://github.com/statamic/cms/issues/5935) by @jonassiewertsen
 
 ### What's fixed
-
 - Fix hidden data when replicator sets are collapsed by default. [#6021](http://github.com/statamic/cms/issues/6021) by @jesseleite
 - Fix adding new s3 folder to asset listing cache with stache watcher disabled. [#5996](http://github.com/statamic/cms/issues/5996) by @jesseleite
 - Fix overzealous deleting from asset listing cache with stache watcher disabled. [#5998](http://github.com/statamic/cms/issues/5998) by @jesseleite
@@ -41,12 +37,10 @@
 ## 3.3.10 (2022-04-29)
 
 ### What's new
-
 - Add `str_pad` modifiers. [#5920](https://github.com/statamic/cms/issues/5920) by @FrittenKeeZ
 - Add 'Copy URL' action to assets. [#5901](https://github.com/statamic/cms/issues/5901) by @duncanmcclean
 
 ### What's improved
-
 - Swedish translations. [#5948](https://github.com/statamic/cms/issues/5948) by @adevade
 - French translations. [#5903](https://github.com/statamic/cms/issues/5903) by @ebeauchamps
 - Runtime: Better line and char numbers when reporting interpolation errors. [#5930](https://github.com/statamic/cms/issues/5930) by @JohnathonKoster
@@ -55,7 +49,6 @@
 - Asset browser uses HasActions mixin. [#5912](https://github.com/statamic/cms/issues/5912) by @jasonvarga
 
 ### What's fixed
-
 - Runtime: Corrects parameter style modifier scope overwriting issue. [#5885](https://github.com/statamic/cms/issues/5885) by @JohnathonKoster
 - Runtime: Prevent variables from leaking out of tags. [#5884](https://github.com/statamic/cms/issues/5884) by @JohnathonKoster
 - Runtime: Adds support for uppercase logical keywords. [#5911](https://github.com/statamic/cms/issues/5911) by @JohnathonKoster
@@ -70,15 +63,12 @@
 ## 3.3.9 (2022-04-21)
 
 ### What's new
-
 - Add “small” Bard button. [#5876](https://github.com/statamic/cms/pull/5876) by @edalzell
 
 ### What's improved
-
 - Updated Russian translations. [#5879](https://github.com/statamic/cms/pull/5879) by @dragomano
 
 ### What's fixed
-
 - Runtime: Fix conditions checking the Cascade. [#5875](https://github.com/statamic/cms/pull/5875) by @JohnathonKoster
 - Fix submitted data when fields are hidden by revealer fieldtype. [#5878](https://github.com/statamic/cms/pull/5878) by @jesseleite
 - Fix hidden field tracking in stacked grid rows. [#5877](https://github.com/statamic/cms/issues/5877) by @jesseleite
