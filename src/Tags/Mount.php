@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
 
 class Mount extends Tags
 {
@@ -28,6 +29,6 @@ class Mount extends Tags
             return;
         }
 
-        return $collection->url();
+        return $collection->url(Site::current()->handle());
     }
 }
