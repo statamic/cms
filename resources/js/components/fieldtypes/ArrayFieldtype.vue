@@ -3,8 +3,8 @@
 
         <div v-if="isSingle" class="flex items-center">
             <div class="input-group">
-                <div class="input-group-prepend">
-                     <select class="bg-transparent shadow-none outline-none border-0 text-sm" @input="setKey($event.target.value)">
+                <div class="input-group-prepend flex items-center">
+                     <select class="bg-transparent appearance-none shadow-none outline-none border-0 text-sm" @input="setKey($event.target.value)">
                         <option
                             v-for="(element, index) in keyedData"
                             v-text="config.keys[element.key] || element.key"
@@ -12,6 +12,7 @@
                             :value="element.key"
                             :selected="element.key === selectedKey" />
                     </select>
+                    <svg-icon name="chevron-down-xs" class="w-2 ml-1" />
                 </div>
                     <input
                         type="text"
