@@ -16,7 +16,6 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Mixins\Router;
 use Statamic\Support\Str;
-use Stringy\StaticStringy as Stringy;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -221,12 +220,24 @@ class RouteServiceProvider extends ServiceProvider
 
     private function isApiRoute(\Illuminate\Routing\Route $route)
     {
-        return Str::startsWith($route->uri(), Stringy::ensureRight(config('statamic.api.route'), '/'));
+        $api = Str::ensureRight(config('statamic.api.route'), '/');
+
+        if ($api === '/') {
+            return true;
+        }
+
+        return Str::startsWith($route->uri(), $api);
     }
 
     private function isCpRoute(\Illuminate\Routing\Route $route)
     {
-        return Str::startsWith($route->uri(), Stringy::ensureRight(config('statamic.cp.route'), '/'));
+        $cp = Str::ensureRight(config('statamic.cp.route'), '/');
+
+        if ($cp === '/') {
+            return true;
+        }
+
+        return Str::startsWith($route->uri(), $cp);
     }
 
     private function isCpOrApiRoute(\Illuminate\Routing\Route $route)
