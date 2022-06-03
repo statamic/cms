@@ -88,10 +88,13 @@ class DefaultInvalidator implements Invalidator
         }
     }
 
-    private function splitUrlAndDomain($url)
+    private function splitUrlAndDomain(string $url)
     {
         $parsed = parse_url($url);
 
-        return [$parsed['path'], $parsed['scheme'].'://'.$parsed['host']];
+        return [
+            Arr::get($parsed, 'path', '/'),
+            $parsed['scheme'].'://'.$parsed['host'],
+        ];
     }
 }
