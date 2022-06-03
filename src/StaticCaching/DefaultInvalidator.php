@@ -92,6 +92,9 @@ class DefaultInvalidator implements Invalidator
     {
         $parsed = parse_url($url);
 
-        return [array_get($parsed, 'path', '/'), $parsed['scheme'].'://'.$parsed['host']];
+        return [
+            Arr::get($parsed, 'path', '/'),
+            $parsed['scheme'].'://'.$parsed['host'],
+        ];
     }
 }
