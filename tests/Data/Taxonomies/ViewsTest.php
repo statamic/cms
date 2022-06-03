@@ -70,17 +70,9 @@ class ViewsTest extends TestCase
     }
 
     /** @test */
-    public function it_loads_the_localized_term_url_if_the_default_view_exists()
+    public function it_loads_the_localized_term_url_if_the_view_exists()
     {
         $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
-
-        $this->get('/fr/tags/le-test')->assertOk()->assertSee('showing Le Test');
-    }
-
-    /** @test */
-    public function it_loads_the_localized_term_url_if_the_site_view_exists()
-    {
-        $this->viewShouldReturnRaw('fr.tags.show', 'showing {{ title }}');
 
         $this->get('/fr/tags/le-test')->assertOk()->assertSee('showing Le Test');
     }
