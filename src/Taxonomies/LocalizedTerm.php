@@ -384,6 +384,13 @@ class LocalizedTerm implements
                 $defaultTemplate = $collection->handle().'.'.$defaultTemplate;
             }
 
+            if (Site::hasMultiple() &&
+                ($handle = Site::current()->handle()) &&
+                view()->exists($handle.'.'.$defaultTemplate)
+            ) {
+                $defaultTemplate = $handle.'.'.$defaultTemplate;
+            }
+
             return $this->get('template', $defaultTemplate);
         }
 
