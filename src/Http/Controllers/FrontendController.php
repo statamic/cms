@@ -43,6 +43,8 @@ class FrontendController extends Controller
             $url = rtrim($url, '/');
         }
 
+        $this->addViewPaths();
+
         if ($data = Data::findByUri($url, Site::current()->handle())) {
             return $data;
         }
