@@ -22,6 +22,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
@@ -200,6 +201,15 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 return config('statamic.amp.enabled') && $ampable;
             })
             ->args(func_get_args());
+    }
+
+    public function absoluteUrl($site = null)
+    {
+        if (! $url = $this->url($site)) {
+            return null;
+        }
+
+        return URL::makeAbsolute($url);
     }
 
     public function url($site = null)
