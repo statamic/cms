@@ -134,6 +134,7 @@ class FieldsController extends CpController
                 'options' => [
                     'visible' => __('Visible'),
                     'read_only' => __('Read Only'),
+                    'computed' => __('Computed'),
                     'hidden' => __('Hidden'),
                 ],
                 'default' => 'visible',
