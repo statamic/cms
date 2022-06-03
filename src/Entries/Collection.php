@@ -22,7 +22,6 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
-use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
@@ -205,11 +204,13 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function absoluteUrl($site = null)
     {
-        if (! $url = $this->url($site)) {
+        if (! $mount = $this->mount()) {
             return null;
         }
 
-        return URL::makeAbsolute($url);
+        $site = $site ?? $this->sites()->first();
+
+        return optional($mount->in($site))->absoluteUrl();
     }
 
     public function url($site = null)
