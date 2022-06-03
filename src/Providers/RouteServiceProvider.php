@@ -220,12 +220,24 @@ class RouteServiceProvider extends ServiceProvider
 
     private function isApiRoute(\Illuminate\Routing\Route $route)
     {
-        return Str::startsWith($route->uri(), config('statamic.api.route').'/');
+        $api = Str::ensureRight(config('statamic.api.route'), '/');
+
+        if ($api === '/') {
+            return true;
+        }
+
+        return Str::startsWith($route->uri(), $api);
     }
 
     private function isCpRoute(\Illuminate\Routing\Route $route)
     {
-        return Str::startsWith($route->uri(), config('statamic.cp.route').'/');
+        $cp = Str::ensureRight(config('statamic.cp.route'), '/');
+
+        if ($cp === '/') {
+            return true;
+        }
+
+        return Str::startsWith($route->uri(), $cp);
     }
 
     private function isCpOrApiRoute(\Illuminate\Routing\Route $route)
