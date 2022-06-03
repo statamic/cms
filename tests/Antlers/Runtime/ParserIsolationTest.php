@@ -80,7 +80,6 @@ EOT;
 {{ /paginate }}
 {{ /collection:blog }}
 EOT;
-;
 
         $expected = <<<'EOT'
 <One>
