@@ -368,6 +368,10 @@ class AntlersNode extends AbstractNode
                 continue;
             }
 
+            if (is_string($value)) {
+                $value = DocumentParser::applyEscapeSequences($value);
+            }
+
             $values[$param->name] = $value;
         }
 
@@ -435,6 +439,10 @@ class AntlersNode extends AbstractNode
             $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
         }
 
+        if (is_string($value)) {
+            $value = DocumentParser::applyEscapeSequences($value);
+        }
+
         return $value;
     }
 
@@ -488,12 +496,16 @@ class AntlersNode extends AbstractNode
             $retriever->setIsPaired($this->isClosedBy != null);
             $value = $retriever->getData($pathParser->parse($value), $data);
 
+            if (is_string($value)) {
+                $value = DocumentParser::applyEscapeSequences($value);
+            }
+
             $values[] = $value;
         } else {
             $pipeEscape = DocumentParser::getPipeEscape();
 
             $values = array_map(function ($item) use ($pipeEscape) {
-                return str_replace($pipeEscape, DocumentParser::Punctuation_Pipe, $item);
+                return DocumentParser::applyEscapeSequences(str_replace($pipeEscape, DocumentParser::Punctuation_Pipe, $item));
             }, explode('|', $value));
         }
 
