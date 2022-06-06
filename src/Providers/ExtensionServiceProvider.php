@@ -150,6 +150,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Markdown::class,
         Tags\Member::class,
         Tags\Mix::class,
+        Tags\Mount::class,
         Tags\Nav::class,
         Tags\NotFound::class,
         Tags\Obfuscate::class,
