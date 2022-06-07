@@ -17,17 +17,22 @@ export default {
                 return false;
             }
 
-            let validator = new Validator(field, this.values, this.$store, this.storeName);
-            let passes = validator.passesConditions();
-            let hiddenByRevealerField = validator.hasRevealerCondition(dottedPrefix);
+            if (field.visibility === 'hidden') {
+                var hideField = true;
+                var omitValue = false;
+            } else {
+                var validator = new Validator(field, this.values, this.$store, this.storeName);
+                var hideField = ! validator.passesConditions();
+                var omitValue = ! validator.hasRevealerCondition(dottedPrefix);
+            }
 
             this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
                 dottedKey: dottedFieldPath,
-                hidden: ! passes,
-                omitValue: ! hiddenByRevealerField,
+                hidden: hideField,
+                omitValue: hideField && omitValue,
             });
 
-            return passes;
+            return ! hideField;
         },
 
         shouldForceHiddenField(dottedFieldPath) {
