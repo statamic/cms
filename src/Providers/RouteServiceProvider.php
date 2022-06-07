@@ -45,7 +45,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindCollections()
     {
-        Route::bind('collection', function ($handle, $route) {
+        Route::bind('collection', function ($handle, $route = null) {
             if (! $this->isCpOrApiRoute($route)) {
                 return $handle;
             }
@@ -61,7 +61,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindEntries()
     {
-        Route::bind('entry', function ($handle, $route) {
+        Route::bind('entry', function ($handle, $route = null) {
             if ($this->isApiRoute($route) || ! $this->isCpRoute($route)) {
                 return $handle;
             }
@@ -77,7 +77,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindTaxonomies()
     {
-        Route::bind('taxonomy', function ($handle, $route) {
+        Route::bind('taxonomy', function ($handle, $route = null) {
             if (! $this->isCpOrApiRoute($route)) {
                 return $handle;
             }
@@ -93,7 +93,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindTerms()
     {
-        Route::bind('term', function ($handle, $route) {
+        Route::bind('term', function ($handle, $route = null) {
             if ($this->isApiRoute($route) || ! $this->isCpRoute($route)) {
                 return $handle;
             }
@@ -112,7 +112,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindAssetContainers()
     {
-        Route::bind('asset_container', function ($handle, $route) {
+        Route::bind('asset_container', function ($handle, $route = null) {
             if (! $this->isCpOrApiRoute($route)) {
                 return $handle;
             }
@@ -128,7 +128,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindAssets()
     {
-        Route::bind('asset', function ($handle, $route) {
+        Route::bind('asset', function ($handle, $route = null) {
             if (! $this->isCpOrApiRoute($route)) {
                 return $handle;
             }
@@ -146,7 +146,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindGlobalSets()
     {
-        Route::bind('global', function ($handle, $route) {
+        Route::bind('global', function ($handle, $route = null) {
             if (! $this->isCpOrApiRoute($route)) {
                 return $handle;
             }
@@ -164,7 +164,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindSites()
     {
-        Route::bind('site', function ($handle, $route) {
+        Route::bind('site', function ($handle, $route = null) {
             if (! $this->isCpOrApiRoute($route)) {
                 return $handle;
             }
@@ -180,7 +180,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindRevisions()
     {
-        Route::bind('revision', function ($reference, $route) {
+        Route::bind('revision', function ($reference, $route = null) {
             if (! $this->isCpOrApiRoute($route)) {
                 return $reference;
             }
@@ -204,7 +204,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindForms()
     {
-        Route::bind('form', function ($handle, $route) {
+        Route::bind('form', function ($handle, $route = null) {
             if (! $this->isCpOrApiRoute($route) && ! Str::startsWith($route->uri(), '!/forms/')) {
                 return $handle;
             }
@@ -218,8 +218,12 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
-    private function isApiRoute(\Illuminate\Routing\Route $route)
+    private function isApiRoute(\Illuminate\Routing\Route $route = null)
     {
+        if (is_null($route)) {
+            return false;
+        }
+
         $api = Str::ensureRight(config('statamic.api.route'), '/');
 
         if ($api === '/') {
@@ -229,8 +233,12 @@ class RouteServiceProvider extends ServiceProvider
         return Str::startsWith($route->uri(), $api);
     }
 
-    private function isCpRoute(\Illuminate\Routing\Route $route)
+    private function isCpRoute(\Illuminate\Routing\Route $route = null)
     {
+        if (is_null($route)) {
+            return false;
+        }
+
         $cp = Str::ensureRight(config('statamic.cp.route'), '/');
 
         if ($cp === '/') {
@@ -240,8 +248,12 @@ class RouteServiceProvider extends ServiceProvider
         return Str::startsWith($route->uri(), $cp);
     }
 
-    private function isCpOrApiRoute(\Illuminate\Routing\Route $route)
+    private function isCpOrApiRoute(\Illuminate\Routing\Route $route = null)
     {
+        if (is_null($route)) {
+            return false;
+        }
+
         return $this->isCpRoute($route) || $this->isApiRoute($route);
     }
 }
