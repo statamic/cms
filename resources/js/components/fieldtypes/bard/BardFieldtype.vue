@@ -295,13 +295,13 @@ export default {
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.clearContent()
-                this.editor.setContent(content, true);
+                this.editor.commands.clearContent()
+                this.editor.commands.setContent(content, true);
             }
         },
 
         readOnly(readOnly) {
-            this.editor.setOptions({ editable: !this.readOnly });
+            this.editor.setEditable(!this.readOnly);
         },
 
         collapsed(value) {
