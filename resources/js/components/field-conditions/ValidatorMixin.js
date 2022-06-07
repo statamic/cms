@@ -10,29 +10,36 @@ export default {
 
     methods: {
         showField(field, dottedKey) {
-            let dottedFieldPath = dottedKey || field.handle;
-            let dottedPrefix = dottedKey? dottedKey.replace(new RegExp('\.'+field.handle+'$'), '') : '';
+            var dottedFieldPath = dottedKey || field.handle;
+            var dottedPrefix = dottedKey ? dottedKey.replace(new RegExp('\.'+field.handle+'$'), '') : '';
 
-            if (this.shouldForceHiddenField(dottedFieldPath)) {
+            // If we know the field is to permanently hidden, bypass validation.
+            if (field.visibility === 'hidden' || this.shouldForceHiddenField(dottedFieldPath)) {
+                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                    dottedKey: dottedFieldPath,
+                    hidden: 'force',
+                    omitValue: false,
+                });
+
                 return false;
             }
 
-            if (field.visibility === 'hidden') {
-                var hideField = true;
-                var omitValue = false;
-            } else {
-                var validator = new Validator(field, this.values, this.$store, this.storeName);
-                var hideField = ! validator.passesConditions();
-                var omitValue = ! validator.hasRevealerCondition(dottedPrefix);
-            }
+            // Use validation to determine whether field should be shown.
+            var validator = new Validator(field, this.values, this.$store, this.storeName);
+            var passes = validator.passesConditions();
 
-            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
-                dottedKey: dottedFieldPath,
-                hidden: hideField,
-                omitValue: hideField && omitValue,
+            // Ensure DOM is updated to ensure all revealers are properly loaded and tracked before committing to store.
+            this.$nextTick(() => {
+                var hasRevealerCondition = validator.hasRevealerCondition(dottedPrefix);
+
+                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                    dottedKey: dottedFieldPath,
+                    hidden: ! passes,
+                    omitValue: (! passes) && (! hasRevealerCondition),
+                });
             });
 
-            return ! hideField;
+            return passes;
         },
 
         shouldForceHiddenField(dottedFieldPath) {
