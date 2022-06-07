@@ -2469,8 +2469,8 @@ class CoreModifiers extends Modifier
      */
     public function toBool($value, $params)
     {
-        if (is_string($value) && strtolower($value) == 'false') {
-            return false;
+        if (is_string($value)) {
+            return Str::toBool($value);
         }
 
         return boolval($value);
