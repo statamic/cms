@@ -17,6 +17,7 @@ class Fields
     protected $parentField;
     protected $filled = [];
     protected $withValidatableValues = false;
+    protected $withComputedValues = false;
 
     public function __construct($items = [], $parent = null, $parentField = null)
     {
@@ -78,6 +79,13 @@ class Fields
     public function withValidatableValues()
     {
         $this->withValidatableValues = true;
+
+        return $this;
+    }
+
+    public function withComputedValues()
+    {
+        $this->withComputedValues = true;
 
         return $this;
     }
@@ -154,21 +162,20 @@ class Fields
 
     public function values()
     {
-        $values = $this->fields
+        return $this->fields
             ->reject(function ($field) {
-                return $field->visibility() === 'computed';
+                return $this->withComputedValues === false
+                    ? $field->visibility() === 'computed'
+                    : false;
             })
             ->mapWithKeys(function ($field) {
                 return [$field->handle() => $field->value()];
+            })
+            ->filter(function ($field, $handle) {
+                return $this->withValidatableValues
+                    ? in_array($handle, $this->filled)
+                    : true;
             });
-
-        if ($this->withValidatableValues) {
-            $values = $values->filter(function ($field, $handle) {
-                return in_array($handle, $this->filled);
-            });
-        }
-
-        return $values;
     }
 
     public function process()
@@ -182,7 +189,7 @@ class Fields
     {
         return $this->newInstance()->setFields(
             $this->fields->map->preProcess()
-        );
+        )->withComputedValues();
     }
 
     public function preProcessValidatables()
