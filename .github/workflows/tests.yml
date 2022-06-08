@@ -7,7 +7,69 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  js:
+  php-tests:
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
+
+    strategy:
+      matrix:
+        php: [7.4, 8.0, 8.1]
+        laravel: [8.*, 9.*]
+        stability: [prefer-lowest, prefer-stable]
+        os: [ubuntu-latest]
+        include:
+          - laravel: 8.*
+            framework: ^8.48.0
+          - laravel: 9.*
+            framework: ^9.0
+          - os: windows-latest
+            php: 7.4
+            laravel: 8.*
+            framework: ^8.48.0
+            stability: prefer-stable
+          - os: windows-latest
+            php: 8.1
+            laravel: 9.*
+            framework: ^9.0
+            stability: prefer-stable
+        exclude:
+          - laravel: 9.*
+            php: 7.4
+
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          coverage: none
+
+      - name: Set PHP 7.4 Mockery
+        run: composer require "mockery/mockery >=1.2.3" --no-interaction --no-update
+        if: matrix.php >= 7.4 && matrix.php <8.0
+
+      - name: Set PHP 8 Mockery
+        run: composer require "mockery/mockery >=1.3.3" --no-interaction --no-update
+        if: matrix.php >= 8.0
+
+      - name: Set PHP 8.1 Testbench
+        run: composer require "orchestra/testbench ^6.22.0" --no-interaction --no-update
+        if: matrix.laravel == '8.*' && matrix.php >= 8.1
+
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.framework }}" --no-interaction --no-update
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: vendor/bin/phpunit
+
+  js-tests:
     runs-on: ubuntu-20.04
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
@@ -17,17 +79,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
 
-      - name: Check npm version
-        run: npm -v
-
-      - name: Upgrade npm
+      - name: Install required npm version
         run: npm -g install npm@8.5.5
-
-      - name: Check npm version
-        run: npm -v
 
       - name: Install dependencies
         run: npm ci
 
       - name: Execute tests
         run: npm run test
+
+  slack:
+    name: Slack Notification
+    runs-on: ubuntu-20.04
+    needs: [php-tests, js-tests]
+    if: always()
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v1
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v2
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        with:
+          status: failure
+          author_name: ${{ github.actor }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
