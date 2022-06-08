@@ -154,9 +154,13 @@ class Fields
 
     public function values()
     {
-        $values = $this->fields->mapWithKeys(function ($field) {
-            return [$field->handle() => $field->value()];
-        });
+        $values = $this->fields
+            ->reject(function ($field) {
+                return $field->visibility() === 'computed';
+            })
+            ->mapWithKeys(function ($field) {
+                return [$field->handle() => $field->value()];
+            });
 
         if ($this->withValidatableValues) {
             $values = $values->filter(function ($field, $handle) {
