@@ -12,6 +12,7 @@ use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\View\Antlers\AntlersString;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
@@ -700,6 +701,10 @@ class PathDataManager
                     if ($this->doBreak) {
                         break;
                     }
+
+                    if ($pathItem->isFinal == false || $this->reduceFinal) {
+                        $this->compact(false);
+                    }
                 }
             }
         }
@@ -801,6 +806,10 @@ class PathDataManager
                 } else {
                     $this->doBreak = true;
                 }
+
+                if (! $this->doBreak) {
+                    $this->compact(false);
+                }
             } elseif (array_key_exists($varPath, $this->reducedVar)) {
                 $this->resolvedPath[] = $varPath;
                 $this->reducedVar = $this->reducedVar[$varPath];
@@ -898,6 +907,11 @@ class PathDataManager
 
                 $reductionStack[] = $augmented;
                 continue;
+            } elseif ($reductionValue instanceof Values) {
+                GlobalRuntimeState::$isEvaluatingData = true;
+                $reductionStack[] = $reductionValue->toArray();
+                GlobalRuntimeState::$isEvaluatingData = false;
+                continue;
             } elseif ($reductionValue instanceof \Statamic\Entries\Collection) {
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = RuntimeValueCache::resolveWithRuntimeIsolation($reductionValue);
@@ -974,6 +988,10 @@ class PathDataManager
             }
             $returnValue = self::guardRuntimeReturnValue($returnValue);
 
+            GlobalRuntimeState::$isEvaluatingUserData = false;
+        } elseif ($value instanceof Values) {
+            GlobalRuntimeState::$isEvaluatingUserData = true;
+            $returnValue = $value->toArray();
             GlobalRuntimeState::$isEvaluatingUserData = false;
         } else {
             if (! $isPair) {
