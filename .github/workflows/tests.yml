@@ -79,6 +79,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
 
+      - name: Check npm version
+        run: npm -v
+
       - name: Install dependencies
         run: npm ci
 
