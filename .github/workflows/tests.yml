@@ -20,6 +20,12 @@ jobs:
       - name: Check npm version
         run: npm -v
 
+      - name: Upgrade npm
+        run: npm -g install npm@8.6.0
+
+      - name: Check npm version
+        run: npm -v
+
       - name: Install dependencies
         run: npm ci
 
