@@ -71,6 +71,11 @@ class ParserTestCase extends TestCase
     protected function getTestValue($handle)
     {
         $field = $this->getTestField($handle);
+
+        if ($field == null) {
+            return null;
+        }
+
         $value = self::$testFieldValues[$handle];
 
         return new Value($value, $handle, $field->fieldtype());
