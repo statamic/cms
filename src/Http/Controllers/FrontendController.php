@@ -32,7 +32,7 @@ class FrontendController extends Controller
         $url = Site::current()->relativePath($request->getUri());
 
         if (Statamic::isAmpRequest()) {
-            $url = str_after($url, '/'.config('statamic.amp.route'));
+            $url = Str::ensureLeft(Str::after($url, '/'.config('statamic.amp.route')), '/');
         }
 
         if (Str::contains($url, '?')) {
