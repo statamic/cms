@@ -14,31 +14,73 @@ class AddViewPathsTest extends TestCase
 {
     /**
      * @test
+     * @dataProvider viewPathProvider
      */
-    public function adds_site_paths()
+    public function adds_view_paths($isAmpEnabled, $requestUrl, $expectedPaths)
     {
         Site::setConfig(['sites' => [
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]]);
-        $this->assertCount(2, view()->getFinder()->getPaths());
 
-        $symfonyRequest = SymfonyRequest::create('/');
+        view()->getFinder()->setPaths([
+            '/path/to/views',
+            '/path/to/other/views',
+        ]);
 
+        config(['statamic.amp.enabled' => $isAmpEnabled]);
+
+        $this->setCurrentSiteBasedOnUrl($requestUrl);
+
+        $request = $this->createRequest($requestUrl);
+
+        (new AddViewPaths())->handle($request, fn () => new Response());
+
+        $this->assertEquals($expectedPaths, view()->getFinder()->getPaths());
+    }
+
+    private function setCurrentSiteBasedOnUrl($requestUrl)
+    {
+        $url = 'http://localhost'.Str::removeLeft($requestUrl, '/amp');
+        $site = Site::findByUrl($url);
+        Site::setCurrent($site->handle());
+    }
+
+    private function createRequest($url)
+    {
+        $symfonyRequest = SymfonyRequest::create($url);
         $request = Request::createFromBase($symfonyRequest);
+        app()->instance('request', $request);
+    }
 
-        Site::setCurrent('french');
-        $response = (new AddViewPaths())->handle(
-            $request,
-            fn () => new Response()
-        );
-
-        $paths = view()->getFinder()->getPaths();
-        $this->assertCount(4, $paths);
-        $this->assertTrue(Str::endsWith($paths[0], 'french'));
-        $this->assertTrue(Str::endsWith($paths[1], 'views'));
-        $this->assertTrue(Str::endsWith($paths[2], 'french'));
-        $this->assertTrue(Str::endsWith($paths[3], 'views'));
+    public function viewPathProvider()
+    {
+        return [
+            'amp enabled, amp request' => [true, '/amp/fr/test', [
+                '/path/to/views/french',
+                '/path/to/views',
+                '/path/to/other/views/french',
+                '/path/to/other/views',
+            ]],
+            'amp enabled, non-amp request' => [true, '/fr/test', [
+                '/path/to/views/french',
+                '/path/to/views',
+                '/path/to/other/views/french',
+                '/path/to/other/views',
+            ]],
+            'amp disabled, default site' => [false, '/test', [
+                '/path/to/views/english',
+                '/path/to/views',
+                '/path/to/other/views/english',
+                '/path/to/other/views',
+            ]],
+            'amp disabled, second site' => [false, '/fr/test', [
+                '/path/to/views/french',
+                '/path/to/views',
+                '/path/to/other/views/french',
+                '/path/to/other/views',
+            ]],
+        ];
     }
 
     /**
