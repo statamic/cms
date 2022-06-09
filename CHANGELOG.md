@@ -1,10 +1,21 @@
 # Release Notes
 
+## 3.3.15 (2022-06-09)
+
+### What's new
+- Add `to_bool` modifier. [#6159](https://github.com/statamic/cms/issues/6159) by @edalzell
+
+### What's fixed
+- Rename `mount` tag to `mount_url` so it doesn't clash with variable. [#6181](https://github.com/statamic/cms/issues/6181) by @jacksleight
+- Fix user recursion issue in Control Panel. [#6163](https://github.com/statamic/cms/issues/6163) by @jasonvarga
+
+
+
 ## 3.3.14 (2022-06-08)
 
 ### What's new
 - Added "single" mode for the `array` fieldtype. [#6141](https://github.com/statamic/cms/issues/6141) by @jackmcdade
-- Added `mount` tag. [#6038](https://github.com/statamic/cms/issues/6038) by @jacksleight
+- Added `mount` tag. (Renamed to `mount_url` in 3.3.15) [#6038](https://github.com/statamic/cms/issues/6038) by @jacksleight
 
 ### What's improved
 - Asset filenames are now lowercased by default. [#6031](https://github.com/statamic/cms/issues/6031) by @jesseleite
