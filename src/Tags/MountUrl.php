@@ -7,8 +7,6 @@ use Statamic\Facades\Site;
 
 class MountUrl extends Tags
 {
-    protected static $aliases = ['mount'];
-
     /**
      * {{ mount_url:* }}.
      */
