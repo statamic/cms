@@ -27,9 +27,10 @@
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
-                    <data-list-table 
+                    <data-list-table
                         v-show="items.length"
                         :allow-bulk-actions="true"
+                        :allow-column-picker="true"
                         @sorted="sorted"
                     >
                         <template slot="cell-email" slot-scope="{ row: user, value }">
