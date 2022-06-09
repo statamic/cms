@@ -53,11 +53,14 @@ abstract class UserRepository implements RepositoryContract
 
     public function blueprint()
     {
+        // TODO: Cache this?
+        $groupsExist = UserGroup::all()->count() > 0;
+
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
             'email' => ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true],
             'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
             'roles' => ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true],
-            'groups' => ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => 'hidden'],
+            'groups' => ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => $groupsExist ?: 'hidden'],
         ])->setHandle('user');
 
         UserBlueprintFound::dispatch($blueprint);
