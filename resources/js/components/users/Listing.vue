@@ -31,6 +31,7 @@
                         v-show="items.length"
                         :allow-bulk-actions="true"
                         :allow-column-picker="true"
+                        :column-preferences-key="preferencesKey('columns')"
                         @sorted="sorted"
                     >
                         <template slot="cell-email" slot-scope="{ row: user, value }">
@@ -87,6 +88,7 @@ export default {
 
     data() {
         return {
+            preferencesPrefix: 'users',
             requestUrl: cp_url('users'),
         }
     },
