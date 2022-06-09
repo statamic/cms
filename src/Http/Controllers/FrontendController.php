@@ -57,8 +57,6 @@ class FrontendController extends Controller
         $data = Arr::pull($params, 'data');
         $data = array_merge($params, $data);
 
-        $this->addViewPaths();
-
         $view = (new View)
             ->template($view)
             ->layout(Arr::get($data, 'layout', 'layout'))
@@ -73,26 +71,6 @@ class FrontendController extends Controller
         return response($view->render(), 200, [
             'Content-Type' => $contentType,
         ]);
-    }
-
-    protected function addViewPaths()
-    {
-        $finder = view()->getFinder();
-        $amp = Statamic::isAmpRequest();
-        $site = Site::current()->handle();
-
-        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
-            return [
-                $amp ? $path.'/'.$site.'/amp' : null,
-                $path.'/'.$site,
-                $amp ? $path.'/amp' : null,
-                $path,
-            ];
-        })->filter()->values()->all();
-
-        $finder->setPaths($paths);
-
-        return $this;
     }
 
     private function getLoadedRouteItem($data)

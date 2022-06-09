@@ -159,6 +159,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\StacheLock::class,
             \Statamic\Http\Middleware\HandleToken::class,
             \Statamic\Http\Middleware\Localize::class,
+            \Statamic\Http\Middleware\AddViewPaths::class,
             \Statamic\Http\Middleware\AuthGuard::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
