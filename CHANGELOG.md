@@ -1,5 +1,40 @@
 # Release Notes
 
+## 3.3.15 (2022-06-09)
+
+### What's new
+- Add `to_bool` modifier. [#6159](https://github.com/statamic/cms/issues/6159) by @edalzell
+
+### What's fixed
+- Rename `mount` tag to `mount_url` so it doesn't clash with variable. [#6181](https://github.com/statamic/cms/issues/6181) by @jacksleight
+- Fix user recursion issue in Control Panel. [#6163](https://github.com/statamic/cms/issues/6163) by @jasonvarga
+
+
+
+## 3.3.14 (2022-06-08)
+
+### What's new
+- Added "single" mode for the `array` fieldtype. [#6141](https://github.com/statamic/cms/issues/6141) by @jackmcdade
+- Added `mount` tag. (Renamed to `mount_url` in 3.3.15) [#6038](https://github.com/statamic/cms/issues/6038) by @jacksleight
+
+### What's improved
+- Asset filenames are now lowercased by default. [#6031](https://github.com/statamic/cms/issues/6031) by @jesseleite
+- The CP text direction is based on the selected site instead of the default. [#6154](https://github.com/statamic/cms/issues/6154) by @jasonvarga
+
+### What's fixed
+- Fix `users` fieldtype search and add pagination. [#6096](https://github.com/statamic/cms/issues/6096) by @ryanmitchell
+- Fix route binding for broadcasting [#6169](https://github.com/statamic/cms/issues/6169) by @jasonvarga
+- Fix parser error when using Blade [#6106](https://github.com/statamic/cms/issues/6106) by @jacksleight
+- Fix issue where calling `saveQuietly` on an entry stops events firing. [#6086](https://github.com/statamic/cms/issues/6086) by @ryanmitchell
+- Fix route bindings when CP route is empty. [#6149](https://github.com/statamic/cms/issues/6149) by @ryanmitchell
+- Fix static caching invalidation for collections. [#6145](https://github.com/statamic/cms/issues/6145) by @edalzell
+- Runtime: Prevent taxonomies from overwriting the current scope. [#6153](https://github.com/statamic/cms/issues/6153) by @JohnathonKoster
+- Runtime: Fix grid fields not being pluckable. [#6174](https://github.com/statamic/cms/issues/6174) by @JohnathonKoster
+- Runtime: Fix variables created in PHP not staying in scope. [#6155](https://github.com/statamic/cms/issues/6155) by @JohnathonKoster
+- Runtime: Fix parameter escaping. [#6158](https://github.com/statamic/cms/issues/6158) by @JohnathonKoster
+
+
+
 ## 3.3.13 (2022-06-02)
 
 ### What's new
