@@ -9,7 +9,7 @@ use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class MountTagTest extends TestCase
+class MountUrlTagTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -31,14 +31,10 @@ class MountTagTest extends TestCase
 
         $this->assertParseEquals('/pages/blog', '{{ mount_url:blog }}');
         $this->assertParseEquals('/pages/blog', '{{ mount_url handle="blog" }}');
-        $this->assertParseEquals('/pages/blog', '{{ mount:blog }}');
-        $this->assertParseEquals('/pages/blog', '{{ mount handle="blog" }}');
 
         Site::setCurrent('french');
         $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount_url:blog }}');
         $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount_url handle="blog" }}');
-        $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount:blog }}');
-        $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount handle="blog" }}');
     }
 
     private function assertParseEquals($expected, $template, $context = [])
