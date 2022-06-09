@@ -29,10 +29,14 @@ class MountTagTest extends TestCase
         $mountFr = EntryFactory::collection('pages')->slug('le-blog')->locale('french')->origin('blog-en')->id('blog-fr')->create();
         Collection::make('blog')->routes('{mount}/{slug}')->mount($mountEn->id())->save();
 
+        $this->assertParseEquals('/pages/blog', '{{ mount_url:blog }}');
+        $this->assertParseEquals('/pages/blog', '{{ mount_url handle="blog" }}');
         $this->assertParseEquals('/pages/blog', '{{ mount:blog }}');
         $this->assertParseEquals('/pages/blog', '{{ mount handle="blog" }}');
 
         Site::setCurrent('french');
+        $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount_url:blog }}');
+        $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount_url handle="blog" }}');
         $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount:blog }}');
         $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount handle="blog" }}');
     }
