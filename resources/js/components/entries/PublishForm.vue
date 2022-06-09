@@ -344,6 +344,7 @@ export default {
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
+            isAutoSave: false,
         }
     },
 
@@ -421,6 +422,10 @@ export default {
             return this.getPreference('after_save');
         },
 
+        autoSaveOptions() {
+            return this.$store.state.publish[this.publishContainer].autoSave;
+        },
+
     },
 
     watch: {
@@ -480,7 +485,7 @@ export default {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
                 }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                if (!this.isCreating) this.$toast.success(__('Saved'));
+                if (!this.isCreating && !this.isAutoSave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));
@@ -525,6 +530,7 @@ export default {
                     }
 
                     this.quickSave = false;
+                    this.isAutoSave = false;
                 }).catch(e => {});
         },
 
@@ -676,6 +682,16 @@ export default {
                 this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
+        },
+
+        setAutoSaveInterval() {
+            const interval = setInterval(() => {
+                if (!this.isDirty) return;
+                this.isAutoSave = true;
+                this.save();
+
+            }, this.autoSaveOptions.timer)
+            this.$store.commit(`publish/${this.publishContainer}/setAutoSaveInterval`, interval);
         }
     },
 
@@ -694,10 +710,15 @@ export default {
         });
 
         this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
+        this.setAutoSaveInterval();
     },
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    beforeDestroy() {
+        this.$store.commit(`publish/${this.publishContainer}/clearAutoSaveInterval`);
     },
 
     destroyed() {
