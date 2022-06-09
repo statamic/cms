@@ -45,6 +45,9 @@
                             <span v-if="!roles || roles.length === 0" />
                             <span v-for="role in (roles || [])" class="badge-pill-sm mr-sm">{{ role.title }}</span>
                         </template>
+                        <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
+                            <span v-for="group in (groups || [])" class="badge-pill-sm mr-sm">{{ group.title }}</span>
+                        </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
                                 <dropdown-item :text="__('Edit')" :redirect="user.edit_url" v-if="user.editable" />
