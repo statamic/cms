@@ -185,7 +185,7 @@ GQL;
     /** @test */
     public function adding_custom_field_to_an_implementation_does_not_add_it_to_the_interface()
     {
-        GraphQL::addField('Term_Tags_Tags', 'one', function () {
+        GraphQL::addField('Term_Tags_Tag', 'one', function () {
             return [
                 'type' => GraphQL::string(),
                 'resolve' => function ($a) {
@@ -210,7 +210,7 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertJson(['errors' => [[
-                'message' => 'Cannot query field "one" on type "TermInterface". Did you mean to use an inline fragment on "Term_Tags_Tags"?',
+                'message' => 'Cannot query field "one" on type "TermInterface". Did you mean to use an inline fragment on "Term_Tags_Tag"?',
             ]]]);
     }
 }
