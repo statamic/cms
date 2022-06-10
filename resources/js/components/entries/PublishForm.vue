@@ -304,6 +304,7 @@ export default {
         listingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
+        autosaveInterval: Number,
     },
 
     data() {
@@ -344,7 +345,7 @@ export default {
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
-            isAutoSave: false,
+            isAutosave: false,
         }
     },
 
@@ -422,10 +423,6 @@ export default {
             return this.getPreference('after_save');
         },
 
-        autoSaveOptions() {
-            return this.$store.state.publish[this.publishContainer].autoSave;
-        },
-
     },
 
     watch: {
@@ -485,7 +482,7 @@ export default {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
                 }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                if (!this.isCreating && !this.isAutoSave) this.$toast.success(__('Saved'));
+                if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));
@@ -530,7 +527,7 @@ export default {
                     }
 
                     this.quickSave = false;
-                    this.isAutoSave = false;
+                    this.isAutosave = false;
                 }).catch(e => {});
         },
 
@@ -684,14 +681,15 @@ export default {
             this.$refs.container.dirty();
         },
 
-        setAutoSaveInterval() {
+        setAutosaveInterval() {
             const interval = setInterval(() => {
                 if (!this.isDirty) return;
-                this.isAutoSave = true;
-                this.save();
 
-            }, this.autoSaveOptions.timer)
-            this.$store.commit(`publish/${this.publishContainer}/setAutoSaveInterval`, interval);
+                this.isAutosave = true;
+                this.save();
+            }, this.autosaveInterval);
+
+            this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
         }
     },
 
@@ -710,7 +708,10 @@ export default {
         });
 
         this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
-        this.setAutoSaveInterval();
+
+        if (typeof this.autosaveInterval === 'number') {
+            this.setAutosaveInterval();
+        }
     },
 
     created() {
@@ -718,7 +719,7 @@ export default {
     },
 
     beforeDestroy() {
-        this.$store.commit(`publish/${this.publishContainer}/clearAutoSaveInterval`);
+        this.$store.commit(`publish/${this.publishContainer}/clearAutosaveInterval`);
     },
 
     destroyed() {

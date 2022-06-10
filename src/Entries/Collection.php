@@ -56,6 +56,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $requiresSlugs = true;
     protected $titleFormats = [];
     protected $previewTargets = [];
+    protected $autosave;
 
     public function __construct()
     {
@@ -494,6 +495,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
             'title_format' => $this->titleFormats,
+            'autosave' => $this->autosave,
         ];
 
         $array = Arr::except($formerlyToArray, [
@@ -581,6 +583,21 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 }
 
                 return $enabled;
+            })
+            ->args(func_get_args());
+    }
+
+    public function autosaveInterval($interval = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('autosave')
+            ->getter(function ($interval) {
+                if (! Statamic::pro() || ! $interval) {
+                    return null;
+                }
+
+                // return 5000 ms as default autosave interval
+                return gettype($interval) === 'boolean' ? 5000 : $interval;
             })
             ->args(func_get_args());
     }
