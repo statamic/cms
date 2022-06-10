@@ -79,7 +79,7 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_taxonomy()
+    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_singular_taxonomy()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
 
@@ -96,11 +96,11 @@ class TaxonomyTest extends TestCase
 
         tap($taxonomy->termBlueprint(), function ($default) use ($blueprint) {
             $this->assertEquals($blueprint, $default);
-            $this->assertEquals('tags', $default->handle());
-            $this->assertEquals('Tags', $default->title());
+            $this->assertEquals('tag', $default->handle());
+            $this->assertEquals('Tag', $default->title());
         });
 
-        $this->assertEquals($blueprint, $taxonomy->termBlueprint('tags'));
+        $this->assertEquals($blueprint, $taxonomy->termBlueprint('tag'));
         $this->assertNull($taxonomy->termBlueprint('two'));
     }
 

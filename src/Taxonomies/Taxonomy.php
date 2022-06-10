@@ -104,9 +104,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function termBlueprint($blueprint = null, $term = null)
     {
-        $blueprint = is_null($blueprint)
-            ? $this->termBlueprints()->first()
-            : $this->termBlueprints()->keyBy->handle()->get($blueprint);
+        $blueprint = $this->getBaseTermBlueprint($blueprint);
 
         $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
 
@@ -115,6 +113,16 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         }
 
         return $blueprint;
+    }
+
+    private function getBaseTermBlueprint($blueprint)
+    {
+        if (is_null($blueprint)) {
+            return $this->termBlueprints()->first();
+        }
+
+        return $this->termBlueprints()->keyBy->handle()->get($blueprint)
+            ?? $this->termBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
     }
 
     public function ensureTermBlueprintFields($blueprint)
@@ -128,14 +136,12 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function fallbackTermBlueprint()
     {
-        $singular = config('statamic.system.blueprint_singular', false);
-
         $blueprint = Blueprint::find('default')
-            ->setHandle($singular ? Str::singular($this->handle()) : $this->handle())
+            ->setHandle(Str::singular($this->handle()))
             ->setNamespace('taxonomies.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = $singular ? Str::singular($this->title()) : $this->title();
+        $contents['title'] = Str::singular($this->title());
         $blueprint->setContents($contents);
 
         return $blueprint;

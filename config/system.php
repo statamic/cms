@@ -72,19 +72,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Singular Blueprint Handles and Titles
-    |--------------------------------------------------------------------------
-    |
-    | Default blueprint handles and titles will match the collection, and those
-    | values are typically plural. Setting this to true will change the default
-    | blueprint handles and titles to singular.
-    |
-    */
-
-    'blueprint_singular' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Track Last Update
     |--------------------------------------------------------------------------
     |

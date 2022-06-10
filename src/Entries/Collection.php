@@ -292,9 +292,12 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint;
 
         return Blink::once($blink, function () use ($blueprint) {
-            return is_null($blueprint)
-                ? $this->entryBlueprints()->reject->hidden()->first()
-                : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
+            if (is_null($blueprint)) {
+                return $this->entryBlueprints()->reject->hidden()->first();
+            }
+
+            return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
+                ?? $this->entryBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
         });
     }
 
@@ -311,14 +314,12 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function fallbackEntryBlueprint()
     {
-        $singular = config('statamic.system.blueprint_singular', false);
-
         $blueprint = Blueprint::find('default')
-            ->setHandle($singular ? Str::singular($this->handle()) : $this->handle())
+            ->setHandle(Str::singular($this->handle()))
             ->setNamespace('collections.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = $singular ? Str::singular($this->title()) : $this->title();
+        $contents['title'] = Str::singular($this->title());
         $blueprint->setContents($contents);
 
         return $blueprint;
