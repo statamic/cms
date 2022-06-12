@@ -4,6 +4,5 @@ namespace Statamic\View\State;
 
 interface ResetsState
 {
-
-    function resetState();
+    public function resetState();
 }

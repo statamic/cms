@@ -4,9 +4,9 @@ namespace Tests\View;
 
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\FakesContent;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Tests\FakesViews;
 
 class StateTest extends TestCase
 {
@@ -50,7 +50,8 @@ EOT;
         $this->assertSame($expected, $resultThree);
     }
 
-    protected function getResponseContent($uri) {
+    protected function getResponseContent($uri)
+    {
         $response = $this->get($uri)->assertStatus(200);
 
         return StringUtilities::normalizeLineEndings(trim($response->getContent()));
