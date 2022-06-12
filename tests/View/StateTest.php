@@ -2,6 +2,7 @@
 
 namespace Tests\View;
 
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\FakesContent;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -52,6 +53,6 @@ EOT;
     protected function getResponseContent($uri) {
         $response = $this->get($uri)->assertStatus(200);
 
-        return trim($response->getContent());
+        return StringUtilities::normalizeLineEndings(trim($response->getContent()));
     }
 }
