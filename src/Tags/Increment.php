@@ -2,9 +2,16 @@
 
 namespace Statamic\Tags;
 
-class Increment extends Tags
+use Statamic\View\State\ResetsState;
+
+class Increment extends Tags implements ResetsState
 {
     protected static $arr = [];
+
+    public function resetState()
+    {
+        self::$arr = [];
+    }
 
     public function reset()
     {
