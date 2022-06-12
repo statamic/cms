@@ -18,7 +18,7 @@ class StateManager
      * interface, that class will have its resetState()
      * method called if another response is generated.
      *
-     * @param string $class The class name.
+     * @param  string  $class  The class name.
      * @return void
      */
     public static function track($class)
