@@ -2,6 +2,7 @@
 
 namespace Tests\Forms;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FormCreated;
 use Statamic\Events\FormSaved;
@@ -105,5 +106,45 @@ class FormTest extends TestCase
         $form = Form::make('contact_us');
 
         $this->assertEquals('honeypot', $form->honeypot());
+    }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $form = Form::make('contact_us');
+
+        $form
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $form->{$key}));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $form = Form::make('contact_us');
+
+        $this->assertInstanceOf(Arrayable::class, $form);
+
+        $expectedAugmented = $form->toAugmentedCollection();
+
+        $array = $form->toArray();
+
+        $this->assertCount($expectedAugmented->count(), $array);
+
+        collect($array)
+            ->each(function ($value, $key) use ($form) {
+                $expected = $form->{$key};
+                $expected = $expected instanceof Arrayable ? $expected->toArray() : $expected;
+                $this->assertEquals($expected, $value);
+            });
+    }
+
+    /** @test */
+    public function it_can_get_action_url()
+    {
+        $form = Form::make('contact_us');
+        $route = route('statamic.forms.submit', $form->handle());
+
+        $this->assertEquals($route, $form->actionUrl());
     }
 }

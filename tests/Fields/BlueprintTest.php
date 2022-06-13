@@ -5,9 +5,11 @@ namespace Tests\Fields;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Events\BlueprintCreated;
@@ -1096,5 +1098,35 @@ class BlueprintTest extends TestCase
         $this->assertEquals('test', Facades\Antlers::parse('{{ blueprint }}', ['blueprint' => $blueprint]));
 
         $this->assertEquals('test Test', Facades\Antlers::parse('{{ blueprint }}{{ handle }} {{ title }}{{ /blueprint }}', ['blueprint' => $blueprint]));
+    }
+
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $blueprint
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $this->assertInstanceOf(Arrayable::class, $blueprint);
+
+        collect($blueprint->toArray())
+            ->each(fn ($value, $key) => $this->assertEquals($value, $blueprint->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value, $blueprint[$key]));
+    }
+
+    /** @test */
+    public function it_resolves_itself_to_a_queryable_value()
+    {
+        $blueprint = (new Blueprint)->setHandle('test');
+        $this->assertInstanceOf(QueryableValue::class, $blueprint);
+        $this->assertEquals('test', $blueprint->toQueryableValue());
     }
 }

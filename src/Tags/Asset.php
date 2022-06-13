@@ -39,6 +39,10 @@ class Asset extends Assets
      */
     public function index()
     {
+        if (! $this->params->hasAny(['url', 'src'])) {
+            return $this->context->value('asset');
+        }
+
         return AssetAPI::find($this->params->get(['url', 'src']));
     }
 }

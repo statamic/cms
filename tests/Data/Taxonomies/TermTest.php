@@ -196,4 +196,54 @@ class TermTest extends TestCase
             ],
         ], $term->fileData());
     }
+
+    /** @test */
+    public function it_gets_preview_targets()
+    {
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.de/'],
+        ]]);
+
+        $taxonomy = tap(Taxonomy::make('tags')->sites(['en', 'fr', 'de']))->save();
+
+        $term = (new Term)->taxonomy('tags');
+
+        $termEn = $term->in('en')->slug('foo');
+        $termFr = $term->in('fr')->slug('le-foo');
+        $termDe = $term->in('de')->slug('das-foo');
+
+        $this->assertEquals([
+            ['label' => 'Term', 'format' => '{permalink}', 'url' => 'http://domain.com/tags/foo'],
+        ], $termEn->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Term', 'format' => '{permalink}', 'url' => 'http://domain.com/fr/tags/le-foo'],
+        ], $termFr->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Term', 'format' => '{permalink}', 'url' => 'http://domain.de/tags/das-foo'],
+        ], $termDe->previewTargets()->all());
+
+        $taxonomy->previewTargets([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true'],
+        ])->save();
+
+        $this->assertEquals([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'url' => 'http://preview.com/en/tags?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/en/tags/foo?preview=true'],
+        ], $termEn->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'url' => 'http://preview.com/fr/tags?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/fr/tags/le-foo?preview=true'],
+        ], $termFr->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'url' => 'http://preview.com/de/tags?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/de/tags/das-foo?preview=true'],
+        ], $termDe->previewTargets()->all());
+    }
 }

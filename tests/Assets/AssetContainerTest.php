@@ -4,6 +4,7 @@ namespace Tests\Assets;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -87,10 +88,18 @@ class AssetContainerTest extends TestCase
 
         $return = $container->disk('test');
 
+        $config = $container->disk()->filesystem()->getConfig();
+
+        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
+        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
+        if (is_array($config)) {
+            $config = collect($config);
+        }
+
         $this->assertEquals($container, $return);
         $this->assertInstanceOf(FlysystemAdapter::class, $container->disk());
         $this->assertEquals('test', $container->diskHandle());
-        $this->assertEquals('/the-url', $container->disk()->filesystem()->getDriver()->getConfig()->get('url'));
+        $this->assertEquals('/the-url', $config->get('url'));
     }
 
     /** @test */
@@ -132,7 +141,7 @@ class AssetContainerTest extends TestCase
         $this->assertTrue($container->private());
         $this->assertFalse($container->accessible());
 
-        Storage::disk('test')->getDriver()->getConfig()->set('url', '/url');
+        Storage::fake('test', ['url' => '/url']);
 
         $this->assertFalse($container->private());
         $this->assertTrue($container->accessible());
@@ -669,6 +678,39 @@ class AssetContainerTest extends TestCase
         $this->assertEquals('foo', $folder->title());
         $this->assertEquals('foo', $folder->path());
         $this->assertEquals($container, $folder->container());
+    }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $container = $this->containerWithDisk();
+
+        $container
+            ->toAugmentedCollection()
+            ->except(['assets'])
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $container = $this->containerWithDisk();
+
+        $this->assertInstanceOf(Arrayable::class, $container);
+
+        $expectedAugmented = $container->toAugmentedCollection()->except('assets');
+
+        $array = $container->toArray();
+
+        $this->assertCount($expectedAugmented->count(), $array);
+
+        collect($array)
+            ->each(function ($value, $key) use ($container) {
+                $expected = $container->{$key};
+                $expected = $expected instanceof Arrayable ? $expected->toArray() : $expected;
+                $this->assertEquals($expected, $value);
+            });
     }
 
     private function containerWithDisk()

@@ -54,8 +54,13 @@
 
 <script>
 import ChangePassword from './ChangePassword.vue';
+import HasHiddenFields from '../data-list/HasHiddenFields';
 
 export default {
+
+    mixins: [
+        HasHiddenFields,
+    ],
 
     components: {
         ChangePassword,
@@ -103,7 +108,7 @@ export default {
         save() {
             this.clearErrors();
 
-            this.$axios[this.method](this.actions.save, this.values).then(response => {
+            this.$axios[this.method](this.actions.save, this.visibleValues).then(response => {
                 this.title = response.data.title;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();

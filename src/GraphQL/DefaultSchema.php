@@ -46,7 +46,7 @@ class DefaultSchema implements ConfigConvertible
             'query' => $this->getQueries(),
             'mutation' => [],
             'middleware' => $this->getMiddleware(),
-            'method' => ['get', 'post'],
+            'method' => ['GET', 'POST'],
         ];
     }
 

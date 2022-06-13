@@ -9,6 +9,7 @@ use Statamic\Actions\Action;
 use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
+use Statamic\Forms\JsDrivers;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes;
@@ -23,6 +24,8 @@ use Statamic\Widgets\Widget;
 class ExtensionServiceProvider extends ServiceProvider
 {
     protected $actions = [
+        Actions\CopyAssetUrl::class,
+        Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
         Actions\Publish::class,
@@ -147,6 +150,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Markdown::class,
         Tags\Member::class,
         Tags\Mix::class,
+        Tags\MountUrl::class,
         Tags\Nav::class,
         Tags\NotFound::class,
         Tags\Obfuscate::class,
@@ -188,6 +192,10 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Widget::class,
     ];
 
+    protected $formJsDrivers = [
+        JsDrivers\Alpine::class,
+    ];
+
     protected $updateScripts = [
         Updates\AddPerEntryPermissions::class,
         Updates\UseDedicatedTrees::class,
@@ -198,6 +206,7 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->registerExtensions();
         $this->registerAddonManifest();
+        $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
     }
 
@@ -300,6 +309,15 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.extensions'][Modifier::class] = collect()
             ->merge($this->app['statamic.extensions'][Modifier::class] ?? [])
             ->merge($modifiers);
+    }
+
+    protected function registerFormJsDrivers()
+    {
+        $this->app->instance('statamic.form-js-drivers', collect());
+
+        foreach ($this->formJsDrivers as $class) {
+            $class::register();
+        }
     }
 
     protected function registerUpdateScripts()

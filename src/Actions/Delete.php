@@ -20,6 +20,7 @@ class Delete extends Action
             case $item instanceof Contracts\Taxonomies\Term:
             case $item instanceof Contracts\Assets\Asset:
             case $item instanceof Contracts\Assets\AssetFolder:
+            case $item instanceof Contracts\Forms\Form:
             case $item instanceof Contracts\Forms\Submission:
             case $item instanceof Contracts\Auth\User:
                 return true;

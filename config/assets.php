@@ -140,4 +140,18 @@ return [
     */
 
     'focal_point_editor' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enforce Lowercase Filenames
+    |--------------------------------------------------------------------------
+    |
+    | Control whether asset filenames will be converted to lowercase when
+    | uploading and renaming. This can help you avoid file conflicts
+    | when working in case-insensitive filesystem environments.
+    |
+    */
+
+    'lowercase' => true,
+
 ];

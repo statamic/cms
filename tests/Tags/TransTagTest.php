@@ -11,8 +11,7 @@ class TransTagTest extends TestCase
     {
         parent::setUp();
 
-        $this->copyLangFile('en/messages.php');
-        $this->copyLangFile('fr/messages.php');
+        app('translator')->addNamespace('package', __DIR__.'/../__fixtures__/lang');
     }
 
     private function parse($tag)
@@ -23,32 +22,19 @@ class TransTagTest extends TestCase
     /** @test */
     public function it_translates_message()
     {
-        $this->assertEquals('Hello', $this->parse('{{ trans key="messages.hello" }}'));
+        $this->assertEquals('Hello', $this->parse('{{ trans key="package::messages.hello" }}'));
     }
 
     /** @test */
     public function it_translates_with_replacement()
     {
-        $this->assertEquals('Hello, Bob', $this->parse('{{ trans key="messages.hello_name" name="Bob" }}'));
+        $this->assertEquals('Hello, Bob', $this->parse('{{ trans key="package::messages.hello_name" name="Bob" }}'));
     }
 
     /** @test */
     public function it_translates_to_specific_locale()
     {
-        $this->assertEquals('Bonjour, Bob', $this->parse('{{ trans key="messages.hello_name" name="Bob" locale="fr" }}'));
-        $this->assertEquals('Bonjour, Bob', $this->parse('{{ trans key="messages.hello_name" name="Bob" site="fr" }}'));
-    }
-
-    private function copyLangFile($path)
-    {
-        $files = app('files');
-
-        $folder = preg_replace('/(.*)\/[^\/]*/', '$1', $path);
-
-        if (! $files->exists($folderPath = resource_path("lang/$folder"))) {
-            $files->makeDirectory($folderPath, 0755, true);
-        }
-
-        $files->copy(__DIR__."/../__fixtures__/lang/{$path}", resource_path("lang/{$path}"));
+        $this->assertEquals('Bonjour, Bob', $this->parse('{{ trans key="package::messages.hello_name" name="Bob" locale="fr" }}'));
+        $this->assertEquals('Bonjour, Bob', $this->parse('{{ trans key="package::messages.hello_name" name="Bob" site="fr" }}'));
     }
 }

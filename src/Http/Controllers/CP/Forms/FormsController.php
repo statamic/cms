@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
+use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -13,9 +14,14 @@ use Statamic\Support\Str;
 
 class FormsController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('index', FormContract::class);
+
+        $columns = [
+            Column::make('title')->label(__('Title')),
+            Column::make('submissions')->label(__('Submissions')),
+        ];
 
         $forms = Form::all()
             ->filter(function ($form) {
@@ -28,14 +34,27 @@ class FormsController extends CpController
                     'submissions' => $form->submissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
-                    'delete_url' => $form->deleteUrl(),
                     'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
-                    'deleteable' => User::current()->can('delete', $form),
+                    'actions' => Action::for($form),
                 ];
             })
             ->values();
 
-        return view('statamic::forms.index', compact('forms'));
+        if ($request->wantsJson()) {
+            return [
+                'meta' => [
+                    'columns' => $columns,
+                    'activeFilterBadges' => [],
+                ],
+                'data' => $forms,
+            ];
+        }
+
+        return view('statamic::forms.index', [
+            'forms' => $forms,
+            'initialColumns' => $columns,
+            'actionUrl' => cp_route('forms.actions.run'),
+        ]);
     }
 
     public function show($form)
@@ -120,7 +139,13 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
-        $values = $form->toArray();
+        $values = [
+            'handle' => $form->handle(),
+            'title' => $form->title(),
+            'honeypot' => $form->honeypot(),
+            'store' => $form->store(),
+            'email' => $form->email(),
+        ];
 
         $fields = ($blueprint = $this->editFormBlueprint($form))
             ->fields()
@@ -154,8 +179,6 @@ class FormsController extends CpController
         $form->save();
 
         $this->success(__('Saved'));
-
-        return $form->toArray();
     }
 
     public function destroy($form)

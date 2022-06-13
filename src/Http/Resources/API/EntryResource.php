@@ -14,8 +14,13 @@ class EntryResource extends JsonResource
      */
     public function toArray($request)
     {
+        $with = $this->blueprint()
+            ->fields()->all()
+            ->filter->isRelationship()->keys()->all();
+
         return $this->resource
             ->toAugmentedCollection()
+            ->withRelations($with)
             ->withShallowNesting()
             ->toArray();
     }

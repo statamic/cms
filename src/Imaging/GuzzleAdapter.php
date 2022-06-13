@@ -6,16 +6,12 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Uri;
-use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
-use League\Flysystem\Util\MimeType;
-use Psr\Http\Message\ResponseInterface;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\UnableToReadFile;
 
-/**
- * Uses Guzzle as a backend for HTTP URLs.
- */
-class GuzzleAdapter implements AdapterInterface
+class GuzzleAdapter implements FilesystemAdapter
 {
     /**
      * Whether this endpoint supports head requests.
@@ -39,217 +35,111 @@ class GuzzleAdapter implements AdapterInterface
     protected $client;
 
     /**
-     * The visibility of this adapter.
-     *
-     * @var string
-     */
-    protected $visibility = AdapterInterface::VISIBILITY_PUBLIC;
-
-    /**
      * Constructs a GuzzleAdapter object.
      *
      * @param  string  $base  The base URL.
      * @param  \GuzzleHttp\ClientInterface  $client  An optional Guzzle client.
-     * @param  bool  $supportsHead  Whether the client supports HEAD requests.
      */
-    public function __construct($base, ClientInterface $client = null, $supportsHead = true)
+    public function __construct($base, ClientInterface $client = null)
     {
         $this->base = rtrim($base, '/').'/';
         $this->client = $client ?: new Client();
-        $this->supportsHead = $supportsHead;
-
-        if (isset(parse_url($base)['user'])) {
-            $this->visibility = AdapterInterface::VISIBILITY_PRIVATE;
-        }
     }
 
-    /**
-     * Returns the base URL.
-     *
-     * @return string The base URL.
-     */
-    public function getBaseUrl()
+    public function fileExists(string $location): bool
     {
-        return $this->base;
+        return (bool) $this->head($location);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function copy($path, $newpath)
+    public function directoryExists(string $location): bool
     {
-        return false;
+        return $this->fileExists($location);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createDir($path, Config $config)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function delete($path)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteDir($path)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadata($path)
-    {
-        if (! $response = $this->head($path)) {
-            return false;
-        }
-
-        return [
-            'type' => 'file',
-            'path' => $path,
-        ] + $this->getResponseMetadata($path, $response);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMimetype($path)
-    {
-        return $this->getMetadata($path);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSize($path)
-    {
-        return $this->getMetadata($path);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTimestamp($path)
-    {
-        return $this->getMetadata($path);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVisibility($path)
-    {
-        return [
-            'path' => $path,
-            'visibility' => $this->visibility,
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function has($path)
-    {
-        return (bool) $this->head($path);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function listContents($directory = '', $recursive = false)
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function read($path)
+    public function read(string $path): string
     {
         if (! $response = $this->get($path)) {
-            return false;
+            throw UnableToReadFile::fromLocation($path);
         }
 
-        return [
-            'path' => $path,
-            'contents' => (string) $response->getBody(),
-        ] + $this->getResponseMetadata($path, $response);
+        return (string) $response->getBody();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function readStream($path)
     {
         if (! $response = $this->get($path)) {
-            return false;
+            throw UnableToReadFile::fromLocation($path);
         }
 
-        return [
-            'path' => $path,
-            'stream' => $response->getBody()->detach(),
-        ] + $this->getResponseMetadata($path, $response);
+        return $response->getBody()->detach();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rename($path, $newpath)
+    public function setVisibility(string $path, string $visibility): void
     {
-        return false;
+        //
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setVisibility($path, $visibility)
+    public function write(string $path, string $contents, Config $config): void
     {
-        throw new \LogicException('GuzzleAdapter does not support visibility. Path: '.$path.', visibility: '.$visibility);
+        //
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function update($path, $contents, Config $conf)
+    public function writeStream(string $path, $contents, Config $config): void
     {
-        return false;
+        //
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function updateStream($path, $resource, Config $config)
+    public function mimeType(string $path): FileAttributes
     {
-        return false;
+        //
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function write($path, $contents, Config $config)
+    public function lastModified(string $path): FileAttributes
     {
-        return false;
+        //
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function writeStream($path, $resource, Config $config)
+    public function fileSize(string $path): FileAttributes
     {
-        return false;
+        //
     }
 
-    /**
+    public function listContents(string $path, bool $deep): iterable
+    {
+        //
+    }
+
+    public function move(string $source, string $destination, Config $config): void
+    {
+        //
+    }
+
+    public function copy(string $source, string $destination, Config $config): void
+    {
+        //
+    }
+
+    public function createDirectory(string $path, Config $config): void
+    {
+        //
+    }
+
+    public function delete(string $path): void
+    {
+        //
+    }
+
+    public function deleteDirectory(string $prefix): void
+    {
+        //
+    }
+
+    public function visibility(string $path): FileAttributes
+    {
+        //
+    }
+
+    /*
      * Performs a GET request.
      *
      * @param  string  $path  The path to GET.
@@ -268,60 +158,6 @@ class GuzzleAdapter implements AdapterInterface
         }
 
         return $response;
-    }
-
-    /**
-     * Returns the mimetype of a response.
-     *
-     * @param  string  $path
-     * @param  \Psr\Http\Message\ResponseInterface  $response
-     * @return string
-     */
-    protected function getMimetypeFromResponse($path, ResponseInterface $response)
-    {
-        if ($mimetype = $response->getHeader('Content-Type')) {
-            [$mimetype] = explode(';', reset($mimetype), 2);
-
-            return trim($mimetype);
-        }
-
-        // Try to guess from file extension.
-        $uri = new Uri($path);
-
-        return MimeType::detectByFilename($uri->getPath());
-    }
-
-    /**
-     * Returns the metadata array for a response.
-     *
-     * @param  string  $path
-     * @param  \Psr\Http\Message\ResponseInterface  $response
-     * @return array
-     */
-    protected function getResponseMetadata($path, ResponseInterface $response)
-    {
-        $metadata = [
-            'visibility' => $this->visibility,
-            'mimetype' => $this->getMimetypeFromResponse($path, $response),
-        ];
-
-        if ($last_modified = $response->getHeader('Last-Modified')) {
-            $last_modified = strtotime(reset($last_modified));
-
-            if ($last_modified !== false) {
-                $metadata['timestamp'] = $last_modified;
-            }
-        }
-
-        if ($length = $response->getHeader('Content-Length')) {
-            $length = reset($length);
-
-            if (is_numeric($length)) {
-                $metadata['size'] = (int) $length;
-            }
-        }
-
-        return $metadata;
     }
 
     /**

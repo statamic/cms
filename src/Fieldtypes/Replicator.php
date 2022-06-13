@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Values;
 use Statamic\GraphQL\Types\ReplicatorSetsType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
@@ -165,7 +166,7 @@ class Replicator extends Fieldtype
 
             $values = $this->fields($set['type'])->addValues($set)->{$augmentMethod}()->values();
 
-            return $values->merge(['type' => $set['type']])->all();
+            return new Values($values->merge(['type' => $set['type']])->all());
         })->values()->all();
     }
 

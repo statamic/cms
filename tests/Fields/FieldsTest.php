@@ -536,6 +536,70 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
+    public function preprocessing_validatables_removes_unfilled_values()
+    {
+        $fields = new Fields([
+            ['handle' => 'title', 'field' => ['type' => 'text']],
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+            ['handle' => 'reppy', 'field' => ['type' => 'replicator', 'sets' => ['replicator_set' => ['fields' => [
+                ['handle' => 'title', 'field' => ['type' => 'text']],
+                ['handle' => 'one', 'field' => ['type' => 'text']],
+                ['handle' => 'two', 'field' => ['type' => 'text']],
+                ['handle' => 'griddy_in_reppy', 'field' => ['type' => 'grid', 'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text']],
+                    ['handle' => 'one', 'field' => ['type' => 'text']],
+                    ['handle' => 'two', 'field' => ['type' => 'text']],
+                    ['handle' => 'bardo_in_griddy_in_reppy', 'field' => ['type' => 'bard', 'sets' => ['bard_set' => ['fields' => [
+                        ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                        ['handle' => 'bardo_in_bardo_in_griddy_in_reppy', 'field' => ['type' => 'bard', 'sets' => ['bard_set_set' => ['fields' => [
+                            ['handle' => 'title', 'field' => ['type' => 'text']],
+                            ['handle' => 'one', 'field' => ['type' => 'text']],
+                            ['handle' => 'two', 'field' => ['type' => 'text']],
+                        ]]]]],
+                    ]]]]],
+                ]]],
+            ]]]]],
+        ]);
+
+        $this->assertEquals(['title' => null, 'one' => null, 'two' => null, 'reppy' => null], $fields->values()->all());
+        $this->assertEquals([], $fields->preProcessValidatables()->values()->all());
+
+        $values = $expected = [
+            'title' => 'recursion madness',
+            'one' => 'foo',
+            'reppy' => [
+                ['type' => 'replicator_set', 'two' => 'foo'],
+                ['type' => 'replicator_set', 'griddy_in_reppy' => [
+                    ['one' => 'foo'],
+                    ['bardo_in_griddy_in_reppy' => json_encode($bardValues = [
+                        ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'two' => 'foo']]],
+                        ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'foo']]],
+                        ['type' => 'set', 'attrs' => ['type' => 'bard_set', 'values' => ['type' => 'bard_set', 'bardo_in_bardo_in_griddy_in_reppy' => json_encode($doubleNestedBardValues = [
+                            ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'two' => 'foo']]],
+                            ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'foo']]],
+                        ])]]],
+                    ])],
+                ]],
+            ],
+        ];
+
+        // Calling `addValues()` should track which fields are filled at each level of nesting.
+        // When we call `preProcessValidatables()`, unfilled values should get removed, in
+        // order to ensure rules like `sometimes` and `required_if` work at all levels.
+        $validatableValues = $fields->addValues($values)->preProcessValidatables()->values()->all();
+
+        // Bard fields submit JSON values, so we'll replace them with their corresponding PHP array
+        // values here, since `preProcessValidatables()` will return JSON decoded decoded values.
+        $expected['reppy'][1]['griddy_in_reppy'][1]['bardo_in_griddy_in_reppy'] = $bardValues;
+        $expected['reppy'][1]['griddy_in_reppy'][1]['bardo_in_griddy_in_reppy'][2]['attrs']['values']['bardo_in_bardo_in_griddy_in_reppy'] = $doubleNestedBardValues;
+
+        $this->assertEquals($expected, $validatableValues);
+    }
+
+    /** @test */
     public function it_processes_each_fields_values_by_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
@@ -762,6 +826,33 @@ class FieldsTest extends TestCase
         $fields->validate(['foo' => 'bar']);
     }
 
+    /** @test */
+    public function it_validates_properly_against_filled_fields_with_sometimes_rule()
+    {
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'text']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'text']);
+        });
+
+        $fields = (new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two'],
+        ]))->addValues(['one' => 'filled']);
+
+        Validator::fields($fields)->withRules([])->validate();
+        Validator::fields($fields)->withRules(['two' => ['sometimes', 'required']])->validate();
+
+        try {
+            Validator::fields($fields)->withRules(['two' => ['required']])->validate();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            //
+        }
+
+        $this->assertInstanceOf(\Illuminate\Validation\ValidationException::class, $e);
+    }
+
     /**
      * @test
      * @group graphql
@@ -785,5 +876,41 @@ class FieldsTest extends TestCase
         $this->assertIsArray($types['two']);
         $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $types['two']['type']);
         $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['two']['type']->getWrappedType());
+    }
+
+    /** @test */
+    public function it_sets_the_parent_on_all_fields()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+        ]);
+
+        $collection = $fields->all();
+        $this->assertNull($collection['one']->parent());
+        $this->assertNull($collection['two']->parent());
+
+        $fields->setParent('foo');
+        $collection = $fields->all();
+        $this->assertEquals('foo', $collection['one']->parent());
+        $this->assertEquals('foo', $collection['two']->parent());
+    }
+
+    /** @test */
+    public function it_sets_the_parentfield_on_all_fields()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+        ]);
+
+        $collection = $fields->all();
+        $this->assertNull($collection['one']->parentField());
+        $this->assertNull($collection['two']->parentField());
+
+        $fields->setParentField('foo');
+        $collection = $fields->all();
+        $this->assertEquals('foo', $collection['one']->parentField());
+        $this->assertEquals('foo', $collection['two']->parentField());
     }
 }

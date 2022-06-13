@@ -28,7 +28,7 @@ class AssetsFieldtypeTest extends TestCase
     /** @test */
     public function it_gets_multiple_assets()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('foo.txt', '');
         Storage::disk('test')->put('bar.txt', '');
         AssetContainer::make('assets')->disk('test')->save();
@@ -78,7 +78,7 @@ GQL;
     /** @test */
     public function it_gets_single_asset()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('foo.txt', '');
         Storage::disk('test')->put('bar.txt', '');
         AssetContainer::make('assets')->disk('test')->save();

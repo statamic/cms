@@ -2,7 +2,8 @@
 
 namespace Statamic\Entries;
 
-use Facades\Statamic\View\Cascade;
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
@@ -10,7 +11,9 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
+use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -18,6 +21,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
@@ -28,6 +32,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -36,13 +41,13 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess
 {
     use Routable {
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified;
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
@@ -59,6 +64,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $template;
+    protected $layout;
 
     public function __construct()
     {
@@ -142,20 +149,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedEntry($this);
-    }
-
-    public function toCacheableArray()
-    {
-        return [
-            'collection' => $this->collectionHandle(),
-            'locale' => $this->locale(),
-            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
-            'slug' => $this->slug(),
-            'date' => optional($this->date())->format('Y-m-d-Hi'),
-            'published' => $this->published(),
-            'path' => $this->initialPath() ?? $this->path(),
-            'data' => $this->data(),
-        ];
     }
 
     public function delete()
@@ -291,16 +284,15 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $this->withEvents = false;
 
-        $result = $this->save();
-
-        $this->withEvents = true;
-
-        return $result;
+        return $this->save();
     }
 
     public function save()
     {
         $isNew = is_null(Facades\Entry::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
 
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
@@ -332,7 +324,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if ($isNew) {
                 EntryCreated::dispatch($this);
             }
@@ -366,13 +358,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $prefix = '';
 
         if ($this->hasDate()) {
-            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
+            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d') . '.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
             rtrim(Stache::store('entries')->directory(), '/'),
             $this->collectionHandle(),
-            Site::hasMultiple() ? $this->locale().'/' : '',
+            Site::hasMultiple() ? $this->locale() . '/' : '',
             $prefix,
             $this->slug() ?? $this->id(),
             $this->fileExtension(),
@@ -396,7 +388,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('template')
             ->getter(function ($template) {
-                $template = $template ?? optional($this->origin())->template() ?? $this->collection()->template();
+                $template = $template ?? $this->get('template') ?? optional($this->origin())->template() ?? $this->collection()->template();
 
                 return $template === '@blueprint'
                     ? $this->inferTemplateFromBlueprint()
@@ -407,7 +399,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     protected function inferTemplateFromBlueprint()
     {
-        $template = $this->collection()->handle().'.'.$this->blueprint();
+        $template = $this->collection()->handle() . '.' . $this->blueprint();
 
         $slugifiedTemplate = str_replace('_', '-', $template);
 
@@ -421,7 +413,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? optional($this->origin())->layout() ?? $this->collection()->layout();
+                return $layout ?? $this->get('layout') ?? optional($this->origin())->layout() ?? $this->collection()->layout();
             })
             ->args(func_get_args());
     }
@@ -429,15 +421,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function toResponse($request)
     {
         return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
-    }
-
-    public function toLivePreviewResponse($request, $extras)
-    {
-        Cascade::hydrated(function ($cascade) use ($extras) {
-            $cascade->set('live_preview', $extras);
-        });
-
-        return $this->toResponse($request);
     }
 
     public function date($date = null)
@@ -765,6 +748,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return ['id', 'title', 'url', 'permalink', 'api_url'];
     }
 
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
+    }
+
     public function getProtectionScheme()
     {
         return $this->value('protect');
@@ -800,5 +788,52 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
         return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+    }
+
+    public function previewTargets()
+    {
+        return $this->collection()->previewTargets()->map(function ($target) {
+            return [
+                'label' => $target['label'],
+                'format' => $target['format'],
+                'url' => $this->resolvePreviewTargetUrl($target['format']),
+            ];
+        });
+    }
+
+    private function resolvePreviewTargetUrl($format)
+    {
+        if (! Str::contains($format, '{{')) {
+            $format = preg_replace_callback('/{\s*([a-zA-Z0-9_\-\:\.]+)\s*}/', function ($match) {
+                return "{{ {$match[1]} }}";
+            }, $format);
+        }
+
+        return (string) Antlers::parse($format, $this->augmented()->all());
+    }
+
+    public function repository()
+    {
+        return app(EntryRepository::class);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        // Avoid using the authors() method.
+        if ($field === 'authors') {
+            return $this->value('authors');
+        }
+
+        if (method_exists($this, $method = Str::camel($field))) {
+            return $this->{$method}();
+        }
+
+        $value = $this->value($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
     }
 }

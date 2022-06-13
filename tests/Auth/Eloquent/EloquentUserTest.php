@@ -94,8 +94,8 @@ class EloquentUserTest extends TestCase
     {
         return (new EloquentUser)
             ->model(User::create([
-                'name' => $this->faker->name,
-                'email' => $this->faker->unique()->safeEmail,
+                'name' => $this->faker->name(),
+                'email' => $this->faker->unique()->safeEmail(),
                 // 'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
                 'remember_token' => str_random(10),
             ])
@@ -129,5 +129,17 @@ class EloquentUserTest extends TestCase
                 'locale' => 'en',
             ],
         ];
+    }
+
+    /** @test */
+    public function it_gets_the_timestamps_property_from_the_model()
+    {
+        $user = $this->user();
+
+        $this->assertTrue($user->timestamps);
+
+        $user->model()->timestamps = false;
+
+        $this->assertFalse($user->timestamps);
     }
 }

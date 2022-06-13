@@ -2,7 +2,10 @@
 
 namespace Tests\API;
 
+use Facades\Statamic\CP\LivePreview;
+use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -18,6 +21,35 @@ class APITest extends TestCase
             ->get('/api/blah')
             ->assertNotFound()
             ->assertJson(['message' => 'Not found.']);
+    }
+
+    /**
+     * @test
+     * @dataProvider entryNotFoundProvider
+     */
+    public function it_handles_not_found_entries($url, $requestShouldSucceed)
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('articles')->save();
+
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)->save();
+
+        if ($requestShouldSucceed) {
+            $this->assertEndpointSuccessful($url);
+        } else {
+            $this->assertEndpointNotFound($url);
+        }
+    }
+
+    public function entryNotFoundProvider()
+    {
+        return [
+            'valid entry id' => ['/api/collections/pages/entries/about', true],
+            'invalid entry id' => ['/api/collections/pages/entries/dance', false],
+            'valid entry id but wrong collection' => ['/api/collections/articles/entries/about', false],
+        ];
     }
 
     /** @test */
@@ -148,6 +180,58 @@ class APITest extends TestCase
             ->assertJsonPath('data.edit_url', null);
     }
 
+    /** @test */
+    public function relationships_are_shallow_augmented()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        // use two collections just so the related entries dont show up in the listing.
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('other')->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'foo' => ['type' => 'text'],
+            'bar' => ['type' => 'entries'],
+        ]);
+        $other = Blueprint::makeFromFields([]);
+        BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect([
+            'page' => $blueprint->setHandle('post'),
+        ]));
+        BlueprintRepository::shouldReceive('in')->with('collections/other')->andReturn(collect([
+            'other' => $other->setHandle('other'),
+        ]));
+
+        Facades\Entry::make()->collection('other')->id('two')->slug('two')->published(true)->save();
+        Facades\Entry::make()->collection('other')->id('three')->slug('three')->published(true)->save();
+
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)
+            ->set('foo', 'foo text value')
+            ->set('bar', ['two', 'three'])
+            ->save();
+
+        $this->get('/api/collections/pages/entries')->assertJson([
+            'data' => [
+                [
+                    'foo' => 'foo text value',
+                    'bar' => [
+                        ['id' => 'two'],
+                        ['id' => 'three'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->get('/api/collections/pages/entries/about')->assertJson([
+            'data' => [
+                'foo' => 'foo text value',
+                'bar' => [
+                    ['id' => 'two'],
+                    ['id' => 'three'],
+                ],
+            ],
+        ]);
+    }
+
     /**
      * @test
      * @dataProvider userPasswordFilterProvider
@@ -160,13 +244,61 @@ class APITest extends TestCase
         User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
 
         $this
-              ->get("/api/users?filter[{$filter}]=abc")
-              ->assertJson([
-                  'data' => [
-                      ['id' => 'one'],
-                      ['id' => 'two'], // this one would be filtered out if the password was allowed
-                  ],
-              ]);
+            ->get("/api/users?filter[{$filter}]=abc")
+            ->assertJson([
+                'data' => [
+                    ['id' => 'one'],
+                    ['id' => 'two'], // this one would be filtered out if the password was allowed
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_replaces_entries_using_live_preview_token()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('dance')->set('title', 'Dance')->slug('dance')->save();
+
+        $substitute = Facades\Entry::make()->collection('pages')->id('dance')->set('title', 'Dance modified in live preview')->slug('dance');
+
+        $this->get('/api/collections/pages/entries/dance')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+
+        LivePreview::tokenize('test-token', $substitute);
+
+        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+            'data' => [
+                'title' => 'Dance modified in live preview',
+            ],
+        ]);
+    }
+
+    /** @test */
+    public function it_replaces_terms_using_live_preview_token()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data(['title' => 'Dance'])->save();
+
+        $substitute = Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data(['title' => 'Dance modified in live preview']);
+
+        $this->get('/api/taxonomies/topics/terms/dance')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+
+        LivePreview::tokenize('test-token', $substitute);
+
+        $this->get('/api/taxonomies/topics/terms/dance?token=test-token')->assertJson([
+            'data' => [
+                'title' => 'Dance modified in live preview',
+            ],
+        ]);
     }
 
     public function userPasswordFilterProvider()
@@ -178,9 +310,36 @@ class APITest extends TestCase
             'password_hash',
             'password_hash:is',
             'password_hash:regex',
-        ])->mapWithKeys(function ($filter) {
-            return [$filter => [$filter]];
-        })->all();
+        ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
+    }
+
+    /**
+     * @test
+     * @dataProvider termNotFoundProvider
+     */
+    public function it_handles_not_found_terms($url, $requestShouldSucceed)
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        Facades\Taxonomy::make('tags')->save();
+        Facades\Taxonomy::make('categories')->save();
+
+        Facades\Term::make('test')->taxonomy('tags')->dataForLocale('en', [])->save();
+
+        if ($requestShouldSucceed) {
+            $this->assertEndpointSuccessful($url);
+        } else {
+            $this->assertEndpointNotFound($url);
+        }
+    }
+
+    public function termNotFoundProvider()
+    {
+        return [
+            'valid term id' => ['/api/taxonomies/tags/terms/test', true],
+            'invalid term id' => ['/api/taxonomies/tags/terms/missing', false],
+            'valid term id but wrong collection' => ['/api/taxonomies/categories/terms/test', false],
+        ];
     }
 
     private function assertEndpointDataCount($endpoint, $count)

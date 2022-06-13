@@ -266,16 +266,24 @@ GQL;
         User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
         User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
 
-        $query = "{ users(filter: $filter) { data { id } } }";
+        $query = <<<GQL
+{
+    users(filter: $filter) {
+        data {
+            id
+        }
+    }
+}
+GQL;
 
         $this
-             ->withoutExceptionHandling()
-             ->post('/graphql', ['query' => $query])
-             ->assertGqlOk()
-             ->assertExactJson(['data' => ['users' => ['data' => [
-                 ['id' => 'one'],
-                 ['id' => 'two'], // this one would be filtered out if the password was allowed
-             ]]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['users' => ['data' => [
+                ['id' => 'one'],
+                ['id' => 'two'], // this one would be filtered out if the password was allowed
+            ]]]]);
     }
 
     public function userPasswordFilterProvider()

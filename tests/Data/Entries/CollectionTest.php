@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
@@ -574,6 +575,38 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $collection
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $collection->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $collection[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $collection = (new Collection)->handle('tags');
+
+        $this->assertInstanceOf(Arrayable::class, $collection);
+
+        $expectedAugmented = $collection->toAugmentedCollection();
+
+        $array = $collection->toArray();
+
+        $this->assertCount($expectedAugmented->count(), $array);
+
+        collect($array)
+            ->each(function ($value, $key) use ($collection) {
+                $expected = $collection->{$key};
+                $expected = $expected instanceof Arrayable ? $expected->toArray() : $expected;
+                $this->assertEquals($expected, $value);
+            });
+    }
+
+    /** @test */
     public function it_augments_in_the_parser()
     {
         $collection = (new Collection)->handle('test');
@@ -601,8 +634,10 @@ class CollectionTest extends TestCase
         $mount->shouldReceive('in')->with('fr')->andReturn($frenchMount);
         $mount->shouldReceive('uri')->andReturn('/blog');
         $mount->shouldReceive('url')->andReturn('/en/blog');
+        $mount->shouldReceive('absoluteUrl')->andReturn('http://site1.com/en/blog');
         $frenchMount->shouldReceive('uri')->andReturn('/le-blog');
         $frenchMount->shouldReceive('url')->andReturn('/fr/le-blog');
+        $frenchMount->shouldReceive('absoluteUrl')->andReturn('http://site2.com/fr/le-blog');
 
         Facades\Entry::shouldReceive('find')->with('mounted')->andReturn($mount);
 
@@ -610,19 +645,25 @@ class CollectionTest extends TestCase
 
         $this->assertNull($collection->uri());
         $this->assertNull($collection->url());
+        $this->assertNull($collection->absoluteUrl());
         $this->assertNull($collection->uri('en'));
         $this->assertNull($collection->url('en'));
+        $this->assertNull($collection->absoluteUrl('en'));
         $this->assertNull($collection->uri('fr'));
         $this->assertNull($collection->url('fr'));
+        $this->assertNull($collection->absoluteUrl('fr'));
 
         $collection->mount('mounted');
 
         $this->assertEquals('/blog', $collection->uri());
         $this->assertEquals('/en/blog', $collection->url());
+        $this->assertEquals('http://site1.com/en/blog', $collection->absoluteUrl());
         $this->assertEquals('/blog', $collection->uri('en'));
         $this->assertEquals('/en/blog', $collection->url('en'));
+        $this->assertEquals('http://site1.com/en/blog', $collection->absoluteUrl('en'));
         $this->assertEquals('/le-blog', $collection->uri('fr'));
         $this->assertEquals('/fr/le-blog', $collection->url('fr'));
+        $this->assertEquals('http://site2.com/fr/le-blog', $collection->absoluteUrl('fr'));
     }
 
     /** @test */
@@ -635,5 +676,77 @@ class CollectionTest extends TestCase
 
         $collection->updateEntryUris();
         $collection->updateEntryUris(['one', 'two']);
+    }
+
+    /**
+     * @test
+     * @dataProvider additionalPreviewTargetProvider
+     */
+    public function it_gets_and_sets_preview_targets($throughFacade)
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->previewTargets());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->basePreviewTargets());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->additionalPreviewTargets());
+
+        $this->assertEquals([
+            ['label' => 'Entry', 'format' => '{permalink}'],
+        ], $collection->basePreviewTargets()->all());
+
+        $return = $collection->previewTargets([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ]);
+
+        $this->assertSame($collection, $return);
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $collection->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $collection->basePreviewTargets()->all());
+
+        $this->assertEquals([], $collection->additionalPreviewTargets()->all());
+
+        $extra = [
+            ['label' => 'Baz', 'format' => '{baz}'],
+            ['label' => 'Qux', 'format' => '{qux}'],
+        ];
+
+        if ($throughFacade) {
+            \Statamic\Facades\Collection::addPreviewTargets('test', $extra);
+        } else {
+            $collection->addPreviewTargets($extra);
+        }
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Baz', 'format' => '{baz}'],
+            ['label' => 'Qux', 'format' => '{qux}'],
+        ], $collection->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Foo', 'format' => '{foo}'],
+            ['label' => 'Bar', 'format' => '{bar}'],
+        ], $collection->basePreviewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Baz', 'format' => '{baz}'],
+            ['label' => 'Qux', 'format' => '{qux}'],
+        ], $collection->additionalPreviewTargets()->all());
+    }
+
+    public function additionalPreviewTargetProvider()
+    {
+        return [
+            'through object' => [false],
+            'through facade' => [true],
+        ];
     }
 }
