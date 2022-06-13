@@ -592,12 +592,11 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $this
             ->fluentlyGetOrSet('autosave')
             ->getter(function ($interval) {
-                if (! Statamic::pro() || ! $interval) {
+                if (! config('statamic.autosave.enabled') || ! config('statamic.autosave.understood') || ! Statamic::pro() || ! $interval) {
                     return null;
                 }
 
-                // return 5000 ms as default autosave interval
-                return gettype($interval) === 'boolean' ? 5000 : $interval;
+                return gettype($interval) === 'boolean' ? config('statamic.autosave.interval') : $interval;
             })
             ->args(func_get_args());
     }
