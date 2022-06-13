@@ -25,6 +25,8 @@ class AssetContainersStore extends BasicStore
             ->allowRenaming(array_get($data, 'allow_renaming'))
             ->allowUploads(array_get($data, 'allow_uploads'))
             ->createFolders(array_get($data, 'create_folders'))
-            ->searchIndex(array_get($data, 'search_index'));
+            ->searchIndex(array_get($data, 'search_index'))
+            ->sortField(array_get($data, 'sort_by'))
+            ->sortDirection(array_get($data, 'sort_dir'));
     }
 }
