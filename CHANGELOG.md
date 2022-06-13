@@ -1,12 +1,5 @@
 # Release Notes
 
-<<<<<<< HEAD
-## 3.2.39 (2022-03-22)
-
-### What's fixed
-- Prevent filtering users by password hashes in the APIs. [#5604](https://github.com/statamic/cms/issues/5604) by @jasonvarga
-- Fix error when determining slug language on non-entry forms. [#5603](https://github.com/statamic/cms/issues/5603) by @jasonvarga
-=======
 ## 3.3.15 (2022-06-09)
 
 ### What's new
@@ -468,7 +461,6 @@
 - `$item->augmentedValue()`, `toAugmentedCollection()`, and `toAugmentedArray()` will always return `Value` instances. [#5302](https://github.com/statamic/cms/issues/5302) by @jasonvarga
 - Form submission data will always be an unfiltered Collection. [#5230](https://github.com/statamic/cms/issues/5230) by @jasonvarga
 - AssetContainer, Collection, Form, and Taxonomy's `toArray` methods return different data. [#5186](https://github.com/statamic/cms/issues/5186) by @jasonvarga
->>>>>>> 3.3
 
 
 
