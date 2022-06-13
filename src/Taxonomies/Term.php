@@ -7,6 +7,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\SyncsOriginalState;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
+use Statamic\Events\TermSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
@@ -172,6 +173,8 @@ class Term implements TermContract
 
     public function save()
     {
+        TermSaving::dispatch($this);
+
         Facades\Term::save($this);
 
         TermSaved::dispatch($this);
