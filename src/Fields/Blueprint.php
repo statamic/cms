@@ -185,7 +185,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         // Get all the fields, and mark which section they're in.
         $allFields = $sections->flatMap(function ($section, $sectionHandle) {
             return collect($section['fields'] ?? [])->keyBy(function ($field) {
-                return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
+                return (isset($field['import'])) ? 'import:' . ($field['prefix'] ?? null) . $field['import'] : $field['handle'];
             })->map(function ($field) use ($sectionHandle) {
                 $field['section'] = $sectionHandle;
 
@@ -196,7 +196,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         $importedFields = $allFields->filter(function ($field, $key) {
             return Str::startsWith($key, 'import:');
         })->keyBy(function ($field) {
-            return ($field['prefix'] ?? null).$field['import'];
+            return ($field['prefix'] ?? null) . $field['import'];
         })->mapWithKeys(function ($field, $partial) {
             return (new Fields([$field]))->all()->map(function ($field) use ($partial) {
                 return compact('partial', 'field');
@@ -225,16 +225,16 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
             }
         }
         $fields = collect($sections[$section]['fields'] ?? [])->keyBy(function ($field) {
-            return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
+            return (isset($field['import'])) ? 'import:' . ($field['prefix'] ?? null) . $field['import'] : $field['handle'];
         });
 
         if (! $exists) {
             if ($importedField = $importedFields->get($handle)) {
-                $importKey = 'import:'.$importedField['partial'];
+                $importKey = 'import:' . $importedField['partial'];
                 $field = $allFields->get($importKey);
                 $section = $field['section'];
                 $fields = collect($sections[$section]['fields'])->keyBy(function ($field) {
-                    return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+                    return (isset($field['import'])) ? 'import:' . $field['import'] : $field['handle'];
                 });
                 $importedConfig = $importedField['field']->config();
                 $config = array_merge($config, $importedConfig);
@@ -385,21 +385,20 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     {
         $this->withEvents = false;
 
-        $result = $this->save();
-
-        $this->withEvents = true;
-
-        return $result;
+        return $this->save();
     }
 
     public function save()
     {
         $isNew = is_null(Facades\Blueprint::find($this->handle()));
 
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if (BlueprintSaving::dispatch($this) === false) {
                 return false;
             }
@@ -411,7 +410,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
             $callback($this);
         }
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if ($isNew) {
                 BlueprintCreated::dispatch($this);
             }

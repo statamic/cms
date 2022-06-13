@@ -99,21 +99,20 @@ class Fieldset
     {
         $this->withEvents = false;
 
-        $result = $this->save();
-
-        $this->withEvents = true;
-
-        return $result;
+        return $this->save();
     }
 
     public function save()
     {
         $isNew = is_null(Facades\Fieldset::find($this->handle()));
 
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if (FieldsetSaving::dispatch($this) === false) {
                 return false;
             }
@@ -125,7 +124,7 @@ class Fieldset
             $callback($this);
         }
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if ($isNew) {
                 FieldsetCreated::dispatch($this);
             }

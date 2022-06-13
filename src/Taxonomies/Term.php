@@ -37,7 +37,7 @@ class Term implements TermContract
 
     public function id()
     {
-        return $this->taxonomyHandle().'::'.$this->slug();
+        return $this->taxonomyHandle() . '::' . $this->slug();
     }
 
     public function slug($slug = null)
@@ -185,21 +185,20 @@ class Term implements TermContract
     {
         $this->withEvents = false;
 
-        $result = $this->save();
-
-        $this->withEvents = true;
-
-        return $result;
+        return $this->save();
     }
 
     public function save()
     {
         $isNew = is_null(Facades\Term::find($this->id()));
 
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if (TermSaving::dispatch($this) === false) {
                 return false;
             }
@@ -211,7 +210,7 @@ class Term implements TermContract
             $callback($this);
         }
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if ($isNew) {
                 TermCreated::dispatch($this);
             }

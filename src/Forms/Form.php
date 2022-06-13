@@ -66,7 +66,7 @@ class Form implements FormContract, Augmentable, Arrayable
      */
     public function blueprint()
     {
-        $blueprint = Blueprint::find('forms.'.$this->handle())
+        $blueprint = Blueprint::find('forms.' . $this->handle())
             ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('forms');
 
         FormBlueprintFound::dispatch($blueprint, $this);
@@ -142,7 +142,7 @@ class Form implements FormContract, Augmentable, Arrayable
      */
     public function path()
     {
-        return config('statamic.forms.forms')."/{$this->handle()}.yaml";
+        return config('statamic.forms.forms') . "/{$this->handle()}.yaml";
     }
 
     public function afterSave($callback)
@@ -156,11 +156,7 @@ class Form implements FormContract, Augmentable, Arrayable
     {
         $this->withEvents = false;
 
-        $result = $this->save();
-
-        $this->withEvents = true;
-
-        return $result;
+        return $this->save();
     }
 
     /**
@@ -170,10 +166,13 @@ class Form implements FormContract, Augmentable, Arrayable
     {
         $isNew = is_null(FormFacade::find($this->handle()));
 
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if (FormSaving::dispatch($this) === false) {
                 return false;
             }
@@ -201,7 +200,7 @@ class Form implements FormContract, Augmentable, Arrayable
             $callback($this);
         }
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if ($isNew) {
                 FormCreated::dispatch($this);
             }
@@ -283,7 +282,7 @@ class Form implements FormContract, Augmentable, Arrayable
      */
     public function submissions()
     {
-        $path = config('statamic.forms.submissions').'/'.$this->handle();
+        $path = config('statamic.forms.submissions') . '/' . $this->handle();
 
         return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
             return $this->makeSubmission()

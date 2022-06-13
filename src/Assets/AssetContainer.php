@@ -170,7 +170,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function blueprint()
     {
-        $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
+        $blueprint = Blueprint::find('assets/' . $this->handle()) ?? Blueprint::makeFromFields([
             'alt' => [
                 'type' => 'text',
                 'display' => 'Alt Text',
@@ -194,11 +194,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     {
         $this->withEvents = false;
 
-        $result = $this->save();
-
-        $this->withEvents = true;
-
-        return $result;
+        return $this->save();
     }
 
     /**
@@ -210,10 +206,13 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     {
         $isNew = is_null(Facades\AssetContainer::find($this->id()));
 
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if (AssetContainerSaving::dispatch($this) === false) {
                 return false;
             }
@@ -225,7 +224,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             $callback($this);
         }
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if ($isNew) {
                 AssetContainerCreated::dispatch($this);
             }
@@ -272,7 +271,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 
     public function contents()
     {
-        return Blink::once('asset-listing-cache-'.$this->handle(), function () {
+        return Blink::once('asset-listing-cache-' . $this->handle(), function () {
             return new AssetContainerContents($this);
         });
     }
@@ -298,7 +297,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     {
         $rec = $recursive ? '-recursive' : '';
 
-        return 'asset-folders-'.$this->handle().'-'.$folder.$rec;
+        return 'asset-folders-' . $this->handle() . '-' . $folder . $rec;
     }
 
     /**
