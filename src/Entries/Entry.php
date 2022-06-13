@@ -358,13 +358,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $prefix = '';
 
         if ($this->hasDate()) {
-            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d') . '.';
+            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
             rtrim(Stache::store('entries')->directory(), '/'),
             $this->collectionHandle(),
-            Site::hasMultiple() ? $this->locale() . '/' : '',
+            Site::hasMultiple() ? $this->locale().'/' : '',
             $prefix,
             $this->slug() ?? $this->id(),
             $this->fileExtension(),
@@ -399,7 +399,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     protected function inferTemplateFromBlueprint()
     {
-        $template = $this->collection()->handle() . '.' . $this->blueprint();
+        $template = $this->collection()->handle().'.'.$this->blueprint();
 
         $slugifiedTemplate = str_replace('_', '-', $template);
 

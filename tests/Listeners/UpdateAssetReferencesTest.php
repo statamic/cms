@@ -23,7 +23,7 @@ class UpdateAssetReferencesTest extends TestCase
 
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__ . '/tmp',
+            'root' => __DIR__.'/tmp',
         ]]);
 
         Facades\Site::setConfig([
@@ -43,7 +43,7 @@ class UpdateAssetReferencesTest extends TestCase
 
     public function tearDown(): void
     {
-        app('files')->deleteDirectory(__DIR__ . '/tmp');
+        app('files')->deleteDirectory(__DIR__.'/tmp');
 
         parent::tearDown();
     }

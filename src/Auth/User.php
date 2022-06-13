@@ -78,7 +78,7 @@ abstract class User implements
             $name = (string) $this->email();
         }
 
-        return strtoupper(mb_substr($name, 0, 1) . mb_substr($surname, 0, 1));
+        return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
     }
 
     public function isSuper()
@@ -228,14 +228,14 @@ abstract class User implements
 
     public function generatePasswordResetToken()
     {
-        $broker = config('statamic.users.passwords.' . PasswordReset::BROKER_RESETS);
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_RESETS);
 
         return Password::broker($broker)->createToken($this);
     }
 
     public function generateActivateAccountToken()
     {
-        $broker = config('statamic.users.passwords.' . PasswordReset::BROKER_ACTIVATIONS);
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
 
         return Password::broker($broker)->createToken($this);
     }
@@ -253,7 +253,7 @@ abstract class User implements
 
         if ($name = $this->get('first_name')) {
             if ($lastName = $this->get('last_name')) {
-                $name .= ' ' . $lastName;
+                $name .= ' '.$lastName;
             }
 
             return $name;
