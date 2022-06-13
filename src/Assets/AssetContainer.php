@@ -170,7 +170,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function blueprint()
     {
-        $blueprint = Blueprint::find('assets/' . $this->handle()) ?? Blueprint::makeFromFields([
+        $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
             'alt' => [
                 'type' => 'text',
                 'display' => 'Alt Text',
@@ -271,7 +271,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 
     public function contents()
     {
-        return Blink::once('asset-listing-cache-' . $this->handle(), function () {
+        return Blink::once('asset-listing-cache-'.$this->handle(), function () {
             return new AssetContainerContents($this);
         });
     }
@@ -297,7 +297,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     {
         $rec = $recursive ? '-recursive' : '';
 
-        return 'asset-folders-' . $this->handle() . '-' . $folder . $rec;
+        return 'asset-folders-'.$this->handle().'-'.$folder.$rec;
     }
 
     /**

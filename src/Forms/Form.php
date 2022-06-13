@@ -66,7 +66,7 @@ class Form implements FormContract, Augmentable, Arrayable
      */
     public function blueprint()
     {
-        $blueprint = Blueprint::find('forms.' . $this->handle())
+        $blueprint = Blueprint::find('forms.'.$this->handle())
             ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('forms');
 
         FormBlueprintFound::dispatch($blueprint, $this);
@@ -142,7 +142,7 @@ class Form implements FormContract, Augmentable, Arrayable
      */
     public function path()
     {
-        return config('statamic.forms.forms') . "/{$this->handle()}.yaml";
+        return config('statamic.forms.forms')."/{$this->handle()}.yaml";
     }
 
     public function afterSave($callback)
@@ -282,7 +282,7 @@ class Form implements FormContract, Augmentable, Arrayable
      */
     public function submissions()
     {
-        $path = config('statamic.forms.submissions') . '/' . $this->handle();
+        $path = config('statamic.forms.submissions').'/'.$this->handle();
 
         return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
             return $this->makeSubmission()

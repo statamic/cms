@@ -47,7 +47,7 @@ class GlobalSet implements Contract
 
     public function blueprint()
     {
-        return Blueprint::find('globals.' . $this->handle());
+        return Blueprint::find('globals.'.$this->handle());
     }
 
     public function path()
