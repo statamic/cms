@@ -14,7 +14,7 @@ return [
     | saving interval of every 5 seconds.
     |
     */
-    'enabled' => false,
+    'enabled' => env('STATAMIC_AUTOSAVE_ENABLED', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -35,8 +35,9 @@ return [
     | Autosave interval
     |--------------------------------------------------------------------------
     |
-    | Here you can specify when it should be checked if something has changed
-    | at an entry and should be saved. By default, this value is set to 5000 ms.
+    | The default value can be set here generally for all collections.
+    | However, it is also possible to manually adjust the value in the
+    | blueprint of a collection. By default, this value is set to 5s.
     |
     */
     'interval' => 5000,
