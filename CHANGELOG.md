@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.3.16 (2022-06-13)
+
+### What's new
+- Actions can be added to the form listing. [#5845](https://github.com/statamic/cms/issues/5845) by @duncanmcclean
+- Ability to specify default sort order for asset containers. [#6171](https://github.com/statamic/cms/issues/6171) by @jacksleight
+
+### What's improved
+- Updated Norwegian translation. [#6195](https://github.com/statamic/cms/issues/6195) by @hgrimelid
+
+### What's fixed
+- Fix JS error when a field has a number. [#6187](https://github.com/statamic/cms/issues/6187) by @jasonvarga
+- Fix `get_error` tag outputting something when there are other errors. [#6201](https://github.com/statamic/cms/issues/6201) by @jasonvarga
+- Fix AMP not working on home page. [#6184](https://github.com/statamic/cms/issues/6184) by @jasonvarga
+- Fix issue where site specific views aren't used for taxonomies. [#6146](https://github.com/statamic/cms/issues/6146) by @edalzell
+- Fix awkward validation error message. [#6188](https://github.com/statamic/cms/issues/6188) by @jasonvarga
+
+
+
 ## 3.3.15 (2022-06-09)
 
 ### What's new
