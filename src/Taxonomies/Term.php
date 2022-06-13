@@ -37,7 +37,7 @@ class Term implements TermContract
 
     public function id()
     {
-        return $this->taxonomyHandle() . '::' . $this->slug();
+        return $this->taxonomyHandle().'::'.$this->slug();
     }
 
     public function slug($slug = null)
