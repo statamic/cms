@@ -22,6 +22,7 @@ class Comb
 
     /**
      * Match weights.
+     *
      * @var array
      */
     private $match_weights = [
@@ -38,24 +39,28 @@ class Comb
 
     /**
      * Minimum characters to search over.
+     *
      * @var int
      */
     private $min_characters = 1;
 
     /**
      * Minimum characters per word to include word in search.
+     *
      * @var int
      */
     private $min_word_characters = 2;
 
     /**
      * Score threshold.
+     *
      * @var int
      */
     private $score_threshold = 1;
 
     /**
      * Property weights.
+     *
      * @var array
      */
     private $property_weights = [];
@@ -65,30 +70,35 @@ class Comb
 
     /**
      * Query mode.
+     *
      * @var int
      */
     private $query_mode = self::QUERY_BOOLEAN;
 
     /**
      * Should query be stemmed?
+     *
      * @var bool
      */
     private $use_stemming = false;
 
     /**
      * Should query use alternate character values?
+     *
      * @var bool
      */
     private $use_alternates = false;
 
     /**
      * Should the full query be included in boolean searches?
+     *
      * @var bool
      */
     private $include_full_query = true;
 
     /**
      * A list of words filtered out of search queries.
+     *
      * @var array
      */
     private $stop_words = [];
@@ -98,24 +108,28 @@ class Comb
 
     /**
      * Limit the number of results returned.
+     *
      * @var int
      */
     private $limit = null;
 
     /**
      * Should we throw the too-many-results exception?
+     *
      * @var bool
      */
     private $enable_too_many_results = false;
 
     /**
      * Should we sort results by score?
+     *
      * @var bool
      */
     private $sort_by_score = true;
 
     /**
      * Should we group results by category?
+     *
      * @var bool
      */
     private $group_by_category = false;
@@ -125,18 +139,21 @@ class Comb
 
     /**
      * Haystack of data to look through.
+     *
      * @var array
      */
     private $haystack = [];
 
     /**
      * A list of properties to exclude.
+     *
      * @var array
      */
     private $exclude_properties = [];
 
     /**
      * A list of the only properties to include.
+     *
      * @var array
      */
     private $include_properties = [];
@@ -146,24 +163,28 @@ class Comb
 
     /**
      * Has the data already been prepared?
+     *
      * @var bool
      */
     private $is_data_prepared = false;
 
     /**
      * Is the haystack categorized?
+     *
      * @var bool
      */
     private $is_haystack_categorized = false;
 
     /**
      * The start time of a query (for measuring performance).
+     *
      * @var int
      */
     private $query_start_time = false;
 
     /**
      * The end time of a query (for measuring performance).
+     *
      * @var int
      */
     private $query_end_time = false;
@@ -174,8 +195,8 @@ class Comb
     /**
      * Constructor.
      *
-     * @param mixed  $haystack  Array to find data
-     * @param array  $settings  An array of settings for overriding defaults
+     * @param  mixed  $haystack  Array to find data
+     * @param  array  $settings  An array of settings for overriding defaults
      * @return Comb
      */
     public function __construct(array $haystack, $settings = [])
@@ -187,7 +208,7 @@ class Comb
     /**
      * Set the current haystack to deal with.
      *
-     * @param string  $data  Data to parse for haystack
+     * @param  string  $data  Data to parse for haystack
      * @return void
      */
     private function setHaystack(array $data)
@@ -207,7 +228,7 @@ class Comb
     /**
      * Look up a $query in the $haystack.
      *
-     * @param string  $query  Query to look up
+     * @param  string  $query  Query to look up
      * @return array
      */
     public function lookUp($query)
@@ -237,7 +258,7 @@ class Comb
     /**
      * Set settings.
      *
-     * @param array  $settings  Array of options
+     * @param  array  $settings  Array of options
      * @return void
      */
     public function setSettings($settings)
@@ -340,19 +361,19 @@ class Comb
     /**
      * Preformats a query for searching.
      *
-     * @param string  $raw_query  The raw query to format
+     * @param  string  $raw_query  The raw query to format
      * @return string
      */
     private function preformat($raw_query)
     {
-        return trim(mb_ereg_replace("[^\w\d\-\.:+\s&’'‘]", '', $raw_query));
+        return trim(mb_ereg_replace("[^\w\d\-\.:+\s@&’'‘]", '', $raw_query));
     }
 
     /**
      * Checks if a given $setting matches up with a $truthy_value.
      *
-     * @param mixed  $setting  Setting to check
-     * @param bool  $truthy_value  Which set of truthy values should be checked
+     * @param  mixed  $setting  Setting to check
+     * @param  bool  $truthy_value  Which set of truthy values should be checked
      * @return bool
      */
     private function is($setting, $truthy_value)
@@ -422,8 +443,8 @@ class Comb
     /**
      * Multidimensional array flattener.
      *
-     * @param mixed  $item  Item to flatten
-     * @param string  $glue  Optional glue to stick between items
+     * @param  mixed  $item  Item to flatten
+     * @param  string  $glue  Optional glue to stick between items
      * @return string
      */
     private function flattenArray($item, $glue = ' ')
@@ -444,9 +465,10 @@ class Comb
     /**
      * Look through each result attempting to find good matches.
      *
-     * @param array  $params  Parameters for search
-     * @param string  $raw_query  Raw query to search for
+     * @param  array  $params  Parameters for search
+     * @param  string  $raw_query  Raw query to search for
      * @return array
+     *
      * @throws CombException
      * @throws NoResultsFound
      */
@@ -654,7 +676,7 @@ class Comb
     /**
      * Removes matches that have been disallowed by a boolean search.
      *
-     * @param array  $params  Parameters for search
+     * @param  array  $params  Parameters for search
      * @return array
      */
     private function removeDisallowedMatches($params)
@@ -681,17 +703,17 @@ class Comb
                 // check for disallowed
                 if (count($params['disallowed']) && preg_match($disallowed, $record)) {
                     // a disallowed was found, we don't want this
-                    throw new Exception('');
+                    throw new CombException('');
                 }
 
                 // check for disallowed
                 if (count($params['required']) && ! preg_match($required, $record)) {
                     // a disallowed was found, we don't want this
-                    throw new Exception('');
+                    throw new CombException('');
                 }
 
                 array_push($new_data, $item);
-            } catch (Exception $e) {
+            } catch (CombException $e) {
                 continue;
             }
         }
@@ -702,7 +724,7 @@ class Comb
     /**
      * Removes properties that are on the exclusion list.
      *
-     * @param array  $data  Data to examine
+     * @param  array  $data  Data to examine
      * @return array
      */
     private function removeDisallowedProperties($data)
@@ -751,7 +773,7 @@ class Comb
     /**
      * Removes duplicate values in a given array.
      *
-     * @param array  $array  Array to make unique
+     * @param  array  $array  Array to make unique
      * @return array
      */
     private function standardizeArray($array)
@@ -774,8 +796,8 @@ class Comb
     /**
      * Tests for a valid query.
      *
-     * @param string  $query  Query to test
-     * @return bool
+     * @param  string  $query  Query to test
+     *
      * @throws NoQuery
      * @throws NotEnoughCharacters
      */
@@ -798,7 +820,7 @@ class Comb
     /**
      * Parses the query for search parameters.
      *
-     * @param string  $query  Query to parse
+     * @param  string  $query  Query to parse
      * @return array
      */
     private function parseSearchParameters($query)
@@ -875,7 +897,7 @@ class Comb
     /**
      * Grabs stemmed words.
      *
-     * @param array  $words  Words to look up
+     * @param  array  $words  Words to look up
      * @return array
      */
     private function getStemmedWords($words)
@@ -896,7 +918,7 @@ class Comb
     /**
      * Attempts to find an alternate word, returns array of alternates or false if none.
      *
-     * @param array  $words  Words to look up
+     * @param  array  $words  Words to look up
      * @return mixed
      */
     private function getAlternateWords($words)
@@ -939,7 +961,7 @@ class Comb
     /**
      * Filters out stop words.
      *
-     * @param array $words A list of words to filter
+     * @param  array  $words  A list of words to filter
      * @return array
      */
     private function filterStopWords($words)
@@ -996,8 +1018,8 @@ class Comb
     /**
      * Create a new Comb object but remove limit from config.
      *
-     * @param array  $data  Data to search through
-     * @param array  $config  Config array to use (and remove `limit` from)
+     * @param  array  $data  Data to search through
+     * @param  array  $config  Config array to use (and remove `limit` from)
      * @return Comb
      */
     public static function create($data, $config)

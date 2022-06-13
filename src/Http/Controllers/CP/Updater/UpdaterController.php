@@ -34,7 +34,7 @@ class UpdaterController extends CpController
     /**
      * Updates count.
      *
-     * @param Request $request
+     * @param  Request  $request
      */
     public function count(Request $request)
     {

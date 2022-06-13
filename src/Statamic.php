@@ -150,7 +150,11 @@ class Statamic
             return false;
         }
 
-        return starts_with(request()->path(), config('statamic.cp.route'));
+        $cp = config('statamic.cp.route');
+        $path = request()->path();
+
+        return $path === $cp
+            || Str::startsWith($path, Str::finish($cp, '/'));
     }
 
     public static function cpRoute($route, $params = [])
@@ -228,7 +232,7 @@ class Statamic
         }
 
         $svg = StaticStringy::collapseWhitespace(
-            File::get(public_path("vendor/statamic/cp/svg/{$name}.svg"))
+            File::get(statamic_path("resources/svg/{$name}.svg"))
         );
 
         return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
@@ -276,6 +280,10 @@ class Statamic
 
         if ($error = session('error')) {
             $messages[] = ['type' => 'error', 'message' => $error];
+        }
+
+        if ($info = session('info')) {
+            $messages[] = ['type' => 'info', 'message' => $info];
         }
 
         return $messages ?? [];
@@ -337,5 +345,16 @@ class Statamic
         }
 
         return $prefix.'.*';
+    }
+
+    public static function trans($key, $replace = [], $locale = null)
+    {
+        $line = __($key, $replace, $locale);
+
+        if (is_array($line)) {
+            return $key;
+        }
+
+        return $line;
     }
 }

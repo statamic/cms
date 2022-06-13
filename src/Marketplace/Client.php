@@ -41,8 +41,8 @@ class Client
     /**
      * Send API request.
      *
-     * @param string $endpoint
-     * @param arra $params
+     * @param  string  $endpoint
+     * @param  arra  $params
      * @return mixed
      */
     public function get($endpoint, $params = [])

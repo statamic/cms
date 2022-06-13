@@ -79,6 +79,7 @@ GQL;
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/3200
      **/
     public function it_outputs_nested_grid_fields()

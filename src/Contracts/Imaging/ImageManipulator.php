@@ -16,7 +16,7 @@ interface ImageManipulator
     /**
      * Set the item to be manipulated.
      *
-     * @param Asset|string $item  The item. Can be an asset, an asset ID, a URL, or path.
+     * @param  Asset|string  $item  The item. Can be an asset, an asset ID, a URL, or path.
      * @return mixed
      */
     public function item($item);
@@ -24,7 +24,7 @@ interface ImageManipulator
     /**
      * Set the parameters.
      *
-     * @param array $params
+     * @param  array  $params
      * @return $this
      */
     public function params($params);
@@ -32,8 +32,8 @@ interface ImageManipulator
     /**
      * Set a parameter.
      *
-     * @param string $param
-     * @param mixed  $value
+     * @param  string  $param
+     * @param  mixed  $value
      */
     public function setParam($param, $value);
 

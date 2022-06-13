@@ -14,7 +14,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Create cacher instance.
      *
-     * @param array $config
+     * @param  array  $config
      */
     public function __construct($config)
     {
@@ -24,8 +24,8 @@ abstract class AbstractCacher implements Cacher
     /**
      * Get a config value.
      *
-     * @param mixed $key
-     * @param mixed $default
+     * @param  mixed  $key
+     * @param  mixed  $default
      * @return mixed
      */
     public function config($key = null, $default = null)
@@ -40,7 +40,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Prefix a cache key.
      *
-     * @param string $key
+     * @param  string  $key
      * @return string
      */
     protected function normalizeKey($key)

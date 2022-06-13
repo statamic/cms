@@ -19,8 +19,7 @@ class ApiController extends Controller
     /**
      * Abort if item is unpublished.
      *
-     * @param mixed $item
-     * @return bool
+     * @param  mixed  $item
      */
     protected function abortIfUnpublished($item)
     {
@@ -54,8 +53,8 @@ class ApiController extends Controller
     /**
      * Abort if route resource is disabled.
      *
-     * @param string $routeSegment
-     * @param string $resource
+     * @param  string  $routeSegment
+     * @param  string  $resource
      */
     protected function abortIfRouteResourceDisabled($routeSegment, $resource)
     {
@@ -75,7 +74,7 @@ class ApiController extends Controller
     /**
      * If endpoint config is an array, filter allowed resources.
      *
-     * @param \Illuminate\Support\Collection $items
+     * @param  \Illuminate\Support\Collection  $items
      * @return \Illuminate\Support\Collection
      */
     protected function filterAllowedResources($items)
@@ -94,7 +93,7 @@ class ApiController extends Controller
     /**
      * Filter, sort, and paginate query for API resource output.
      *
-     * @param \Statamic\Query\Builder $query
+     * @param  \Statamic\Query\Builder  $query
      * @return \Statamic\Extensions\Pagination\LengthAwarePaginator
      */
     protected function filterSortAndPaginate($query)
@@ -110,7 +109,7 @@ class ApiController extends Controller
      *
      * /endpoint?filter[field:condition]=foo&filter[anotherfield]=bar
      *
-     * @param \Statamic\Query\Builder $query
+     * @param  \Statamic\Query\Builder  $query
      * @return $this
      */
     protected function filter($query)
@@ -155,7 +154,7 @@ class ApiController extends Controller
     /**
      * Check if user is not filtering by a specific field, for applying default filters.
      *
-     * @param string $field
+     * @param  string  $field
      * @return bool
      */
     public function doesntHaveFilter($field)
@@ -204,7 +203,7 @@ class ApiController extends Controller
      *
      * /endpoint?limit=10
      *
-     * @param \Statamic\Query\Builder $query
+     * @param  \Statamic\Query\Builder  $query
      * @return \Statamic\Extensions\Pagination\LengthAwarePaginator
      */
     protected function paginate($query)
@@ -219,8 +218,8 @@ class ApiController extends Controller
     /**
      * Get query param.
      *
-     * @param string $key
-     * @param mixed $default
+     * @param  string  $key
+     * @param  mixed  $default
      * @return mixed
      */
     protected function queryParam($key, $default = null)

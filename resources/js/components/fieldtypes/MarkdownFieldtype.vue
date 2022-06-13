@@ -70,7 +70,7 @@
                             <div class="flex w-full">
                                 <div class="markdown-cheatsheet-helper">
                                     <button class="text-link flex items-center" @click="showCheatsheet = true" :aria-label="__('Show Markdown Cheatsheet')">
-                                        <svg-icon name="markdown-icon" class="w-6 items-start mr-px" />
+                                        <svg-icon name="markdown-icon" class="w-6 h-4 items-start mr-1" />
                                         <span>{{ __('Markdown Cheatsheet') }}</span>
                                     </button>
                                 </div>
@@ -121,7 +121,7 @@
 
 <script>
 var CodeMirror = require('codemirror');
-var marked = require('marked');
+var { marked } = require('marked');
 var PlainTextRenderer = require('marked-plaintext');
 
 require('codemirror/addon/edit/closebrackets');
@@ -180,7 +180,7 @@ export default {
     watch: {
 
         data(data) {
-            this.update(data);
+            this.updateDebounced(data);
         },
 
         fullScreenMode: {
@@ -471,7 +471,7 @@ export default {
             this.$axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
                 _(response.data).each((asset) => {
                     var alt = asset.values.alt || '';
-                    var url = encodeURI(asset.url);
+                    var url = encodeURI('statamic://'+asset.reference);
                     if (asset.isImage) {
                         this[method+'Image'](url, alt);
                     } else {
@@ -571,7 +571,10 @@ export default {
             tabindex: 0,
             autoRefresh: true,
             readOnly: self.isReadOnly ? 'nocursor' : false,
-            extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
+            extraKeys: {
+                "Enter": "newlineAndIndentContinueMarkdownList",
+                "Cmd-Left": "goLineLeftSmart"
+            }
         });
 
         self.codemirror.on('change', function (cm) {

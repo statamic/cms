@@ -9,4 +9,9 @@ class CollectionStructureType extends StructureType
     protected $attributes = [
         'name' => self::NAME,
     ];
+
+    protected function getTreeBranchType(): string
+    {
+        return CollectionTreeBranchType::NAME;
+    }
 }

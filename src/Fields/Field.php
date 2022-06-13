@@ -5,8 +5,10 @@ namespace Statamic\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Facades\GraphQL;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Field implements Arrayable
@@ -17,6 +19,7 @@ class Field implements Arrayable
     protected $value;
     protected $parent;
     protected $parentField;
+    protected $validationContext;
 
     public function __construct($handle, array $config)
     {
@@ -102,6 +105,10 @@ class Field implements Arrayable
 
     protected function addNullableRule($rules)
     {
+        if (in_array('nullable', $rules)) {
+            return $rules;
+        }
+
         $nullable = true;
 
         foreach ($rules as $rule) {
@@ -121,6 +128,30 @@ class Field implements Arrayable
     public function isRequired()
     {
         return collect($this->rules()[$this->handle])->contains('required');
+    }
+
+    public function setValidationContext($context)
+    {
+        $this->validationContext = $context;
+
+        return $this;
+    }
+
+    public function validationContext($key = null)
+    {
+        return func_num_args() === 0 ? $this->validationContext : Arr::get($this->validationContext, $key);
+    }
+
+    public function validationAttributes()
+    {
+        $display = Lang::has($key = 'validation.attributes.'.$this->handle())
+            ? Lang::get($key)
+            : $this->display();
+
+        return array_merge(
+            [$this->handle() => $display],
+            $this->fieldtype()->extraValidationAttributes()
+        );
     }
 
     public function isLocalizable()
@@ -180,6 +211,9 @@ class Field implements Arrayable
         ]);
     }
 
+    /**
+     * @deprecated
+     */
     public function toBlueprintArray()
     {
         return [

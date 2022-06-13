@@ -34,7 +34,7 @@ class Tags extends BaseTags
     /**
      * Generate the login URL.
      *
-     * @param string $provider
+     * @param  string  $provider
      * @return string
      */
     protected function generateLoginUrl($provider)

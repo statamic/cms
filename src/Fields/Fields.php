@@ -217,37 +217,31 @@ class Fields
     {
         $blink = 'blueprint-imported-fields-'.md5(json_encode($config));
 
-        if (Blink::has($blink)) {
-            return Blink::get($blink);
-        }
+        return Blink::once($blink, function () use ($config) {
+            if (! $fieldset = FieldsetRepository::find($config['import'])) {
+                throw new \Exception("Fieldset {$config['import']} not found.");
+            }
 
-        if (! $fieldset = FieldsetRepository::find($config['import'])) {
-            throw new \Exception("Fieldset {$config['import']} not found.");
-        }
+            $fields = $fieldset->fields()->all();
 
-        $fields = $fieldset->fields()->all()->each->setParent($this->parent);
+            if ($overrides = $config['config'] ?? null) {
+                $fields = $fields->map(function ($field, $handle) use ($overrides) {
+                    return $field->setConfig(array_merge($field->config(), $overrides[$handle] ?? []));
+                });
+            }
 
-        if ($overrides = $config['config'] ?? null) {
-            $fields = $fields->map(function ($field, $handle) use ($overrides) {
-                return $field->setConfig(array_merge($field->config(), $overrides[$handle] ?? []));
-            });
-        }
+            if ($prefix = array_get($config, 'prefix')) {
+                $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
+                    $field = clone $field;
+                    $handle = $prefix.$field->handle();
+                    $prefix = $prefix.$field->prefix();
 
-        if ($prefix = array_get($config, 'prefix')) {
-            $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
-                $field = clone $field;
-                $handle = $prefix.$field->handle();
-                $prefix = $prefix.$field->prefix();
+                    return [$handle => $field->setHandle($handle)->setPrefix($prefix)];
+                });
+            }
 
-                return [$handle => $field->setHandle($handle)->setPrefix($prefix)];
-            });
-        }
-
-        $result = $fields->all();
-
-        Blink::put($blink, $result);
-
-        return $result;
+            return $fields;
+        })->each->setParent($this->parent)->all();
     }
 
     public function meta()

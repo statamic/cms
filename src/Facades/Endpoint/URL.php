@@ -18,7 +18,7 @@ class URL
      * Removes occurrences of "//" in a $path (except when part of a protocol)
      * Alias of Path::tidy().
      *
-     * @param string  $url  URL to remove "//" from
+     * @param  string  $url  URL to remove "//" from
      * @return string
      */
     public function tidy($url)
@@ -42,7 +42,7 @@ class URL
     /**
      * Get the slug of a URL.
      *
-     * @param string $url  URL to parse
+     * @param  string  $url  URL to parse
      * @return string
      */
     public function slug($url)
@@ -53,8 +53,8 @@ class URL
     /**
      * Swaps the slug of a $url with the $slug provided.
      *
-     * @param string  $url   URL to modify
-     * @param string  $slug  New slug to use
+     * @param  string  $url  URL to modify
+     * @param  string  $slug  New slug to use
      * @return string
      */
     public function replaceSlug($url, $slug)
@@ -65,7 +65,7 @@ class URL
     /**
      * Get the parent URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string
      */
     public function parent($url)
@@ -97,9 +97,9 @@ class URL
     /**
      * Make sure the site root is prepended to a URL.
      *
-     * @param  string       $url
+     * @param  string  $url
      * @param  string|null  $locale
-     * @param  bool      $controller
+     * @param  bool  $controller
      * @return string
      */
     public function prependSiteRoot($url, $locale = null, $controller = true)
@@ -120,9 +120,9 @@ class URL
     /**
      * Make sure the site root url is prepended to a URL.
      *
-     * @param string      $url
-     * @param string|null $locale
-     * @param bool        $controller
+     * @param  string  $url
+     * @param  string|null  $locale
+     * @param  bool  $controller
      * @return string
      */
     public function prependSiteUrl($url, $locale = null, $controller = true)
@@ -145,7 +145,7 @@ class URL
     /**
      * Removes the site root url from the beginning of a URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string
      */
     public function removeSiteUrl($url)
@@ -156,7 +156,7 @@ class URL
     /**
      * Make an absolute URL relative.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string
      */
     public function makeRelative($url)
@@ -179,7 +179,7 @@ class URL
     /**
      * Make a relative URL absolute.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string
      */
     public function makeAbsolute($url)
@@ -205,7 +205,7 @@ class URL
     /**
      * Formats a URL properly.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string
      */
     public function format($url)
@@ -215,6 +215,7 @@ class URL
 
     /**
      * Checks whether a URL is external or not.
+     *
      * @param  string  $url
      * @return bool
      */
@@ -232,6 +233,7 @@ class URL
 
     /**
      * Get the current site url from Apache headers.
+     *
      * @return string
      */
     public function getSiteUrl()
@@ -248,7 +250,7 @@ class URL
     /**
      * Encode a URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string
      */
     public function encode($url)
@@ -276,8 +278,8 @@ class URL
     /**
      * Given a localized URI, get the default URI.
      *
-     * @param string $locale  The locale of the provided URI
-     * @param string $uri     The URI from which to find the default
+     * @param  string  $locale  The locale of the provided URI
+     * @param  string  $uri  The URI from which to find the default
      */
     public function getDefaultUri($locale, $uri)
     {
@@ -290,7 +292,7 @@ class URL
      * Return a gravatar image.
      *
      * @param  string  $email
-     * @param  int $size
+     * @param  int  $size
      * @return string
      */
     public function gravatar($email, $size = null)

@@ -55,13 +55,37 @@ class LicenseManager
 
     public function valid()
     {
-        return $this->statamic()->valid()
-            && $this->addons()->reject->valid()->isEmpty();
+        return $this->statamicValid() && $this->addonsValid();
     }
 
     public function invalid()
     {
         return ! $this->valid();
+    }
+
+    public function statamicValid()
+    {
+        return $this->statamic()->valid();
+    }
+
+    public function addonsValid()
+    {
+        return $this->addons()->reject->valid()->isEmpty();
+    }
+
+    public function onlyStatamicIsInvalid()
+    {
+        return $this->addonsValid() && ! $this->statamicValid();
+    }
+
+    public function onlyAddonsAreInvalid()
+    {
+        return $this->statamicValid() && ! $this->addonsValid();
+    }
+
+    public function statamicNeedsRenewal()
+    {
+        return $this->statamic()->needsRenewal();
     }
 
     public function response($key = null, $default = null)

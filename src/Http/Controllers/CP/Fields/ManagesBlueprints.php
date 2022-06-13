@@ -39,10 +39,10 @@ trait ManagesBlueprints
 
         $blueprint
             ->setHidden($request->hidden)
-            ->setContents(array_filter([
+            ->setContents(array_merge($blueprint->contents(), array_filter([
                 'title' => $request->title,
                 'sections' => $sections,
-            ]));
+            ])));
 
         return $blueprint;
     }
@@ -99,10 +99,10 @@ trait ManagesBlueprints
 
     private function storeBlueprint(Request $request, string $namespace)
     {
-        $handle = Str::snake($request->title);
+        $handle = Str::slug($request->title, '_');
 
-        if (Facades\Blueprint::find($handle)) {
-            throw ValidationException::withMessages([__('A blueprint with that name already exists.')]);
+        if (Facades\Blueprint::in($namespace)->has($handle)) {
+            throw ValidationException::withMessages(['title' => __('A blueprint with that name already exists.')]);
         }
 
         $blueprint = (new Blueprint)

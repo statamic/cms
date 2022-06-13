@@ -31,6 +31,13 @@
             <h1 class="flex-1">{{ __('Licensing') }}</h1>
         </div>
 
+        @if ($configCached)
+            <div class="text-xs border border-yellow-dark rounded p-2 bg-yellow">
+                <div class="font-bold mb-1">{{ __('Configuration is cached') }}</div>
+                <p>{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
+           </div>
+        @endif
+
         <h6 class="mt-4">Site</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
@@ -74,7 +81,7 @@
                     <tr>
                         <td class="w-64 mr-1">
                             <span class="little-dot {{ $addon->valid() ? 'bg-green' : 'bg-red' }} mr-1"></span>
-                            <span class="font-bold">{{ $addon->name() }}</span>
+                            <span class="font-bold"><a href="{{ $addon->addon()->marketplaceUrl() }}" class="text-grey hover:text-blue">{{ $addon->name() }}</a></span>
                             @if ($addon->edition())<span class="badge uppercase font-bold text-grey-60">{{ $addon->edition() ?? '' }}</span>@endif
                         </td>
                         <td>{{ $addon->version() }}</td>
@@ -104,6 +111,7 @@
 
         <div class="mt-5 py-2 border-t flex items-center">
             <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary mr-2">{{ __('Edit Site') }}</a>
+            @if ($addToCartUrl) <a href="{{ $addToCartUrl }}" target="_blank" class="btn mr-2">{{ __('Buy Licenses') }}</a> @endif
             <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn">{{ __('Sync') }}</a>
             <p class="ml-2 text-2xs text-grey">{{ __('statamic::messages.licensing_sync_instructions') }}</p>
         </div>

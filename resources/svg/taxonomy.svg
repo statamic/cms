@@ -1,9 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
-    <defs />
-    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M11.5.5h-9C2.2.5 2 .7 2 1v2c0 .3.2.5.5.5h9c.3 0 .5-.2.5-.5V1c0-.3-.2-.5-.5-.5zM7 3.5v9M2 12.5v-3c0-.6.4-1 1-1h8c.6 0 1 .4 1 1v3" />
-        <circle cx="2" cy="14" r="1.5" />
-        <circle cx="7" cy="14" r="1.5" />
-        <circle cx="12" cy="14" r="1.5" />
-    </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><g transform="scale(.66667)"><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" d="M12 5.499v13M3 18.5a6 6 0 016-6h6a6 6 0 016 6"/><rect x="9.5" y=".499" width="5" height="5" rx="1" ry="1" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"/><rect x="9.5" y="18.499" width="5" height="5" rx="1" ry="1" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"/><rect x=".5" y="18.499" width="5" height="5" rx="1" ry="1" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"/><rect x="18.5" y="18.499" width="5" height="5" rx="1" ry="1" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"/></g></svg>

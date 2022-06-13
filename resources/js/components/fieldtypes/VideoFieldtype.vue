@@ -9,7 +9,7 @@
                     :class="{ 'bg-white': !isReadOnly }"
                     :id="fieldId"
                     :readonly="isReadOnly"
-                    placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    :placeholder="config.placeholder || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
                     @focus="$emit('focus')"
                     @blur="$emit('blur')" />
             </div>
@@ -38,9 +38,9 @@ export default {
 
     watch: {
 
-        data(value) {
+        data: _.debounce(function (value)  {
             this.update(value);
-        },
+        }, 500),
 
         value(value) {
             this.data = value;
@@ -55,19 +55,26 @@ export default {
 
     computed: {
         embed() {
-            if (this.data.includes('youtube')) {
-                return this.data.replace('watch?v=', 'embed/');
+            let embed_url = this.data;
+
+            if (embed_url.includes('youtube')) {
+                embed_url = embed_url.replace('watch?v=', 'embed/');
             }
 
-            if (this.data.includes('youtu.be')) {
-                return this.data.replace('youtu.be', 'www.youtube.com/embed');
+            if (embed_url.includes('youtu.be')) {
+                embed_url = embed_url.replace('youtu.be', 'www.youtube.com/embed');
             }
 
-            if (this.data.includes('vimeo')) {
-                return this.data.replace('/vimeo.com', '/player.vimeo.com/video');
+            if (embed_url.includes('vimeo')) {
+                embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
             }
 
-            return this.data;
+            // Make sure additional query parameters are included.
+            if (embed_url.includes('&') && !embed_url.includes('?')) {
+                embed_url = embed_url.replace('&', '?');
+            }
+
+            return embed_url;
         },
 
         isEmbeddable() {

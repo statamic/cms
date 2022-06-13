@@ -10,6 +10,7 @@ use Statamic\Facades\User;
 use Statamic\Rules\EmailAvailable;
 use Statamic\Statamic;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class MakeUser extends Command
 {
@@ -42,6 +43,13 @@ class MakeUser extends Command
      * @var array
      */
     protected $data = [];
+
+    /**
+     * Super user?
+     *
+     * @var bool
+     */
+    protected $super = false;
 
     /**
      * Execute the console command.
@@ -136,7 +144,13 @@ class MakeUser extends Command
      */
     protected function promptSuper()
     {
-        $this->data['super'] = (bool) $this->confirm('Super user', false);
+        if ($this->option('super')) {
+            return $this;
+        }
+
+        if ($this->confirm('Super user', false)) {
+            $this->super = true;
+        }
 
         return $this;
     }
@@ -151,10 +165,15 @@ class MakeUser extends Command
             return;
         }
 
-        User::make()
+        $user = User::make()
             ->email($this->email)
-            ->data($this->data)
-            ->save();
+            ->data($this->data);
+
+        if ($this->super || $this->option('super')) {
+            $user->makeSuper();
+        }
+
+        $user->save();
 
         $this->info('User created successfully.');
     }
@@ -206,5 +225,17 @@ class MakeUser extends Command
         return [
             ['email', InputArgument::OPTIONAL, 'Non-interactively create a user with only an email address'],
         ];
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return array_merge(parent::getOptions(), [
+            ['super', '', InputOption::VALUE_NONE, 'Generate a super user with permission to do everything'],
+        ]);
     }
 }

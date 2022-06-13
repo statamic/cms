@@ -12,6 +12,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Events\GlobalVariablesBlueprintFound;
+use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
@@ -137,9 +138,18 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     public function fileData()
     {
-        return array_merge([
-            'origin' => $this->hasOrigin() ? $this->origin()->locale() : null,
-        ], $this->data()->all());
+        $data = $this->data()->all();
+
+        if ($this->hasOrigin()) {
+            $data['origin'] = $this->origin()->locale();
+        }
+
+        return $data;
+    }
+
+    protected function shouldRemoveNullsFromFileData()
+    {
+        return ! $this->hasOrigin();
     }
 
     public function reference()
@@ -155,5 +165,10 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedVariables($this);
+    }
+
+    public function fresh()
+    {
+        return Facades\GlobalSet::find($this->id())->in($this->locale);
     }
 }

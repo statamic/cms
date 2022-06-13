@@ -41,6 +41,121 @@ class TermQueryBuilderTest extends TestCase
     }
 
     /** @test */
+    public function it_filters_using_or_wheres()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+
+        $terms = Term::query()->where('test', 'foo')->orWhere('test', 'bar')->get();
+        $this->assertEquals(['a', 'd', 'b'], $terms->map->slug()->values()->all());
+    }
+
+    /** @test */
+    public function it_filters_using_or_where_ins()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+
+        $terms = Term::query()->whereIn('test', ['foo', 'bar'])->orWhereIn('test', ['foo', 'raz'])->get();
+
+        $this->assertEquals(['a', 'b', 'd', 'e'], $terms->map->slug()->values()->all());
+    }
+
+    /** @test **/
+    public function it_filters_using_or_where_not_ins()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+        Term::make('f')->taxonomy('tags')->data(['test' => 'taz'])->save();
+
+        $terms = Term::query()->whereNotIn('test', ['foo', 'bar'])->orWhereNotIn('test', ['foo', 'raz'])->get();
+
+        $this->assertEquals(['c', 'f'], $terms->map->slug()->values()->all());
+    }
+
+    /** @test */
+    public function it_filters_using_nested_wheres()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+
+        $terms = Term::query()
+            ->where(function ($query) {
+                $query->where('test', 'foo');
+            })
+            ->orWhere(function ($query) {
+                $query->where('test', 'baz');
+            })
+            ->orWhere('test', 'raz')
+            ->get();
+
+        $this->assertCount(4, $terms);
+        $this->assertEquals(['a', 'c', 'd', 'e'], $terms->map->slug()->sort()->values()->all());
+    }
+
+    /** @test */
+    public function it_filters_using_nested_where_ins()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+        Term::make('f')->taxonomy('tags')->data(['test' => 'chaz'])->save();
+
+        $terms = Term::query()
+            ->where(function ($query) {
+                $query->where('test', 'foo');
+            })
+            ->orWhere(function ($query) {
+                $query->whereIn('test', ['baz', 'raz']);
+            })
+            ->orWhere('test', 'chaz')
+            ->get();
+
+        $this->assertCount(5, $terms);
+        $this->assertEquals(['a', 'c', 'd', 'e', 'f'], $terms->map->slug()->sort()->values()->all());
+    }
+
+    /** @test */
+    public function it_filters_using_nested_where_not_ins()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('b')->taxonomy('tags')->data(['test' => 'bar'])->save();
+        Term::make('c')->taxonomy('tags')->data(['test' => 'baz'])->save();
+        Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
+        Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
+
+        $terms = Term::query()
+            ->where('test', 'foo')
+            ->orWhere(function ($query) {
+                $query->whereNotIn('test', ['baz', 'raz']);
+            })
+            ->get();
+
+        $this->assertCount(3, $terms);
+        $this->assertEquals(['a', 'b', 'd'], $terms->map->slug()->sort()->values()->all());
+    }
+
+    /** @test */
     public function it_filters_by_taxonomy()
     {
         Taxonomy::make('tags')->save();
@@ -70,6 +185,27 @@ class TermQueryBuilderTest extends TestCase
 
         $terms = Term::query()->orderBy('test')->get();
         $this->assertEquals(['c', 'b', 'e', 'a', 'd'], $terms->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_where_column()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Post 1', 'other_title' => 'Not Post 1'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Post 2', 'other_title' => 'Not Post 2'])->save();
+        Term::make('c')->taxonomy('tags')->data(['title' => 'Post 3', 'other_title' => 'Post 3'])->save();
+        Term::make('d')->taxonomy('tags')->data(['title' => 'Post 4', 'other_title' => 'Post 4'])->save();
+        Term::make('e')->taxonomy('tags')->data(['title' => 'Post 5', 'other_title' => 'Not Post 5'])->save();
+
+        $terms = Term::query()->whereColumn('title', 'other_title')->get();
+
+        $this->assertCount(2, $terms);
+        $this->assertEquals(['c', 'd'], $terms->map->slug()->all());
+
+        $terms = Term::query()->whereColumn('title', '!=', 'other_title')->get();
+
+        $this->assertCount(3, $terms);
+        $this->assertEquals(['a', 'b', 'e'], $terms->map->slug()->all());
     }
 
     /** @test */
@@ -133,5 +269,95 @@ class TermQueryBuilderTest extends TestCase
                 ->where('taxonomy', 'tags')
                 ->get()->map->id()->sort()->values()->all()
         );
+    }
+
+    /** @test **/
+    public function terms_are_found_using_where_json_contains()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+
+        $entries = Term::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['1', '3'], $entries->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_where_json_doesnt_contain()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonDoesntContain('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->slug()->all());
+
+        $entries = Term::query()->whereJsonDoesntContain('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_or_where_json_contains()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1'])->orWhereJsonContains('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_or_where_json_doesnt_contain()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntContain('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['1', '3', '2', '4'], $entries->map->slug()->all());
+    }
+
+    /** @test **/
+    public function terms_are_found_using_where_json_length()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonLength('test_taxonomy', 1)->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['2', '5'], $entries->map->slug()->all());
     }
 }

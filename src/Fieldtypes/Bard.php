@@ -20,8 +20,11 @@ use Statamic\Support\Str;
 
 class Bard extends Replicator
 {
-    public $category = ['text', 'structured'];
+    use Concerns\ResolvesStatamicUrls;
+
+    protected $categories = ['text', 'structured'];
     protected $defaultValue = '[]';
+    protected $rules = [];
 
     protected function configFieldItems(): array
     {
@@ -61,6 +64,7 @@ class Bard extends Replicator
                 'display' => __('Container'),
                 'instructions' => __('statamic::fieldtypes.bard.config.container'),
                 'type' => 'asset_container',
+                'mode' => 'select',
                 'max_items' => 1,
                 'if' => [
                     'buttons' => 'contains_any anchor, image',
@@ -144,6 +148,12 @@ class Bard extends Replicator
                 'default' => true,
                 'width' => 50,
             ],
+            'antlers' => [
+                'display' => 'Antlers',
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
         ];
     }
 
@@ -155,7 +165,7 @@ class Bard extends Replicator
     protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
-            return $value;
+            return is_null($value) ? $value : $this->resolveStatamicUrls($value);
         }
 
         if ($this->isLegacyData($value)) {
@@ -178,7 +188,7 @@ class Bard extends Replicator
         })->all();
 
         if ($this->shouldSaveHtml()) {
-            return (new Augmentor($this))->convertToHtml($structure);
+            return (new Augmentor($this))->withStatamicImageUrls()->convertToHtml($structure);
         }
 
         if ($structure === [['type' => 'paragraph']]) {
@@ -223,6 +233,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
+            $value = str_replace('statamic://', '', $value);
             $doc = (new \HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
@@ -293,9 +304,26 @@ class Bard extends Replicator
         }, collect())->all();
     }
 
-    protected function setRuleFieldKey($handle, $index)
+    protected function setRuleFieldPrefix($index)
     {
-        return "{$this->field->handle()}.{$index}.attrs.values.{$handle}";
+        return "{$this->field->handle()}.{$index}.attrs.values";
+    }
+
+    public function extraValidationAttributes(): array
+    {
+        if (! $this->config('sets')) {
+            return [];
+        }
+
+        return collect($this->field->value())->filter(function ($set) {
+            return $set['type'] === 'set';
+        })->map(function ($set, $index) {
+            $set = $set['attrs']['values'];
+
+            return $this->setValidationAttributes($set['type'], $set, $index);
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
     }
 
     public function isLegacyData($value)

@@ -92,6 +92,7 @@ return [
     'origin_cannot_be_disabled' => 'Kan geen gedeactiveerde oorsprong selecteren.',
     'unique_uri' => 'Deze URI is al in gebruik.',
     'duplicate_uri' => 'Dubbele URI voor :value',
+    'reserved' => 'Dit is een gereserveerd woord.',
     'custom.attribute-name.rule-name' => 'aangepast-bericht',
     'attributes' => [],
 ];

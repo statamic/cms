@@ -269,8 +269,8 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * Get all the asset files in this container.
      *
-     * @param string|null $folder Narrow down assets by folder
-     * @param bool $recursive
+     * @param  string|null  $folder  Narrow down assets by folder
+     * @param  bool  $recursive
      * @return \Illuminate\Support\Collection
      */
     public function files($folder = '/', $recursive = false)
@@ -293,8 +293,8 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * Get all the subfolders in this container.
      *
-     * @param string|null $folder Narrow down subfolders by folder
-     * @param bool $recursive
+     * @param  string|null  $folder  Narrow down subfolders by folder
+     * @param  bool  $recursive
      * @return \Illuminate\Support\Collection
      */
     public function folders($folder = '/', $recursive = false)
@@ -310,8 +310,8 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * Get all the assets in this container.
      *
-     * @param string|null $folder Narrow down assets by folder
-     * @param bool $recursive Whether to look for assets recursively
+     * @param  string|null  $folder  Narrow down assets by folder
+     * @param  bool  $recursive  Whether to look for assets recursively
      * @return AssetCollection
      */
     public function assets($folder = '/', $recursive = false)
@@ -326,10 +326,12 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $folder = null;
         }
 
-        if ($folder && $recursive) {
-            $query->where('folder', 'like', "{$folder}%");
-        } elseif ($folder) {
-            $query->where('folder', $folder);
+        if ($folder !== null) {
+            if ($recursive) {
+                $query->where('path', 'like', "{$folder}/%");
+            } else {
+                $query->where('folder', $folder);
+            }
         }
 
         return $query->get();
@@ -338,9 +340,9 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * Get all the asset folders in this container.
      *
-     * @param string $folder Narrow down by folder
-     * @param bool $recursive Whether to look for subfolders recursively
-     * @return Collection  A collection of AssetFolder instances
+     * @param  string  $folder  Narrow down by folder
+     * @param  bool  $recursive  Whether to look for subfolders recursively
+     * @return Collection A collection of AssetFolder instances
      */
     public function assetFolders($folder = '/', $recursive = false)
     {
@@ -358,7 +360,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * Make an asset.
      *
-     * @param string $path
+     * @param  string  $path
      * @return \Statamic\Assets\Asset
      */
     public function makeAsset($path)
@@ -372,26 +374,24 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * Find an asset.
      *
-     * @param string $path
+     * @param  string  $path
      * @return \Statamic\Assets\Asset|null
      */
     public function asset($path)
     {
-        $asset = Facades\Asset::make()->container($this)->path($path);
+        $asset = $this->makeAsset($path);
 
         if (! $asset->exists()) {
             return null;
         }
 
-        $asset->hydrate();
-
-        return $asset;
+        return $asset->hydrate()->syncOriginal();
     }
 
     /**
      * Create an asset folder.
      *
-     * @param string $path
+     * @param  string  $path
      * @return AssetFolder
      */
     public function assetFolder($path)
@@ -422,7 +422,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * Enable the quick download button when editing files in this container.
      *
-     * @param bool|null $allowDownloading
+     * @param  bool|null  $allowDownloading
      * @return bool|$this
      */
     public function allowDownloading($allowDownloading = null)
@@ -438,7 +438,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * The ability to move files around within this container.
      *
-     * @param bool|null $allowMoving
+     * @param  bool|null  $allowMoving
      * @return bool|$this
      */
     public function allowMoving($allowMoving = null)
@@ -454,7 +454,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * The ability to rename files in this container.
      *
-     * @param bool|null $allowRenaming
+     * @param  bool|null  $allowRenaming
      * @return bool|$this
      */
     public function allowRenaming($allowRenaming = null)
@@ -470,7 +470,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * The ability to upload into this container.
      *
-     * @param bool|null $allowUploads
+     * @param  bool|null  $allowUploads
      * @return bool|$this
      */
     public function allowUploads($allowUploads = null)
@@ -486,7 +486,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * The ability to create folders within this container.
      *
-     * @param bool|null $createFolders
+     * @param  bool|null  $createFolders
      * @return bool|$this
      */
     public function createFolders($createFolders = null)

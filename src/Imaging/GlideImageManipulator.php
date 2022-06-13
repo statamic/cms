@@ -56,7 +56,7 @@ class GlideImageManipulator implements ImageManipulator
     protected $params = [];
 
     /**
-     * @param UrlBuilder $builder
+     * @param  UrlBuilder  $builder
      */
     public function __construct(UrlBuilder $builder)
     {
@@ -66,7 +66,7 @@ class GlideImageManipulator implements ImageManipulator
     /**
      * Set the item to be manipulated.
      *
-     * @param Asset|string $item The item. Can be an asset, an asset ID, a URL, or path.
+     * @param  Asset|string  $item  The item. Can be an asset, an asset ID, a URL, or path.
      * @return $this
      */
     public function item($item)
@@ -89,7 +89,7 @@ class GlideImageManipulator implements ImageManipulator
     /**
      * Set a custom filename.
      *
-     * @param string $filename
+     * @param  string  $filename
      * @return $this
      */
     public function filename($filename)
@@ -102,7 +102,7 @@ class GlideImageManipulator implements ImageManipulator
     /**
      * Set the parameters.
      *
-     * @param array $params
+     * @param  array  $params
      * @return $this
      */
     public function params($params)
@@ -125,8 +125,9 @@ class GlideImageManipulator implements ImageManipulator
     /**
      * Set a parameter.
      *
-     * @param string $param
-     * @param mixed  $value
+     * @param  string  $param
+     * @param  mixed  $value
+     *
      * @throws \Exception
      */
     public function setParam($param, $value)
@@ -142,8 +143,8 @@ class GlideImageManipulator implements ImageManipulator
     /**
      * Unknown method calls will attempt to add a parameter.
      *
-     * @param string $method
-     * @param array $args
+     * @param  string  $method
+     * @param  array  $args
      * @return $this
      */
     public function __call($method, $args)
@@ -165,7 +166,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function height($value)
@@ -176,7 +177,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function fit($value)
@@ -201,7 +202,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function crop($value)
@@ -212,7 +213,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param int $pixels
+     * @param  int  $pixels
      * @return $this
      */
     public function square($pixels)
@@ -224,7 +225,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function orient($value)
@@ -235,7 +236,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function brightness($value)
@@ -246,7 +247,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function contrast($value)
@@ -257,7 +258,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function gamma($value)
@@ -268,7 +269,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function sharpen($value)
@@ -279,7 +280,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function blur($value)
@@ -290,7 +291,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function pixelate($value)
@@ -301,7 +302,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function filter($value)
@@ -312,7 +313,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function format($value)
@@ -323,7 +324,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function quality($value)
@@ -334,7 +335,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param string $value
+     * @param  string  $value
      * @return $this
      */
     public function preset($value)

@@ -27,7 +27,7 @@ class Index extends BaseIndex
 
         try {
             $results = $comb->lookUp($query)['data'];
-        } catch (NoResultsFound | NotEnoughCharacters | NoQuery $e) {
+        } catch (NoResultsFound|NotEnoughCharacters|NoQuery $e) {
             return collect();
         }
 
@@ -59,7 +59,6 @@ class Index extends BaseIndex
             'enable_too_many_results' => null,
             'sort_by_score' => null,
             'exclude_properties' => null,
-            'include_properties' => null,
             'stop_words' => ['the', 'a', 'an'],
             'include_properties' => $this->config['fields'] ?? ['title'],
         ], $this->config);

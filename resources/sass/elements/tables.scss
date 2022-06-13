@@ -63,16 +63,30 @@
 				@apply bg-grey-20;
 			}
 
+			&:first-child {
+				td:first-child {
+				    @apply .rounded-tl;
+				}
+
+				td:last-child {
+				    @apply .rounded-tr;
+				}
+			}
+
 			&:last-child {
 				@apply border-none;
+				td:first-child {
+				    @apply .rounded-bl;
+				}
+
+				td:last-child {
+				    @apply .rounded-br;
+				}
 			}
 
             &:hover {
                 @apply bg-grey-10;
             }
-
-            td:first-child { @apply .rounded-bl; }
-            td:last-child { @apply .rounded-br; }
 
             th {
                 @apply py-1 pr-2;

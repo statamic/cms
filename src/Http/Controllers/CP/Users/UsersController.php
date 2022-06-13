@@ -41,23 +41,36 @@ class UsersController extends CpController
         ]);
     }
 
+    protected function indexQuery()
+    {
+        $query = User::query();
+
+        if ($search = request('search')) {
+            $query->where('email', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
+        }
+
+        return $query;
+    }
+
     protected function json($request)
     {
         $query = $request->group
             ? UserGroup::find($request->group)->queryUsers()
-            : User::query();
+            : $this->indexQuery();
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters);
 
         $users = $query
-            ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
+            ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
 
         return (new Users($users))
-            ->blueprint(User::blueprint())
+            ->blueprint($blueprint = User::blueprint())
             ->columns(collect([
                 Column::make('email')->label(__('Email')),
-                Column::make('name')->label(__('Name')),
+                $blueprint->hasField('name') ? Column::make('name')->label(__('Name')) : null,
+                $blueprint->hasField('first_name') ? Column::make('first_name')->label(__('First Name')) : null,
+                $blueprint->hasField('last_name') ? Column::make('last_name')->label(__('Last Name')) : null,
                 Statamic::pro() ? Column::make('roles')->label(__('Roles'))->fieldtype('relationship')->sortable(false) : null,
                 Column::make('last_login')->label(__('Last Login'))->sortable(false),
             ])->filter()->values()->all())
@@ -92,6 +105,7 @@ class UsersController extends CpController
                 'save' => cp_route('users.store'),
             ],
             'expiry' => $expiry,
+            'separateNameFields' => $blueprint->hasField('first_name'),
         ];
 
         if ($request->wantsJson()) {
@@ -108,7 +122,7 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->only(['email', 'name'])->addValues($request->all());
+        $fields = $blueprint->fields()->only(['email', 'name', 'first_name', 'last_name'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 

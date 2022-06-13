@@ -9,7 +9,11 @@ export default {
 
     props: {
         asset: Object,
-        readOnly: Boolean
+        readOnly: Boolean,
+        showFilename: {
+            type: Boolean,
+            default: true
+        }
     },
 
     data() {
@@ -26,7 +30,7 @@ export default {
         },
 
         canShowSvg() {
-            return this.asset.extension === 'svg' && ! this.asset.url.includes('::');
+            return this.asset.extension === 'svg';
         },
 
         canBeTransparent() {

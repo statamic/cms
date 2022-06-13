@@ -45,7 +45,7 @@ class Collection extends Widget
     /**
      * Parse sort column and direction, similar to how sorting works on collection tag.
      *
-     * @param \Statamic\Entries\Collection $collection
+     * @param  \Statamic\Entries\Collection  $collection
      * @return array
      */
     protected function parseSort($collection)

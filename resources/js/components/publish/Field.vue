@@ -8,7 +8,11 @@
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
             <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
-                <span v-text="labelText" v-tooltip="{content: config.handle, delay: 500, autoHide: false}" />
+                <span
+                    :class="{ 'text-grey-60': syncable && isSynced }"
+                    v-text="labelText"
+                    v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
+                />
                 <i class="required ml-sm" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
                 <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-sm">
@@ -20,9 +24,10 @@
                     v-if="!isReadOnly && !isSection"
                     v-show="syncable && isSynced"
                     class="outline-none"
+                    :class="{ flex: syncable && isSynced }"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="hyperlink" class="h-4 ml-sm w-4 text-grey-60"
+                    <svg-icon name="hyperlink" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
@@ -30,17 +35,18 @@
                     v-if="!isReadOnly && !isSection"
                     v-show="syncable && !isSynced"
                     class="outline-none"
+                    :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 ml-sm w-4 text-grey-60"
+                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>
 
             <div
                 class="help-block -mt-1"
-                v-if="config.instructions"
-                v-html="$options.filters.markdown(config.instructions)" />
+                v-if="instructions && config.instructions_position !== 'below'"
+                v-html="instructions" />
         </div>
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
@@ -63,6 +69,11 @@
                 @blur="blurred"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
+
+        <div
+            class="help-block mt-1"
+            v-if="instructions && config.instructions_position === 'below'"
+            v-html="instructions" />
 
         <div v-if="hasError">
             <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
@@ -115,6 +126,12 @@ export default {
             return Vue.options.components[this.fieldtypeComponent] !== undefined;
         },
 
+        instructions() {
+            return this.config.instructions
+                ? this.$options.filters.markdown(this.config.instructions)
+                : null
+        },
+
         hasError() {
             return this.errors && this.errors.length > 0;
         },
@@ -141,7 +158,7 @@ export default {
                 `field-${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
-                { 'has-error': this.hasError }
+                { 'has-error': this.hasError || this.hasNestedError }
             ];
         },
 
@@ -171,6 +188,12 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        hasNestedError() {
+            const prefix = `${this.errorKeyPrefix || this.config.handle}.`;
+
+            return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
 
         labelText() {

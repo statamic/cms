@@ -18,9 +18,9 @@ class Str extends \Illuminate\Support\Str
     /**
      * Creates a sentence list from the given $list.
      *
-     * @param array  $list  List of items to list
-     * @param string  $glue  Joining string before the last item when more than one item
-     * @param bool  $oxford_comma  Include a comma before $glue?
+     * @param  array  $list  List of items to list
+     * @param  string  $glue  Joining string before the last item when more than one item
+     * @param  bool  $oxford_comma  Include a comma before $glue?
      * @return string
      */
     public static function makeSentenceList(array $list, $glue = 'and', $oxford_comma = true)
@@ -126,8 +126,8 @@ class Str extends \Illuminate\Support\Str
     /**
      * Get the human file size of a given file.
      *
-     * @param int $bytes
-     * @param int $decimals
+     * @param  int  $bytes
+     * @param  int  $decimals
      * @return string
      */
     public static function fileSizeForHumans($bytes, $decimals = 2)
@@ -162,7 +162,7 @@ class Str extends \Illuminate\Support\Str
      * Attempts to prevent widows in a string by adding a
      * &nbsp; between the last two words of each paragraph.
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     public static function widont($value, $words = 1)
@@ -176,12 +176,17 @@ class Str extends \Illuminate\Support\Str
                 return str_replace(' ', '%###%##%', $matches[0]);
             }, $value);
 
-            // step 2, replace all spaces based on params with &nbsp;
+            // step 2, replace all tabs and spaces based on params with &nbsp;
             $value = preg_replace_callback("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s]\s)([^\s]*\s?){{$words}}(<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>)/", function ($matches) {
-                return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));
+                return preg_replace('/([[:blank:]])/', '&nbsp;', rtrim($matches[0]));
             }, $value);
 
-            // step 3, re-replace the code from step 1 with spaces
+            // Step 3, handle potential nested list orphans
+            $value = preg_replace_callback("/(?<!<[li])([^\s]\s)([^\s]*\s?){{$words}}(<(?:ol|ul)>)/", function ($matches) {
+                return preg_replace('/[[:blank:]]/', '&nbsp;', rtrim($matches[0]));
+            }, $value);
+
+            // step 4, re-replace the code from step 1 with spaces
             return str_replace('%###%##%', ' ', $value);
 
         // otherwise
@@ -206,8 +211,8 @@ class Str extends \Illuminate\Support\Str
     /**
      * Apply multiple string modifications via array.
      *
-     * @param string $string
-     * @param array $modifications
+     * @param  string  $string
+     * @param  array  $modifications
      * @return string
      */
     public static function modifyMultiple($string, $modifications)
@@ -240,7 +245,7 @@ class Str extends \Illuminate\Support\Str
     /**
      * Output either literal "true" or "false" strings given a boolean.
      *
-     * @param bool $value
+     * @param  bool  $value
      * @return string
      */
     public static function bool(bool $value): string
@@ -251,7 +256,7 @@ class Str extends \Illuminate\Support\Str
     /**
      * Get an actual boolean from a string based boolean.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return bool
      */
     public static function toBool($value): bool
@@ -262,5 +267,22 @@ class Str extends \Illuminate\Support\Str
     public static function replace($string, $search, $replace)
     {
         return StaticStringy::replace($string, $search, $replace);
+    }
+
+    public static function studly($value)
+    {
+        $key = $value;
+
+        if (isset(parent::$studlyCache[$key])) {
+            return parent::$studlyCache[$key];
+        }
+
+        $words = explode(' ', str_replace(['-', '_'], ' ', $value));
+
+        $studlyWords = array_map(function ($word) {
+            return parent::ucfirst($word);
+        }, $words);
+
+        return parent::$studlyCache[$key] = implode($studlyWords);
     }
 }

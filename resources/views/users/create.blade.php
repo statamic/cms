@@ -9,6 +9,7 @@
         users-create-url="{{ cp_route('users.create') }}"
         :can-create-supers="{{ $str::bool($user->can('super')) }}"
         :activation-expiry="{{ $expiry }}"
+        :separate-name-fields="{{ $str::bool($separateNameFields) }}"
     >
     </user-wizard>
 @stop

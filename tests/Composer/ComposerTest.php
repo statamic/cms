@@ -12,9 +12,7 @@ class ComposerTest extends TestCase
 {
     public function setUp(): void
     {
-        if ($this->isRunningWindows()) {
-            $this->markTestSkipped();
-        }
+        $this->markTestSkippedInWindows();
 
         parent::setUp();
 
@@ -47,8 +45,14 @@ class ComposerTest extends TestCase
         $installed = Composer::installed();
 
         $this->assertNotEmpty($installed);
+
         $this->assertContains('statamic/composer-test-example-dependency', $installed->keys());
         $this->assertEquals('1.2.3', $installed->get('statamic/composer-test-example-dependency')->version);
+        $this->assertFalse($installed->get('statamic/composer-test-example-dependency')->dev);
+
+        $this->assertContains('statamic/composer-test-example-dev-dependency', $installed->keys());
+        $this->assertEquals('1.2.4', $installed->get('statamic/composer-test-example-dev-dependency')->version);
+        $this->assertTrue($installed->get('statamic/composer-test-example-dev-dependency')->dev);
     }
 
     /**
@@ -88,6 +92,21 @@ class ComposerTest extends TestCase
     }
 
     /**
+     * @group integration
+     * @test
+     */
+    public function it_gracefully_fails_when_lock_file_does_not_exist()
+    {
+        unlink($this->basePath('composer.lock'));
+
+        $installed = Composer::installed();
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $installed);
+        $this->assertEmpty($installed);
+        $this->assertNull(Composer::installedVersion('statamic/composer-test-example-dependency'));
+    }
+
+    /**
      * This method is intentionally doing way too much, for the sake of test suite performance.
      *
      * @group integration
@@ -102,7 +121,7 @@ class ComposerTest extends TestCase
         $this->assertFileNotExists($this->basePath('vendor/test/package'));
         $this->assertFalse(Cache::has('composer.test/package'));
 
-        // Test that we can require the package...
+        // Test that we can require a package...
 
         PackToTheFuture::setVersion('1.0.0');
         Composer::require('test/package');
@@ -111,7 +130,8 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
-        $this->assertStringContainsString("Installing \e[32mtest/package", Cache::get('composer.test/package')['output']);
+        $this->assertFalse($installed->get('test/package')->dev);
+        $this->assertStringContainsString('Installing test/package', Cache::get('composer.test/package')['output']);
 
         // Test that we can update the package...
 
@@ -122,7 +142,8 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.1', $installed->get('test/package')->version);
-        $this->assertStringContainsString("Updating \e[32mtest/package", Cache::get('composer.test/package')['output']);
+        $this->assertFalse($installed->get('test/package')->dev);
+        $this->assertStringContainsString('Upgrading test/package', Cache::get('composer.test/package')['output']);
 
         // Test that we can downgrade to a specific version...
 
@@ -133,7 +154,8 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
-        $this->assertStringContainsString("Downgrading \e[32mtest/package", Cache::get('composer.test/package')['output']);
+        $this->assertFalse($installed->get('test/package')->dev);
+        $this->assertStringContainsString('Downgrading test/package', Cache::get('composer.test/package')['output']);
 
         // Test that we can remove the package...
 
@@ -141,7 +163,47 @@ class ComposerTest extends TestCase
 
         $this->assertStringNotContainsString('test/package', Composer::installed()->keys());
         $this->assertFileNotExists($this->basePath('vendor/test/package'));
-        $this->assertStringContainsString("Removing \e[32mtest/package", Cache::get('composer.test/package')['output']);
+        $this->assertStringContainsString('Removing test/package', Cache::get('composer.test/package')['output']);
+
+        // Test that we can add extra params when requiring...
+
+        PackToTheFuture::setVersion('1.0.0');
+        Composer::require('test/package', '1.0.0', '--dry-run');
+
+        $installed = Composer::installed();
+        $this->assertFalse($installed->keys()->contains('test/package'));
+        $this->assertFileNotExists($this->basePath('vendor/test/package'));
+        $this->assertStringContainsString('Installing test/package', Cache::get('composer.test/package')['output']);
+
+        // Test that we can add extra params when requiring a dev dependency...
+
+        PackToTheFuture::setVersion('1.0.0');
+        Composer::requireDev('test/package', '1.0.0', '--dry-run');
+
+        $installed = Composer::installed();
+        $this->assertFalse($installed->keys()->contains('test/package'));
+        $this->assertFileNotExists($this->basePath('vendor/test/package'));
+        $this->assertStringContainsString('Installing test/package', Cache::get('composer.test/package')['output']);
+
+        // Test that we can require a package as a dev dependency...
+
+        PackToTheFuture::setVersion('1.0.0');
+        Composer::requireDev('test/package');
+
+        $installed = Composer::installed();
+        $this->assertTrue($installed->keys()->contains('test/package'));
+        $this->assertFileExists($this->basePath('vendor/test/package'));
+        $this->assertEquals('1.0.0', $installed->get('test/package')->version);
+        $this->assertTrue($installed->get('test/package')->dev);
+        $this->assertStringContainsString('Installing test/package', Cache::get('composer.test/package')['output']);
+
+        // Test that we can remove a dev package...
+
+        Composer::removeDev('test/package');
+
+        $this->assertStringNotContainsString('test/package', Composer::installed()->keys());
+        $this->assertFileNotExists($this->basePath('vendor/test/package'));
+        $this->assertStringContainsString('Removing test/package', Cache::get('composer.test/package')['output']);
     }
 
     private function basePath($path = null)

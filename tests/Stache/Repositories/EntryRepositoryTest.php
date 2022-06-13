@@ -134,6 +134,7 @@ class EntryRepositoryTest extends TestCase
 
     /**
      * @test
+     *
      * @deprecated
      **/
     public function it_gets_entry_by_slug()

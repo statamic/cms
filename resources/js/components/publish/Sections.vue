@@ -25,7 +25,7 @@
                     v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
                 ></button>
             </div>
-            <dropdown-list class="ml-1 v-cloak" v-if="showHiddenTabsDropdown">
+            <dropdown-list class="ml-1" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
                     v-for="(section, index) in mainSections"
                     v-show="isTabHidden(index)"
@@ -130,6 +130,10 @@ export default {
             return this.state.blueprint.sections;
         },
 
+        inStack() {
+            return this.actionsPortal !== 'publish-actions-base';
+        },
+
         mainSections() {
             if (! this.shouldShowSidebar) return this.sections;
 
@@ -152,24 +156,17 @@ export default {
             return this.state.errors;
         },
 
-        // A mapping of fields to which section they are in.
-        sectionFields() {
-            let fields = {};
-            this.sections.forEach(section => {
-                section.fields.forEach(field => {
-                    fields[field.handle] = section.handle;
-                })
-            });
-            return fields;
-        },
+        sectionsWithErrors() {
+            const handles = Object.keys(this.errors).map((fieldHandle) => {
+                const topFieldHandle = fieldHandle.split('.')[0];
+                const section = this.sections.find(section =>
+                    section.fields.some(field => field.handle === topFieldHandle)
+                );
 
-        // A mapping of fields with errors to which section they are in.
-        sectionErrors() {
-            let errors = {};
-            Object.keys(this.errors).forEach(field => {
-                errors[field] = this.sectionFields[field];
+                return section && section.handle
             });
-            return errors;
+
+            return _.uniq(handles);
         },
 
         actionsPortal() {
@@ -182,15 +179,34 @@ export default {
 
     },
 
+    mounted() {
+        if (this.inStack) return;
+
+        // Deep linking/refreshing to a specific #section
+        if (window.location.hash.length > 0) {
+            let hash = window.location.hash.substr(1);
+            // if hash is in this.visibleTabs, make it active.
+            if (_.chain(this.visibleTabs).values().contains(hash)) {
+                this.setActive(hash);
+            } else {
+                window.location.hash = '';
+            }
+        }
+    },
+
     methods: {
 
         sectionHasError(handle) {
-            return _.chain(this.sectionErrors).values().contains(handle).value();
+            return this.sectionsWithErrors.includes(handle);
         },
 
         setActive(tab) {
             this.active = tab;
             this.$events.$emit('tab-switched', tab);
+
+            if (! this.inStack) {
+                window.location.hash = tab;
+            }
         },
 
         isTabHidden(section) {

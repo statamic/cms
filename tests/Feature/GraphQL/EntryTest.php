@@ -7,6 +7,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
+use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -58,6 +59,7 @@ class EntryTest extends TestCase
         status
         date
         last_modified
+        blueprint
         collection {
             title
             handle
@@ -82,13 +84,14 @@ GQL;
                     'slug' => 'event-one',
                     'url' => '/events/event-one',
                     'uri' => '/events/event-one',
-                    'edit_url' => 'http://localhost/cp/collections/events/entries/3/event-one',
+                    'edit_url' => 'http://localhost/cp/collections/events/entries/3',
                     'permalink' => 'http://localhost/events/event-one',
                     'published' => true,
                     'private' => false,
                     'status' => 'published',
                     'date' => 'November 3rd, 2017',
                     'last_modified' => 'December 25th, 2017',
+                    'blueprint' => 'event',
                     'collection' => [
                         'title' => 'Events',
                         'handle' => 'events',
@@ -203,6 +206,138 @@ GQL;
                     'id' => '44',
                 ],
             ]]);
+    }
+
+    /** @test */
+    public function it_queries_an_existing_entry_parent()
+    {
+        $this->createStructuredCollection();
+
+        $query = <<<'GQL'
+{
+    entry(id: "4") {
+        parent {
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'parent' => [
+                        'title' => 'Event One',
+                    ],
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_queries_a_non_existing_entry_parent()
+    {
+        $this->createStructuredCollection();
+
+        $query = <<<'GQL'
+{
+    entry(id: "3") {
+        parent {
+            id
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'parent' => null,
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_filters_an_entry()
+    {
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->published(false)
+            ->create();
+
+        $query = <<<'GQL'
+{
+    entry(id: "6", filter: { status: { is: "published" } }) {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => null]]);
+    }
+
+    /** @test */
+    public function it_filters_entries_with_equalto_shorthand()
+    {
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->published(true)
+            ->create();
+
+        $query = <<<'GQL'
+{
+    entry(id: "6", filter: { status: "draft" }) {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => null]]);
+    }
+
+    /** @test */
+    public function it_filters_entries_with_multiple_conditions_of_the_same_type()
+    {
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->published(true)
+            ->create();
+
+        $query = <<<'GQL'
+{
+    entry(id: "6", filter: { status: "published", title: { doesnt_contain: "rad" } }) {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => null]]);
     }
 
     /** @test */
@@ -332,6 +467,135 @@ GQL;
             ->post('/graphql', ['query' => $query])
             ->assertJson(['errors' => [[
                 'message' => 'Cannot query field "one" on type "EntryInterface". Did you mean to use an inline fragment on "Entry_Blog_ArtDirected"?',
+            ]]]);
+    }
+
+    private function createStructuredCollection()
+    {
+        $collection = Collection::find('events');
+        $structure = (new CollectionStructure)->maxDepth(3);
+        $collection->structure($structure)->save();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => '3', 'children' => [
+                ['entry' => '4'],
+            ]],
+        ])->save();
+    }
+
+    /** @test */
+    public function it_only_shows_published_entries_by_default()
+    {
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->published(false)
+            ->create();
+        EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('that-will-be-so-rad')
+            ->data(['title' => 'That will be so rad!'])
+            ->date(now()->addMonths(2))
+            ->create();
+
+        $query = <<<'GQL'
+{
+    entry(id: "6") {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => null]]);
+
+        $query = <<<'GQL'
+{
+    entry(id: "6", filter: {published: true}) {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => null]]);
+
+        $query = <<<'GQL'
+{
+    entry(id: "6", filter: { status: "draft" }) {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+                ->withoutExceptionHandling()
+                ->post('/graphql', ['query' => $query])
+                ->assertGqlOk()
+                ->assertExactJson(['data' => ['entry' => [
+                    'id' => '6',
+                    'title' => 'That was so rad!',
+                ]]]);
+
+        $query = <<<'GQL'
+{
+    entry(id: "6", filter: { published: false }) {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => [
+                'id' => '6',
+                'title' => 'That was so rad!',
+            ]]]);
+
+        $query = <<<'GQL'
+{
+    entry(id: "6", filter: { status: "scheduled" }) {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => null]]);
+
+        $query = <<<'GQL'
+{
+    entry(id: "7", filter: { status: "scheduled" }) {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => [
+                'id' => '7',
+                'title' => 'That will be so rad!',
             ]]]);
     }
 }

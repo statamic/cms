@@ -525,6 +525,43 @@ class CollectionTest extends TestCase
         $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['collection' => 'music'])->index());
     }
 
+    /** @test */
+    public function it_orders_using_the_collection_sort_direction()
+    {
+        $this->foods->sortField('title')->sortDirection('asc')->save();
+
+        $this->makeEntry($this->foods, 'b')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'd')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'c')->set('title', 'Carrot')->save();
+
+        $this->setTagParameters(['in' => 'foods']);
+
+        $items = collect($this->collectionTag->index()->toAugmentedArray())->mapWithKeys(function ($item) {
+            return [$item['slug']->value() => $item['title']->value()];
+        })->all();
+
+        $this->assertEquals([
+            'a' => 'Apple',
+            'b' => 'Banana',
+            'c' => 'Carrot',
+            'd' => 'Danish',
+        ], $items);
+
+        $this->foods->sortField('title')->sortDirection('desc')->save();
+
+        $items = collect($this->collectionTag->index()->toAugmentedArray())->mapWithKeys(function ($item) {
+            return [$item['slug']->value() => $item['title']->value()];
+        })->all();
+
+        $this->assertEquals([
+            'd' => 'Danish',
+            'c' => 'Carrot',
+            'b' => 'Banana',
+            'a' => 'Apple',
+        ], $items);
+    }
+
     private function setTagParameters($parameters)
     {
         $this->collectionTag->setParameters($parameters);

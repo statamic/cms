@@ -4,10 +4,12 @@ namespace Tests\View;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Sites\Site as SiteInstance;
+use Statamic\Support\Arr;
 use Statamic\View\Cascade;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -17,6 +19,7 @@ class CascadeTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     private $cascade;
+    private $siteConfig;
 
     public function setUp(): void
     {
@@ -30,7 +33,7 @@ class CascadeTest extends TestCase
             return $this->cascade;
         }
 
-        return $this->cascade = new Cascade(request(), new FakeSite);
+        return $this->cascade = new Cascade(request(), new \Statamic\Sites\Site('en', $this->siteConfig['sites']['en']));
     }
 
     /** @test */
@@ -88,11 +91,14 @@ class CascadeTest extends TestCase
     /** @test */
     public function it_hydrates_auth_when_logged_in()
     {
-        $this->actingAs(User::make())->get('/');
+        $user = User::make();
 
-        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+        $this->actingAs($user)->get('/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) use ($user) {
             $this->assertTrue($cascade['logged_in']);
             $this->assertFalse($cascade['logged_out']);
+            $this->assertSame($user, $cascade['current_user']);
         });
     }
 
@@ -104,6 +110,17 @@ class CascadeTest extends TestCase
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertFalse($cascade['logged_in']);
             $this->assertTrue($cascade['logged_out']);
+            $this->assertNull($cascade['current_user']);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_current_user()
+    {
+        $this->actingAs(User::make())->get('/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertInstanceOf(UserContract::class, $cascade['current_user']);
         });
     }
 
@@ -128,6 +145,29 @@ class CascadeTest extends TestCase
             $this->assertEquals('http://test.com/test', $cascade['current_url']);
             $this->assertEquals('http://test.com/test?test=test', $cascade['current_full_url']);
             $this->assertEquals('/test', $cascade['current_uri']);
+            $this->assertFalse($cascade['is_homepage']);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_request_is_homepage_when_request_is_homepage()
+    {
+        $this->get('http://test.com/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertTrue($cascade['is_homepage']);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_request_is_homepage_when_request_is_homepage_with_relative_site_url()
+    {
+        Arr::set($this->siteConfig, 'sites.en.url', '/');
+
+        $this->get('http://test.com/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertTrue($cascade['is_homepage']);
         });
     }
 
@@ -385,6 +425,24 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
+    public function the_cascade_can_be_manipulated_after_hydration()
+    {
+        $cascade = $this->cascade();
+
+        $cascade->hydrated(function ($cascade) {
+            $cascade->set('foo', 'bar');
+            $cascade->set('xml_header', 'not the xml header');
+        });
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertEquals('bar', $cascade['foo']);
+
+            // a var that would normally be there to show the callbacks are run at the end
+            $this->assertEquals('not the xml header', $cascade['xml_header']);
+        });
+    }
+
+    /** @test */
     public function page_data_overrides_globals()
     {
         $this->withoutEvents(); // prevents taxonomy term tracker from kicking in.
@@ -428,7 +486,7 @@ class CascadeTest extends TestCase
     {
         config(['app.url' => 'http://test.com']);
         url()->forceRootUrl(config('app.url'));
-        Site::setConfig([
+        Site::setConfig($this->siteConfig = [
             'default' => 'en',
             'sites' => [
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
@@ -445,14 +503,6 @@ class CascadeTest extends TestCase
             $global->makeLocalization('en')->data($data)
         );
         $global->save();
-    }
-}
-
-class FakeSite extends \Statamic\Sites\Site
-{
-    public function __construct()
-    {
-        parent::__construct('en', config('statamic.sites.sites.en'));
     }
 }
 

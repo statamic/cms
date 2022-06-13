@@ -5,6 +5,7 @@ namespace Tests\Feature\GraphQL;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Nav;
 use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -15,11 +16,11 @@ class PageTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
 
-    protected $enabledQueries = ['collections', 'entries'];
+    protected $enabledQueries = ['navs'];
 
     private function createData()
     {
-        $collection = Collection::make('pages')->title('Pages')->routes(['en' => '{parent_uri}/{slug}']);
+        $collection = Collection::make('pages')->title('Pages');
         $structure = (new CollectionStructure)->maxDepth(3)->expectsRoot(true);
         $collection->structure($structure)->save();
 
@@ -27,10 +28,11 @@ class PageTest extends TestCase
         EntryFactory::collection('pages')->id('about')->slug('about')->create();
         EntryFactory::collection('pages')->id('team')->slug('team')->create();
 
-        $collection->structure()->in('en')->tree([
-            ['entry' => 'home'],
-            ['entry' => 'about', 'children' => [
-                ['entry' => 'team'],
+        $nav = tap(Nav::make('links')->collections(['pages']))->save();
+        $nav->makeTree('en', [
+            ['id' => 'a', 'entry' => 'home'],
+            ['id' => 'b', 'entry' => 'about', 'children' => [
+                ['id' => 'c', 'entry' => 'team'],
             ]],
         ])->save();
     }
@@ -39,23 +41,21 @@ class PageTest extends TestCase
     {
         return <<<'GQL'
 {
-    collection(handle: "pages") {
-        structure {
+    nav(handle: "links") {
             tree {
                 depth
                 page {
-                    id
+                    entry_id
                     custom
                 }
                 children {
                     depth
                     page {
-                        id
+                        entry_id
                         custom
                     }
                 }
             }
-        }
     }
 }
 GQL;
@@ -64,30 +64,28 @@ GQL;
     private function expectedStructureQueryResponse()
     {
         return ['data' => [
-            'collection' => [
-                'structure' => [
-                    'tree' => [
-                        [
-                            'depth' => 1,
-                            'page' => [
-                                'id' => 'home',
-                                'custom' => 'custom home',
-                            ],
-                            'children' => [],
+            'nav' => [
+                'tree' => [
+                    [
+                        'depth' => 1,
+                        'page' => [
+                            'entry_id' => 'home',
+                            'custom' => 'custom home',
                         ],
-                        [
-                            'depth' => 1,
-                            'page' => [
-                                'id' => 'about',
-                                'custom' => 'custom about',
-                            ],
-                            'children' => [
-                                [
-                                    'depth' => 2,
-                                    'page' => [
-                                        'id' => 'team',
-                                        'custom' => 'custom team',
-                                    ],
+                        'children' => [],
+                    ],
+                    [
+                        'depth' => 1,
+                        'page' => [
+                            'entry_id' => 'about',
+                            'custom' => 'custom about',
+                        ],
+                        'children' => [
+                            [
+                                'depth' => 2,
+                                'page' => [
+                                    'entry_id' => 'team',
+                                    'custom' => 'custom team',
                                 ],
                             ],
                         ],
@@ -98,34 +96,13 @@ GQL;
     }
 
     /** @test */
-    public function adding_a_field_to_entry_interface_will_appear_within_pages()
-    {
-        GraphQL::addField('EntryInterface', 'custom', function () {
-            return [
-                'type' => GraphQL::string(),
-                'resolve' => function ($page) {
-                    return 'custom '.$page->id();
-                },
-            ];
-        });
-
-        $this->createData();
-
-        $this
-            ->withoutExceptionHandling()
-            ->post('/graphql', ['query' => $this->structureQuery()])
-            ->assertGqlOk()
-            ->assertExactJson($this->expectedStructureQueryResponse());
-    }
-
-    /** @test */
-    public function adding_a_field_to_page_interface_will_appear_within_pages_but_not_entries()
+    public function custom_fields_can_be_added_to_interface()
     {
         GraphQL::addField('PageInterface', 'custom', function () {
             return [
                 'type' => GraphQL::string(),
                 'resolve' => function ($page) {
-                    return 'custom '.$page->id();
+                    return 'custom '.$page->reference();
                 },
             ];
         });
@@ -135,70 +112,6 @@ GQL;
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $this->structureQuery()])
-            ->assertGqlOk()
-            ->assertExactJson($this->expectedStructureQueryResponse());
-
-        $entryQuery = <<<'GQL'
-{
-    entry(id: "home") {
-        id
-        custom
-    }
-}
-GQL;
-
-        $this
-            ->withoutExceptionHandling()
-            ->post('/graphql', ['query' => $entryQuery])
-            ->assertJson(['errors' => [[
-                'message' => 'Cannot query field "custom" on type "EntryInterface".',
-            ]]]);
-    }
-
-    /** @test */
-    public function it_can_add_custom_fields_to_an_implementation()
-    {
-        GraphQL::addField('EntryPage_Pages_Pages', 'custom', function () {
-            return [
-                'type' => GraphQL::string(),
-                'resolve' => function ($page) {
-                    return 'custom '.$page->id();
-                },
-            ];
-        });
-
-        $this->createData();
-
-        $query = <<<'GQL'
-{
-    collection(handle: "pages") {
-        structure {
-            tree {
-                depth
-                page {
-                    id
-                    ... on EntryPage_Pages_Pages {
-                        custom
-                    }
-                }
-                children {
-                    depth
-                    page {
-                        id
-                        ... on EntryPage_Pages_Pages {
-                            custom
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-GQL;
-
-        $this
-            ->withoutExceptionHandling()
-            ->post('/graphql', ['query' => $query])
             ->assertGqlOk()
             ->assertExactJson($this->expectedStructureQueryResponse());
     }

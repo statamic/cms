@@ -43,7 +43,7 @@ foo: bar
 some content
 EOT;
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar'], 'some content'));
+        $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], 'some content'));
     }
 
     /** @test */
@@ -56,7 +56,7 @@ content:
 
 EOT;
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar'], ['baz' => 'qux']));
+        $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
     /** @test */
@@ -67,8 +67,8 @@ foo: bar
 
 EOT;
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar'], null));
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar']));
+        $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], null));
+        $this->assertEquals($expected, YAML::dump(['foo' => 'bar']));
     }
 
     /** @test */
@@ -81,7 +81,7 @@ foo: bar
 
 EOT;
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
+        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /** @test */
@@ -94,7 +94,7 @@ foo: bar
 some content
 EOT;
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], 'some content'));
+        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], 'some content'));
     }
 
     /** @test */
@@ -109,7 +109,7 @@ content:
 
 EOT;
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
+        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
     /** @test */
@@ -122,12 +122,13 @@ foo: bar
 
 EOT;
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], null));
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
+        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], null));
+        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/3612
      **/
     public function it_dumps_front_matter_properly_when_symfony_yaml_dumper_doesnt_end_with_a_line_break()
@@ -161,19 +162,19 @@ $symfonyDumpedYaml
 content
 EOT;
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter($array, 'content'));
+        $this->assertEquals($expected, YAML::dumpFrontMatter($array, 'content'));
     }
 
     /** @test */
     public function it_parses_a_string_of_yaml()
     {
-        $this->assertEqualsIgnoringLineEndings(['foo' => 'bar'], YAML::parse('foo: bar'));
+        $this->assertEquals(['foo' => 'bar'], YAML::parse('foo: bar'));
     }
 
     /** @test */
     public function it_parses_an_empty_string_of_yaml()
     {
-        $this->assertEqualsIgnoringLineEndings([], YAML::parse(''));
+        $this->assertEquals([], YAML::parse(''));
     }
 
     /** @test */
@@ -202,7 +203,7 @@ content: some content
 ---
 EOT;
 
-        $this->assertEqualsIgnoringLineEndings(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
+        $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
     }
 
     /** @test */
@@ -234,7 +235,7 @@ EOT;
         fwrite($fp, $yaml);
         $path = stream_get_meta_data($fp)['uri'];
 
-        $this->assertEqualsIgnoringLineEndings(
+        $this->assertEquals(
             ['foo' => 'bar', 'content' => 'some content'],
             YAML::file($path)->parse()
         );
@@ -414,12 +415,5 @@ EOT;
         }
 
         $this->fail('Exception was not thrown.');
-    }
-
-    protected function assertEqualsIgnoringLineEndings($expected, $actual)
-    {
-        $actual = str_replace("\r\n", "\n", $actual);
-
-        $this->assertEquals($expected, $actual);
     }
 }

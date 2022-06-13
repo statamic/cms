@@ -10,9 +10,9 @@ class Writer
     /**
      * Write the cache file to disk.
      *
-     * @param string $path The path to the file.
-     * @param string $content The content of the file.
-     * @param int $lockFor
+     * @param  string  $path  The path to the file.
+     * @param  string  $content  The content of the file.
+     * @param  int  $lockFor
      * @return bool True if written, false if not.
      */
     public function write($path, $content, $lockFor = 0)
@@ -44,7 +44,7 @@ class Writer
     /**
      * Delete the cache file from disk.
      *
-     * @param string $path
+     * @param  string  $path
      * @return bool
      */
     public function delete($path)

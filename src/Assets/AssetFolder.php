@@ -98,7 +98,9 @@ class AssetFolder implements Contract, Arrayable
 
     public function save()
     {
-        $this->disk()->makeDirectory($this->path());
+        $this->disk()->put($this->path().'/.gitkeep', '');
+
+        $this->container()->contents()->add($this->path())->save();
 
         AssetFolderSaved::dispatch($this);
 
@@ -122,7 +124,7 @@ class AssetFolder implements Contract, Arrayable
         $this->disk()->delete($this->path());
 
         $cache = $this->container->contents();
-        $cache->directories()->keys()->filter(function ($path) {
+        $cache->all()->keys()->filter(function ($path) {
             return Str::startsWith($path, $this->path());
         })->each(function ($path) use ($cache) {
             $cache->forget($path);
@@ -132,6 +134,54 @@ class AssetFolder implements Contract, Arrayable
         AssetFolderDeleted::dispatch($this);
 
         return $this;
+    }
+
+    /**
+     * Rename the folder.
+     *
+     * @param  string  $filename
+     * @return AssetFolder
+     *
+     * @throws \Exception
+     */
+    public function rename($name)
+    {
+        return $this->move(optional($this->parent())->path(), $name);
+    }
+
+    /**
+     * Move the folder to a different location.
+     *
+     * @param  string  $parent  The destination folder relative to the container.
+     * @param  string|null  $name  The new folder name, if renaming.
+     * @return AssetFolder
+     *
+     * @throws \Exception
+     */
+    public function move($parent, $name = null)
+    {
+        if (Str::startsWith($parent, $this->path())) {
+            throw new \Exception('Folder cannot be moved to its own subfolder.');
+        }
+
+        $name = $name ?? $this->basename();
+        $oldPath = $this->path();
+        $newPath = Str::removeLeft(Path::tidy($parent.'/'.$name), '/');
+
+        if ($oldPath === $newPath) {
+            return $this;
+        }
+
+        if ($this->disk()->exists($newPath)) {
+            throw new \Exception('Folder already exists.');
+        }
+
+        $folder = $this->container->assetFolder($newPath)->save();
+        $this->container()->assetFolders($oldPath)->each->move($newPath);
+        $this->container()->assets($oldPath)->each->move($newPath);
+        $this->delete();
+
+        return $folder;
     }
 
     /**
@@ -157,10 +207,10 @@ class AssetFolder implements Contract, Arrayable
     public function toArray()
     {
         return [
-            'title' => $this->title(),
-            'path' => $this->path(),
-            'parent_path' => optional($this->parent())->path(),
-            'basename' => $this->basename(),
+            'title' => (string) $this->title(),
+            'path' => (string) $this->path(),
+            'parent_path' => $this->parent() ? (string) $this->parent()->path() : null,
+            'basename' => (string) $this->basename(),
         ];
     }
 }

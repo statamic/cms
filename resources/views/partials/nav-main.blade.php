@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @section('nav-main')
     <nav class="nav-main" v-cloak>
         <div class="nav-main-inner">
@@ -5,7 +7,7 @@
                 @if ($section !== 'Top Level')
                     <h6>{{ __($section) }}</h6>
                 @endif
-                <ul>
+                <ul class="nav-section-{{ Statamic\Support\Str::slug($section) }}">
                     @foreach ($items as $item)
                         @unless ($item->view())
                             <li class="{{ $item->isActive() ? 'current' : '' }}">

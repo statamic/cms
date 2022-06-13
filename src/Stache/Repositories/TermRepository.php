@@ -9,6 +9,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
+use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 
 class TermRepository implements RepositoryContract
@@ -119,11 +120,20 @@ class TermRepository implements RepositoryContract
 
     public function entriesCount(Term $term): int
     {
-        return $this->store->store($term->taxonomyHandle())
+        $items = $this->store->store($term->taxonomyHandle())
             ->index('associations')
             ->items()
-            ->where('value', $term->slug())
-            ->count();
+            ->where('value', $term->slug());
+
+        if ($term instanceof LocalizedTerm) {
+            $items = $items->where('site', $term->locale());
+        }
+
+        if ($collection = $term->collection()) {
+            $items = $items->where('collection', $collection->handle());
+        }
+
+        return $items->count();
     }
 
     protected function ensureAssociations()

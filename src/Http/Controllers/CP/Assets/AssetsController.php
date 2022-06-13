@@ -91,18 +91,7 @@ class AssetsController extends CpController
 
         // TODO: Auth
 
-        $file = $asset->path();
-
-        $filesystem = $asset->disk()->filesystem()->getDriver();
-        $stream = $filesystem->readStream($file);
-
-        return response()->stream(function () use ($stream) {
-            fpassthru($stream);
-        }, 200, [
-            'Content-Type' => $filesystem->getMimetype($file),
-            'Content-Length' => $filesystem->getSize($file),
-            'Content-disposition' => 'attachment; filename="'.basename($file).'"',
-        ]);
+        return $asset->download();
     }
 
     public function destroy($asset)

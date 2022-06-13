@@ -30,6 +30,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\SendPasswordReset::class,
         Actions\MoveAsset::class,
         Actions\RenameAsset::class,
+        Actions\MoveAssetFolder::class,
+        Actions\RenameAssetFolder::class,
     ];
 
     protected $fieldtypes = [
@@ -43,6 +45,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
         Fieldtypes\CollectionRoutes::class,
+        Fieldtypes\CollectionTitleFormats::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
@@ -130,6 +133,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Dd::class,
         Tags\Dump::class,
         Tags\GetContent::class,
+        Tags\GetError::class,
+        Tags\GetErrors::class,
         Tags\GetFiles::class,
         Tags\Glide::class,
         Tags\In::class,

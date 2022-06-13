@@ -39,6 +39,7 @@ last_modified: $timestamp
 width: 30
 height: 60
 mime_type: image/jpeg
+duration: null
 
 EOT;
         $this->assertEquals($contents, $disk->get($path));

@@ -5,21 +5,21 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
-                    <svg-icon class="text-grey-70 mr-1 flex-none" :name="field.icon" v-tooltip="tooltipText" />
+                    <svg-icon class="text-grey-80 mr-1 h-4 w-4 flex-none" :name="field.icon" v-tooltip="tooltipText" default="generic-field" />
                     <a class="break-all" v-text="labelText" @click="$emit('edit')" />
-                    <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
+                    <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="flex-none pr-1 flex">
                     <width-selector v-model="width" class="mr-1" />
                     <button v-if="canDefineLocalizable"
-                        class="hover:text-grey-100 mr-1"
+                        class="hover:text-grey-100 mr-1 flex items-center"
                         :class="{ 'text-grey-100': localizable, 'text-grey-60': !localizable }"
                         v-tooltip="__('Localizable')"
                         @click="localizable = !localizable"
                     >
-                        <svg-icon name="earth" />
+                        <svg-icon name="earth" class="h-4 w-4" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100"><svg-icon name="trash" /></button>
+                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100 flex items-center"><svg-icon name="trash" class="h-4 w-4" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"

@@ -97,8 +97,17 @@ class ComposerLockTest extends TestCase
     {
         PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
 
-        $this->assertTrue(Lock::file()->isInstalled('package/one'));
-        $this->assertFalse(Lock::file()->isInstalled('package/two'));
+        $this->assertTrue(Lock::file()->isPackageInstalled('package/one'));
+        $this->assertFalse(Lock::file()->isDevPackageInstalled('package/one'));
+    }
+
+    /** @test */
+    public function it_can_check_if_package_is_installed_as_dev_dependency()
+    {
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath, true);
+
+        $this->assertTrue(Lock::file()->isPackageInstalled('package/one'));
+        $this->assertTrue(Lock::file()->isDevPackageInstalled('package/one'));
     }
 
     /** @test */

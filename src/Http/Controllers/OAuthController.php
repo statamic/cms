@@ -26,7 +26,7 @@ class OAuthController
 
         session()->put('oauth-provider', $provider);
 
-        Auth::login($user, true);
+        Auth::login($user, config('statamic.oauth.remember_me', true));
 
         return redirect()->to($this->successRedirectUrl());
     }

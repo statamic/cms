@@ -28,18 +28,27 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
-    Route::group(['namespace' => 'Structures'], function () {
+    Route::group(['namespace' => 'Navigation'], function () {
         Route::resource('navigation', 'NavigationController');
-        Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
+
+        Route::get('navigation/{navigation}/blueprint', 'NavigationBlueprintController@edit')->name('navigation.blueprint.edit');
+        Route::patch('navigation/{navigation}/blueprint', 'NavigationBlueprintController@update')->name('navigation.blueprint.update');
+        Route::get('navigation/{navigation}/tree', 'NavigationTreeController@index')->name('navigation.tree.index');
+        Route::patch('navigation/{navigation}/tree', 'NavigationTreeController@update')->name('navigation.tree.update');
+        Route::post('navigation/{navigation}/pages', 'NavigationPagesController@update')->name('navigation.pages.update');
+        Route::get('navigation/{navigation}/pages/create', 'NavigationPagesController@create')->name('navigation.pages.create');
+        Route::get('navigation/{navigation}/pages/{edit}/edit', 'NavigationPagesController@edit')->name('navigation.pages.edit');
     });
 
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
-        Route::post('collections/{collection}/structure', 'CollectionStructureController@update')->name('collections.structure.update');
         Route::get('collections/{collection}/scaffold', 'ScaffoldCollectionController@index')->name('collections.scaffold');
         Route::post('collections/{collection}/scaffold', 'ScaffoldCollectionController@create')->name('collections.scaffold.create');
         Route::resource('collections.blueprints', 'CollectionBlueprintsController');
         Route::post('collections/{collection}/blueprints/reorder', 'ReorderCollectionBlueprintsController')->name('collections.blueprints.reorder');
+
+        Route::get('collections/{collection}/tree', 'CollectionTreeController@index')->name('collections.tree.index');
+        Route::patch('collections/{collection}/tree', 'CollectionTreeController@update')->name('collections.tree.update');
 
         Route::group(['prefix' => 'collections/{collection}/entries'], function () {
             Route::get('/', 'EntriesController@index')->name('collections.entries.index');
@@ -50,7 +59,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
             Route::post('{site}', 'EntriesController@store')->name('collections.entries.store');
 
-            Route::group(['prefix' => '{entry}/{slug}'], function () {
+            Route::group(['prefix' => '{entry}'], function () {
                 Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
                 Route::post('publish', 'PublishedEntriesController@store')->name('collections.entries.published.store');
                 Route::post('unpublish', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
@@ -133,6 +142,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::resource('assets', 'AssetsController')->parameters(['assets' => 'encoded_asset']);
         Route::get('assets/{encoded_asset}/download', 'AssetsController@download')->name('assets.download');
         Route::get('thumbnails/{encoded_asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
+        Route::get('svgs/{encoded_asset}', 'SvgController@show')->name('assets.svgs.show');
+        Route::get('pdfs/{encoded_asset}', 'PdfController@show')->name('assets.pdfs.show');
     });
 
     Route::group(['prefix' => 'fields', 'namespace' => 'Fields'], function () {
@@ -141,8 +152,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('update', 'FieldsController@update')->name('fields.update');
         Route::get('field-meta', 'MetaController@show');
         Route::resource('fieldsets', 'FieldsetController');
-        Route::post('fieldsets/quick', 'FieldsetController@quickStore');
-        Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
         Route::get('blueprints', 'BlueprintController@index')->name('blueprints.index');
         Route::get('fieldtypes', 'FieldtypesController@index');
     });
@@ -205,7 +214,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');
-        Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
+        Route::post('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
         Route::get('relationship/filters', 'RelationshipFieldtypeController@filters')->name('relationship.filters');
         Route::post('markdown', 'MarkdownFieldtypeController@preview')->name('markdown.preview');
     });

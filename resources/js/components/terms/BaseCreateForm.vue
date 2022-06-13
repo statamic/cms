@@ -42,7 +42,7 @@ export default {
     methods: {
 
         saved(response) {
-            window.location = response.data.data.redirect + '?created=true';
+            window.location = response.data.data.edit_url + '?created=true';
         }
 
     }

@@ -13,7 +13,7 @@ class Subscriber
     /**
      * Register the listeners for the subscriber.
      *
-     * @param \Illuminate\Events\Dispatcher $events
+     * @param  \Illuminate\Events\Dispatcher  $events
      */
     public function subscribe($events)
     {
@@ -25,7 +25,7 @@ class Subscriber
     /**
      * Commit changes.
      *
-     * @param mixed $event
+     * @param  mixed  $event
      */
     public function commit($event)
     {
@@ -53,7 +53,7 @@ class Subscriber
     /**
      * Check if event is ignored.
      *
-     * @param mixed $event
+     * @param  mixed  $event
      * @return bool
      */
     protected function eventIsIgnored($event)

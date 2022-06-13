@@ -79,7 +79,7 @@ class User extends BaseUser
     /**
      * Get or set a user's email.
      *
-     * @param string|null $email
+     * @param  string|null  $email
      * @return mixed
      */
     public function email($email = null)
@@ -90,7 +90,7 @@ class User extends BaseUser
     /**
      * Get or set a user's password.
      *
-     * @param string|null $password
+     * @param  string|null  $password
      * @return string
      */
     public function password($password = null)
@@ -145,7 +145,7 @@ class User extends BaseUser
     /**
      * Set the token value for the "remember me" session.
      *
-     * @param  string $value
+     * @param  string  $value
      * @return void
      */
     public function setRememberToken($token)
@@ -331,8 +331,8 @@ class User extends BaseUser
     /**
      * Get a value from the user's meta YAML file.
      *
-     * @param  string $key
-     * @param  mixed $default
+     * @param  string  $key
+     * @param  mixed  $default
      * @return mixed
      */
     public function getMeta($key, $default = null)
@@ -345,8 +345,8 @@ class User extends BaseUser
     /**
      * Write to the user's meta YAML file.
      *
-     * @param  string $key
-     * @param  mixed $value
+     * @param  string  $key
+     * @param  mixed  $value
      * @return void
      */
     public function setMeta($key, $value)
@@ -375,5 +375,10 @@ class User extends BaseUser
             'password_hash' => $this->password(),
             'preferences' => $this->preferences(),
         ])->all();
+    }
+
+    public function fresh()
+    {
+        return Facades\User::find($this->id);
     }
 }

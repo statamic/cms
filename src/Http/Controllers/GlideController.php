@@ -35,8 +35,8 @@ class GlideController extends Controller
     /**
      * GlideController constructor.
      *
-     * @param \League\Glide\Server     $server
-     * @param \Illuminate\Http\Request $request
+     * @param  \League\Glide\Server  $server
+     * @param  \Illuminate\Http\Request  $request
      */
     public function __construct(Server $server, Request $request)
     {
@@ -48,7 +48,7 @@ class GlideController extends Controller
     /**
      * Generate a manipulated image by a path.
      *
-     * @param string $path
+     * @param  string  $path
      * @return mixed
      */
     public function generateByPath($path)
@@ -69,7 +69,7 @@ class GlideController extends Controller
     /**
      * Generate a manipulated image by a URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return mixed
      */
     public function generateByUrl($url)
@@ -84,8 +84,9 @@ class GlideController extends Controller
     /**
      * Generate a manipulated image by an asset reference.
      *
-     * @param string $ref
+     * @param  string  $ref
      * @return mixed
+     *
      * @throws \Exception
      */
     public function generateByAsset($encoded)
@@ -97,9 +98,9 @@ class GlideController extends Controller
         // The string before the first slash is the container
         [$container, $path] = explode('/', $decoded, 2);
 
-        $asset = AssetContainer::find($container)->asset($path);
+        throw_unless($container = AssetContainer::find($container), new NotFoundHttpException);
 
-        throw_unless($asset, new NotFoundHttpException);
+        throw_unless($asset = $container->asset($path), new NotFoundHttpException);
 
         return $this->createResponse($this->generateBy('asset', $asset));
     }
@@ -125,7 +126,7 @@ class GlideController extends Controller
     /**
      * Create a response.
      *
-     * @param string $path  Path of the generated image
+     * @param  string  $path  Path of the generated image
      * @return mixed
      */
     private function createResponse($path)
@@ -148,7 +149,7 @@ class GlideController extends Controller
         $path = Str::after($this->request->url(), Site::current()->absoluteUrl());
 
         try {
-            SignatureFactory::create(Config::getAppKey())->validateRequest($path, $_GET);
+            SignatureFactory::create(Config::getAppKey())->validateRequest($path, $this->request->query->all());
         } catch (SignatureException $e) {
             abort(400, $e->getMessage());
         }

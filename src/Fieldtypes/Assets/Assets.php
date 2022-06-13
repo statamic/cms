@@ -9,6 +9,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Assets extends Fieldtype
@@ -24,7 +25,7 @@ class Assets extends Fieldtype
                 'display' => __('Mode'),
                 'instructions' => __('statamic::fieldtypes.assets.config.mode'),
                 'type' => 'select',
-                'default' => 'grid',
+                'default' => 'list',
                 'options' => [
                     'grid' => __('Grid'),
                     'list' => __('List'),
@@ -59,9 +60,17 @@ class Assets extends Fieldtype
                 'default' => true,
                 'width' => 50,
             ],
+            'show_filename' => [
+                'display' => __('Show Filename'),
+                'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'max_files' => [
                 'display' => __('Max Files'),
                 'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
+                'min' => 1,
                 'type' => 'integer',
                 'width' => 50,
             ],
@@ -172,8 +181,25 @@ class Assets extends Fieldtype
 
     public function fieldRules()
     {
-        return collect(parent::fieldRules())->map(function ($rule) {
-            return AssetRule::makeFromRule($rule);
+        $classes = [
+            'dimensions' => DimensionsRule::class,
+            'image' => ImageRule::class,
+            'max_filesize' => MaxRule::class,
+            'mimes' => MimesRule::class,
+            'mimetypes' => MimetypesRule::class,
+            'min_filesize' => MinRule::class,
+        ];
+
+        return collect(parent::fieldRules())->map(function ($rule) use ($classes) {
+            $name = Str::before($rule, ':');
+
+            if ($class = Arr::get($classes, $name)) {
+                $parameters = explode(',', Str::after($rule, ':'));
+
+                return new $class($parameters);
+            }
+
+            return $rule;
         })->all();
     }
 
@@ -191,6 +217,7 @@ class Assets extends Fieldtype
             $arr = [
                 'id' => $asset->id(),
                 'is_image' => $isImage = $asset->isImage(),
+                'extension' => $asset->extension(),
                 'url' => $asset->url(),
             ];
 

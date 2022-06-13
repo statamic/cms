@@ -241,6 +241,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return URL::makeRelative($this->absoluteUrl());
     }
 
+    public function urlWithoutRedirect()
+    {
+        return $this->url();
+    }
+
     public function absoluteUrl()
     {
         return URL::tidy(Site::current()->absoluteUrl().$this->uri());

@@ -49,7 +49,7 @@ class Rotate extends Tags
      * Expand switch values with : colon syntax to let you set the
      * number of times you want a specific value repeated.
      *
-     * @param array $values
+     * @param  array  $values
      * @return array
      */
     private function expand($values)

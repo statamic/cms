@@ -56,6 +56,7 @@ class Manifest extends PackageManifest
             'editions' => $statamic['editions'] ?? [],
             'marketplaceId' => data_get($marketplaceData, 'id', null),
             'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
+            'marketplaceUrl' => data_get($marketplaceData, 'url', null),
             'marketplaceSellerSlug' => data_get($marketplaceData, 'seller', null),
             'latestVersion' => data_get($marketplaceData, 'latest_version', null),
             'version' => Str::removeLeft($package['version'], 'v'),

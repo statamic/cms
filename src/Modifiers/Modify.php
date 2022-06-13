@@ -31,7 +31,7 @@ class Modify implements \IteratorAggregate
     /**
      * Invoke the class as a function.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return \Statamic\Modifiers\Modify
      */
     public function __invoke($value)
@@ -42,7 +42,7 @@ class Modify implements \IteratorAggregate
     /**
      * Specify a value to start the modification chain.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return \Statamic\Modifiers\Modify
      */
     public static function value($value)
@@ -57,7 +57,7 @@ class Modify implements \IteratorAggregate
     /**
      * Set the context.
      *
-     * @param array $context
+     * @param  array  $context
      * @return $this
      */
     public function context($context)
@@ -81,6 +81,7 @@ class Modify implements \IteratorAggregate
      * Get the value as a string.
      *
      * @return string
+     *
      * @throws \Statamic\Modifiers\ModifierException
      */
     public function __toString()
@@ -98,8 +99,10 @@ class Modify implements \IteratorAggregate
      * Get the value as an array.
      *
      * @return \Traversable
+     *
      * @throws \Statamic\Modifiers\ModifierException
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         if (! is_array($this->value)) {
@@ -115,8 +118,8 @@ class Modify implements \IteratorAggregate
     /**
      * Allow calls to modifiers via method names.
      *
-     * @param  string $method Modifier name
-     * @param  array  $args   Any parameters as arguments
+     * @param  string  $method  Modifier name
+     * @param  array  $args  Any parameters as arguments
      * @return $this
      */
     public function __call($method, $args)
@@ -129,9 +132,10 @@ class Modify implements \IteratorAggregate
     /**
      * Modify a value.
      *
-     * @param string $modifier
-     * @param array  $params
+     * @param  string  $modifier
+     * @param  array  $params
      * @return mixed
+     *
      * @throws \Statamic\Exceptions\ModifierException
      */
     public function modify($modifier, $params = [])
@@ -170,9 +174,10 @@ class Modify implements \IteratorAggregate
      * rather than a million separate files. First, we'll check there
      * then attempt to load a modifier in a regular addon location.
      *
-     * @param string $modifier
-     * @param array $params
+     * @param  string  $modifier
+     * @param  array  $params
      * @return mixed
+     *
      * @throws \Exception
      */
     protected function runModifier($modifier, $params)

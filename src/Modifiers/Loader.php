@@ -9,7 +9,7 @@ class Loader
     /**
      * Loads a modifier.
      *
-     * @return array  The class, and the method to be called.
+     * @return array The class, and the method to be called.
      */
     public function load($name)
     {

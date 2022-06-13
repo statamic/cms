@@ -7,7 +7,7 @@ trait RendersAttributes
     /**
      * Render HTML attributes.
      *
-     * @param array $attributes
+     * @param  array  $attributes
      * @return string
      */
     protected function renderAttributes($attributes)
@@ -31,7 +31,7 @@ trait RendersAttributes
     /**
      * Render HTML attributes from rest of tag params, except for specifically known params.
      *
-     * @param array $knownTagParams
+     * @param  array  $knownTagParams
      * @return string
      */
     protected function renderAttributesFromParams($knownTagParams = [])

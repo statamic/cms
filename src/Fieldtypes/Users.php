@@ -30,6 +30,7 @@ class Users extends Relationship
                 'display' => __('Max Items'),
                 'instructions' => __('statamic::messages.max_items_instructions'),
                 'type' => 'integer',
+                'min' => 1,
             ],
             'mode' => [
                 'display' => __('Mode'),
@@ -115,6 +116,11 @@ class Users extends Relationship
     protected function augmentValue($value)
     {
         return User::find($value);
+    }
+
+    protected function shallowAugmentValue($value)
+    {
+        return $value->toShallowAugmentedCollection();
     }
 
     protected function getCreateItemUrl()

@@ -17,7 +17,7 @@ interface Submission extends Arrayable
     /**
      * Get or set the form.
      *
-     * @param Form|null $form
+     * @param  Form|null  $form
      * @return Form
      */
     public function form($form = null);
@@ -46,7 +46,7 @@ interface Submission extends Arrayable
     /**
      * Get or set the data.
      *
-     * @param array|null $data
+     * @param  array|null  $data
      * @return array
      */
     public function data($data = null);
@@ -54,7 +54,7 @@ interface Submission extends Arrayable
     /**
      * Get a value of a field.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return mixed
      */
     public function get($field);
@@ -62,8 +62,8 @@ interface Submission extends Arrayable
     /**
      * Set a value of a field.
      *
-     * @param string $field
-     * @param mixed $value
+     * @param  string  $field
+     * @param  mixed  $value
      * @return void
      */
     public function set($field, $value);
@@ -71,7 +71,7 @@ interface Submission extends Arrayable
     /**
      * Delete submission.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return mixed
      */
     public function delete();

@@ -15,7 +15,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
     protected $options;
 
     /**
-     * @param array $options
+     * @param  array  $options
      */
     public function __construct(array $options = [])
     {
@@ -25,10 +25,11 @@ class GlideUrlBuilder extends ImageUrlBuilder
     /**
      * Build the URL.
      *
-     * @param \Statamic\Contracts\Assets\Asset|string $item
-     * @param array                                   $params
-     * @param string|null                             $filename
+     * @param  \Statamic\Contracts\Assets\Asset|string  $item
+     * @param  array  $params
+     * @param  string|null  $filename
      * @return string
+     *
      * @throws \Exception
      */
     public function build($item, $params, $filename = null)

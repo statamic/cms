@@ -9,6 +9,10 @@ use Statamic\Support\Html;
 
 class Markdown extends Fieldtype
 {
+    protected $categories = ['text'];
+
+    use Concerns\ResolvesStatamicUrls;
+
     protected function configFieldItems(): array
     {
         return [
@@ -16,6 +20,7 @@ class Markdown extends Fieldtype
                 'display' => __('Container'),
                 'instructions' => __('statamic::fieldtypes.markdown.config.container'),
                 'type' => 'asset_container',
+                'mode' => 'select',
                 'max_items' => 1,
                 'width' => 50,
             ],
@@ -111,6 +116,8 @@ class Markdown extends Fieldtype
         if ($this->config('smartypants')) {
             $markdown = $markdown->withSmartPunctuation();
         }
+
+        $value = $this->resolveStatamicUrls($value);
 
         $html = $markdown->parse((string) $value);
 

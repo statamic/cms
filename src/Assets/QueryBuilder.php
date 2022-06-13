@@ -35,24 +35,23 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
     protected function getKeysFromContainersWithWheres($containers, $wheres)
     {
         return collect($wheres)->reduce(function ($ids, $where) use ($containers) {
-            // Get a single array comprised of the items from the same index across all containers.
-            $items = collect($containers)->flatMap(function ($collection) use ($where) {
-                return $this->store->store($collection)
-                    ->index($where['column'])->items()
-                    ->mapWithKeys(function ($item, $key) use ($collection) {
-                        return ["{$collection}::{$key}" => $item];
-                    });
-            });
+            $keys = $where['type'] == 'Nested'
+                ? $this->getKeysFromContainersWithWheres($containers, $where['query']->wheres)
+                : $this->getKeysFromContainersWithWhere($containers, $where);
 
-            // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $method = 'filterWhere'.$where['type'];
-            $keys = $this->{$method}($items, $where)->keys();
-
-            // Continue intersecting the keys across the where clauses.
-            // If a key exists in the reduced array but not in the current iteration, it should be removed.
-            // On the first iteration, there's nothing to intersect, so just use the result as a starting point.
-            return $ids ? $ids->intersect($keys)->values() : $keys;
+            return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
+    }
+
+    protected function getKeysFromContainersWithWhere($containers, $where)
+    {
+        $items = collect($containers)->flatMap(function ($collection) use ($where) {
+            return $this->getWhereColumnKeysFromStore($collection, $where);
+        });
+
+        $method = 'filterWhere'.$where['type'];
+
+        return $this->{$method}($items, $where)->keys();
     }
 
     protected function getOrderKeyValuesByIndex()
@@ -93,7 +92,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
             : Facades\AssetContainer::find($this->container);
     }
 
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column === 'container') {
             throw_if($this->container, new Exception('Only one asset container may be queried.'));
@@ -102,11 +101,22 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
             return $this;
         }
 
-        return parent::where($column, $operator, $value);
+        return parent::where($column, $operator, $value, $boolean);
     }
 
     protected function collect($items = [])
     {
         return AssetCollection::make($items);
+    }
+
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        $container = $this->getContainer()->handle();
+
+        $items = collect([$container])->flatMap(function ($collection) use ($column) {
+            return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
+        });
+
+        return $items;
     }
 }

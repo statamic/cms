@@ -14,11 +14,25 @@ class AugmentedTestCase extends TestCase
 
     protected function assertAugmentedCorrectly($expectations, $augmented)
     {
+        $this->assertAllKeysAreAugmented($expectations, $augmented);
+        $this->assertAugmentedAsExpected($expectations, $augmented);
+    }
+
+    protected function assertSubsetAugmentedCorrectly($expectations, $augmented)
+    {
+        $this->assertAugmentedAsExpected($expectations, $augmented);
+    }
+
+    private function assertAllKeysAreAugmented($expectations, $augmented)
+    {
         $this->assertEquals(
             collect($expectations)->keys()->sort()->values()->all(),
             $augmented->keys()
         );
+    }
 
+    private function assertAugmentedAsExpected($expectations, $augmented)
+    {
         foreach ($expectations as $key => $expectation) {
             $actual = $augmented->get($key);
 
@@ -29,6 +43,15 @@ class AugmentedTestCase extends TestCase
             switch ($expectation['type']) {
                 case Value::class:
                     $this->assertSame($expectation['value'], $actual->value(), "Key '{$key}' does not match expected value.");
+
+                    if (isset($expectation['fieldtype'])) {
+                        $this->assertEquals(
+                            $expectation['fieldtype'],
+                            $actual->fieldtype()->handle(),
+                            "Key '{$key}' does not have the expected fieldtype."
+                        );
+                    }
+
                     break;
 
                 case Carbon::class:

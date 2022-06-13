@@ -3,6 +3,7 @@
 namespace Tests\API;
 
 use Statamic\Facades;
+use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -47,17 +48,22 @@ class APITest extends TestCase
         Facades\Config::set('statamic.api.resources.collections', true);
 
         Facades\Collection::make('pages')->structureContents(['root' => true])->save();
+
+        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
+        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
+
         Facades\Collection::find('pages')->structure()->makeTree('en', [
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
         ])->save();
 
-        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
-        Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
-        Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
-
         $this->assertEndpointDataCount('/api/collections/pages/tree', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[status:is]=published', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[status:is]=draft', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[published:is]=true', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/tree?filter[published:is]=false', 2);
     }
 
     /** @test */
@@ -95,6 +101,7 @@ class APITest extends TestCase
             ['entry' => 'one'],
             ['entry' => 'two'],
             ['entry' => 'three'],
+            ['title' => 'Balki Bartokomous'],
         ])->save();
         $nav->save();
 
@@ -102,7 +109,78 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('two')->slug('two')->published(false)->save();
         Facades\Entry::make()->collection('pages')->id('three')->slug('three')->published(false)->save();
 
-        $this->assertEndpointDataCount('/api/navs/footer/tree', 1);
+        $this->assertEndpointDataCount('/api/navs/footer/tree', 2);
+    }
+
+    /** @test */
+    public function it_excludes_keys()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Config::set('statamic.api.cache', false);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(true)->save();
+
+        $apiUrl = 'http://localhost/api/collections/pages/entries/dance';
+        $editUrl = 'http://localhost/cp/collections/pages/entries/dance';
+
+        $this
+            ->get('/api/collections/pages/entries')
+            ->assertJsonPath('data.0.api_url', $apiUrl)
+            ->assertJsonPath('data.0.edit_url', $editUrl);
+
+        $this
+            ->get('/api/collections/pages/entries/dance')
+            ->assertJsonPath('data.api_url', $apiUrl)
+            ->assertJsonPath('data.edit_url', $editUrl);
+
+        Facades\Config::set('statamic.api.excluded_keys', ['api_url', 'edit_url']);
+
+        $this
+            ->get('/api/collections/pages/entries')
+            ->assertJsonPath('data.0.api_url', null)
+            ->assertJsonPath('data.0.edit_url', null);
+
+        $this
+            ->get('/api/collections/pages/entries/dance')
+            ->assertJsonPath('data.api_url', null)
+            ->assertJsonPath('data.edit_url', null);
+    }
+
+    /**
+     * @test
+     * @dataProvider userPasswordFilterProvider
+     */
+    public function it_doesnt_allow_filtering_users_by_password($filter)
+    {
+        Facades\Config::set('statamic.api.resources.users', true);
+
+        User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
+        User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
+
+        $this
+              ->get("/api/users?filter[{$filter}]=abc")
+              ->assertJson([
+                  'data' => [
+                      ['id' => 'one'],
+                      ['id' => 'two'], // this one would be filtered out if the password was allowed
+                  ],
+              ]);
+    }
+
+    public function userPasswordFilterProvider()
+    {
+        return collect([
+            'password',
+            'password:is',
+            'password:regex',
+            'password_hash',
+            'password_hash:is',
+            'password_hash:regex',
+        ])->mapWithKeys(function ($filter) {
+            return [$filter => [$filter]];
+        })->all();
     }
 
     private function assertEndpointDataCount($endpoint, $count)

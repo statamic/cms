@@ -44,8 +44,8 @@ class Preferences
     /**
      * Get preference off user or role, respecting the precedence setup in `all()`.
      *
-     * @param mixed $key
-     * @param mixed $fallback
+     * @param  mixed  $key
+     * @param  mixed  $fallback
      * @return mixed
      */
     public function get($key, $fallback = null)

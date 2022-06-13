@@ -2,7 +2,7 @@
     <div class="flex items-center">
 
         <!-- Link type selector -->
-        <div class="w-48 mr-2">
+        <div class="w-40 mr-2">
             <v-select
                 v-model="option"
                 :options="options"
@@ -32,6 +32,18 @@
                 @meta-updated="meta.entry.meta = $event"
             />
 
+            <!-- Asset select -->
+            <assets-fieldtype
+                v-if="option === 'asset'"
+                ref="assets"
+                handle="asset"
+                :value="selectedAssets"
+                :config="meta.asset.config"
+                :meta="meta.asset.meta"
+                @input="assetsSelected"
+                @meta-updated="meta.asset.meta = $event"
+            />
+
         </div>
     </div>
 </template>
@@ -44,10 +56,12 @@ export default {
     data() {
 
         return {
-            option: null,
-            options: [],
-            urlValue: null,
-            selectedEntries: [],
+            option: this.meta.initialOption,
+            options: this.initialOptions(),
+            urlValue: this.meta.initialUrl,
+            selectedEntries: this.meta.initialSelectedEntries,
+            selectedAssets: this.meta.initialSelectedAssets,
+            metaChanging: false,
         }
 
     },
@@ -58,6 +72,12 @@ export default {
             return this.selectedEntries.length
                 ? `entry::${this.selectedEntries[0]}`
                 : null
+        },
+
+        assetValue() {
+            return this.selectedAssets.length
+                ? `asset::${this.selectedAssets[0]}`
+                : null
         }
 
     },
@@ -65,10 +85,12 @@ export default {
     watch: {
 
         option(option, oldOption) {
+            if (this.metaChanging) return;
+
             if (option === null) {
                 this.update(null);
             } else if (option === 'url') {
-                this.update(this.urlValue);
+                this.updateDebounced(this.urlValue);
             } else if (option === 'first-child') {
                 this.update('@child');
             } else if (option === 'entry') {
@@ -77,32 +99,30 @@ export default {
                 } else {
                     setTimeout(() => this.$refs.entries.linkExistingItem(), 0);
                 }
+            } else if (option === 'asset') {
+                if (this.assetValue) {
+                    this.update(this.assetValue);
+                } else {
+                    setTimeout(() => this.$refs.assets.openSelector(), 0);
+                }
             }
         },
 
         urlValue(url) {
+            if (this.metaChanging) return;
+
             this.update(url);
+        },
+
+        meta(meta) {
+            this.metaChanging = true;
+            this.urlValue = meta.initialUrl;
+            this.option = meta.initialOption;
+            this.selectedEntries = meta.initialSelectedEntries;
+            this.selectedAssets = meta.initialSelectedAssets;
+            this.$nextTick(() => this.metaChanging = false);
         }
 
-    },
-
-    created() {
-        this.options = this.initialOptions();
-
-        if (! this.value) {
-            this.option = this.config.required ? 'url' : null;
-            return;
-        }
-
-        if (this.value === '@child') {
-            this.option = 'first-child';
-        } else if (this.value.startsWith('entry::')) {
-            this.option = 'entry';
-            this.selectedEntries = [this.value.substr(7)];
-        } else {
-            this.option = 'url';
-            this.urlValue = this.value;
-        }
     },
 
     methods: {
@@ -120,7 +140,11 @@ export default {
                     ? { label: __('First Child'), value: 'first-child' }
                     : null,
 
-                { label: __('Entry'), value: 'entry' }
+                { label: __('Entry'), value: 'entry' },
+
+                this.meta.showAssetOption
+                    ? { label: __('Asset'), value: 'asset' }
+                    : null,
 
             ].filter(option => option);
         },
@@ -128,6 +152,11 @@ export default {
         entriesSelected(entries) {
             this.selectedEntries = entries;
             this.update(this.entryValue);
+        },
+
+        assetsSelected(assets) {
+            this.selectedAssets = assets;
+            this.update(this.assetValue);
         }
 
     }

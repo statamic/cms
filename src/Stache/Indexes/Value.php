@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Indexes;
 
+use Statamic\Query\ResolveValue;
 use Statamic\Support\Str;
 
 class Value extends Index
@@ -30,14 +31,6 @@ class Value extends Index
             return $item->value('authors');
         }
 
-        if (method_exists($item, $method)) {
-            return $item->{$method}();
-        }
-
-        if (method_exists($item, 'value')) {
-            return $item->value($this->name);
-        }
-
-        return $item->get($this->name);
+        return (new ResolveValue)($item, $this->name);
     }
 }

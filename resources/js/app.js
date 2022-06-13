@@ -1,11 +1,13 @@
 import Vue from 'vue';
 import Toast from './mixins/Toast.js';
 import Statamic from './components/Statamic.js';
+import Alpine from 'alpinejs'
 
 Vue.config.silent = false;
 Vue.config.devtools = true;
 Vue.config.productionTip = false
 
+window.Alpine = Alpine
 window.Vue = Vue;
 window.Statamic = Statamic;
 window._ = require('underscore');
@@ -23,7 +25,6 @@ require('./bootstrap/components');
 require('./bootstrap/fieldtypes');
 require('./bootstrap/directives');
 
-// import Wizard from './mixins/Wizard.js';
 import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
@@ -54,6 +55,8 @@ Statamic.booting(Statamic => {
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
 });
+
+Alpine.start()
 
 Vue.prototype.$axios = axios;
 Vue.prototype.$events = new Vue();
@@ -188,8 +191,12 @@ Statamic.app({
         window.moment.locale(Statamic.$config.get('locale'));
         Vue.moment.locale(Statamic.$config.get('locale'));
         Vue.prototype.$moment.locale(Statamic.$config.get('locale'));
-        
+
         this.fixAutofocus();
+
+        this.showBanner = Statamic.$config.get('hasLicenseBanner');
+
+        this.$toast.intercept();
     },
 
     created() {
@@ -225,13 +232,10 @@ Statamic.app({
                 const inputs = document.querySelectorAll('input[autofocus]');
                 for (let input of inputs) {
                     input.blur();
-                    input.focus();    
+                    input.focus();
                 }
             }, 0);
         }
     }
 
 });
-
-// TODO: Drag events
-// TODO: Live Preview

@@ -1,9 +1,11 @@
 <template>
 
     <slugify
+        ref="slugify"
         :enabled="generate"
         :from="source"
         :separator="separator"
+        :language="language"
         v-model="slug"
     >
         <text-fieldtype
@@ -59,6 +61,11 @@ export default {
             const field = this.config.from || 'title';
 
             return this.$store.state.publish[this.store].values[field];
+        },
+
+        language() {
+            const targetSite = this.$store.state.publish[this.store].site;
+            return targetSite ? Statamic.$config.get('sites').find(site => site.handle === targetSite).lang : null;
         }
 
     },
@@ -70,7 +77,27 @@ export default {
         },
 
         slug(slug) {
-            this.update(slug);
+            this.updateDebounced(slug);
+        }
+
+    },
+
+    created() {
+        this.$events.$on('localization.created', this.handleLocalizationCreated);
+    },
+
+    destroyed() {
+        this.$events.$off('localization.created', this.handleLocalizationCreated);
+    },
+
+    methods: {
+
+        handleLocalizationCreated({ store }) {
+            // Only reset for the "slug" field in the matching store.
+            // Other slug fields that aren't named "slug" should be left alone.
+            if (this.handle === 'slug' && store === this.store) {
+                this.$refs.slugify.reset();
+            }
         }
 
     }

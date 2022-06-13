@@ -4,12 +4,14 @@ namespace Statamic\Data;
 
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Fields\Value;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 abstract class AbstractAugmented implements Augmented
 {
     protected $data;
+    protected $blueprintFields;
 
     public function __construct($data)
     {
@@ -30,7 +32,7 @@ abstract class AbstractAugmented implements Augmented
     {
         $arr = [];
 
-        $keys = Arr::wrap($keys ?: $this->keys());
+        $keys = $this->filterKeys(Arr::wrap($keys ?: $this->keys()));
 
         foreach ($keys as $key) {
             $arr[$key] = $this->get($key);
@@ -54,6 +56,18 @@ abstract class AbstractAugmented implements Augmented
         }
 
         return $this->wrapValue($this->getFromData($handle), $handle);
+    }
+
+    protected function filterKeys($keys)
+    {
+        return array_diff($keys, $this->excludedKeys());
+    }
+
+    protected function excludedKeys()
+    {
+        return Statamic::isApiRoute()
+            ? config('statamic.api.excluded_keys', [])
+            : [];
     }
 
     private function methodExistsOnThisClass($method)
@@ -90,8 +104,12 @@ abstract class AbstractAugmented implements Augmented
 
     protected function blueprintFields()
     {
-        return (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
-            ? $blueprint->fields()->all()
-            : collect();
+        if (! isset($this->blueprintFields)) {
+            $this->blueprintFields = (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
+                ? $blueprint->fields()->all()
+                : collect();
+        }
+
+        return $this->blueprintFields;
     }
 }

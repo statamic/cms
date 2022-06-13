@@ -113,7 +113,7 @@
                                             v-if="permalink"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="external-link" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="external-link" class="w-4 h-4 mr-1" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
@@ -339,6 +339,8 @@ export default {
             permalink: this.initialPermalink,
 
             saveKeyBinding: null,
+            quickSaveKeyBinding: null,
+            quickSave: false
         }
     },
 
@@ -434,12 +436,15 @@ export default {
         },
 
         save() {
-            if (!this.canSave) return;
+            if (! this.canSave) {
+                this.quickSave = false;
+                return;
+            }
 
             this.saving = true;
             this.clearErrors();
 
-            this.runBeforeSaveHook();
+            setTimeout(() => this.runBeforeSaveHook(), 151); // 150ms is the debounce time for fieldtype updates
         },
 
         runBeforeSaveHook() {
@@ -466,7 +471,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                this.title = this.values.title;
+                this.title = response.data.data.title;
                 this.isWorkingCopy = true;
                 if (this.isBase) {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
@@ -494,13 +499,15 @@ export default {
                         return;
                     }
 
+                    let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
+
                     // If the user has opted to create another entry, redirect them to create page.
-                    if (!this.isInline && this.afterSaveOption === 'create_another') {
+                    if (!this.isInline && nextAction === 'create_another') {
                         window.location = this.createAnotherUrl;
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && this.afterSaveOption === null) {
+                    else if (!this.isInline && nextAction === null) {
                         window.location = this.listingUrl;
                     }
 
@@ -513,6 +520,8 @@ export default {
                         this.activeLocalization.status = response.data.data.status;
                         this.$nextTick(() => this.$emit('saved', response));
                     }
+
+                    this.quickSave = false;
                 }).catch(e => {});
         },
 
@@ -561,7 +570,7 @@ export default {
         },
 
         editLocalization(localization) {
-            this.$axios.get(localization.url).then(response => {
+            return this.$axios.get(localization.url).then(response => {
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
@@ -579,7 +588,7 @@ export default {
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.clearDirtyState());
+                setTimeout(() => this.$refs.container.clearDirtyState(), 150); // after any fieldtypes do a debounced update
             })
         },
 
@@ -591,7 +600,13 @@ export default {
 
             const url = this.activeLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
-                this.editLocalization(response.data);
+                this.editLocalization(response.data).then(() => {
+                    this.$events.$emit('localization.created', {store: this.publishContainer});
+
+                    if (this.originValues.published) {
+                        this.setFieldValue('published', true);
+                    }
+                });
             });
         },
 
@@ -662,9 +677,16 @@ export default {
     },
 
     mounted() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s', 'mod+return'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+return'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
+            this.save();
+        });
+
+        this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], e => {
+            e.preventDefault();
+            if (this.confirmingPublish) return;
+            this.quickSave = true;
             this.save();
         });
 
@@ -677,6 +699,7 @@ export default {
 
     destroyed() {
         this.saveKeyBinding.destroy();
+        this.quickSaveKeyBinding.destroy();
     }
 
 }

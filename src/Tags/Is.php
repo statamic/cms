@@ -10,9 +10,9 @@ class Is extends Tags
     /**
      * Maps to {{ is:[role] }}.
      *
-     * @param  string $method
-     * @param  array $args
-     * @return string
+     * @param  string  $method
+     * @param  array  $args
+     * @return string|void
      */
     public function wildcard($method)
     {

@@ -9,27 +9,32 @@ class UserQueryBuilder extends Builder
     protected function getFilteredKeys()
     {
         if (! empty($this->wheres)) {
-            return $this->getKeysWithWheres();
+            return $this->getKeysWithWheres($this->wheres);
         }
 
         return collect($this->store->paths()->keys());
     }
 
-    protected function getKeysWithWheres()
+    protected function getKeysWithWheres($wheres)
     {
-        return collect($this->wheres)->reduce(function ($ids, $where) {
-            $items = app('stache')
-                ->store('users')
-                ->index($where['column'])->items();
+        return collect($wheres)->reduce(function ($ids, $where) {
+            $keys = $where['type'] == 'Nested'
+                ? $this->getKeysWithWheres($where['query']->wheres)
+                : $this->getKeysWithWhere($where);
 
-            // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $keys = $this->filterWhereBasic($items, $where)->keys();
-
-            // Continue intersecting the keys across the where clauses.
-            // If a key exists in the reduced array but not in the current iteration, it should be removed.
-            // On the first iteration, there's nothing to intersect, so just use the result as a starting point.
-            return $ids ? $ids->intersect($keys)->values() : $keys;
+            return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
+    }
+
+    protected function getKeysWithWhere($where)
+    {
+        $items = app('stache')
+            ->store('users')
+            ->index($where['column'])->items();
+
+        $method = 'filterWhere'.$where['type'];
+
+        return $this->{$method}($items, $where)->keys();
     }
 
     protected function collect($items = [])

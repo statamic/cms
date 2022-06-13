@@ -55,7 +55,7 @@
                 class="ml-2" />
 
             <button @click="remove(index)" class="btn-close ml-1 group">
-                <svg-icon name="trash" class="w-auto group-hover:text-red" />
+                <svg-icon name="trash" class="w-4 h-4 group-hover:text-red" />
             </button>
         </div>
 

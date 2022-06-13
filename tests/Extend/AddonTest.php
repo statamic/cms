@@ -7,6 +7,7 @@ use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Collection;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Tests\TestCase;
 
 class AddonTest extends TestCase
@@ -16,7 +17,7 @@ class AddonTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->addonFixtureDir = realpath(__DIR__.'/../Fixtures/Addon').'/';
+        $this->addonFixtureDir = Path::tidy(realpath(__DIR__.'/../Fixtures/Addon').'/');
     }
 
     /** @test */

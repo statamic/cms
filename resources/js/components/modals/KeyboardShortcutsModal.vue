@@ -21,9 +21,16 @@
 
             <div class="shortcut-pair">
                 <span class="shortcut-combo">
+                    <span class="shortcut">⌘</span><span class="shortcut-joiner">+</span><span class="shortcut">return</span>
+                </span>
+                <span class="shortcut-value">{{ __('Save') }}</span>
+            </div>
+
+            <div class="shortcut-pair">
+                <span class="shortcut-combo">
                     <span class="shortcut">⌘</span><span class="shortcut-joiner">+</span><span class="shortcut">s</span>
                 </span>
-                <span class="shortcut-value">{{ __('Save Content') }}</span>
+                <span class="shortcut-value">{{ __('Quick Save') }}</span>
             </div>
 
             <div class="shortcut-pair">

@@ -17,6 +17,12 @@ class Video extends Fieldtype
                 'type' => 'text',
                 'width' => 50,
             ],
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                'type' => 'text',
+                'width' => 50,
+            ],
         ];
     }
 }

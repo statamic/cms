@@ -2,12 +2,18 @@
 
 namespace Tests\Fieldtypes;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Markdown;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class MarkdownTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     public function it_augments_to_html()
     {
@@ -124,6 +130,43 @@ EOT;
 
         $disabled = $this->fieldtype(['automatic_line_breaks' => false]);
         $this->assertEqualsTrimmed($withoutBreaks, $disabled->augment($value));
+    }
+
+    /** @test */
+    public function it_converts_statamic_asset_urls()
+    {
+        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+
+        tap(Facades\AssetContainer::make()->handle('test_container')->disk('test'))->save();
+        tap(Facades\Asset::make()->container('test_container')->path('foo/hoff.jpg'))->save();
+
+        $markdown = <<<'EOT'
+# Actual asset...
+[link](statamic://asset::test_container::foo/hoff.jpg)
+![](statamic://asset::test_container::foo/hoff.jpg)
+<img src="statamic://asset::test_container::foo/hoff.jpg" alt="Asset" />
+
+# Non-existent asset...
+[link](statamic://asset::test_container::nope.jpg)
+![](statamic://asset::test_container::nope.jpg)
+<a href="statamic://asset::test_container::nope.jpg">Asset Link</a>
+EOT;
+
+        $expected = <<<'EOT'
+<h1>Actual asset...</h1>
+<p><a href="/assets/foo/hoff.jpg">link</a>
+<img src="/assets/foo/hoff.jpg" alt="" />
+<img src="/assets/foo/hoff.jpg" alt="Asset" /></p>
+<h1>Non-existent asset...</h1>
+<p><a href="">link</a>
+<img src="" alt="" />
+<a href="">Asset Link</a></p>
+
+EOT;
+
+        $this->assertEquals($expected, $this->fieldtype()->augment($markdown));
     }
 
     private function fieldtype($config = [])

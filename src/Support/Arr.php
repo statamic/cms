@@ -11,7 +11,7 @@ class Arr extends IlluminateArr
      * Get an item from an array using "dot" or "colon" notation.
      *
      * @param  array  $array
-     * @param  string $key
+     * @param  string  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -28,7 +28,7 @@ class Arr extends IlluminateArr
      * Check if an item from an array exists using "dot" or "colon" notation.
      *
      * @param  array  $array
-     * @param  string $key
+     * @param  string  $key
      * @return bool
      */
     public static function has($array, $key)
@@ -73,8 +73,8 @@ class Arr extends IlluminateArr
     /**
      * Deep merges arrays better than array_merge_recursive().
      *
-     * @param array $array1
-     * @param array $array2
+     * @param  array  $array1
+     * @param  array  $array2
      * @return array
      */
     public static function &combineRecursive(array &$array1, &$array2)
@@ -98,8 +98,8 @@ class Arr extends IlluminateArr
     /**
      * Recusive friendly method of sanitizing an array.
      *
-     * @param array $array   The array to sanitize
-     * @param bool $antlers  Whether Antlers (curly braces) should be escaped.
+     * @param  array  $array  The array to sanitize
+     * @param  bool  $antlers  Whether Antlers (curly braces) should be escaped.
      * @return array
      */
     public static function sanitize($array, $antlers = true)
@@ -112,8 +112,8 @@ class Arr extends IlluminateArr
     /**
      * Explodes options into an array.
      *
-     * @param string  $string  String to explode
-     * @param bool $keyed  Are options keyed?
+     * @param  string  $string  String to explode
+     * @param  bool  $keyed  Are options keyed?
      * @return array
      */
     public static function explodeOptions($string, $keyed = false)
@@ -190,8 +190,8 @@ class Arr extends IlluminateArr
     /**
      * Sort an array by an array of keys.
      *
-     * @param  array  $array The array to be sorted
-     * @param  array  $order An array of keys in the order to sort the first array
+     * @param  array  $array  The array to be sorted
+     * @param  array  $order  An array of keys in the order to sort the first array
      * @return array
      */
     public static function sortByArray(array $array, array $order)
@@ -211,7 +211,7 @@ class Arr extends IlluminateArr
     /**
      * Get rid of null values. (Empty arrays, literal null values, and empty strings).
      *
-     * @param array $array
+     * @param  array  $array
      * @return array
      */
     public static function removeNullValues($data)
@@ -226,9 +226,9 @@ class Arr extends IlluminateArr
     /**
      * Get the first item from an array using a list of keys.
      *
-     * @param \ArrayAccess|array $array
-     * @param array $keys
-     * @param mixed $default
+     * @param  \ArrayAccess|array  $array
+     * @param  array  $keys
+     * @param  mixed  $default
      * @return mixed
      */
     public static function getFirst($array, $keys, $default = null)

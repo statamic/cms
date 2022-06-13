@@ -26,25 +26,41 @@
                     <div class="flex items-center justify-between">
                         <span>
                             <b class="mr-1">{{ __('Trial Mode') }}:</b>
-                            {{ __('statamic::messages.licensing_trial_mode_alert') }}
+                            @if ($licenses->onlyAddonsAreInvalid())
+                                {{ __('statamic::messages.licensing_trial_mode_alert_addons') }}
+                            @elseif ($licenses->onlyStatamicIsInvalid())
+                                {{ __('statamic::messages.licensing_trial_mode_alert_statamic') }}
+                            @else
+                                {{ __('statamic::messages.licensing_trial_mode_alert') }}
+                            @endif
                         </span>
                         <div class="flex">
                             <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
-                            <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to Your License Settings') }}">
-                                @cp_svg('arrow-right')
+                            <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
+                                {{ __('Manage Licenses') }} &rarr;
                             </a>
                             @endcan
                         </div>
                     </div>
                 @else
                     <div class="flex items-center justify-between">
-                        {{ __('statamic::messages.licensing_production_alert') }}
+                        @if ($licenses->onlyAddonsAreInvalid())
+                            {{ __('statamic::messages.licensing_production_alert_addons') }}
+                        @elseif ($licenses->onlyStatamicIsInvalid())
+                            @if ($licenses->statamicNeedsRenewal())
+                                {{ __('statamic::messages.licensing_production_alert_renew_statamic') }}
+                            @else
+                                {{ __('statamic::messages.licensing_production_alert_statamic') }}
+                            @endif
+                        @else
+                            {{ __('statamic::messages.licensing_production_alert') }}
+                        @endif
                         <div class="flex">
                             <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
-                                <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to Your License Settings') }}">
-                                    @cp_svg('arrow-right')
+                                <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
+                                    {{ __('Manage Licenses') }} &rarr;
                                 </a>
                             @endcan
                         </div>

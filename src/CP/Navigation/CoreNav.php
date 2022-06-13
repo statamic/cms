@@ -19,6 +19,7 @@ use Statamic\Facades\Role as RoleAPI;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
 use Statamic\Statamic;
@@ -50,13 +51,11 @@ class CoreNav
      */
     protected function makeTopLevel()
     {
-        Nav::topLevel('Dashboard')
-            ->route('dashboard')
-            ->icon('charts');
-
-        // Nav::topLevel('Playground')
-        //     ->route('playground')
-        //     ->icon('playground');
+        if (count(config('statamic.cp.widgets')) > 0 || config('statamic.cp.start_page') === 'dashboard') {
+            Nav::topLevel('Dashboard')
+                ->route('dashboard')
+                ->icon('charts');
+        }
 
         return $this;
     }
@@ -122,12 +121,16 @@ class CoreNav
             ->can('index', GlobalSet::class)
             ->children(function () {
                 return GlobalSetAPI::all()->sortBy->title()->map(function ($globalSet) {
-                    $globalSet = $globalSet->in(Site::selected()->handle());
+                    $localized = $globalSet->inSelectedSite();
+
+                    if (! $localized && User::current()->cant('edit', $globalSet)) {
+                        return null;
+                    }
 
                     return Nav::item($globalSet->title())
-                              ->url($globalSet->editUrl())
+                              ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
                               ->can('view', $globalSet);
-                });
+                })->filter();
             });
 
         return $this;

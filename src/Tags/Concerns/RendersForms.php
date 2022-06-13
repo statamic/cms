@@ -11,7 +11,7 @@ trait RendersForms
     /**
      * Open a form.
      *
-     * @param string $action
+     * @param  string  $action
      * @return string
      */
     protected function formOpen($action, $method = 'POST', $knownTagParams = [])
@@ -64,7 +64,7 @@ trait RendersForms
     /**
      * Get field with extra data for rendering.
      *
-     * @param \Statamic\Fields\Field $field
+     * @param  \Statamic\Fields\Field  $field
      * @return array
      */
     protected function getRenderableField($field, $errorBag = 'default')

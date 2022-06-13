@@ -101,6 +101,77 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_the_title_formats()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]]);
+
+        // A collection with no sites uses the default site.
+        $collection = new Collection;
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->titleFormats());
+        $this->assertEquals(['en' => null], $collection->titleFormats()->all());
+        $this->assertFalse($collection->autoGeneratesTitles());
+
+        $collection->titleFormats(null);
+        $this->assertFalse($collection->autoGeneratesTitles());
+
+        $return = $collection->titleFormats([
+            'en' => 'Quote by {author}',
+            'fr' => 'Citation de {author}',
+            'de' => 'Zitat vom {author}',
+        ]);
+
+        $this->assertEquals($collection, $return);
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->titleFormats());
+        $this->assertTrue($collection->autoGeneratesTitles());
+
+        // Only titleFormats corresponding to the collection's sites will be returned.
+        $this->assertEquals(['en' => 'Quote by {author}'], $collection->titleFormats()->all());
+        $this->assertEquals('Quote by {author}', $collection->titleFormat('en'));
+        $this->assertNull($collection->titleFormat('fr'));
+        $this->assertNull($collection->titleFormat('de'));
+        $this->assertNull($collection->titleFormat('unknown'));
+
+        $collection->sites(['en', 'fr']);
+
+        $this->assertEquals([
+            'en' => 'Quote by {author}',
+            'fr' => 'Citation de {author}',
+        ], $collection->titleFormats()->all());
+        $this->assertEquals('Quote by {author}', $collection->titleFormat('en'));
+        $this->assertEquals('Citation de {author}', $collection->titleFormat('fr'));
+        $this->assertNull($collection->titleFormat('de'));
+        $this->assertNull($collection->titleFormat('unknown'));
+    }
+
+    /** @test */
+    public function it_sets_all_the_title_formats_identically()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]]);
+
+        $collection = (new Collection)->sites(['en', 'fr']);
+
+        $return = $collection->titleFormats('Quote by {author}');
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals([
+            'en' => 'Quote by {author}',
+            'fr' => 'Quote by {author}',
+        ], $collection->titleFormats()->all());
+        $this->assertEquals('Quote by {author}', $collection->titleFormat('en'));
+        $this->assertEquals('Quote by {author}', $collection->titleFormat('fr'));
+        $this->assertNull($collection->titleFormat('de'));
+        $this->assertNull($collection->titleFormat('unknown'));
+    }
+
+    /** @test */
     public function it_gets_and_sets_the_template()
     {
         $collection = new Collection;
@@ -176,6 +247,19 @@ class CollectionTest extends TestCase
 
         $this->assertEquals($collection, $return);
         $this->assertEquals(['en'], $collection->sites()->all());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_propagation_setting()
+    {
+        $collection = new Collection;
+
+        $this->assertFalse($collection->propagate());
+
+        $return = $collection->propagate(true);
+
+        $this->assertEquals($collection, $return);
+        $this->assertTrue($collection->propagate());
     }
 
     /** @test */

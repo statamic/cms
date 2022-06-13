@@ -73,8 +73,8 @@ class Pattern
     /**
      * Checks to see if a given $haystack starts with a given $needle.
      *
-     * @param string $haystack  String to check within
-     * @param string $needle    String to look for
+     * @param  string  $haystack  String to check within
+     * @param  string  $needle  String to look for
      * @return bool
      */
     public function startsWith($haystack, $needle)
@@ -85,8 +85,8 @@ class Pattern
     /**
      * Checks to see if a given $haystack ends with a given $needle.
      *
-     * @param string $haystack  String to check within
-     * @param string $needle    String to look for
+     * @param  string  $haystack  String to check within
+     * @param  string  $needle  String to look for
      * @return bool
      */
     public function endsWith($haystack, $needle)
@@ -97,7 +97,7 @@ class Pattern
     /**
      * Checks to see if a given $value is a valid UUID.
      *
-     * @param string $value
+     * @param  string  $value
      * @return bool
      */
     public function isUUID($value)

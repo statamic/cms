@@ -1,6 +1,6 @@
 <template>
 
-    <div 
+    <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
         @dragstart.stop="ignorePageHeader(true)"
@@ -58,12 +58,9 @@
 
             <editor-floating-menu :editor="editor">
                 <div
-                    slot-scope="{ commands, isActive, menu }"
+                    slot-scope="{ menu }"
                     class="bard-set-selector"
-                    :class="{
-                        'invisible': !config.always_show_set_button && !menu.isActive,
-                        'visible': menu.isActive
-                    }"
+                    :class="config.sets.length && (config.always_show_set_button || menu.isActive) ? 'visible' : 'invisible'"
                     :style="`top: ${menu.top}px`"
                 >
                     <dropdown-list>
@@ -92,7 +89,7 @@
 
 <script>
 import uniqid from 'uniqid';
-import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble } from 'tiptap';
+import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble, Paragraph, Text } from 'tiptap';
 import {
     Blockquote,
     CodeBlock,
@@ -150,6 +147,7 @@ export default {
     provide() {
         return {
             setConfigs: this.config.sets,
+            isReadOnly: this.readOnly,
         }
     },
 
@@ -221,10 +219,14 @@ export default {
             return indexes;
         },
 
-        site() {
-            if (! this.storeName) return this.$config.get('selectedSite');
+        storeState() {
+            if (! this.storeName) return undefined;
 
-            return this.$store.state.publish[this.storeName].site;
+            return this.$store.state.publish[this.storeName];
+        },
+
+        site() {
+            return this.storeState ? this.storeState.site : this.$config.get('selectedSite');
         },
 
         htmlWithReplacedLinks() {
@@ -237,6 +239,16 @@ export default {
 
                 return `"${linkData.permalink}"`;
             });
+        },
+
+        setsWithErrors() {
+            if (! this.storeState) return [];
+
+            return Object.values(this.setIndexes).filter((setIndex) => {
+                const prefix = `${this.errorKeyPrefix || this.handle}.${setIndex}.`;
+
+                return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
+            })
         }
 
     },
@@ -245,6 +257,7 @@ export default {
         this.initToolbarButtons();
 
         this.editor = new Editor({
+            useBuiltInExtensions: false,
             extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
@@ -285,7 +298,7 @@ export default {
             if (!this.mounted) return;
 
             // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
-            this.update(JSON.stringify(json));
+            this.updateDebounced(JSON.stringify(json));
         },
 
         value(value, oldValue) {
@@ -295,6 +308,7 @@ export default {
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.clearContent()
                 this.editor.setContent(content, true);
             }
         },
@@ -397,22 +411,30 @@ export default {
 
             // Get the configured buttons and swap them with corresponding objects
             let buttons = selectedButtons.map(button => {
-                return _.findWhere(availableButtons(), { name: button.toLowerCase() })
-                    || button;
+                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
             });
 
             // Let addons add, remove, or control the position of buttons.
             this.$bard.buttonCallbacks.forEach(callback => {
-                let returned = callback(buttons);
+                // Since the developer uses the same callback to add buttons to the field itself, and for the
+                // button configurator, we need to make the button conditional when on the Bard fieldtype
+                // but not in the button configurator. So here we'll filter it out if it's not selected.
+                const buttonFn = (button) => selectedButtons.includes(button.name) ? button : null;
 
-                // No return value means they intend to manipulate the
-                // buttons object manually. Just continue on.
-                if (! returned) return;
+                const addedButtons = callback(buttons, buttonFn);
+
+                // No return value means either they literally returned nothing, with the intention
+                // of manipulating the buttons object manually. Or, they used the button() and
+                // the button was not configured in the field so it was stripped out.
+                if (! addedButtons) return;
 
                 buttons = buttons.concat(
-                    Array.isArray(returned) ? returned : [returned]
+                    Array.isArray(addedButtons) ? addedButtons : [addedButtons]
                 );
             });
+
+            // Remove any nulls. This could happen if a developer-added button was not specified in this field's buttons array.
+            buttons = buttons.filter(button => !!button);
 
             // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
             buttons = buttons.filter(button => typeof button != 'string');
@@ -472,6 +494,8 @@ export default {
             let exts = [
                 new Doc(),
                 new Set({ bard: this }),
+                new Text(),
+                new Paragraph(),
                 new HardBreak(),
                 new History()
             ];
@@ -533,6 +557,14 @@ export default {
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
+            });
+
+            this.$bard.extensionReplacementCallbacks.forEach(({callback, name}) => {
+                let index = exts.findIndex(ext => ext.name === name);
+                if (index === -1) return;
+                let extension = exts[index];
+                let newExtension = callback({ bard: this, mark, node, extension });
+                exts[index] = newExtension;
             });
 
             return exts;

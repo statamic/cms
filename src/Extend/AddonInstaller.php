@@ -26,7 +26,7 @@ class AddonInstaller
     /**
      * Install an addon.
      *
-     * @param string $addon
+     * @param  string  $addon
      */
     public function install(string $addon)
     {
@@ -40,7 +40,7 @@ class AddonInstaller
     /**
      * Uninstall an addon.
      *
-     * @param string $addon
+     * @param  string  $addon
      */
     public function uninstall(string $addon)
     {

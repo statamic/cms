@@ -25,7 +25,7 @@ class AssetsGeneratePresets extends Command
      *
      * @var string
      */
-    protected $description = 'Generate asset preset manipulations.';
+    protected $description = 'Generate asset preset manipulations';
 
     /**
      * @var \Statamic\Assets\AssetCollection
@@ -91,7 +91,7 @@ class AssetsGeneratePresets extends Command
     /**
      * Generate supplied presets.
      *
-     * @param array $presets
+     * @param  array  $presets
      * @return void
      */
     private function generatePresets($presets)

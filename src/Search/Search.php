@@ -33,7 +33,7 @@ class Search
 
     public function indexExists($index = null)
     {
-        return $this->index($index)->exists();
+        return $this->indexes()->has($index) && $this->index($index)->exists();
     }
 
     public function extend($driver, $callback)

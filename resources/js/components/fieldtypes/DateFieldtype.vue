@@ -27,6 +27,8 @@
                     :masks="{ input: [displayFormat] }"
                     :mode="config.mode"
                     :input="value"
+                    :min-date="config.earliest_date"
+                    :max-date="config.latest_date"
                     :is-required="config.required"
                     :is-inline="config.inline"
                     :is-expanded="name === 'date' || config.full_width"

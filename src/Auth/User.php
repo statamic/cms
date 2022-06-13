@@ -120,6 +120,11 @@ abstract class User implements
         return $this->id();
     }
 
+    public function getKey()
+    {
+        return $this->id();
+    }
+
     public function getAuthPassword()
     {
         return $this->password();
@@ -257,7 +262,7 @@ abstract class User implements
         return $this->selectedQueryColumns;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'name', 'email', 'api_url'];
     }

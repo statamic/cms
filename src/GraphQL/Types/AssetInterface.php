@@ -88,10 +88,10 @@ class AssetInterface extends InterfaceType
                 'type' => GraphQL::string(),
             ],
             'height' => [
-                'type' => GraphQL::int(),
+                'type' => GraphQL::float(),
             ],
             'width' => [
-                'type' => GraphQL::int(),
+                'type' => GraphQL::float(),
             ],
             'orientation' => [
                 'type' => GraphQL::string(),
@@ -119,8 +119,6 @@ class AssetInterface extends InterfaceType
 
     public static function addTypes()
     {
-        GraphQL::addType(self::class);
-
         GraphQL::addTypes(AssetContainer::all()->each(function ($container) {
             $container->blueprint()->addGqlTypes();
         })->mapInto(AssetType::class)->all());

@@ -30,7 +30,9 @@ class UserRepositoryManager extends Manager
 
     public function createEloquentDriver(array $config)
     {
-        $config['model'] = $this->app['config']['auth.providers.users.model'];
+        $guard = $this->app['config']['statamic.users.guards.cp'];
+        $provider = $this->app['config']["auth.guards.$guard.provider"];
+        $config['model'] = $this->app['config']["auth.providers.$provider.model"];
 
         return new EloquentRepository($config);
     }

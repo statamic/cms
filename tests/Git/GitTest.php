@@ -19,6 +19,8 @@ class GitTest extends TestCase
     {
         parent::setUp();
 
+        $this->markTestSkippedInWindows(); // TODO: Figure out why GitTest is breaking suite in Windows.
+
         $this->files = app(Filesystem::class);
 
         $this->createTempDirectory($this->basePath('temp'));
@@ -26,6 +28,7 @@ class GitTest extends TestCase
         $this->files->copyDirectory($this->basePath('assets'), $this->basePath('temp/assets'));
         $this->createTempRepo(base_path('content'));
         $this->createTempRepo($this->basePath('temp/assets'));
+        $this->files->copyDirectory($this->basePath('assets'), base_path('../assets-external'));
 
         $defaultConfig = include __DIR__.'/../../config/git.php';
 
@@ -42,6 +45,8 @@ class GitTest extends TestCase
     {
         $this->deleteTempDirectory(base_path('content'));
         $this->deleteTempDirectory($this->basePath('temp'));
+        $this->deleteTempDirectory(base_path('../assets-external'));
+        $this->deleteTempDirectory(base_path('content/assets-linked'));
 
         parent::tearDown();
     }
@@ -66,7 +71,7 @@ class GitTest extends TestCase
 
         $statuses = Git::statuses();
         $contentStatus = $statuses->get(Path::resolve(base_path('content')));
-        $assetsStatus = $statuses->get($this->basePath('temp/assets'));
+        $assetsStatus = $statuses->get(Path::resolve($this->basePath('temp/assets')));
 
         $expectedContentStatus = <<<'EOT'
  M collections/pages.yaml
@@ -100,7 +105,6 @@ EOT;
     /** @test */
     public function it_filters_out_external_paths_that_are_not_separate_repos()
     {
-        // If a user symlinks an assets folder for example, this will fail if not a repo itself.
         $notARepoPath = Path::resolve(base_path('../../../../..'));
 
         Config::set('statamic.git.paths', [
@@ -127,6 +131,35 @@ EOT;
         $this->assertEquals(1, $contentStatus->addedCount);
         $this->assertEquals(1, $contentStatus->modifiedCount);
         $this->assertEquals(0, $contentStatus->deletedCount);
+    }
+
+    /** @test */
+    public function it_can_handle_configured_paths_that_are_symlinks()
+    {
+        $externalPath = Path::resolve(base_path('../assets-external'));
+        $symlinkPath = Path::resolve(base_path('content/assets-linked'));
+
+        $this->markTestSkippedInWindows(); // TODO: Figure out why calling `symlink()` results in permissions error in Windows
+        @symlink($externalPath, $symlinkPath);
+
+        $this->files->put($externalPath.'/statement.txt', 'Change statement.');
+
+        Config::set('statamic.git.paths', [
+            $symlinkPath,
+        ]);
+
+        $status = Git::statuses()->get(Path::resolve(base_path('content')));
+
+        $expectedStatus = <<<'EOT'
+?? assets-linked
+EOT;
+
+        $this->assertEquals($expectedStatus, $status->status);
+
+        $this->assertEquals(1, $status->totalCount);
+        $this->assertEquals(1, $status->addedCount);
+        $this->assertEquals(0, $status->modifiedCount);
+        $this->assertEquals(0, $status->deletedCount);
     }
 
     /** @test */
@@ -188,6 +221,38 @@ EOT;
     }
 
     /** @test */
+    public function it_shell_escapes_git_user_name_and_email()
+    {
+        Config::set('statamic.git.user.name', 'Jimmy"; echo "deleting all your files now"; #');
+        Config::set('statamic.git.user.email', 'jimmy@haxor.org"; echo "deleting all your files now"; #');
+
+        $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
+
+        $expectedContentStatus = <<<'EOT'
+ M collections/pages.yaml
+EOT;
+
+        $this->assertEquals($expectedContentStatus, GitProcess::create(Path::resolve(base_path('content')))->status());
+
+        $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
+
+        Git::commit('Message"; echo "deleting all your files now"; #');
+
+        $expectedUser = 'Jimmy\; echo deleting all your files now\; \# <jimmy@haxor.org\; echo deleting all your files now\; \#>';
+        $expectedMessage = 'Message\; echo deleting all your files now\; \#';
+
+        if (static::isRunningWindows()) {
+            $expectedUser = str_replace('\\', '^', $expectedUser);
+            $expectedMessage = str_replace('\\', '^', $expectedMessage);
+        }
+
+        $lastCommit = $this->showLastCommit(base_path('content'));
+
+        $this->assertStringContainsString($expectedUser, $lastCommit);
+        $this->assertStringContainsString($expectedMessage, $lastCommit);
+    }
+
+    /** @test */
     public function it_can_commit_with_custom_commit_message()
     {
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
@@ -201,9 +266,7 @@ EOT;
     /** @test */
     public function it_can_run_custom_commands()
     {
-        if ($this->isRunningWindows()) {
-            $this->markTestSkipped();
-        }
+        $this->markTestSkippedInWindows();
 
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
         $this->files->put(base_path('content/taxonomies/tags.yaml'), 'title: Added Tags');

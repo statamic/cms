@@ -24,7 +24,7 @@ class NavItem
     /**
      * Get or set name.
      *
-     * @param string|null $name
+     * @param  string|null  $name
      * @return mixed
      */
     public function name($name = null)
@@ -35,7 +35,7 @@ class NavItem
     /**
      * Get or set section name.
      *
-     * @param string|null $section
+     * @param  string|null  $section
      * @return mixed
      */
     public function section($section = null)
@@ -46,8 +46,8 @@ class NavItem
     /**
      * Get or set url by cp route name.
      *
-     * @param array|string $name
-     * @param mixed $params
+     * @param  array|string  $name
+     * @param  mixed  $params
      * @return mixed
      */
     public function route($name, $params = [])
@@ -58,7 +58,7 @@ class NavItem
     /**
      * Get or set URL.
      *
-     * @param string|null $url
+     * @param  string|null  $url
      * @return mixed
      */
     public function url($url = null)
@@ -80,7 +80,7 @@ class NavItem
                 $cpUrl = url(config('statamic.cp.route')).'/';
 
                 if (! $this->active && Str::startsWith($url, $cpUrl)) {
-                    $this->active = str_replace($cpUrl, '', $url).'(/(.*)?|$)';
+                    $this->active = str_replace($cpUrl, '', Str::before($url, '?')).'(/(.*)?|$)';
                 }
             })
             ->value($url);
@@ -89,7 +89,7 @@ class NavItem
     /**
      * Get or set icon.
      *
-     * @param string|null $icon
+     * @param  string|null  $icon
      * @return mixed
      */
     public function icon($icon = null)
@@ -105,7 +105,7 @@ class NavItem
     /**
      * Get or set HTML attributes.
      *
-     * @param array|null $attrs
+     * @param  array|null  $attrs
      * @return mixed
      */
     public function attributes($attrs = null)
@@ -122,7 +122,7 @@ class NavItem
     /**
      * Get or set child nav items.
      *
-     * @param array|null $items
+     * @param  array|null  $items
      * @return mixed
      */
     public function children($items = null)
@@ -155,8 +155,8 @@ class NavItem
     /**
      * Get or set authorization.
      *
-     * @param string|null $ability
-     * @param array $arguments
+     * @param  string|null  $ability
+     * @param  array  $arguments
      * @return mixed
      */
     public function authorization($ability = null, $arguments = [])
@@ -176,8 +176,8 @@ class NavItem
     /**
      * Get or set authorization (an alias for consistency with Laravel's can() method).
      *
-     * @param string|null $ability
-     * @param array $arguments
+     * @param  string|null  $ability
+     * @param  array  $arguments
      * @return mixed
      */
     public function can($ability = null, $arguments = [])
@@ -188,7 +188,7 @@ class NavItem
     /**
      * Get or set pattern for active state styling.
      *
-     * @param string|null $pattern
+     * @param  string|null  $pattern
      * @return mixed
      */
     public function active($pattern = null)
@@ -211,7 +211,7 @@ class NavItem
     /**
      * Get or set custom view.
      *
-     * @param string|null $view
+     * @param  string|null  $view
      * @return mixed
      */
     public function view($view = null)

@@ -66,7 +66,7 @@ abstract class Changelog
     /**
      * Parse release type.
      *
-     * @param string $releaseVersion
+     * @param  string  $releaseVersion
      * @return string
      */
     protected function parseReleaseType($releaseVersion)

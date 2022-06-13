@@ -1,29 +1,23 @@
-<template>
-    <svg-icon class="file-icon" :type="type" :name="name"></svg-icon>
-</template>
-
-
 <script>
+import Vue from "vue";
+
 export default {
 
     props: {
         extension: String,
-        type: {
-            type: String,
-            default() {
-                return 'svg';
-            }
-        }
     },
 
+    render(createElement) {
+        const compiledTemplate = Vue.compile(this.getIcon());
+
+        return compiledTemplate.render.call(this, createElement);
+    },
 
     computed: {
-
         name() {
-            switch (this.extension) {
+            switch (this.extension.toLowerCase()) {
                 case 'folder':
                     return 'folder';
-
                 case '7z':
                 case 'pkg':
                 case 'rar':
@@ -31,8 +25,7 @@ export default {
                 case 'tar.zg':
                 case 'z':
                 case 'zip':
-                    return 'file-archive';
-
+                    return 'archive';
                 case 'aac':
                 case 'aif':
                 case 'cda':
@@ -46,36 +39,32 @@ export default {
                 case 'midi':
                 case 'wav':
                 case 'wma':
-                    return 'file-audio';
-
+                    return 'audio';
                 case 'doc':
                 case 'docx':
-                    return 'file-doc';
-
+                case 'epub':
+                case 'mobi':
+                    return 'doc';
                 case 'xls':
                 case 'xlsx':
-                    return 'file-excel';
-
+                    return 'excel';
                 case 'json':
-                    return 'file-json';
-
+                    return 'json';
                 case 'ai':
                 case 'eps':
+                case 'fig':
                 case 'indb':
                 case 'psd':
                 case 'sketch':
-                    return 'file-layered';
-
+                    return 'layered';
                 case 'pdf':
-                    return 'file-pdf';
-
+                    return 'pdf';
                 case 'key':
                 case 'odp':
                 case 'pps':
                 case 'ppt':
                 case 'pptx':
-                    return 'file-presentation';
-
+                    return 'presentation';
                 case '3g2':
                 case '3gp':
                 case 'avi':
@@ -91,27 +80,30 @@ export default {
                 case 'swf':
                 case 'vob':
                 case 'wmv':
-                    return 'file-video';
-
+                    return 'video';
                 case 'xml':
-                    return 'file-xml';
-
+                    return 'xml';
                 case 'bmp':
                 case 'gif':
                 case 'ico':
                 case 'jpg':
                 case 'jpeg':
                 case 'png':
+                case 'raw':
+                case 'nef':
                 case 'tiff':
-                    return 'picture';
-
+                    return 'image';
                 default:
-                    return 'file-generic';
+                    return 'generic';
             }
         }
+    },
 
+    methods: {
+
+        getIcon() {
+            return require(`!!html-loader!./../../svg/filetypes/${this.name}.svg`);
+        },
     }
-
-
 }
 </script>

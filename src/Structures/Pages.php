@@ -64,11 +64,13 @@ class Pages
             $page = (new Page)
                 ->setTree($this->tree)
                 ->setParent($this->parent)
+                ->setId($branch[$this->tree->idKey()] ?? null)
                 ->setEntry($branch['entry'] ?? null)
                 ->setUrl($branch['url'] ?? null)
                 ->setTitle($branch['title'] ?? null)
                 ->setDepth($this->depth)
-                ->setChildren($branch['children'] ?? []);
+                ->setChildren($branch['children'] ?? [])
+                ->setPageData($branch['data'] ?? []);
 
             if ($this->route) {
                 $page->setRoute($this->route);

@@ -21,8 +21,8 @@ abstract class AbstractMetric implements Metric
     /**
      * Create a new Metric.
      *
-     * @param Form $form
-     * @param array $config
+     * @param  Form  $form
+     * @param  array  $config
      */
     public function __construct(Form $form, $config = [])
     {
@@ -43,8 +43,8 @@ abstract class AbstractMetric implements Metric
     /**
      * Get a value from the config.
      *
-     * @param  string $key
-     * @param  mixed $default
+     * @param  string  $key
+     * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null)

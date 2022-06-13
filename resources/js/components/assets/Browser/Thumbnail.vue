@@ -1,20 +1,21 @@
 <template>
 
     <div class="">
-        <div v-if="showSvg" class="rounded p-1 mb-1 flex items-center justify-center asset-thumbnail h-full w-full">
+        <div v-if="showSvg" class="rounded flex items-center justify-center asset-thumbnail h-full w-full">
             <img
-                class="max-w-full max-h-full mx-auto"
-                :src="asset.url"
+                class="w-full h-full max-w-full max-h-full mx-auto"
+                :src="asset.thumbnail"
             />
         </div>
 
         <template v-else>
             <img v-if="asset.is_image"
-                :data-src="asset.thumbnail"
-                class="asset-thumbnail max-h-full max-w-full mx-auto rounded lazyload"
+                :src="asset.thumbnail"
+                class="asset-thumbnail rounded max-h-full max-w-full mx-auto rounded"
+                loading="lazy"
                 :class="{'w-8 h-8 fit-cover': square}"
                 />
-            <file-icon v-else :extension="asset.extension" class="asset-thumbnail w-full h-full p-1 rounded"></file-icon>
+            <file-icon v-else :extension="asset.extension" class="p-px asset-thumbnail rounded w-full h-full" />
         </template>
 
     </div>
@@ -22,8 +23,6 @@
 </template>
 
 <script>
-require('lazysizes')
-
 export default {
 
     props: {

@@ -22,7 +22,7 @@ class CommitJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param string|null $message
+     * @param  string|null  $message
      */
     public function __construct($message = null)
     {

@@ -16,6 +16,7 @@ class Asset extends JsonResource
             'filename' => $this->filename(),
             'basename' => $this->basename(),
             'url' => $this->url(),
+            'reference' => $this->reference(),
             'permalink' => $this->absoluteUrl(),
             'extension' => $this->extension(),
             'downloadUrl' => cp_route('assets.download', base64_encode($this->id())),
@@ -26,14 +27,21 @@ class Asset extends JsonResource
             'isSvg' => $this->isSvg(),
             'isAudio' => $this->isAudio(),
             'isVideo' => $this->isVideo(),
+            'isPdf' => $this->isPdf(),
             'isPreviewable' => $this->isPreviewable(),
 
-            $this->mergeWhen($this->isImage(), function () {
+            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
                 return [
                     'width' => $this->width(),
                     'height' => $this->height(),
                     'preview' => $this->previewUrl(),
                     'thumbnail' => $this->thumbnailUrl('small'),
+                ];
+            }),
+
+            $this->mergeWhen($this->isPdf(), function () {
+                return [
+                    'pdfUrl' => $this->pdfUrl(),
                 ];
             }),
 

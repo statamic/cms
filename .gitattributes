@@ -1,4 +1,5 @@
 * text=auto
+*.php eol=lf
 /.github export-ignore
 /tests export-ignore
 .babelrc export-ignore

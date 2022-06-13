@@ -43,7 +43,15 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(UserRepository::class, function ($app) {
-            return $app[UserRepositoryManager::class]->repository();
+            $repository = $app[UserRepositoryManager::class]->repository();
+
+            foreach ($repository::bindings() as $abstract => $concrete) {
+                if (! $this->app->bound($abstract)) {
+                    $this->app->bind($abstract, $concrete);
+                }
+            }
+
+            return $repository;
         });
 
         $this->app->singleton(RoleRepository::class, function ($app) {

@@ -11,7 +11,7 @@ class DashboardController extends CpController
     /**
      * View for the CP dashboard.
      *
-     * @param Loader $loader
+     * @param  Loader  $loader
      * @return mixed
      */
     public function index(Loader $loader)
@@ -24,7 +24,7 @@ class DashboardController extends CpController
     /**
      * Get displayable widgets.
      *
-     * @param Loader $loader
+     * @param  Loader  $loader
      * @return \Illuminate\Support\Collection
      */
     private function getDisplayableWidgets($loader)

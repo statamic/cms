@@ -18,7 +18,7 @@ class AssetContainersController extends CpController
 
     public function index(Request $request)
     {
-        $containers = AssetContainer::all()->filter(function ($container) {
+        $containers = AssetContainer::all()->sortBy->title()->filter(function ($container) {
             return User::current()->can('view', $container);
         })->map(function ($container) {
             return [
@@ -71,7 +71,7 @@ class AssetContainersController extends CpController
     {
         $this->authorize('update', $container, 'You are not authorized to edit asset containers.');
 
-        $fields = $this->formBlueprint()->fields()->addValues($request->all());
+        $fields = $this->formBlueprint($container)->fields()->addValues($request->all());
 
         $fields->validate();
 
@@ -170,15 +170,21 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_title_instructions'),
                         'validate' => 'required',
                     ],
-                    'handle' => [
-                        'type' => 'slug',
-                        'display' => __('Handle'),
-                        'validate' => 'required|alpha_dash',
-                        'separator' => '_',
-                        'instructions' => __('statamic::messages.asset_container_handle_instructions'),
-                    ],
                 ],
             ],
+        ];
+
+        if (! $container) {
+            $fields['name']['fields']['handle'] = [
+                'type' => 'slug',
+                'display' => __('Handle'),
+                'validate' => 'required|alpha_dash',
+                'separator' => '_',
+                'instructions' => __('statamic::messages.asset_container_handle_instructions'),
+            ];
+        }
+
+        $fields = array_merge($fields, [
             'filesystem' => [
                 'display' => __('File Driver'),
                 'fields' => [
@@ -191,7 +197,7 @@ class AssetContainersController extends CpController
                     ],
                 ],
             ],
-        ];
+        ]);
 
         if ($container) {
             $fields['fields'] = [

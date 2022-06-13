@@ -31,7 +31,7 @@ class DataCollection extends IlluminateCollection
      * Accepts a string like "title:desc|foo:asc"
      * The keys are optional. "title:desc|foo" is fine.
      *
-     * @param string $sort
+     * @param  string  $sort
      * @return static
      */
     public function multisort($sort)
@@ -69,9 +69,9 @@ class DataCollection extends IlluminateCollection
     /**
      * Get the values from two content objects to be sorted against each other.
      *
-     * @param string                        $sort The field to be searched
-     * @param \Statamic\Contracts\Data\Data $a    The first data object
-     * @param \Statamic\Contracts\Data\Data $b    The second data object
+     * @param  string  $sort  The field to be searched
+     * @param  \Statamic\Contracts\Data\Data  $a  The first data object
+     * @param  \Statamic\Contracts\Data\Data  $b  The second data object
      * @return array
      */
     protected function getSortableValues($sort, $a, $b)
@@ -100,12 +100,16 @@ class DataCollection extends IlluminateCollection
     /**
      * Make sure the sortable value is in a format suitable for sorting.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return mixed
      */
     protected function normalizeSortableValue($value)
     {
-        if ($value instanceof Carbon) {
+        if (is_array($value)) {
+            $value = count($value)
+                ? $this->normalizeSortableValue(array_values($value)[0])
+                : null;
+        } elseif ($value instanceof Carbon) {
             $value = $value->timestamp;
         }
 
@@ -115,8 +119,9 @@ class DataCollection extends IlluminateCollection
     /**
      * Walk over an array of methods and attempt to run each one.
      *
-     * @param array $actions
+     * @param  array  $actions
      * @return \Statamic\Data\DataCollection
+     *
      * @throws \Statamic\Exceptions\MethodNotFoundException
      */
     public function actions($actions)
@@ -137,8 +142,8 @@ class DataCollection extends IlluminateCollection
     /**
      * Add a new key to each item of the collection.
      *
-     * @param string|callable $key       New key to add, or a function to return an array of new values
-     * @param mixed           $callable  Function to return the new value when specifying a key
+     * @param  string|callable  $key  New key to add, or a function to return an array of new values
+     * @param  mixed  $callable  Function to return the new value when specifying a key
      * @return \Statamic\Data\DataCollection
      */
     public function supplement($key, $callable = null)
@@ -160,7 +165,7 @@ class DataCollection extends IlluminateCollection
     /**
      * Add a new set of keys to each item of the collection.
      *
-     * @param callable $callable  Function to return an array of new values
+     * @param  callable  $callable  Function to return an array of new values
      * @return static
      */
     public function supplementMany(callable $callable)
@@ -187,7 +192,7 @@ class DataCollection extends IlluminateCollection
     /**
      * Get the collection as a plain array using only selected keys.
      *
-     * @param array $keys
+     * @param  array  $keys
      * @return array
      */
     public function toArrayWith($keys)

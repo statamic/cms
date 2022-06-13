@@ -3,6 +3,7 @@
 namespace Tests\Stache;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Stores\BasicStore;
 use Statamic\Support\Str;
@@ -13,7 +14,8 @@ class BasicStoreTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        @mkdir($this->tempDir = __DIR__.'/tmp');
+
+        @mkdir($this->tempDir = Path::tidy(__DIR__.'/tmp'));
         $this->store = (new TestBasicStore)->directory($this->tempDir);
     }
 
@@ -76,7 +78,7 @@ class TestBasicStore extends BasicStore
     public function makeItemFromFile($path, $contents)
     {
         $data = YAML::parse($contents);
-        $id = Str::after($path, __DIR__.'/tmp/');
+        $id = Str::after($path, Path::tidy(__DIR__.'/tmp/'));
         $id = Str::before($id, '.yaml');
 
         return new TestBasicStoreItem($id, $data);

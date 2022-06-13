@@ -4,7 +4,9 @@ namespace Statamic\Forms;
 
 use Statamic\CP\Column;
 use Statamic\Facades;
+use Statamic\Facades\GraphQL;
 use Statamic\Fieldtypes\Relationship;
+use Statamic\GraphQL\Types\FormType;
 
 class Fieldtype extends Relationship
 {
@@ -28,6 +30,7 @@ class Fieldtype extends Relationship
                 'display' => __('Max Items'),
                 'default' => 1,
                 'instructions' => __('statamic::fieldtypes.form.config.max_items'),
+                'min' => 1,
                 'width' => 50,
             ],
         ];
@@ -77,5 +80,10 @@ class Fieldtype extends Relationship
     protected function shallowAugmentValue($value)
     {
         return $value->toShallowAugmentedCollection();
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::type(FormType::NAME);
     }
 }

@@ -17,8 +17,8 @@ class FluentGetterSetter
     /**
      * Instantiate fluent getter/setter helper.
      *
-     * @param mixed $object
-     * @param string $property
+     * @param  mixed  $object
+     * @param  string  $property
      */
     public function __construct($object, $property)
     {
@@ -29,7 +29,7 @@ class FluentGetterSetter
     /**
      * Define custom getter logic.
      *
-     * @param Closure $callback
+     * @param  Closure  $callback
      * @return $this
      */
     public function getter(Closure $callback)
@@ -42,7 +42,7 @@ class FluentGetterSetter
     /**
      * Define custom setter logic.
      *
-     * @param Closure $callback
+     * @param  Closure  $callback
      * @return $this
      */
     public function setter($callback)
@@ -55,7 +55,7 @@ class FluentGetterSetter
     /**
      * Define custom logic to be run after the setter.
      *
-     * @param Closure $callback
+     * @param  Closure  $callback
      * @return $this
      */
     public function afterSetter($callback)
@@ -68,7 +68,7 @@ class FluentGetterSetter
     /**
      * Run getter if the provided value is null, otherwise run fluent setter using the provided value.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return mixed
      */
     public function value($value)
@@ -85,7 +85,7 @@ class FluentGetterSetter
     /**
      * Run getter if the provided arguments array is empty, otherwise run fluent setter using the first argument.
      *
-     * @param mixed $args
+     * @param  mixed  $args
      * @return mixed
      */
     public function args($args)
@@ -122,7 +122,7 @@ class FluentGetterSetter
     /**
      * Run setter logic.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      */
     protected function runSetterLogic($value)
     {

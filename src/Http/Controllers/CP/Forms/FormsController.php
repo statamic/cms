@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -44,6 +45,7 @@ class FormsController extends CpController
         $columns = $form
             ->blueprint()
             ->columns()
+            ->prepend(Column::make('datestamp'), 'datestamp')
             ->setPreferred("forms.{$form->handle()}.columns")
             ->rejectUnlisted()
             ->values();
@@ -54,7 +56,7 @@ class FormsController extends CpController
     /**
      * Get the metrics array ready to be injected into a Grid field.
      *
-     * @param  Form $form
+     * @param  Form  $form
      * @return array
      */
     private function preProcessMetrics($form)
@@ -269,6 +271,14 @@ class FormsController extends CpController
                                     'type' => 'toggle',
                                     'display' => __('Markdown'),
                                     'instructions' => __('statamic::messages.form_configure_email_markdown_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'attachments',
+                                'field' => [
+                                    'type' => 'toggle',
+                                    'display' => __('Attachments'),
+                                    'instructions' => __('statamic::messages.form_configure_email_attachments_instructions'),
                                 ],
                             ],
                         ],

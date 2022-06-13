@@ -34,8 +34,8 @@ class StaticUrlBuilder extends ImageUrlBuilder
     protected $options;
 
     /**
-     * @param ImageGenerator $generator
-     * @param array $options
+     * @param  ImageGenerator  $generator
+     * @param  array  $options
      */
     public function __construct(ImageGenerator $generator, array $options = [])
     {
@@ -46,9 +46,9 @@ class StaticUrlBuilder extends ImageUrlBuilder
     /**
      * Build the URL.
      *
-     * @param \Statamic\Contracts\Assets\Asset|string $item
-     * @param array                                   $params
-     * @param string|null                             $filename
+     * @param  \Statamic\Contracts\Assets\Asset|string  $item
+     * @param  array  $params
+     * @param  string|null  $filename
      * @return string
      */
     public function build($item, $params, $filename = null)

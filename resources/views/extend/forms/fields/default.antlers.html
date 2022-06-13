@@ -1,1 +1,1 @@
-<input type="text" name="{{ handle }}"{{ if placeholder }} placeholder="{{ placeholder }}"{{ /if }}{{ if old }} value="{{ old }}"{{ /if }}{{ if validate|contains:required }} required{{ /if }}{{ if character_limit }} maxlength="{{ character_limit }}"{{ /if }}>
+<input type="text" name="{{ handle }}"{{ if placeholder }} placeholder="{{ placeholder }}"{{ /if }} value="{{ old ?? default}}"{{ if validate|contains:required }} required{{ /if }}{{ if character_limit }} maxlength="{{ character_limit }}"{{ /if }}>

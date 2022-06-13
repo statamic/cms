@@ -9,6 +9,7 @@ export default {
     props: {
         from: String,
         to: String,
+        language: String,
         separator: {
             type: String,
             default: '-'
@@ -30,7 +31,7 @@ export default {
         slug() {
             if (!this.shouldSlugify) return this.to;
             if (!this.from) return '';
-            return this.$slugify(this.from, this.separator);
+            return this.$slugify(this.from, this.separator, this.language);
         }
 
     },
@@ -55,6 +56,14 @@ export default {
 
     render() {
         return this.$scopedSlots.default({});
+    },
+
+    methods: {
+
+        reset() {
+            if (this.enabled) this.shouldSlugify = true;
+        }
+
     }
 
 }

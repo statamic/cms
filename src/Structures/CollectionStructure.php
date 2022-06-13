@@ -8,6 +8,8 @@ use Statamic\Facades\Collection;
 
 class CollectionStructure extends Structure
 {
+    protected $showSlugs = false;
+
     public function title($title = null)
     {
         if (func_num_args() === 1) {
@@ -138,5 +140,10 @@ class CollectionStructure extends Structure
     public function existsIn($site)
     {
         return $this->collection()->sites()->contains($site);
+    }
+
+    public function showSlugs($showSlugs = null)
+    {
+        return $this->fluentlyGetOrSet('showSlugs')->args(func_get_args());
     }
 }

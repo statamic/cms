@@ -51,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
         $this->loadJsonTranslationsFrom("{$this->root}/resources/lang");
 
         $this->publishes([
-            "{$this->root}/resources/lang" => resource_path('lang/vendor/statamic'),
+            "{$this->root}/resources/lang" => app()->langPath().'/vendor/statamic',
         ], 'statamic-translations');
 
         $this->loadViewsFrom("{$this->root}/resources/views/extend", 'statamic');

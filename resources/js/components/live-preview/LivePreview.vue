@@ -250,6 +250,11 @@ export default {
                 .then(() => {
                     this.panesVisible = true;
                     return this.$wait(300);
+                })
+                .then(() => {
+                    // Components that update position based on native
+                    // resize events (like Popovers) need to be informed thusly
+                    window.dispatchEvent(new Event('resize'));
                 });
         },
 

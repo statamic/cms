@@ -10,9 +10,9 @@ class In extends Tags
     /**
      * Maps to {{ in:[group] }}.
      *
-     * @param  string $method
-     * @param  array $args
-     * @return string
+     * @param  string  $method
+     * @param  array  $args
+     * @return string|void
      */
     public function wildcard($method)
     {

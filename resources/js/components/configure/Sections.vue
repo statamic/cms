@@ -65,40 +65,8 @@ export default {
             return _.filter(this.sections, section => section.handle != 'sidebar');
         },
 
-        errors() {
-            return this.state.errors;
-        },
-
-        // A mapping of fields to which section they are in.
-        sectionFields() {
-            let fields = {};
-            this.sections.forEach(section => {
-                section.fields.forEach(field => {
-                    fields[field.handle] = section.handle;
-                })
-            });
-            return fields;
-        },
-
-        // A mapping of fields with errors to which section they are in.
-        sectionErrors() {
-            let errors = {};
-            Object.keys(this.errors).forEach(field => {
-                errors[field] = this.sectionFields[field];
-            });
-            return errors;
-        },
-
         actionsPortal() {
             return `publish-actions-${this.storeName}`;
-        }
-
-    },
-
-    methods: {
-
-        sectionHasError(handle) {
-            return _.chain(this.sectionErrors).values().contains(handle).value();
         }
 
     }

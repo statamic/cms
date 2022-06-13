@@ -14,7 +14,7 @@ class Roles
     protected $user;
 
     /**
-     * @param User $user
+     * @param  User  $user
      */
     public function __construct(UserContract $user)
     {
@@ -42,7 +42,7 @@ class Roles
     /**
      * Sync up the user/role relationship in the pivot table.
      *
-     * @param  array $roles  Array of role IDs the user should belong to.
+     * @param  array  $roles  Array of role IDs the user should belong to.
      * @return void
      */
     public function sync($roles)

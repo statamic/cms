@@ -9,9 +9,9 @@ trait QueriesFilters
     /**
      * Query filters and return active filter badges.
      *
-     * @param mixed $query
-     * @param array $filters
-     * @param array $context
+     * @param  mixed  $query
+     * @param  array  $filters
+     * @param  array  $context
      * @return array
      */
     public function queryFilters($query, $filters, $context = [])

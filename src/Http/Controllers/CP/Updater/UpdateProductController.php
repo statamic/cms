@@ -15,7 +15,7 @@ class UpdateProductController extends CpController
     /**
      * Show product updates overview.
      *
-     * @param string $slug
+     * @param  string  $slug
      */
     public function show($slug)
     {
@@ -35,7 +35,7 @@ class UpdateProductController extends CpController
     /**
      * Product changelog.
      *
-     * @param string $slug
+     * @param  string  $slug
      */
     public function changelog($slug)
     {
@@ -57,8 +57,8 @@ class UpdateProductController extends CpController
     /**
      * Install explicit version.
      *
-     * @param string $product
-     * @param Request $request
+     * @param  string  $product
+     * @param  Request  $request
      */
     public function install($product, Request $request)
     {
@@ -72,7 +72,7 @@ class UpdateProductController extends CpController
     /**
      * Get updatable addon from product slug.
      *
-     * @param string $product
+     * @param  string  $product
      * @return \Illuminate\Support\Collection
      */
     private function getAddon($product)

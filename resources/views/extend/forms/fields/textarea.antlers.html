@@ -1,1 +1,1 @@
-<textarea name="{{ handle }}" rows="5"{{ if placeholder }} placeholder="{{ placeholder }}"{{ /if }}{{ if validate|contains:required }} required{{ /if }}{{ if character_limit }} maxlength="{{ character_limit }}"{{ /if }}>{{ old }}</textarea>
+<textarea name="{{ handle }}" rows="5"{{ if placeholder }} placeholder="{{ placeholder }}"{{ /if }}{{ if validate|contains:required }} required{{ /if }}{{ if character_limit }} maxlength="{{ character_limit }}"{{ /if }}>{{ old ?? default }}</textarea>

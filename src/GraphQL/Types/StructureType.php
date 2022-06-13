@@ -7,7 +7,7 @@ use Statamic\Facades\Site;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Str;
 
-class StructureType extends \Rebing\GraphQL\Support\Type
+abstract class StructureType extends \Rebing\GraphQL\Support\Type
 {
     public function fields(): array
     {
@@ -25,7 +25,7 @@ class StructureType extends \Rebing\GraphQL\Support\Type
                 'type' => GraphQL::nonNull(GraphQL::boolean()),
             ],
             'tree' => [
-                'type' => GraphQL::listOf(GraphQL::type(TreeBranchType::NAME)),
+                'type' => GraphQL::listOf(GraphQL::type($this->getTreeBranchType())),
                 'args' => [
                     'site' => [
                         'type' => GraphQL::string(),
@@ -58,4 +58,6 @@ class StructureType extends \Rebing\GraphQL\Support\Type
             }
         };
     }
+
+    abstract protected function getTreeBranchType(): string;
 }

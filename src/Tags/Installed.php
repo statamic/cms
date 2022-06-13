@@ -9,8 +9,8 @@ class Installed extends Tags
     /**
      * Check if composer package is installed via {{ installed:* }}.
      *
-     * @param string $package
-     * @return string
+     * @param  string  $package
+     * @return string|void
      */
     public function wildcard($package)
     {

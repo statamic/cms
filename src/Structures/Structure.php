@@ -3,12 +3,14 @@
 namespace Statamic\Structures;
 
 use Illuminate\Support\Traits\Tappable;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-abstract class Structure implements StructureContract
+abstract class Structure implements StructureContract, Augmentable
 {
     use FluentlyGetsAndSets, Tappable;
 
@@ -18,6 +20,8 @@ abstract class Structure implements StructureContract
     protected $collection;
     protected $maxDepth;
     protected $expectsRoot = false;
+
+    use HasAugmentedData;
 
     public function id()
     {
@@ -86,10 +90,6 @@ abstract class Structure implements StructureContract
             return $tree;
         }
 
-        if (! empty($tree) && ! isset($tree[0]['entry'])) {
-            throw new \Exception('Root page must be an entry');
-        }
-
         throw_if(isset($tree[0]['children']), new \Exception('Root page cannot have children'));
 
         return $tree;
@@ -118,5 +118,13 @@ abstract class Structure implements StructureContract
     public static function __callStatic($method, $parameters)
     {
         return Facades\Structure::{$method}(...$parameters);
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+        ];
     }
 }

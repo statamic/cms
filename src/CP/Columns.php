@@ -10,7 +10,7 @@ class Columns extends Collection
     /**
      * Ensure has column.
      *
-     * @param \Statamic\CP\Column $column
+     * @param  \Statamic\CP\Column  $column
      * @return $this
      */
     public function ensureHas($column)
@@ -25,7 +25,7 @@ class Columns extends Collection
     /**
      * Ensure has column, and if not prepend.
      *
-     * @param \Statamic\CP\Column $column
+     * @param  \Statamic\CP\Column  $column
      * @return $this
      */
     public function ensurePrepended($column)
@@ -50,7 +50,7 @@ class Columns extends Collection
     /**
      * Set preferred column visibility and order.
      *
-     * @param mixed $preferred
+     * @param  mixed  $preferred
      * @return Columns
      */
     public function setPreferred($preferred)

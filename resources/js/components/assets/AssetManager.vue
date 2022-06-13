@@ -35,6 +35,7 @@
         <asset-browser
             ref="browser"
             :initial-container="container"
+            :initial-per-page="$config.get('paginationSize')"
             :initial-editing-asset-id="initialEditingAssetId"
             :selected-path="path"
             :selected-assets="selectedAssets"

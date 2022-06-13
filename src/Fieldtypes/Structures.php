@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
 use Statamic\Facades\Structure;
+use Statamic\Structures\CollectionStructure;
 
 class Structures extends Relationship
 {
@@ -16,7 +17,7 @@ class Structures extends Relationship
         if ($structure = Structure::find($id)) {
             return [
                 'title' => $structure->title(),
-                'id' => $structure->handle(),
+                'id' => $this->getStructureId($structure),
             ];
         }
 
@@ -27,7 +28,7 @@ class Structures extends Relationship
     {
         return Structure::all()->map(function ($structure) {
             return [
-                'id' => $structure->handle(),
+                'id' => $this->getStructureId($structure),
                 'title' => $structure->title(),
             ];
         })->values();
@@ -43,5 +44,16 @@ class Structures extends Relationship
         return [
             Column::make('title'),
         ];
+    }
+
+    private function getStructureId($structure)
+    {
+        $id = $structure->id();
+
+        if ($structure instanceof CollectionStructure) {
+            $id = 'collection::'.$id;
+        }
+
+        return $id;
     }
 }

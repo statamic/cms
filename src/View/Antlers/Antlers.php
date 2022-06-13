@@ -32,10 +32,10 @@ class Antlers
     /**
      * Iterate over an array and parse the string/template for each.
      *
-     * @param string  $content
-     * @param array   $data
-     * @param bool    $supplement
-     * @param array   $context
+     * @param  string  $content
+     * @param  array  $data
+     * @param  bool  $supplement
+     * @param  array  $context
      * @return string
      */
     public function parseLoop($content, $data, $supplement = true, $context = [])

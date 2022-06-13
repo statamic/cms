@@ -3,8 +3,10 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use LogicException;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -26,7 +28,7 @@ class CollectionsController extends CpController
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries' => \Statamic\Facades\Entry::query()->where('collection', $collection->handle())->count(),
+                'entries' => $collection->queryEntries()->where('site', Site::selected())->count(),
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
@@ -63,8 +65,13 @@ class CollectionsController extends CpController
 
         $site = $request->site ? Site::get($request->site) : Site::selected();
 
-        $columns = $collection
-            ->entryBlueprint()
+        $blueprint = $collection->entryBlueprint();
+
+        if (! $blueprint) {
+            throw new LogicException("The {$collection->handle()} collection does not have any visible blueprints. At least one must not be hidden.");
+        }
+
+        $columns = $blueprint
             ->columns()
             ->setPreferred("collections.{$collection->handle()}.columns")
             ->rejectUnlisted()
@@ -79,8 +86,12 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'sites' => $collection->sites()->map(function ($site) {
-                $site = Site::get($site);
+            'sites' => $collection->sites()->map(function ($site_handle) {
+                $site = Site::get($site_handle);
+
+                if (! $site) {
+                    throw new SiteNotFoundException($site_handle);
+                }
 
                 return [
                     'handle' => $site->handle(),
@@ -133,6 +144,8 @@ class CollectionsController extends CpController
             'sort_direction' => $collection->sortDirection(),
             'max_depth' => optional($collection->structure())->maxDepth(),
             'expects_root' => optional($collection->structure())->expectsRoot(),
+            'show_slugs' => optional($collection->structure())->showSlugs(),
+            'require_slugs' => $collection->requiresSlugs(),
             'links' => $collection->entryBlueprints()->map->handle()->contains('link'),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
             'default_publish_state' => $collection->defaultPublishState(),
@@ -140,10 +153,14 @@ class CollectionsController extends CpController
             'layout' => $collection->layout(),
             'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
+            'propagate' => $collection->propagate(),
             'routes' => $collection->routes()->unique()->count() === 1
                 ? $collection->routes()->first()
                 : $collection->routes()->all(),
             'mount' => optional($collection->mount())->id(),
+            'title_formats' => $collection->titleFormats()->unique()->count() === 1
+                ? $collection->titleFormats()->first()
+                : $collection->titleFormats()->all(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))
@@ -216,7 +233,10 @@ class CollectionsController extends CpController
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
-            ->mount(array_get($values, 'mount'));
+            ->mount(array_get($values, 'mount'))
+            ->propagate(array_get($values, 'propagate'))
+            ->titleFormats($values['title_formats'])
+            ->requiresSlugs($values['require_slugs']);
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -228,7 +248,7 @@ class CollectionsController extends CpController
             }
             $collection->structure(null);
         } else {
-            $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites'] ?? null));
+            $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['show_slugs']));
         }
 
         $collection->save();
@@ -268,7 +288,7 @@ class CollectionsController extends CpController
             ->save();
     }
 
-    protected function makeStructure($collection, $maxDepth, $expectsRoot, $sites)
+    protected function makeStructure($collection, $maxDepth, $expectsRoot, $showSlugs)
     {
         if (! $structure = $collection->structure()) {
             $structure = new CollectionStructure;
@@ -276,7 +296,8 @@ class CollectionsController extends CpController
 
         return $structure
             ->maxDepth($maxDepth)
-            ->expectsRoot($expectsRoot);
+            ->expectsRoot($expectsRoot)
+            ->showSlugs($showSlugs);
     }
 
     public function destroy($collection)
@@ -366,6 +387,12 @@ class CollectionsController extends CpController
                         'type' => 'toggle',
                         'if' => ['structured' => true],
                     ],
+                    'show_slugs' => [
+                        'display' => __('Slugs'),
+                        'instructions' => __('statamic::messages.show_slugs_instructions'),
+                        'type' => 'toggle',
+                        'if' => ['structured' => true],
+                    ],
                 ],
             ],
             'content_model' => [
@@ -408,6 +435,11 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
                         'type' => 'template',
                     ],
+                    'title_formats' => [
+                        'display' => __('Title Format'),
+                        'instructions' => __('statamic::messages.collection_configure_title_format_instructions'),
+                        'type' => 'collection_title_formats',
+                    ],
                 ],
             ],
         ];
@@ -421,6 +453,11 @@ class CollectionsController extends CpController
                         'mode' => 'select',
                         'required' => true,
                     ],
+                    'propagate' => [
+                        'type' => 'toggle',
+                        'display' => __('Propagate'),
+                        'instructions' => __('statamic::messages.collection_configure_propagate_instructions'),
+                    ],
                 ],
             ];
         }
@@ -433,6 +470,11 @@ class CollectionsController extends CpController
                         'display' => __('Route'),
                         'instructions' => __('statamic::messages.collections_route_instructions'),
                         'type' => 'collection_routes',
+                    ],
+                    'require_slugs' => [
+                        'display' => __('Require Slugs'),
+                        'instructions' => __('statamic::messages.collection_configure_require_slugs_instructions'),
+                        'type' => 'toggle',
                     ],
                     'mount' => [
                         'display' => __('Mount'),

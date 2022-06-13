@@ -24,7 +24,7 @@ class EditGlobalVariablesTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->get($global->editUrl())
+            ->get($global->in('en')->editUrl())
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }

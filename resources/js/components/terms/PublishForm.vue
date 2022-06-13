@@ -21,7 +21,7 @@
 
                 <save-button-options
                     v-if="!readOnly"
-                    :show-options="!revisionsEnabled"
+                    :show-options="!revisionsEnabled && !isInline"
                     :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
@@ -110,7 +110,7 @@
                                             v-if="permalink"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="external-link" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="external-link" class="w-4 h-4 mr-1" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
@@ -269,6 +269,7 @@ export default {
         amp: Boolean,
         initialPublished: Boolean,
         isCreating: Boolean,
+        isInline: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
         initialPermalink: String,
@@ -307,6 +308,9 @@ export default {
             isRoot: this.initialIsRoot,
             permalink: this.initialPermalink,
             preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
+            saveKeyBinding: null,
+            quickSaveKeyBinding: null,
+            quickSave: false
         }
     },
 
@@ -389,7 +393,10 @@ export default {
         },
 
         save() {
-            if (!this.canSave) return;
+            if (! this.canSave) {
+                this.quickSave = false;
+                return;
+            }
 
             this.saving = true;
             this.clearErrors();
@@ -443,20 +450,32 @@ export default {
                     response
                 })
                 .then(() => {
+                    // If revisions are enabled, just emit event.
+                    if (this.revisionsEnabled) {
+                        this.$nextTick(() => this.$emit('saved', response));
+                        return;
+                    }
+
+                    let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
+
                     // If the user has opted to create another entry, redirect them to create page.
-                    if (! this.revisionsEnabled && this.afterSaveOption === 'create_another') {
+                    if (!this.isInline && this.afterSaveOption === 'create_another') {
                         window.location = this.createAnotherUrl;
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (! this.revisionsEnabled && this.afterSaveOption === null) {
+                    else if (!this.isInline && nextAction === null) {
                         window.location = this.listingUrl;
                     }
 
-                    // Otherwise, leave them on the edit form and emit an event.
+                    // Otherwise, leave them on the edit form and emit an event. We need to wait until after
+                    // the hooks are resolved because if this form is being shown in a stack, we only
+                    // want to close it once everything's done.
                     else {
                         this.$nextTick(() => this.$emit('saved', response));
                     }
+
+                    this.quickSave = false;
                 }).catch(e => {});
         },
 
@@ -583,9 +602,16 @@ export default {
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+return'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
+            this.canPublish ? this.confirmPublish() : this.save();
+        });
+
+        this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], e => {
+            e.preventDefault();
+            if (this.confirmingPublish) return;
+            this.quickSave = true;
             this.canPublish ? this.confirmPublish() : this.save();
         });
 
@@ -594,6 +620,11 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    destroyed() {
+        this.saveKeyBinding.destroy();
+        this.quickSaveKeyBinding.destroy();
     }
 
 }

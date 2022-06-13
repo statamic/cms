@@ -62,8 +62,6 @@ class TermInterface extends InterfaceType
 
     public static function addTypes()
     {
-        GraphQL::addType(self::class);
-
         $combinations = Taxonomy::all()
             ->flatMap(function ($taxonomy) {
                 return $taxonomy

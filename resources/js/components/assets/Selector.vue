@@ -5,6 +5,7 @@
             <div class="flex-1 overflow-scroll">
                 <asset-browser
                     :initial-container="container"
+                    :initial-per-page="$config.get('paginationSize')"
                     :selected-path="folder"
                     :selected-assets="browserSelections"
                     :restrict-container-navigation="restrictContainerNavigation"

@@ -24,7 +24,7 @@ class ImageNode extends Node
 
         if (Str::startsWith($attrs->src, 'asset::')) {
             $id = Str::after($attrs->src, 'asset::');
-            $attrs->src = Asset::find($id)->url();
+            $attrs->src = $this->getUrl($id);
         }
 
         return [
@@ -33,5 +33,10 @@ class ImageNode extends Node
                 'attrs' => (array) $attrs,
             ],
         ];
+    }
+
+    protected function getUrl($id)
+    {
+        return optional(Asset::find($id))->url();
     }
 }

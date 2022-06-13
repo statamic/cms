@@ -4,11 +4,13 @@ namespace Statamic\Http\View\Composers;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\View\View;
+use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use voku\helper\ASCII;
 
 class JavascriptComposer
 {
@@ -17,6 +19,7 @@ class JavascriptComposer
     public function compose(View $view)
     {
         $user = User::current();
+        $licenses = app('Statamic\Licensing\LicenseManager');
 
         Statamic::provideToScript([
             'version' => Statamic::version(),
@@ -28,6 +31,7 @@ class JavascriptComposer
             'resourceUrl' => Statamic::cpAssetUrl(),
             'locales' => config('statamic.system.locales'),
             'flash' => Statamic::flash(),
+            'toasts' => Toast::toArray(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
@@ -42,6 +46,8 @@ class JavascriptComposer
             'livePreview' => config('statamic.live_preview'),
             'locale' => config('app.locale'),
             'permissions' => $this->permissions($user),
+            'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
+            'charmap' => ASCII::charsArray(),
         ]);
     }
 
@@ -51,6 +57,7 @@ class JavascriptComposer
             return [
                 'name' => $site->name(),
                 'handle' => $site->handle(),
+                'lang' => $site->lang(),
             ];
         })->values();
     }

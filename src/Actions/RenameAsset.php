@@ -33,12 +33,6 @@ class RenameAsset extends Action
         return 'Are you sure you want to rename this asset?|Are you sure you want to rename these :count assets?';
     }
 
-    public function warningText()
-    {
-        /** @translation */
-        return 'messages.rename_asset_warning';
-    }
-
     public function run($assets, $values)
     {
         return $assets->each->rename($values['filename'], true);

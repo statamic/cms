@@ -8,47 +8,12 @@ use Tests\TestCase;
 
 class CheckboxesTest extends TestCase
 {
-    /** @test */
-    public function it_augments_to_empty_array_when_null()
-    {
-        $this->assertEquals([], $this->fieldtype()->augment(null));
-    }
+    use MultipleLabeledValueTests, CastsMultipleBooleansTests;
 
-    /** @test */
-    public function it_augments_to_LabeledValue_equivalents_for_looping()
+    private function field($config)
     {
-        $this->assertEquals([
-            ['key' => 'au', 'value' => 'au', 'label' => 'Australia'],
-            ['key' => 'ca', 'value' => 'ca', 'label' => 'Canada'],
-        ], $this->fieldtype()->augment(['au', 'ca']));
-    }
+        $ft = new Checkboxes;
 
-    /** @test */
-    public function it_augments_to_LabeledValue_equivalents_for_looping_with_no_keys()
-    {
-        $fieldtype = $this->fieldtype([
-            'options' => [
-                'au',
-                'ca',
-                'us',
-            ],
-        ]);
-
-        $this->assertEquals([
-            ['key' => 'au', 'value' => 'au', 'label' => 'au'],
-            ['key' => 'ca', 'value' => 'ca', 'label' => 'ca'],
-        ], $fieldtype->augment(['au', 'ca']));
-    }
-
-    public function fieldtype($config = [])
-    {
-        return (new Checkboxes)->setField(new Field('test', array_merge([
-            'type' => 'checkboxes',
-            'options' => [
-                'au' => 'Australia',
-                'ca' => 'Canada',
-                'us' => 'USA',
-            ],
-        ], $config)));
+        return $ft->setField(new Field('test', array_merge($config, ['type' => $ft->handle()])));
     }
 }

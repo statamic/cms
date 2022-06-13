@@ -10,6 +10,7 @@ use Statamic\Http\Controllers\CP\Utilities\GitController;
 use Statamic\Http\Controllers\CP\Utilities\PhpInfoController;
 use Statamic\Http\Controllers\CP\Utilities\UpdateSearchController;
 use Statamic\Statamic;
+use function Statamic\trans as __;
 
 class CoreUtilities
 {
@@ -24,6 +25,7 @@ class CoreUtilities
             ->docsUrl(Statamic::docsUrl('utilities/cache-manager'))
             ->routes(function ($router) {
                 $router->post('cache/{cache}', [CacheController::class, 'clear'])->name('clear');
+                $router->post('cache/{cache}/warm', [CacheController::class, 'warm'])->name('warm');
             })
             ->register();
 

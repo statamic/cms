@@ -10,9 +10,11 @@
     "license": "proprietary",
     "require": {
         "ext-json": "*",
+        "ajthinking/archetype": "^0.2.5",
         "composer/composer": "^1.10.22 || ^2.0.13",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
+        "james-heinrich/getid3": "^1.9",
         "laravel/framework": "^6.20.14 || ^7.30.4 || ^8.24.0",
         "laravel/helpers": "^1.1",
         "league/commonmark": "^1.5",
@@ -29,6 +31,7 @@
         "symfony/yaml": "^4.1 || ^5.1",
         "ueberdosis/html-to-prosemirror": "^1.3",
         "ueberdosis/prosemirror-to-html": "^2.6",
+        "voku/portable-ascii": "^1.6.1 || ^2.0",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
@@ -40,7 +43,11 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "pixelfear/composer-dist-plugin": true
+        }
     },
     "extra": {
         "download-dist": {
@@ -61,7 +68,8 @@
             "Statamic\\": "src/"
         },
         "files": [
-            "src/helpers.php"
+            "src/helpers.php",
+            "src/namespaced_helpers.php"
         ]
     },
     "autoload-dev": {

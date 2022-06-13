@@ -21,7 +21,7 @@ class TermTracker
     private $taxonomyStache;
 
     /**
-     * @param Stache $stache
+     * @param  Stache  $stache
      */
     public function __construct(Stache $stache)
     {
@@ -32,7 +32,7 @@ class TermTracker
     /**
      * Register the listeners for the subscriber.
      *
-     * @param \Illuminate\Events\Dispatcher $events
+     * @param  \Illuminate\Events\Dispatcher  $events
      */
     public function subscribe($events)
     {
@@ -41,7 +41,7 @@ class TermTracker
     }
 
     /**
-     * @param RepositoryItemInserted $event
+     * @param  RepositoryItemInserted  $event
      */
     public function insert(RepositoryItemInserted $event)
     {
@@ -102,7 +102,7 @@ class TermTracker
     }
 
     /**
-     * @param RepositoryItemRemoved $event
+     * @param  RepositoryItemRemoved  $event
      */
     public function remove(RepositoryItemRemoved $event)
     {

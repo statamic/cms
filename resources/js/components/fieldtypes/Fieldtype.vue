@@ -30,6 +30,10 @@ export default {
             this.$emit('input', value);
         },
 
+        updateDebounced: _.debounce(function (value) {
+            this.update(value);
+        }, 150),
+
         updateMeta(value) {
             this.$emit('meta-updated', value);
         }

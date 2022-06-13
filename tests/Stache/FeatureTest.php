@@ -22,6 +22,10 @@ class FeatureTest extends TestCase
     {
         parent::setUp();
 
+        // Use the file driver which is a more accurate representation of how the Stache would be used.
+        config(['cache.default' => 'file']);
+        $this->artisan('cache:clear');
+
         $this->stache = tap($this->app->make('stache'), function ($stache) {
             $dir = __DIR__.'/__fixtures__';
             $stache->store('taxonomies')->directory($dir.'/content/taxonomies');
@@ -58,8 +62,8 @@ class FeatureTest extends TestCase
     {
         $entry = Entry::find('blog-christmas');
         $this->assertEquals('Christmas', $entry->get('title'));
-        $this->assertSame($entry, Data::find('entry::blog-christmas'));
-        $this->assertSame($entry, Data::find('blog-christmas'));
+        $this->assertEquals($entry, Data::find('entry::blog-christmas'));
+        $this->assertEquals($entry, Data::find('blog-christmas'));
 
         // ensure it only gets from the entries' store, not anywhere in the stache.
         $this->assertNull(Entry::find('users-john'));
@@ -67,6 +71,7 @@ class FeatureTest extends TestCase
 
     /**
      * @test
+     *
      * @deprecated
      **/
     public function it_gets_entry_by_slug()
@@ -91,8 +96,8 @@ class FeatureTest extends TestCase
     {
         $global = GlobalSet::find('global');
         $this->assertEquals('Bar', $global->in('en')->get('foo'));
-        $this->assertSame($global, Data::find('global::global'));
-        $this->assertSame($global, Data::find('global'));
+        $this->assertEquals($global, Data::find('global::global'));
+        $this->assertEquals($global, Data::find('global'));
         $this->assertEquals('555-1234', GlobalSet::find('contact')->in('en')->get('phone'));
     }
 
@@ -122,8 +127,8 @@ class FeatureTest extends TestCase
         $this->assertEquals('users-john', $user->id());
         $this->assertEquals('John Smith', $user->get('name'));
         $this->assertEquals('john@example.com', $user->email());
-        $this->assertSame($user, Data::find('user::users-john'));
-        $this->assertSame($user, Data::find('users-john'));
+        $this->assertEquals($user, Data::find('user::users-john'));
+        $this->assertEquals($user, Data::find('users-john'));
     }
 
     /** @test */
@@ -281,6 +286,25 @@ class FeatureTest extends TestCase
             ->id('123')
             ->collection(Collection::findByHandle('blog'))
             ->slug('test-entry')
+            ->date('2017-07-04')
+            ->data(['title' => 'Test Entry', 'foo' => 'bar'])
+        )->save();
+
+        $this->assertFileExists(__DIR__.'/__fixtures__/content/collections/blog/2017-07-04.test-entry.md');
+
+        $entry->delete();
+    }
+
+    /** @test */
+    public function saving_an_entry_with_a_closure_based_slug_resolves_it_before_writing_to_file()
+    {
+        $entry = tap(Entry::make()
+            ->locale('en')
+            ->id('123')
+            ->collection(Collection::findByHandle('blog'))
+            ->slug(function () {
+                return 'test-entry';
+            })
             ->date('2017-07-04')
             ->data(['title' => 'Test Entry', 'foo' => 'bar'])
         )->save();

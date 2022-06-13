@@ -6,9 +6,9 @@ use Statamic\Fields\Fieldtype;
 
 class Floatval extends Fieldtype
 {
+    protected $categories = ['number'];
     protected $icon = 'float';
     protected $rules = ['numeric'];
-    protected static $title = 'Float';
     protected static $handle = 'float';
 
     protected function configFieldItems(): array
@@ -26,7 +26,7 @@ class Floatval extends Fieldtype
     /**
      * Pre-process the data before it gets sent to the publish page.
      *
-     * @param mixed $data
+     * @param  mixed  $data
      * @return array|mixed
      */
     public function preProcess($data)

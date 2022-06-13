@@ -13,7 +13,7 @@ class SupportDetails extends Command
     use RunsInPlease;
 
     protected $signature = 'statamic:support:details';
-    protected $description = 'Outputs details helpful for support requests.';
+    protected $description = 'Outputs details helpful for support requests';
 
     public function handle()
     {

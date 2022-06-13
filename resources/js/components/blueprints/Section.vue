@@ -2,13 +2,13 @@
 
     <div class="blueprint-section"
         :class="{
-            'w-full md:w-1/2 2xl:w-1/3': !isEditing && !isSingle,
+            'w-full md:w-1/2': !isEditing && !isSingle,
             'w-full': isEditing || isSingle
         }"
     >
-        <div class="blueprint-section-card card p-0 h-full flex flex-col">
+        <div class="blueprint-section-card card p-0 h-full flex rounded-t flex-col">
 
-            <div class="bg-grey-20 border-b text-sm flex rounded-t;" v-if="!isSingle">
+            <div class="bg-grey-20 border-b text-sm flex rounded-t" v-if="!isSingle">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-1.5 py-1 flex-1">
                     <span class="font-medium mr-1">
@@ -19,11 +19,11 @@
                     </span>
                 </div>
                 <div class="flex items-center px-1.5">
-                    <button @click.prevent="toggleEditing" class="text-grey-60 hover:text-grey-100 mr-1">
-                        <svg-icon :name="isEditing ? 'shrink' : 'expand'" />
+                    <button @click.prevent="toggleEditing" class="flex items-center text-grey-60 hover:text-grey-100 mr-1">
+                        <svg-icon class="h-4 w-4" :name="isEditing ? 'shrink' : 'expand'" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100" v-if="deletable">
-                        <svg-icon name="trash" />
+                    <button @click.prevent="$emit('deleted')" class="flex items-center text-grey-60 hover:text-grey-100" v-if="deletable">
+                        <svg-icon class="h-4 w-4" name="trash" />
                     </button>
                 </div>
             </div>

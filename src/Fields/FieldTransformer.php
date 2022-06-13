@@ -81,7 +81,7 @@ class FieldTransformer
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
             'config_overrides' => array_keys($config),
-            'fieldtype' => $type = $fieldsetField['type'],
+            'fieldtype' => $type = $mergedConfig['type'],
             'icon' => FieldtypeRepository::find($type)->icon(),
         ];
     }
@@ -119,12 +119,14 @@ class FieldTransformer
 
         $fields = Fieldset::all()->flatMap(function ($fieldset) {
             return collect($fieldset->fields()->all())->mapWithKeys(function ($field, $handle) use ($fieldset) {
-                return [$fieldset->handle().'.'.$field->handle() => array_merge($field->toBlueprintArray(), [
+                return [$fieldset->handle().'.'.$field->handle() => [
+                    'display' => $field->display(),
+                    'config' => $field->config(),
                     'fieldset' => [
                         'handle' => $fieldset->handle(),
                         'title' => $fieldset->title(),
                     ],
-                ])];
+                ]];
             });
         })->sortBy('display')->all();
 

@@ -9,15 +9,15 @@ interface Cacher
     /**
      * Cache a page.
      *
-     * @param \Illuminate\Http\Request $request     Request associated with the page to be cached
-     * @param string                   $content     The response content to be cached
+     * @param  \Illuminate\Http\Request  $request  Request associated with the page to be cached
+     * @param  string  $content  The response content to be cached
      */
     public function cachePage(Request $request, $content);
 
     /**
      * Check if a page has been cached.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return bool
      */
     public function hasCachedPage(Request $request);
@@ -25,7 +25,7 @@ interface Cacher
     /**
      * Get a cached page.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return string
      */
     public function getCachedPage(Request $request);
@@ -40,7 +40,7 @@ interface Cacher
     /**
      * Invalidate a URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return void
      */
     public function invalidateUrl($url);
@@ -48,7 +48,7 @@ interface Cacher
     /**
      * Invalidate multiple URLs.
      *
-     * @param array $urls
+     * @param  array  $urls
      * @return void
      */
     public function invalidateUrls($urls);
@@ -56,7 +56,7 @@ interface Cacher
     /**
      * Get all the URLs that have been cached.
      *
-     * @param string|null $domain
+     * @param  string|null  $domain
      * @return \Illuminate\Support\Collection
      */
     public function getUrls($domain = null);

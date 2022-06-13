@@ -42,6 +42,9 @@
         height: 32px;
         width: 32px;
         margin: 0 2px;
+        svg {
+            @apply w-4 h-4;
+        }
     }
 
     .bard-toolbar-button:hover {
@@ -76,6 +79,9 @@
         height: 32px;
         width: 32px;
         margin: 0 2px;
+        svg {
+            @apply w-4 h-4;
+        }
     }
 
     button.active {
@@ -128,25 +134,28 @@
         margin-left: -3px
     }
 
-    button {
+    .bard-toolbar-button {
         @apply text-grey-20 h-10 w-10 text-center bg-black rounded-lg flex items-center justify-center;
         font-size: 16px;
         transition: all .1s ease-in-out;
+        svg {
+            @apply w-4 h-4;
+        }
     }
 
-    button:hover {
+    .bard-toolbar-button:hover {
         @apply .text-white;
     }
 
-    button.active {
+    .bard-toolbar-button.active {
         @apply .text-blue;
     }
 
-    button:focus {
+    .bard-toolbar-button:focus {
         outline: none;
     }
 
-    button:disabled {
+    .bard-toolbar-button:disabled {
         @apply .opacity-50;
         &:hover {
             @apply .text-grey-20;
@@ -169,6 +178,9 @@
     }
 }
 
+.bard-set.has-error > .replicator-set-header label {
+    color: $color_red;
+}
 
 /* The set selection options for each text block
   ========================================================================== */
@@ -216,6 +228,11 @@
 
         > p > code, > pre code {
             @apply bg-grey-30;
+        }
+        
+        // To remove min height from nested bard fields inside bard in fullscreen mode.
+        * > .ProseMirror { 
+            min-height: auto;
         }
     }
 
@@ -407,12 +424,27 @@
                 content: '';
             }
         }
+
+        a {
+            @apply text-blue underline break-words;
+        }
+
+        a:active,
+        a:focus,
+        a:hover {
+            outline: 0;
+            text-decoration: underline;
+        }
     }
 
     p > code {
         @apply font-mono bg-grey-40 rounded-sm text-xs relative;
         padding: 2px 4px;
         top: -1px;
+    }
+
+    pre {
+        margin-bottom: .85em;
     }
 
     pre code {

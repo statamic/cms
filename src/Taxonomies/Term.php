@@ -4,6 +4,7 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\SyncsOriginalState;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
@@ -18,7 +19,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Term implements TermContract
 {
-    use ExistsAsFile, FluentlyGetsAndSets;
+    use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
 
     protected $taxonomy;
     protected $slug;
@@ -27,6 +28,7 @@ class Term implements TermContract
     protected $data;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $syncOriginalProperties = ['slug'];
 
     public function __construct()
     {
@@ -35,7 +37,7 @@ class Term implements TermContract
 
     public function id()
     {
-        return $this->taxonomyHandle().'::'.$this->slug();
+        return $this->taxonomyHandle() . '::' . $this->slug();
     }
 
     public function slug($slug = null)
@@ -97,7 +99,9 @@ class Term implements TermContract
     {
         $localizations = clone $this->data;
 
-        $array = $localizations->pull($this->defaultLocale());
+        $array = Arr::removeNullValues(
+            $localizations->pull($this->defaultLocale())->all()
+        );
 
         // todo: add published bool (for each locale?)
 
@@ -106,12 +110,10 @@ class Term implements TermContract
         }
 
         if (! $localizations->isEmpty()) {
-            $array['localizations'] = $localizations->map(function ($item) {
-                return Arr::removeNullValues($item->all());
-            })->all();
+            $array['localizations'] = $localizations->map->all()->all();
         }
 
-        return $array->all();
+        return $array;
     }
 
     public function in($site)
@@ -148,7 +150,12 @@ class Term implements TermContract
 
     public function entriesCount()
     {
-        return Blink::once('term-entries-count-'.$this->id(), function () {
+        $key = vsprintf('term-entries-count-%s-%s', [
+            $this->id(),
+            optional($this->collection())->handle(),
+        ]);
+
+        return Blink::once($key, function () {
             return Facades\Term::entriesCount($this);
         });
     }
@@ -211,6 +218,8 @@ class Term implements TermContract
 
             TermSaved::dispatch($this);
         }
+
+        $this->syncOriginal();
 
         return true;
     }

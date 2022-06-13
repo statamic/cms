@@ -6,6 +6,8 @@ use Statamic\Facades\Site;
 
 class Sites extends Relationship
 {
+    protected $indexComponent = 'text';
+
     public function toItemArray($id)
     {
         if ($site = Site::get($id)) {
@@ -26,5 +28,23 @@ class Sites extends Relationship
                 'title' => $site->name(),
             ];
         })->values();
+    }
+
+    public function augmentValue($value)
+    {
+        return Site::get($value);
+    }
+
+    public function preProcessIndex($data)
+    {
+        if (! $items = $this->augment($data)) {
+            return [];
+        }
+
+        if ($this->config('max_items') === 1) {
+            $items = collect([$items]);
+        }
+
+        return $items->map->name()->join(', ');
     }
 }

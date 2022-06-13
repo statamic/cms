@@ -9,7 +9,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
 
-                <dropdown-list class="mr-1">
+                <dropdown-list class="mr-1" v-if="!!this.$scopedSlots.twirldown">
                     <slot name="twirldown" />
                 </dropdown-list>
 
@@ -111,7 +111,9 @@
             :submit-parameters="{ deletedEntries, deleteLocalizationBehavior }"
             :max-depth="structureMaxDepth"
             :expects-root="structureExpectsRoot"
+            :show-slugs="structureShowSlugs"
             :site="site"
+            :preferences-prefix="preferencesPrefix"
             @edit-page="editPage"
             @changed="markTreeDirty"
             @saved="markTreeClean"
@@ -197,6 +199,7 @@ export default {
         structureSubmitUrl: { type: String },
         structureMaxDepth: { type: Number, default: Infinity },
         structureExpectsRoot: { type: Boolean },
+        structureShowSlugs: { type: Boolean },
     },
 
     data() {
@@ -211,7 +214,8 @@ export default {
             showLocalizationDeleteBehaviorConfirmation: false,
             localizationDeleteBehaviorConfirmCallback: null,
             site: this.initialSite,
-            reordering: false
+            reordering: false,
+            preferencesPrefix: `collections.${this.handle}`,
         }
     },
 

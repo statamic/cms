@@ -1,7 +1,7 @@
 <template>
 
     <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
-        :class="{ 'border-blue-lighter': selected }"
+        :class="{ 'border-blue-lighter': selected, 'has-error': hasError }"
         contenteditable="false" @copy.stop @paste.stop @cut.stop
     >
         <div ref="content" hidden />
@@ -44,6 +44,7 @@
                 :parent-name="parentName"
                 :set-index="index"
                 :error-key="errorKey(field)"
+                :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="focused"
@@ -69,14 +70,14 @@ export default {
         'updateAttrs', // function to update attributes defined in `schema`
         'editable', // global editor prop whether the content can be edited
         'options', // array of extension options
-        `selected`, // whether its selected,
+        'selected', // whether its selected,
     ],
 
     components: { SetField },
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
-    inject: ['setConfigs'],
+    inject: ['setConfigs', 'isReadOnly'],
 
     computed: {
 
@@ -124,6 +125,10 @@ export default {
         instructions() {
             return this.config.instructions ? markdown(this.config.instructions) : null;
         },
+
+        hasError() {
+            return this.options.bard.setsWithErrors.includes(this.index);
+        }
 
     },
 

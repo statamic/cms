@@ -22,22 +22,38 @@
                 <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
 
                 <div class="text-2xs text-red mt-1 flex items-center" v-if="userExists">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                     {{ __('This user already exists.') }}
                 </div>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center" v-else>
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_email_instructions') }}
                 </div>
             </div>
 
             <!-- Name -->
-            <div class="max-w-md mx-auto px-2 pb-7">
+            <div v-if="! separateNameFields" class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" autofocus tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_name_instructions') }}
+                </div>
+            </div>
+
+            <div v-else class="max-w-md mx-auto px-2 pb-7 flex space-x-4">
+                <div class="flex-1">
+                    <label class="font-bold text-base mb-sm" for="first_name">{{ __('First Name') }}</label>
+                    <input type="text" v-model="user.first_name" id="first_name" class="input-text" autofocus tabindex="2">
+                    <div class="text-2xs text-grey-60 mt-1 flex items-center">
+                        <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                        {{ __('messages.user_wizard_name_instructions') }}
+                    </div>
+                </div>
+
+                <div class="flex-1">
+                    <label class="font-bold text-base mb-sm" for="last_name">{{ __('Last Name') }}</label>
+                    <input type="text" v-model="user.last_name" id="last_name" class="input-text" autofocus tabindex="2">
                 </div>
             </div>
         </div>
@@ -56,7 +72,7 @@
                     <label class="font-bold ml-1">{{ __('Super Admin') }}</label>
                 </div>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_super_admin_instructions') }}
                 </div>
             </div>
@@ -191,6 +207,7 @@ export default {
         usersIndexUrl: { type: String },
         canCreateSupers: { type: Boolean },
         activationExpiry: { type: Number },
+        separateNameFields: { type: Boolean },
     },
 
     data() {

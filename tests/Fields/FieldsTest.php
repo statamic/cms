@@ -210,6 +210,7 @@ class FieldsTest extends TestCase
 
     /**
      * @test
+     *
      * @see https://github.com/statamic/cms/issues/2869
      **/
     public function it_prefixes_the_handles_of_nested_imported_fieldsets()

@@ -38,7 +38,6 @@ class GlobalSetInterfaceTest extends TestCase
 
         GlobalSetInterface::addTypes();
 
-        GraphQL::shouldHaveReceived('addType')->with(GlobalSetInterface::class)->once();
         GraphQL::shouldHaveReceived('addTypes')->withArgs(function ($args) {
             $this->assertEveryItemIsInstanceOf(GlobalSetType::class, $args);
             $this->assertEquals($expected = [

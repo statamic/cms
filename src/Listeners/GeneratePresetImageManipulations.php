@@ -16,7 +16,7 @@ class GeneratePresetImageManipulations implements ShouldQueue
     private $generator;
 
     /**
-     * @param PresetGenerator $generator
+     * @param  PresetGenerator  $generator
      */
     public function __construct(PresetGenerator $generator)
     {
@@ -26,7 +26,7 @@ class GeneratePresetImageManipulations implements ShouldQueue
     /**
      * Register the listeners for the subscriber.
      *
-     * @param \Illuminate\Events\Dispatcher $events
+     * @param  \Illuminate\Events\Dispatcher  $events
      */
     public function subscribe($events)
     {
@@ -36,7 +36,7 @@ class GeneratePresetImageManipulations implements ShouldQueue
     /**
      * Handle the events.
      *
-     * @param AssetUploaded $event
+     * @param  AssetUploaded  $event
      */
     public function handle($event)
     {

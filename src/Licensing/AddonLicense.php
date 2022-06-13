@@ -56,4 +56,9 @@ class AddonLicense extends License
 
         return parent::invalidReason();
     }
+
+    public function addon()
+    {
+        return $this->addon;
+    }
 }

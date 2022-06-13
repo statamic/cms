@@ -9,8 +9,8 @@ class AddonRepository
     /**
      * Make an addon instance.
      *
-     * @param string|array $addon  The name of the addon. This will be converted to StudlyCase.
-     *                             Or, an array containing package data.
+     * @param  string|array  $addon  The name of the addon. This will be converted to StudlyCase.
+     *                               Or, an array containing package data.
      * @return Addon
      */
     public function make($addon)

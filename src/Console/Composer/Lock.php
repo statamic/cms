@@ -17,7 +17,7 @@ class Lock
     /**
      * Instantiate lock file helper.
      *
-     * @param string $file
+     * @param  string  $file
      */
     public function __construct(string $file = 'composer.lock')
     {
@@ -29,7 +29,7 @@ class Lock
     /**
      * Instantiate lock file helper.
      *
-     * @param string $file
+     * @param  string  $file
      * @return static
      */
     public static function file(string $file = 'composer.lock')
@@ -40,7 +40,7 @@ class Lock
     /**
      * Backup lock file, using vanilla PHP so that this can be run in a Composer hook.
      *
-     * @param string $file
+     * @param  string  $file
      */
     public static function backup(string $file = 'composer.lock')
     {
@@ -78,8 +78,9 @@ class Lock
     /**
      * Ensure this lock file exists.
      *
-     * @throws ComposerLockFileNotFoundException
      * @return $this
+     *
+     * @throws ComposerLockFileNotFoundException
      */
     public function ensureExists()
     {
@@ -91,14 +92,17 @@ class Lock
     /**
      * Get installed version of a specific package.
      *
-     * @param string $package
+     * @param  string  $package
      * @return string
      */
     public function getInstalledVersion(string $package)
     {
         $this->ensureExists();
 
-        $installed = collect(json_decode($this->files->get($this->path))->packages)
+        $lock = json_decode($this->files->get($this->path));
+
+        $installed = collect($lock->packages)
+            ->merge($lock->{'packages-dev'})
             ->keyBy('name')
             ->get($package);
 
@@ -112,7 +116,7 @@ class Lock
     /**
      * Get installed version of a specific package, normalized for comparisons.
      *
-     * @param string $package
+     * @param  string  $package
      * @return string
      */
     public function getNormalizedInstalledVersion(string $package)
@@ -123,23 +127,41 @@ class Lock
     /**
      * Check if package is installed.
      *
-     * @param string $package
+     * @param  string  $package
      * @return bool
      */
-    public function isInstalled(string $package)
+    public function isPackageInstalled(string $package)
     {
         $this->ensureExists();
 
-        return collect(json_decode($this->files->get($this->path))->packages)
-            ->keyBy('name')
-            ->has($package);
+        $lock = json_decode($this->files->get($this->path), true);
+
+        return collect($lock['packages'] ?? [])
+            ->merge($lock['packages-dev'] ?? [])
+            ->pluck('name')
+            ->contains($package);
+    }
+
+    /**
+     * Check if package is installed as dev dependency.
+     *
+     * @param  string  $package
+     * @return bool
+     */
+    public function isDevPackageInstalled(string $package)
+    {
+        $this->ensureExists();
+
+        return collect(json_decode($this->files->get($this->path), true)['packages-dev'] ?? [])
+            ->pluck('name')
+            ->contains($package);
     }
 
     /**
      * Override package version.
      *
-     * @param string $package
-     * @param string $version
+     * @param  string  $package
+     * @param  string  $version
      * @return $this
      */
     public function overridePackageVersion($package, $version)

@@ -7,7 +7,7 @@ trait NormalizesHtml
     /**
      * Normalize dynamically rendered HTML output so that it's easier to make assertions against it.
      *
-     * @param mixed $html
+     * @param  mixed  $html
      */
     protected function normalizeHtml($html)
     {

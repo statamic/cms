@@ -17,14 +17,6 @@ class StatamicTest extends TestCase
         $app['config']->set('statamic.cp.date_format', 'cp-date-format');
         $app['config']->set('statamic.system.date_format', 'system-date-format');
 
-        Route::get('is-cp-route', function () {
-            return ['isCpRoute' => Statamic::isCpRoute()];
-        });
-
-        Route::get('cp/is-cp-route', function () {
-            return ['isCpRoute' => Statamic::isCpRoute()];
-        });
-
         Route::get('date-format', function () {
             return [
                 'dateFormat' => Statamic::dateFormat(),
@@ -38,9 +30,21 @@ class StatamicTest extends TestCase
     /** @test */
     public function it_checks_for_cp_route()
     {
-        $this->assertFalse($this->getJson('/is-cp-route')->assertOk()->json('isCpRoute'));
+        $this->get('/not-cp');
+        $this->assertFalse(Statamic::isCpRoute());
 
-        $this->assertTrue($this->getJson('/cp/is-cp-route')->assertOk()->json('isCpRoute'));
+        $this->get('/cp');
+        $this->assertTrue(Statamic::isCpRoute());
+
+        $this->get('/cp/foo');
+        $this->assertTrue(Statamic::isCpRoute());
+
+        $this->get('/cpa');
+        $this->assertFalse(Statamic::isCpRoute());
+
+        config(['statamic.cp.enabled' => false]);
+        $this->get('/cp/foo');
+        $this->assertFalse(Statamic::isCpRoute());
     }
 
     /** @test */

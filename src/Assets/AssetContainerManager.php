@@ -29,7 +29,7 @@ class AssetContainerManager
     /**
      * Get an absolute version of a given URL.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string|bool
      */
     public function getAbsoluteUrl($url)
@@ -65,7 +65,7 @@ class AssetContainerManager
     /**
      * Get an Amazon S3 filesystem instance.
      *
-     * @param array $config  An array containing key, secret, region, bucket, and path.
+     * @param  array  $config  An array containing key, secret, region, bucket, and path.
      * @return
      */
     public function createS3Filesystem($config)
@@ -80,7 +80,7 @@ class AssetContainerManager
     /**
      * Parse the keys in an array for environment variables.
      *
-     * @param array $data
+     * @param  array  $data
      * @return static
      */
     private function parseEnv($data)

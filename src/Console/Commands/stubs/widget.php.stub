@@ -13,6 +13,6 @@ class DummyClass extends Widget
      */
     public function html()
     {
-        // return view('widgets.widget_view');
+        return view('widget_view');
     }
 }

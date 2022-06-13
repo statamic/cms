@@ -4,10 +4,7 @@
 @section('content')
 
     <header class="mb-3">
-        @include('statamic::partials.breadcrumb', [
-            'url' => $set->inSelectedSite()->editUrl(),
-            'title' => $set->title()
-        ])
+        @include('statamic::partials.breadcrumb', $breadcrumb)
         <h1>@yield('title')</h1>
     </header>
 

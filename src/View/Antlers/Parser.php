@@ -130,7 +130,7 @@ class Parser
 
         try {
             $parsed = $this->parse($text, $data);
-        } catch (\Exception | \Error $e) {
+        } catch (\Exception|\Error $e) {
             throw $this->viewException($e, $data);
         }
 
@@ -142,8 +142,8 @@ class Parser
     /**
      * Kick off the Antlers parse process.
      *
-     * @param  string        $text      Text to parse
-     * @param  array|object  $data      Array or object to use
+     * @param  string  $text  Text to parse
+     * @param  array|object  $data  Array or object to use
      * @return AntlersString
      */
     public function parse($text, $data = [])
@@ -203,7 +203,7 @@ class Parser
     /**
      * Strip all comments out of the markup.
      *
-     * @param  string $text
+     * @param  string  $text
      * @return string
      */
     public function stripComments($text)
@@ -214,8 +214,8 @@ class Parser
     /**
      * Recursively parses all of the variables in the given HTML markup.
      *
-     * @param  string       $html      The HTML markup
-     * @param  array|object $data      the data
+     * @param  string  $html  The HTML markup
+     * @param  array|object  $data  the data
      * @return string
      */
     public function parseVariables($html, $data)
@@ -230,8 +230,8 @@ class Parser
     /**
      * Look for and parse array variables.
      *
-     * @param  string       $html      The HTML markup
-     * @param  array|object $data      the data
+     * @param  string  $html  The HTML markup
+     * @param  array|object  $data  the data
      * @return string
      */
     public function parseLoopVariables($text, $data)
@@ -346,8 +346,8 @@ class Parser
     /**
      * Look for and parse string variables.
      *
-     * @param  string       $html      The HTML markup
-     * @param  array|object $data      the data
+     * @param  string  $html  The HTML markup
+     * @param  array|object  $data  the data
      * @return string
      */
     public function parseStringVariables($text, $data)
@@ -379,15 +379,15 @@ class Parser
     /**
      * Parse a single string variable tag.
      *
-     * @param  string       $var      The name of the variable. eg. foo
-     * @param  string       $text     The tag text.
-     *                                eg.
-     *                                {{ var }}
-     *                                {{ var | modifier }}
-     *                                {{ var or anothervar }}
-     *                                {{ var | modifier or anothervar }}
-     * @param  array|object $data     The data
-     * @return string
+     * @param  string  $var  The name of the variable. eg. foo
+     * @param  string  $text  The tag text.
+     *                        eg.
+     *                        {{ var }}
+     *                        {{ var | modifier }}
+     *                        {{ var or anothervar }}
+     *                        {{ var | modifier or anothervar }}
+     * @param  array|object  $data  The data
+     * @return string|void
      */
     protected function parseStringVariableTag($var, $text, $data)
     {
@@ -436,8 +436,8 @@ class Parser
      * Look for and parse variables with parameter style modifiers.
      * Example: {{ date format="Y-m-d" }}.
      *
-     * @param  string       $html      The HTML markup
-     * @param  array|object $data      the data
+     * @param  string  $html  The HTML markup
+     * @param  array|object  $data  the data
      * @return string
      */
     public function parseVariablesWithParameterStyleModifiers($text, $data)
@@ -497,8 +497,8 @@ class Parser
     /**
      * Parses all Callback tags, by sending them through the defined callback.
      *
-     * @param  string $text     Text to parse
-     * @param  array  $data     An array of data to use
+     * @param  string  $text  Text to parse
+     * @param  array  $data  An array of data to use
      * @return string
      */
     public function parseCallbackTags($text, $data)
@@ -675,8 +675,8 @@ class Parser
     /**
      * Parses all conditionals, then executes the conditionals.
      *
-     * @param  string $text     Text to parse
-     * @param  mixed  $data     Data to use when executing conditionals
+     * @param  string  $text  Text to parse
+     * @param  mixed  $data  Data to use when executing conditionals
      * @return string
      */
     public function parseConditionPairs($text, $data)
@@ -722,8 +722,8 @@ class Parser
     /**
      * Parses simple ternary conditional strings.
      *
-     * @param  string $text     Text to parse
-     * @param  mixed  $data     Data to use when executing conditionals
+     * @param  string  $text  Text to parse
+     * @param  mixed  $data  Data to use when executing conditionals
      * @return string
      */
     public function parseTernaries($text, $data)
@@ -780,8 +780,8 @@ class Parser
     /**
      * Parses and assembles a condition string.
      *
-     * @param  string $condition  Text to parse
-     * @param  mixed  $data       Data to use when executing conditionals
+     * @param  string  $condition  Text to parse
+     * @param  mixed  $data  Data to use when executing conditionals
      * @return string
      */
     public function processCondition($condition, $data, $isTagPair = true)
@@ -889,8 +889,8 @@ class Parser
     /**
      * Recursively process a callback tag with a passed child array.
      *
-     * @param  string $text       The replaced text after a callback.
-     * @param  string $orig_text  The original text, before a callback is called.
+     * @param  string  $text  The replaced text after a callback.
+     * @param  string  $orig_text  The original text, before a callback is called.
      * @return string $text
      */
     public function parseRecursives($text, $orig_text, $data)
@@ -968,7 +968,7 @@ class Parser
      * extractions and all noparse can then be injected right
      * before data is displayed.
      *
-     * @param  string $text Text to inject into
+     * @param  string  $text  Text to inject into
      * @return string
      */
     public function injectNoparse($text)
@@ -980,7 +980,7 @@ class Parser
      * This is used as a callback for the conditional parser.  It takes a variable
      * and returns the value of it, properly formatted.
      *
-     * @param  array    $match    A match from $this->preg_replace_callback
+     * @param  array  $match  A match from $this->preg_replace_callback
      * @return string
      */
     public function processConditionVar($match)
@@ -1028,7 +1028,7 @@ class Parser
      * This is used as a callback for the conditional parser.  It takes a variable
      * and returns the value of it, properly formatted.
      *
-     * @param  array $match A match from $this->preg_replace_callback
+     * @param  array  $match  A match from $this->preg_replace_callback
      * @return string
      */
     protected function processParamVar($match)
@@ -1039,7 +1039,7 @@ class Parser
     /**
      * Takes a value and returns the literal value for it for use in a tag.
      *
-     * @param  string $value Value to convert
+     * @param  string  $value  Value to convert
      * @return string
      */
     protected function valueToLiteral($value)
@@ -1064,7 +1064,7 @@ class Parser
     /**
      * Ignore tags-who-must-not-be-parsed.
      *
-     * @param  string $text The text to extract from
+     * @param  string  $text  The text to extract from
      * @return string
      */
     public function extractNoparse($text)
@@ -1092,8 +1092,8 @@ class Parser
     /**
      * Extracts the looped tags so that we can parse conditionals then re-inject.
      *
-     * @param string   $text     The text to extract from
-     * @param array    $data     Data array to use
+     * @param  string  $text  The text to extract from
+     * @param  array  $data  Data array to use
      * @return string
      */
     protected function extractTagPairs($text, $data = [])
@@ -1117,10 +1117,10 @@ class Parser
      * Extracts text out of the given text and replaces it with a hash which
      * can be used to inject the extractions replacement later.
      *
-     * @param  string $type        Type of extraction
-     * @param  string $extraction  The text to extract
-     * @param  string $replacement Text that will replace the extraction when re-injected
-     * @param  string $text        Text to extract out of
+     * @param  string  $type  Type of extraction
+     * @param  string  $extraction  The text to extract
+     * @param  string  $replacement  Text that will replace the extraction when re-injected
+     * @param  string  $text  Text to extract out of
      * @return string
      */
     protected function createExtraction($type, $extraction, $replacement, $text)
@@ -1134,8 +1134,8 @@ class Parser
     /**
      * Injects all of the extractions for a given type.
      *
-     * @param string $text Text to inject into
-     * @param string $type Type of extraction to inject
+     * @param  string  $text  Text to inject into
+     * @param  string  $type  Type of extraction to inject
      * @return string
      */
     protected function injectExtractions($text, $type)
@@ -1156,9 +1156,9 @@ class Parser
      * Takes a scope-notated key and finds the value for it in the given
      * array or object.
      *
-     * @param  string       $key     Dot-notated key to find
-     * @param  array|object $data    Array or object to search
-     * @param  mixed        $default Default value to use if not found
+     * @param  string  $key  Dot-notated key to find
+     * @param  array|object  $data  Array or object to search
+     * @param  mixed  $default  Default value to use if not found
      * @return mixed
      */
     public function getVariable($key, $context, $default = null)
@@ -1192,9 +1192,9 @@ class Parser
     /**
      * Find out whether a given variable exists within a given context.
      *
-     * @param string $key
-     * @param array $context
-     * @return array  Array of [boolean whether it exists, value of the key]
+     * @param  string  $key
+     * @param  array  $context
+     * @return array Array of [boolean whether it exists, value of the key]
      */
     protected function getVariableExistenceAndValue($key, $context)
     {
@@ -1262,11 +1262,11 @@ class Parser
      *
      *      {{ old[key] }} or {{ if old[key] }} ...
      *
-     * @param string $key
-     * @param array $context
-     * @throws ArrayKeyNotFoundException
-     *
+     * @param  string  $key
+     * @param  array  $context
      * @return string
+     *
+     * @throws ArrayKeyNotFoundException
      */
     protected function replaceDynamicArrayKeys($key, $context)
     {
@@ -1297,7 +1297,7 @@ class Parser
     /**
      * Splits a string into a modifier and its parameters.
      *
-     * @param string $text Text to evaluate
+     * @param  string  $text  Text to evaluate
      * @return array
      */
     protected function unpackModifier($modifier)
@@ -1311,7 +1311,7 @@ class Parser
     /**
      * Checks if a string is wrapped in quotes and should be left alone.
      *
-     * @param string $string String to evaluate
+     * @param  string  $string  String to evaluate
      * @return bool
      */
     protected function isLiteralString($string)
@@ -1327,8 +1327,9 @@ class Parser
     /**
      * Evaluates the PHP in the given string.
      *
-     * @param string $text Text to evaluate
+     * @param  string  $text  Text to evaluate
      * @return string
+     *
      * @throws \Statamic\Exceptions\ParsingException
      */
     protected function parsePhp($text)
@@ -1347,8 +1348,8 @@ class Parser
     /**
      * Parses a parameter string into an array.
      *
-     * @param string   $parameters The string of parameters
-     * @param array    $data       Array of data
+     * @param  string  $parameters  The string of parameters
+     * @param  array  $data  Array of data
      * @return array
      */
     protected function parseParameters($parameters, $data)
