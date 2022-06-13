@@ -336,4 +336,14 @@ class Form implements FormContract, Augmentable, Arrayable
     {
         return Statamic::apiRoute('forms.show', $this->handle());
     }
+
+    /**
+     * Get the form action url.
+     *
+     * @return string
+     */
+    public function actionUrl()
+    {
+        return route('statamic.forms.submit', $this->handle());
+    }
 }

@@ -2461,6 +2461,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Convert value to a boolean.
+     *
+     * @param $params
+     * @param $value
+     * @return bool
+     */
+    public function toBool($value, $params)
+    {
+        if (is_string($value)) {
+            return Str::toBool($value);
+        }
+
+        return boolval($value);
+    }
+
+    /**
      * Converts the data to json.
      *
      * @param $value

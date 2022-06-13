@@ -46,6 +46,7 @@ use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
@@ -207,6 +208,8 @@ class NodeProcessor
 
     private $lockedData = [];
 
+    private $doStackIntercept = true;
+
     public function __construct(Loader $loader, EnvironmentDetails $envDetails)
     {
         $this->loader = $loader;
@@ -350,6 +353,19 @@ class NodeProcessor
     }
 
     /**
+     * Sets whether the processor will treat "stack" as a tag or variable.
+     *
+     * @param  bool  $doIntercept
+     * @return $this
+     */
+    public function setDoStackIntercept($doIntercept = true)
+    {
+        $this->doStackIntercept = $doIntercept;
+
+        return $this;
+    }
+
+    /**
      * Tests if the runtime configuration supports tracing.
      *
      * @return bool
@@ -393,6 +409,8 @@ class NodeProcessor
                     $this->previousAssignments[$path] = $targetIndex;
                 }
             }
+
+            $this->runtimeAssignments[$path] = $value;
         }
 
         if (GlobalRuntimeState::$traceTagAssignments) {
@@ -513,8 +531,13 @@ class NodeProcessor
 
         $this->pathDataManager->setIsPaired(false);
         $this->pathDataManager->setReduceFinal(false);
+
+        $currentData = $this->getActiveData();
+
         $managerResults = $this->pathDataManager->cascade($this->cascade)
-            ->getDataWithExistence($node->pathReference, $this->getActiveData(), true);
+            ->setInterpolations($node->processedInterpolationRegions)
+            ->setNodeProcessor($this->cloneProcessor()->setData($currentData))
+            ->getDataWithExistence($node->pathReference, $currentData, true);
         $this->pathDataManager->setIsPaired($cur);
         $this->pathDataManager->setReduceFinal($curReduce);
 
@@ -751,6 +774,11 @@ class NodeProcessor
         $this->runtimeAssignments = $assignments;
     }
 
+    public function mergeRuntimeAssignments($assignments)
+    {
+        $this->runtimeAssignments = array_merge($this->runtimeAssignments, $assignments);
+    }
+
     /**
      * Tests if the node sequence represents an iterable assignment.
      *
@@ -789,7 +817,7 @@ class NodeProcessor
         if ($this->antlersParser != null) {
             $processor->setAntlersParserInstance($this->antlersParser);
         }
-        $processor->cascade($this->cascade);
+        $processor->cascade($this->cascade)->setDoStackIntercept($this->doStackIntercept);
 
         if ($this->runtimeConfiguration != null) {
             $processor->setRuntimeConfiguration($this->runtimeConfiguration);
@@ -1136,24 +1164,37 @@ class NodeProcessor
                         continue;
                     }
 
-                    if ($node->name->name == 'stack' && ($node->isSelfClosing || $node->isClosedBy == null)) {
-                        $registeredStack = StackReplacementManager::registerStack($node->name->methodPart);
+                    if ($this->doStackIntercept && $node->name->name == 'stack') {
+                        if ($node->isClosingTag) {
+                            continue;
+                        }
+
+                        if ($node->isSelfClosing || $node->isClosedBy == null) {
+                            $registeredStack = StackReplacementManager::registerStack($node->name->methodPart);
+                        } else {
+                            $registeredStack = StackReplacementManager::registerArrayStack(
+                                $node->name->methodPart,
+                                $node,
+                                $this->cloneProcessor()->setData($this->getActiveData())->setDoStackIntercept(false)
+                            );
+                        }
 
                         $buffer .= $registeredStack;
                         continue;
-                    } elseif ($node->name->name == 'push' && $node->isClosedBy != null) {
-                        $stackContent = $this->cloneProcessor()->setData($this->getActiveData())->reduce($node->children);
+                    } elseif (($node->name->name == 'push' || $node->name->name == 'prepend') && $node->isClosedBy != null) {
+                        $currentData = $this->getActiveData();
 
-                        StackReplacementManager::pushStack($node->name->methodPart, $stackContent);
+                        $trimContentWhitespace = TypeCoercion::coerceBool($node->getSingleParameterValueByName(
+                            'trim', $this->cloneProcessor(), $currentData, false
+                        ));
 
-                        if ($this->isTracingEnabled()) {
-                            $this->runtimeConfiguration->traceManager->traceOnExit($node, $stackContent);
+                        $stackContent = $this->cloneProcessor()->setData($currentData)->reduce($node->children);
+
+                        if ($node->name->name == 'push') {
+                            StackReplacementManager::pushStack($node->name->methodPart, $stackContent, $trimContentWhitespace);
+                        } else {
+                            StackReplacementManager::prependStack($node->name->methodPart, $stackContent, $trimContentWhitespace);
                         }
-                        continue;
-                    } elseif ($node->name->name == 'prepend' && $node->isClosedBy != null) {
-                        $stackContent = $this->cloneProcessor()->setData($this->getActiveData())->reduce($node->children);
-
-                        StackReplacementManager::prependStack($node->name->methodPart, $stackContent);
 
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, $stackContent);
@@ -1362,7 +1403,10 @@ class NodeProcessor
 
                         if (! empty($this->runtimeAssignments)) {
                             GlobalRuntimeState::$traceTagAssignments = true;
-                            GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
+                            GlobalRuntimeState::$tracedRuntimeAssignments = array_merge(
+                                $this->runtimeAssignments,
+                                GlobalRuntimeState::$tracedRuntimeAssignments
+                            );
                         }
                         /** @var Tags $tag */
                         $tag = $this->loader->load($tagToLoad, [
@@ -2063,6 +2107,9 @@ class NodeProcessor
 
                                             $runtimeData = array_merge($runtimeData, $runtimeAssignmentsToProcess);
                                         }
+
+                                        $processor->setRuntimeAssignments($runtimeAssignments);
+
                                         if (count($this->data) > $dataCount) {
                                             $this->popLoopScope();
                                         }
@@ -2182,7 +2229,7 @@ class NodeProcessor
                 $___antlersVarAfter = get_defined_vars();
 
                 foreach ($___antlersVarAfter as $varKey => $varValue) {
-                    if (! array_key_exists($varKey, $___antlersVarBefore) || array_key_exists($varKey, $this->previousAssignments)) {
+                    if (! array_key_exists($varKey, $___antlersVarBefore) || array_key_exists($varKey, $this->previousAssignments) || array_key_exists($varKey, $this->runtimeAssignments)) {
                         $phpRuntimeAssignments[$varKey] = $varValue;
                     }
                 }
@@ -2192,6 +2239,9 @@ class NodeProcessor
         }
 
         if (! $node->isEchoNode && ! empty($phpRuntimeAssignments)) {
+            unset($phpRuntimeAssignments['___antlersVarBefore']);
+            unset($phpRuntimeAssignments['___antlersPhpExecutionResult']);
+
             $this->processAssignments($phpRuntimeAssignments);
         }
 

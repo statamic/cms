@@ -110,6 +110,7 @@ return [
     'replicator.config.collapse.enabled' => 'Tous les ensembles réduits par défaut',
     'replicator.config.max_sets' => 'Le nombre maximal d’ensembles.',
     'replicator.title' => 'Replicator',
+    'revealer.config.mode' => 'Choisissez votre disposition préférée.',
     'revealer.title' => 'Revealer',
     'section.title' => 'Section',
     'select.config.clearable' => 'Activez pour permettre de désélectionner votre option.',
