@@ -1,5 +1,7 @@
 <?php
+
 return [
+
     /*
     |--------------------------------------------------------------------------
     | Enable autosave
@@ -14,6 +16,7 @@ return [
     | saving interval of every 5 seconds.
     |
     */
+
     'enabled' => env('STATAMIC_AUTOSAVE_ENABLED', false),
 
     /*
@@ -28,11 +31,12 @@ return [
     | Set `understood` to true, to confirm that you do understand the risks.
     |
     */
+
     'understood' => false,
 
     /*
     |--------------------------------------------------------------------------
-    | Autosave interval
+    | Default autosave interval
     |--------------------------------------------------------------------------
     |
     | The default value can be set here generally for all collections.
@@ -40,5 +44,7 @@ return [
     | blueprint of a collection. By default, this value is set to 5s.
     |
     */
+
     'interval' => 5000,
+
 ];
