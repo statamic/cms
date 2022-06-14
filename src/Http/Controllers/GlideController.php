@@ -119,7 +119,7 @@ class GlideController extends Controller
 
         try {
             return $this->generator->$method($item, $this->request->all());
-        } catch (FileNotFoundException | UnableToReadFile $e) {
+        } catch (FileNotFoundException|UnableToReadFile $e) {
             throw new NotFoundHttpException;
         }
     }
