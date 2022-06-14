@@ -2,6 +2,8 @@
 
 namespace Statamic\View\State;
 
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+
 class StateManager
 {
     /**
@@ -35,6 +37,8 @@ class StateManager
      */
     public static function resetState()
     {
+        GlobalRuntimeState::resetGlobalState();
+
         if (count(self::$resetsState) > 0) {
             foreach (self::$resetsState as $className => $throwAway) {
                 app($className)->resetState();

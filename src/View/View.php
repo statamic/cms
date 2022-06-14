@@ -86,8 +86,6 @@ class View
 
     public function render(): string
     {
-        GlobalRuntimeState::resetGlobalState();
-        StateManager::resetState();
         ViewRendering::dispatch($this);
 
         $cascade = $this->gatherData();
