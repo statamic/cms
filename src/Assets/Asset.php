@@ -547,7 +547,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function move($folder, $filename = null)
     {
-        $filename = $filename ?: $this->filename();
+        $filename = $this->getSafeFilename($filename ?: $this->filename());
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
@@ -729,6 +729,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         foreach ($replacements as $from => $to) {
             $str = $str->replace($from, $to);
+        }
+
+        if (config('statamic.assets.lowercase')) {
+            $str = strtolower($str);
         }
 
         return (string) $str;

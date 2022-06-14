@@ -178,6 +178,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('addons/editions', 'AddonEditionsController');
 
     Route::group(['namespace' => 'Forms'], function () {
+        Route::post('forms/actions', 'ActionController@run')->name('forms.actions.run');
+        Route::post('forms/actions/list', 'ActionController@bulkActions')->name('forms.actions.bulk');
         Route::post('forms/{form}/submissions/actions', 'SubmissionActionController@run')->name('forms.submissions.actions.run');
         Route::post('forms/{form}/submissions/actions/list', 'SubmissionActionController@bulkActions')->name('forms.submissions.actions.bulk');
         Route::resource('forms', 'FormsController');

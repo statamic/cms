@@ -50,12 +50,20 @@ class Fields
     {
         $this->parent = $parent;
 
+        if ($this->fields) {
+            $this->fields->each(fn ($f) => $f->setParent($parent));
+        }
+
         return $this;
     }
 
     public function setParentField($field)
     {
         $this->parentField = $field;
+
+        if ($this->fields) {
+            $this->fields->each(fn ($f) => $f->setParentField($field));
+        }
 
         return $this;
     }

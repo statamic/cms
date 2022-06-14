@@ -37,7 +37,6 @@ class DataResponse implements Responsable
             ->protect()
             ->handleDraft()
             ->handlePrivateEntries()
-            ->addViewPaths()
             ->adjustResponseType()
             ->addContentHeaders()
             ->handleAmp();

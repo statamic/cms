@@ -5,6 +5,7 @@ namespace Tests\Antlers\Runtime;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Entries\Collection;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Tests\Antlers\Fixtures\Addon\Modifiers\VarTestModifier;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -58,5 +59,14 @@ EOT;
 EOT;
 
         $this->assertSame($expected, StringUtilities::normalizeLineEndings(trim($response->content())));
+    }
+
+    public function test_modifier_style_parameters_applies_brace_escape_sequences()
+    {
+        VarTestModifier::register();
+        $template = '{{ value var_test_modifier="test@{}|param_two@{@}" }} ';
+        $this->renderString($template, ['value' => 'value'], true);
+
+        $this->assertSame(['test{}', 'param_two{}'], VarTestModifier::$params);
     }
 }
