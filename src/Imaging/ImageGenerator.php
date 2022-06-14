@@ -3,7 +3,9 @@
 namespace Statamic\Imaging;
 
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
+use League\Flysystem\UnableToReadFile;
 use League\Glide\Filesystem\FileNotFoundException as GlideFileNotFoundException;
 use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
@@ -282,7 +284,7 @@ class ImageGenerator
         } else {
             $path = public_path($this->path);
             if (! File::exists($path)) {
-                throw new \Exception("File not found at path: {$path}");
+                throw $this->isUsingFlysystemOne() ? new FlysystemFileNotFoundException($path) : UnableToReadFile::fromLocation($path);
             }
             $mime = File::mimeType($path);
         }
