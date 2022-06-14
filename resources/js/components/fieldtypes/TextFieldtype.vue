@@ -14,8 +14,11 @@
         :name="name"
         :id="fieldId"
         @input="updateDebounced"
+        @click="updateCursorPosition"
+        @keydown.up.down="updateCursorPosition"
+        @keydown.left.right="updateCursorPosition"
         @focus="$emit('focus')"
-        @blur="$emit('blur')"
+        @blur="this.blurEvent"
     />
 </template>
 
