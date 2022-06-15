@@ -8,11 +8,22 @@ export default {
             this.setIframeAttributes(iframe);
 
             const container = this.$refs.contents;
-            container.firstChild
-                ? container.replaceChild(iframe, container.firstChild)
-                : container.appendChild(iframe);
 
-            // todo: maintain scroll position
+            if (! container.firstChild) {
+                container.appendChild(iframe);
+                return;
+            }
+
+            const scroll = [
+                container.firstChild.contentWindow.scrollX ?? 0,
+                container.firstChild.contentWindow.scrollY ?? 0
+            ];
+
+            container.replaceChild(iframe, container.firstChild);
+
+            setTimeout(() => {
+                iframe.contentWindow.scrollTo(...scroll);
+            }, 200);
         },
 
         setIframeAttributes(iframe) {
