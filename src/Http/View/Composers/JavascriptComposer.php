@@ -37,6 +37,7 @@ class JavascriptComposer
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
             'user' => $this->user($user),
             'paginationSize' => config('statamic.cp.pagination_size'),
+            'paginationPerPage' => config('statamic.cp.pagination_per_page'),
             'translationLocale' => app('translator')->locale(),
             'translations' => app('translator')->toJson(),
             'sites' => $this->sites(),
