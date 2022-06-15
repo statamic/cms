@@ -112,7 +112,8 @@ export default {
             this.assetId = src.substr(7);
         }
 
-        this.loadAsset(this.assetId || src);
+        let id = this.assetId || src;
+        if (id) this.loadAsset(id);
     },
 
     watch: {

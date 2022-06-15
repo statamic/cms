@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\Glide;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -11,11 +12,11 @@ Route::name('statamic.')->group(function () {
      * Glide
      * On-the-fly URL-based image transforms.
      */
-    if (! config('statamic.assets.image_manipulation.cache')) {
+    if (Glide::shouldServeByHttp()) {
         Site::all()->map(function ($site) {
             return URL::makeRelative($site->url());
         })->unique()->each(function ($sitePrefix) {
-            Route::group(['prefix' => $sitePrefix.'/'.config('statamic.assets.image_manipulation.route')], function () {
+            Route::group(['prefix' => $sitePrefix.'/'.Glide::route()], function () {
                 Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
                 Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
                 Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');

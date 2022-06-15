@@ -519,6 +519,29 @@ EOT;
 
         $this->assertSame('As the World TurnsAS THE WORLD TURNS', $this->renderString($template, $this->data, true));
     }
+
+    public function test_null_values_on_count_does_not_trigger_error()
+    {
+        $template = <<<'EOT'
+{{ if variable|count > 0 }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('No', $this->renderString($template, [], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => null], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => []], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => collect()], true));
+        $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One']], true));
+
+        $template = <<<'EOT'
+{{ if {variable count="count"} > 0 }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('No', $this->renderString($template, [], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => null], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => []], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => collect()], true));
+        $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One']], true));
+    }
 }
 
 class SimpleEntryObject implements Arrayable

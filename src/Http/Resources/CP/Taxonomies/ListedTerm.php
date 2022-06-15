@@ -53,6 +53,10 @@ class ListedTerm extends JsonResource
         return $this->columns->mapWithKeys(function ($column) use ($extra) {
             $key = $column->field;
 
+            if ($key == 'taxonomy') {
+                return [$key => $this->resource->taxonomy()->title()];
+            }
+
             $value = $this->blueprint
                 ->field($key)
                 ->setValue($extra[$key] ?? $this->resource->value($key))

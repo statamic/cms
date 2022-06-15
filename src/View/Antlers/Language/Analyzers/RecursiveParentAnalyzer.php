@@ -63,6 +63,8 @@ class RecursiveParentAnalyzer
                     }
                 }
 
+                $lastNode = self::findNextNonConditional($lastNode);
+
                 if ($lastNode == null) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_RECURSIVE_UNPAIRED_NODE,
@@ -88,5 +90,18 @@ class RecursiveParentAnalyzer
                 }
             }
         }
+    }
+
+    private static function findNextNonConditional(AntlersNode $node)
+    {
+        if (ConditionPairAnalyzer::isConditionalStructure($node) == false) {
+            return $node;
+        }
+
+        if ($node->parent == null) {
+            return $node;
+        }
+
+        return self::findNextNonConditional($node->parent);
     }
 }

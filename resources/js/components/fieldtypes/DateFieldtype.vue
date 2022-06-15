@@ -176,6 +176,11 @@ export default {
     methods: {
 
         setDate(date) {
+            if (!date) {
+                this.update(null);
+                return;
+            }
+
             if (this.isRange) {
                 this.setDateRange(date);
             } else {

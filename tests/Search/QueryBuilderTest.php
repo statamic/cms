@@ -548,6 +548,23 @@ class QueryBuilderTest extends TestCase
         $this->assertCount(2, $results);
         $this->assertEquals(['a', 'c'], $results->map->reference->all());
     }
+
+    /** @test */
+    public function results_are_found_using_offset()
+    {
+        $items = collect([
+            ['reference' => 'a'],
+            ['reference' => 'b'],
+            ['reference' => 'c'],
+            ['reference' => 'd'],
+        ]);
+
+        $query = (new FakeQueryBuilder($items))->withoutData();
+
+        $this->assertEquals(['a', 'b', 'c', 'd'], $query->get()->map->reference->all());
+
+        $this->assertEquals(['b', 'c', 'd'], $query->offset(1)->get()->map->reference->all());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder

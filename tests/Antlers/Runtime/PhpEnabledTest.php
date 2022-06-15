@@ -467,4 +467,69 @@ EOT;
 
         $this->assertSame('<p>Literal Content. hi!<END></p>', trim($this->renderString($template)));
     }
+
+    public function test_php_node_assignments_within_loops()
+    {
+        mt_srand(1234);
+        $data = [
+            'collection' => [
+                'articles' => [
+                    'one',
+                    'two',
+                    'three',
+                    'four',
+                    'five',
+                ],
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{ collection:articles }}
+{{? $rand = mt_rand(1,4); ?}}
+<{{ value }}><{{ rand }}>
+{{ /collection:articles }}
+EOT;
+
+        $expected = <<<'EOT'
+<one><4>
+
+
+<two><4>
+
+
+<three><3>
+
+
+<four><2>
+
+
+<five><1>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, $data)));
+    }
+
+    public function test_assignments_from_php_nodes()
+    {
+        $template = <<<'EOT'
+{{? 
+    $value_one = 100; 
+    $value_two = 0;
+?}}
+
+{{ loop from="1" to="5" }}
+{{? $value_one += 5; ?}}
+{{? $value_two += 5; ?}}
+{{ /loop }}
+
+{{ value_one += 1000; value_two += 1000; }}
+
+<value_one: {{ value_one }}>
+<value_two: {{ value_two }}>
+EOT;
+
+        $result = $this->renderString($template, [], true);
+        $this->assertStringContainsString('<value_one: 1125>', $result);
+        $this->assertStringContainsString('<value_two: 1025>', $result);
+    }
 }

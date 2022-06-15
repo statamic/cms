@@ -23,6 +23,35 @@ class APITest extends TestCase
             ->assertJson(['message' => 'Not found.']);
     }
 
+    /**
+     * @test
+     * @dataProvider entryNotFoundProvider
+     */
+    public function it_handles_not_found_entries($url, $requestShouldSucceed)
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('articles')->save();
+
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)->save();
+
+        if ($requestShouldSucceed) {
+            $this->assertEndpointSuccessful($url);
+        } else {
+            $this->assertEndpointNotFound($url);
+        }
+    }
+
+    public function entryNotFoundProvider()
+    {
+        return [
+            'valid entry id' => ['/api/collections/pages/entries/about', true],
+            'invalid entry id' => ['/api/collections/pages/entries/dance', false],
+            'valid entry id but wrong collection' => ['/api/collections/articles/entries/about', false],
+        ];
+    }
+
     /** @test */
     public function it_filters_published_entries_by_default()
     {
@@ -282,6 +311,35 @@ class APITest extends TestCase
             'password_hash:is',
             'password_hash:regex',
         ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
+    }
+
+    /**
+     * @test
+     * @dataProvider termNotFoundProvider
+     */
+    public function it_handles_not_found_terms($url, $requestShouldSucceed)
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        Facades\Taxonomy::make('tags')->save();
+        Facades\Taxonomy::make('categories')->save();
+
+        Facades\Term::make('test')->taxonomy('tags')->dataForLocale('en', [])->save();
+
+        if ($requestShouldSucceed) {
+            $this->assertEndpointSuccessful($url);
+        } else {
+            $this->assertEndpointNotFound($url);
+        }
+    }
+
+    public function termNotFoundProvider()
+    {
+        return [
+            'valid term id' => ['/api/taxonomies/tags/terms/test', true],
+            'invalid term id' => ['/api/taxonomies/tags/terms/missing', false],
+            'valid term id but wrong collection' => ['/api/taxonomies/categories/terms/test', false],
+        ];
     }
 
     private function assertEndpointDataCount($endpoint, $count)

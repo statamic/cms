@@ -11,6 +11,8 @@ use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\LiteralReplacementManager;
+use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Events\ViewRendered;
 
 class View
@@ -87,6 +89,8 @@ class View
         /** @var NoCacheManager $noCacheManager */
         $noCacheManager = app(NoCacheManager::class);
 
+        GlobalRuntimeState::resetGlobalState();
+
         $cascade = $this->gatherData();
 
         $noCacheManager->session()
@@ -115,6 +119,11 @@ class View
         ViewRendered::dispatch($this);
 
         $renderedContents = $contents->render();
+
+        if (config('statamic.antlers.version') == 'runtime') {
+            $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
+            $renderedContents = StackReplacementManager::processReplacements($renderedContents);
+        }
 
         if ($noCacheManager->session()->isActive($this->templateViewPath())) {
             $mockResponse = response($renderedContents);

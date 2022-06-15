@@ -6,10 +6,12 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class VariableAssignmentTest extends ParserTestCase
 {
+    use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
     public function test_simple_variable_is_set()
@@ -992,5 +994,46 @@ EOT;
 
         $results = trim($this->renderString($template, $data, true));
         $this->assertSame($expected, $results);
+    }
+
+    public function test_variable_assignment_do_not_leak()
+    {
+        $testTemplate = <<<'EOT'
+{{ arg = arg ?? 'default' }}{{ arg }}
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('test', $testTemplate);
+
+        $template = <<<'EOT'
+<{{ partial:test arg="foo" }}><{{ partial:test }}>
+EOT;
+
+        $this->assertSame('<foo><default>', trim($this->renderString($template)));
+    }
+
+    public function test_variable_assignments_are_not_reset_when_crossing_parser_boundaries()
+    {
+        $textTemplate = <<<'EOT'
+<count:{{ counter }}>
+
+{{ increment:something_else }}
+{{ increment:something_else }}
+{{ increment:something_else }}
+{{ increment:something_else }}
+{{ increment:something_else }}
+
+{{ bard }}
+{{ partial:echo }}{{ partial:echo }}{{ partial:echo }}{{ partial:echo }}{{ partial:echo }}{{ foreach:array_dynamic }}{{ /foreach:array_dynamic }}{{ /partial:echo }}{{ /partial:echo }}{{ /partial:echo }}{{ /partial:echo }}{{ /partial:echo }}
+{{ /bard }}
+
+{{ increment:something_else }}
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('components.text', $textTemplate);
+        $this->viewShouldReturnRaw('echo', '{{ slot }}');
+
+        $this->runFieldTypeTest('replicator_blocks', null, ['bard']);
     }
 }

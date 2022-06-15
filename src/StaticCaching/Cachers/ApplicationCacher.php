@@ -99,8 +99,10 @@ class ApplicationCacher extends AbstractCacher
      */
     public function flush()
     {
-        $this->getUrls()->keys()->each(function ($key) {
-            $this->cache->forget($this->normalizeKey('responses:'.$key));
+        $this->getDomains()->each(function ($domain) {
+            $this->getUrls($domain)->keys()->each(function ($key) {
+                $this->cache->forget($this->normalizeKey('responses:'.$key));
+            });
         });
 
         $this->flushUrls();
@@ -110,15 +112,16 @@ class ApplicationCacher extends AbstractCacher
      * Invalidate a URL.
      *
      * @param  string  $url
+     * @param  string|null  $domain
      * @return void
      */
-    public function invalidateUrl($url)
+    public function invalidateUrl($url, $domain = null)
     {
         if ($this->noCacheManager != null) {
             $this->noCacheManager->invalidateUrl($url);
         }
 
-        if (! $key = $this->getUrls()->flip()->get($url)) {
+        if (! $key = $this->getUrls($domain)->flip()->get($url)) {
             // URL doesn't exist, nothing to invalidate.
             return;
         }
