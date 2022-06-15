@@ -111,6 +111,7 @@ return [
     'replicator.config.max_sets' => 'The maximum number of sets.',
     'replicator.title' => 'Replicator',
     'revealer.title' => 'Revealer',
+    'revealer.config.mode' => 'Choose your preferred layout style.',
     'section.title' => 'Section',
     'select.config.clearable' => 'Enable to allow deselecting your option.',
     'select.config.multiple' => 'Allow multiple selections.',

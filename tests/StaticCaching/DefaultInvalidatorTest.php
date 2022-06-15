@@ -34,12 +34,12 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     public function collection_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry')->once();
+            $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
-            $m->shouldReceive('url')->andReturn('/my/test/entry');
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
         });
 
@@ -61,8 +61,8 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     public function taxonomy_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/term')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term')->once();
+            $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.com')->once();
+            $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.com')->once();
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/tags/one', '/tags/two']);
         });
 
@@ -73,7 +73,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         });
 
         $term = tap(Mockery::mock(Term::class), function ($m) use ($taxonomy) {
-            $m->shouldReceive('url')->andReturn('/my/test/term', '/my/collection/tags/term');
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/term', 'http://test.com/my/collection/tags/term');
             $m->shouldReceive('taxonomyHandle')->andReturn('tags');
             $m->shouldReceive('taxonomy')->andReturn($taxonomy);
             $m->shouldReceive('collection')->andReturn($m);

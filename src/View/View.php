@@ -9,6 +9,8 @@ use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\LiteralReplacementManager;
+use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Events\ViewRendered;
 
 class View
@@ -82,6 +84,8 @@ class View
 
     public function render(): string
     {
+        GlobalRuntimeState::resetGlobalState();
+
         $cascade = $this->gatherData();
 
         if ($this->shouldUseLayout()) {
@@ -105,7 +109,14 @@ class View
 
         ViewRendered::dispatch($this);
 
-        return $contents->render();
+        $renderedContents = $contents->render();
+
+        if (config('statamic.antlers.version') == 'runtime') {
+            $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
+            $renderedContents = StackReplacementManager::processReplacements($renderedContents);
+        }
+
+        return $renderedContents;
     }
 
     private function shouldUseLayout()

@@ -26,6 +26,7 @@ class GlideManager
             'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
             'cache_with_file_extensions' => true,
             'presets' => Image::manipulationPresets(),
+            'watermarks' => public_path(),
         ]);
     }
 

@@ -22,6 +22,7 @@ class Arr extends Fieldtype
                 'options' => [
                     'dynamic' => __('Dynamic'),
                     'keyed' => __('Keyed'),
+                    'single' => __('Single'),
                 ],
             ],
             'keys' => [
@@ -30,8 +31,8 @@ class Arr extends Fieldtype
                 'type' => 'array',
                 'key_header' => __('Key'),
                 'value_header' => __('Label').' ('.__('Optional').')',
-                'if' => [
-                    'mode' => 'keyed',
+                'unless' => [
+                    'mode' => 'dynamic',
                 ],
             ],
         ];

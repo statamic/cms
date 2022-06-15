@@ -2,7 +2,7 @@
     <button
         type="button"
         class="toggle-container"
-        :class="{ 'on': value, 'cursor-not-allowed': readOnly }"
+        :class="{ 'on': value, 'cursor-not-allowed read-only': readOnly }"
         @click="toggle"
         :aria-pressed="stateLiteral"
         :aria-label="__('Toggle Button')"

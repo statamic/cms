@@ -177,6 +177,10 @@ abstract class Builder implements Contract
 
     protected function invalidOperator($operator)
     {
+        if (is_null($operator)) {
+            return true;
+        }
+
         return ! in_array(strtolower($operator), array_keys($this->operators), true);
     }
 
@@ -594,13 +598,13 @@ abstract class Builder implements Contract
 
     protected function filterTestEquals($item, $value)
     {
-        return strtolower($item) === strtolower($value);
+        return strtolower($item ?? '') === strtolower($value ?? '');
     }
 
     protected function filterTestNotEquals($item, $value)
     {
         if (is_string($item)) {
-            return strtolower($item) !== strtolower($value);
+            return strtolower($item) !== strtolower($value ?? '');
         }
 
         return $item !== $value;
@@ -634,7 +638,7 @@ abstract class Builder implements Contract
             $item = json_encode($item);
         }
 
-        return preg_match($pattern, $item);
+        return preg_match($pattern, (string) $item);
     }
 
     protected function filterTestNotLike($item, $like)

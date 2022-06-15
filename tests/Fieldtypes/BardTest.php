@@ -408,7 +408,7 @@ class BardTest extends TestCase
                     ],
                 ],
             ],
-        ]));
+        ]))->setValue('[]'); // what an empty value would get preprocessed into.
 
         $expected = [
             'things' => [],
@@ -443,7 +443,7 @@ class BardTest extends TestCase
                     ],
                 ],
             ],
-        ]));
+        ]))->setValue('[]'); // what an empty value would get preprocessed into.
 
         $expected = [
             '_' => '_',

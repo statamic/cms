@@ -82,4 +82,13 @@ class FormTest extends TestCase
                 $this->assertEquals($expected, $value);
             });
     }
+
+    /** @test */
+    public function it_can_get_action_url()
+    {
+        $form = Form::make('contact_us');
+        $route = route('statamic.forms.submit', $form->handle());
+
+        $this->assertEquals($route, $form->actionUrl());
+    }
 }

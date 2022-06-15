@@ -4,12 +4,13 @@ namespace Tests\Antlers\Runtime;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Taxonomy;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
-use Tests\TestCase;
 
-class ParserIsolationTest extends TestCase
+class ParserIsolationTest extends ParserTestCase
 {
     use PreventSavingStacheItemsToDisk;
     use FakesViews;
@@ -55,5 +56,41 @@ EOT;
             ->assertOk();
 
         $this->assertSame($expected, StringUtilities::normalizeLineEndings($response->content()));
+    }
+
+    public function test_parser_isolation_considers_all_options_after_taxonomy()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->routes(['en' => '{slug}'])->taxonomies(['tags'])->save();
+        EntryFactory::collection('blog')->id('1')->data(['title' => 'One', 'tags' => ['rad', 'test', 'test-two']])->create();
+        EntryFactory::collection('blog')->id('2')->data(['title' => 'Two', 'tags' => ['rad', 'two']])->create();
+        EntryFactory::collection('blog')->id('3')->data(['title' => 'Three', 'tags' => ['meh']])->create();
+        EntryFactory::collection('blog')->id('4')->create();
+
+        $template = <<<'EOT'
+{{ collection:blog paginate="1" as="posts" }}
+{{ posts }}
+<{{ title }}>
+{{ if tags }}{{ tags }}<{{ url }}:{{ title }}>{{ /tags }}{{ /if }}
+{{ /posts }}
+{{ paginate }}
+<total_pages:{{ total_pages }}>
+<a href="{{ prev_page }}">Previous</a>
+<a href="{{ next_page }}">Next</a>
+{{ /paginate }}
+{{ /collection:blog }}
+EOT;
+
+        $expected = <<<'EOT'
+<One>
+</blog/tags/rad:rad></blog/tags/test:test></blog/tags/test-two:test-two>
+
+
+<total_pages:4>
+<a href="">Previous</a>
+<a href="http://localhost?page=2">Next</a>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [])));
     }
 }
