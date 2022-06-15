@@ -165,7 +165,7 @@ class Field implements Arrayable
             return true;
         }
 
-        if ($this->config()['type'] === 'section') {
+        if ($this->type() === 'section') {
             return false;
         }
 
