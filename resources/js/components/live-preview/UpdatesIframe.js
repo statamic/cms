@@ -21,7 +21,9 @@ export default {
 
             container.replaceChild(iframe, container.firstChild);
 
-            iframe.contentWindow.scrollTo(...scroll);
+            setTimeout(() => {
+                iframe.contentWindow.scrollTo(...scroll);
+            }, 200);
         },
 
         setIframeAttributes(iframe) {
