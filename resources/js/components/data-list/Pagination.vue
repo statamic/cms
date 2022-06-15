@@ -131,7 +131,7 @@ export default {
 
         perPageOptions() {
             let defaultPaginationSize = Statamic.$config.get('paginationSize');
-            let defaultOptions = Statamic.$config.get('paginationPerPage').filter(size => size !== defaultPaginationSize);
+            let defaultOptions = Statamic.$config.get('paginationSizeOptions').filter(size => size !== defaultPaginationSize);
             let options = this.normalizeInputOptions(defaultOptions);
 
             options.push({

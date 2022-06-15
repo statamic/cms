@@ -60,16 +60,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Pagination
+    | Pagination size
     |--------------------------------------------------------------------------
     |
-    | The numbers of items to show on each paginated page.
+    | The numbers of items to show on each paginated page by default.
     |
     */
 
     'pagination_size' => 50,
     
-    'pagination_per_page' => [10, 25, 50, 100, 500],
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination Options
+    |--------------------------------------------------------------------------
+    |
+    | Define the default pagination options, made available for users
+    | under every paginated entry listing inside the control panel.
+    |
+    */
+
+    'pagination_size_options' => [10, 25, 50, 100, 500],
 
     /*
     |--------------------------------------------------------------------------
