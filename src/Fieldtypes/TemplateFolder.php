@@ -18,9 +18,11 @@ class TemplateFolder extends Relationship
         return Folder::disk('resources')
             ->getFoldersRecursively('views')
             ->map(function ($folder) {
+                $path = str_replace_first('views/', '', $folder);
+
                 return [
-                    'id' => str_replace_first('views/', '', $folder),
-                    'title' => str_replace_first('views/', '', $folder)
+                    'id' => $path,
+                    'title' => $path,
                 ];
             })
             ->prepend(['id' => '/', 'title' => '/'])
