@@ -29,20 +29,22 @@ export default {
     },
 
     mounted() {
-        this.$axios.get(cp_url('api/templates')).then(response => {
+        this.$axios.get(cp_url('api/templates'), {
+            params: { folder: this.config.folder },
+        }).then(response => {
 
             var templates = response.data;
 
             // Filter out partials
             if (this.config.hide_partials) {
                 templates = _.reject(templates, function(template) {
-                    return template.startsWith('partials/') || template.match(/(^_.*|\/_.*|\._.*)/g);
+                    return template.id.startsWith('partials/') || template.id.match(/(^_.*|\/_.*|\._.*)/g);
                 });
             }
 
             // Filter out error templates
             templates = _.reject(templates, function(template) {
-                return template.startsWith('errors/');
+                return template.id.startsWith('errors/');
             });
 
             // Set default
@@ -50,8 +52,8 @@ export default {
 
             _.each(templates, function(template) {
                 options.push({
-                    label: template,
-                    value: template
+                    label: template.title,
+                    value: template.id
                 });
             });
 

@@ -128,6 +128,7 @@ return [
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Taxonomies',
     'template.config.hide_partials' => 'Partials are rarely intended to be used as templates.',
+    'template.config.folder' => 'The folder to list templates in.',
     'template.title' => 'Template',
     'terms.config.create' => 'Allow creation of new terms.',
     'terms.title' => 'Taxonomy Terms',
