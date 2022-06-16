@@ -79,7 +79,7 @@ class AssetContainerTest extends TestCase
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
+            'root' => __DIR__ . '/__fixtures__/container',
             'url' => '/the-url',
         ]]);
 
@@ -107,7 +107,7 @@ class AssetContainerTest extends TestCase
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
+            'root' => __DIR__ . '/__fixtures__/container',
             'url' => 'http://example.com/container',
         ]]);
 
@@ -122,7 +122,7 @@ class AssetContainerTest extends TestCase
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
+            'root' => __DIR__ . '/__fixtures__/container',
             'url' => '/container',
         ]]);
 
@@ -254,11 +254,30 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function if_saving_event_returns_false_the_asset_container_doesnt_save()
+    {
+        Event::fake([AssetContainerSaved::class]);
+        Facades\AssetContainer::spy();
+
+        Event::listen(AssetContainerSaving::class, function () {
+            return false;
+        });
+
+        $container = new AssetContainer;
+
+        $return = $container->saveQuietly();
+
+        $this->assertEquals($container, $return);
+
+        Event::assertNotDispatched(AssetContainerSaved::class);
+    }
+
+    /** @test */
     public function it_gets_the_path_from_the_stache()
     {
         $container = (new AssetContainer)->handle('test');
 
-        $this->assertEquals($this->fakeStacheDirectory.'/content/assets/test.yaml', $container->path());
+        $this->assertEquals($this->fakeStacheDirectory . '/content/assets/test.yaml', $container->path());
     }
 
     /** @test */
@@ -717,7 +736,7 @@ class AssetContainerTest extends TestCase
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
+            'root' => __DIR__ . '/__fixtures__/container',
         ]]);
 
         $container = (new AssetContainer)->handle('test')->disk('test');

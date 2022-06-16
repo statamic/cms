@@ -180,4 +180,36 @@ EOT;
         Event::assertNotDispatched(GlobalSetSaved::class);
         Event::assertNotDispatched(GlobalSetCreated::class);
     }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_global_set_doesnt_save()
+    {
+        Event::fake([GlobalSetSaved::class]);
+
+        Event::listen(GlobalSetSaving::class, function () {
+            return false;
+        });
+
+        Site::setConfig([
+             'default' => 'en',
+             'sites' => [
+                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                 'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                 'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+             ],
+         ]);
+
+        $set = (new GlobalSet)->title('SEO Settings');
+
+        $set->in('en', function ($loc) {
+            $loc->data([
+                 'array' => ['first one', 'second one'],
+                 'string' => 'The string',
+             ]);
+        });
+
+        $set->save();
+
+        Event::assertNotDispatched(GlobalSetSaved::class);
+    }
 }

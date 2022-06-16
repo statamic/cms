@@ -201,4 +201,25 @@ class FieldsetTest extends TestCase
         Event::assertNotDispatched(FieldsetSaved::class);
         Event::assertNotDispatched(FieldsetCreated::class);
     }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_fieldset_doesnt_save()
+    {
+        Event::fake([FieldsetSaved::class]);
+
+        Event::listen(FieldsetSaving::class, function () {
+            return false;
+        });
+
+        $fieldset = (new Fieldset)->setHandle('seo');
+
+        FieldsetRepository::shouldReceive('find')->with($fieldset->handle());
+        FieldsetRepository::shouldReceive('save')->with($fieldset)->once();
+
+        $return = $fieldset->saveQuietly();
+
+        $this->assertEquals($fieldset, $return);
+
+        Event::assertNotDispatched(FieldsetSaved::class);
+    }
 }

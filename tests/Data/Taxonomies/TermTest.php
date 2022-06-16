@@ -154,6 +154,25 @@ class TermTest extends TestCase
         Event::assertNotDispatched(TermCreated::class);
     }
 
+    /** @test */
+    public function if_saving_event_returns_false_the_term_doesnt_save()
+    {
+        Event::fake([TermSaved::class]);
+
+        Event::listen(TermSaving::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(TermSaved::class);
+    }
+
     public function it_gets_file_contents_for_saving()
     {
         tap(Taxonomy::make('tags')->sites(['en', 'fr']))->save();

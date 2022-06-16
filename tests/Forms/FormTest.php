@@ -90,6 +90,25 @@ class FormTest extends TestCase
     }
 
     /** @test */
+    public function if_saving_event_returns_false_the_form_doesnt_save()
+    {
+        Event::fake([FormSaved::class]);
+
+        Event::listen(FormSaving::class, function () {
+            return false;
+        });
+
+        $blueprint = (new Blueprint)->setHandle('post')->save();
+
+        $form = Form::make('contact_us')
+            ->title('Contact Us')
+            ->honeypot('winnie')
+            ->save();
+
+        Event::assertNotDispatched(FormSaved::class);
+    }
+
+    /** @test */
     public function it_gets_all_forms()
     {
         $this->assertEmpty(Form::all());

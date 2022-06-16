@@ -547,6 +547,27 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function if_saving_event_returns_false_the_blueprint_doesnt_save()
+    {
+        Event::fake([BlueprintSaved::class]);
+
+        Event::listen(BlueprintSaving::class, function () {
+            return false;
+        });
+
+        $blueprint = new Blueprint;
+
+        BlueprintRepository::shouldReceive('find')->with($blueprint->handle());
+        BlueprintRepository::shouldReceive('save')->with($blueprint)->once();
+
+        $return = $blueprint->saveQuietly();
+
+        $this->assertEquals($blueprint, $return);
+
+        Event::assertNotDispatched(BlueprintSaved::class);
+    }
+
+    /** @test */
     public function it_ensures_a_field_exists()
     {
         $blueprint = (new Blueprint)->setContents(['sections' => [
