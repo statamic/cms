@@ -390,7 +390,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 
     public function save()
     {
-        $isNew = is_null(Facades\Blueprint::find($this->handle()));
+        $name = Str::removeLeft($this->namespace().'.'.$this->handle(), '.');
+        $isNew = is_null(Facades\Blueprint::find($name));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
