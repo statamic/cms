@@ -55,8 +55,6 @@ export default {
                     end: input.target.selectionStart,
                 }
             }
-
-            console.log(Statamic.user.cursor)
         },
 
         isInputEvent(input) {
