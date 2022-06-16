@@ -139,6 +139,7 @@ return [
     'textarea.title' => 'Textarea',
     'time.config.seconds_enabled' => 'Toon seconden in de tijdpicker.',
     'time.title' => 'Time',
+    'toggle.config.inline_label' => 'Een inline label die naast de toggle getoond wordt.',
     'toggle.title' => 'Toggle',
     'user_groups.title' => 'User Groups',
     'user_roles.title' => 'User Roles',

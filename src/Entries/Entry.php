@@ -303,20 +303,19 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $this->withEvents = false;
 
-        $result = $this->save();
-
-        $this->withEvents = true;
-
-        return $result;
+        return $this->save();
     }
 
     public function save()
     {
         $isNew = is_null(Facades\Entry::find($this->id()));
 
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
-        if ($this->withEvents) {
+        if ($withEvents) {
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }
@@ -345,7 +344,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if ($isNew) {
                 EntryCreated::dispatch($this);
             }

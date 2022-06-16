@@ -14,7 +14,7 @@
         <publish-fields-container>
             <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, fieldPath(field.handle))"
                 :key="field.handle"
                 :field="field"
                 :meta="meta[field.handle]"
@@ -22,7 +22,7 @@
                 :parent-name="name"
                 :set-index="index"
                 :errors="errors(field.handle)"
-                :error-key-prefix="errorKey(field.handle)"
+                :field-path="fieldPath(field.handle)"
                 class="p-2"
                 :read-only="grid.isReadOnly"
                 @updated="updated(field.handle, $event)"

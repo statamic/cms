@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Statamic\Contracts\Entries\QueryBuilder;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
@@ -181,6 +181,7 @@ class Environment
     {
         $this->nodeProcessor = $processor;
 
+        $this->cascade($processor->getCascade());
         $this->operatorManager->setNodeProcessor($this->nodeProcessor);
 
         return $this;
@@ -360,7 +361,7 @@ class Environment
                 $this->unlock();
 
                 return $value;
-            } elseif ($result instanceof QueryBuilder) {
+            } elseif ($result instanceof Builder) {
                 $builderResults = $result->count();
                 $this->unlock();
 
@@ -1163,11 +1164,12 @@ class Environment
      * Returns the current value associated with the provided variable name.
      *
      * @param  string|VariableReference  $name  The variable name.
+     * @param  AbstractNode|null  $originalNode  The original node, if available.
      * @return array|ArrayAccess|mixed|string|null
      *
      * @throws RuntimeException
      */
-    private function scopeValue($name)
+    private function scopeValue($name, $originalNode = null)
     {
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
@@ -1176,6 +1178,16 @@ class Environment
                 }
 
                 $this->dataRetriever->setReduceFinal(false);
+            }
+
+            if ($originalNode != null && $originalNode->hasModifiers()) {
+                $doIntercept = $this->dataRetriever->getShouldDoValueIntercept();
+
+                $this->dataRetriever->setShouldDoValueIntercept(false);
+                $value = $this->dataRetriever->getData($name, $this->data);
+                $this->dataRetriever->setShouldDoValueIntercept($doIntercept);
+
+                return $value;
             }
 
             return $this->dataRetriever->getData($name, $this->data);
@@ -1496,7 +1508,7 @@ class Environment
                 return $interpolationValue;
             }
 
-            $scopeValue = $this->scopeValue($varName);
+            $scopeValue = $this->scopeValue($varName, $val);
 
             if ($scopeValue instanceof Collection && ! $val->hasModifiers()) {
                 $scopeValue = $scopeValue->all();
@@ -1524,7 +1536,7 @@ class Environment
 
                 $returnVal = $stringValue;
             } else {
-                $returnVal = $this->applyEscapeSequences($val->value);
+                $returnVal = DocumentParser::applyEscapeSequences($val->value);
             }
         } elseif ($val instanceof NullCoalescenceGroup) {
             $returnVal = $this->evaluateNullCoalescence($val);
@@ -1532,10 +1544,10 @@ class Environment
             $returnVal = $this->evaluateTernaryGroup($val);
         } elseif ($val instanceof ModifierValueNode) {
             if (is_string($val->value) && in_array(trim($val->value), GlobalRuntimeState::$interpolatedVariables)) {
-                return $this->applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
+                return DocumentParser::applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
             }
 
-            $returnVal = $this->applyEscapeSequences($val->value);
+            $returnVal = DocumentParser::applyEscapeSequences($val->value);
         } elseif ($val instanceof ArrayNode) {
             $returnVal = $this->resolveArrayValue($val);
         }
@@ -1569,13 +1581,5 @@ class Environment
         }
 
         return $this->adjustValue($returnVal, $val);
-    }
-
-    private function applyEscapeSequences($string)
-    {
-        $string = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $string);
-        $string = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $string);
-
-        return $string;
     }
 }

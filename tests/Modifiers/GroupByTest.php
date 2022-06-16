@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -48,6 +49,47 @@ class GroupByTest extends TestCase
                     'group' => 'baseball',
                     'items' => collect([
                         ['sport' => 'baseball', 'team' => 'yankees'],
+                    ]),
+                ],
+            ]),
+        ]);
+
+        $this->assertEquals($expected, $this->modify($items, 'sport'));
+    }
+
+    /** @test */
+    public function it_groups_values_instances()
+    {
+        // eg. grids
+
+        $items = [
+            $one = new Values(['sport' => 'basketball', 'team' => 'jazz']),
+            $two = new Values(['sport' => 'baseball', 'team' => 'yankees']),
+            $three = new Values(['sport' => 'basketball', 'team' => 'bulls']),
+        ];
+
+        $expected = collect([
+            'basketball' => collect([
+                $one,
+                $three,
+            ]),
+            'baseball' => collect([
+                $two,
+            ]),
+            'groups' => collect([
+                [
+                    'key' => 'basketball',
+                    'group' => 'basketball',
+                    'items' => collect([
+                        $one,
+                        $three,
+                    ]),
+                ],
+                [
+                    'key' => 'baseball',
+                    'group' => 'baseball',
+                    'items' => collect([
+                        $two,
                     ]),
                 ],
             ]),

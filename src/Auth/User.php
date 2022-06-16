@@ -74,7 +74,7 @@ abstract class User implements
                 [$name, $surname] = explode(' ', $name);
             }
         } else {
-            $name = $this->email();
+            $name = (string) $this->email();
         }
 
         return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));

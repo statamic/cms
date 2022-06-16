@@ -328,7 +328,9 @@ class ValidatorTest extends TestCase
                 ['type' => 'replicator_set', 'nested_replicator' => [['type' => 'replicator_set', 'nested_replicator' => [['type' => 'replicator_set']]]]],
             ],
             'replicator_with_nested_grid' => [
-                ['type' => 'replicator_set', 'nested_grid' => [[]]],
+                ['type' => 'replicator_set', 'nested_grid' => [
+                    ['text' => null, 'not_in_blueprint' => 'test'],
+                ]],
             ],
             'replicator_with_nested_bard' => [
                 ['type' => 'replicator_set', 'nested_bard' => [['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set']]]]],
