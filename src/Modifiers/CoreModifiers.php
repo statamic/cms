@@ -2096,6 +2096,10 @@ class CoreModifiers extends Modifier
     {
         $seed = Arr::get($params, 0);
 
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         if (is_array($value)) {
             return collect($value)->shuffle($seed)->all();
         }
