@@ -15,8 +15,8 @@
         :id="fieldId"
         @input="updateDebounced"
         @click="updateCursorPosition"
-        @keydown.up.down="updateCursorPosition"
-        @keydown.left.right="updateCursorPosition"
+        @keyup.up.down="updateCursorPosition"
+        @keyup.left.right="updateCursorPosition"
         @focus="$emit('focus')"
         @blur="this.blurEvent"
     />

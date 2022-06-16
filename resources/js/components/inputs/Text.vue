@@ -19,6 +19,7 @@
                 @input="$emit('input', $event)"
                 @click="$emit('click', $event)"
                 @keydown="$emit('keydown', $event)"
+                @keyup="$emit('keyup', $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             >

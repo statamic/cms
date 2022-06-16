@@ -46,51 +46,17 @@ export default {
         },
 
         updateCursorPosition(input) {
-            let position = null;
-
-            if (this.isInputEvent(input) || this.isPointerEvent(input)) {
-                position = {
-                    start: input.target.selectionStart,
-                    end: input.target.selectionStart
-                };
-            }
-
-            if (this.isKeyboardEvent(input)) {
-                // If using the keydown event, the selection position is so to say always one number behind.
-                let start = input.target.selectionStart;
-
-                // Substract one position if moving to the left, if not already on position zero.
-                if (input.code === "ArrowLeft" && start !== 0) {
-                    start--;
-                }
-
-                // Add one position if moving to the right, if not already on the last position.
-                if (input.code === "ArrowRight" && input.target.value.length > start) {
-                    start++;
-                }
-
-                // Move position to start if pressing arrow up.
-                if (input.code === "ArrowUp") {
-                    start = 0;
-                }
-
-                // Move position to last position if pressing arrow up.
-                if (input.code === "ArrowDown") {
-                    start = input.target.value.length;
-                }
-
-                position = {
-                  start: start,
-                  end: start // Is the same as start
-                };
-            }
-
-            if (! position) return;
+            if (! this.isInputEvent(input) && ! this.isPointerEvent(input) && ! this.isKeyboardEvent(input)) return;
 
             Statamic.user.cursor = {
                 handle: this.handle,
-                position: position,
+                position: {
+                    start: input.target.selectionStart,
+                    end: input.target.selectionStart,
+                }
             }
+
+            console.log(Statamic.user.cursor)
         },
 
         isInputEvent(input) {
