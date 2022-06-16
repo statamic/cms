@@ -3,8 +3,10 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Replacer;
 
 class Cache
 {
@@ -28,16 +30,34 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return response($this->cacher->getCachedPage($request));
+            $response = response($this->cacher->getCachedPage($request));
+
+            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
+
+            return $response;
         }
 
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
-            $this->cacher->cachePage($request, $response);
+            $this->makeReplacementsAndCacheResponse($request, $response);
         }
 
         return $response;
+    }
+
+    private function makeReplacementsAndCacheResponse($request, $response)
+    {
+        $cachedResponse = clone $response;
+
+        $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse));
+
+        $this->cacher->cachePage($request, $cachedResponse);
+    }
+
+    protected function getReplacers(): Collection
+    {
+        return collect(config('statamic.static_caching.replacers'))->map(fn ($class) => app($class));
     }
 
     private function canBeCached($request)
