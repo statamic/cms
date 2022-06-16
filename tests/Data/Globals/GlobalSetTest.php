@@ -191,21 +191,21 @@ EOT;
         });
 
         Site::setConfig([
-             'default' => 'en',
-             'sites' => [
-                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                 'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                 'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-             ],
-         ]);
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
 
         $set = (new GlobalSet)->title('SEO Settings');
 
         $set->in('en', function ($loc) {
             $loc->data([
-                 'array' => ['first one', 'second one'],
-                 'string' => 'The string',
-             ]);
+                'array' => ['first one', 'second one'],
+                'string' => 'The string',
+            ]);
         });
 
         $set->save();

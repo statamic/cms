@@ -79,7 +79,7 @@ class AssetContainerTest extends TestCase
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__ . '/__fixtures__/container',
+            'root' => __DIR__.'/__fixtures__/container',
             'url' => '/the-url',
         ]]);
 
@@ -107,7 +107,7 @@ class AssetContainerTest extends TestCase
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__ . '/__fixtures__/container',
+            'root' => __DIR__.'/__fixtures__/container',
             'url' => 'http://example.com/container',
         ]]);
 
@@ -122,7 +122,7 @@ class AssetContainerTest extends TestCase
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__ . '/__fixtures__/container',
+            'root' => __DIR__.'/__fixtures__/container',
             'url' => '/container',
         ]]);
 
@@ -277,7 +277,7 @@ class AssetContainerTest extends TestCase
     {
         $container = (new AssetContainer)->handle('test');
 
-        $this->assertEquals($this->fakeStacheDirectory . '/content/assets/test.yaml', $container->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/assets/test.yaml', $container->path());
     }
 
     /** @test */
@@ -736,7 +736,7 @@ class AssetContainerTest extends TestCase
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__ . '/__fixtures__/container',
+            'root' => __DIR__.'/__fixtures__/container',
         ]]);
 
         $container = (new AssetContainer)->handle('test')->disk('test');
