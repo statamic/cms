@@ -6,7 +6,7 @@ namespace Statamic\StaticCaching;
 
  interface Replacer
  {
-     public function prepareResponseToCache(Response $response);
+     public function prepareResponseToCache(Response $response, Response $initial);
 
      public function replaceInCachedResponse(Response $response);
  }

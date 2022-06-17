@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Collection;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\NoCache\NoCacheManager;
 use Statamic\StaticCaching\Replacer;
 
 class Cache
@@ -15,9 +16,15 @@ class Cache
      */
     private $cacher;
 
-    public function __construct(Cacher $cacher)
+    /**
+     * @var NoCacheManager
+     */
+    protected $nocache;
+
+    public function __construct(Cacher $cacher, NoCacheManager $nocache)
     {
         $this->cacher = $cacher;
+        $this->nocache = $nocache;
     }
 
     /**
@@ -41,6 +48,8 @@ class Cache
 
         if ($this->shouldBeCached($request, $response)) {
             $this->makeReplacementsAndCacheResponse($request, $response);
+
+            $this->nocache->session()->write();
         }
 
         return $response;

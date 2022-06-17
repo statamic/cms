@@ -4,6 +4,8 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Statamic\StaticCaching\NoCache\NoCacheManager;
+use Statamic\StaticCaching\Replacers\NoCacheReplacer;
 
 class ServiceProvider extends LaravelServiceProvider
 {
@@ -28,6 +30,17 @@ class ServiceProvider extends LaravelServiceProvider
                 $app[Cacher::class],
                 $app['config']['statamic.static_caching.invalidation.rules']
             );
+        });
+
+        $this->app->singleton(NoCacheManager::class, function ($app) {
+            return new NoCacheManager;
+        });
+
+        $this->app->beforeResolving(NoCacheManager::class, function ($manager) {
+            $configKey = 'statamic.static_caching.replacers';
+            $replacers = config($configKey);
+            $replacers[] = NoCacheReplacer::class;
+            config([$configKey => $replacers]);
         });
     }
 
