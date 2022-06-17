@@ -37,23 +37,25 @@ export default {
 
             // Filter out partials
             if (this.config.hide_partials) {
-                templates = _.reject(templates, function(template) {
-                    return template.id.startsWith('partials/') || template.id.match(/(^_.*|\/_.*|\._.*)/g);
+                templates = _.reject(templates, (template) => {
+                    return template.startsWith('partials/') || template.match(/(^_.*|\/_.*|\._.*)/g);
                 });
             }
 
             // Filter out error templates
-            templates = _.reject(templates, function(template) {
-                return template.id.startsWith('errors/');
+            templates = _.reject(templates, (template) => {
+                return template.startsWith('errors/');
             });
 
             // Set default
             var options = [];
 
-            _.each(templates, function(template) {
+            _.each(templates, (template) => {
                 options.push({
-                    label: template.title,
-                    value: template.id
+                    label: this.config.folder
+                        ? template.substring(this.config.folder.length + 1)
+                        : template,
+                    value: template
                 });
             });
 
