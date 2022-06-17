@@ -176,12 +176,12 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Flattens a bard value into a list of nodes and marks.
+     * Flattens a bard value into an array of nodes and marks.
      *
      * @param $value
      * @return array
      */
-    public function bard_items($value)
+    public function bard_array($value)
     {
         // If it's assoc it's a node with child nodes, otherwise it's an array of nodes
         if (Arr::isAssoc($value)) {
