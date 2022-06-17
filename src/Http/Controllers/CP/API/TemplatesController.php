@@ -15,12 +15,8 @@ class TemplatesController extends CpController
             : 'views';
 
         return collect(Folder::disk('resources')->getFilesRecursively($path))
-            ->filter(function ($view) {
-                return $view !== 'views/.gitkeep';
-            })
             ->map(function ($view) {
                 return str_replace_first('views/', '', str_before($view, '.'));
-            })
-            ->values();
+            });
     }
 }

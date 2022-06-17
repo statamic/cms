@@ -47,6 +47,11 @@ export default {
                 return template.startsWith('errors/');
             });
 
+            // Filter out blank value (.gitkeep)
+            templates = _.reject(templates, (template) => {
+                return template === '';
+            });
+
             // Set default
             var options = [];
 
