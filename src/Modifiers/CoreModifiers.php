@@ -215,7 +215,7 @@ class CoreModifiers extends Modifier
         if (Arr::isAssoc($value)) {
             $value = $value['content'] ?? [];
         }
-        
+
         $items = [];
         while (count($value)) {
             $item = array_shift($value);
