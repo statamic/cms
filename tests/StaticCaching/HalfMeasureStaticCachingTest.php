@@ -69,6 +69,98 @@ class HalfMeasureStaticCachingTest extends TestCase
         $response = $this->get('/about')->assertOk();
         $this->assertSame('2019-01-01 SUBSEQUENT-2020-05-23', $response->getContent());
     }
+
+    /** @test */
+    public function it_can_keep_parts_dynamic_using_nocache_tags()
+    {
+        // Use a tag that outputs something dynamic.
+        // It will just increment by one every time it's used.
+
+        app()->instance('example_count', 0);
+
+        (new class extends \Statamic\Tags\Tags {
+            public static $handle = 'example_count';
+
+            public function index()
+            {
+                $count = app('example_count');
+                $count++;
+                app()->instance('example_count', $count);
+
+                return $count;
+            }
+        })::register();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ example_count }} {{ no_cache }}{{ example_count }}{{ /no_cache }}');
+
+        $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('1 2', false);
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('1 3', false);
+    }
+
+    /** @test */
+    public function it_can_keep_the_cascade_parts_dynamic_using_nocache_tags()
+    {
+        // The "now" variable is generated in the cascade on every request.
+
+        Carbon::setTestNow(Carbon::parse('2019-01-01'));
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ now format="Y-m-d" }} {{ no_cache }}{{ now format="Y-m-d" }}{{ /no_cache }}');
+
+        $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('2019-01-01 2019-01-01', false);
+
+        Carbon::setTestNow(Carbon::parse('2020-05-23'));
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('2019-01-01 2020-05-23', false);
+    }
+
+    /** @test */
+    public function it_can_keep_the_urls_page_parts_dynamic_using_nocache_tags()
+    {
+        // The "page" variable (i.e. the about entry) is inserted into the cascade on every request.
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '<h1>{{ title }}</h1> {{ text }} {{ no_cache }}{{ text }}{{ /no_cache }}');
+
+        $page = $this->createPage('about', [
+            'with' => [
+                'title' => 'The About Page',
+                'text' => 'This is the about page.',
+            ],
+        ]);
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('<h1>The About Page</h1> This is the about page. This is the about page.', false);
+
+        $page
+            ->set('text', 'Updated text')
+            ->saveQuietly(); // Save quietly to prevent the invalidator from clearing the statically cached page.
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('<h1>The About Page</h1> This is the about page. Updated text', false);
+    }
 }
 
 class TestReplacer implements Replacer
