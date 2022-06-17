@@ -9,7 +9,7 @@ namespace Statamic\StaticCaching\Replacers;
  {
      const REPLACEMENT = '<statamic-cache-crsf-token>';
 
-     public function prepareResponseToCache(Response $response)
+     public function prepareResponseToCache(Response $response, Response $initial)
      {
          if (! $response->getContent()) {
              return;
