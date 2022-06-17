@@ -175,6 +175,59 @@ class CoreModifiers extends Modifier
         return substr($value, 0, -$params[0]);
     }
 
+    /**
+     * Flattens a bard value into a list of nodes and marks.
+     *
+     * @param $value
+     * @return array
+     */
+    public function bard_items($value)
+    {
+        // If it's assoc it's a node with child nodes, otherwise it's an array of nodes
+        if (Arr::isAssoc($value)) {
+            $value = $value['content'] ?? [];
+        }
+
+        $items = [];
+        while (count($value)) {
+            $items[] = $item = array_shift($value);
+            // Marks are children of the text node they apply to, but having access to that node would be useful
+            // so we insert the node as fake mark content and strip out the marks to avoid an infinite loop
+            $marks = collect($item['marks'] ?? [])
+                ->map(fn ($m) => $m + ['content' => [Arr::except($item, 'marks')]])
+                ->all();
+            array_unshift($value, ...$marks);
+            array_unshift($value, ...($item['content'] ?? []));
+        }
+
+        return $items;
+    }
+
+    /**
+     * Flattens a bard value into a conctenated string of all text content.
+     *
+     * @param $value
+     * @return array
+     */
+    public function bard_text($value)
+    {
+        // If it's assoc it's a node with child nodes, otherwise it's an array of nodes
+        if (Arr::isAssoc($value)) {
+            $value = $value['content'] ?? [];
+        }
+        
+        $items = [];
+        while (count($value)) {
+            $item = array_shift($value);
+            if ($item['type'] === 'text') {
+                $items[] = $item['text'] ?? '';
+            }
+            array_unshift($value, ...($item['content'] ?? []));
+        }
+
+        return implode(' ', $items);
+    }
+
     public function boolString($value)
     {
         if ($value == true) {
