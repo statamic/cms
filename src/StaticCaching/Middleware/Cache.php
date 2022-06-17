@@ -55,7 +55,7 @@ class Cache
         $this->cacher->cachePage($request, $cachedResponse);
     }
 
-    protected function getReplacers(): Collection
+    private function getReplacers(): Collection
     {
         return collect(config('statamic.static_caching.replacers'))->map(fn ($class) => app($class));
     }
