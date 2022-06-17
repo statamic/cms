@@ -50,7 +50,7 @@ class Cache
     {
         $cachedResponse = clone $response;
 
-        $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse));
+        $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
 
         $this->cacher->cachePage($request, $cachedResponse);
     }
