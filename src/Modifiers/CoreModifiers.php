@@ -185,7 +185,7 @@ class CoreModifiers extends Modifier
     {
         if ($value instanceof Value) {
             $value = $value->raw();
-        } else if (Arr::isAssoc($value)) {
+        } elseif (Arr::isAssoc($value)) {
             $value = [$value];
         }
 
@@ -214,7 +214,7 @@ class CoreModifiers extends Modifier
     {
         if ($value instanceof Value) {
             $value = $value->raw();
-        } else if (Arr::isAssoc($value)) {
+        } elseif (Arr::isAssoc($value)) {
             $value = [$value];
         }
 
