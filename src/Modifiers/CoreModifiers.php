@@ -192,12 +192,9 @@ class CoreModifiers extends Modifier
         $items = [];
         while (count($value)) {
             $items[] = $item = array_shift($value);
-            // Marks are children of the node they apply to, but having access to that node
-            // would be useful when finding marks, so we insert the node as fake mark content
-            array_unshift($value, ...array_map(
-                fn ($m) => $m + ['content' => [Arr::except($item, 'marks')]],
-                $item['marks'] ?? []
-            ));
+            // Marks are children of the text they apply to, but having access to that node
+            // would be useful when working with marks, so we add the node to the mark data
+            array_unshift($value, ...array_map(fn ($m) => $m + ['node' => $item], $item['marks'] ?? []));
             array_unshift($value, ...($item['content'] ?? []));
         }
 
