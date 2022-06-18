@@ -181,22 +181,23 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return array
      */
-    public function bard_array($value)
+    public function bardItems($value)
     {
-        // If it's assoc it's a node with child nodes, otherwise it's an array of nodes
-        if (Arr::isAssoc($value)) {
-            $value = $value['content'] ?? [];
+        if ($value instanceof Value) {
+            $value = $value->raw();
+        } else if (Arr::isAssoc($value)) {
+            $value = [$value];
         }
 
         $items = [];
         while (count($value)) {
             $items[] = $item = array_shift($value);
-            // Marks are children of the text node they apply to, but having access to that node would be useful
-            // so we insert the node as fake mark content and strip out the marks to avoid an infinite loop
-            $marks = collect($item['marks'] ?? [])
-                ->map(fn ($m) => $m + ['content' => [Arr::except($item, 'marks')]])
-                ->all();
-            array_unshift($value, ...$marks);
+            // Marks are children of the node they apply to, but having access to that node
+            // would be useful when finding marks, so we insert the node as fake mark content
+            array_unshift($value, ...array_map(
+                fn ($m) => $m + ['content' => [Arr::except($item, 'marks')]],
+                $item['marks'] ?? []
+            ));
             array_unshift($value, ...($item['content'] ?? []));
         }
 
@@ -204,16 +205,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Flattens a bard value into a conctenated string of all text content.
+     * Flattens a bard value into a string of all text content.
      *
      * @param $value
-     * @return array
+     * @return string
      */
-    public function bard_text($value)
+    public function bardText($value)
     {
-        // If it's assoc it's a node with child nodes, otherwise it's an array of nodes
-        if (Arr::isAssoc($value)) {
-            $value = $value['content'] ?? [];
+        if ($value instanceof Value) {
+            $value = $value->raw();
+        } else if (Arr::isAssoc($value)) {
+            $value = [$value];
         }
 
         $items = [];
