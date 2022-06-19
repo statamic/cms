@@ -29,9 +29,7 @@ export default {
     },
 
     mounted() {
-        this.$axios.get(cp_url('api/templates'), {
-            params: { folder: this.config.folder },
-        }).then(response => {
+        this.$axios.get(cp_url('api/templates')).then(response => {
 
             var templates = response.data;
 
@@ -51,6 +49,13 @@ export default {
             templates = _.reject(templates, (template) => {
                 return template === '';
             });
+
+            // Filter templates in folder
+            if (this.config.folder) {
+                templates = _.filter(templates, (template) => {
+                    return template.startsWith(`${this.config.folder}/`);
+                });
+            }
 
             // Set default
             var options = [];
