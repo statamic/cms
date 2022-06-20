@@ -2,17 +2,17 @@
 
 namespace Statamic\StaticCaching\Replacers;
 
-use Statamic\StaticCaching\NoCache\NoCacheManager;
+use Statamic\StaticCaching\NoCache\CacheSession;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
 
 class NoCacheReplacer implements Replacer
 {
-    private $manager;
+    private $session;
 
-    public function __construct(NoCacheManager $manager)
+    public function __construct(CacheSession $session)
     {
-        $this->manager = $manager;
+        $this->session = $session;
     }
 
     public function prepareResponseToCache(Response $cached, Response $response)
@@ -32,7 +32,7 @@ class NoCacheReplacer implements Replacer
             return;
         }
 
-        $this->manager->session()->restore();
+        $this->session->restore();
 
         $response->setContent($this->replace($content));
     }
@@ -44,7 +44,7 @@ class NoCacheReplacer implements Replacer
                 return '';
             }
 
-            return $this->manager->session()->getView($section)->render();
+            return $this->session->getView($section)->render();
         }, $content);
     }
 }

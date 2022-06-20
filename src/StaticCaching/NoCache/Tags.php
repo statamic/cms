@@ -8,13 +8,13 @@ class Tags extends \Statamic\Tags\Tags
     public static $stack = 0;
 
     /**
-     * @var NoCacheManager
+     * @var CacheSession
      */
-    private $noCacheManager;
+    private $nocache;
 
-    public function __construct(NoCacheManager $noCacheManager)
+    public function __construct(CacheSession $nocache)
     {
-        $this->noCacheManager = $noCacheManager;
+        $this->nocache = $nocache;
     }
 
     public function index()
@@ -25,7 +25,7 @@ class Tags extends \Statamic\Tags\Tags
             static::$stack -= 1;
 
             return $this
-                ->noCacheManager->session()
+                ->nocache
                 ->pushSection($this->content, $this->context->all(), 'antlers.html');
         }
 

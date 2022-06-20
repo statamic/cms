@@ -5,21 +5,19 @@ namespace Statamic\StaticCaching\NoCache;
 class BladeDirective
 {
     /**
-     * @var NoCacheManager
+     * @var CacheSession
      */
-    private $noCacheManager;
+    private $nocache;
 
-    public function __construct(NoCacheManager $noCacheManager)
+    public function __construct(CacheSession $nocache)
     {
-        $this->noCacheManager = $noCacheManager;
+        $this->nocache = $nocache;
     }
 
     public function handle($expression, $context)
     {
         $view = $expression;
 
-        return $this
-            ->noCacheManager->session()
-            ->pushView($view, $context);
+        return $this->nocache->pushView($view, $context);
     }
 }

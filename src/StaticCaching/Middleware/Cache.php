@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Support\Collection;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
-use Statamic\StaticCaching\NoCache\NoCacheManager;
+use Statamic\StaticCaching\NoCache\CacheSession;
 use Statamic\StaticCaching\Replacer;
 
 class Cache
@@ -17,11 +17,11 @@ class Cache
     private $cacher;
 
     /**
-     * @var NoCacheManager
+     * @var CacheSession
      */
     protected $nocache;
 
-    public function __construct(Cacher $cacher, NoCacheManager $nocache)
+    public function __construct(Cacher $cacher, CacheSession $nocache)
     {
         $this->cacher = $cacher;
         $this->nocache = $nocache;
@@ -49,7 +49,7 @@ class Cache
         if ($this->shouldBeCached($request, $response)) {
             $this->makeReplacementsAndCacheResponse($request, $response);
 
-            $this->nocache->session()->write();
+            $this->nocache->write();
         }
 
         return $response;
