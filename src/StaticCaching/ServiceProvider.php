@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching;
 
 use Facades\Statamic\View\Cascade;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\StaticCaching\NoCache\NoCacheManager;
@@ -50,6 +51,10 @@ class ServiceProvider extends LaravelServiceProvider
         // nocache session so it can filter out contextual data.
         Cascade::hydrated(function ($cascade) {
             $this->app[NoCacheManager::class]->session()->setCascade($cascade->toArray());
+        });
+
+        Blade::directive('nocache', function ($exp) {
+            return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', $__data); ?>';
         });
     }
 

@@ -162,6 +162,46 @@ class HalfMeasureStaticCachingTest extends TestCase
             ->assertOk()
             ->assertSee('<h1>The About Page</h1> This is the about page. Updated text', false);
     }
+
+    public function bladeViewPaths($app)
+    {
+        $app['config']->set('view.paths', [
+            __DIR__.'/blade',
+            ...$app['config']->get('view.paths'),
+        ]);
+    }
+
+    /**
+     * @test
+     * @define-env bladeViewPaths
+     */
+    public function it_can_keep_parts_dynamic_using_blade()
+    {
+        // Use a tag that outputs something dynamic.
+        // It will just increment by one every time it's used.
+
+        app()->instance('example_count', 0);
+
+        app()->instance('example_count_tag', function () {
+            $count = app('example_count');
+            $count++;
+            app()->instance('example_count', $count);
+
+            return $count;
+        });
+
+        $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('1 2', false);
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('1 3', false);
+    }
 }
 
 class TestReplacer implements Replacer

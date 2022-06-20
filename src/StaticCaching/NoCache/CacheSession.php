@@ -21,7 +21,7 @@ class CacheSession
         $this->url = $url;
     }
 
-    public function pushSection($contents, $context, $engine)
+    public function pushSection($contents, $context, $extension)
     {
         foreach ($this->ignoreVars as $varName) {
             unset($context[$varName]);
@@ -30,7 +30,21 @@ class CacheSession
         $contents = trim($contents);
         $key = sha1($contents);
 
-        $this->sections[$key] = ['engine' => $engine, 'view' => $contents];
+        $this->sections[$key] = ['type' => 'string', 'contents' => $contents, 'extension' => $extension];
+        $this->contexts[$key] = $this->filterContext($context);
+
+        return sprintf('<no_cache_section:%s>', $key);
+    }
+
+    public function pushView($view, $context)
+    {
+        foreach ($this->ignoreVars as $varName) {
+            unset($context[$varName]);
+        }
+
+        $key = str_random(32);
+
+        $this->sections[$key] = ['type' => 'view', 'view' => $view];
         $this->contexts[$key] = $this->filterContext($context);
 
         return sprintf('<no_cache_section:%s>', $key);
@@ -48,7 +62,17 @@ class CacheSession
 
     public function getView($region)
     {
-        return $this->sections[$region];
+        $section = $this->sections[$region];
+
+        $data = $this->getViewData($region);
+
+        if ($section['type'] === 'string') {
+            return new StringView($region, $section['contents'], $section['extension'], $data);
+        } elseif ($section['type'] === 'view') {
+            return new ViewView($section['view'], $data);
+        }
+
+        throw new \Exception('Unknown section type.');
     }
 
     public function setCascade(array $cascade)
