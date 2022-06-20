@@ -2,8 +2,13 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Facade;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Replacer;
+use Statamic\View\Cascade;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesContent;
 use Tests\FakesViews;
@@ -15,6 +20,25 @@ class HalfMeasureStaticCachingTest extends TestCase
     use FakesContent;
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // During these tests, we're doing multiple requests, so we want to make it act like
+        // fresh requests. Within a single test, the cascade would normally hang around,
+        // but we don't want the second request to use the cascade from the first, so we'll reset it.
+        // We don't want to reset it for the whole app (not yet, anyway) since that breaks some stuff.
+        Event::listen(function (RequestHandled $event) {
+            $this->app->offsetUnset(Cascade::class);
+            Facade::clearResolvedInstance(Cascade::class);
+
+            // Exact same as in ViewServiceProvider
+            $this->app->singleton(Cascade::class, function ($app) {
+                return new Cascade($app['request'], Site::current());
+            });
+        });
+    }
 
     protected function getEnvironmentSetUp($app)
     {
