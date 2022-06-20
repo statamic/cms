@@ -54,7 +54,7 @@ use Statamic\StaticCaching\NoCache\NoCacheManager;
 
              $this->createTemporaryView($section, $view['engine'], $view['view']);
 
-             return view('nocache::'.$section, $session->getContext($section))->render();
+             return view('nocache::'.$section, $session->getViewData($section))->render();
          }, $content);
      }
 

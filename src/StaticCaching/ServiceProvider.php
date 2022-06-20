@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use Facades\Statamic\View\Cascade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\StaticCaching\NoCache\NoCacheManager;
@@ -44,6 +45,12 @@ class ServiceProvider extends LaravelServiceProvider
         }
 
         $this->addNocacheReplacer();
+
+        // When the cascade gets hydrated, insert it into the
+        // nocache session so it can filter out contextual data.
+        Cascade::hydrated(function ($cascade) {
+            $this->app[NoCacheManager::class]->session()->setCascade($cascade->toArray());
+        });
     }
 
     private function addNocacheReplacer()
