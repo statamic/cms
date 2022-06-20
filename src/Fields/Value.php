@@ -8,8 +8,8 @@ use IteratorAggregate;
 use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\View\Antlers\Parser;
-use Statamic\Support\Str;
 use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
 
 class Value implements IteratorAggregate, JsonSerializable
