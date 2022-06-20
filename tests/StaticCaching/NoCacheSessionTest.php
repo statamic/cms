@@ -2,6 +2,8 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Support\Facades\Cache;
+use Mockery;
 use Statamic\StaticCaching\NoCache\CacheSession;
 use Tests\FakesContent;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -67,5 +69,65 @@ class NoCacheSessionTest extends TestCase
             'baz' => 'qux',
             'title' => 'local title',
         ], $session->getViewData($section));
+    }
+
+    /** @test */
+    public function it_writes()
+    {
+        // Testing that the cache key used is unique to the url.
+        // The contents aren't really important.
+
+        Cache::shouldReceive('forever')
+            ->with('nocache::session.'.md5('/'), Mockery::any())
+            ->once();
+
+        Cache::shouldReceive('forever')
+            ->with('nocache::session.'.md5('/foo'), Mockery::any())
+            ->once();
+
+        (new CacheSession('/'))->write();
+        (new CacheSession('/foo'))->write();
+    }
+
+    /** @test */
+    public function it_restores_from_cache()
+    {
+        Cache::forever('nocache::session.'.md5('/test'), [
+            'contexts' => ['foo' => 'bar'],
+            'sections' => ['baz' => 'qux'],
+        ]);
+
+        $this->createPage('/test', [
+            'with' => ['title' => 'Test page'],
+        ]);
+
+        $session = new CacheSession('/test');
+        $this->assertEquals([], $session->getContexts());
+        $this->assertEquals([], $session->getSections());
+        $this->assertEquals([], $session->getCascade());
+
+        // Ensure there is a request in the container.
+        // This can be removed if the controller logic in CacheSession@restoreCascade is refactored.
+        $this->get('/test');
+
+        $session->restore();
+
+        $this->assertEquals(['foo' => 'bar'], $session->getContexts());
+        $this->assertEquals(['baz' => 'qux'], $session->getSections());
+        $this->assertNotEquals([], $cascade = $session->getCascade());
+        $this->assertEquals('/test', $cascade['url']);
+        $this->assertEquals('Test page', $cascade['title']);
+        $this->assertEquals('http://localhost/cp', $cascade['cp_url']);
+    }
+
+    /** @test */
+    public function a_singleton_is_bound_in_the_container()
+    {
+        $this->get('/test?foo=bar');
+
+        $session = $this->app->make(CacheSession::class);
+
+        $this->assertInstanceOf(CacheSession::class, $session);
+        $this->assertEquals('http://localhost/test?foo=bar', $session->getUrl());
     }
 }

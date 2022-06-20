@@ -21,6 +21,16 @@ class CacheSession
         $this->url = $url;
     }
 
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    public function getSections()
+    {
+        return $this->sections;
+    }
+
     public function pushSection($contents, $context, $extension)
     {
         foreach ($this->ignoreVars as $varName) {
@@ -73,6 +83,11 @@ class CacheSession
         }
 
         throw new \Exception('Unknown section type.');
+    }
+
+    public function getCascade()
+    {
+        return $this->cascade;
     }
 
     public function setCascade(array $cascade)
