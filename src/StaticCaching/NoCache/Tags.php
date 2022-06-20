@@ -4,7 +4,7 @@ namespace Statamic\StaticCaching\NoCache;
 
 class Tags extends \Statamic\Tags\Tags
 {
-    public static $handle = 'no_cache';
+    public static $handle = 'nocache';
     public static $stack = 0;
 
     /**

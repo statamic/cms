@@ -93,7 +93,7 @@ class HalfMeasureStaticCachingTest extends TestCase
         })::register();
 
         $this->withStandardFakeViews();
-        $this->viewShouldReturnRaw('default', '{{ example_count }} {{ no_cache }}{{ example_count }}{{ /no_cache }}');
+        $this->viewShouldReturnRaw('default', '{{ example_count }} {{ nocache }}{{ example_count }}{{ /nocache }}');
 
         $this->createPage('about');
 
@@ -116,7 +116,7 @@ class HalfMeasureStaticCachingTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2019-01-01'));
 
         $this->withStandardFakeViews();
-        $this->viewShouldReturnRaw('default', '{{ now format="Y-m-d" }} {{ no_cache }}{{ now format="Y-m-d" }}{{ /no_cache }}');
+        $this->viewShouldReturnRaw('default', '{{ now format="Y-m-d" }} {{ nocache }}{{ now format="Y-m-d" }}{{ /nocache }}');
 
         $this->createPage('about');
 
@@ -139,7 +139,7 @@ class HalfMeasureStaticCachingTest extends TestCase
         // The "page" variable (i.e. the about entry) is inserted into the cascade on every request.
 
         $this->withStandardFakeViews();
-        $this->viewShouldReturnRaw('default', '<h1>{{ title }}</h1> {{ text }} {{ no_cache }}{{ text }}{{ /no_cache }}');
+        $this->viewShouldReturnRaw('default', '<h1>{{ title }}</h1> {{ text }} {{ nocache }}{{ text }}{{ /nocache }}');
 
         $page = $this->createPage('about', [
             'with' => [
