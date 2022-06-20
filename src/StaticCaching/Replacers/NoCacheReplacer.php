@@ -4,8 +4,8 @@ namespace Statamic\StaticCaching\Replacers;
 
 use Statamic\Facades\File;
 use Statamic\StaticCaching\NoCache\NoCacheManager;
- use Statamic\StaticCaching\Replacer;
- use Symfony\Component\HttpFoundation\Response;
+use Statamic\StaticCaching\Replacer;
+use Symfony\Component\HttpFoundation\Response;
 
  class NoCacheReplacer implements Replacer
  {
