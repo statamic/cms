@@ -35,13 +35,6 @@ class ServiceProvider extends LaravelServiceProvider
         $this->app->singleton(NoCacheManager::class, function ($app) {
             return new NoCacheManager;
         });
-
-        $this->app->beforeResolving(NoCacheManager::class, function ($manager) {
-            $configKey = 'statamic.static_caching.replacers';
-            $replacers = config($configKey);
-            $replacers[] = NoCacheReplacer::class;
-            config([$configKey => $replacers]);
-        });
     }
 
     public function boot()
@@ -49,5 +42,15 @@ class ServiceProvider extends LaravelServiceProvider
         if (config('statamic.static_caching.strategy')) {
             Event::subscribe(Invalidate::class);
         }
+
+        $this->addNocacheReplacer();
+    }
+
+    private function addNocacheReplacer()
+    {
+        $configKey = 'statamic.static_caching.replacers';
+        $replacers = config($configKey);
+        $replacers[] = NoCacheReplacer::class;
+        config([$configKey => $replacers]);
     }
 }
