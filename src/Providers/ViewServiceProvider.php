@@ -2,6 +2,9 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
@@ -31,9 +34,7 @@ class ViewServiceProvider extends ServiceProvider
     {
         $this->app->singleton(Store::class);
 
-        $this->app->singleton(Cascade::class, function ($app) {
-            return new Cascade($app['request'], Site::current());
-        });
+        $this->bindCascade();
 
         $this->registerRuntimeAntlers();
         $this->registerRegexAntlers();
@@ -170,5 +171,23 @@ class ViewServiceProvider extends ServiceProvider
         }
 
         ini_set('pcre.backtrack_limit', config('statamic.system.pcre_backtrack_limit', -1));
+
+        Event::listen(function (RequestHandled $event) {
+            $this->rebindCascade();
+        });
+    }
+
+    private function bindCascade()
+    {
+        $this->app->singleton(Cascade::class, function ($app) {
+            return new Cascade($app['request'], Site::current());
+        });
+    }
+
+    private function rebindCascade()
+    {
+        $this->app->offsetUnset(Cascade::class);
+        Facade::clearResolvedInstance(Cascade::class);
+        $this->bindCascade();
     }
 }
