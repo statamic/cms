@@ -52,7 +52,7 @@ export default {
                 handle: this.handle,
                 position: {
                     start: input.target.selectionStart,
-                    end: input.target.selectionStart,
+                    end: input.target.selectionEnd,
                 }
             }
         },
