@@ -92,7 +92,7 @@ class NoCacheSessionTest extends TestCase
     /** @test */
     public function it_restores_from_cache()
     {
-        Cache::forever('nocache::session.'.md5('/test'), [
+        Cache::forever('nocache::session.'.md5('http://localhost/test'), [
             'contexts' => ['foo' => 'bar'],
             'sections' => ['baz' => 'qux'],
         ]);
@@ -101,14 +101,10 @@ class NoCacheSessionTest extends TestCase
             'with' => ['title' => 'Test page'],
         ]);
 
-        $session = new CacheSession('/test');
+        $session = new CacheSession('http://localhost/test');
         $this->assertEquals([], $session->getContexts());
         $this->assertEquals([], $session->getSections());
         $this->assertEquals([], $session->getCascade());
-
-        // Ensure there is a request in the container.
-        // This can be removed if the controller logic in CacheSession@restoreCascade is refactored.
-        $this->get('/test');
 
         $session->restore();
 

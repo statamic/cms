@@ -4,7 +4,7 @@ namespace Statamic\StaticCaching\NoCache;
 
 use Facades\Statamic\View\Cascade;
 use Illuminate\Support\Facades\Cache;
-use Statamic\Http\Controllers\FrontendController;
+use Statamic\Facades\Data;
 
 class CacheSession
 {
@@ -153,12 +153,8 @@ class CacheSession
 
     private function restoreCascade()
     {
-        // The front-end controller has all the logic to get the page content object by uri.
-        // TODO: Probably a good idea to refactor into something nicer than calling a controller.
-        $content = app(FrontendController::class)->index(app('request'));
-
         return Cascade::instance()
-            ->withContent($content)
+            ->withContent(Data::findByRequestUrl($this->url))
             ->hydrate()
             ->toArray();
     }
