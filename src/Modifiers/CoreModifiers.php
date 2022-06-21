@@ -2096,6 +2096,10 @@ class CoreModifiers extends Modifier
     {
         $seed = Arr::get($params, 0);
 
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         if (is_array($value)) {
             return collect($value)->shuffle($seed)->all();
         }
@@ -2458,6 +2462,22 @@ class CoreModifiers extends Modifier
         $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor'];
 
         return Stringy::titleize($value, $ignore);
+    }
+
+    /**
+     * Convert value to a boolean.
+     *
+     * @param $params
+     * @param $value
+     * @return bool
+     */
+    public function toBool($value, $params)
+    {
+        if (is_string($value)) {
+            return Str::toBool($value);
+        }
+
+        return boolval($value);
     }
 
     /**

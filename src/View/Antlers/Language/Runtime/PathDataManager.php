@@ -12,6 +12,7 @@ use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\View\Antlers\AntlersString;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
@@ -187,10 +188,13 @@ class PathDataManager
      * Sets the internal node processor reference.
      *
      * @param  NodeProcessor  $processor
+     * @return $this
      */
     public function setNodeProcessor($processor)
     {
         $this->nodeProcessor = $processor;
+
+        return $this;
     }
 
     /**
@@ -211,10 +215,13 @@ class PathDataManager
      * Sets the data manager's internal interpolation reference.
      *
      * @param  array  $interpolations
+     * @return $this
      */
     public function setInterpolations($interpolations)
     {
         $this->interpolations = $interpolations;
+
+        return $this;
     }
 
     /**
@@ -530,9 +537,16 @@ class PathDataManager
                     $nodeProcessor = $this->getNodeProcessor();
 
                     if ($nodeProcessor != null) {
-                        $varResult = $nodeProcessor->reduce($this->interpolations[$pathItem->name]);
+                        $varResult = $nodeProcessor->cloneProcessor()
+                            ->setData($data)->reduce($this->interpolations[$pathItem->name]);
+
                         $this->resolvedPath[] = $pathItem->name;
-                        $this->reducedVar = $varResult;
+
+                        if ((is_string($varResult) || is_numeric($varResult)) && is_array($this->reducedVar) && array_key_exists($varResult, $this->reducedVar)) {
+                            $this->reducedVar = $this->reducedVar[$varResult];
+                        } else {
+                            $this->reducedVar = $varResult;
+                        }
 
                         $this->compact($pathItem->isFinal);
                         continue;
@@ -628,7 +642,7 @@ class PathDataManager
                     $wasBuilderGoingIntoLast = true;
                 }
 
-                $this->reduceVar($pathItem);
+                $this->reduceVar($pathItem, $data);
 
                 if ($pathItem->isFinal && $this->reducedVar instanceof Builder && ! $wasBuilderGoingIntoLast) {
                     $this->encounteredBuilderOnFinalPart = true;
@@ -664,16 +678,32 @@ class PathDataManager
                     $this->doBreak = false;
                     continue;
                 } else {
-                    $retriever = new PathDataManager();
-                    $retriever->setInterpolations($this->interpolations);
-                    $retriever->setEnvironment($this->environment);
-                    $retriever->setIsPaired(false);
-                    $referencePath = $retriever->getData($pathItem, $data, true);
+                    $referencePath = null;
+                    $processor = $this->getNodeProcessor();
 
-                    $this->reduceVar($referencePath);
+                    if (count($pathItem->pathParts) == 1 && array_key_exists($pathItem->originalContent, $this->interpolations) && $processor != null) {
+                        $referencePath = $processor->cloneProcessor()->setData($data)
+                            ->setIsInterpolationProcessor(true)->reduce($this->interpolations[$pathItem->originalContent]);
+                    } else {
+                        $retriever = new PathDataManager();
+                        $retriever->setInterpolations($this->interpolations);
+                        $retriever->setEnvironment($this->environment);
+                        $retriever->setIsPaired(false);
+                        $referencePath = $retriever->getData($pathItem, $data, true);
+                    }
+
+                    if (is_numeric($referencePath) && array_key_exists($referencePath, $this->reducedVar)) {
+                        $this->reducedVar = $this->reducedVar[$referencePath];
+                    } else {
+                        $this->reduceVar($referencePath, $data);
+                    }
 
                     if ($this->doBreak) {
                         break;
+                    }
+
+                    if ($pathItem->isFinal == false || $this->reduceFinal) {
+                        $this->compact(false);
                     }
                 }
             }
@@ -710,8 +740,9 @@ class PathDataManager
      * Reduces the provided path data element.
      *
      * @param  PathNode|string  $path  The path element.
+     * @param  array  $processorData
      */
-    private function reduceVar($path)
+    private function reduceVar($path, $processorData = [])
     {
         if ($path === null) {
             $this->reducedVar = null;
@@ -730,6 +761,11 @@ class PathDataManager
                 $doCompact = (! $path->isFinal || $this->reduceFinal);
                 $varPath = $path->name;
             }
+        }
+
+        if (is_string($varPath) && array_key_exists($varPath, $this->interpolations) && $this->nodeProcessor != null) {
+            $varPath = $this->nodeProcessor->cloneProcessor()->setData($processorData)
+                ->setIsInterpolationProcessor(true)->reduce($this->interpolations[$varPath]);
         }
 
         // Handles some edge-case type values.
@@ -757,11 +793,23 @@ class PathDataManager
                 $this->compact($path->isFinal);
             }
         } elseif (is_array($this->reducedVar)) {
-            if (is_numeric($path) && ! Arr::isAssoc($this->reducedVar) && $path < count($this->reducedVar)) {
-                $this->resolvedPath[] = $path;
-                $this->reducedVar = $this->reducedVar[$path];
+            if (is_numeric($varPath) && ! Arr::isAssoc($this->reducedVar) && $varPath < count($this->reducedVar) && array_key_exists($varPath, $this->reducedVar)) {
+                $this->resolvedPath[] = $varPath;
+                $this->reducedVar = $this->reducedVar[$varPath];
 
-                $this->doBreak = true;
+                if ($path instanceof PathNode) {
+                    if ($path->isFinal) {
+                        $this->doBreak = true;
+                    } else {
+                        $this->doBreak = false;
+                    }
+                } else {
+                    $this->doBreak = true;
+                }
+
+                if (! $this->doBreak) {
+                    $this->compact(false);
+                }
             } elseif (array_key_exists($varPath, $this->reducedVar)) {
                 $this->resolvedPath[] = $varPath;
                 $this->reducedVar = $this->reducedVar[$varPath];
@@ -859,6 +907,11 @@ class PathDataManager
 
                 $reductionStack[] = $augmented;
                 continue;
+            } elseif ($reductionValue instanceof Values) {
+                GlobalRuntimeState::$isEvaluatingData = true;
+                $reductionStack[] = $reductionValue->toArray();
+                GlobalRuntimeState::$isEvaluatingData = false;
+                continue;
             } elseif ($reductionValue instanceof \Statamic\Entries\Collection) {
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = RuntimeValueCache::resolveWithRuntimeIsolation($reductionValue);
@@ -935,6 +988,10 @@ class PathDataManager
             }
             $returnValue = self::guardRuntimeReturnValue($returnValue);
 
+            GlobalRuntimeState::$isEvaluatingUserData = false;
+        } elseif ($value instanceof Values) {
+            GlobalRuntimeState::$isEvaluatingUserData = true;
+            $returnValue = $value->toArray();
             GlobalRuntimeState::$isEvaluatingUserData = false;
         } else {
             if (! $isPair) {

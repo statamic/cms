@@ -149,11 +149,6 @@ class Glide extends Tags
      */
     private function output($url)
     {
-        if ($this->isPair) {
-            return $this->parse(
-                compact('url', 'width', 'height')
-            );
-        }
         if ($this->params->bool('tag')) {
             return "<img src=\"$url\" alt=\"{$this->params->get('alt')}\" />";
         }
