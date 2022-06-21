@@ -44,7 +44,12 @@ class Users extends ResourceCollection
 
         $columns->forget('avatar');
 
-        $columns->put('last_login', Column::make('last_login')->label(__('Last Login'))->sortable(false));
+        $lastLogin = Column::make('last_login')
+            ->label(__('Last Login'))
+            ->sortable(false)
+            ->defaultOrder($columns->max('defaultOrder') + 1);
+
+        $columns->put('last_login', $lastLogin);
 
         if ($key = $this->columnPreferenceKey) {
             $columns->setPreferred($key);
