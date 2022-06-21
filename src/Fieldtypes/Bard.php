@@ -423,7 +423,7 @@ class Bard extends Replicator
             return $value;
         }
 
-        $value = json_decode($value, true);
+        $value = json_decode($value ?? '[]', true);
 
         return collect($value)->map(function ($item) {
             if ($item['type'] !== 'set') {

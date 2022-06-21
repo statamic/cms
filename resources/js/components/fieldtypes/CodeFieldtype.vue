@@ -110,6 +110,7 @@ export default {
             matchBrackets: true,
             readOnly: this.readOnlyOption,
             theme: this.exactTheme,
+            inputStyle: 'contenteditable',
         });
 
         this.codemirror.on('change', (cm) => {

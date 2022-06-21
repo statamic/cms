@@ -12,6 +12,8 @@ export const Set = Node.create({
 
     draggable: true,
 
+    group: 'root',
+
     addAttributes() {
         return {
             id: {
@@ -56,6 +58,13 @@ export const Set = Node.create({
                     dispatch(transaction);
                 }
             },
+            setAt: ({ attrs, pos }) => ({ tr, dispatch }) => {
+                const node = this.type.create(attrs);
+                if (dispatch) {
+                    const transaction = tr.insert(pos, node);
+                    dispatch(transaction);
+                }
+            }
         }
     },
 

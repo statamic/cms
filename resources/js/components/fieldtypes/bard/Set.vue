@@ -30,6 +30,7 @@
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list class="-mt-sm">
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
+                        <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="deleteNode" />
                     </dropdown-list>
                 </div>
@@ -186,6 +187,11 @@ export default {
         expand() {
             // this.$events.$emit('expanded', this.node.attrs.id);
             this.extension.options.bard.expandSet(this.node.attrs.id);
+        },
+
+        duplicate() {
+            // this.$events.$emit('duplicated', this.node.attrs.id);
+            this.extension.options.bard.duplicateSet(this.node.attrs.id, this.node.attrs, this.getPos() + this.node.nodeSize);
         },
 
         fieldPath(field) {

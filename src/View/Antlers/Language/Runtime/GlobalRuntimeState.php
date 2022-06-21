@@ -207,8 +207,9 @@ class GlobalRuntimeState
         self::$environmentId = StringUtilities::uuidv4();
         self::$yieldCount = 0;
         self::$yieldStacks = [];
-        StackReplacementManager::clearStackState();
 
+        StackReplacementManager::clearStackState();
+        LiteralReplacementManager::resetLiteralState();
         RecursiveNodeManager::resetRecursiveNodeState();
     }
 
