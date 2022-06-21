@@ -211,6 +211,20 @@ class ParserTestCase extends TestCase
 
     protected function renderString($text, $data = [], $withCoreTagsAndModifiers = false)
     {
+        $runtimeParser = $this->newParser($data, $withCoreTagsAndModifiers);
+
+        return StringUtilities::normalizeLineEndings((string) $runtimeParser->parse($text, $data));
+    }
+
+    protected function renderView($view, $template, $data = [], $withCoreTagsAndModifiers = false)
+    {
+        $runtimeParser = $this->newParser($data, $withCoreTagsAndModifiers);
+
+        return StringUtilities::normalizeLineEndings((string) $runtimeParser->parseView($view, $template, $data));
+    }
+
+    protected function newParser($data, $withCoreTagsAndModifiers)
+    {
         ModifierManager::$statamicModifiers = null;
         GlobalRuntimeState::resetGlobalState();
 
@@ -234,7 +248,7 @@ class ParserTestCase extends TestCase
             $runtimeParser->cascade(app(Cascade::class));
         }
 
-        return StringUtilities::normalizeLineEndings((string) $runtimeParser->parse($text, $data));
+        return $runtimeParser;
     }
 
     protected function getParsedRuntimeNodes($text)

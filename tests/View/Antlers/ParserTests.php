@@ -2460,6 +2460,32 @@ EOT;
         ];
     }
 
+    /** @test */
+    public function it_parses_a_view()
+    {
+        \Facades\Statamic\View\Cascade::set('views', ['testview' => ['author' => 'bob']]);
+
+        $rendered = $this->renderView('testview', 'its me, {{ view:author }}', [], true);
+
+        $this->assertEquals('its me, bob', $rendered);
+    }
+
+    /** @test */
+    public function it_parses_a_view_with_extra_view_array()
+    {
+        \Facades\Statamic\View\Cascade::set('views', ['testview' => ['author' => 'bob']]);
+
+        $data = [
+            'view' => [
+                'name' => 'joe',
+            ],
+        ];
+
+        $rendered = $this->renderView('testview', 'hello {{ view:name }}, its {{ view:author }}', $data, true);
+
+        $this->assertEquals('hello joe, its bob', $rendered);
+    }
+
     private function assertEqualsWithCollapsedNewlines($expected, $actual)
     {
         $expected = trim($expected);

@@ -20,6 +20,11 @@ class ParserTest extends TestCase
         return (string) $this->parser()->parse($template, $data);
     }
 
+    private function renderView($view, $template, $data = [])
+    {
+        return (string) $this->parser()->parseView($view, $template, $data);
+    }
+
     private function parser()
     {
         return Antlers::parser();
