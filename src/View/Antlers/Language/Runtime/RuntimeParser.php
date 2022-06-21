@@ -754,7 +754,7 @@ INFO;
         }
 
         $data = array_merge($data, [
-            'view' => $this->cascade->getViewData($view),
+            'view' => array_merge($this->cascade->getViewData($view), $data['view'] ?? []),
         ]);
 
         $parsed = $this->renderText($text, $data);

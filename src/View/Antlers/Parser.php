@@ -128,7 +128,9 @@ class Parser implements ParserContract
 
         $this->view = $view;
 
-        $data = array_merge($data, ['view' => $this->cascade->getViewData($view)]);
+        $data = array_merge($data, [
+            'view' => array_merge($this->cascade->getViewData($view), $data['view'] ?? []),
+        ]);
 
         try {
             $parsed = $this->parse($text, $data);
