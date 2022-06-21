@@ -51,6 +51,7 @@ trait PermissibleContractTests
         RoleAPI::shouldReceive('find')->with('c')->andReturn($roleC);
         RoleAPI::shouldReceive('find')->with('d')->andReturn($roleD);
         RoleAPI::shouldReceive('find')->with('unknown')->andReturnNull();
+        RoleAPI::shouldReceive('all')->andReturn(collect([$roleA, $roleB, $roleC, $roleD])); // the stache calls this when getting a user. unrelated to test.
 
         $user = $this->createPermissible();
         $this->assertInstanceOf(Collection::class, $user->roles());
@@ -108,6 +109,7 @@ trait PermissibleContractTests
 
         RoleAPI::shouldReceive('find')->with('b')->andReturn($roleB);
         RoleAPI::shouldReceive('find')->with('c')->andReturn($roleC);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$roleA, $roleB, $roleC, $roleD])); // the stache calls this when getting a user. unrelated to test.
 
         $user = $this->createPermissible()->assignRole([$roleA, $roleB, $roleC, $roleD]);
 
@@ -138,6 +140,7 @@ trait PermissibleContractTests
         };
 
         RoleAPI::shouldReceive('find')->with('a')->andReturn($roleA);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$roleA])); // the stache calls this when getting a user. unrelated to test.
 
         $user = $this->createPermissible();
 
@@ -171,6 +174,7 @@ trait PermissibleContractTests
         $userGroup = (new UserGroup)->handle('usergroup')->assignRole($userGroupRole);
 
         RoleAPI::shouldReceive('find')->with('direct')->andReturn($directRole);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$directRole])); // the stache calls this when getting a user. unrelated to test.
         UserGroupAPI::shouldReceive('find')->with('usergroup')->andReturn($userGroup);
         UserGroupAPI::shouldReceive('all')->andReturn(collect([$userGroup])); // the stache calls this when getting a user. unrelated to test.
 
@@ -253,6 +257,7 @@ trait PermissibleContractTests
 
         RoleAPI::shouldReceive('find')->with('superrole')->andReturn($superRole);
         RoleAPI::shouldReceive('find')->with('nonsuperrole')->andReturn($nonSuperRole);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$superRole, $nonSuperRole])); // the stache calls this when getting a user. unrelated to test.
         UserGroupAPI::shouldReceive('find')->with('supergroup')->andReturn($superGroup);
         UserGroupAPI::shouldReceive('find')->with('nonsupergroup')->andReturn($nonSuperGroup);
         UserGroupAPI::shouldReceive('all')->andReturn(collect([$superGroup, $nonSuperGroup])); // the stache calls this when getting a user. unrelated to test.
