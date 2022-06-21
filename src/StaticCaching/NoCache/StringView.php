@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\NoCache;
 
 use Statamic\Facades\File;
+use Statamic\Support\Arr;
 
 class StringView
 {
@@ -27,6 +28,8 @@ class StringView
         File::makeDirectory($this->directory);
 
         $this->createTemporaryView();
+
+        $this->data['__frontmatter'] = Arr::pull($this->data, 'view', []);
 
         return view('nocache::'.$this->region, $this->data)->render();
     }

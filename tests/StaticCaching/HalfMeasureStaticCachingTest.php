@@ -235,6 +235,32 @@ EOT;
             ->assertSeeInOrder([1, 4, 5]);
     }
 
+    /** @test */
+    public function it_can_keep_parts_dynamic_using_nocache_tags_with_view_front_matter()
+    {
+        $template = <<<'EOT'
+---
+foo: bar
+---
+{{ view:foo }} {{ nocache }}{{ view:foo }}{{ /nocache }}
+EOT;
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', $template);
+
+        $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('bar bar');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('bar bar');
+    }
+
     public function bladeViewPaths($app)
     {
         $app['config']->set('view.paths', [
