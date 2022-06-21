@@ -2,12 +2,18 @@
 
 namespace Tests\Data;
 
+use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Data\DataRepository;
+use Statamic\Facades\Collection;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DataRepositoryTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     // Mocking method_exists, courtesy of https://stackoverflow.com/a/37928161
     public static $functions;
 
@@ -100,6 +106,128 @@ class DataRepositoryTest extends TestCase
             ->setRepository('baz', 'BazRepository');
 
         $this->assertEquals('test', $this->data->find('123'));
+    }
+
+    /**
+     * @test
+     * @dataProvider findByRequestUrlAmpDisabledProvider
+     */
+    public function it_finds_by_request_url($requestUrl, $entryId)
+    {
+        config([
+            'statamic.amp.enabled' => false,
+            'statamic.amp.route' => 'plop',
+        ]);
+
+        $this->findByRequestUrlTest($requestUrl, $entryId);
+    }
+
+    /**
+     * @test
+     * @dataProvider findByRequestUrlAmpEnabledProvider
+     */
+    public function it_finds_by_request_url_with_amp_enabled($requestUrl, $entryId)
+    {
+        config([
+            'statamic.amp.enabled' => true,
+            'statamic.amp.route' => 'plop',
+        ]);
+
+        $this->findByRequestUrlTest($requestUrl, $entryId);
+    }
+
+    public function findByRequestUrlAmpDisabledProvider()
+    {
+        return [
+            'root' => ['http://localhost', 'home'],
+            'root with slash' => ['http://localhost/', 'home'],
+            'root with query' => ['http://localhost?a=b', 'home'],
+            'root with query and slash' => ['http://localhost/?a=b', 'home'],
+
+            'dir' => ['http://localhost/foo', 'foo'],
+            'dir with slash' => ['http://localhost/foo/', 'foo'],
+            'dir with query' => ['http://localhost/foo?a=b', 'foo'],
+            'dir with query and slash' => ['http://localhost/foo/?a=b', 'foo'],
+
+            'missing' => ['http://localhost/unknown', null],
+            'missing with slash' => ['http://localhost/unknown/', null],
+            'missing with query' => ['http://localhost/unknown?a=b', null],
+            'missing with query and slash' => ['http://localhost/unknown/?a=b', null],
+
+            'amp, root' => ['http://localhost/plop', null],
+            'amp, root with slash' => ['http://localhost/plop/', null],
+            'amp, root with query' => ['http://localhost/plop?a=b', null],
+            'amp, root with query and slash' => ['http://localhost/plop/?a=b', null],
+
+            'amp, dir' => ['http://localhost/plop/foo', null],
+            'amp, dir with slash' => ['http://localhost/plop/foo/', null],
+            'amp, dir with query' => ['http://localhost/plop/foo?a=b', null],
+            'amp, dir with query and slash' => ['http://localhost/plop/foo/?a=b', null],
+
+            'amp, missing' => ['http://localhost/plop/unknown', null],
+            'amp, missing with slash' => ['http://localhost/plop/unknown/', null],
+            'amp, missing with query' => ['http://localhost/plop/unknown?a=b', null],
+            'amp, missing with query and slash' => ['http://localhost/plop/unknown/?a=b', null],
+        ];
+    }
+
+    public function findByRequestUrlAmpEnabledProvider()
+    {
+        return [
+            'root' => ['http://localhost', 'home'],
+            'root with slash' => ['http://localhost/', 'home'],
+            'root with query' => ['http://localhost?a=b', 'home'],
+            'root with query and slash' => ['http://localhost/?a=b', 'home'],
+
+            'dir' => ['http://localhost/foo', 'foo'],
+            'dir with slash' => ['http://localhost/foo/', 'foo'],
+            'dir with query' => ['http://localhost/foo?a=b', 'foo'],
+            'dir with query and slash' => ['http://localhost/foo/?a=b', 'foo'],
+
+            'missing' => ['http://localhost/unknown', null],
+            'missing with slash' => ['http://localhost/unknown/', null],
+            'missing with query' => ['http://localhost/unknown?a=b', null],
+            'missing with query and slash' => ['http://localhost/unknown/?a=b', null],
+
+            'amp, root' => ['http://localhost/plop', 'home'],
+            'amp, root with slash' => ['http://localhost/plop/', 'home'],
+            'amp, root with query' => ['http://localhost/plop?a=b', 'home'],
+            'amp, root with query and slash' => ['http://localhost/plop/?a=b', 'home'],
+
+            'amp, dir' => ['http://localhost/plop/foo', 'foo'],
+            'amp, dir with slash' => ['http://localhost/plop/foo/', 'foo'],
+            'amp, dir with query' => ['http://localhost/plop/foo?a=b', 'foo'],
+            'amp, dir with query and slash' => ['http://localhost/plop/foo/?a=b', 'foo'],
+
+            'amp, missing' => ['http://localhost/plop/unknown', null],
+            'amp, missing with slash' => ['http://localhost/plop/unknown/', null],
+            'amp, missing with query' => ['http://localhost/plop/unknown?a=b', null],
+            'amp, missing with query and slash' => ['http://localhost/plop/unknown/?a=b', null],
+        ];
+    }
+
+    private function findByRequestUrlTest($requestUrl, $entryId)
+    {
+        self::$functions->shouldReceive('method_exists')->with(EntryRepository::class, 'findByUri')->once()->andReturnTrue();
+        $this->data->setRepository('entry', EntryRepository::class);
+
+        $c = tap(Collection::make('pages')->routes('{slug}')->structureContents(['root' => true]))->save();
+        EntryFactory::collection('pages')->id('home')->slug('home')->create();
+        EntryFactory::collection('pages')->id('foo')->slug('foo')->create();
+
+        $c->structure()->in('en')->tree([
+            ['entry' => 'home'],
+            ['entry' => 'foo'],
+        ])->save();
+
+        $found = $this->data->findByRequestUrl($requestUrl);
+
+        if ($entryId) {
+            $this->assertNotNull($found);
+            $this->assertEquals($entryId, $found->id());
+        } else {
+            $this->assertNull($found);
+        }
     }
 }
 
