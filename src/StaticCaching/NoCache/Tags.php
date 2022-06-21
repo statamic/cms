@@ -19,16 +19,8 @@ class Tags extends \Statamic\Tags\Tags
 
     public function index()
     {
-        static::$stack += 1;
-
-        if (static::$stack <= 1) {
-            static::$stack -= 1;
-
-            return $this
-                ->nocache
-                ->pushSection($this->content, $this->context->all(), 'antlers.html');
-        }
-
-        return [];
+        return $this
+            ->nocache
+            ->pushSection($this->content, $this->context->all(), 'antlers.html');
     }
 }
