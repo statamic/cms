@@ -187,6 +187,54 @@ class HalfMeasureStaticCachingTest extends TestCase
             ->assertSee('<h1>The About Page</h1> This is the about page. Updated text', false);
     }
 
+    /** @test */
+    public function it_can_keep_parts_dynamic_using_nested_nocache_tags()
+    {
+        // Use a tag that outputs something dynamic.
+        // It will just increment by one every time it's used.
+
+        app()->instance('example_count', 0);
+
+        (new class extends \Statamic\Tags\Tags
+        {
+            public static $handle = 'example_count';
+
+            public function index()
+            {
+                $count = app('example_count');
+                $count++;
+                app()->instance('example_count', $count);
+
+                return $count;
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ example_count }}
+{{ nocache }}
+    {{ example_count }}
+    {{ nocache }}
+        {{ example_count }}
+    {{ /nocache }}
+{{ /nocache }}
+EOT;
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', $template);
+
+        $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSeeInOrder([1, 2, 3]);
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSeeInOrder([1, 4, 5]);
+    }
+
     public function bladeViewPaths($app)
     {
         $app['config']->set('view.paths', [

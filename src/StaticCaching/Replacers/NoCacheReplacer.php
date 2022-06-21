@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class NoCacheReplacer implements Replacer
 {
+    const PATTERN = '/<no_cache_section:([\w\d]+)>/';
+
     private $session;
 
     public function __construct(CacheSession $session)
@@ -39,7 +41,16 @@ class NoCacheReplacer implements Replacer
 
     private function replace(string $content)
     {
-        return preg_replace_callback('/<no_cache_section:([\w\d]+)>/', function ($matches) {
+        while (preg_match(self::PATTERN, $content)) {
+            $content = $this->performReplacement($content);
+        }
+
+        return $content;
+    }
+
+    private function performReplacement(string $content)
+    {
+        return preg_replace_callback(self::PATTERN, function ($matches) {
             if (! $section = $matches[1] ?? null) {
                 return '';
             }
