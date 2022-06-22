@@ -37,7 +37,7 @@ class CacheSession
         }
 
         $contents = trim($contents);
-        $key = sha1($contents);
+        $key = sha1($contents.str_random());
 
         $this->sections[$key] = [
             'type' => 'string',

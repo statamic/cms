@@ -109,6 +109,72 @@ class HalfMeasureStaticCachingTest extends TestCase
     }
 
     /** @test */
+    public function it_can_keep_parts_dynamic_using_nocache_tags_in_loops()
+    {
+        // Use a tag that outputs something dynamic but consistent.
+        // It will just increment by one every time it's used.
+
+        app()->instance('example_count', 0);
+
+        (new class extends \Statamic\Tags\Tags
+        {
+            public static $handle = 'example_count';
+
+            public function wildcard($method)
+            {
+                $count = app('example_count');
+                $count++;
+                app()->instance('example_count', $count);
+
+                return $this->context->get($method) . $count;
+            }
+        })::register();
+
+
+        $this->withStandardFakeViews();
+
+        $template = <<<EOT
+    {{ array }}
+        {{ value }}
+        {{ example_count:value }}
+        {{ nocache }}
+            {{ value }}
+            {{ example_count:value }}
+        {{ /nocache }}
+    {{ /array }}
+    EOT;
+
+        $this->viewShouldReturnRaw('default', $template);
+
+        $this->createPage('about', ['with' => [
+            'array' => [
+                ['value' => 'One'],
+                ['value' => 'Two'],
+                ['value' => 'Three'],
+            ]
+        ]]);
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSeeInOrder([
+                'One', 'One1', 'One', 'One4',
+                'Two', 'Two2', 'Two', 'Two5',
+                'Three', 'Three3', 'Three', 'Three6',
+            ]);
+
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSeeInOrder([
+                'One', 'One1', 'One', 'One7',
+                'Two', 'Two2', 'Two', 'Two8',
+                'Three', 'Three3', 'Three', 'Three9',
+            ]);
+    }
+
+    /** @test */
     public function it_can_keep_the_cascade_parts_dynamic_using_nocache_tags()
     {
         // The "now" variable is generated in the cascade on every request.
