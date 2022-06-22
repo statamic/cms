@@ -39,7 +39,7 @@ class NoCacheSessionTest extends TestCase
             'title' => 'different title',
             'foo' => 'bar',
             'baz' => 'qux',
-        ], collect($session->getContexts())->first());
+        ], collect($session->getSections())->first()['context']);
     }
 
     /** @test */
@@ -56,7 +56,7 @@ class NoCacheSessionTest extends TestCase
             'title' => 'local title',
         ], '');
 
-        $section = collect($session->getContexts())->keys()->first();
+        $section = collect($session->getSections())->keys()->first();
 
         $session->setCascade([
             'csrf_token' => 'abc',
@@ -100,7 +100,6 @@ class NoCacheSessionTest extends TestCase
     public function it_restores_from_cache()
     {
         Cache::forever('nocache::session.'.md5('http://localhost/test'), [
-            'contexts' => ['foo' => 'bar'],
             'sections' => ['baz' => 'qux'],
         ]);
 
@@ -109,13 +108,11 @@ class NoCacheSessionTest extends TestCase
         ]);
 
         $session = new CacheSession('http://localhost/test');
-        $this->assertEquals([], $session->getContexts());
         $this->assertEquals([], $session->getSections());
         $this->assertEquals([], $session->getCascade());
 
         $session->restore();
 
-        $this->assertEquals(['foo' => 'bar'], $session->getContexts());
         $this->assertEquals(['baz' => 'qux'], $session->getSections());
         $this->assertNotEquals([], $cascade = $session->getCascade());
         $this->assertEquals('/test', $cascade['url']);
@@ -176,8 +173,7 @@ class NoCacheSessionTest extends TestCase
         $this->createPage('test');
 
         Cache::put('nocache::session.'.md5('http://localhost/test'), [
-            'contexts' => $contexts = ['abc' => ['foo' => 'bar']],
-            'sections' => $sections = ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html']],
+            'sections' => $sections = ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html', 'context' => ['foo' => 'bar']]],
         ]);
 
         $this
@@ -185,7 +181,6 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello world');
 
-        $this->assertEquals($contexts, app(CacheSession::class)->getContexts());
         $this->assertEquals($sections, app(CacheSession::class)->getSections());
     }
 
@@ -197,8 +192,7 @@ class NoCacheSessionTest extends TestCase
         $this->createPage('test');
 
         Cache::put('nocache::session.'.md5('http://localhost/test'), [
-            'contexts' => ['abc' => ['foo' => 'bar']],
-            'sections' => ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html']],
+            'sections' => ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html', 'context' => ['foo' => 'bar']]],
         ]);
 
         $this
@@ -206,7 +200,6 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello');
 
-        $this->assertEquals([], app(CacheSession::class)->getContexts());
         $this->assertEquals([], app(CacheSession::class)->getSections());
     }
 }

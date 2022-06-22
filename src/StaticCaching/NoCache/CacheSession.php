@@ -13,7 +13,6 @@ class CacheSession
     ];
     protected $cascade = [];
     protected $sections = [];
-    protected $contexts = [];
     protected $url;
 
     public function __construct($url)
@@ -40,8 +39,12 @@ class CacheSession
         $contents = trim($contents);
         $key = sha1($contents);
 
-        $this->sections[$key] = ['type' => 'string', 'contents' => $contents, 'extension' => $extension];
-        $this->contexts[$key] = $this->filterContext($context);
+        $this->sections[$key] = [
+            'type' => 'string',
+            'contents' => $contents,
+            'extension' => $extension,
+            'context' => $this->filterContext($context),
+        ];
 
         return sprintf('<no_cache_section:%s>', $key);
     }
@@ -54,20 +57,18 @@ class CacheSession
 
         $key = str_random(32);
 
-        $this->sections[$key] = ['type' => 'view', 'view' => $view];
-        $this->contexts[$key] = $this->filterContext($context);
+        $this->sections[$key] = [
+            'type' => 'view',
+            'view' => $view,
+            'context' => $this->filterContext($context)
+        ];
 
         return sprintf('<no_cache_section:%s>', $key);
     }
 
     public function getContext($region)
     {
-        return $this->contexts[$region];
-    }
-
-    public function getContexts()
-    {
-        return $this->contexts;
+        return $this->sections[$region]['context'];
     }
 
     public function getView($region)
@@ -146,7 +147,6 @@ class CacheSession
         }
 
         Cache::forever('nocache::session.'.md5($this->url), [
-            'contexts' => $this->contexts,
             'sections' => $this->sections,
         ]);
     }
@@ -155,7 +155,6 @@ class CacheSession
     {
         $session = Cache::get('nocache::session.'.md5($this->url));
 
-        $this->contexts = array_merge($this->contexts, $session['contexts'] ?? []);
         $this->sections = array_merge($this->sections, $session['sections'] ?? []);
         $this->cascade = $this->restoreCascade();
 
