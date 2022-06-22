@@ -115,14 +115,8 @@
 }
 
 .bard-floating-toolbar {
-    @apply flex bg-black rounded-full absolute shadow-lg px-0 opacity-0 invisible;
-    transform: translateX(-50%) translateY(-10px);
+    @apply flex bg-black rounded-full shadow-lg px-0;
     white-space: nowrap;
-    z-index: 1000;
-
-    &.active {
-        @apply opacity-100 visible;
-    }
 
     &:before {
         content: '';
@@ -182,14 +176,15 @@
     color: $color_red;
 }
 
+.bard-set .popover-container:not(.popover-open) .popover{
+    inset: 0 !important;
+    transform: none !important;
+}
+
 /* The set selection options for each text block
   ========================================================================== */
 
 .bard-set-selector {
-    position: absolute;
-    left: -20px;
-    margin-top: -6px;
-    z-index: 6;
     // transition: all .15s ease-in-out;
 
     .dropdown-menu {
@@ -229,9 +224,9 @@
         > p > code, > pre code {
             @apply bg-grey-30;
         }
-        
+
         // To remove min height from nested bard fields inside bard in fullscreen mode.
-        * > .ProseMirror { 
+        * > .ProseMirror {
             min-height: auto;
         }
     }

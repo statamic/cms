@@ -2,10 +2,23 @@
 
 namespace Statamic\Fieldtypes\Bard\Marks;
 
-use ProseMirrorToHtml\Marks\Mark;
+use Tiptap\Core\Mark;
 
 class Small extends Mark
 {
-    protected $markType = 'small';
-    protected $tagName = 'small';
+    public static $name = 'small';
+
+    public function parseHTML()
+    {
+        return [
+            [
+                'tag' => 'small',
+            ],
+        ];
+    }
+
+    public function renderHTML($mark)
+    {
+        return ['small', 0];
+    }
 }

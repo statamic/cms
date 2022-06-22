@@ -1,72 +1,77 @@
 <template>
 
-    <div class="bard-inline-image-container">
-        <div v-if="src">
-            <div class="p-1 text-center">
-                <div ref="content" hidden />
-                <img :src="src" class="block mx-auto" data-drag-handle />
+    <node-view-wrapper>
+        <div class="bard-inline-image-container">
+            <div v-if="src">
+                <div class="p-1 text-center">
+                    <div ref="content" hidden />
+                    <img :src="src" class="block mx-auto" data-drag-handle />
+                </div>
+
+                <div class="flex items-center p-1 pt-0 rounded-b" @paste.stop>
+                    <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
+                    <button class="btn-flat mr-1" @click="openSelector">
+                        {{ __('Replace') }}
+                    </button>
+                    <button class="btn-flat" @click="deleteNode">
+                        {{ __('Remove') }}
+                    </button>
+                </div>
             </div>
 
-            <div class="flex items-center p-1 pt-0 rounded-b" @paste.stop>
-                <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
-                <button class="btn-flat mr-1" @click="openSelector">
-                    {{ __('Replace') }}
+            <div v-else class="text-center p-2">
+                <button class="btn-flat" @click="openSelector">
+                    {{ __('Choose Image') }}
                 </button>
-                <button class="btn-flat" @click="remove">
+                <button class="btn-flat" @click="deleteNode">
                     {{ __('Remove') }}
                 </button>
             </div>
-        </div>
 
-        <div v-else class="text-center p-2">
-            <button class="btn-flat" @click="openSelector">
-                {{ __('Choose Image') }}
-            </button>
-            <button class="btn-flat" @click="remove">
-                {{ __('Remove') }}
-            </button>
+            <stack
+                v-if="showingSelector"
+                name="asset-selector"
+                @closed="closeSelector"
+            >
+                <selector
+                    :container="extension.options.bard.config.container"
+                    :folder="extension.options.bard.config.folder || '/'"
+                    :restrict-container-navigation="true"
+                    :restrict-folder-navigation="extension.options.bard.config.restrict_assets"
+                    :selected="selections"
+                    :view-mode="'grid'"
+                    :max-files="1"
+                    @selected="assetsSelected"
+                    @closed="closeSelector">
+                </selector>
+            </stack>
         </div>
-
-        <stack
-            v-if="showingSelector"
-            name="asset-selector"
-            @closed="closeSelector"
-        >
-            <selector
-                :container="options.bard.config.container"
-                :folder="options.bard.config.folder || '/'"
-                :restrict-container-navigation="true"
-                :restrict-folder-navigation="options.bard.config.restrict_assets"
-                :selected="selections"
-                :view-mode="'grid'"
-                :max-files="1"
-                @selected="assetsSelected"
-                @closed="closeSelector">
-            </selector>
-        </stack>
-    </div>
+    </node-view-wrapper>
 
 </template>
 
 <script>
+import { NodeViewWrapper } from '@tiptap/vue-2';
 import Selector from '../../assets/Selector.vue';
 
 export default {
 
     components: {
+        NodeViewWrapper,
         Selector,
     },
 
     inject: ['storeName'],
 
     props: [
-        'node', // Prosemirror Node Object
-        'view', // Prosemirror EditorView Object
-        'getPos', // function allowing the view to find its position
-        'updateAttrs', // function to update attributes defined in `schema`
-        'editable', // global editor prop whether the content can be edited
-        'options', // array of extension options
-        `selected`, // whether its selected
+        'editor', // the editor instance
+        'node', // access the current node
+        'decorations', // an array of decorations
+        'selected', // true when there is a NodeSelection at the current node view
+        'extension', // access to the node extension, for example to get options
+        'getPos', // get the document position of the current node
+        'updateAttributes', // update attributes of the current node.
+        'deleteNode', // delete the current node
     ],
 
     data() {
@@ -108,7 +113,7 @@ export default {
             this.openSelector();
         }
 
-        if (src.startsWith('asset:')) {
+        if (src && src.startsWith('asset:')) {
             this.assetId = src.substr(7);
         }
 
@@ -120,12 +125,12 @@ export default {
 
         actualSrc(src) {
             if ( !this.node.attrs.src) {
-                this.updateAttrs({ src, asset: !!this.assetId });
+                this.updateAttributes({ src, asset: !!this.assetId });
             }
         },
 
         alt(alt) {
-            this.updateAttrs({ alt });
+            this.updateAttributes({ alt });
         }
 
     },
@@ -135,13 +140,6 @@ export default {
         openSelector() {
             this.showingSelector = true;
             this.$root.hideOverflow = true;
-        },
-
-        remove() {
-            let tr = this.view.state.tr;
-            let pos = this.getPos();
-            tr.delete(pos, pos + this.node.nodeSize);
-            this.view.dispatch(tr);
         },
 
         closeSelector() {
@@ -178,7 +176,7 @@ export default {
             this.assetId = asset.id;
             this.alt = asset.alt || this.alt;
             this.loading = false;
-            this.updateAttrs({ src: this.actualSrc });
+            this.updateAttributes({ src: this.actualSrc });
         },
 
     }

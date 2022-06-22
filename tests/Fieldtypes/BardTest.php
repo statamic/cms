@@ -10,6 +10,7 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
+use Statamic\Fieldtypes\Bard\Augmentor;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -235,9 +236,7 @@ class BardTest extends TestCase
                     ]],
                     ['type' => 'text', 'text' => '. '],
                     ['type' => 'image', 'attrs' => [
-                        'alt' => null,
                         'src' => 'asset::assets::lagoa.jpg',
-                        'title' => null,
                     ]],
                 ],
             ],
@@ -488,7 +487,7 @@ class BardTest extends TestCase
 </p>
 EOT;
 
-        $prosemirror = (new \HtmlToProseMirror\Renderer)->render($html)['content'];
+        $prosemirror = (new Augmentor($this))->renderHtmlToProsemirror($html)['content'];
 
         $this->assertEquals([
             'entry::1' => ['title' => 'About', 'permalink' => 'http://localhost/about'],
