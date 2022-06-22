@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 
 class Users extends ResourceCollection
 {
@@ -51,6 +52,10 @@ class Users extends ResourceCollection
 
         $columns->put('last_login', $lastLogin);
 
+        $columns->transform(function ($column) {
+            return $this->normalizeDefaultVisibilityOnColumn($column);
+        });
+
         if ($key = $this->columnPreferenceKey) {
             $columns->setPreferred($key);
         }
@@ -58,6 +63,21 @@ class Users extends ResourceCollection
         $this->columns = $columns->rejectUnlisted()->values();
 
         return $this;
+    }
+
+    private function normalizeDefaultVisibilityOnColumn($column)
+    {
+        $defaultVisible = ['email', 'name', 'first_name', 'last_name', 'roles', 'groups'];
+
+        if (! in_array($column->field(), $defaultVisible)) {
+            return $column;
+        }
+
+        if (Arr::get($this->blueprint->field($column->field())->config(), 'listable') === null) {
+            $column->defaultVisibility(true)->visible(true);
+        }
+
+        return $column;
     }
 
     public function toArray($request)
