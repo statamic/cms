@@ -126,14 +126,13 @@ class HalfMeasureStaticCachingTest extends TestCase
                 $count++;
                 app()->instance('example_count', $count);
 
-                return $this->context->get($method) . $count;
+                return $this->context->get($method).$count;
             }
         })::register();
 
-
         $this->withStandardFakeViews();
 
-        $template = <<<EOT
+        $template = <<<'EOT'
     {{ array }}
         {{ value }}
         {{ example_count:value }}
@@ -151,7 +150,7 @@ class HalfMeasureStaticCachingTest extends TestCase
                 ['value' => 'One'],
                 ['value' => 'Two'],
                 ['value' => 'Three'],
-            ]
+            ],
         ]]);
 
         $this
@@ -162,7 +161,6 @@ class HalfMeasureStaticCachingTest extends TestCase
                 'Two', 'Two2', 'Two', 'Two5',
                 'Three', 'Three3', 'Three', 'Three6',
             ]);
-
 
         $this
             ->get('/about')
