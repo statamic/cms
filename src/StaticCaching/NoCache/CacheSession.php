@@ -60,7 +60,7 @@ class CacheSession
         $this->sections[$key] = [
             'type' => 'view',
             'view' => $view,
-            'context' => $this->filterContext($context)
+            'context' => $this->filterContext($context),
         ];
 
         return sprintf('<no_cache_section:%s>', $key);
