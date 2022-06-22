@@ -132,6 +132,13 @@ class CacheSession
         return array_merge($this->cascade, $this->getContext($section));
     }
 
+    public function reset()
+    {
+        $this->contexts = [];
+        $this->sections = [];
+        $this->cascade = [];
+    }
+
     public function write()
     {
         Cache::forever('nocache::session.'.md5($this->url), [
@@ -144,8 +151,8 @@ class CacheSession
     {
         $session = Cache::get('nocache::session.'.md5($this->url));
 
-        $this->contexts = $session['contexts'] ?? [];
-        $this->sections = $session['sections'] ?? [];
+        $this->contexts = array_merge($this->contexts, $session['contexts'] ?? []);
+        $this->sections = array_merge($this->sections, $session['sections'] ?? []);
         $this->cascade = $this->restoreCascade();
 
         return $this;

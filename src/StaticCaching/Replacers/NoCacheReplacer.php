@@ -23,6 +23,8 @@ class NoCacheReplacer implements Replacer
             return;
         }
 
+        $this->session->restore();
+
         $content = $this->replace($content);
 
         $response->setContent($content);
