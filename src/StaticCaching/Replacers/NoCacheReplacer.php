@@ -19,18 +19,15 @@ class NoCacheReplacer implements Replacer
 
     public function prepareResponseToCache(Response $cached, Response $response)
     {
-        if (! $content = $response->getContent()) {
-            return;
-        }
-
-        $this->session->restore();
-
-        $content = $this->replace($content);
-
-        $response->setContent($content);
+        $this->replaceInResponse($response);
     }
 
     public function replaceInCachedResponse(Response $response)
+    {
+        $this->replaceInResponse($response);
+    }
+
+    private function replaceInResponse(Response $response)
     {
         if (! $content = $response->getContent()) {
             return;
