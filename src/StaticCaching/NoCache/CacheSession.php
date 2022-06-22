@@ -141,6 +141,10 @@ class CacheSession
 
     public function write()
     {
+        if (empty($this->sections)) {
+            return;
+        }
+
         Cache::forever('nocache::session.'.md5($this->url), [
             'contexts' => $this->contexts,
             'sections' => $this->sections,

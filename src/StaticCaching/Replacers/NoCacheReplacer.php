@@ -33,13 +33,15 @@ class NoCacheReplacer implements Replacer
             return;
         }
 
-        $this->session->restore();
-
         $response->setContent($this->replace($content));
     }
 
     private function replace(string $content)
     {
+        if (preg_match(self::PATTERN, $content)) {
+            $this->session->restore();
+        }
+
         while (preg_match(self::PATTERN, $content)) {
             $content = $this->performReplacement($content);
         }

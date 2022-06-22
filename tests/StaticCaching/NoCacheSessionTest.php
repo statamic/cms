@@ -6,11 +6,13 @@ use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Statamic\StaticCaching\NoCache\CacheSession;
 use Tests\FakesContent;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class NoCacheSessionTest extends TestCase
 {
+    use FakesViews;
     use FakesContent;
     use PreventSavingStacheItemsToDisk;
 
@@ -85,8 +87,13 @@ class NoCacheSessionTest extends TestCase
             ->with('nocache::session.'.md5('/foo'), Mockery::any())
             ->once();
 
-        (new CacheSession('/'))->write();
-        (new CacheSession('/foo'))->write();
+        tap(new CacheSession('/'), function ($session) {
+            $session->pushSection('test', [], '.html');
+        })->write();
+
+        tap(new CacheSession('/foo'), function ($session) {
+            $session->pushSection('test', [], '.html');
+        })->write();
     }
 
     /** @test */
@@ -125,5 +132,81 @@ class NoCacheSessionTest extends TestCase
 
         $this->assertInstanceOf(CacheSession::class, $session);
         $this->assertEquals('http://localhost/test?foo=bar', $session->getUrl());
+    }
+
+    /** @test */
+    public function it_writes_session_if_a_nocache_tag_is_used()
+    {
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }} {{ nocache }}{{ title }}{{ /nocache }}');
+        $this->createPage('test', ['with' => ['title' => 'Test']]);
+
+        $this->assertNull(Cache::get('nocache::session.'.md5('http://localhost/test')));
+
+        $this
+            ->get('/test')
+            ->assertOk()
+            ->assertSee('Test Test');
+
+        $this->assertNotNull(Cache::get('nocache::session.'.md5('http://localhost/test')));
+    }
+
+    /** @test */
+    public function it_doesnt_write_session_if_a_nocache_tag_is_not_used()
+    {
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }}');
+        $this->createPage('test', ['with' => ['title' => 'Test']]);
+
+        $this->assertNull(Cache::get('nocache::session.'.md5('http://localhost/test')));
+
+        $this
+            ->get('/test')
+            ->assertOk()
+            ->assertSee('Test');
+
+        $this->assertNull(Cache::get('nocache::session.'.md5('http://localhost/test')));
+    }
+
+    /** @test */
+    public function it_restores_session_if_theres_a_nocache_placeholder_in_the_response()
+    {
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRendered('default', 'Hello <no_cache_section:abc>');
+        $this->createPage('test');
+
+        Cache::put('nocache::session.'.md5('http://localhost/test'), [
+            'contexts' => $contexts = ['abc' => ['foo' => 'bar']],
+            'sections' => $sections = ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html']],
+        ]);
+
+        $this
+            ->get('/test')
+            ->assertOk()
+            ->assertSee('Hello world');
+
+        $this->assertEquals($contexts, app(CacheSession::class)->getContexts());
+        $this->assertEquals($sections, app(CacheSession::class)->getSections());
+    }
+
+    /** @test */
+    public function it_doesnt_restore_session_if_there_is_no_nocache_placeholder_in_the_response()
+    {
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRendered('default', 'Hello');
+        $this->createPage('test');
+
+        Cache::put('nocache::session.'.md5('http://localhost/test'), [
+            'contexts' => ['abc' => ['foo' => 'bar']],
+            'sections' => ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html']],
+        ]);
+
+        $this
+            ->get('/test')
+            ->assertOk()
+            ->assertSee('Hello');
+
+        $this->assertEquals([], app(CacheSession::class)->getContexts());
+        $this->assertEquals([], app(CacheSession::class)->getSections());
     }
 }
