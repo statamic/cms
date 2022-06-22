@@ -26,7 +26,7 @@ class NocacheTagsTest extends TestCase
     {
         $this->withStandardFakeViews();
 
-        $template = <<<EOT
+        $template = <<<'EOT'
 {{ title }}
 {{ cache }}
     {{ title }}
@@ -64,7 +64,7 @@ EOT;
     {
         $this->withStandardFakeViews();
 
-        $template = <<<EOT
+        $template = <<<'EOT'
 {{ title }}
 {{ nocache }}
     {{ title }}
