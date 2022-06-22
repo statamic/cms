@@ -4,6 +4,7 @@ namespace Statamic\Http\Resources\CP\Users;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
+use Statamic\Facades\UserGroup;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -35,6 +36,13 @@ class Users extends ResourceCollection
     {
         $columns = $this->blueprint->columns();
 
+        // Ensure email column is always first on listing
+        $columns->prepend($columns->pull('email')->defaultOrder(0), 'email');
+
+        // Forget avatar, because it is rendered within the email column
+        $columns->forget('avatar');
+
+        // Configure roles and groups columns
         if (Statamic::pro()) {
             $columns->put('roles', $columns->get('roles')->fieldtype('relationship')->sortable(false));
             $columns->put('groups', $columns->get('groups')->fieldtype('relationship')->sortable(false));
@@ -43,19 +51,20 @@ class Users extends ResourceCollection
             $columns->forget('groups');
         }
 
-        $columns->forget('avatar');
+        // Append last login column
+        $columns->put('last_login',
+            Column::make('last_login')
+                ->label(__('Last Login'))
+                ->sortable(false)
+                ->defaultOrder($columns->max('defaultOrder') + 1)
+        );
 
-        $lastLogin = Column::make('last_login')
-            ->label(__('Last Login'))
-            ->sortable(false)
-            ->defaultOrder($columns->max('defaultOrder') + 1);
-
-        $columns->put('last_login', $lastLogin);
-
+        // Normalize default visibility for when user blueprint file exists in app
         $columns->transform(function ($column) {
             return $this->normalizeDefaultVisibilityOnColumn($column);
         });
 
+        // Wire up column preferences
         if ($key = $this->columnPreferenceKey) {
             $columns->setPreferred($key);
         }
@@ -73,8 +82,14 @@ class Users extends ResourceCollection
             return $column;
         }
 
+        // Ensure default visibility if `listable` is not set on blueprint
         if (Arr::get($this->blueprint->field($column->field())->config(), 'listable') === null) {
             $column->defaultVisibility(true)->visible(true);
+        }
+
+        // Only show groups if groups actually exist
+        if ($column->field() === 'groups' && UserGroup::all()->count() === 0) {
+            $column->defaultVisibility(false)->visible(false);
         }
 
         return $column;
