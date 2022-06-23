@@ -151,11 +151,11 @@ export default {
         },
 
         fromItem() {
-            return this.resourceMeta.from ?? 0;
+            return this.resourceMeta.from || 0;
         },
 
         toItem() {
-            return this.resourceMeta.to ?? 0;
+            return this.resourceMeta.to || 0;
         },
 
         totalItems() {
