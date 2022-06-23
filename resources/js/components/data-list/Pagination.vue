@@ -2,7 +2,11 @@
 
     <div class="w-full flex">
 
-        <div class="flex-1" v-if="! inline"></div>
+        <div class="flex flex-1" v-if="! inline">
+            <div class="text-xs text-grey-70">
+                {{ __(':fromItem–:toItem of :totalItems items', { fromItem, toItem, totalItems }) }}
+            </div>
+        </div>
 
         <ul v-if="hasMultiplePages" class="pagination" :class="{'pagination-inline': inline}">
 
@@ -144,6 +148,18 @@ export default {
 
         isPerPageEvenUseful() {
             return this.resourceMeta.total > this.perPageOptions[0].value;
+        },
+
+        fromItem() {
+            return this.resourceMeta.from;
+        },
+
+        toItem() {
+            return this.resourceMeta.to;
+        },
+
+        totalItems() {
+            return this.resourceMeta.total;
         },
 
     },
