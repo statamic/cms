@@ -63,7 +63,7 @@ class FullMeasureStaticCachingTest extends TestCase
 
         app(Cacher::class)->setNocacheJs('js here');
 
-        $this->assertFileDoesNotExist($this->dir.'/about_.html');
+        $this->assertFalse(file_exists($this->dir.'/about_.html'));
 
         $response = $this
             ->get('/about')
