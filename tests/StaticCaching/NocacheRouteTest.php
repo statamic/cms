@@ -20,7 +20,8 @@ class NocacheRouteTest extends TestCase
 
         app()->instance('example_count', 0);
 
-        (new class extends \Statamic\Tags\Tags {
+        (new class extends \Statamic\Tags\Tags
+        {
             public static $handle = 'example_count';
 
             public function index()
