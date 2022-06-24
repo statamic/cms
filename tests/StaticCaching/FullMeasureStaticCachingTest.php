@@ -70,7 +70,7 @@ class FullMeasureStaticCachingTest extends TestCase
             ->get('/about')
             ->assertOk();
 
-        $section = collect(app(Session::class)->getSections())->keys()->first();
+        $region = collect(app(Session::class)->getRegions())->keys()->first();
 
         // Initial response should be dynamic and not contain javascript.
         $this->assertEquals('<html><body>1 2</body></html>', $response->getContent());
@@ -78,7 +78,7 @@ class FullMeasureStaticCachingTest extends TestCase
         // The cached response should have the nocache placeholder, and the javascript.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
         $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
-            $section,
+            $region,
             '<svg>Loading...</svg>',
             '<script type="text/javascript">js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));

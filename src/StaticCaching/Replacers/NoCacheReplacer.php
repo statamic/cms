@@ -56,11 +56,11 @@ class NoCacheReplacer implements Replacer
     private function performReplacement(string $content)
     {
         return preg_replace_callback(self::PATTERN, function ($matches) {
-            if (! $section = $matches[1] ?? null) {
+            if (! $region = $matches[1] ?? null) {
                 return '';
             }
 
-            return $this->session->getFragment($section)->render();
+            return $this->session->getFragment($region)->render();
         }, $content);
     }
 

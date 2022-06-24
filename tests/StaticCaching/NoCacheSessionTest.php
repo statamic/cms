@@ -17,7 +17,7 @@ class NoCacheSessionTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    public function when_pushing_a_section_it_will_filter_out_cascade()
+    public function when_pushing_a_region_it_will_filter_out_cascade()
     {
         $session = new Session('/');
 
@@ -27,7 +27,7 @@ class NoCacheSessionTest extends TestCase
             'title' => 'base title',
         ]);
 
-        $session->pushSection('', [
+        $session->pushRegion('', [
             'csrf_token' => 'abc',
             'now' => 'carbon',
             'title' => 'different title',
@@ -39,7 +39,7 @@ class NoCacheSessionTest extends TestCase
             'title' => 'different title',
             'foo' => 'bar',
             'baz' => 'qux',
-        ], collect($session->getSections())->first()['context']);
+        ], collect($session->getRegions())->first()['context']);
     }
 
     /** @test */
@@ -50,13 +50,13 @@ class NoCacheSessionTest extends TestCase
 
         $session = new Session('/');
 
-        $session->pushSection('', [
+        $session->pushRegion('', [
             'foo' => 'bar',
             'baz' => 'qux',
             'title' => 'local title',
         ], '');
 
-        $section = collect($session->getSections())->keys()->first();
+        $region = collect($session->getRegions())->keys()->first();
 
         $session->setCascade([
             'csrf_token' => 'abc',
@@ -70,7 +70,7 @@ class NoCacheSessionTest extends TestCase
             'foo' => 'bar',
             'baz' => 'qux',
             'title' => 'local title',
-        ], $session->getFragmentData($section));
+        ], $session->getFragmentData($region));
     }
 
     /** @test */
@@ -88,11 +88,11 @@ class NoCacheSessionTest extends TestCase
             ->once();
 
         tap(new Session('/'), function ($session) {
-            $session->pushSection('test', [], '.html');
+            $session->pushRegion('test', [], '.html');
         })->write();
 
         tap(new Session('/foo'), function ($session) {
-            $session->pushSection('test', [], '.html');
+            $session->pushRegion('test', [], '.html');
         })->write();
     }
 
@@ -100,7 +100,7 @@ class NoCacheSessionTest extends TestCase
     public function it_restores_from_cache()
     {
         Cache::forever('nocache::session.'.md5('http://localhost/test'), [
-            'sections' => ['baz' => 'qux'],
+            'regions' => ['baz' => 'qux'],
         ]);
 
         $this->createPage('/test', [
@@ -108,12 +108,12 @@ class NoCacheSessionTest extends TestCase
         ]);
 
         $session = new Session('http://localhost/test');
-        $this->assertEquals([], $session->getSections());
+        $this->assertEquals([], $session->getRegions());
         $this->assertEquals([], $session->getCascade());
 
         $session->restore();
 
-        $this->assertEquals(['baz' => 'qux'], $session->getSections());
+        $this->assertEquals(['baz' => 'qux'], $session->getRegions());
         $this->assertNotEquals([], $cascade = $session->getCascade());
         $this->assertEquals('/test', $cascade['url']);
         $this->assertEquals('Test page', $cascade['title']);
@@ -173,7 +173,7 @@ class NoCacheSessionTest extends TestCase
         $this->createPage('test');
 
         Cache::put('nocache::session.'.md5('http://localhost/test'), [
-            'sections' => $sections = ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html', 'context' => ['foo' => 'bar']]],
+            'regions' => $regions = ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html', 'context' => ['foo' => 'bar']]],
         ]);
 
         $this
@@ -181,7 +181,7 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello world');
 
-        $this->assertEquals($sections, app(Session::class)->getSections());
+        $this->assertEquals($regions, app(Session::class)->getRegions());
     }
 
     /** @test */
@@ -192,7 +192,7 @@ class NoCacheSessionTest extends TestCase
         $this->createPage('test');
 
         Cache::put('nocache::session.'.md5('http://localhost/test'), [
-            'sections' => ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html', 'context' => ['foo' => 'bar']]],
+            'regions' => ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html', 'context' => ['foo' => 'bar']]],
         ]);
 
         $this
@@ -200,6 +200,6 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello');
 
-        $this->assertEquals([], app(Session::class)->getSections());
+        $this->assertEquals([], app(Session::class)->getRegions());
     }
 }

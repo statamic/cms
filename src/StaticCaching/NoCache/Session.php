@@ -12,7 +12,7 @@ class Session
         '__env', 'app', 'errors',
     ];
     protected $cascade = [];
-    protected $sections = [];
+    protected $regions = [];
     protected $url;
 
     public function __construct($url)
@@ -32,12 +32,12 @@ class Session
         return $this;
     }
 
-    public function getSections()
+    public function getRegions()
     {
-        return $this->sections;
+        return $this->regions;
     }
 
-    public function pushSection($contents, $context, $extension)
+    public function pushRegion($contents, $context, $extension)
     {
         foreach ($this->ignoreVars as $varName) {
             unset($context[$varName]);
@@ -46,7 +46,7 @@ class Session
         $contents = trim($contents);
         $key = sha1($contents.str_random());
 
-        $this->sections[$key] = [
+        $this->regions[$key] = [
             'type' => 'string',
             'contents' => $contents,
             'extension' => $extension,
@@ -64,7 +64,7 @@ class Session
 
         $key = str_random(32);
 
-        $this->sections[$key] = [
+        $this->regions[$key] = [
             'type' => 'view',
             'view' => $view,
             'context' => $this->filterContext($context),
@@ -75,22 +75,22 @@ class Session
 
     public function getContext($region)
     {
-        return $this->sections[$region]['context'];
+        return $this->regions[$region]['context'];
     }
 
-    public function getFragment($region): Fragment
+    public function getFragment($key): Fragment
     {
-        $section = $this->sections[$region];
+        $region = $this->regions[$key];
 
-        $data = $this->getFragmentData($region);
+        $data = $this->getFragmentData($key);
 
-        if ($section['type'] === 'string') {
-            return new StringFragment($region, $section['contents'], $section['extension'], $data);
-        } elseif ($section['type'] === 'view') {
-            return new ViewFragment($section['view'], $data);
+        if ($region['type'] === 'string') {
+            return new StringFragment($key, $region['contents'], $region['extension'], $data);
+        } elseif ($region['type'] === 'view') {
+            return new ViewFragment($region['view'], $data);
         }
 
-        throw new \Exception('Unknown section type.');
+        throw new \Exception('Unknown region type.');
     }
 
     public function getCascade()
@@ -135,26 +135,26 @@ class Session
         return $data;
     }
 
-    public function getFragmentData($section): array
+    public function getFragmentData($region): array
     {
-        return array_merge($this->cascade, $this->getContext($section));
+        return array_merge($this->cascade, $this->getContext($region));
     }
 
     public function reset()
     {
         $this->contexts = [];
-        $this->sections = [];
+        $this->regions = [];
         $this->cascade = [];
     }
 
     public function write()
     {
-        if (empty($this->sections)) {
+        if (empty($this->regions)) {
             return;
         }
 
         Cache::forever('nocache::session.'.md5($this->url), [
-            'sections' => $this->sections,
+            'regions' => $this->regions,
         ]);
     }
 
@@ -162,7 +162,7 @@ class Session
     {
         $session = Cache::get('nocache::session.'.md5($this->url));
 
-        $this->sections = array_merge($this->sections, $session['sections'] ?? []);
+        $this->regions = array_merge($this->regions, $session['regions'] ?? []);
         $this->cascade = $this->restoreCascade();
 
         return $this;

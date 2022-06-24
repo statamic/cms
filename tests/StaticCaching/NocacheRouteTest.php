@@ -13,7 +13,7 @@ class NocacheRouteTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    public function it_gets_nocache_sections_via_a_route()
+    public function it_gets_nocache_regions_via_a_route()
     {
         // Use a tag that outputs something dynamic.
         // It will just increment by one every time it's used.
@@ -47,11 +47,11 @@ Second {{ example_count }} {{ name }} {{ title }}
 EOT;
 
         $session = new Session('http://localhost/test');
-        $session->pushSection('First {{ example_count }} {{ name }} {{ title }}', ['name' => 'Dustin'], 'antlers.html');
-        $session->pushSection($secondTemplate, ['name' => 'Will'], 'antlers.html');
+        $session->pushRegion('First {{ example_count }} {{ name }} {{ title }}', ['name' => 'Dustin'], 'antlers.html');
+        $session->pushRegion($secondTemplate, ['name' => 'Will'], 'antlers.html');
         $session->write();
 
-        $keys = collect($session->getSections())->keys()->all();
+        $keys = collect($session->getRegions())->keys()->all();
 
         $secondExpectation = <<<'EOT'
 Second 2 Will Test

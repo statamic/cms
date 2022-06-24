@@ -21,7 +21,7 @@ class Tags extends \Statamic\Tags\Tags
     {
         $key = $this
             ->nocache
-            ->pushSection($this->content, $this->context->all(), 'antlers.html');
+            ->pushRegion($this->content, $this->context->all(), 'antlers.html');
 
         return sprintf('<span class="nocache" data-nocache="%s">NOCACHE_PLACEHOLDER</span>', $key);
     }
