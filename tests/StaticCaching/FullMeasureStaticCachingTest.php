@@ -75,7 +75,7 @@ class FullMeasureStaticCachingTest extends TestCase
         $this->assertEquals('<html><body>1 2</body></html>', $response->getContent());
 
         // The cached response should have the nocache placeholder, and the javascript.
-        $this->assertFileExists($this->dir.'/about_.html');
+        $this->assertTrue(file_exists($this->dir.'/about_.html'));
         $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s"></span>%s</body></html>', [
             $section,
             '<script type="text/javascript">js here</script>',
