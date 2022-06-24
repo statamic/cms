@@ -49,4 +49,14 @@ class StaticCacheManager extends Manager
             'locale' => Site::current()->handle(),
         ]);
     }
+
+    public function nocacheJs(string $js)
+    {
+        $this->driver()->setNocacheJs($js);
+    }
+
+    public function nocachePlaceholder(string $placeholder)
+    {
+        $this->driver()->setNocachePlaceholder($placeholder);
+    }
 }

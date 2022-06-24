@@ -3,7 +3,7 @@
 namespace Tests\StaticCaching;
 
 use Statamic\Facades\File;
-use Statamic\StaticCaching\Cacher;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\NoCache\CacheSession;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesContent;
@@ -61,8 +61,8 @@ class FullMeasureStaticCachingTest extends TestCase
 
         $this->createPage('about');
 
-        app(Cacher::class)->setNocacheJs('js here');
-        app(Cacher::class)->setNocachePlaceholderContent('<svg>Loading...</svg>');
+        StaticCache::nocacheJs('js here');
+        StaticCache::nocachePlaceholder('<svg>Loading...</svg>');
 
         $this->assertFalse(file_exists($this->dir.'/about_.html'));
 
