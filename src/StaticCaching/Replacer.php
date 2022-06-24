@@ -2,7 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
- use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
 
 interface Replacer
 {

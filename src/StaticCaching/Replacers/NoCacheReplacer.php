@@ -2,11 +2,11 @@
 
 namespace Statamic\StaticCaching\Replacers;
 
+use Illuminate\Http\Response;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\NoCache\CacheSession;
 use Statamic\StaticCaching\Replacer;
-use Symfony\Component\HttpFoundation\Response;
 
 class NoCacheReplacer implements Replacer
 {

@@ -2,8 +2,8 @@
 
 namespace Statamic\StaticCaching\Replacers;
 
+use Illuminate\Http\Response;
 use Statamic\StaticCaching\Replacer;
-use Symfony\Component\HttpFoundation\Response;
 
 class CsrfTokenReplacer implements Replacer
 {
