@@ -2,13 +2,15 @@
 
 namespace Statamic\StaticCaching\Replacers;
 
+use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\NoCache\CacheSession;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
 
 class NoCacheReplacer implements Replacer
 {
-    const PATTERN = '/<no_cache_section:([\w\d]+)>/';
+    const PATTERN = '/<span class="nocache" data-nocache="([\w\d]+)"><\/span>/';
 
     private $session;
 
@@ -17,9 +19,11 @@ class NoCacheReplacer implements Replacer
         $this->session = $session;
     }
 
-    public function prepareResponseToCache(Response $cached, Response $response)
+    public function prepareResponseToCache(Response $responseToBeCached, Response $initialResponse)
     {
-        $this->replaceInResponse($response);
+        $this->replaceInResponse($initialResponse);
+
+        $this->addFullMeasureJavascript($responseToBeCached);
     }
 
     public function replaceInCachedResponse(Response $response)
@@ -33,15 +37,15 @@ class NoCacheReplacer implements Replacer
             return;
         }
 
-        $response->setContent($this->replace($content));
-    }
-
-    private function replace(string $content)
-    {
         if (preg_match(self::PATTERN, $content)) {
             $this->session->restore();
         }
 
+        $response->setContent($this->replace($content));
+    }
+
+    public function replace(string $content)
+    {
         while (preg_match(self::PATTERN, $content)) {
             $content = $this->performReplacement($content);
         }
@@ -58,5 +62,20 @@ class NoCacheReplacer implements Replacer
 
             return $this->session->getView($section)->render();
         }, $content);
+    }
+
+    private function addFullMeasureJavascript(Response $response)
+    {
+        $cacher = app(Cacher::class);
+
+        if (! $cacher instanceof FileCacher) {
+            return;
+        }
+
+        $js = $cacher->getNocacheJs();
+
+        $contents = str_replace('</body>', '<script type="text/javascript">'.$js.'</script></body>', $response->getContent());
+
+        $response->setContent($contents);
     }
 }

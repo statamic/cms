@@ -19,8 +19,10 @@ class Tags extends \Statamic\Tags\Tags
 
     public function index()
     {
-        return $this
+        $key = $this
             ->nocache
             ->pushSection($this->content, $this->context->all(), 'antlers.html');
+
+        return sprintf('<span class="nocache" data-nocache="%s"></span>', $key);
     }
 }

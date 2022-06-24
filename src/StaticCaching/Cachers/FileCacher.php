@@ -17,6 +17,11 @@ class FileCacher extends AbstractCacher
     private $writer;
 
     /**
+     * @var string
+     */
+    private $nocacheJs;
+
+    /**
      * @param  Writer  $writer
      * @param  Repository  $cache
      * @param  array  $config
@@ -165,5 +170,39 @@ class FileCacher extends AbstractCacher
     private function isLongQueryStringPath($path)
     {
         return Str::contains($path, '_lqs_');
+    }
+
+    public function setNocacheJs(string $js)
+    {
+        $this->nocacheJs = $js;
+    }
+
+    public function getNocacheJs(): string
+    {
+        $default = <<<'EOT'
+var els = document.getElementsByClassName('nocache');
+var map = {};
+for (var i = 0; i < els.length; i++) {
+    var section = els[i].getAttribute('data-nocache');
+    map[section] = els[i];
+}
+
+fetch('/!/nocache', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        url: window.location.href,
+        sections: Object.keys(map)
+    })
+})
+.then((response) => response.json())
+.then((data) => {
+    for (var key in data) {
+        map[key].outerHTML = data[key];
+    }
+});
+EOT;
+
+        return $this->nocacheJs ?? $default;
     }
 }

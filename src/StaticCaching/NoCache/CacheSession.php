@@ -25,6 +25,13 @@ class CacheSession
         return $this->url;
     }
 
+    public function setUrl(string $url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
     public function getSections()
     {
         return $this->sections;
@@ -46,7 +53,7 @@ class CacheSession
             'context' => $this->filterContext($context),
         ];
 
-        return sprintf('<no_cache_section:%s>', $key);
+        return $key;
     }
 
     public function pushView($view, $context)
@@ -63,7 +70,7 @@ class CacheSession
             'context' => $this->filterContext($context),
         ];
 
-        return sprintf('<no_cache_section:%s>', $key);
+        return $key;
     }
 
     public function getContext($region)

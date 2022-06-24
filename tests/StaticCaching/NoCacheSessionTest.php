@@ -169,7 +169,7 @@ class NoCacheSessionTest extends TestCase
     public function it_restores_session_if_theres_a_nocache_placeholder_in_the_response()
     {
         $this->withStandardFakeViews();
-        $this->viewShouldReturnRendered('default', 'Hello <no_cache_section:abc>');
+        $this->viewShouldReturnRendered('default', 'Hello <span class="nocache" data-nocache="abc"></span>');
         $this->createPage('test');
 
         Cache::put('nocache::session.'.md5('http://localhost/test'), [
