@@ -2,7 +2,7 @@
 
     <div class="w-full flex">
 
-        <div class="flex flex-1" v-if="! inline">
+        <div class="flex flex-1" v-if="! inline && totalItems > 0">
             <div class="text-xs text-grey-70">
                 {{ __(':fromItem–:toItem of :totalItems items', { fromItem, toItem, totalItems }) }}
             </div>
