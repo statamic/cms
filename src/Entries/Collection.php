@@ -603,7 +603,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $this
             ->fluentlyGetOrSet('autosave')
             ->getter(function ($interval) {
-                if (! config('statamic.autosave.enabled') || ! config('statamic.autosave.understood') || ! Statamic::pro() || ! $interval) {
+                if (! config('statamic.autosave.enabled') || ! Statamic::pro() || ! $interval) {
                     return null;
                 }
 

@@ -21,21 +21,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Do you understand the risks?
-    |--------------------------------------------------------------------------
-    |
-    | As this is experimental and might break, be aware that you souldn't use
-    | this feature in production. If you do or if anything breaks, this is
-    | expected and will probably happen.
-    |
-    | Set `understood` to true, to confirm that you do understand the risks.
-    |
-    */
-
-    'understood' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Default autosave interval
     |--------------------------------------------------------------------------
     |
