@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\StaticCaching\NoCache\CacheSession;
-use Statamic\StaticCaching\Replacers\NoCacheReplacer;
 
 class ServiceProvider extends LaravelServiceProvider
 {
@@ -45,8 +44,6 @@ class ServiceProvider extends LaravelServiceProvider
             Event::subscribe(Invalidate::class);
         }
 
-        $this->addNocacheReplacer();
-
         // When the cascade gets hydrated, insert it into the
         // nocache session so it can filter out contextual data.
         Cascade::hydrated(function ($cascade) {
@@ -56,13 +53,5 @@ class ServiceProvider extends LaravelServiceProvider
         Blade::directive('nocache', function ($exp) {
             return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', $__data); ?>';
         });
-    }
-
-    private function addNocacheReplacer()
-    {
-        $configKey = 'statamic.static_caching.replacers';
-        $replacers = config($configKey);
-        $replacers[] = NoCacheReplacer::class;
-        config([$configKey => $replacers]);
     }
 }

@@ -21,7 +21,10 @@ class HalfMeasureStaticCachingTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $app['config']->set('statamic.static_caching.strategy', 'half');
-        $app['config']->set('statamic.static_caching.replacers', [TestReplacer::class]);
+
+        $app['config']->set('statamic.static_caching.replacers', array_merge($app['config']->get('statamic.static_caching.replacers'), [
+            'test' => TestReplacer::class,
+        ]));
     }
 
     /** @test */
