@@ -78,16 +78,16 @@ class CacheSession
         return $this->sections[$region]['context'];
     }
 
-    public function getView($region)
+    public function getFragment($region): Fragment
     {
         $section = $this->sections[$region];
 
-        $data = $this->getViewData($region);
+        $data = $this->getFragmentData($region);
 
         if ($section['type'] === 'string') {
-            return new StringView($region, $section['contents'], $section['extension'], $data);
+            return new StringFragment($region, $section['contents'], $section['extension'], $data);
         } elseif ($section['type'] === 'view') {
-            return new ViewView($section['view'], $data);
+            return new ViewFragment($section['view'], $data);
         }
 
         throw new \Exception('Unknown section type.');
@@ -135,7 +135,7 @@ class CacheSession
         return $data;
     }
 
-    public function getViewData($section): array
+    public function getFragmentData($section): array
     {
         return array_merge($this->cascade, $this->getContext($section));
     }

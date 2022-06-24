@@ -70,7 +70,7 @@ class NoCacheSessionTest extends TestCase
             'foo' => 'bar',
             'baz' => 'qux',
             'title' => 'local title',
-        ], $session->getViewData($section));
+        ], $session->getFragmentData($section));
     }
 
     /** @test */

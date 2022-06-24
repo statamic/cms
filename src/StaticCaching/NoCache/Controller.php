@@ -17,7 +17,7 @@ class Controller
 
         return collect($session->getSections())
             ->keys()
-            ->mapWithKeys(fn ($key) => [$key => $session->getView($key)->render()])
+            ->mapWithKeys(fn ($key) => [$key => $session->getFragment($key)->render()])
             ->map(fn ($contents) => $replacer->replace($contents));
     }
 }

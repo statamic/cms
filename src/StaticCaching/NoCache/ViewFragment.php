@@ -2,7 +2,7 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
-class ViewView
+class ViewFragment implements Fragment
 {
     private $name;
     private $data;
@@ -13,7 +13,7 @@ class ViewView
         $this->data = $data;
     }
 
-    public function render()
+    public function render(): string
     {
         return view($this->name, $this->data)->render();
     }

@@ -5,7 +5,7 @@ namespace Statamic\StaticCaching\NoCache;
 use Statamic\Facades\File;
 use Statamic\Support\Arr;
 
-class StringView
+class StringFragment implements Fragment
 {
     private $region;
     private $contents;
@@ -22,7 +22,7 @@ class StringView
         $this->directory = config('view.compiled').'/nocache';
     }
 
-    public function render()
+    public function render(): string
     {
         view()->addNamespace('nocache', $this->directory);
         File::makeDirectory($this->directory);
