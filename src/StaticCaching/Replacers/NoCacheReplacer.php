@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class NoCacheReplacer implements Replacer
 {
-    const PATTERN = '/<span class="nocache" data-nocache="([\w\d]+)"><\/span>/';
+    const PATTERN = '/<span class="nocache" data-nocache="([\w\d]+)">NOCACHE_PLACEHOLDER<\/span>/';
 
     private $session;
 
@@ -23,7 +23,7 @@ class NoCacheReplacer implements Replacer
     {
         $this->replaceInResponse($initialResponse);
 
-        $this->addFullMeasureJavascript($responseToBeCached);
+        $this->modifyFullMeasureResponse($responseToBeCached);
     }
 
     public function replaceInCachedResponse(Response $response)
@@ -64,7 +64,7 @@ class NoCacheReplacer implements Replacer
         }, $content);
     }
 
-    private function addFullMeasureJavascript(Response $response)
+    private function modifyFullMeasureResponse(Response $response)
     {
         $cacher = app(Cacher::class);
 
@@ -75,6 +75,8 @@ class NoCacheReplacer implements Replacer
         $js = $cacher->getNocacheJs();
 
         $contents = str_replace('</body>', '<script type="text/javascript">'.$js.'</script></body>', $response->getContent());
+
+        $contents = str_replace('NOCACHE_PLACEHOLDER', $cacher->getNocachePlaceholderContent(), $contents);
 
         $response->setContent($contents);
     }

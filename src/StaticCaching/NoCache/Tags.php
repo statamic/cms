@@ -23,6 +23,6 @@ class Tags extends \Statamic\Tags\Tags
             ->nocache
             ->pushSection($this->content, $this->context->all(), 'antlers.html');
 
-        return sprintf('<span class="nocache" data-nocache="%s"></span>', $key);
+        return sprintf('<span class="nocache" data-nocache="%s">NOCACHE_PLACEHOLDER</span>', $key);
     }
 }

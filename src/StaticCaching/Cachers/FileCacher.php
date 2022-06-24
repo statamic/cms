@@ -22,6 +22,11 @@ class FileCacher extends AbstractCacher
     private $nocacheJs;
 
     /**
+     * @var string
+     */
+    private $nocachePlaceholderContent;
+
+    /**
      * @param  Writer  $writer
      * @param  Repository  $cache
      * @param  array  $config
@@ -204,5 +209,15 @@ fetch('/!/nocache', {
 EOT;
 
         return $this->nocacheJs ?? $default;
+    }
+
+    public function setNocachePlaceholderContent(string $content)
+    {
+        $this->nocachePlaceholderContent = $content;
+    }
+
+    public function getNocachePlaceholderContent()
+    {
+        return $this->nocachePlaceholderContent ?? '';
     }
 }

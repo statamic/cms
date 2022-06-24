@@ -62,6 +62,7 @@ class FullMeasureStaticCachingTest extends TestCase
         $this->createPage('about');
 
         app(Cacher::class)->setNocacheJs('js here');
+        app(Cacher::class)->setNocachePlaceholderContent('<svg>Loading...</svg>');
 
         $this->assertFalse(file_exists($this->dir.'/about_.html'));
 
@@ -76,8 +77,9 @@ class FullMeasureStaticCachingTest extends TestCase
 
         // The cached response should have the nocache placeholder, and the javascript.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
-        $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s"></span>%s</body></html>', [
+        $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
             $section,
+            '<svg>Loading...</svg>',
             '<script type="text/javascript">js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));
     }

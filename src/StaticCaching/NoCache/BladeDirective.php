@@ -20,6 +20,6 @@ class BladeDirective
 
         $key = $this->nocache->pushView($view, $context);
 
-        return sprintf('<span class="nocache" data-nocache="%s"></span>', $key);
+        return sprintf('<span class="nocache" data-nocache="%s">NOCACHE_PLACEHOLDER</span>', $key);
     }
 }
