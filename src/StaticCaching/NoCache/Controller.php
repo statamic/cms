@@ -7,7 +7,7 @@ use Statamic\StaticCaching\Replacers\NoCacheReplacer;
 
 class Controller
 {
-    public function __invoke(Request $request, CacheSession $session)
+    public function __invoke(Request $request, Session $session)
     {
         $url = $request->input('url'); // todo: maybe strip off query params?
 

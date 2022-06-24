@@ -5,11 +5,11 @@ namespace Statamic\StaticCaching\NoCache;
 class BladeDirective
 {
     /**
-     * @var CacheSession
+     * @var Session
      */
     private $nocache;
 
-    public function __construct(CacheSession $nocache)
+    public function __construct(Session $nocache)
     {
         $this->nocache = $nocache;
     }

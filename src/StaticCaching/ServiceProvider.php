@@ -6,7 +6,7 @@ use Facades\Statamic\View\Cascade;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
-use Statamic\StaticCaching\NoCache\CacheSession;
+use Statamic\StaticCaching\NoCache\Session;
 
 class ServiceProvider extends LaravelServiceProvider
 {
@@ -33,8 +33,8 @@ class ServiceProvider extends LaravelServiceProvider
             );
         });
 
-        $this->app->singleton(CacheSession::class, function ($app) {
-            return new CacheSession($app['request']->getUri());
+        $this->app->singleton(Session::class, function ($app) {
+            return new Session($app['request']->getUri());
         });
     }
 
@@ -47,7 +47,7 @@ class ServiceProvider extends LaravelServiceProvider
         // When the cascade gets hydrated, insert it into the
         // nocache session so it can filter out contextual data.
         Cascade::hydrated(function ($cascade) {
-            $this->app[CacheSession::class]->setCascade($cascade->toArray());
+            $this->app[Session::class]->setCascade($cascade->toArray());
         });
 
         Blade::directive('nocache', function ($exp) {

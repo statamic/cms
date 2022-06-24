@@ -4,7 +4,7 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Support\Facades\Cache;
 use Mockery;
-use Statamic\StaticCaching\NoCache\CacheSession;
+use Statamic\StaticCaching\NoCache\Session;
 use Tests\FakesContent;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -19,7 +19,7 @@ class NoCacheSessionTest extends TestCase
     /** @test */
     public function when_pushing_a_section_it_will_filter_out_cascade()
     {
-        $session = new CacheSession('/');
+        $session = new Session('/');
 
         $session->setCascade([
             'csrf_token' => 'abc',
@@ -48,7 +48,7 @@ class NoCacheSessionTest extends TestCase
         // view data should be the context,
         // with the cascade merged in.
 
-        $session = new CacheSession('/');
+        $session = new Session('/');
 
         $session->pushSection('', [
             'foo' => 'bar',
@@ -87,11 +87,11 @@ class NoCacheSessionTest extends TestCase
             ->with('nocache::session.'.md5('/foo'), Mockery::any())
             ->once();
 
-        tap(new CacheSession('/'), function ($session) {
+        tap(new Session('/'), function ($session) {
             $session->pushSection('test', [], '.html');
         })->write();
 
-        tap(new CacheSession('/foo'), function ($session) {
+        tap(new Session('/foo'), function ($session) {
             $session->pushSection('test', [], '.html');
         })->write();
     }
@@ -107,7 +107,7 @@ class NoCacheSessionTest extends TestCase
             'with' => ['title' => 'Test page'],
         ]);
 
-        $session = new CacheSession('http://localhost/test');
+        $session = new Session('http://localhost/test');
         $this->assertEquals([], $session->getSections());
         $this->assertEquals([], $session->getCascade());
 
@@ -125,9 +125,9 @@ class NoCacheSessionTest extends TestCase
     {
         $this->get('/test?foo=bar');
 
-        $session = $this->app->make(CacheSession::class);
+        $session = $this->app->make(Session::class);
 
-        $this->assertInstanceOf(CacheSession::class, $session);
+        $this->assertInstanceOf(Session::class, $session);
         $this->assertEquals('http://localhost/test?foo=bar', $session->getUrl());
     }
 
@@ -181,7 +181,7 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello world');
 
-        $this->assertEquals($sections, app(CacheSession::class)->getSections());
+        $this->assertEquals($sections, app(Session::class)->getSections());
     }
 
     /** @test */
@@ -200,6 +200,6 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello');
 
-        $this->assertEquals([], app(CacheSession::class)->getSections());
+        $this->assertEquals([], app(Session::class)->getSections());
     }
 }

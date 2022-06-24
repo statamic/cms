@@ -4,7 +4,7 @@ namespace Tests\StaticCaching;
 
 use Statamic\Facades\File;
 use Statamic\Facades\StaticCache;
-use Statamic\StaticCaching\NoCache\CacheSession;
+use Statamic\StaticCaching\NoCache\Session;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesContent;
 use Tests\FakesViews;
@@ -70,7 +70,7 @@ class FullMeasureStaticCachingTest extends TestCase
             ->get('/about')
             ->assertOk();
 
-        $section = collect(app(CacheSession::class)->getSections())->keys()->first();
+        $section = collect(app(Session::class)->getSections())->keys()->first();
 
         // Initial response should be dynamic and not contain javascript.
         $this->assertEquals('<html><body>1 2</body></html>', $response->getContent());

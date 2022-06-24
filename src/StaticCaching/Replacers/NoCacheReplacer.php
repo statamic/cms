@@ -5,7 +5,7 @@ namespace Statamic\StaticCaching\Replacers;
 use Illuminate\Http\Response;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
-use Statamic\StaticCaching\NoCache\CacheSession;
+use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 
 class NoCacheReplacer implements Replacer
@@ -14,7 +14,7 @@ class NoCacheReplacer implements Replacer
 
     private $session;
 
-    public function __construct(CacheSession $session)
+    public function __construct(Session $session)
     {
         $this->session = $session;
     }

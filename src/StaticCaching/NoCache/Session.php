@@ -6,7 +6,7 @@ use Facades\Statamic\View\Cascade;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Data;
 
-class CacheSession
+class Session
 {
     protected $ignoreVars = [
         '__env', 'app', 'errors',

@@ -2,7 +2,7 @@
 
 namespace Tests\StaticCaching;
 
-use Statamic\StaticCaching\NoCache\CacheSession;
+use Statamic\StaticCaching\NoCache\Session;
 use Tests\FakesContent;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -46,7 +46,7 @@ Second {{ example_count }} {{ name }} {{ title }}
 {{ /nocache }}
 EOT;
 
-        $session = new CacheSession('http://localhost/test');
+        $session = new Session('http://localhost/test');
         $session->pushSection('First {{ example_count }} {{ name }} {{ title }}', ['name' => 'Dustin'], 'antlers.html');
         $session->pushSection($secondTemplate, ['name' => 'Will'], 'antlers.html');
         $session->write();

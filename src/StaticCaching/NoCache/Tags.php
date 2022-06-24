@@ -8,11 +8,11 @@ class Tags extends \Statamic\Tags\Tags
     public static $stack = 0;
 
     /**
-     * @var CacheSession
+     * @var Session
      */
     private $nocache;
 
-    public function __construct(CacheSession $nocache)
+    public function __construct(Session $nocache)
     {
         $this->nocache = $nocache;
     }

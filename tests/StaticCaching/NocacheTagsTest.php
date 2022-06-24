@@ -2,7 +2,7 @@
 
 namespace Tests\StaticCaching;
 
-use Statamic\StaticCaching\NoCache\CacheSession;
+use Statamic\StaticCaching\NoCache\Session;
 use Tests\FakesContent;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -51,7 +51,7 @@ EOT;
             ->set('title', 'Updated')
             ->saveQuietly(); // Save quietly to prevent the invalidator from clearing the statically cached page.
 
-        $this->app->make(CacheSession::class)->reset();
+        $this->app->make(Session::class)->reset();
 
         $this
             ->get('/about')
@@ -92,7 +92,7 @@ EOT;
             ->set('title', 'Updated')
             ->saveQuietly(); // Save quietly to prevent the invalidator from clearing the statically cached page.
 
-        $this->app->make(CacheSession::class)->reset();
+        $this->app->make(Session::class)->reset();
 
         $this
             ->get('/about')
