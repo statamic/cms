@@ -47,11 +47,9 @@ Second {{ example_count }} {{ name }} {{ title }}
 EOT;
 
         $session = new Session('http://localhost/test');
-        $session->pushRegion('First {{ example_count }} {{ name }} {{ title }}', ['name' => 'Dustin'], 'antlers.html');
-        $session->pushRegion($secondTemplate, ['name' => 'Will'], 'antlers.html');
+        $regionOne = $session->pushRegion('First {{ example_count }} {{ name }} {{ title }}', ['name' => 'Dustin'], 'antlers.html');
+        $regionTwo = $session->pushRegion($secondTemplate, ['name' => 'Will'], 'antlers.html');
         $session->write();
-
-        $keys = collect($session->getRegions())->keys()->all();
 
         $secondExpectation = <<<'EOT'
 Second 2 Will Test
@@ -63,8 +61,8 @@ EOT;
             ->postJson('/!/nocache', ['url' => 'http://localhost/test'])
             ->assertOk()
             ->assertExactJson([
-                $keys[0] => 'First 1 Dustin Test',
-                $keys[1] => $secondExpectation,
+                $regionOne->key() => 'First 1 Dustin Test',
+                $regionTwo->key() => $secondExpectation,
             ]);
     }
 }

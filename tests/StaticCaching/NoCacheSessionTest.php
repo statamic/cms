@@ -28,7 +28,7 @@ class NoCacheSessionTest extends TestCase
             'title' => 'base title',
         ]);
 
-        $session->pushRegion('', [
+        $region = $session->pushRegion('', [
             'csrf_token' => 'abc',
             'now' => 'carbon',
             'title' => 'different title',
@@ -40,7 +40,7 @@ class NoCacheSessionTest extends TestCase
             'title' => 'different title',
             'foo' => 'bar',
             'baz' => 'qux',
-        ], collect($session->getRegions())->first()->context());
+        ], $region->context());
     }
 
     /** @test */
@@ -51,13 +51,11 @@ class NoCacheSessionTest extends TestCase
 
         $session = new Session('/');
 
-        $session->pushRegion('', [
+        $region = $session->pushRegion('', [
             'foo' => 'bar',
             'baz' => 'qux',
             'title' => 'local title',
         ], '');
-
-        $region = collect($session->getRegions())->first();
 
         $session->setCascade([
             'csrf_token' => 'abc',
