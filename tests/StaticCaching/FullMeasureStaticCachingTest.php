@@ -70,7 +70,7 @@ class FullMeasureStaticCachingTest extends TestCase
             ->get('/about')
             ->assertOk();
 
-        $region = app(Session::class)->getRegions()->first();
+        $region = app(Session::class)->regions()->first();
 
         // Initial response should be dynamic and not contain javascript.
         $this->assertEquals('<html><body>1 2</body></html>', $response->getContent());

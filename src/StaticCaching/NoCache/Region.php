@@ -31,12 +31,12 @@ abstract class Region
             unset($context[$var]);
         }
 
-        return $this->arrayRecursiveDiff($context, $this->session->getCascade());
+        return $this->arrayRecursiveDiff($context, $this->session->cascade());
     }
 
     public function fragmentData(): array
     {
-        return array_merge($this->session->getCascade(), $this->context());
+        return array_merge($this->session->cascade(), $this->context());
     }
 
     private function arrayRecursiveDiff($a, $b)

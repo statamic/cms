@@ -110,13 +110,13 @@ class NoCacheSessionTest extends TestCase
         ]);
 
         $session = new Session('http://localhost/test');
-        $this->assertEquals([], $session->getRegions()->all());
-        $this->assertEquals([], $session->getCascade());
+        $this->assertEquals([], $session->regions()->all());
+        $this->assertEquals([], $session->cascade());
 
         $session->restore();
 
-        $this->assertEquals([$regionOne, $regionTwo], $session->getRegions()->all());
-        $this->assertNotEquals([], $cascade = $session->getCascade());
+        $this->assertEquals([$regionOne, $regionTwo], $session->regions()->all());
+        $this->assertNotEquals([], $cascade = $session->cascade());
         $this->assertEquals('/test', $cascade['url']);
         $this->assertEquals('Test page', $cascade['title']);
         $this->assertEquals('http://localhost/cp', $cascade['cp_url']);
@@ -130,7 +130,7 @@ class NoCacheSessionTest extends TestCase
         $session = $this->app->make(Session::class);
 
         $this->assertInstanceOf(Session::class, $session);
-        $this->assertEquals('http://localhost/test?foo=bar', $session->getUrl());
+        $this->assertEquals('http://localhost/test?foo=bar', $session->url());
     }
 
     /** @test */
@@ -187,7 +187,7 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello world');
 
-        $this->assertEquals(['abc' => $region], app(Session::class)->getRegions()->all());
+        $this->assertEquals(['abc' => $region], app(Session::class)->regions()->all());
     }
 
     /** @test */
@@ -206,6 +206,6 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello');
 
-        $this->assertEquals([], app(Session::class)->getRegions()->all());
+        $this->assertEquals([], app(Session::class)->regions()->all());
     }
 }

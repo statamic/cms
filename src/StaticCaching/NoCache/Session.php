@@ -24,7 +24,7 @@ class Session
         $this->regions = new Collection;
     }
 
-    public function getUrl()
+    public function url()
     {
         return $this->url;
     }
@@ -39,7 +39,7 @@ class Session
     /**
      * @return Collection<Region>
      */
-    public function getRegions(): Collection
+    public function regions(): Collection
     {
         return $this->regions;
     }
@@ -63,7 +63,7 @@ class Session
         return $this->regions[$region->key()] = $region;
     }
 
-    public function getCascade()
+    public function cascade()
     {
         return $this->cascade;
     }
