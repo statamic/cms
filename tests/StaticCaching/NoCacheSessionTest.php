@@ -113,12 +113,12 @@ class NoCacheSessionTest extends TestCase
         ]);
 
         $session = new Session('http://localhost/test');
-        $this->assertEquals([], $session->getRegions());
+        $this->assertEquals([], $session->getRegions()->all());
         $this->assertEquals([], $session->getCascade());
 
         $session->restore();
 
-        $this->assertEquals([$regionOne, $regionTwo], $session->getRegions());
+        $this->assertEquals([$regionOne, $regionTwo], $session->getRegions()->all());
         $this->assertNotEquals([], $cascade = $session->getCascade());
         $this->assertEquals('/test', $cascade['url']);
         $this->assertEquals('Test page', $cascade['title']);
@@ -192,7 +192,7 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello world');
 
-        $this->assertEquals(['abc' => $region], app(Session::class)->getRegions());
+        $this->assertEquals(['abc' => $region], app(Session::class)->getRegions()->all());
     }
 
     /** @test */
@@ -211,6 +211,6 @@ class NoCacheSessionTest extends TestCase
             ->assertOk()
             ->assertSee('Hello');
 
-        $this->assertEquals([], app(Session::class)->getRegions());
+        $this->assertEquals([], app(Session::class)->getRegions()->all());
     }
 }

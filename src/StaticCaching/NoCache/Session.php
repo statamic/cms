@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\NoCache;
 
 use Facades\Statamic\View\Cascade;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Data;
 
@@ -11,15 +12,16 @@ class Session
     protected $cascade = [];
 
     /**
-     * @var array<Region>
+     * @var Collection<Region>
      */
-    protected $regions = [];
+    protected $regions;
 
     protected $url;
 
     public function __construct($url)
     {
         $this->url = $url;
+        $this->regions = new Collection;
     }
 
     public function getUrl()
@@ -35,9 +37,9 @@ class Session
     }
 
     /**
-     * @return array<Region>
+     * @return Collection<Region>
      */
-    public function getRegions(): array
+    public function getRegions(): Collection
     {
         return $this->regions;
     }
@@ -81,13 +83,13 @@ class Session
     public function reset()
     {
         $this->contexts = [];
-        $this->regions = [];
+        $this->regions = new Collection;
         $this->cascade = [];
     }
 
     public function write()
     {
-        if (empty($this->regions)) {
+        if ($this->regions->isEmpty()) {
             return;
         }
 
@@ -100,7 +102,7 @@ class Session
     {
         $session = Cache::get('nocache::session.'.md5($this->url));
 
-        $this->regions = array_merge($this->regions, $session['regions'] ?? []);
+        $this->regions = $this->regions->merge($session['regions'] ?? []);
         $this->cascade = $this->restoreCascade();
 
         return $this;
