@@ -44,6 +44,11 @@ class Session
         return $this->regions;
     }
 
+    public function region(string $key): Region
+    {
+        return $this->regions[$key];
+    }
+
     public function pushRegion($contents, $context, $extension): StringRegion
     {
         $region = new StringRegion($this, trim($contents), $context, $extension);

@@ -60,7 +60,7 @@ class NoCacheReplacer implements Replacer
                 return '';
             }
 
-            return $this->session->getFragment($region)->render();
+            return $this->session->region($region)->render();
         }, $content);
     }
 

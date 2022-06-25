@@ -10,7 +10,7 @@ interface Region
 
     public function context(): array;
 
-    public function fragment(): Fragment;
-
     public function fragmentData(): array;
+
+    public function render(): string;
 }

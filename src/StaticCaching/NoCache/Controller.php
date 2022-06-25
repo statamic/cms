@@ -17,7 +17,7 @@ class Controller
 
         return collect($session->getRegions())
             ->keys()
-            ->mapWithKeys(fn ($key) => [$key => $session->getFragment($key)->render()])
+            ->mapWithKeys(fn ($key) => [$key => $session->region($key)->render()])
             ->map(fn ($contents) => $replacer->replace($contents));
     }
 }

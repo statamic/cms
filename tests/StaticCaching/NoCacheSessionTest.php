@@ -5,7 +5,6 @@ namespace Tests\StaticCaching;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Statamic\StaticCaching\NoCache\Session;
-use Statamic\StaticCaching\NoCache\StringFragment;
 use Statamic\StaticCaching\NoCache\StringRegion;
 use Tests\FakesContent;
 use Tests\FakesViews;
@@ -183,9 +182,7 @@ class NoCacheSessionTest extends TestCase
             ],
         ]);
 
-        $fragment = Mockery::mock(StringFragment::class);
-        $fragment->shouldReceive('render')->andReturn('world');
-        $region->shouldReceive('fragment')->andReturn($fragment);
+        $region->shouldReceive('render')->andReturn('world');
 
         $this
             ->get('/test')

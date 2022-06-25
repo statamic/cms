@@ -5,7 +5,7 @@ namespace Statamic\StaticCaching\NoCache;
 use Statamic\Facades\File;
 use Statamic\Support\Arr;
 
-class StringFragment implements Fragment
+class StringFragment
 {
     private $region;
     private $contents;

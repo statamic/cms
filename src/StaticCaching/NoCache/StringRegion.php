@@ -21,13 +21,13 @@ class StringRegion extends AbstractRegion
         return $this->key;
     }
 
-    public function fragment(): StringFragment
+    public function render(): string
     {
-        return new StringFragment(
+        return (new StringFragment(
             $this->key(),
             $this->content,
             $this->extension,
             $this->fragmentData()
-        );
+        ))->render();
     }
 }

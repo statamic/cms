@@ -19,8 +19,8 @@ class ViewRegion extends AbstractRegion
         return $this->key;
     }
 
-    public function fragment(): ViewFragment
+    public function render(): string
     {
-        return new ViewFragment($this->view, $this->fragmentData());
+        return view($this->view, $this->fragmentData())->render();
     }
 }
