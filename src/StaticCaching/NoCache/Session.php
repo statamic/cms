@@ -82,7 +82,6 @@ class Session
 
     public function reset()
     {
-        $this->contexts = [];
         $this->regions = new Collection;
         $this->cascade = [];
     }
