@@ -8,11 +8,13 @@ use Statamic\Facades\Data;
 
 class Session
 {
-    protected $ignoreVars = [
-        '__env', 'app', 'errors',
-    ];
     protected $cascade = [];
+
+    /**
+     * @var array<Region>
+     */
     protected $regions = [];
+
     protected $url;
 
     public function __construct($url)
@@ -32,65 +34,36 @@ class Session
         return $this;
     }
 
-    public function getRegions()
+    /**
+     * @return array<Region>
+     */
+    public function getRegions(): array
     {
         return $this->regions;
     }
 
-    public function pushRegion($contents, $context, $extension)
+    public function pushRegion($contents, $context, $extension): StringRegion
     {
-        foreach ($this->ignoreVars as $varName) {
-            unset($context[$varName]);
-        }
+        $region = new StringRegion($this, trim($contents), $context, $extension);
 
-        $contents = trim($contents);
-        $key = sha1($contents.str_random());
-
-        $this->regions[$key] = [
-            'type' => 'string',
-            'contents' => $contents,
-            'extension' => $extension,
-            'context' => $this->filterContext($context),
-        ];
-
-        return $key;
+        return $this->regions[$region->key()] = $region;
     }
 
-    public function pushView($view, $context)
+    public function pushView($view, $context): ViewRegion
     {
-        foreach ($this->ignoreVars as $varName) {
-            unset($context[$varName]);
-        }
+        $region = new ViewRegion($this, $view, $context);
 
-        $key = str_random(32);
-
-        $this->regions[$key] = [
-            'type' => 'view',
-            'view' => $view,
-            'context' => $this->filterContext($context),
-        ];
-
-        return $key;
+        return $this->regions[$region->key()] = $region;
     }
 
     public function getContext($region)
     {
-        return $this->regions[$region]['context'];
+        return $this->regions[$region]->context();
     }
 
     public function getFragment($key): Fragment
     {
-        $region = $this->regions[$key];
-
-        $data = $this->getFragmentData($key);
-
-        if ($region['type'] === 'string') {
-            return new StringFragment($key, $region['contents'], $region['extension'], $data);
-        } elseif ($region['type'] === 'view') {
-            return new ViewFragment($region['view'], $data);
-        }
-
-        throw new \Exception('Unknown region type.');
+        return $this->regions[$key]->fragment();
     }
 
     public function getCascade()
@@ -103,41 +76,6 @@ class Session
         $this->cascade = $cascade;
 
         return $this;
-    }
-
-    private function filterContext(array $context): array
-    {
-        return $this->arrayRecursiveDiff($context, $this->cascade);
-    }
-
-    private function arrayRecursiveDiff($a, $b)
-    {
-        $data = [];
-
-        foreach ($a as $aKey => $aValue) {
-            if (! is_object($aKey) && is_array($b) && array_key_exists($aKey, $b)) {
-                if (is_array($aValue)) {
-                    $aRecursiveDiff = $this->arrayRecursiveDiff($aValue, $b[$aKey]);
-
-                    if (! empty($aRecursiveDiff)) {
-                        $data[$aKey] = $aRecursiveDiff;
-                    }
-                } else {
-                    if ($aValue != $b[$aKey]) {
-                        $data[$aKey] = $aValue;
-                    }
-                }
-            } else {
-                $data[$aKey] = $aValue;
-            }
-        }
-
-        return $data;
-    }
-
-    public function getFragmentData($region): array
-    {
-        return array_merge($this->cascade, $this->getContext($region));
     }
 
     public function reset()

@@ -20,6 +20,9 @@ class HalfMeasureStaticCachingTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        // Use the file driver so that serializing happens, to better simulate a real world scenario.
+        $app['config']->set('cache.default', 'file');
+
         $app['config']->set('statamic.static_caching.strategy', 'half');
 
         $app['config']->set('statamic.static_caching.replacers', array_merge($app['config']->get('statamic.static_caching.replacers'), [

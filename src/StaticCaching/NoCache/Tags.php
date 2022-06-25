@@ -19,10 +19,9 @@ class Tags extends \Statamic\Tags\Tags
 
     public function index()
     {
-        $key = $this
+        return $this
             ->nocache
-            ->pushRegion($this->content, $this->context->all(), 'antlers.html');
-
-        return sprintf('<span class="nocache" data-nocache="%s">NOCACHE_PLACEHOLDER</span>', $key);
+            ->pushRegion($this->content, $this->context->all(), 'antlers.html')
+            ->placeholder();
     }
 }

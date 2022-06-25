@@ -5,6 +5,8 @@ namespace Tests\StaticCaching;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Statamic\StaticCaching\NoCache\Session;
+use Statamic\StaticCaching\NoCache\StringFragment;
+use Statamic\StaticCaching\NoCache\StringRegion;
 use Tests\FakesContent;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -39,13 +41,13 @@ class NoCacheSessionTest extends TestCase
             'title' => 'different title',
             'foo' => 'bar',
             'baz' => 'qux',
-        ], collect($session->getRegions())->first()['context']);
+        ], collect($session->getRegions())->first()->context());
     }
 
     /** @test */
-    public function it_gets_the_view_data()
+    public function it_gets_the_fragment_data()
     {
-        // view data should be the context,
+        // fragment data should be the context,
         // with the cascade merged in.
 
         $session = new Session('/');
@@ -56,7 +58,7 @@ class NoCacheSessionTest extends TestCase
             'title' => 'local title',
         ], '');
 
-        $region = collect($session->getRegions())->keys()->first();
+        $region = collect($session->getRegions())->first();
 
         $session->setCascade([
             'csrf_token' => 'abc',
@@ -70,7 +72,7 @@ class NoCacheSessionTest extends TestCase
             'foo' => 'bar',
             'baz' => 'qux',
             'title' => 'local title',
-        ], $session->getFragmentData($region));
+        ], $region->fragmentData());
     }
 
     /** @test */
@@ -100,7 +102,10 @@ class NoCacheSessionTest extends TestCase
     public function it_restores_from_cache()
     {
         Cache::forever('nocache::session.'.md5('http://localhost/test'), [
-            'regions' => ['baz' => 'qux'],
+            'regions' => [
+                $regionOne = Mockery::mock(StringRegion::class),
+                $regionTwo = Mockery::mock(StringRegion::class),
+            ],
         ]);
 
         $this->createPage('/test', [
@@ -113,7 +118,7 @@ class NoCacheSessionTest extends TestCase
 
         $session->restore();
 
-        $this->assertEquals(['baz' => 'qux'], $session->getRegions());
+        $this->assertEquals([$regionOne, $regionTwo], $session->getRegions());
         $this->assertNotEquals([], $cascade = $session->getCascade());
         $this->assertEquals('/test', $cascade['url']);
         $this->assertEquals('Test page', $cascade['title']);
@@ -173,15 +178,21 @@ class NoCacheSessionTest extends TestCase
         $this->createPage('test');
 
         Cache::put('nocache::session.'.md5('http://localhost/test'), [
-            'regions' => $regions = ['abc' => ['type' => 'string', 'contents' => 'world', 'extension' => 'html', 'context' => ['foo' => 'bar']]],
+            'regions' => [
+                'abc' => $region = Mockery::mock(StringRegion::class),
+            ],
         ]);
+
+        $fragment = Mockery::mock(StringFragment::class);
+        $fragment->shouldReceive('render')->andReturn('world');
+        $region->shouldReceive('fragment')->andReturn($fragment);
 
         $this
             ->get('/test')
             ->assertOk()
             ->assertSee('Hello world');
 
-        $this->assertEquals($regions, app(Session::class)->getRegions());
+        $this->assertEquals(['abc' => $region], app(Session::class)->getRegions());
     }
 
     /** @test */
