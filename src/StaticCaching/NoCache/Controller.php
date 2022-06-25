@@ -15,9 +15,9 @@ class Controller
 
         $replacer = new NoCacheReplacer($session);
 
-        return collect($session->getRegions())
-            ->keys()
-            ->mapWithKeys(fn ($key) => [$key => $session->region($key)->render()])
+        return $session
+            ->getRegions()
+            ->map->render()
             ->map(fn ($contents) => $replacer->replace($contents));
     }
 }
