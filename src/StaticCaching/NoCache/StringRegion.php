@@ -2,7 +2,7 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
-class StringRegion extends AbstractRegion
+class StringRegion extends Region
 {
     protected $content;
     protected $extension;

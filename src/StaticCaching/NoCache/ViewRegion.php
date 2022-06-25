@@ -2,7 +2,7 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
-class ViewRegion extends AbstractRegion
+class ViewRegion extends Region
 {
     protected $view;
 
