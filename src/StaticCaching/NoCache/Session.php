@@ -63,16 +63,6 @@ class Session
         return $this->regions[$region->key()] = $region;
     }
 
-    public function getContext($region)
-    {
-        return $this->regions[$region]->context();
-    }
-
-    public function getFragment($key): Fragment
-    {
-        return $this->regions[$key]->fragment();
-    }
-
     public function getCascade()
     {
         return $this->cascade;
