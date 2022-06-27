@@ -4,7 +4,7 @@
 
         <div class="flex flex-1" v-if="! inline && totalItems > 0">
             <div class="text-xs text-grey-70">
-                {{ __(':fromItem–:toItem of :totalItems items', { fromItem, toItem, totalItems }) }}
+                {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
 
