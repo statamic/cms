@@ -152,17 +152,15 @@ EOT;
     {{ /replicator_field }}
 {{ /just_a_tag }}
 EOT;
-        $partial = <<<PARTIAL
+        $partial = <<<'PARTIAL'
 {{ stuff }}
 
 {{ if bard_field }} {{ bard_field }} {{ /if }}
 PARTIAL;
 
-
         $this->viewShouldReturnRaw('inner', $partial);
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('default', $template);
-
 
         $responseOne = $this->get('/home')->assertOk();
         $content = trim($responseOne->content());
