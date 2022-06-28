@@ -25,9 +25,9 @@ return [
     | Default autosave interval
     |--------------------------------------------------------------------------
     |
-    | The default value can be set here generally for all collections.
+    | The default value may be set here and will apply to all collections.
     | However, it is also possible to manually adjust the value in the
-    | blueprint of a collection. By default, this value is set to 5s.
+    | each collection's config file. By default, this is set to 5s.
     |
     */
 
