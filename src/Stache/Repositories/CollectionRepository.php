@@ -2,11 +2,13 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Closure;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 use Statamic\Facades\Blink;
 use Statamic\Stache\Stache;
+use Statamic\Statamic;
 
 class CollectionRepository implements RepositoryContract
 {
@@ -115,5 +117,10 @@ class CollectionRepository implements RepositoryContract
     public function additionalPreviewTargets($handle)
     {
         return collect($this->additionalPreviewTargets[$handle] ?? []);
+    }
+
+    public function computed(string $collection, string $field, Closure $callback)
+    {
+        Statamic::computed("collections.{$collection}.{$field}", $callback);
     }
 }
