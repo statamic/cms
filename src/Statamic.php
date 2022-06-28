@@ -30,6 +30,7 @@ class Statamic
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
+    protected static $computedFieldCallbacks = [];
 
     public static function version()
     {
@@ -373,5 +374,23 @@ class Statamic
         }
 
         return $line;
+    }
+
+    public static function computed(string $fieldPath, Closure $callback)
+    {
+        static::$computedFieldCallbacks[$fieldPath] = $callback;
+    }
+
+    public static function getComputedCallbacks(string $fieldPrefix)
+    {
+        $fieldPrefix = Str::ensureRight($fieldPrefix, '.');
+
+        return collect(static::$computedFieldCallbacks)
+            ->filter(function ($callback, $fieldPath) use ($fieldPrefix) {
+                return Str::startsWith($fieldPath, $fieldPrefix);
+            })
+            ->keyBy(function ($callback, $fieldPath) {
+                return collect(explode('.', $fieldPath))->last();
+            });
     }
 }
