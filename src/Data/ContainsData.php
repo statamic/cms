@@ -2,6 +2,8 @@
 
 namespace Statamic\Data;
 
+use Statamic\Statamic;
+
 trait ContainsData
 {
     use ContainsSupplementalData;
@@ -50,6 +52,19 @@ trait ContainsData
         $this->data = collect($data);
 
         return $this;
+    }
+
+    public function computedData()
+    {
+        if (method_exists($this, 'computedDataPrefix')) {
+            return collect(Statamic::getComputedCallbacks($this->computedDataPrefix()))
+                ->map(function ($callback, $field) {
+                    return $callback($this, $this->get($field));
+                })
+                ->all();
+        }
+
+        return [];
     }
 
     public function merge($data)
