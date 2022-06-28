@@ -304,6 +304,7 @@ export default {
         listingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
+        autosaveInterval: Number,
     },
 
     data() {
@@ -344,6 +345,7 @@ export default {
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
+            isAutosave: false,
         }
     },
 
@@ -480,7 +482,7 @@ export default {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
                 }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                if (!this.isCreating) this.$toast.success(__('Saved'));
+                if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));
@@ -502,7 +504,7 @@ export default {
                         return;
                     }
 
-                    let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
+                    let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && nextAction === 'create_another') {
@@ -525,6 +527,7 @@ export default {
                     }
 
                     this.quickSave = false;
+                    this.isAutosave = false;
                 }).catch(e => {});
         },
 
@@ -676,6 +679,17 @@ export default {
                 this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
+        },
+
+        setAutosaveInterval() {
+            const interval = setInterval(() => {
+                if (!this.isDirty) return;
+
+                this.isAutosave = true;
+                this.save();
+            }, this.autosaveInterval);
+
+            this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
         }
     },
 
@@ -694,10 +708,18 @@ export default {
         });
 
         this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
+
+        if (typeof this.autosaveInterval === 'number') {
+            this.setAutosaveInterval();
+        }
     },
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    beforeDestroy() {
+        this.$store.commit(`publish/${this.publishContainer}/clearAutosaveInterval`);
     },
 
     destroyed() {
