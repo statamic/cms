@@ -7,13 +7,14 @@ return [
     | Enable autosave
     |--------------------------------------------------------------------------
     |
-    | THIS IS A EXPERIMENTAL FEATURE. THINGS WILL PROBABLY GO WRONG.
-    | Set to true to enable autosave in general. You need to enable
-    | autosave manually in every collection, to make it work.
+    | THIS IS A EXPERIMENTAL FEATURE. Things may go wrong.
     |
-    | For example inside `content/collections/pages.yaml`
-    | Add `autosave: true` or `autosave: 5000` for a
-    | saving interval of every 5 seconds.
+    | Set to true to enable autosave. You must also enable autosave
+    | manually in every collection in order for it to work.
+    |
+    | For example, inside `content/collections/pages.yaml`, add
+    | `autosave: 5000` for a 5s interval or `autosave: true`
+    | to use the default interval as defined below.
     |
     */
 
