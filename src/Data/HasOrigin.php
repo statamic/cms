@@ -10,7 +10,11 @@ trait HasOrigin
     {
         $originValues = $this->hasOrigin() ? $this->origin()->values() : collect();
 
-        return $originValues->merge($this->data);
+        $computedData = method_exists($this, 'computedData') ? $this->computedData() : [];
+
+        return $originValues
+            ->merge($this->data)
+            ->merge($computedData);
     }
 
     public function value($key)
