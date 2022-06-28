@@ -607,7 +607,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                     return null;
                 }
 
-                return gettype($interval) === 'boolean' ? config('statamic.autosave.interval') : $interval;
+                return is_bool($interval) ? config('statamic.autosave.interval') : $interval;
             })
             ->args(func_get_args());
     }
