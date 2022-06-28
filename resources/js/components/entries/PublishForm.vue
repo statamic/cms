@@ -504,7 +504,7 @@ export default {
                         return;
                     }
 
-                    let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
+                    let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && nextAction === 'create_another') {
