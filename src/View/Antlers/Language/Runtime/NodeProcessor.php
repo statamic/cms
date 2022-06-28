@@ -1208,7 +1208,9 @@ class NodeProcessor
                 }
 
                 if ($node instanceof ConditionNode && ! empty($node->logicBranches)) {
+                    $lockData = $this->data;
                     $result = $this->conditionProcessor->process($node, $this->getActiveData());
+                    $this->data = $lockData;
 
                     if ($result == null) {
                         if ($this->isTracingEnabled()) {
