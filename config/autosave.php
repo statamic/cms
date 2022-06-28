@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'enabled' => env('STATAMIC_AUTOSAVE_ENABLED', false),
+    'enabled' => false,
 
     /*
     |--------------------------------------------------------------------------
