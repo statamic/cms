@@ -16,6 +16,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Preferences\HasPreferencesInProperty;
+use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 /**
@@ -59,6 +60,12 @@ class User extends BaseUser
 
     public function value($key)
     {
+        $computedFields = Statamic::getComputedCallbacks($this->computedDataPrefix());
+
+        if ($callback = $computedFields->get($key)) {
+            return $callback($this, $this->get($key));
+        }
+
         return $this->get($key);
     }
 
