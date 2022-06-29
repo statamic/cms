@@ -5,10 +5,10 @@ namespace Statamic\Tags;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 
-class Mount extends Tags
+class MountUrl extends Tags
 {
     /**
-     * {{ mount:* }}.
+     * {{ mount_url:* }}.
      */
     public function wildcard($tag)
     {
@@ -16,7 +16,7 @@ class Mount extends Tags
     }
 
     /**
-     * {{ mount handle="" }}.
+     * {{ mount_url handle="" }}.
      */
     public function index()
     {

@@ -1,10 +1,39 @@
 # Release Notes
 
+## 3.3.16 (2022-06-13)
+
+### What's new
+- Actions can be added to the form listing. [#5845](https://github.com/statamic/cms/issues/5845) by @duncanmcclean
+- Ability to specify default sort order for asset containers. [#6171](https://github.com/statamic/cms/issues/6171) by @jacksleight
+
+### What's improved
+- Updated Norwegian translation. [#6195](https://github.com/statamic/cms/issues/6195) by @hgrimelid
+
+### What's fixed
+- Fix JS error when a field has a number. [#6187](https://github.com/statamic/cms/issues/6187) by @jasonvarga
+- Fix `get_error` tag outputting something when there are other errors. [#6201](https://github.com/statamic/cms/issues/6201) by @jasonvarga
+- Fix AMP not working on home page. [#6184](https://github.com/statamic/cms/issues/6184) by @jasonvarga
+- Fix issue where site specific views aren't used for taxonomies. [#6146](https://github.com/statamic/cms/issues/6146) by @edalzell
+- Fix awkward validation error message. [#6188](https://github.com/statamic/cms/issues/6188) by @jasonvarga
+
+
+
+## 3.3.15 (2022-06-09)
+
+### What's new
+- Add `to_bool` modifier. [#6159](https://github.com/statamic/cms/issues/6159) by @edalzell
+
+### What's fixed
+- Rename `mount` tag to `mount_url` so it doesn't clash with variable. [#6181](https://github.com/statamic/cms/issues/6181) by @jacksleight
+- Fix user recursion issue in Control Panel. [#6163](https://github.com/statamic/cms/issues/6163) by @jasonvarga
+
+
+
 ## 3.3.14 (2022-06-08)
 
 ### What's new
 - Added "single" mode for the `array` fieldtype. [#6141](https://github.com/statamic/cms/issues/6141) by @jackmcdade
-- Added `mount` tag. [#6038](https://github.com/statamic/cms/issues/6038) by @jacksleight
+- Added `mount` tag. (Renamed to `mount_url` in 3.3.15) [#6038](https://github.com/statamic/cms/issues/6038) by @jacksleight
 
 ### What's improved
 - Asset filenames are now lowercased by default. [#6031](https://github.com/statamic/cms/issues/6031) by @jesseleite
