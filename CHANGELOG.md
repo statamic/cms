@@ -22,6 +22,7 @@
 - Fix publish path of addon translations. [#6214](https://github.com/statamic/cms/issues/6214) by @aerni
 - Using config type fallback. [#6207](https://github.com/statamic/cms/issues/6207) by @sliesensei
 - Replace reference to FlysystemFileNotFoundException. [#6054](https://github.com/statamic/cms/issues/6054) by @michaelr0
+- Fix `locales` tag when using Live Preview. [#6263](https://github.com/statamic/cms/issues/6263) by @edalzell
 
 
 
