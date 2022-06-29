@@ -47,6 +47,7 @@
 
                     <data-list-bulk-actions
                         :url="actionUrl"
+                        :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -112,6 +113,12 @@ export default {
             preferencesPrefix: `taxonomies.${this.taxonomy}`,
             requestUrl: cp_url(`taxonomies/${this.taxonomy}/terms`),
         }
+    },
+
+    computed: {
+        actionContext() {
+            return {taxonomy: this.taxonomy};
+        },
     },
 
     methods: {

@@ -409,6 +409,8 @@ class NodeProcessor
                     $this->previousAssignments[$path] = $targetIndex;
                 }
             }
+
+            $this->runtimeAssignments[$path] = $value;
         }
 
         if (GlobalRuntimeState::$traceTagAssignments) {
@@ -1206,7 +1208,9 @@ class NodeProcessor
                 }
 
                 if ($node instanceof ConditionNode && ! empty($node->logicBranches)) {
+                    $lockData = $this->data;
                     $result = $this->conditionProcessor->process($node, $this->getActiveData());
+                    $this->data = $lockData;
 
                     if ($result == null) {
                         if ($this->isTracingEnabled()) {
@@ -2227,7 +2231,7 @@ class NodeProcessor
                 $___antlersVarAfter = get_defined_vars();
 
                 foreach ($___antlersVarAfter as $varKey => $varValue) {
-                    if (! array_key_exists($varKey, $___antlersVarBefore) || array_key_exists($varKey, $this->previousAssignments)) {
+                    if (! array_key_exists($varKey, $___antlersVarBefore) || array_key_exists($varKey, $this->previousAssignments) || array_key_exists($varKey, $this->runtimeAssignments)) {
                         $phpRuntimeAssignments[$varKey] = $varValue;
                     }
                 }
@@ -2237,6 +2241,9 @@ class NodeProcessor
         }
 
         if (! $node->isEchoNode && ! empty($phpRuntimeAssignments)) {
+            unset($phpRuntimeAssignments['___antlersVarBefore']);
+            unset($phpRuntimeAssignments['___antlersPhpExecutionResult']);
+
             $this->processAssignments($phpRuntimeAssignments);
         }
 

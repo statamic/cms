@@ -679,9 +679,26 @@ INFO;
         ))->allowPhp($this->allowPhp);
     }
 
+    private function shouldIsolate()
+    {
+        if ($this->isolateRuntimes) {
+            return true;
+        }
+
+        if (GlobalRuntimeState::$isEvaluatingUserData) {
+            return true;
+        }
+
+        if (GlobalRuntimeState::$requiresRuntimeIsolation) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function parse($text, $data = [])
     {
-        if ($this->isolateRuntimes || GlobalRuntimeState::$isEvaluatingData) {
+        if ($this->shouldIsolate()) {
             return $this->cloneRuntimeParser()->renderText($text, $data);
         }
 

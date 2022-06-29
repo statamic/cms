@@ -2,7 +2,10 @@
 
 namespace Statamic\Data;
 
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class DataRepository
 {
@@ -37,6 +40,38 @@ class DataRepository
     public function findByUri($uri, $site = null)
     {
         return $this->attemptAllRepositories('findByUri', $uri, $site);
+    }
+
+    public function findByRequestUrl($url)
+    {
+        $site = Site::findByUrl($url);
+
+        $url = $site->relativePath($url);
+
+        if ($this->isAmpUrl($url)) {
+            $url = Str::ensureLeft(Str::after($url, '/'.config('statamic.amp.route')), '/');
+        }
+
+        if (Str::contains($url, '?')) {
+            $url = substr($url, 0, strpos($url, '?'));
+        }
+
+        if (Str::endsWith($url, '/') && Str::length($url) > 1) {
+            $url = rtrim($url, '/');
+        }
+
+        return $this->findByUri($url, $site->handle());
+    }
+
+    private function isAmpUrl($url)
+    {
+        if (! config('statamic.amp.enabled')) {
+            return false;
+        }
+
+        $url = URL::makeRelative($url);
+
+        return Str::startsWith($url, '/'.config('statamic.amp.route'));
     }
 
     protected function attemptAllRepositories($method, ...$args)
