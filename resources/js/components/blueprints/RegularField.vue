@@ -10,7 +10,12 @@
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="flex-none pr-1 flex">
-                    <width-selector v-model="width" :hidden="isHidden" class="mr-1" />
+                    <width-selector v-if="!isHidden" v-model="width" class="mr-1" />
+
+                    <div v-else class="relative border border-grey-40 opacity-50 w-12 flex items-center justify-center mr-1">
+                        <svg-icon name="hidden" class="h-4 w-4 opacity-50"></svg-icon>
+                    </div>
+
                     <button v-if="canDefineLocalizable"
                         class="hover:text-grey-100 mr-1 flex items-center"
                         :class="{ 'text-grey-100': localizable, 'text-grey-60': !localizable }"

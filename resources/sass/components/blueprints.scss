@@ -89,8 +89,8 @@
 }
 
 .field-width-selector {
+    @apply w-12;
     display: flex;
-    width: 49px;
     height: 20px;
     position: relative;
     cursor: pointer;
@@ -121,12 +121,6 @@
         &.selected {
             @apply border-r rounded-r-sm;
         }
-    }
-
-    .field-width-hidden {
-        @apply relative border border-grey-40;
-        opacity: 0.6;
-        width: 48px;
     }
 
     &.large {
