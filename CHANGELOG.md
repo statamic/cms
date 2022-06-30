@@ -1,6 +1,6 @@
 # Release Notes
 
-## 3.3.17 (2022-06-29)
+## 3.3.17 (2022-06-30)
 
 ### What's new
 - Add item totals to CP listing pagination. [#6244](https://github.com/statamic/cms/issues/6244) by @jacksleight
