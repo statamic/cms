@@ -4,7 +4,7 @@
             :handle="handle"
             :value="value"
             :meta="relationshipMeta"
-            :config="{ type: 'template_folder' }"
+            :config="{ type: 'template_folder', mode: 'select', max_items: 1 }"
             @input="update"
         />
     </div>
