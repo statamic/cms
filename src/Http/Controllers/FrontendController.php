@@ -40,7 +40,7 @@ class FrontendController extends Controller
         $data = Arr::pull($params, 'data');
         $data = array_merge($params, $data);
 
-        $view = (new View)
+        $view = app(View::class)
             ->template($view)
             ->layout(Arr::get($data, 'layout', 'layout'))
             ->with($data)

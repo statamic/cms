@@ -23,7 +23,7 @@ class View
 
     public static function make($template = null, $data = [])
     {
-        return (new static)
+        return app(static::class)
             ->template($template)
             ->with($data);
     }
