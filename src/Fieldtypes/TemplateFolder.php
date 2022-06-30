@@ -7,6 +7,7 @@ use Statamic\Facades\Folder;
 class TemplateFolder extends Relationship
 {
     protected $component = 'template_folder';
+    protected $selectable = false;
 
     protected function toItemArray($id, $site = null)
     {
