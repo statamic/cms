@@ -35,19 +35,19 @@ export default {
 
             // Filter out partials
             if (this.config.hide_partials) {
-                templates = _.reject(templates, function(template) {
+                templates = _.reject(templates, (template) => {
                     return template.startsWith('partials/') || template.match(/(^_.*|\/_.*|\._.*)/g);
                 });
             }
 
             // Filter out error templates
-            templates = _.reject(templates, function(template) {
+            templates = _.reject(templates, (template) => {
                 return template.startsWith('errors/');
             });
 
             // Filter templates in folder
             if (this.config.folder) {
-                templates = _.filter(templates, function(template) {
+                templates = _.filter(templates, (template) => {
                     return template.startsWith(`${this.config.folder}/`);
                 });
             }
@@ -55,7 +55,7 @@ export default {
             // Set default
             var options = [];
 
-            _.each(templates, function(template) {
+            _.each(templates, (template) => {
                 options.push({
                     label: this.config.folder
                         ? template.substring(this.config.folder.length + 1)
