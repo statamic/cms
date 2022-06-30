@@ -48,6 +48,7 @@
 
                     <data-list-bulk-actions
                         :url="actionUrl"
+                        :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -124,6 +125,12 @@ export default {
             currentSite: this.site,
             initialSite: this.site,
         }
+    },
+
+    computed: {
+        actionContext() {
+            return {collection: this.collection};
+        },
     },
 
     watch: {

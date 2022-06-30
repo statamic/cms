@@ -680,6 +680,13 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return true;
     }
 
+    public function truncate()
+    {
+        $this->queryEntries()->get()->each->delete();
+
+        return true;
+    }
+
     public function mount($page = null)
     {
         return $this

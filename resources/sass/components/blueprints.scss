@@ -89,8 +89,8 @@
 }
 
 .field-width-selector {
+    @apply w-12;
     display: flex;
-    width: 49px;
     height: 20px;
     position: relative;
     cursor: pointer;

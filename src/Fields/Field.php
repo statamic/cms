@@ -178,7 +178,7 @@ class Field implements Arrayable
             return true;
         }
 
-        if ($this->config()['type'] === 'section') {
+        if ($this->type() === 'section') {
             return false;
         }
 
@@ -192,6 +192,14 @@ class Field implements Arrayable
         }
 
         return ! in_array($this->get('listable'), [false, 'hidden'], true);
+    }
+
+    /**
+     * @deprecated  Use isVisibleOnListing() instead.
+     */
+    public function isVisible()
+    {
+        return $this->isVisibleOnListing();
     }
 
     public function isSortable()

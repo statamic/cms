@@ -44,7 +44,13 @@ export default {
     inject: ['storeName'],
 
     mounted() {
-        this.$store.commit(`publish/${this.storeName}/setRevealerFields`, this.fieldPath);
+        this.$store.commit(`publish/${this.storeName}/setRevealerField`, this.fieldPath);
+    },
+
+    watch: {
+        fieldPath(fieldPath) {
+            this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
+        }
     },
 
     methods: {

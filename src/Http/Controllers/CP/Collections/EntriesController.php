@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
@@ -199,7 +200,7 @@ class EntriesController extends CpController
         }
 
         if ($entry->collection()->dated()) {
-            $entry->date($this->formatDateForSaving($request->date));
+            $entry->date($this->toCarbonInstanceForSaving($request->date));
         }
 
         $entry->slug($this->resolveSlug($request));
@@ -341,7 +342,7 @@ class EntriesController extends CpController
             ->data($values);
 
         if ($collection->dated()) {
-            $entry->date($this->formatDateForSaving($request->date));
+            $entry->date($this->toCarbonInstanceForSaving($request->date));
         }
 
         if (($structure = $collection->structure()) && ! $collection->orderable()) {
@@ -450,15 +451,10 @@ class EntriesController extends CpController
             ->values();
     }
 
-    protected function formatDateForSaving($date)
+    protected function toCarbonInstanceForSaving($date): Carbon
     {
-        // If there's a time, adjust the format into a datetime order string.
-        if (strlen($date) > 10) {
-            $date = str_replace(':', '', $date);
-            $date = str_replace(' ', '-', $date);
-        }
-
-        return $date;
+        // Since assume `Y-m-d ...` format, we can use `parse` here.
+        return Carbon::parse($date);
     }
 
     private function validateUniqueUri($entry, $tree, $parent)
