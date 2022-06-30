@@ -14,7 +14,7 @@ class Vite extends Tags
     public function index()
     {
         if (! $src = $this->params->get('src')) {
-            throw new \Exception('Please provide a source file."');
+            throw new \Exception('Please provide a source file.');
         }
 
         return app(LaravelVite::class)->__invoke($src);
