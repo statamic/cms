@@ -45,11 +45,6 @@ export default {
                 return template.startsWith('errors/');
             });
 
-            // Filter out blank value (.gitkeep)
-            templates = _.reject(templates, (template) => {
-                return template === '';
-            });
-
             // Filter templates in folder
             if (this.config.folder) {
                 templates = _.filter(templates, (template) => {
