@@ -23,7 +23,6 @@ class TemplateFolder extends Relationship
 
                 return ['id' => $folder, 'title' => $folder];
             })
-            ->prepend(['id' => '/', 'title' => '/'])
             ->values();
     }
 }
