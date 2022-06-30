@@ -7,6 +7,7 @@ use Statamic\Auth\File\User;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades\Role;
+use Statamic\Facades\User as UserFacade;
 use Statamic\Facades\UserGroup;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -118,5 +119,52 @@ class FileUserTest extends TestCase
 
         // Doing it a second time should give the same result but without multiple calls.
         $this->assertEquals($expectedPermissions, $user->permissions()->all());
+    }
+
+    /** @test */
+    public function it_gets_custom_computed_data()
+    {
+        UserFacade::computed('balance', function ($user) {
+            return $user->name().'\'s balance is $25 owing.';
+        });
+
+        $user = $this->makeUser()->data(['name' => 'Han Solo']);
+
+        $expectedData = [
+            'name' => 'Han Solo',
+        ];
+
+        $expectedComputedData = [
+            'balance' => 'Han Solo\'s balance is $25 owing.',
+        ];
+
+        $expectedValues = array_merge($expectedData, $expectedComputedData);
+
+        $this->assertEquals($expectedData, $user->data()->all());
+        $this->assertEquals($expectedComputedData, $user->computedData()->all());
+        $this->assertEquals($expectedValues['name'], $user->value('name'));
+        $this->assertEquals($expectedValues['balance'], $user->value('balance'));
+    }
+
+    /** @test */
+    public function it_gets_empty_computed_data_by_default()
+    {
+        $this->assertEquals([], $this->user()->computedData()->all());
+    }
+
+    /** @test */
+    public function it_can_use_actual_data_to_compose_computed_data()
+    {
+        UserFacade::computed('nickname', function ($user, $attribute) {
+            return $attribute ?? 'Nameless';
+        });
+
+        $user = $this->makeUser();
+
+        $this->assertEquals('Nameless', $user->value('nickname'));
+
+        $user->data(['nickname' => 'The Hoff']);
+
+        $this->assertEquals('The Hoff', $user->value('nickname'));
     }
 }
