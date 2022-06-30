@@ -71,7 +71,6 @@ return [
     'fields_instructions_instructions' => 'Texte affiché sous l’étiquette du champ (comme celui-ci). Markdown est pris en compte.',
     'fields_instructions_position_instructions' => 'Défini le positionnement des instructions par rapport au champ.',
     'fields_listable_instructions' => 'Contrôle la visibilité de ce champ dans les colonnes.',
-    'fields_read_only_instructions' => 'Désactivez la possibilité de modifier dans le panneau de contrôle.',
     'fieldset_import_fieldset_instructions' => 'Le jeu de champs à importer.',
     'fieldset_import_prefix_instructions' => 'Le préfixe à appliquer à chaque champ lors de leur importation. Ex. hero_',
     'fieldset_intro' => 'Les jeux de champs sont des compagnons optionnels des Blueprints qui vous permettent de créer des partiels réutilisables dans tous vos Blueprints.',
