@@ -249,9 +249,4 @@ abstract class User implements
     {
         return $this->setPreference('locale', $locale);
     }
-
-    protected function computedDataPrefix()
-    {
-        return 'users';
-    }
 }

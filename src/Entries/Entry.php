@@ -835,9 +835,4 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         return $field->fieldtype()->toQueryableValue($value);
     }
-
-    protected function computedDataPrefix()
-    {
-        return "collections.$this->collection";
-    }
 }
