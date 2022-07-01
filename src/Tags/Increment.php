@@ -8,7 +8,7 @@ class Increment extends Tags implements ResetsState
 {
     protected static $arr = [];
 
-    public function resetState()
+    public static function resetStaticState()
     {
         self::$arr = [];
     }

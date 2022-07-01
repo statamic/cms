@@ -10,7 +10,7 @@ class Rotate extends Tags implements ResetsState
     protected static $aliases = ['switch'];
     protected static $counts = [];
 
-    public function resetState()
+    public static function resetStaticState()
     {
         self::$counts = [];
     }

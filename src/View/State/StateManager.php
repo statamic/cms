@@ -39,12 +39,10 @@ class StateManager
     {
         GlobalRuntimeState::resetGlobalState();
 
-        if (count(self::$resetsState) > 0) {
-            foreach (self::$resetsState as $className => $throwAway) {
-                app($className)->resetState();
-            }
-
-            self::$resetsState = [];
+        foreach (self::$resetsState as $className => $throwAway) {
+            $className::resetStaticState();
         }
+
+        self::$resetsState = [];
     }
 }

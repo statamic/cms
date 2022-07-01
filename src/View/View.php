@@ -12,7 +12,6 @@ use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\LiteralReplacementManager;
 use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Events\ViewRendered;
-use Statamic\View\Events\ViewRendering;
 
 class View
 {
@@ -85,8 +84,6 @@ class View
 
     public function render(): string
     {
-        ViewRendering::dispatch($this);
-
         $cascade = $this->gatherData();
 
         if ($this->shouldUseLayout()) {
