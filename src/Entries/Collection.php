@@ -796,6 +796,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return [
             'title' => $this->title(),
             'handle' => $this->handle(),
+            'mount' => $this->mount(),
         ];
     }
 }
