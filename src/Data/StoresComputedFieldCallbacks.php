@@ -9,11 +9,12 @@ use Statamic\Support\Str;
 trait StoresComputedFieldCallbacks
 {
     protected $computedFieldCallbacks;
-    protected $scopeComputedFieldCallbacks = false;
 
     public function computed(...$args)
     {
-        $numArgsRequired = $this->scopeComputedFieldCallbacks ? 3 : 2;
+        $numArgsRequired = isset($this->scopeComputedFieldCallbacks) && $this->scopeComputedFieldCallbacks
+            ? 3
+            : 2;
 
         if (func_num_args() !== $numArgsRequired) {
             throw new Exception("Number of arguments required: {$numArgsRequired}");
