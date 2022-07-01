@@ -86,7 +86,7 @@ class FormSubmissionsController extends CpController
         $this->authorize('view', $submission);
 
         $blueprint = $submission->blueprint();
-        $fields = $blueprint->fields()->addValues($submission->data())->preProcess();
+        $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
         return view('statamic::forms.submission', [
             'form' => $form,

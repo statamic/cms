@@ -2,6 +2,8 @@
 
 namespace Statamic\Assets;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -18,9 +20,10 @@ use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable
+class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess, Arrayable
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -34,6 +37,8 @@ class AssetContainer implements AssetContainerContract, Augmentable
     protected $allowRenaming;
     protected $createFolders;
     protected $searchIndex;
+    protected $sortField;
+    protected $sortDirection;
 
     public function id($id = null)
     {
@@ -44,6 +49,34 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+    }
+
+    public function sortField($field = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sortField')
+            ->getter(function ($sortField) {
+                if ($sortField) {
+                    return $sortField;
+                }
+
+                return 'basename';
+            })
+            ->args(func_get_args());
+    }
+
+    public function sortDirection($dir = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sortDirection')
+            ->getter(function ($sortDirection) {
+                if ($sortDirection) {
+                    return $sortDirection;
+                }
+
+                return 'asc';
+            })
+            ->args(func_get_args());
     }
 
     public function title($title = null)
@@ -91,36 +124,14 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return URL::makeAbsolute($this->url());
     }
 
-    /**
-     * Convert to an array.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        $array = [
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'disk' => $this->disk,
-            'search_index' => $this->searchIndex,
-            'allow_uploads' => $this->allowUploads,
-            'allow_downloading' => $this->allowDownloading,
-            'allow_renaming' => $this->allowRenaming,
-            'allow_moving' => $this->allowMoving,
-            'create_folders' => $this->createFolders,
-        ];
-
-        // if ($user = user()) {
-        //     $array['allow_uploads'] = user()->can('store', [AssetContract::class, $this]);
-        //     $array['create_folders'] = user()->can('create', [AssetFolder::class, $this]);
-        // }
-
-        return $array;
-    }
-
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedAssetContainer($this);
+    }
+
+    protected function excludedEvaluatedAugmentedArrayKeys()
+    {
+        return ['assets'];
     }
 
     /**
@@ -363,7 +374,15 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function accessible()
     {
-        return $this->disk()->filesystem()->getDriver()->getConfig()->get('url') !== null;
+        $config = $this->disk()->filesystem()->getConfig();
+
+        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
+        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
+        if (is_array($config)) {
+            $config = collect($config);
+        }
+
+        return $config->get('url') !== null;
     }
 
     /**
@@ -458,24 +477,23 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     public function fileData()
     {
-        $data = array_except($this->toArray(), 'handle');
+        $array = [
+            'title' => $this->title,
+            'disk' => $this->disk,
+            'search_index' => $this->searchIndex,
+            'allow_uploads' => $this->allowUploads,
+            'allow_downloading' => $this->allowDownloading,
+            'allow_renaming' => $this->allowRenaming,
+            'allow_moving' => $this->allowMoving,
+            'create_folders' => $this->createFolders,
+        ];
 
-        // @TODO: Determine why we were explicity unsetting this data
+        $array = Arr::removeNullValues(array_merge($array, [
+            'sort_by' => $this->sortField,
+            'sort_dir' => $this->sortDirection,
+        ]));
 
-        // if ($data['allow_uploads'] === true) {
-        //     unset($data['allow_uploads']);
-        // }
-
-        // if ($data['create_folders'] === true) {
-        //     unset($data['create_folders']);
-        // }
-
-        return $data;
-    }
-
-    public function toCacheableArray()
-    {
-        return $this->fileData();
+        return $array;
     }
 
     public function queryAssets()

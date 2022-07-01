@@ -51,8 +51,8 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateEntryUrls($entry)
     {
-        if ($url = $entry->url()) {
-            $this->cacher->invalidateUrl($url);
+        if ($url = $entry->absoluteUrl()) {
+            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
         }
 
         $this->cacher->invalidateUrls(
@@ -62,12 +62,12 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateTermUrls($term)
     {
-        if ($url = $term->url()) {
-            $this->cacher->invalidateUrl($url);
+        if ($url = $term->absoluteUrl()) {
+            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
 
             $term->taxonomy()->collections()->each(function ($collection) use ($term) {
-                if ($url = $term->collection($collection)->url()) {
-                    $this->cacher->invalidateUrl($url);
+                if ($url = $term->collection($collection)->absoluteUrl()) {
+                    $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
                 }
             });
         }
@@ -93,8 +93,18 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateCollectionUrls($collection)
     {
-        if ($url = $collection->url()) {
-            $this->cacher->invalidateUrl($url);
+        if ($url = $collection->absoluteUrl()) {
+            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
         }
+    }
+
+    private function splitUrlAndDomain(string $url)
+    {
+        $parsed = parse_url($url);
+
+        return [
+            Arr::get($parsed, 'path', '/'),
+            $parsed['scheme'].'://'.$parsed['host'],
+        ];
     }
 }

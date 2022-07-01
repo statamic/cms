@@ -97,6 +97,8 @@ class ScopeTest extends TestCase
 
 class NonArrayableObject
 {
+    protected $data;
+
     public function __construct($data)
     {
         $this->data = $data;
@@ -117,7 +119,7 @@ class AugmentableObject extends ArrayableObject implements Augmentable
 
     public function augmentedArrayData()
     {
-        return $this->toArray();
+        return $this->data;
     }
 
     public function blueprint()

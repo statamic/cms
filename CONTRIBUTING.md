@@ -24,27 +24,26 @@ This is a guideline for contributing to Statamic, its documentation, and addons.
 
 ### Statamic isn’t FOSS
 
-Statamic is not Free Open Source Software. It is **proprietary**. Everything in this and our other repos on Github — including community-contributed code — is the property of Wilderborn. For that reason there are a few limitations on how you can use the code:
+While Statamic's source code is open source, publicly available, and can be [used for free](https://statamic.dev/licensing#solo-vs-pro) in many cases, it is proprietary. Everything in this repo, including any community-contributed code, is the property of Statamic LLC. For that reason there are a few limitations on how you can use the code:
 
-- You cannot redistribute or use Statamic as a dependency in another project — open source or otherwise — without prior permission or licensing.
-- You cannot alter anything related to licensing, updating, version/edition checking, or anything else that would circumvent our business model. We want to stay in business so we can support _you_ better.
+- You cannot alter anything related to licensing, updating, version or edition checking, purchasing, first party notifications or banners, or anything else that attempts to circumvent paying for features that are designated as Statamic Pro features. We want to stay in business so we can better support _you_ and the community.
 - You can’t publicly maintain a long-term fork of Statamic.
 
 ### How to Get Support
 
-If you're looking for official developer support (and you own a license), please go to [statamic.com/support](https://statamic.com/support) and we will always do our best to reply in a timely manner. **Github issues are intended for reporting bugs and resolving issues.**
+If you're looking for official developer support (and you have an active license), please visit [statamic.com/support](https://statamic.com/support). We will always do our best to reply in a timely manner. **Github issues are intended for reporting bugs.**
 
-You can chat and collaborate with other developers in the community — [Discord](https://statamic.com/discord) and the [forum](https://statamic.com/forum) are the best places to go. You will find many helpful folks who may be willing to help.
+You can chat and collaborate with other developers in the community in [Github Discussions](https://github.com/statamic/cms/discussions) or [Discord](https://statamic.com/discord). You will find many helpful folks who may be willing to help.
 
 ## How You Can Contribute
 
 ### Which Repo?
 
-Statamic 3 is broken out into a few Github repositories. Here's a quick summary of each.
+Statamic is broken out into a few Github repositories. Here's a quick summary of each.
 
 - [`statamic/cms`](https://github.com/statamic/cms) is the core package. It doesn't run by itself but is instead a dependency consumed by Laravel apps. 99% of the work goes on here.
 - [`statamic/statamic`](https://github.com/statamic/statamic) is the starter Laravel app used to build a new site.
-- [`statamic/docs`](https://github.com/statamic/docs) is the Statamic 3 documentation site that is curently running on [statamic.dev](https://statamic.dev).
+- [`statamic/docs`](https://github.com/statamic/docs) is the Statamic documentation site that is curently running on [statamic.dev](https://statamic.dev).
 
 ### Bug Reports
 

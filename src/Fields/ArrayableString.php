@@ -36,6 +36,7 @@ class ArrayableString implements Arrayable, JsonSerializable
         return array_merge(['value' => $this->value], $this->extra);
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

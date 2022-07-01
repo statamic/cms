@@ -41,12 +41,18 @@ EOT;
     public function organizedProvider()
     {
         $filledExpectation = <<<'EOT'
+
 before
+
 name
+
 - name is required
+
 - name should be 10 chars
 
+
 email
+
 - email should be an email
 
 
@@ -105,9 +111,13 @@ EOT;
     public function allProvider()
     {
         $filledExpectation = <<<'EOT'
+
 before
+
 - name is required
+
 - name should be 10 chars
+
 - email should be an email
 
 after
@@ -165,8 +175,11 @@ EOT;
     public function fieldProvider()
     {
         $filledExpectation = <<<'EOT'
+
 before
+
 - name is required
+
 - name should be 10 chars
 
 after

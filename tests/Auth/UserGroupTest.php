@@ -2,6 +2,7 @@
 
 namespace Tests\Auth;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
@@ -307,5 +308,28 @@ class UserGroupTest extends TestCase
         $group = (new UserGroup);
         Facades\UserGroup::shouldReceive('delete')->with($group)->once()->andReturnTrue();
         $this->assertTrue($group->delete());
+    }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $group = (new UserGroup)->handle('test')->title('Test');
+
+        $group
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $group->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $group[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $group = (new UserGroup)->handle('test')->title('Test');
+
+        $this->assertInstanceOf(Arrayable::class, $group);
+
+        collect($group->toArray())
+            ->each(fn ($value, $key) => $this->assertEquals($value, $group->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value, $group[$key]));
     }
 }
