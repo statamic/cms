@@ -5,14 +5,18 @@ namespace Statamic\Stache\Repositories;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
+use Statamic\Data\StoresComputedFieldCallbacks;
 use Statamic\Facades\Blink;
 use Statamic\Stache\Stache;
 
 class CollectionRepository implements RepositoryContract
 {
+    use StoresComputedFieldCallbacks;
+
     protected $stache;
     protected $store;
     protected $additionalPreviewTargets = [];
+    protected $scopeComputedFieldCallbacks = true;
 
     public function __construct(Stache $stache)
     {
