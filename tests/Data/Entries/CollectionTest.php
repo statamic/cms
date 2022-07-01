@@ -572,23 +572,20 @@ class CollectionTest extends TestCase
         $this->assertEquals([
             'title' => 'Test',
             'handle' => 'test',
-            'mount' => '',
-        ], $collection->toAugmentedArray());
+        ], collect($collection->toAugmentedArray())->except(['mount'])->all());
     }
 
     /** @test */
     public function it_augments_with_mount()
     {
         (new Collection)->handle('pages')->save();
-        $mount = EntryFactory::id('mount')->collection('pages')->make();
+        $mount = tap(EntryFactory::id('mount')->collection('pages')->make())->save();
         $collection = (new Collection)->handle('test')->mount($mount->id());
 
-        $this->assertInstanceof(Augmentable::class, $collection);
-        $this->assertEquals([
-            'title' => 'Test',
-            'handle' => 'test',
-            'mount' => $mount,
-        ], $collection->toAugmentedArray());
+        $augmented = $collection->toAugmentedArray();
+
+        $this->assertArrayHasKey('mount', $augmented);
+        $this->assertEquals($augmented['mount']->value(), $mount);
     }
 
     /** @test */
