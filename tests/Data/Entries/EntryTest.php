@@ -349,7 +349,7 @@ class EntryTest extends TestCase
             return $entry->get('title').' AND MORE!';
         });
 
-        $collection = tap(Collection::make('test'))->save();
+        $collection = tap(Collection::make('articles'))->save();
         $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
 
         $expectedData = [
@@ -385,7 +385,7 @@ class EntryTest extends TestCase
             return $attribute ?? 'N/A';
         });
 
-        $collection = tap(Collection::make('test'))->save();
+        $collection = tap(Collection::make('articles'))->save();
 
         $entry = (new Entry)->collection($collection)->data([
             'title' => 'Pop Rocks',
@@ -396,6 +396,27 @@ class EntryTest extends TestCase
         $entry->data(['description' => 'Raddest article ever!']);
 
         $this->assertEquals('Raddest article ever!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_properly_scopes_custom_computed_data_by_collection_handle()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->get('title').' AND MORE!';
+        });
+
+        Facades\Collection::computed('events', 'french_description', function ($entry) {
+            return $entry->get('title').' ET PLUS!';
+        });
+
+        $articleEntry = (new Entry)->collection(tap(Collection::make('articles'))->save())->data(['title' => 'Pop Rocks']);
+        $eventEntry = (new Entry)->collection(tap(Collection::make('events'))->save())->data(['title' => 'Jazz Concert']);
+
+        $this->assertEquals('Pop Rocks AND MORE!', $articleEntry->value('description'));
+
+        $this->assertNull($articleEntry->value('french_description'));
+        $this->assertNull($eventEntry->value('description'));
+        $this->assertEquals('Jazz Concert ET PLUS!', $eventEntry->value('french_description'));
     }
 
     /** @test */

@@ -86,6 +86,28 @@ class StoresComputedFieldCallbacksTest extends TestCase
 
         $repository->computed('articles', 'some_field', 'not a closure');
     }
+
+    /** @test */
+    public function getting_scoped_callbacks_returns_correct_results()
+    {
+        $repository = new FakeRepositoryWithScopedCallbacks;
+
+        $repository->computed('events', 'some_field', function ($item, $attribute) {
+            //
+        });
+
+        $repository->computed('articles', 'some_field', function ($item, $attribute) {
+            //
+        });
+
+        $repository->computed('articles', 'another_field', function ($item, $attribute) {
+            //
+        });
+
+        $this->assertCount(1, $repository->getComputedCallbacks('events'));
+        $this->assertCount(2, $repository->getComputedCallbacks('articles'));
+        $this->assertCount(0, $repository->getComputedCallbacks('products'));
+    }
 }
 
 class FakeRepository

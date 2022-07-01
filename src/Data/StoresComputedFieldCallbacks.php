@@ -37,10 +37,14 @@ trait StoresComputedFieldCallbacks
 
     public function getComputedCallbacks($fieldPrefix = null)
     {
-        $fieldPrefix = Str::ensureRight((string) $fieldPrefix, '.');
-
-        return collect($this->computedFieldCallbacks)->keyBy(function ($callback, $fieldPath) {
-            return collect(explode('.', $fieldPath))->last();
-        });
+        return collect($this->computedFieldCallbacks)
+            ->filter(function ($callback, $fieldPath) use ($fieldPrefix) {
+                return $fieldPrefix
+                    ? Str::startsWith($fieldPath, Str::ensureRight((string) $fieldPrefix, '.'))
+                    : true;
+            })
+            ->keyBy(function ($callback, $fieldPath) {
+                return collect(explode('.', $fieldPath))->last();
+            });
     }
 }
