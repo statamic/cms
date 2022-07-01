@@ -25,7 +25,6 @@
                     v-if="meta.last_page != 1"
                     class="py-1 border-t bg-grey-20 rounded-b-lg text-sm"
                     :resource-meta="meta"
-                    :totals="false"
                     @page-selected="selectPage"
                     :scroll-to-top="false"
                 />

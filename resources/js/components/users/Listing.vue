@@ -63,6 +63,7 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
+                    :totals="true"
                     @page-selected="selectPage"
                     @per-page-changed="changePerPage"
                 />

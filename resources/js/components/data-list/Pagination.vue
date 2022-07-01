@@ -61,7 +61,7 @@ export default {
         },
         totals: {
             type: Boolean,
-            default: true
+            default: false
         },
         perPage: {
             type: Number
