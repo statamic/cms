@@ -17,6 +17,7 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Data\ContainsComputedData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
@@ -40,7 +41,7 @@ abstract class User implements
     ArrayAccess,
     Arrayable
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, ContainsComputedData;
 
     abstract public function get($key, $fallback = null);
 
@@ -248,5 +249,10 @@ abstract class User implements
     public function setPreferredLocale($locale)
     {
         return $this->setPreference('locale', $locale);
+    }
+
+    protected function getComputedCallbacks()
+    {
+        return Facades\User::getComputedCallbacks();
     }
 }

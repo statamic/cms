@@ -59,6 +59,10 @@ class User extends BaseUser
 
     public function value($key)
     {
+        if ($callback = $this->getComputedCallbacks()->get($key)) {
+            return $callback($this, $this->get($key));
+        }
+
         return $this->get($key);
     }
 
