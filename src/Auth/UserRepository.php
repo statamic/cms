@@ -2,13 +2,11 @@
 
 namespace Statamic\Auth;
 
-use Closure;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
 use Statamic\Events\UserBlueprintFound;
 use Statamic\Facades\Blueprint;
 use Statamic\OAuth\Provider;
-use Statamic\Statamic;
 
 abstract class UserRepository implements RepositoryContract
 {
@@ -72,10 +70,5 @@ abstract class UserRepository implements RepositoryContract
         return $this->find(
             (new Provider($provider))->getUserId($id)
         );
-    }
-
-    public function computed(string $field, Closure $callback)
-    {
-        Statamic::computed("users.{$field}", $callback);
     }
 }
