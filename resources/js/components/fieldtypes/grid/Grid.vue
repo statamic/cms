@@ -117,7 +117,7 @@ export default {
 
     reactiveProvide: {
         name: 'grid',
-        include: ['config', 'isReorderable', 'isReadOnly', 'handle', 'errorKeyPrefix']
+        include: ['config', 'isReorderable', 'isReadOnly', 'handle', 'fieldPathPrefix']
     },
 
     watch: {
@@ -169,7 +169,7 @@ export default {
 
         removed(index) {
             if (! confirm(__('Are you sure?'))) return;
-                
+
             this.update([
                 ...this.value.slice(0, index),
                 ...this.value.slice(index + 1)

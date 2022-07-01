@@ -74,6 +74,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         foreach ($configs as $config) {
             $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
         }
+
+        $app['config']->set('statamic.antlers.version', 'runtime');
     }
 
     protected function getEnvironmentSetUp($app)
@@ -111,6 +113,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'file',
             'path' => storage_path('framework/cache/outpost-data'),
         ]);
+
+        $viewPaths = $app['config']->get('view.paths');
+        $viewPaths[] = __DIR__.'/__fixtures__/views/';
+
+        $app['config']->set('view.paths', $viewPaths);
     }
 
     public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
@@ -194,6 +201,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         method_exists(static::class, 'assertDirectoryDoesNotExist')
             ? static::assertDirectoryDoesNotExist($filename, $message)
             : parent::assertDirectoryNotExists($filename, $message);
+    }
+
+    public static function assertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
+    {
+        method_exists(\PHPUnit\Framework\Assert::class, 'assertMatchesRegularExpression')
+            ? parent::assertMatchesRegularExpression($pattern, $string, $message)
+            : parent::assertRegExp($pattern, $string, $message);
     }
 
     private function addGqlMacros()

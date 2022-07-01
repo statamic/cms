@@ -183,6 +183,7 @@ class StoreEntryTest extends TestCase
     {
         $blueprint = Blueprint::makeFromFields($fields);
 
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('in')
             ->with('collections/'.$collection->handle())
             ->andReturn(collect([$blueprint]));

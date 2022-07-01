@@ -10,34 +10,35 @@
     "license": "proprietary",
     "require": {
         "ext-json": "*",
-        "ajthinking/archetype": "^0.2.5",
-        "composer/composer": "^1.10.22 || ^2.0.13",
+        "ajthinking/archetype": "^1.0.3",
+        "composer/composer": "^1.10.22 || ^2.2.12",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
-        "james-heinrich/getid3": "^1.9",
-        "laravel/framework": "^6.20.14 || ^7.30.4 || ^8.24.0",
+        "james-heinrich/getid3": "^1.9.21",
+        "laravel/framework": "^8.48.0 || ^9.0",
         "laravel/helpers": "^1.1",
-        "league/commonmark": "^1.5",
+        "league/commonmark": "^1.5 || ^2.2",
         "league/csv": "^9.0",
-        "league/glide": "^1.1",
-        "michelf/php-smartypants": "^1.8",
+        "league/glide": "^1.1 || ^2.0",
+        "michelf/php-smartypants": "^1.8.1",
         "pixelfear/composer-dist-plugin": "^0.1.4",
-        "rebing/graphql-laravel": "^6.5",
+        "rebing/graphql-laravel": "^6.5 || ^8.0",
         "spatie/blink": "^1.1.2",
-        "statamic/stringy": "^3.1",
-        "symfony/http-foundation": "^4.3.3 || ^5.1.4",
+        "statamic/stringy": "^3.1.2",
+        "symfony/http-foundation": "^4.3.3 || ^5.1.4 || ^6.0",
         "symfony/lock": "^5.1",
         "symfony/var-exporter": "^4.3 || ^5.1",
-        "symfony/yaml": "^4.1 || ^5.1",
+        "symfony/yaml": "^4.1 || ^5.1 || ^6.0",
         "ueberdosis/html-to-prosemirror": "^1.3",
         "ueberdosis/prosemirror-to-html": "^2.6",
+        "voku/portable-ascii": "^1.6.1 || ^2.0",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
         "mockery/mockery": "^1.2.3",
-        "orchestra/testbench": "^4.0 || ^5.0 || ^6.0"
+        "orchestra/testbench": "^6.7.0 || ^7.0"
     },
     "config": {
         "optimize-autoloader": true,
@@ -49,10 +50,16 @@
         }
     },
     "extra": {
-        "download-dist": {
-            "url": "https://github.com/statamic/cms/releases/download/{$version}/dist.tar.gz",
-            "path": "resources/dist"
-        },
+        "download-dist": [
+            {
+                "url": "https://github.com/statamic/cms/releases/download/{$version}/dist.tar.gz",
+                "path": "resources/dist"
+            },
+            {
+                "url": "https://github.com/statamic/cms/releases/download/{$version}/dist-frontend.tar.gz",
+                "path": "resources/dist-frontend"
+            }
+        ],
         "laravel": {
             "providers": [
                 "Statamic\\Providers\\StatamicServiceProvider"

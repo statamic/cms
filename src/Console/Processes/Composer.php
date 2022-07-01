@@ -5,6 +5,7 @@ namespace Statamic\Console\Processes;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Composer\Lock;
 use Statamic\Jobs\RunComposer;
+use Statamic\Support\Str;
 
 class Composer extends Process
 {
@@ -138,6 +139,32 @@ class Composer extends Process
     }
 
     /**
+     * Require multiple packages at once.
+     *
+     * @param  array  $packages
+     * @param  mixed  $extraParams
+     */
+    public function requireMultiple(array $packages, ...$extraParams)
+    {
+        $parts = array_merge($this->normalizePackagesArrayToRequireArgs($packages), $extraParams);
+
+        $parts[] = '--update-with-dependencies';
+
+        $this->queueComposerCommand('require', ...$parts);
+    }
+
+    /**
+     * Require multiple dev packages at once.
+     *
+     * @param  array  $packages
+     * @param  mixed  $extraParams
+     */
+    public function requireMultipleDev(array $packages, ...$extraParams)
+    {
+        $this->requireMultiple($packages, '--dev', ...$extraParams);
+    }
+
+    /**
      * Remove a package.
      *
      * @param  string  $package
@@ -152,10 +179,35 @@ class Composer extends Process
      * Remove a dev package.
      *
      * @param  string  $package
+     * @param  mixed  $extraParams
      */
-    public function removeDev(string $package)
+    public function removeDev(string $package, ...$extraParams)
     {
-        $this->remove($package, '--dev');
+        $this->remove($package, '--dev', ...$extraParams);
+    }
+
+    /**
+     * Remove multiple packages at once.
+     *
+     * @param  array  $packages
+     * @param  mixed  $extraParams
+     */
+    public function removeMultiple(array $packages, ...$extraParams)
+    {
+        $parts = array_merge($packages, $extraParams);
+
+        $this->queueComposerCommand('remove', ...$parts);
+    }
+
+    /**
+     * Remove multiple dev packages at once.
+     *
+     * @param  array  $packages
+     * @param  mixed  $extraParams
+     */
+    public function removeMultipleDev(array $packages, ...$extraParams)
+    {
+        $this->removeMultiple($packages, '--dev', ...$extraParams);
     }
 
     /**
@@ -293,5 +345,23 @@ class Composer extends Process
     private function getCacheKey($package)
     {
         return "composer.{$package}";
+    }
+
+    /**
+     * Normalize packages array to require args, with version handling if `package => version` array structure is passed.
+     *
+     * @param  array  $packages
+     * @return array
+     */
+    private function normalizePackagesArrayToRequireArgs(array $packages)
+    {
+        return collect($packages)
+            ->map(function ($value, $key) {
+                return Str::contains($key, '/')
+                    ? "{$key}:{$value}"
+                    : "{$value}";
+            })
+            ->values()
+            ->all();
     }
 }

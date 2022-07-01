@@ -29,6 +29,7 @@
                     v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                 <dropdown-list class="-mt-sm">
                     <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
+                    <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
@@ -36,14 +37,14 @@
         <div class="replicator-set-body" v-if="!collapsed && index !== undefined">
             <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, fieldPath(field))"
                 :key="field.handle"
                 :field="field"
                 :value="values[field.handle]"
                 :meta="meta[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                :error-key="errorKey(field)"
+                :field-path="fieldPath(field)"
                 :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
@@ -191,10 +192,15 @@ export default {
             this.options.bard.expandSet(this.node.attrs.id);
         },
 
-        errorKey(field) {
-            let prefix = this.options.bard.errorKeyPrefix || this.options.bard.handle;
+        duplicate() {
+            // this.$events.$emit('duplicated', this.node.attrs.id);
+            this.options.bard.duplicateSet(this.node.attrs.id, this.node.attrs, this.getPos() + this.node.nodeSize);
+        },
+
+        fieldPath(field) {
+            let prefix = this.options.bard.fieldPathPrefix || this.options.bard.handle;
             return `${prefix}.${this.index}.attrs.values.${field.handle}`;
-        }
+        },
 
     }
 }

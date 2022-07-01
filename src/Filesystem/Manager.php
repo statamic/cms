@@ -3,6 +3,7 @@
 namespace Statamic\Filesystem;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Filesystem\FilesystemAdapter as IlluminateFilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 
 class Manager
@@ -16,6 +17,10 @@ class Manager
      */
     public function disk($name = null)
     {
+        if ($name instanceof IlluminateFilesystemAdapter) {
+            return new FlysystemAdapter($name);
+        }
+
         if ($name === null) {
             $name = 'standard';
         }

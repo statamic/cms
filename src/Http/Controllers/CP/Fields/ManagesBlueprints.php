@@ -22,6 +22,7 @@ trait ManagesBlueprints
                 'title' => $blueprint->title(),
                 'sections' => $blueprint->sections()->count(),
                 'fields' => $blueprint->fields()->all()->count(),
+                'hidden' => $blueprint->hidden(),
                 'edit_url' => $this->editUrl($item, $blueprint),
                 'delete_url' => $this->deleteUrl($item, $blueprint),
             ];

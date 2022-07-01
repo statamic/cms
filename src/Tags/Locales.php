@@ -157,7 +157,7 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $id = $this->params->get('id', $this->context->get('id'));
+        $id = $this->params->get('id', $this->context->value('id'));
 
         return $this->data = Data::find($id);
     }
@@ -239,7 +239,7 @@ class Locales extends Tags
             return false;
         }
 
-        if (! $this->params->bool('self', true) && $item['locale']['handle'] === $this->data->locale()) {
+        if (! $this->params->bool('self', true) && $item['locale']['handle']->value() === $this->data->locale()) {
             return false;
         }
 

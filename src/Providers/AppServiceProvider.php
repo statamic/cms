@@ -2,10 +2,13 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Facades;
 use Statamic\Facades\Preference;
+use Statamic\Facades\Token;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 
@@ -14,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
     protected $root = __DIR__.'/../..';
 
     protected $configFiles = [
-        'amp', 'api', 'assets', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'oauth', 'protect', 'revisions',
+        'amp', 'antlers', 'api', 'assets', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'oauth', 'protect', 'revisions',
         'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users',
     ];
 
@@ -47,6 +50,10 @@ class AppServiceProvider extends ServiceProvider
             "{$this->root}/resources/dist" => public_path('vendor/statamic/cp'),
         ], 'statamic-cp');
 
+        $this->publishes([
+            "{$this->root}/resources/dist-frontend" => public_path('vendor/statamic/frontend'),
+        ], 'statamic-frontend');
+
         $this->loadTranslationsFrom("{$this->root}/resources/lang", 'statamic');
         $this->loadJsonTranslationsFrom("{$this->root}/resources/lang");
 
@@ -68,6 +75,12 @@ class AppServiceProvider extends ServiceProvider
             return $this->format(
                 Preference::get('date_format', config('statamic.cp.date_format'))
             );
+        });
+
+        Request::macro('statamicToken', function () {
+            if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
+                return Token::find($token);
+            }
         });
     }
 
@@ -125,13 +138,28 @@ class AppServiceProvider extends ServiceProvider
             return (new \Statamic\Fields\FieldsetRepository)
                 ->setDirectory(resource_path('fieldsets'));
         });
+
+        collect([
+            'entries' => fn () => Facades\Entry::query(),
+            'terms' => fn () => Facades\Term::query(),
+            'assets' => fn () => Facades\Asset::query(),
+            'users' => fn () => Facades\User::query(),
+        ])->each(function ($binding, $alias) {
+            app()->bind('statamic.queries.'.$alias, $binding);
+        });
+
+        $this->app->bind('statamic.imaging.guzzle', function () {
+            return new \GuzzleHttp\Client;
+        });
     }
 
     protected function registerMiddlewareGroup()
     {
         $this->app->make(Router::class)->middlewareGroup('statamic.web', [
             \Statamic\Http\Middleware\StacheLock::class,
+            \Statamic\Http\Middleware\HandleToken::class,
             \Statamic\Http\Middleware\Localize::class,
+            \Statamic\Http\Middleware\AddViewPaths::class,
             \Statamic\Http\Middleware\AuthGuard::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);

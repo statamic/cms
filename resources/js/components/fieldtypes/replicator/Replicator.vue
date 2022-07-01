@@ -30,11 +30,13 @@
                     :sortable-handle-class="sortableHandleClass"
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
-                    :error-key-prefix="errorKeyPrefix || handle"
+                    :field-path-prefix="fieldPathPrefix || handle"
                     :has-error="setHasError(index)"
                     :previews="previews[set._id]"
+                    :can-add-set="canAddSet"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
+                    @duplicated="duplicateSet(set._id)"
                     @updated="updated"
                     @meta-updated="updateSetMeta(set._id, $event)"
                     @removed="removed(set, index)"
@@ -90,7 +92,7 @@ export default {
     },
 
     computed: {
-        
+
         previews() {
             return this.meta.previews;
         },
@@ -159,6 +161,27 @@ export default {
             this.expandSet(set._id);
         },
 
+        duplicateSet(old_id) {
+            const index = this.value.findIndex(v => v._id === old_id);
+            const old = this.value[index];
+            const set = {
+                ...old,
+                _id: `set-${uniqid()}`,
+            };
+
+            this.updateSetPreviews(set._id, {});
+
+            this.updateSetMeta(set._id, this.meta.existing[old_id]);
+
+            this.update([
+                ...this.value.slice(0, index + 1),
+                set,
+                ...this.value.slice(index + 1)
+            ]);
+            
+            this.expandSet(set._id);
+        },
+
         updateSetPreviews(id, previews) {
             this.updateMeta({
                 ...this.meta,
@@ -204,7 +227,7 @@ export default {
         },
 
         setHasError(index) {
-            const prefix = `${this.errorKeyPrefix || this.handle}.${index}.`;
+            const prefix = `${this.fieldPathPrefix || this.handle}.${index}.`;
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },

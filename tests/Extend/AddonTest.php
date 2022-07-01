@@ -241,6 +241,30 @@ class AddonTest extends TestCase
         $this->assertEquals('the license', Addon::make('foo/bar')->license());
     }
 
+    /**
+     * @test
+     * @dataProvider isLatestVersionProvider
+     **/
+    public function it_checks_if_its_the_latest_version($version, $latest, $isLatest)
+    {
+        $this->assertEquals($isLatest, $this->makeFromPackage([
+            'version' => $version,
+            'latestVersion' => $latest,
+        ])->isLatestVersion());
+    }
+
+    public function isLatestVersionProvider()
+    {
+        return [
+            ['1.0.0', '1.0.0', true],
+            ['1.0.1', '1.0.2', false],
+            ['1.0.1', '2.0.0', false],
+            ['2.0.0', '2.0.0', true],
+            ['1.0', '1.0.0', true],
+            ['1.0', '1.0.1', false],
+        ];
+    }
+
     private function makeFromPackage($attributes = [])
     {
         return Addon::makeFromPackage(array_merge([

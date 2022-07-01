@@ -51,9 +51,9 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->get()->first();
     }
 
-    public function paginate($perPage = null, $columns = [])
+    public function paginate($perPage = null, $columns = [], $pageName = 'page', $page = null)
     {
-        $paginator = $this->builder->paginate($perPage, $this->selectableColumns($columns));
+        $paginator = $this->builder->paginate($perPage, $this->selectableColumns($columns), $pageName, $page);
 
         $paginator = app()->makeWith(LengthAwarePaginator::class, [
             'items' => $paginator->items(),
