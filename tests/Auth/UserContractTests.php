@@ -82,6 +82,53 @@ trait UserContractTests
         ], $this->additionalDataValues()), $this->user()->data()->all());
     }
 
+    /** @test */
+    public function it_gets_custom_computed_data()
+    {
+        Facades\User::computed('balance', function ($user) {
+            return $user->name().'\'s balance is $25 owing.';
+        });
+
+        $user = $this->makeUser()->data(['name' => 'Han Solo']);
+
+        $expectedData = [
+            'name' => 'Han Solo',
+        ];
+
+        $expectedComputedData = [
+            'balance' => 'Han Solo\'s balance is $25 owing.',
+        ];
+
+        $expectedValues = array_merge($expectedData, $expectedComputedData);
+
+        $this->assertArraySubset($expectedData, $user->data()->all());
+        $this->assertEquals($expectedComputedData, $user->computedData()->all());
+        $this->assertEquals($expectedValues['name'], $user->value('name'));
+        $this->assertEquals($expectedValues['balance'], $user->value('balance'));
+    }
+
+    /** @test */
+    public function it_gets_empty_computed_data_by_default()
+    {
+        $this->assertEquals([], $this->user()->computedData()->all());
+    }
+
+    /** @test */
+    public function it_can_use_actual_data_to_compose_computed_data()
+    {
+        Facades\User::computed('nickname', function ($user, $attribute) {
+            return $attribute ?? 'Nameless';
+        });
+
+        $user = $this->makeUser();
+
+        $this->assertEquals('Nameless', $user->value('nickname'));
+
+        $user->data(['nickname' => 'The Hoff']);
+
+        $this->assertEquals('The Hoff', $user->value('nickname'));
+    }
+
     public function additionalDataValues()
     {
         return [];
