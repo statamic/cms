@@ -343,6 +343,61 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_custom_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->get('title').' AND MORE!';
+        });
+
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
+
+        $expectedData = [
+            'title' => 'Pop Rocks',
+        ];
+
+        $expectedComputedData = [
+            'description' => 'Pop Rocks AND MORE!',
+        ];
+
+        $expectedValues = array_merge($expectedData, $expectedComputedData);
+
+        $this->assertArraySubset($expectedData, $entry->data()->all());
+        $this->assertEquals($expectedComputedData, $entry->computedData()->all());
+        $this->assertEquals($expectedValues['title'], $entry->value('title'));
+        $this->assertEquals($expectedValues['description'], $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_gets_empty_computed_data_by_default()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
+
+        $this->assertEquals([], $entry->computedData()->all());
+    }
+
+    /** @test */
+    public function it_can_use_actual_data_to_compose_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($user, $attribute) {
+            return $attribute ?? 'N/A';
+        });
+
+        $collection = tap(Collection::make('test'))->save();
+
+        $entry = (new Entry)->collection($collection)->data([
+            'title' => 'Pop Rocks',
+        ]);
+
+        $this->assertEquals('N/A', $entry->value('description'));
+
+        $entry->data(['description' => 'Raddest article ever!']);
+
+        $this->assertEquals('Raddest article ever!', $entry->value('description'));
+    }
+
+    /** @test */
     public function it_gets_the_url_from_the_collection()
     {
         config(['statamic.amp.enabled' => true]);
