@@ -27,9 +27,7 @@ class DefaultInvalidator implements Invalidator
             return $this->cacher->flush();
         }
 
-        if ($item instanceof Asset) {
-            $this->invalidateAssetUrls($item);
-        } elseif ($item instanceof Entry) {
+        if ($item instanceof Entry) {
             $this->invalidateEntryUrls($item);
         } elseif ($item instanceof Term) {
             $this->invalidateTermUrls($item);
@@ -39,6 +37,8 @@ class DefaultInvalidator implements Invalidator
             $this->invalidateGlobalUrls($item);
         } elseif ($item instanceof Collection) {
             $this->invalidateCollectionUrls($item);
+        } elseif ($item instanceof Asset) {
+            $this->invalidateAssetUrls($item);
         }
     }
 
