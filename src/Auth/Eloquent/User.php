@@ -10,7 +10,6 @@ use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
 use Statamic\Preferences\HasPreferences;
-use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 class User extends BaseUser
@@ -287,12 +286,6 @@ class User extends BaseUser
 
     public function value($key)
     {
-        $computedFields = Statamic::getComputedCallbacks($this->computedDataPrefix());
-
-        if ($callback = $computedFields->get($key)) {
-            return $callback($this, $this->get($key));
-        }
-
         return $this->get($key);
     }
 
