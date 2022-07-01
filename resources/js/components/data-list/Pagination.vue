@@ -3,7 +3,7 @@
     <div class="w-full flex">
 
         <div class="flex flex-1 items-center" v-if="! inline">
-            <div class="text-xs text-grey-70" v-if="totals && totalItems > 0">
+            <div class="text-xs text-grey-70" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
@@ -59,7 +59,7 @@ export default {
             type: Boolean,
             default: false
         },
-        totals: {
+        showTotals: {
             type: Boolean,
             default: false
         },
