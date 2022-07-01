@@ -3,6 +3,8 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetSaved;
 use Statamic\Events\CollectionTreeDeleted;
 use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\EntryDeleted;
@@ -21,6 +23,8 @@ class Invalidate implements ShouldQueue
     protected $invalidator;
 
     protected $events = [
+        AssetSaved::class => 'invalidateAsset',
+        AssetDeleted::class => 'invalidateAsset',
         EntrySaved::class => 'invalidateEntry',
         EntryDeleted::class => 'invalidateEntry',
         TermSaved::class => 'invalidateTerm',
@@ -45,6 +49,11 @@ class Invalidate implements ShouldQueue
         foreach ($this->events as $event => $method) {
             $dispatcher->listen($event, self::class.'@'.$method);
         }
+    }
+
+    public function invalidateAsset($event)
+    {
+        $this->invalidator->invalidate($event->asset);
     }
 
     public function invalidateEntry($event)
