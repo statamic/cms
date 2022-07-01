@@ -364,6 +364,7 @@ class EntryTest extends TestCase
 
         $this->assertArraySubset($expectedData, $entry->data()->all());
         $this->assertEquals($expectedComputedData, $entry->computedData()->all());
+        $this->assertEquals($expectedValues, $entry->values()->all());
         $this->assertEquals($expectedValues['title'], $entry->value('title'));
         $this->assertEquals($expectedValues['description'], $entry->value('description'));
     }
