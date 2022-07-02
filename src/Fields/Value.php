@@ -61,12 +61,12 @@ class Value implements IteratorAggregate, JsonSerializable
     {
         $value = $this->value();
 
-        if ($value instanceof Augmentable || $value instanceof Collection) {
-            $value = $value->toAugmentedArray();
+        if ($value instanceof OrderedQueryBuilder) {
+            $value = $value->get();
         }
 
-        if ($value instanceof OrderedQueryBuilder) {
-            $value = $this->value()->get()->toAugmentedArray();
+        if ($value instanceof Augmentable || $value instanceof Collection) {
+            $value = $value->toAugmentedArray();
         }
 
         return $value;
