@@ -33,8 +33,17 @@ export default {
             return this.asset.extension === 'svg';
         },
 
+        container() {
+            return this.asset.id.substr(0, this.asset.id.indexOf('::'))
+        },
+
         canBeTransparent() {
             return ['png', 'svg'].includes(this.asset.extension)
+        },
+
+        canDownload() {
+            return Statamic.$permissions.has('super')
+                || Statamic.$permissions.has(`view ${this.container} assets`)
         },
 
         thumbnail() {

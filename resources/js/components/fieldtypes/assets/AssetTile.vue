@@ -49,7 +49,7 @@
 
                 <div class="asset-controls" v-if="readOnly">
                     <button
-                        v-if="asset.url"
+                        v-if="asset.url && (asset.isImage || asset.isAudio || asset.isVideo) && this.canDownload"
                         @click="open"
                         class="btn btn-icon"
                         :alt="__('Open in a new window')"
@@ -58,7 +58,7 @@
                     </button>
 
                     <button
-                        v-if="asset.allowDownloading"
+                        v-if="asset.allowDownloading && this.canDownload"
                         @click="download"
                         class="btn btn-icon"
                         :alt="__('Download file')"
