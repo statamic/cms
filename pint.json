@@ -1,6 +1,12 @@
 {
     "preset": "laravel",
     "rules": {
+        "binary_operator_spaces": {
+            "default": "single_space",
+            "operators": {
+                "=>": null
+            }
+        },
         "class_attributes_separation": {
             "elements": {
                 "method": "one"
