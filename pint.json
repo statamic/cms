@@ -5,6 +5,11 @@
             "elements": {
                 "method": "one"
             }
+        },
+        "phpdoc_tag_type": {
+            "tags": {
+                "inheritdoc": "inline"
+            }
         }
     }
 }

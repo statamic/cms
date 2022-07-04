@@ -109,7 +109,11 @@ $rules = [
     'phpdoc_single_line_var_spacing' => true,
     'phpdoc_summary' => false,
     'phpdoc_to_comment' => false, // override to preserve user preference
-    'phpdoc_tag_type' => true,
+    'phpdoc_tag_type' => [
+        'tags' => [
+            'inheritdoc' => 'inline',
+        ],
+    ],
     'phpdoc_trim' => true,
     'phpdoc_types' => true,
     'phpdoc_var_without_name' => true,
