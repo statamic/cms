@@ -117,7 +117,7 @@ export default {
 
     reactiveProvide: {
         name: 'grid',
-        include: ['config', 'isReorderable', 'isReadOnly', 'handle', 'errorKeyPrefix']
+        include: ['config', 'isReorderable', 'isReadOnly', 'handle', 'fieldPathPrefix']
     },
 
     watch: {
@@ -156,30 +156,34 @@ export default {
             row._id = id;
 
             this.updateRowMeta(id, this.meta.new);
-            this.value.push(row);
-            this.update(this.value);
+            this.update([...this.value, row]);
         },
 
         updated(index, row) {
-            this.value.splice(index, 1, row);
-            this.update(this.value);
+            this.update([
+                ...this.value.slice(0, index),
+                row,
+                ...this.value.slice(index + 1)
+            ]);
         },
 
         removed(index) {
-            if (confirm(__('Are you sure?'))) {
-                this.value.splice(index, 1);
-                this.update(this.value);
-            }
+            if (! confirm(__('Are you sure?'))) return;
+
+            this.update([
+                ...this.value.slice(0, index),
+                ...this.value.slice(index + 1)
+            ]);
         },
 
         duplicate(index) {
-            const row = _.clone(this.value[index]);
+            const row = clone(this.value[index]);
             const old_id = row._id;
             row._id = uniqid();
 
             this.updateRowMeta(row._id, this.meta.existing[old_id]);
-            this.value.push(row);
-            this.update(this.value);
+
+            this.update([...this.value, row]);
         },
 
         sorted(rows) {

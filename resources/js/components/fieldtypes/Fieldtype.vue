@@ -22,13 +22,17 @@ export default {
             default: false
         },
         namePrefix: String,
-        errorKeyPrefix: String,
+        fieldPathPrefix: String,
     },
 
     methods: {
         update(value) {
             this.$emit('input', value);
         },
+
+        updateDebounced: _.debounce(function (value) {
+            this.update(value);
+        }, 150),
 
         updateMeta(value) {
             this.$emit('meta-updated', value);
@@ -45,7 +49,7 @@ export default {
         },
 
         isReadOnly() {
-            return this.readOnly || this.config.read_only || false;
+            return this.readOnly || this.config.visibility === 'read_only' || false;
         },
 
         replicatorPreview() {

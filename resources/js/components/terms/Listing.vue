@@ -47,6 +47,7 @@
 
                     <data-list-bulk-actions
                         :url="actionUrl"
+                        :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -86,6 +87,7 @@
                 <data-list-pagination
                     class="mt-3"
                     :resource-meta="meta"
+                    :show-totals="true"
                     @page-selected="selectPage"
                     @per-page-changed="changePerPage"
                 />
@@ -112,6 +114,12 @@ export default {
             preferencesPrefix: `taxonomies.${this.taxonomy}`,
             requestUrl: cp_url(`taxonomies/${this.taxonomy}/terms`),
         }
+    },
+
+    computed: {
+        actionContext() {
+            return {taxonomy: this.taxonomy};
+        },
     },
 
     methods: {

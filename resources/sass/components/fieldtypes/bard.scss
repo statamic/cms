@@ -134,7 +134,7 @@
         margin-left: -3px
     }
 
-    button {
+    .bard-toolbar-button {
         @apply text-grey-20 h-10 w-10 text-center bg-black rounded-lg flex items-center justify-center;
         font-size: 16px;
         transition: all .1s ease-in-out;
@@ -143,19 +143,19 @@
         }
     }
 
-    button:hover {
+    .bard-toolbar-button:hover {
         @apply .text-white;
     }
 
-    button.active {
+    .bard-toolbar-button.active {
         @apply .text-blue;
     }
 
-    button:focus {
+    .bard-toolbar-button:focus {
         outline: none;
     }
 
-    button:disabled {
+    .bard-toolbar-button:disabled {
         @apply .opacity-50;
         &:hover {
             @apply .text-grey-20;
@@ -178,6 +178,9 @@
     }
 }
 
+.bard-set.has-error > .replicator-set-header label {
+    color: $color_red;
+}
 
 /* The set selection options for each text block
   ========================================================================== */
@@ -225,6 +228,11 @@
 
         > p > code, > pre code {
             @apply bg-grey-30;
+        }
+        
+        // To remove min height from nested bard fields inside bard in fullscreen mode.
+        * > .ProseMirror { 
+            min-height: auto;
         }
     }
 
@@ -378,7 +386,15 @@
     }
 
     ol ol {
-        list-style-type: lower-roman;
+        list-style-type: decimal;
+    }
+
+    ul ol {
+        list-style-type: decimal;
+    }
+
+    ol ul {
+        list-style-type: circle;
     }
 
     blockquote {
@@ -416,12 +432,27 @@
                 content: '';
             }
         }
+
+        a {
+            @apply text-blue underline break-words;
+        }
+
+        a:active,
+        a:focus,
+        a:hover {
+            outline: 0;
+            text-decoration: underline;
+        }
     }
 
     p > code {
         @apply font-mono bg-grey-40 rounded-sm text-xs relative;
         padding: 2px 4px;
         top: -1px;
+    }
+
+    pre {
+        margin-bottom: .85em;
     }
 
     pre code {

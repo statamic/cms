@@ -12,18 +12,20 @@
             <button v-if="canDelete" class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" :aria-label="__('Delete Row')" />
         </div>
         <publish-fields-container>
-            <publish-field
+            <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, fieldPath(field.handle))"
                 :key="field.handle"
-                :config="{...field, localizable: grid.config.localizable}"
-                :value="values[field.handle]"
+                :field="field"
                 :meta="meta[field.handle]"
-                :read-only="grid.isReadOnly"
-                :name-prefix="namePrefix"
+                :value="values[field.handle]"
+                :parent-name="name"
+                :set-index="index"
                 :errors="errors(field.handle)"
+                :field-path="fieldPath(field.handle)"
                 class="p-2"
-                @input="updated(field.handle, $event)"
+                :read-only="grid.isReadOnly"
+                @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
@@ -45,7 +47,7 @@
 
 <script>
 import Row from './Row.vue';
-import PublishField from '../../publish/Field.vue';
+import SetField from '../replicator/Field.vue';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
@@ -55,13 +57,7 @@ export default {
         ValidatesFieldConditions,
     ],
 
-    components: { PublishField },
-
-    computed: {
-        namePrefix() {
-            return `${this.name}[${this.index}]`;
-        }
-    }
+    components: { SetField },
 
 }
 </script>

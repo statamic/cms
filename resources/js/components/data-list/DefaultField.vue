@@ -16,6 +16,8 @@ export default {
         text() {
             let value = this.value;
 
+            if (value === 0) return 0;
+
             if (!value) return '';
 
             if (typeof value !== 'string') return JSON.stringify(value);

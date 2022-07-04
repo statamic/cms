@@ -12,14 +12,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
 
+      - name: Install required npm version
+        run: npm -g install npm@8.5.5
+
       - name: Install dependencies
         run: npm ci
 
       - name: Compile assets
         run: npm run production
 
-      - name: Create zip
+      - name: Compile frontend assets
+        run: npm run frontend-prod
+
+      - name: Create dist zip
         run: cd resources && tar -czvf dist.tar.gz dist
+
+      - name: Create dist-frontend zip
+        run: cd resources && tar -czvf dist-frontend.tar.gz dist-frontend
 
       - name: Get Changelog
         id: changelog
@@ -37,7 +46,7 @@ jobs:
           release_name: ${{ steps.changelog.outputs.version }}
           body: ${{ steps.changelog.outputs.text }}
 
-      - name: Upload zip to release
+      - name: Upload dist zip to release
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -45,4 +54,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./resources/dist.tar.gz
           asset_name: dist.tar.gz
+          asset_content_type: application/tar+gz
+
+      - name: Upload dist-frontend zip to release
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./resources/dist-frontend.tar.gz
+          asset_name: dist-frontend.tar.gz
           asset_content_type: application/tar+gz

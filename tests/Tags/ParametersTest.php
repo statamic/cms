@@ -116,6 +116,9 @@ class ParametersTest extends TestCase
     {
         $this->assertTrue($this->params->has('string'));
         $this->assertFalse($this->params->has('unknown'));
+
+        $this->assertTrue($this->params->hasAny(['string', 'unknown']));
+        $this->assertFalse($this->params->hasAny(['unknown', 'another_unknown']));
     }
 
     /** @test */

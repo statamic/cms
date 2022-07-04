@@ -5,7 +5,6 @@ namespace Statamic\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
-use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
@@ -14,10 +13,11 @@ use Statamic\Support\Str;
 
 abstract class Fieldtype implements Arrayable
 {
-    use RegistersItself, HasTitle, HasHandle {
+    use RegistersItself, HasHandle {
         handle as protected traitHandle;
     }
 
+    protected static $title;
     protected static $binding = 'fieldtypes';
 
     protected $field;
@@ -26,16 +26,33 @@ abstract class Fieldtype implements Arrayable
     protected $defaultable = true;
     protected $selectable = true;
     protected $selectableInForms = false;
-    protected $categories = ['text'];
+    protected $relationship = false;
+    protected $categories = [];
     protected $rules = [];
     protected $extraRules = [];
     protected $defaultValue;
     protected $configFields = [];
+    protected static $extraConfigFields = [];
     protected $icon;
+
+    public static function title()
+    {
+        if (static::$title) {
+            return __(static::$title);
+        }
+
+        $translation = __($key = 'statamic::fieldtypes.'.static::handle().'.title');
+
+        if ($translation !== $key) {
+            return $translation;
+        }
+
+        return __(Str::title(Str::humanize(static::handle())));
+    }
 
     public function setField(Field $field)
     {
-        $this->field = $field;
+        $this->field = clone $field;
 
         return $this;
     }
@@ -115,6 +132,11 @@ abstract class Fieldtype implements Arrayable
         return array_map([Validator::class, 'explodeRules'], $this->extraRules);
     }
 
+    public function extraValidationAttributes(): array
+    {
+        return [];
+    }
+
     public function preProcessValidatable($value)
     {
         return $value;
@@ -158,9 +180,11 @@ abstract class Fieldtype implements Arrayable
 
     public function configFields(): Fields
     {
-        $fields = collect($this->configFieldItems())->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        });
+        $fields = collect($this->configFieldItems())
+            ->merge($this->extraConfigFieldItems())
+            ->map(function ($field, $handle) {
+                return compact('handle', 'field');
+            });
 
         return new ConfigFields($fields);
     }
@@ -168,6 +192,23 @@ abstract class Fieldtype implements Arrayable
     protected function configFieldItems(): array
     {
         return $this->configFields;
+    }
+
+    protected function extraConfigFieldItems(): array
+    {
+        return self::$extraConfigFields[static::class] ?? [];
+    }
+
+    public static function appendConfigFields(array $config): void
+    {
+        $existingConfig = self::$extraConfigFields[static::class] ?? [];
+
+        self::$extraConfigFields[static::class] = array_merge($existingConfig, $config);
+    }
+
+    public static function appendConfigField(string $field, array $config): void
+    {
+        self::appendConfigFields([$field => $config]);
     }
 
     public function icon()
@@ -238,5 +279,15 @@ abstract class Fieldtype implements Arrayable
     public function addGqlTypes()
     {
         //
+    }
+
+    public function isRelationship(): bool
+    {
+        return $this->relationship;
+    }
+
+    public function toQueryableValue($value)
+    {
+        return $value;
     }
 }

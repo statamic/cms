@@ -12,7 +12,7 @@ class Path extends Tags
     /**
      * Maps to the {{ path }} tag.
      *
-     * @return string
+     * @return string|void
      */
     public function index()
     {

@@ -58,20 +58,20 @@
 
             @if (config('statamic.cp.link_to_docs'))
             <dropdown-item external-link="https://statamic.dev" class="flex items-center">
-                <span>{{__('Documentation')}}</span>
+                <span>{{ __('Documentation') }}</span>
                 <i class="w-3 block ml-1">@cp_svg('external-link')</i>
             </dropdown-item>
             @endif
 
             @if (config('statamic.cp.support_url'))
             <dropdown-item external-link="{{ config('statamic.cp.support_url') }}" class="flex items-center">
-                <span>{{__('Support')}}</span>
+                <span>{{ __('Support') }}</span>
                 <i class="w-3 block ml-1">@cp_svg('external-link')</i>
             </dropdown-item>
             @endif
 
             <dropdown-item @click="$events.$emit('keyboard-shortcuts.open')" class="flex items-center">
-                <span>{{__('Keyboard Shortcuts')}}</span>
+                <span>{{ __('Keyboard Shortcuts') }}</span>
             </dropdown-item>
         </dropdown-list>
 

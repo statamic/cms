@@ -5,12 +5,15 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Values;
 use Statamic\GraphQL\Types\GridItemType;
 use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Grid extends Fieldtype
 {
+    protected $categories = ['structured'];
     protected $defaultable = false;
     protected $defaultValue = [];
 
@@ -78,7 +81,9 @@ class Grid extends Fieldtype
 
         $fields = $this->fields()->addValues($row)->process()->values()->all();
 
-        return array_merge($row, $fields);
+        $row = array_merge($row, $fields);
+
+        return Arr::removeNullValues($row);
     }
 
     public function preProcess($data)
@@ -125,11 +130,45 @@ class Grid extends Fieldtype
 
     public function extraRules(): array
     {
-        $rules = $this->fields()->validator()->rules();
+        return collect($this->field->value())->map(function ($row, $index) {
+            return $this->rowRules($row, $index);
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
+    }
 
-        return collect($rules)->mapWithKeys(function ($rules, $handle) {
-            return ["{$this->field->handle()}.*.{$handle}" => $rules];
+    protected function rowRules($data, $index)
+    {
+        $rules = $this
+            ->fields()
+            ->addValues($data)
+            ->validator()
+            ->withContext([
+                'prefix' => $this->field->validationContext('prefix').$this->rowRuleFieldPrefix($index).'.',
+            ])
+            ->rules();
+
+        return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
+            return [$this->rowRuleFieldPrefix($index).'.'.$handle => $rules];
         })->all();
+    }
+
+    protected function rowRuleFieldPrefix($index)
+    {
+        return "{$this->field->handle()}.{$index}";
+    }
+
+    public function extraValidationAttributes(): array
+    {
+        $attributes = $this->fields()->validator()->attributes();
+
+        return collect($this->field->value())->map(function ($row, $index) use ($attributes) {
+            return collect($attributes)->except('_id')->mapWithKeys(function ($attribute, $handle) use ($index) {
+                return [$this->rowRuleFieldPrefix($index).'.'.$handle => $attribute];
+            });
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->filter()->all();
     }
 
     public function preload()
@@ -165,7 +204,7 @@ class Grid extends Fieldtype
         $method = $shallow ? 'shallowAugment' : 'augment';
 
         return collect($value)->map(function ($row) use ($method) {
-            return $this->fields()->addValues($row)->{$method}()->values()->all();
+            return new Values($this->fields()->addValues($row)->{$method}()->values()->all());
         })->all();
     }
 
@@ -188,5 +227,18 @@ class Grid extends Fieldtype
         return 'GridItem_'.collect($this->field->handlePath())->map(function ($part) {
             return Str::studly($part);
         })->join('_');
+    }
+
+    public function preProcessValidatable($value)
+    {
+        return collect($value)->map(function ($values) {
+            $processed = $this->fields()
+                ->addValues($values)
+                ->preProcessValidatables()
+                ->values()
+                ->all();
+
+            return array_merge($values, $processed);
+        })->all();
     }
 }

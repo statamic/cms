@@ -8,7 +8,7 @@
         :id="fieldId"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
-        @input="update" />
+        @input="updateDebounced" />
 </template>
 
 <script>

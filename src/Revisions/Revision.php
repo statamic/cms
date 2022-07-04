@@ -6,6 +6,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Events\RevisionDeleted;
+use Statamic\Events\RevisionSaved;
 use Statamic\Facades;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -129,10 +131,14 @@ class Revision implements Contract, Arrayable
     public function save()
     {
         Revisions::save($this);
+
+        RevisionSaved::dispatch($this);
     }
 
     public function delete()
     {
         Revisions::delete($this);
+
+        RevisionDeleted::dispatch($this);
     }
 }

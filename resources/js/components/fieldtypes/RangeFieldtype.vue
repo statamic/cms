@@ -30,7 +30,7 @@ export default {
 
      data() {
         return {
-            val: this.value || this.config.default || this.getDefault()
+            val: this.getValue(),
         }
     },
 
@@ -47,12 +47,28 @@ export default {
             }
 
             return val;
-        }
+        },
+
+        getValue() {
+            if (typeof(this.value) === 'number') {
+                return this.value;
+            }
+
+            if (typeof(this.config.default) === 'number') {
+                return this.config.default;
+            }
+
+            return this.getDefault();
+        },
     },
 
+
     watch: {
+        value(value) {
+            this.val = value;
+        },
         val(value) {
-            this.update(value);
+            this.updateDebounced(value);
         }
     }
 

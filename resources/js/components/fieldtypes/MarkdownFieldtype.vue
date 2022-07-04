@@ -121,7 +121,7 @@
 
 <script>
 var CodeMirror = require('codemirror');
-var marked = require('marked');
+var { marked } = require('marked');
 var PlainTextRenderer = require('marked-plaintext');
 
 require('codemirror/addon/edit/closebrackets');
@@ -180,7 +180,7 @@ export default {
     watch: {
 
         data(data) {
-            this.update(data);
+            this.updateDebounced(data);
         },
 
         fullScreenMode: {
@@ -289,7 +289,7 @@ export default {
             }
 
             if (! url) {
-                url = prompt(__('Enter URL'), 'http://');
+                url = prompt(__('Enter URL'), 'https://');
                 if (! url) {
                     url = '';
                 }
@@ -566,11 +566,14 @@ export default {
             mode: 'gfm',
             dragDrop: false,
             keyMap: 'sublime',
+            direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             lineWrapping: true,
             viewportMargin: Infinity,
             tabindex: 0,
             autoRefresh: true,
             readOnly: self.isReadOnly ? 'nocursor' : false,
+            inputStyle: 'contenteditable',
+            spellcheck: true,
             extraKeys: {
                 "Enter": "newlineAndIndentContinueMarkdownList",
                 "Cmd-Left": "goLineLeftSmart"

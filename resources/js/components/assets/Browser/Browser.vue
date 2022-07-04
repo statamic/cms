@@ -93,7 +93,7 @@
                             <data-list-table
                                 v-if="mode === 'table' && ! containerIsEmpty"
                                 :allow-bulk-actions="true"
-                                :loading="loadingAssets"
+                                :loading="loading"
                                 :rows="rows"
                                 :toggle-selection-on-row-click="true"
                                 @sorted="sorted"
@@ -254,10 +254,12 @@ import HasPagination from '../../data-list/HasPagination';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
+import HasActions from '../../data-list/HasActions';
 
 export default {
 
     mixins: [
+        HasActions,
         HasPagination,
         HasPreferences,
     ],
@@ -295,7 +297,7 @@ export default {
             containers: [],
             container: {},
             initializing: true,
-            loadingAssets: true,
+            loading: true,
             assets: [],
             path: this.selectedPath,
             folders: [],
@@ -308,8 +310,8 @@ export default {
             page: 1,
             preferencesPrefix: null,
             meta: {},
-            sortColumn: 'basename',
-            sortDirection: 'asc',
+            sortColumn: this.initialContainer.sort_field,
+            sortDirection: this.initialContainer.sort_direction,
             mode: 'table',
             actionUrl: null,
             folderActionUrl: null,
@@ -332,10 +334,6 @@ export default {
 
         showContainerTabs() {
             return !this.restrictContainerNavigation && Object.keys(this.containers).length > 1
-        },
-
-        loading() {
-            return this.loadingAssets;
         },
 
         showAssetEditor() {
@@ -441,15 +439,7 @@ export default {
 
     methods: {
 
-        actionStarted() {
-            this.loadingAssets = true;
-        },
-
-        actionCompleted() {
-            this.$toast.success(__('Action completed'));
-
-            this.$events.$emit('clear-selections');
-
+        afterActionSuccessfullyCompleted() {
             this.loadAssets();
         },
 
@@ -461,7 +451,7 @@ export default {
         },
 
         loadAssets() {
-            this.loadingAssets = true;
+            this.loading = true;
 
             const url = this.searchQuery
                 ? cp_url(`assets/browse/search/${this.container.id}`)
@@ -482,13 +472,13 @@ export default {
                     this.folderActionUrl = data.links.folder_action;
                 }
 
-                this.loadingAssets = false;
+                this.loading = false;
                 this.initializing = false;
             }).catch(e => {
                 this.$toast.error(e.response.data.message, { action: null, duration: null });
                 this.assets = [];
                 this.folders = [];
-                this.loadingAssets = false;
+                this.loading = false;
                 this.initializing = false;
             });
         },

@@ -20,7 +20,8 @@
             :value="value"
             :handle="field.handle"
             :name-prefix="namePrefix"
-            :error-key-prefix="errorKey"
+            :field-path-prefix="fieldPath"
+            :has-error="hasError || hasNestedError"
             :read-only="isReadOnly"
             @input="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"
@@ -64,7 +65,7 @@ export default {
             type: Number,
             required: true
         },
-        errorKey: {
+        fieldPath: {
             type: String
         },
         readOnly: Boolean,
@@ -92,18 +93,26 @@ export default {
                 : null
         },
 
+        storeState() {
+            return this.$store.state.publish[this.storeName] || [];
+        },
+
+        errors() {
+            return this.storeState.errors[this.fieldPath] || [];
+        },
+
         hasError() {
             return this.errors.length > 0;
         },
 
-        errors() {
-            const state = this.$store.state.publish[this.storeName];
-            if (! state) return [];
-            return state.errors[this.errorKey] || [];
+        hasNestedError() {
+            const prefix = `${this.fieldPath}.`;
+
+            return Object.keys(this.storeState.errors).some(handle => handle.startsWith(prefix));
         },
 
         isReadOnly() {
-            return this.readOnly || this.field.read_only || false;
+            return this.readOnly || this.field.visibility === 'read_only' || false;
         },
 
         classes() {
@@ -113,7 +122,7 @@ export default {
                 `field-${tailwind_width_class(this.field.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.field.classes || '',
-                { 'has-error': this.hasError }
+                { 'has-error': this.hasError || this.hasNestedError }
             ];
         }
 

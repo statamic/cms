@@ -8,7 +8,7 @@ class Dd extends Tags
 
     public function index()
     {
-        $value = $this->context->all();
+        $value = $this->context->sortKeys()->all();
 
         function_exists('ddd') ? ddd($value) : dd($value);
     }

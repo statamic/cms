@@ -7,8 +7,9 @@ use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Support\Str;
-use Statamic\View\Antlers\Parser;
+use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
 
 class Value implements IteratorAggregate, JsonSerializable
 {
@@ -54,6 +55,7 @@ class Value implements IteratorAggregate, JsonSerializable
         return (string) $this->value();
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize($options = 0)
     {
         $value = $this->value();
@@ -65,6 +67,7 @@ class Value implements IteratorAggregate, JsonSerializable
         return $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->value());
@@ -78,17 +81,26 @@ class Value implements IteratorAggregate, JsonSerializable
     public function antlersValue(Parser $parser, $variables)
     {
         $value = $this->value();
+        $shouldParseAntlers = $this->shouldParseAntlers();
+
+        if ($value instanceof  ArrayableString && $shouldParseAntlers) {
+            $value = (string) $value;
+        }
 
         if (! is_string($value)) {
             return $value;
         }
 
-        if ($this->shouldParseAntlers()) {
+        if ($shouldParseAntlers) {
+            if (config('statamic.antlers.version') === 'runtime') {
+                $value = (new DocumentTransformer())->correct($value);
+            }
+
             return $parser->parse($value, $variables);
         }
 
         if (Str::contains($value, '{')) {
-            return $parser->extractNoparse(str_replace('{{', '@{{', $value));
+            return $parser->valueWithNoparse($value);
         }
 
         return $value;
@@ -117,5 +129,10 @@ class Value implements IteratorAggregate, JsonSerializable
     public function shallow()
     {
         return new static($this->raw, $this->handle, $this->fieldtype, $this->augmentable, true);
+    }
+
+    public function isRelationship(): bool
+    {
+        return optional($this->fieldtype)->isRelationship() ?? false;
     }
 }

@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Users;
 use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
-use Statamic\CP\Column;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -15,7 +14,6 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
-use Statamic\Statamic;
 
 class UsersController extends CpController
 {
@@ -41,26 +39,32 @@ class UsersController extends CpController
         ]);
     }
 
+    protected function indexQuery()
+    {
+        $query = User::query();
+
+        if ($search = request('search')) {
+            $query->where('email', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
+        }
+
+        return $query;
+    }
+
     protected function json($request)
     {
         $query = $request->group
             ? UserGroup::find($request->group)->queryUsers()
-            : User::query();
+            : $this->indexQuery();
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters);
 
         $users = $query
-            ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
+            ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
 
         return (new Users($users))
             ->blueprint(User::blueprint())
-            ->columns(collect([
-                Column::make('email')->label(__('Email')),
-                Column::make('name')->label(__('Name')),
-                Statamic::pro() ? Column::make('roles')->label(__('Roles'))->fieldtype('relationship')->sortable(false) : null,
-                Column::make('last_login')->label(__('Last Login'))->sortable(false),
-            ])->filter()->values()->all())
+            ->columnPreferenceKey('users.columns')
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
             ]]);
@@ -92,6 +96,7 @@ class UsersController extends CpController
                 'save' => cp_route('users.store'),
             ],
             'expiry' => $expiry,
+            'separateNameFields' => $blueprint->hasField('first_name'),
         ];
 
         if ($request->wantsJson()) {
@@ -108,7 +113,7 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->only(['email', 'name'])->addValues($request->all());
+        $fields = $blueprint->fields()->only(['email', 'name', 'first_name', 'last_name'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
@@ -158,11 +163,11 @@ class UsersController extends CpController
         $blueprint = $user->blueprint();
 
         if (! User::current()->can('edit roles')) {
-            $blueprint->ensureField('roles', ['read_only' => true]);
+            $blueprint->ensureField('roles', ['visibility' => 'read_only']);
         }
 
         if (! User::current()->can('edit user groups')) {
-            $blueprint->ensureField('groups', ['read_only' => true]);
+            $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
 
         $fields = $blueprint

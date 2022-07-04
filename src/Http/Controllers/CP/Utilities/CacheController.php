@@ -53,7 +53,7 @@ class CacheController extends CpController
         return [
             'count' => $files->count(),
             'size' => Str::fileSizeForHumans($files->reduce(function ($size, $file) {
-                return $size + $file['size'];
+                return $size + $this->normalizeFlysystemFileSize($file);
             }, 0)),
         ];
     }
@@ -115,5 +115,29 @@ class CacheController extends CpController
         Artisan::call('statamic:glide:clear');
 
         return back()->withSuccess(__('Image cache cleared.'));
+    }
+
+    public function warm(Request $request, $cache)
+    {
+        $method = 'warm'.ucfirst($cache).'Cache';
+
+        return $this->$method();
+    }
+
+    protected function warmStacheCache()
+    {
+        Stache::warm();
+
+        return back()->withSuccess(__('Stache warmed.'));
+    }
+
+    protected function normalizeFlysystemFileSize($file)
+    {
+        // If legacy Flysystem 1.x, we'll have an array of file attributes
+        if (is_array($file)) {
+            return $file['size'];
+        }
+
+        return $file->fileSize();
     }
 }

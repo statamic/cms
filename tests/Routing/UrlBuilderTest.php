@@ -3,6 +3,7 @@
 namespace Tests\Routing;
 
 use Statamic\Contracts\Routing\UrlBuilder;
+use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -23,6 +24,11 @@ class UrlBuilderTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        Site::setConfig(['sites' => [
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]]);
 
         $entry = \Statamic\Facades\Entry::make()
             ->id('post')
@@ -121,5 +127,13 @@ class UrlBuilderTest extends TestCase
             '/test/foo/baz',
             $this->builder->merge(['foo' => 'foo', 'baz' => 'baz'])->build('/test/{{ foo }}/{{ bar }}/{{ baz }}')
         );
+    }
+
+    /** @test */
+    public function it_preserves_dots_in_url()
+    {
+        $this->assertEquals('/blog/post.html', $this->builder->build('/blog/{{ slug }}.html'));
+        $this->assertEquals('/blog/post.aspx', $this->builder->build('/blog/{{ slug }}.aspx'));
+        $this->assertEquals('/blog/post.foo.bar', $this->builder->build('/blog/{{ slug }}.foo.bar'));
     }
 }

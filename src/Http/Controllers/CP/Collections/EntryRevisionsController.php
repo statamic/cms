@@ -42,7 +42,7 @@ class EntryRevisionsController extends CpController
         return new EntryResource($entry);
     }
 
-    public function show(Request $request, $collection, $entry, $slug, $revision)
+    public function show(Request $request, $collection, $entry, $revision)
     {
         $entry = $entry->makeFromRevision($revision);
 

@@ -1,0 +1,98 @@
+bard1 - Bard 1
+        
+        
+            bard2 - Bard 2
+        
+        
+        
+        
+            
+            ABC
+            
+            123
+            
+        
+        
+        button1
+        
+        
+        
+            /**
+     * Is it or is it not numberwang?
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isNumberwang($value)
+    {
+        return in_array($value, [1, 22, 7, 9, 1002, 2.3, 15, 109876567, 31]);
+    }
+        
+        #8D3451
+        
+        32
+        
+        
+        
+            
+            Grid 1
+            
+            Grid 2
+            
+        
+        
+        
+        
+            
+            Bard Stacked 1
+            
+            Bard Stacked 2
+            
+        
+        
+            
+            Bard Stacked 3
+            
+            Bard Stacked 4
+            
+        
+        
+        
+        
+        
+        
+        19
+        
+        https://statamic.com/
+        
+        <p>Test</p>
+<pre><code class="language-yaml"># content/collections/articles.yaml
+title: Articles
+inject:
+  view_model: App\ViewModels\ArticleStats
+</code></pre>
+<p>test</p>
+
+        
+        radio3
+        
+        
+        
+        option2
+        
+        <table><tr><td>Row1</td></tr><tr><td>Row2</td></tr><tr><td>Row3</td></tr></table>
+        
+        View models help keep your views nice and clean. Use them often and you’ll find that they’re quickly becoming your new best friend.
+        
+        07:45
+        
+        
+        
+        https://www.youtube.com/watch?v=WJmEVjJYmCY
+        
+        
+        
+        
+            
+                Grid 1
+                Grid 2

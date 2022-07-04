@@ -24,6 +24,10 @@ class ReorderEntriesController extends CpController
 
         $reorderPayload = $request->ids;
 
+        if ($collection->sortDirection() === 'desc') {
+            $reorderPayload = array_reverse($reorderPayload);
+        }
+
         $reorderedEntries = clone $contents;
 
         $contents

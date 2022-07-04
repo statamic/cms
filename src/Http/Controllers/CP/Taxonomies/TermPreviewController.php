@@ -23,9 +23,9 @@ class TermPreviewController extends PreviewController
         $term = Term::make()
             ->slug($preview['slug'] ?? 'slug')
             ->taxonomy($taxonomy)
-            ->locale($site->handle())
+            ->in($site->handle())
             ->data($values);
 
-        return $this->getDataResponse($request, $term)->getContent();
+        return $this->tokenizeAndReturn($request, $term);
     }
 }

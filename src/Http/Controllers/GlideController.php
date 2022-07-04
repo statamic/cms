@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use League\Glide\Server;
 use League\Glide\Signatures\SignatureException;
 use League\Glide\Signatures\SignatureFactory;
@@ -98,9 +99,9 @@ class GlideController extends Controller
         // The string before the first slash is the container
         [$container, $path] = explode('/', $decoded, 2);
 
-        $asset = AssetContainer::find($container)->asset($path);
+        throw_unless($container = AssetContainer::find($container), new NotFoundHttpException);
 
-        throw_unless($asset, new NotFoundHttpException);
+        throw_unless($asset = $container->asset($path), new NotFoundHttpException);
 
         return $this->createResponse($this->generateBy('asset', $asset));
     }
@@ -118,7 +119,7 @@ class GlideController extends Controller
 
         try {
             return $this->generator->$method($item, $this->request->all());
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException|UnableToReadFile $e) {
             throw new NotFoundHttpException;
         }
     }
@@ -149,7 +150,7 @@ class GlideController extends Controller
         $path = Str::after($this->request->url(), Site::current()->absoluteUrl());
 
         try {
-            SignatureFactory::create(Config::getAppKey())->validateRequest($path, $_GET);
+            SignatureFactory::create(Config::getAppKey())->validateRequest($path, $this->request->query->all());
         } catch (SignatureException $e) {
             abort(400, $e->getMessage());
         }

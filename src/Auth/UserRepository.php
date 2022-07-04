@@ -54,10 +54,10 @@ abstract class UserRepository implements RepositoryContract
     public function blueprint()
     {
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
-            'name' => ['type' => 'text', 'display' => 'Name'],
-            'email' => ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address'],
-            'roles' => ['type' => 'user_roles', 'width' => 50],
-            'groups' => ['type' => 'user_groups', 'width' => 50],
+            'email' => ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true],
+            'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
+            'roles' => ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true],
+            'groups' => ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => true],
         ])->setHandle('user');
 
         UserBlueprintFound::dispatch($blueprint);

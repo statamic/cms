@@ -7,7 +7,7 @@
         :value="value"
         :is-read-only="isReadOnly"
         :id="fieldId"
-        @input="update"
+        @input="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />

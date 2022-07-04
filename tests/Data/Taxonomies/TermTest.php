@@ -87,4 +87,98 @@ class TermTest extends TestCase
         $this->assertEquals(7, $term->entriesCount());
         $this->assertEquals(7, $term->entriesCount());
     }
+
+    /** @test */
+    public function it_gets_file_contents_for_saving()
+    {
+        tap(Taxonomy::make('tags')->sites(['en', 'fr']))->save();
+
+        $term = (new Term)
+            ->taxonomy('tags')
+            ->slug('test');
+
+        $term->dataForLocale('en', [
+            'title' => 'The title',
+            'array' => ['first one', 'second one'],
+            'null' => null, // this...
+            'empty' => [],  // and this should get stripped out because it's the root. there's no origin to fall back to.
+            'content' => 'The content',
+        ]);
+
+        $term->dataForLocale('fr', [
+            'title' => 'Le titre',
+            'array' => ['premier', 'deuxième'],
+            'null' => null, // this...
+            'empty' => [],  // and this should not get stripped out, otherwise it would fall back to the origin.
+            'content' => 'Le contenu',
+        ]);
+
+        $this->assertEquals([
+            'title' => 'The title',
+            'array' => [
+                'first one',
+                'second one',
+            ],
+            'content' => 'The content',
+            'localizations' => [
+                'fr' => [
+                    'title' => 'Le titre',
+                    'array' => ['premier', 'deuxième'],
+                    'null' => null,
+                    'empty' => [],
+                    'content' => 'Le contenu',
+                ],
+            ],
+        ], $term->fileData());
+    }
+
+    /** @test */
+    public function it_gets_preview_targets()
+    {
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.de/'],
+        ]]);
+
+        $taxonomy = tap(Taxonomy::make('tags')->sites(['en', 'fr', 'de']))->save();
+
+        $term = (new Term)->taxonomy('tags');
+
+        $termEn = $term->in('en')->slug('foo');
+        $termFr = $term->in('fr')->slug('le-foo');
+        $termDe = $term->in('de')->slug('das-foo');
+
+        $this->assertEquals([
+            ['label' => 'Term', 'format' => '{permalink}', 'url' => 'http://domain.com/tags/foo'],
+        ], $termEn->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Term', 'format' => '{permalink}', 'url' => 'http://domain.com/fr/tags/le-foo'],
+        ], $termFr->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Term', 'format' => '{permalink}', 'url' => 'http://domain.de/tags/das-foo'],
+        ], $termDe->previewTargets()->all());
+
+        $taxonomy->previewTargets([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true'],
+        ])->save();
+
+        $this->assertEquals([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'url' => 'http://preview.com/en/tags?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/en/tags/foo?preview=true'],
+        ], $termEn->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'url' => 'http://preview.com/fr/tags?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/fr/tags/le-foo?preview=true'],
+        ], $termFr->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'url' => 'http://preview.com/de/tags?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/de/tags/das-foo?preview=true'],
+        ], $termDe->previewTargets()->all());
+    }
 }

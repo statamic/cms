@@ -98,6 +98,49 @@ class ExportTest extends TestCase
     }
 
     /** @test */
+    public function it_can_export_as_to_different_destination_path()
+    {
+        $paths = $this->cleanPaths([
+            base_path('README.md'),
+            base_path('test-folder'),
+        ]);
+
+        $this->files->put(base_path('README.md'), 'This is readme for the new site!');
+        $this->files->makeDirectory(base_path('test-folder'));
+        $this->files->put(base_path('test-folder/one.txt'), 'One.');
+        $this->files->put(base_path('test-folder/two.txt'), 'Two.');
+
+        $this->setExportPaths([
+            'config/filesystems.php',
+            'resources/views',
+        ], [
+            'README.md' => 'README-new-site.md',
+            'test-folder' => 'test-renamed-folder',
+        ]);
+
+        $this->assertFileNotExists($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+        $this->assertFileNotExists($composerJson = $this->exportPath('resources/views/errors'));
+        $this->assertFileNotExists($renamedFile = $this->exportPath('README-new-site.md'));
+        $this->assertFileNotExists($renamedFolder = $this->exportPath('test-renamed-folder'));
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileExists($filesystemsConfig);
+        $this->assertFileExists($composerJson);
+        $this->assertFileExists($renamedFile);
+        $this->assertFileExists($renamedFolder);
+
+        $this->assertFileNotExists($this->exportPath('README.md')); // This got renamed above
+        $this->assertFileNotExists($this->exportPath('test-folder')); // This got renamed above
+
+        $this->assertFileHasContent('This is readme for the new site!', $renamedFile);
+        $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
+        $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
+
+        $this->cleanPaths($paths);
+    }
+
+    /** @test */
     public function it_copies_export_config()
     {
         $this->setExportPaths([
@@ -370,6 +413,22 @@ EOT
     }
 
     /** @test */
+    public function it_does_not_export_as_with_opinionated_app_composer_json()
+    {
+        $this->setExportPaths([
+            'config/filesystems.php',
+        ], [
+            'composer.json' => 'composer-renamed.json',
+        ]);
+
+        $this->assertFileExists(base_path('composer.json'));
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileNotExists($this->exportPath('composer.json'));
+    }
+
+    /** @test */
     public function it_exports_basic_composer_json_file()
     {
         $this->setExportPaths([
@@ -434,9 +493,13 @@ EOT
         return collect([$this->exportPath, $path])->filter()->implode('/');
     }
 
-    private function setExportPaths($paths)
+    private function setExportPaths($paths, $exportAs = null)
     {
         $config['export_paths'] = $paths;
+
+        if ($exportAs) {
+            $config['export_as'] = $exportAs;
+        }
 
         $this->files->put($this->configPath, YAML::dump($config));
 
@@ -487,5 +550,20 @@ EOT
         $this->assertFileExists($path);
 
         $this->assertStringContainsString($expected, $this->files->get($path));
+    }
+
+    private function cleanPaths($paths)
+    {
+        collect($paths)
+            ->filter(function ($path) {
+                return $this->files->exists($path);
+            })
+            ->each(function ($path) {
+                $this->files->isDirectory($path)
+                    ? $this->files->deleteDirectory($path)
+                    : $this->files->delete($path);
+            });
+
+        return $paths;
     }
 }

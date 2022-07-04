@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -17,6 +19,13 @@ class AssetTest extends TestCase
     use EnablesQueries;
 
     protected $enabledQueries = ['assets'];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        BlueprintRepository::partialMock();
+    }
 
     /**
      * @test
@@ -34,12 +43,15 @@ class AssetTest extends TestCase
     public function it_queries_an_asset_by_id()
     {
         Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('sub', $file, 'image.jpg');
-        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'sub/image.jpg';
+        $realFilePath = Storage::disk('test')->path('sub/image.jpg');
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
-        AssetContainer::make('test')->disk('test')->title('Test')->save();
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $container->makeAsset('sub/image.jpg')->data(['potato' => 'baked'])->save();
+        $blueprint = Blueprint::makeFromFields(['potato' => ['type' => 'text']]);
+        BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
 
         $query = <<<'GQL'
 {
@@ -73,6 +85,9 @@ class AssetTest extends TestCase
         width
         orientation
         ratio
+        ... on Asset_Test {
+            potato
+        }
     }
 }
 GQL;
@@ -109,6 +124,7 @@ GQL;
                     'width' => 30,
                     'orientation' => 'portrait',
                     'ratio' => 0.5,
+                    'potato' => 'baked',
                 ],
             ]]);
     }
@@ -116,7 +132,7 @@ GQL;
     /** @test */
     public function it_queries_an_asset_by_container_and_path()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('a.txt', '');
         Storage::disk('test')->put('b.txt', '');
         Storage::disk('test')->put('c.txt', '');
@@ -171,7 +187,7 @@ GQL;
             ];
         });
 
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('a.txt', '');
         AssetContainer::make('test')->disk('test')->save();
 
@@ -221,7 +237,7 @@ GQL;
             ];
         });
 
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('a.txt', '');
         AssetContainer::make('test')->disk('test')->save();
 
@@ -262,7 +278,7 @@ GQL;
             ];
         });
 
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('a.txt', '');
         AssetContainer::make('test')->disk('test')->save();
 

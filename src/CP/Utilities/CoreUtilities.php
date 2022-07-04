@@ -10,6 +10,7 @@ use Statamic\Http\Controllers\CP\Utilities\GitController;
 use Statamic\Http\Controllers\CP\Utilities\PhpInfoController;
 use Statamic\Http\Controllers\CP\Utilities\UpdateSearchController;
 use Statamic\Statamic;
+use function Statamic\trans as __;
 
 class CoreUtilities
 {
@@ -24,6 +25,7 @@ class CoreUtilities
             ->docsUrl(Statamic::docsUrl('utilities/cache-manager'))
             ->routes(function ($router) {
                 $router->post('cache/{cache}', [CacheController::class, 'clear'])->name('clear');
+                $router->post('cache/{cache}/warm', [CacheController::class, 'warm'])->name('warm');
             })
             ->register();
 
@@ -40,7 +42,6 @@ class CoreUtilities
             ->title(__('Search'))
             ->icon('search-utility')
             ->description(__('statamic::messages.search_utility_description'))
-            ->docsUrl(Statamic::docsUrl('utilities/search'))
             ->routes(function ($router) {
                 $router->post('/', [UpdateSearchController::class, 'update'])->name('update');
             })

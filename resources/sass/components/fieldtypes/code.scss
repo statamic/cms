@@ -1,0 +1,26 @@
+.code-fieldtype-container {
+    @apply relative;
+
+    .code-mode-picker {
+        @apply z-10 right-0 uppercase absolute outline-none shadow-none;
+        right: 0;
+
+        select {
+            @apply text-white w-auto text-2xs p-1 text-right;
+            opacity: .5;
+            background: none;
+            border: none;
+            &:focus {
+                @apply outline-none shadow-none text-blue-light;
+            }
+        }
+        select:hover:not(:disabled) {
+            @apply text-white opacity-100;
+            background: none;
+            border: none;
+        }
+        .select-input-toggle {
+            display: none;
+        }
+    }
+}

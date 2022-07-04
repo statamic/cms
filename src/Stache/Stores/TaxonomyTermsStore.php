@@ -119,7 +119,7 @@ class TaxonomyTermsStore extends ChildStore
         $associations->cache();
 
         foreach ($terms as $slug => $value) {
-            $term = $this->makeTerm($taxonomy, $slug);
+            $term = Term::find("$taxonomy::$slug") ?? $this->makeTerm($taxonomy, $slug);
             $indexes->each->updateItem($term);
         }
     }

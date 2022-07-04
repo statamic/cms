@@ -4,11 +4,13 @@ namespace Statamic\Http\View\Composers;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\View\View;
+use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use voku\helper\ASCII;
 
 class JavascriptComposer
 {
@@ -29,11 +31,13 @@ class JavascriptComposer
             'resourceUrl' => Statamic::cpAssetUrl(),
             'locales' => config('statamic.system.locales'),
             'flash' => Statamic::flash(),
+            'toasts' => Toast::toArray(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
             'user' => $this->user($user),
             'paginationSize' => config('statamic.cp.pagination_size'),
+            'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
             'translationLocale' => app('translator')->locale(),
             'translations' => app('translator')->toJson(),
             'sites' => $this->sites(),
@@ -44,6 +48,7 @@ class JavascriptComposer
             'locale' => config('app.locale'),
             'permissions' => $this->permissions($user),
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
+            'charmap' => ASCII::charsArray(),
         ]);
     }
 
@@ -53,6 +58,7 @@ class JavascriptComposer
             return [
                 'name' => $site->name(),
                 'handle' => $site->handle(),
+                'lang' => $site->lang(),
             ];
         })->values();
     }
@@ -70,9 +76,9 @@ class JavascriptComposer
             return [];
         }
 
-        return array_merge($user->toAugmentedArray(), [
+        return $user->toAugmentedCollection()->merge([
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
-        ]);
+        ])->toArray();
     }
 }

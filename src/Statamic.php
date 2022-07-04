@@ -9,8 +9,10 @@ use Statamic\Facades\File;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Modifiers\Modify;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Tags\FluentTag;
 use Stringy\StaticStringy;
 
 class Statamic
@@ -282,6 +284,10 @@ class Statamic
             $messages[] = ['type' => 'error', 'message' => $error];
         }
 
+        if ($info = session('info')) {
+            $messages[] = ['type' => 'info', 'message' => $info];
+        }
+
         return $messages ?? [];
     }
 
@@ -341,5 +347,31 @@ class Statamic
         }
 
         return $prefix.'.*';
+    }
+
+    public static function tag($name)
+    {
+        return FluentTag::make($name);
+    }
+
+    public static function modify($value)
+    {
+        return Modify::value($value);
+    }
+
+    public static function query($name)
+    {
+        return app()->make('statamic.queries.'.$name);
+    }
+
+    public static function trans($key, $replace = [], $locale = null)
+    {
+        $line = __($key, $replace, $locale);
+
+        if (is_array($line)) {
+            return $key;
+        }
+
+        return $line;
     }
 }

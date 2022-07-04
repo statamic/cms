@@ -5,12 +5,17 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
-                    <svg-icon class="text-grey-70 mr-1 h-4 w-4 flex-none" :name="field.icon" v-tooltip="tooltipText" />
+                    <svg-icon class="text-grey-80 mr-1 h-4 w-4 flex-none" :name="field.icon" v-tooltip="tooltipText" default="generic-field" />
                     <a class="break-all" v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="flex-none pr-1 flex">
-                    <width-selector v-model="width" class="mr-1" />
+                    <width-selector v-if="!isHidden" v-model="width" class="mr-1" />
+
+                    <div v-else class="relative border border-grey-40 opacity-50 w-12 flex items-center justify-center mr-1">
+                        <svg-icon name="hidden" class="h-4 w-4 opacity-50"></svg-icon>
+                    </div>
+
                     <button v-if="canDefineLocalizable"
                         class="hover:text-grey-100 mr-1 flex items-center"
                         :class="{ 'text-grey-100': localizable, 'text-grey-60': !localizable }"
@@ -99,6 +104,10 @@ export default {
                 if (field.type === 'reference') field.config_overrides.push('width');
                 this.$emit('updated', field);
             }
+        },
+
+        isHidden() {
+            return this.fieldConfig.visibility === 'hidden';
         },
 
         widthClass() {

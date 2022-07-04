@@ -4,14 +4,17 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 
 class TaxonomiesController extends CpController
 {
@@ -38,7 +41,7 @@ class TaxonomiesController extends CpController
             'taxonomies' => $taxonomies,
             'columns' => [
                 Column::make('title')->label(__('Title')),
-                Column::make('terms')->label(__('Terms')),
+                Column::make('terms')->label(__('Terms'))->numeric(true),
             ],
         ]);
     }
@@ -101,7 +104,7 @@ class TaxonomiesController extends CpController
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        if (Collection::find($handle)) {
+        if (Taxonomy::findByHandle($handle)) {
             throw new \Exception('Taxonomy already exists');
         }
 
@@ -129,6 +132,7 @@ class TaxonomiesController extends CpController
             'blueprints' => $taxonomy->termBlueprints()->map->handle()->all(),
             'collections' => $taxonomy->collections()->map->handle()->all(),
             'sites' => $taxonomy->sites()->all(),
+            'preview_targets' => $taxonomy->basePreviewTargets(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
@@ -152,9 +156,13 @@ class TaxonomiesController extends CpController
 
         $fields->validate();
 
+        $existingSites = $taxonomy->sites();
+
         $values = $fields->process()->values()->all();
 
-        $taxonomy->title($values['title']);
+        $taxonomy
+            ->title($values['title'])
+            ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
@@ -162,9 +170,25 @@ class TaxonomiesController extends CpController
 
         $taxonomy->save();
 
+        $this->clearStacheStore($taxonomy, $existingSites);
+
         $this->associateTaxonomyWithCollections($taxonomy, $values['collections']);
 
         return $taxonomy->toArray();
+    }
+
+    private function clearStacheStore($taxonomy, $oldSites)
+    {
+        // We're only interested in clearing the stache if you're using it.
+        if (! app(TermRepository::class) instanceof StacheTermRepository) {
+            return;
+        }
+
+        if ($oldSites === $taxonomy->sites()->all()) {
+            return;
+        }
+
+        Stache::store('terms::'.$taxonomy->handle())->clear();
     }
 
     protected function associateTaxonomyWithCollections($taxonomy, $collections)
@@ -247,6 +271,33 @@ class TaxonomiesController extends CpController
                 ],
             ];
         }
+
+        $fields = array_merge($fields, [
+            'routing' => [
+                'display' => __('Routing & URLs'),
+                'fields' => [
+                    'preview_targets' => [
+                        'display' => __('Preview Targets'),
+                        'instructions' => __('statamic::messages.taxonomies_preview_targets_instructions'),
+                        'type' => 'grid',
+                        'fields' => [
+                            [
+                                'handle' => 'label',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                            [
+                                'handle' => 'format',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
         return Blueprint::makeFromSections($fields);
     }

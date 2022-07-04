@@ -2,6 +2,7 @@
 
 namespace Tests\Auth;
 
+use Statamic\Facades\User;
 use Tests\TestCase;
 
 /** @group user-repo */
@@ -49,6 +50,17 @@ class EloquentUserRepositoryTest extends TestCase
     public function fakeUserClass()
     {
         return FakeEloquentUser::class;
+    }
+
+    /** @test */
+    public function it_normalizes_to_statamic_user_from_model()
+    {
+        $user = User::make()->email('foo@bar.com')->data(['name' => 'foo', 'password' => 'foo']);
+        $user->save();
+
+        $normalized = User::fromUser($user->model());
+
+        $this->assertInstanceOf(ActualEloquentUser::class, $normalized);
     }
 }
 

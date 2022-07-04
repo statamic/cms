@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -19,7 +20,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Form implements FormContract, Augmentable
+class Form implements FormContract, Augmentable, Arrayable
 {
     use FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -149,6 +150,7 @@ class Form implements FormContract, Augmentable
             'honeypot' => $this->honeypot,
             'email' => collect($this->email)->map(function ($email) {
                 $email['markdown'] = $email['markdown'] ?: null;
+                $email['attachments'] = $email['attachments'] ?: null;
 
                 return Arr::removeNullValues($email);
             })->all(),
@@ -313,22 +315,6 @@ class Form implements FormContract, Augmentable
         return Statamic::isCpRoute() ? Statamic::cpDateTimeFormat() : Statamic::dateTimeFormat();
     }
 
-    /**
-     * Convert to an array.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return [
-            'handle' => $this->handle,
-            'title' => $this->title,
-            'honeypot' => $this->honeypot(),
-            'store' => $this->store(),
-            'email' => $this->email,
-        ];
-    }
-
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {
@@ -341,7 +327,7 @@ class Form implements FormContract, Augmentable
         return new AugmentedForm($this);
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['handle', 'title', 'api_url'];
     }
@@ -349,5 +335,15 @@ class Form implements FormContract, Augmentable
     public function apiUrl()
     {
         return Statamic::apiRoute('forms.show', $this->handle());
+    }
+
+    /**
+     * Get the form action url.
+     *
+     * @return string
+     */
+    public function actionUrl()
+    {
+        return route('statamic.forms.submit', $this->handle());
     }
 }

@@ -1,52 +1,46 @@
-import marked from 'marked';
+import { marked } from 'marked';
 import { translate, translateChoice } from '../translations/translator';
 
-global.cp_url = function(url) {
+export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;
     return tidy_url(url);
 };
 
-global.docs_url = function(url) {
+export function docs_url(url) {
     return tidy_url('https://statamic.dev/' + url);
 };
 
-global.resource_url = function(url) {
+export function resource_url(url) {
     url = Statamic.$config.get('resourceUrl') + '/' + url;
     return tidy_url(url);
 };
 
-global.tidy_url = function(url) {
+export function tidy_url(url) {
     return url.replace(/([^:])(\/\/+)/g, '$1/')
 }
 
-global.relative_url = function(url) {
+export function relative_url(url) {
     return url.replace(/^(?:\/\/|[^/]+)*\//, '/');
 }
 
-global.file_icon = function(extension) {
-    return resource_url('img/filetypes/'+ extension +'.png');
-};
-
-global.dd = function(args) {
+export function dd(args) {
     console.log(args);
 };
 
-global.data_get = function(obj, path, fallback=null) {
+export function data_get(obj, path, fallback=null) {
     // Source: https://stackoverflow.com/a/22129960
     var properties = Array.isArray(path) ? path : path.split('.');
     var value = properties.reduce((prev, curr) => prev && prev[curr], obj);
     return value !== undefined ? value : fallback;
 };
 
-global.clone = function (value) {
+export function clone(value) {
     if (value === undefined) return undefined;
 
     return JSON.parse(JSON.stringify(value));
 }
 
-global.Cookies = require('cookies-js');
-
-global.tailwind_width_class = function (width) {
+export function tailwind_width_class(width) {
     const widths = {
         25: '1/4',
         33: '1/3',
@@ -59,18 +53,18 @@ global.tailwind_width_class = function (width) {
     return `w-${widths[width] || 'full'}`;
 }
 
-global.markdown = function (value) {
+export function markdown(value) {
     return marked(value);
 };
 
-global.__ = function (string, replacements) {
+export function __(string, replacements) {
     return translate(string, replacements);
 }
-global.__n = function (string, number, replacements) {
+export function __n(string, number, replacements) {
     return translateChoice(string, number, replacements);
 }
 
-global.utf8btoa = function (stringToEncode) {
+export function utf8btoa(stringToEncode) {
     // first we convert it to utf-8
     const utf8String = encodeURIComponent(stringToEncode)
       .replace(/%([0-9A-F]{2})/g, (_, code) => String.fromCharCode(`0x${code}`));

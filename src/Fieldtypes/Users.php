@@ -2,10 +2,13 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\UserType;
+use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Support\Arr;
 
 class Users extends Relationship
 {
@@ -30,6 +33,7 @@ class Users extends Relationship
                 'display' => __('Max Items'),
                 'instructions' => __('statamic::messages.max_items_instructions'),
                 'type' => 'integer',
+                'min' => 1,
             ],
             'mode' => [
                 'display' => __('Mode'),
@@ -69,13 +73,33 @@ class Users extends Relationship
 
     public function getIndexItems($request)
     {
-        return User::all()->map(function ($user) {
+        $query = User::query();
+
+        if ($search = $request->search) {
+            $query->where('name', 'like', '%'.$search.'%');
+        }
+
+        if ($request->exclusions) {
+            $query->whereNotIn('id', $request->exclusions);
+        }
+
+        $userFields = function ($user) {
             return [
                 'id' => $user->id(),
                 'title' => $user->name(),
                 'email' => $user->email(),
             ];
-        })->values();
+        };
+
+        if ($request->boolean('paginate', true)) {
+            $users = $query->paginate();
+
+            $users->getCollection()->transform($userFields);
+
+            return $users;
+        }
+
+        return $query->get()->map($userFields);
     }
 
     protected function getColumns()
@@ -88,38 +112,49 @@ class Users extends Relationship
 
     public function preProcessIndex($data)
     {
-        if (! $data) {
-            return collect();
-        }
-
-        $users = $this->augment($data);
-
-        if ($this->config('max_items') === 1) {
-            $users = collect([$users]);
-        }
-
-        return $users->map(function ($user) {
-            if (! $user) {
-                return null;
-            }
-
+        return $this->getItemsForPreProcessIndex($data)->map(function ($user) {
             return [
                 'id' => $user->id(),
-                'title' => $user->get('name', $user->email()),
+                'title' => $user->name(),
                 'edit_url' => $user->editUrl(),
                 'published' => null,
             ];
         })->filter()->values();
     }
 
-    protected function augmentValue($value)
+    protected function getItemsForPreProcessIndex($values): Collection
     {
-        return User::find($value);
+        if (! $augmented = $this->augment($values)) {
+            return collect();
+        }
+
+        return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
     }
 
-    protected function shallowAugmentValue($value)
+    public function augment($values)
     {
-        return $value->toShallowAugmentedCollection();
+        $ids = Arr::wrap($values);
+
+        $query = (new OrderedQueryBuilder(User::query(), $ids))->whereIn('id', $ids);
+
+        return $this->config('max_items') === 1 ? $query->first() : $query;
+    }
+
+    public function shallowAugment($values)
+    {
+        $items = $this->augment($values);
+
+        if ($this->config('max_items') === 1) {
+            $items = collect([$items]);
+        } else {
+            $items = $items->get();
+        }
+
+        $items = $items->filter()->map(function ($item) {
+            return $item->toShallowAugmentedCollection();
+        })->collect();
+
+        return $this->config('max_items') === 1 ? $items->first() : $items;
     }
 
     protected function getCreateItemUrl()

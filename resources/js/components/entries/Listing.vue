@@ -48,6 +48,7 @@
 
                     <data-list-bulk-actions
                         :url="actionUrl"
+                        :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -75,7 +76,7 @@
                         </template>
                         <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
-                                <dropdown-item :text="__('View')" :external-link="entry.permalink" v-if="entry.viewable" />
+                                <dropdown-item :text="__('View')" :external-link="entry.permalink" v-if="entry.viewable && entry.permalink" />
                                 <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" v-if="entry.editable" />
                                 <div class="divider" v-if="entry.actions.length" />
                                 <data-list-inline-actions
@@ -93,6 +94,7 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
+                    :show-totals="true"
                     @page-selected="selectPage"
                     @per-page-changed="changePerPage"
                 />
@@ -124,6 +126,12 @@ export default {
             currentSite: this.site,
             initialSite: this.site,
         }
+    },
+
+    computed: {
+        actionContext() {
+            return {collection: this.collection};
+        },
     },
 
     watch: {

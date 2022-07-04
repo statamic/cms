@@ -7,11 +7,27 @@ use Statamic\Fields\Fieldtype;
 
 class Range extends Fieldtype
 {
+    protected $categories = ['controls'];
+
     protected function configFieldItems(): array
     {
         return [
             'hidden' => [
                 'type' => 'hidden',
+                'width' => 50,
+            ],
+            'min' => [
+                'display' => __('Min'),
+                'instructions' => __('statamic::fieldtypes.range.config.min'),
+                'type' => 'integer',
+                'default' => 0,
+                'width' => 50,
+            ],
+            'max' => [
+                'display' => __('Max'),
+                'instructions' => __('statamic::fieldtypes.range.config.max'),
+                'type' => 'integer',
+                'default' => 100,
                 'width' => 50,
             ],
             'step' => [
@@ -21,26 +37,13 @@ class Range extends Fieldtype
                 'default' => 1,
                 'width' => 50,
             ],
-            'min' => [
-                'display' => __('Min'),
-                'instructions' => __('statamic::fieldtypes.range.config.min'),
-                'type' => 'integer',
-                'default' => 0,
-                'width' => 33,
-            ],
-            'max' => [
-                'display' => __('Max'),
-                'instructions' => __('statamic::fieldtypes.range.config.max'),
-                'type' => 'integer',
-                'default' => 100,
-                'width' => 33,
-            ],
             'default' => [
-                'display' => __('Default'),
-                'instructions' => __('statamic::fieldtypes.any.config.default'),
-                'type' => 'integer',
+                'display' => __('Default Value'),
+                'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'input_type' => 'number',
                 'default' => null,
-                'width' => 33,
+                'width' => 50,
             ],
             'prepend' => [
                 'display' => __('Prepend'),
@@ -54,13 +57,12 @@ class Range extends Fieldtype
                 'type' => 'text',
                 'width' => 50,
             ],
-            'default' => [
-                'display' => __('Default Value'),
-                'instructions' => __('statamic::messages.fields_default_instructions'),
-                'type' => 'text',
-                'width' => 50,
-            ],
         ];
+    }
+
+    public function process($data)
+    {
+        return (int) $data;
     }
 
     public function toGqlType()

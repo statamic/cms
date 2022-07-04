@@ -64,6 +64,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | New User Groups
+    |--------------------------------------------------------------------------
+    |
+    | When registering new users through the user:register_form tag, these
+    | groups will automatically be applied to your newly created users.
+    |
+    */
+
+    'new_user_groups' => [
+        //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Password Brokers
     |--------------------------------------------------------------------------
     |

@@ -2,23 +2,24 @@
 
     <div class="replicator-fieldtype-container">
 
-        <div class="absolute top-0 right-0 p-3 text-2xs" v-if="config.collapse !== 'accordion' && values.length > 0">
+        <div class="absolute top-0 right-0 p-3 text-2xs" v-if="config.collapse !== 'accordion' && value.length > 0">
             <button @click="collapseAll" class="text-blue hover:text-black mr-1" v-text="__('Collapse All')" />
             <button @click="expandAll" class="text-blue hover:text-black" v-text="__('Expand All')" />
         </div>
 
         <sortable-list
-            v-model="values"
+            :value="value"
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
             constrain-dimensions
+            @input="sorted($event)"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
             <div slot-scope="{}" class="replicator-set-container">
                 <replicator-set
-                    v-for="(set, index) in values"
+                    v-for="(set, index) in value"
                     :key="set._id"
                     :index="index"
                     :values="set"
@@ -29,18 +30,21 @@
                     :sortable-handle-class="sortableHandleClass"
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
-                    :error-key-prefix="errorKeyPrefix || handle"
+                    :field-path-prefix="fieldPathPrefix || handle"
+                    :has-error="setHasError(index)"
                     :previews="previews[set._id]"
+                    :can-add-set="canAddSet"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
+                    @duplicated="duplicateSet(set._id)"
                     @updated="updated"
                     @meta-updated="updateSetMeta(set._id, $event)"
                     @removed="removed(set, index)"
                     @focus="focused = true"
                     @blur="blurred"
-                    @previews-updated="previews[set._id] = $event"
+                    @previews-updated="updateSetPreviews(set._id, $event)"
                 >
-                    <template v-slot:picker v-if="index !== values.length-1 && canAddSet">
+                    <template v-slot:picker v-if="index !== value.length-1 && canAddSet">
                         <set-picker
                             class="replicator-set-picker-between"
                             :sets="setConfigs"
@@ -54,7 +58,7 @@
         <set-picker v-if="canAddSet"
             :last="true"
             :sets="setConfigs"
-            :index="values.length"
+            :index="value.length"
             @added="addSet" />
 
     </div>
@@ -78,20 +82,25 @@ export default {
         SetPicker,
     },
 
+    inject: ['storeName'],
+
     data() {
         return {
-            values: this.value,
             focused: false,
-            collapsed: this.meta.collapsed,
-            previews: this.meta.previews,
+            collapsed: clone(this.meta.collapsed),
         }
     },
 
     computed: {
+
+        previews() {
+            return this.meta.previews;
+        },
+
         canAddSet() {
             if (this.isReadOnly) return false;
 
-            return !this.config.max_sets || this.values.length < this.config.max_sets;
+            return !this.config.max_sets || this.value.length < this.config.max_sets;
         },
 
         setConfigs() {
@@ -104,8 +113,11 @@ export default {
 
         sortableHandleClass() {
             return `${this.name}-sortable-handle`;
-        }
+        },
 
+        storeState() {
+            return this.$store.state.publish[this.storeName] || {};
+        }
     },
 
     methods: {
@@ -115,37 +127,69 @@ export default {
         },
 
         updated(index, set) {
-            let oldValues = clone(this.values);
-            let newValues = clone(this.values);
-
-            newValues.splice(index, 1, set);
-
-            if (JSON.stringify(oldValues) !== JSON.stringify(newValues)) {
-                this.values = newValues;
-            }
+            this.update([...this.value.slice(0, index), set, ...this.value.slice(index + 1)]);
         },
 
         removed(set, index) {
             this.removeSetMeta(set._id);
-            this.values.splice(index, 1);
+
+            this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
+        },
+
+        sorted(value) {
+            this.update(value);
         },
 
         addSet(handle, index) {
-            let set = Object.assign({}, this.meta.defaults[handle], {
+            const set = {
+                ...this.meta.defaults[handle],
                 _id: `set-${uniqid()}`,
                 type: handle,
                 enabled: true,
-            });
+            };
 
-            let previews = {};
-            Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
-            this.previews = Object.assign({}, this.previews, { [set._id]: previews });
+            this.updateSetPreviews(set._id, {});
 
             this.updateSetMeta(set._id, this.meta.new[handle]);
 
-            this.values.splice(index, 0, set);
+            this.update([
+                ...this.value.slice(0, index),
+                set,
+                ...this.value.slice(index)
+            ]);
 
             this.expandSet(set._id);
+        },
+
+        duplicateSet(old_id) {
+            const index = this.value.findIndex(v => v._id === old_id);
+            const old = this.value[index];
+            const set = {
+                ...old,
+                _id: `set-${uniqid()}`,
+            };
+
+            this.updateSetPreviews(set._id, {});
+
+            this.updateSetMeta(set._id, this.meta.existing[old_id]);
+
+            this.update([
+                ...this.value.slice(0, index + 1),
+                set,
+                ...this.value.slice(index + 1)
+            ]);
+            
+            this.expandSet(set._id);
+        },
+
+        updateSetPreviews(id, previews) {
+            this.updateMeta({
+                ...this.meta,
+                previews: {
+                    ...this.meta.previews,
+                    [id]: previews,
+                },
+            });
         },
 
         collapseSet(id) {
@@ -167,7 +211,7 @@ export default {
         },
 
         collapseAll() {
-            this.collapsed = _.pluck(this.values, '_id');
+            this.collapsed = _.pluck(this.value, '_id');
         },
 
         expandAll() {
@@ -181,6 +225,12 @@ export default {
                 }
             }, 1);
         },
+
+        setHasError(index) {
+            const prefix = `${this.fieldPathPrefix || this.handle}.${index}.`;
+
+            return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
+        },
     },
 
     mounted() {
@@ -188,17 +238,6 @@ export default {
     },
 
     watch: {
-
-        value(value) {
-            this.values = value;
-        },
-
-        values: {
-            deep: true,
-            handler(values) {
-                this.update(values);
-            }
-        },
 
         focused(focused, oldFocused) {
             if (focused === oldFocused) return;
@@ -212,17 +251,9 @@ export default {
             }, 1);
         },
 
-        collapsed(value) {
-            const meta = this.meta;
-            meta.collapsed = value;
-            this.updateMeta(meta);
+        collapsed(collapsed) {
+            this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
         },
-
-        previews(previews) {
-            let meta = this.meta;
-            meta.previews = previews;
-            this.updateMeta(meta);
-        }
 
     }
 

@@ -5,6 +5,7 @@
         :enabled="generate"
         :from="source"
         :separator="separator"
+        :language="language"
         v-model="slug"
     >
         <text-fieldtype
@@ -60,6 +61,12 @@ export default {
             const field = this.config.from || 'title';
 
             return this.$store.state.publish[this.store].values[field];
+        },
+
+        language() {
+            if (! this.store) return;
+            const targetSite = this.$store.state.publish[this.store].site;
+            return targetSite ? Statamic.$config.get('sites').find(site => site.handle === targetSite).lang : null;
         }
 
     },
@@ -71,7 +78,7 @@ export default {
         },
 
         slug(slug) {
-            this.update(slug);
+            this.updateDebounced(slug);
         }
 
     },

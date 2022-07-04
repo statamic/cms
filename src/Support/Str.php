@@ -85,6 +85,8 @@ class Str extends \Illuminate\Support\Str
 
     public static function slug($string, $separator = '-', $language = 'en')
     {
+        $string = (string) $string;
+
         // Statamic is a-OK with underscores in slugs.
         $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
 
@@ -176,12 +178,17 @@ class Str extends \Illuminate\Support\Str
                 return str_replace(' ', '%###%##%', $matches[0]);
             }, $value);
 
-            // step 2, replace all spaces based on params with &nbsp;
+            // step 2, replace all tabs and spaces based on params with &nbsp;
             $value = preg_replace_callback("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s]\s)([^\s]*\s?){{$words}}(<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>)/", function ($matches) {
-                return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));
+                return preg_replace('/([[:blank:]])/', '&nbsp;', rtrim($matches[0]));
             }, $value);
 
-            // step 3, re-replace the code from step 1 with spaces
+            // Step 3, handle potential nested list orphans
+            $value = preg_replace_callback("/(?<!<[li])([^\s]\s)([^\s]*\s?){{$words}}(<(?:ol|ul)>)/", function ($matches) {
+                return preg_replace('/[[:blank:]]/', '&nbsp;', rtrim($matches[0]));
+            }, $value);
+
+            // step 4, re-replace the code from step 1 with spaces
             return str_replace('%###%##%', ' ', $value);
 
         // otherwise
@@ -262,5 +269,22 @@ class Str extends \Illuminate\Support\Str
     public static function replace($string, $search, $replace)
     {
         return StaticStringy::replace($string, $search, $replace);
+    }
+
+    public static function studly($value)
+    {
+        $key = $value;
+
+        if (isset(parent::$studlyCache[$key])) {
+            return parent::$studlyCache[$key];
+        }
+
+        $words = explode(' ', str_replace(['-', '_'], ' ', $value));
+
+        $studlyWords = array_map(function ($word) {
+            return parent::ucfirst($word);
+        }, $words);
+
+        return parent::$studlyCache[$key] = implode($studlyWords);
     }
 }
