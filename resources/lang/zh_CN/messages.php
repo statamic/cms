@@ -71,7 +71,6 @@ return [
     'fields_instructions_instructions' => '显示在字段的显示标签下，就像文本一样。支持Markdown。',
     'fields_instructions_position_instructions' => '在字段上方或下方显示指示。',
     'fields_listable_instructions' => '控制此字段列的可见性。',
-    'fields_read_only_instructions' => '禁用控制面板中的编辑。',
     'fieldset_import_fieldset_instructions' => '要导入的字段集。',
     'fieldset_import_prefix_instructions' => '导入每个字段时应应用的前缀。例如。hero_',
     'fieldset_intro' => '字段集是蓝图的可选伴侣，允许您创建要在蓝图中使用的部分。',

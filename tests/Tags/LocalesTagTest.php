@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
+use Statamic\Fields\Value;
 use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -429,6 +430,23 @@ HTML;
         $this->assertEquals(
             '',
             $this->tag('{{ locales self="false" }}you should not see this{{ /locales }}', ['id' => '1'])
+        );
+    }
+
+    /** @test */
+    public function it_displays_nothing_when_context_id_is_null()
+    {
+        $entry = (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->data(['title' => 'hello'])
+            ->make();
+
+        $value = new Value(null, 'id', null, $entry);
+
+        $this->assertEquals(
+            '',
+            $this->tag('{{ locales }}you should not see this{{ /locales }}', ['id' => $value])
         );
     }
 }

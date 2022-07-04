@@ -8,11 +8,26 @@ export default {
             this.setIframeAttributes(iframe);
 
             const container = this.$refs.contents;
-            container.firstChild
-                ? container.replaceChild(iframe, container.firstChild)
-                : container.appendChild(iframe);
 
-            // todo: maintain scroll position
+            if (! container.firstChild) {
+                container.appendChild(iframe);
+                return;
+            }
+
+            let isSameOrigin = url.startsWith('/') || new URL(url).hostname === window.location.host;
+
+            let scroll = isSameOrigin ? [
+                container.firstChild.contentWindow.scrollX ?? 0,
+                container.firstChild.contentWindow.scrollY ?? 0
+            ] : null;
+
+            container.replaceChild(iframe, container.firstChild);
+
+            if (isSameOrigin) {
+                setTimeout(() => {
+                    iframe.contentWindow.scrollTo(...scroll);
+                }, 200);
+            }
         },
 
         setIframeAttributes(iframe) {

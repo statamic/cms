@@ -422,6 +422,8 @@ class FieldsTest extends TestCase
                 'append' => null,
                 'antlers' => false,
                 'default' => null,
+                'visibility' => 'visible',
+                'read_only' => false, // deprecated
             ],
             [
                 'handle' => 'two',
@@ -436,6 +438,8 @@ class FieldsTest extends TestCase
                 'antlers' => false,
                 'placeholder' => null,
                 'default' => null,
+                'visibility' => 'visible',
+                'read_only' => false, // deprecated
             ],
         ], $fields->toPublishArray());
     }
@@ -491,6 +495,8 @@ class FieldsTest extends TestCase
                 'required' => false,
                 'antlers' => false,
                 'default' => null,
+                'visibility' => 'visible',
+                'read_only' => false, // deprecated
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -507,6 +513,8 @@ class FieldsTest extends TestCase
                 'required' => false,
                 'antlers' => false,
                 'default' => null,
+                'visibility' => 'visible',
+                'read_only' => false, // deprecated
             ],
         ], $fields->toPublishArray());
     }
@@ -876,5 +884,41 @@ class FieldsTest extends TestCase
         $this->assertIsArray($types['two']);
         $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $types['two']['type']);
         $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['two']['type']->getWrappedType());
+    }
+
+    /** @test */
+    public function it_sets_the_parent_on_all_fields()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+        ]);
+
+        $collection = $fields->all();
+        $this->assertNull($collection['one']->parent());
+        $this->assertNull($collection['two']->parent());
+
+        $fields->setParent('foo');
+        $collection = $fields->all();
+        $this->assertEquals('foo', $collection['one']->parent());
+        $this->assertEquals('foo', $collection['two']->parent());
+    }
+
+    /** @test */
+    public function it_sets_the_parentfield_on_all_fields()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+        ]);
+
+        $collection = $fields->all();
+        $this->assertNull($collection['one']->parentField());
+        $this->assertNull($collection['two']->parentField());
+
+        $fields->setParentField('foo');
+        $collection = $fields->all();
+        $this->assertEquals('foo', $collection['one']->parentField());
+        $this->assertEquals('foo', $collection['two']->parentField());
     }
 }

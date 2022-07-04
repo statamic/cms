@@ -73,13 +73,33 @@ class Users extends Relationship
 
     public function getIndexItems($request)
     {
-        return User::all()->map(function ($user) {
+        $query = User::query();
+
+        if ($search = $request->search) {
+            $query->where('name', 'like', '%'.$search.'%');
+        }
+
+        if ($request->exclusions) {
+            $query->whereNotIn('id', $request->exclusions);
+        }
+
+        $userFields = function ($user) {
             return [
                 'id' => $user->id(),
                 'title' => $user->name(),
                 'email' => $user->email(),
             ];
-        })->values();
+        };
+
+        if ($request->boolean('paginate', true)) {
+            $users = $query->paginate();
+
+            $users->getCollection()->transform($userFields);
+
+            return $users;
+        }
+
+        return $query->get()->map($userFields);
     }
 
     protected function getColumns()

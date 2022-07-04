@@ -16,19 +16,19 @@ class StacksTest extends ParserTestCase
         $template = <<<'EOT'
 BEFORE{{ stack:scripts }}AFTER
 
-{{ push:scripts }}
+{{ push:scripts trim="true" }}
 Push 1
 {{ /push:scripts }}
 
-{{ prepend:scripts }}
+{{ prepend:scripts trim="true" }}
 Prepend 1
 {{ /prepend:scripts }}
 
-{{ push:scripts }}
+{{ push:scripts trim="true" }}
 Push 2
 {{ /push:scripts }}
 
-{{ prepend:scripts }}
+{{ prepend:scripts trim="true" }}
 Prepend 2
 {{ /prepend:scripts }}
 EOT;
@@ -86,28 +86,16 @@ EOT;
     public function test_stacks_can_be_created_out_of_order()
     {
         $layoutTemplate = <<<'LAYOUT'
-{{ push:example }}
-Layout Push 1
-{{ /push:example }}
-{{ push:example }}
-Layout Push 2
-{{ /push:example }}
+{{ push:example }}Layout Push 1{{ /push:example }}
+{{ push:example }}Layout Push 2{{ /push:example }}
 {{ template_content }}
-{{ push:example }}
-Layout Push 3
-{{ /push:example }}
-{{ push:example }}
-Layout Push 4
-{{ /push:example }}
+{{ push:example }}Layout Push 3{{ /push:example }}
+{{ push:example }}Layout Push 4{{ /push:example }}
 LAYOUT;
 
         $templateTemplate = <<<'TEMPLATE'
-{{ push:example }}
-Template Push 1
-{{ /push:example  }}
-{{ push:example }}
-Template Push 2
-{{ /push:example  }}
+{{ push:example }}Template Push 1{{ /push:example  }}
+{{ push:example }}Template Push 2{{ /push:example  }}
 {{ content }}
 {{ stack:example }}
 
@@ -165,5 +153,149 @@ TEMPLATE;
             ->assertStatus(200);
 
         $this->assertSame('Home Page', trim($response->getContent()));
+    }
+
+    public function test_whitespace_can_be_preserved_inside_stacks()
+    {
+        $template = <<<'EOT'
+<body class="{{ stack:modifiers }}">
+
+{{ push:modifiers }} class-one{{ /push:modifiers }}
+{{ push:modifiers }} class-two{{ /push:modifiers }}
+</body>
+EOT;
+
+        $this->assertStringContainsString('<body class=" class-one class-two">', $this->renderString($template, []));
+    }
+
+    public function test_stack_items_can_be_retrieved()
+    {
+        $template = <<<'EOT'
+<body class="{{ stack:modifiers }}{{ unless first }} {{ /unless }}{{ value }}{{ /stack:modifiers }}">
+
+{{ push:modifiers }}class-one{{ /push:modifiers }}
+{{ push:modifiers }}class-two{{ /push:modifiers }}
+EOT;
+
+        $this->assertStringContainsString('<body class="class-one class-two">', $this->renderString($template, []));
+    }
+
+    public function test_array_stack_items_can_be_used_in_multiple_places()
+    {
+        $template = <<<'EOT'
+{{ stack:items }}<a:{{ value }}>{{ /stack:items }}
+
+{{ push:items }}item-one{{ /push:items }}
+{{ push:items }}item-two{{ /push:items }}
+
+{{ stack:items }}<b:{{ value }}>{{ /stack:items }}
+EOT;
+
+        $result = $this->renderString($template);
+
+        $this->assertStringContainsString('<a:item-one><a:item-two>', $result);
+        $this->assertStringContainsString('<b:item-one><b:item-two>', $result);
+    }
+
+    public function test_array_stacks_when_not_pushed()
+    {
+        $template = <<<'EOT'
+{{ stack:items }}<a:{{ value }}>{{ /stack:items }}
+
+
+{{ stack:items }}<b:{{ value }}>{{ /stack:items }}
+EOT;
+
+        $this->assertSame('', trim($this->renderString($template)));
+    }
+
+    public function test_array_stacks_when_only_pushing_to_one()
+    {
+        $template = <<<'EOT'
+{{ stack:items }}<a:{{ value }}>{{ /stack:items }}
+
+{{ push:items }}item-one{{ /push:items }}
+{{ push:items }}item-two{{ /push:items }}
+
+{{ stack:items_two }}<b:{{ value }}>{{ /stack:items_two }}
+EOT;
+
+        $this->assertSame('<a:item-one><a:item-two>', trim($this->renderString($template)));
+    }
+
+    public function test_stack_replacements_are_removed_if_nothing_is_pushed_to_them_on_not_found()
+    {
+        $layoutTemplate = <<<'LAYOUT'
+{{ stack:head }}
+{{ template_content }}
+{{ stack:footer }}
+LAYOUT;
+
+        $templateTemplate = <<<'TEMPLATE'
+{{ not_found }}
+TEMPLATE;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', $layoutTemplate);
+        $this->viewShouldReturnRaw('errors.404', '404');
+        $this->viewShouldReturnRaw('home', $templateTemplate);
+
+        $this->createPage('home', [
+            'with' => [
+                'title' => 'Home Page',
+                'template' => 'home',
+            ],
+        ]);
+
+        $response = $this->get('/home');
+
+        $this->assertSame('404', trim($response->getContent()));
+    }
+
+    public function test_subsequent_requests_clears_stack_state()
+    {
+        $layoutTemplate = <<<'LAYOUT'
+{{ stack:head }}
+{{ template_content }}
+{{ stack:footer }}
+LAYOUT;
+
+        $templateTemplate = <<<'TEMPLATE'
+{{ title }}
+{{ push:head}}value-1{{ /push:head }}
+{{ push:footer}}value-2{{ /push:footer }}
+TEMPLATE;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', $layoutTemplate);
+        $this->viewShouldReturnRaw('home', $templateTemplate);
+
+        $this->createPage('home', [
+            'with' => [
+                'title' => 'Home Page',
+                'content' => 'This is the home page.',
+                'template' => 'home',
+            ],
+        ]);
+
+        $response = $this->get('/home')
+            ->assertStatus(200);
+
+        $responseOneContent = trim($response->getContent());
+
+        $responseTwo = $this->get('/home')->assertStatus(200);
+
+        $responseTwoContent = trim($responseTwo->getContent());
+
+        $expected = <<<'EOT'
+value-1
+Home Page
+
+
+value-2
+EOT;
+
+        $this->assertSame($expected, $responseOneContent);
+        $this->assertSame($expected, $responseTwoContent);
     }
 }
