@@ -46,6 +46,26 @@
                         class="btn btn-icon icon icon-trash"
                         :alt="__('Remove')"></button>
                 </div>
+
+                <div class="asset-controls" v-if="readOnly">
+                    <button
+                        v-if="asset.url && (asset.isImage || asset.isAudio || asset.isVideo) && this.canDownload"
+                        @click="open"
+                        class="btn btn-icon"
+                        :alt="__('Open in a new window')"
+                    >
+                        <svg-icon name="external-link" class="h-4 my-1"/>
+                    </button>
+
+                    <button
+                        v-if="asset.allowDownloading && this.canDownload"
+                        @click="download"
+                        class="btn btn-icon"
+                        :alt="__('Download file')"
+                    >
+                        <svg-icon name="download" class="h-4 my-1"/>
+                    </button>
+                </div>
             </div>
         </div>
 
