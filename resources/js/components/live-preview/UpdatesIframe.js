@@ -24,9 +24,13 @@ export default {
             container.replaceChild(iframe, container.firstChild);
 
             if (isSameOrigin) {
-                setTimeout(() => {
-                    iframe.contentWindow.scrollTo(...scroll);
-                }, 200);
+                let iframeContentWindow = iframe.contentWindow;
+                const iframeScrollUpdate = (event) => {
+                    iframeContentWindow.scrollTo(...scroll);
+                };
+
+                iframeContentWindow.addEventListener('DOMContentLoaded', iframeScrollUpdate, true);
+                iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
             }
         },
 
