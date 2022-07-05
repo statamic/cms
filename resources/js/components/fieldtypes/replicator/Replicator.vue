@@ -33,6 +33,7 @@
                     :field-path-prefix="fieldPathPrefix || handle"
                     :has-error="setHasError(index)"
                     :previews="previews[set._id]"
+                    :show-field-previews="config.previews"
                     :can-add-set="canAddSet"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
@@ -178,7 +179,7 @@ export default {
                 set,
                 ...this.value.slice(index + 1)
             ]);
-            
+
             this.expandSet(set._id);
         },
 
