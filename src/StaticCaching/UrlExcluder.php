@@ -2,7 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
-interface Excluder
+interface UrlExcluder
 {
     /**
      * Determine whether URL should be excluded from caching.
@@ -10,5 +10,5 @@ interface Excluder
      * @param  string  $url  Url.
      * @return bool
      */
-    public function __invoke(string $url): bool;
+    public function isExcluded(string $url): bool;
 }

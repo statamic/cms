@@ -5,8 +5,8 @@ namespace Tests\StaticCaching;
 use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Mockery;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
-use Statamic\StaticCaching\Excluder;
 use Tests\TestCase;
 
 class CacherTest extends TestCase
@@ -176,60 +176,21 @@ class CacherTest extends TestCase
     }
 
     /** @test */
-    public function excludes_urls()
+    public function it_asks_the_url_excluder_if_a_url_should_be_excluder()
     {
-        $cacher = $this->cacher(['exclude' => ['/blog']]);
+        $mock = Mockery::mock(UrlExcluder::class);
+        $mock->shouldReceive('isExcluded')->with('/foo')->andReturnTrue()->once();
+        $mock->shouldReceive('isExcluded')->with('/bar')->andReturnFalse()->once();
+        app()->instance('mock-url-excluder', $mock);
 
-        $this->assertTrue($cacher->isExcluded('/blog'));
-        $this->assertFalse($cacher->isExcluded('/blog/post'));
-    }
-
-    /** @test */
-    public function excludes_wildcard_urls()
-    {
-        $cacher = $this->cacher(['exclude' => [
-            '/blog/*', // The slash indicates "only child pages"
-            '/news*',   // No slash would get the "news" page, child pages, and any page with the substring.
+        config(['statamic.static_caching.exclude' => [
+            'class' => 'mock-url-excluder',
         ]]);
 
-        $this->assertTrue($cacher->isExcluded('/blog/post'));
-        $this->assertFalse($cacher->isExcluded('/blog'));
+        $cacher = $this->cacher();
 
-        $this->assertTrue($cacher->isExcluded('/news'));
-        $this->assertTrue($cacher->isExcluded('/news/article'));
-        $this->assertTrue($cacher->isExcluded('/newspaper'));
-    }
-
-    /** @test */
-    public function excludes_dynamic_urls()
-    {
-        $cacher = $this->cacher(['exclude' => [
-            'class' => TestExcluder::class,
-            'urls' => ['/static-url'],
-        ]]);
-
-        $this->assertTrue($cacher->isExcluded('/static-url'));
-        $this->assertTrue($cacher->isExcluded('/dynamic-url'));
-        $this->assertFalse($cacher->isExcluded('/cached-url'));
-    }
-
-    /** @test */
-    public function url_exclusions_ignore_query_strings()
-    {
-        $cacher = $this->cacher(['exclude' => ['/blog']]);
-
-        $this->assertTrue($cacher->isExcluded('/blog?page=1'));
-    }
-
-    /** @test */
-    public function url_exclusions_trim_the_base_url()
-    {
-        $cacher = $this->cacher([
-            'base_url' => 'http://example.com',
-            'exclude' => ['/blog'],
-        ]);
-
-        $this->assertTrue($cacher->isExcluded('http://example.com/blog'));
+        $this->assertTrue($cacher->isExcluded('/foo'));
+        $this->assertFalse($cacher->isExcluded('/bar'));
     }
 
     private function cacher($config = [])
@@ -254,13 +215,5 @@ class TestCacher extends AbstractCacher
 
     public function invalidateUrl($url)
     {
-    }
-}
-
-class TestExcluder implements Excluder
-{
-    public function __invoke(string $url): bool
-    {
-        return $url === '/dynamic-url';
     }
 }
