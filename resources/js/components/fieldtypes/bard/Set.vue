@@ -132,7 +132,7 @@ export default {
         },
 
         showFieldPreviews() {
-            return this.options.bard.config.show_field_previews;
+            return this.options.bard.config.previews;
         }
 
     },
