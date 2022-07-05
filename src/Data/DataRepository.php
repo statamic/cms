@@ -44,7 +44,7 @@ class DataRepository
 
     public function findByRequestUrl($url)
     {
-        $site = Site::findByUrl($url);
+        $site = Site::findByUrl($url) ?? Site::current();
 
         $url = $site->relativePath($url);
 
