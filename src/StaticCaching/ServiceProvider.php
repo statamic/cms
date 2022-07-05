@@ -44,7 +44,7 @@ class ServiceProvider extends LaravelServiceProvider
             $urls = $config['urls'] ?? $config;
 
             return new DefaultUrlExcluder(
-                $app[Cacher::class],
+                $app[Cacher::class]->getBaseUrl(),
                 $urls
             );
         });

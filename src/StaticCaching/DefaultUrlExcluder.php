@@ -6,13 +6,18 @@ use Statamic\Support\Str;
 
 class DefaultUrlExcluder implements UrlExcluder
 {
-    protected $cacher;
+    protected $baseUrl;
     protected $exclusions;
 
-    public function __construct(Cacher $cacher, array $exclusions)
+    public function __construct(string $baseUrl, array $exclusions)
     {
-        $this->cacher = $cacher;
+        $this->baseUrl = $baseUrl;
         $this->exclusions = $exclusions;
+    }
+
+    public function getBaseUrl(): string
+    {
+        return $this->baseUrl;
     }
 
     public function getExclusions(): array
@@ -25,7 +30,7 @@ class DefaultUrlExcluder implements UrlExcluder
         // Query strings should be ignored.
         $url = explode('?', $url)[0];
 
-        $url = Str::removeLeft($url, $this->cacher->getBaseUrl());
+        $url = Str::removeLeft($url, $this->baseUrl);
 
         foreach ($this->exclusions as $excluded) {
             if (Str::endsWith($excluded, '*') && Str::startsWith($url, substr($excluded, 0, -1))) {

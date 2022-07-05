@@ -3,12 +3,23 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Mockery;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultUrlExcluder;
 use Statamic\StaticCaching\UrlExcluder;
 use Tests\TestCase;
 
 class UrlExcluderTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $mock = Mockery::mock(Cacher::class);
+        $mock->shouldReceive('getBaseUrl')->andReturn('http://example.com');
+        app()->instance(Cacher::class, $mock);
+    }
+
     /** @test */
     public function it_defaults_to_the_default_excluder_when_only_urls_are_defined()
     {
@@ -21,6 +32,7 @@ class UrlExcluderTest extends TestCase
 
         $this->assertInstanceOf(DefaultUrlExcluder::class, $excluder);
         $this->assertEquals(['/one', '/two'], $excluder->getExclusions());
+        $this->assertEquals('http://example.com', $excluder->getBaseUrl());
     }
 
     /** @test */

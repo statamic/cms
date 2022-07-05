@@ -2,18 +2,13 @@
 
 namespace Tests\StaticCaching;
 
-use Mockery;
-use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultUrlExcluder;
 
 class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
 {
     private function excluder(array $urls, string $baseUrl = 'http://localhost')
     {
-        $cacher = Mockery::mock(Cacher::class);
-        $cacher->shouldReceive('getBaseUrl')->andReturn($baseUrl);
-
-        return new DefaultUrlExcluder($cacher, $urls);
+        return new DefaultUrlExcluder($baseUrl, $urls);
     }
 
     /** @test */
