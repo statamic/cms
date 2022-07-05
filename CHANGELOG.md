@@ -1,5 +1,36 @@
 # Release Notes
 
+## 3.3.18 (2022-07-05)
+
+### What's new
+- Added `vite` tag. [#6271](https://github.com/statamic/cms/issues/6271) by @lokmanm
+- Add column selector to users listing. [#6185](https://github.com/statamic/cms/issues/6185) by @jesseleite
+- Allow assets to trigger static caching invalidation. [#5489](https://github.com/statamic/cms/issues/5489) by @FrittenKeeZ
+- Allow `templates` fieldtype to be scoped to a folder. [#6222](https://github.com/statamic/cms/issues/6222) by @jacksleight
+- Pagination size options are configurable. [#6215](https://github.com/statamic/cms/issues/6215) by @jonassiewertsen
+- Add `visibility` field config with new `hidden` option. [#5958](https://github.com/statamic/cms/issues/5958) by @jesseleite
+- Add `truncate` method to collections and taxonomies. [#6220](https://github.com/statamic/cms/issues/6220) by @jacksleight
+- Add open and download buttons for readonly assets. [#6299](https://github.com/statamic/cms/issues/6299) by @RafaelKr
+
+### What's improved
+- Improved Live preview scroll position consistency. [#6295](https://github.com/statamic/cms/issues/6295) by @ryanmitchell
+- Runtime: Allows parameters to begin with numbers. [#6288](https://github.com/statamic/cms/issues/6288) by @JohnathonKoster
+- Add file size to `assets` fieldtype row tooltip. [#6294](https://github.com/statamic/cms/issues/6294) by @ExpDev07
+- View class is more easily extendable. [#6272](https://github.com/statamic/cms/issues/6272) by @dimitri-koenig
+- German translations. [#6297](https://github.com/statamic/cms/issues/6297) by @helloDanuk
+
+### What's fixed
+- Fix status on newly propagated entries. [#5684](https://github.com/statamic/cms/issues/5684) by @j3ll3yfi5h
+- Don't show hidden blueprints on the `entries` fieldtype. [#6285](https://github.com/statamic/cms/issues/6285) by @duncanmcclean
+- Fix blueprint parent not being set. [#5999](https://github.com/statamic/cms/issues/5999) by @aerni
+- Do not remove dots from URLs. [#5468](https://github.com/statamic/cms/issues/5468) by @Konafets
+- Only attempt to scroll live preview when on the same origin. [#6282](https://github.com/statamic/cms/issues/6282) by @jasonvarga
+- Remove pagination totals in widgets and selectors. [#6279](https://github.com/statamic/cms/issues/6279) by @jacksleight
+- Update search indexes for assets, terms, and users. [#6044](https://github.com/statamic/cms/issues/6044) by @okaufmann
+- Use `implode()` instead of `join()` alias to appease style fixers. [#6300](https://github.com/statamic/cms/issues/6300) by @jesseleite
+
+
+
 ## 3.3.17 (2022-06-30)
 
 ### What's new
