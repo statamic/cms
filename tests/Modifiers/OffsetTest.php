@@ -6,10 +6,13 @@ use Illuminate\Support\Collection;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
+/**
+ * @group array
+ */
 class OffsetTest extends TestCase
 {
     /** @test */
-    public function it_offsets_arrays()
+    public function it_offsets_arrays(): void
     {
         $arr = ['one', 'two', 'three'];
 
@@ -18,7 +21,7 @@ class OffsetTest extends TestCase
     }
 
     /** @test */
-    public function it_offsets_collections()
+    public function it_offsets_collections(): void
     {
         $collection = collect(['one', 'two', 'three']);
 

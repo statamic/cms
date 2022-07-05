@@ -139,7 +139,7 @@ class Structure extends Tags
                 'last'        => $index === count($tree) - 1,
                 'is_current'  => ! is_null($url) && rtrim($url, '/') === rtrim($this->currentUrl, '/'),
                 'is_parent'   => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
-                'is_external' => URL::isExternal($absoluteUrl),
+                'is_external' => URL::isExternal((string) $absoluteUrl),
             ]);
         })->filter()->values();
 

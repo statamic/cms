@@ -5,6 +5,9 @@ namespace Tests\Modifiers;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
+/**
+ * @group array
+ */
 class CompactTest extends TestCase
 {
     protected $data = [
@@ -26,7 +29,7 @@ class CompactTest extends TestCase
     }
 
     /** @test */
-    public function compact_coverts_variables_to_array()
+    public function compact_converts_variables_to_array()
     {
         $template = <<<'EOT'
 {{ foreach :array="'view:var_one, view:var_two, title, nested:variable:path'|compact" }}<{{ value }}>{{ /foreach }}

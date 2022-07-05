@@ -60,6 +60,11 @@ class TermQueryBuilder extends Builder
         return TermCollection::make($items);
     }
 
+    protected function getItems($keys)
+    {
+        return Facades\Term::applySubstitutions(parent::getItems($keys));
+    }
+
     protected function getFilteredKeys()
     {
         $taxonomies = empty($this->taxonomies)

@@ -74,6 +74,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
                 Route::post('preview', 'EntryPreviewController@edit')->name('collections.entries.preview.edit');
                 Route::get('preview', 'EntryPreviewController@show')->name('collections.entries.preview.popout');
                 Route::patch('/', 'EntriesController@update')->name('collections.entries.update');
+                Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
             });
         });
     });
@@ -141,7 +142,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('assets-fieldtype', 'FieldtypeController@index');
         Route::resource('assets', 'AssetsController')->parameters(['assets' => 'encoded_asset']);
         Route::get('assets/{encoded_asset}/download', 'AssetsController@download')->name('assets.download');
-        Route::get('thumbnails/{encoded_asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
+        Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
         Route::get('svgs/{encoded_asset}', 'SvgController@show')->name('assets.svgs.show');
         Route::get('pdfs/{encoded_asset}', 'PdfController@show')->name('assets.pdfs.show');
     });
@@ -177,6 +178,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('addons/editions', 'AddonEditionsController');
 
     Route::group(['namespace' => 'Forms'], function () {
+        Route::post('forms/actions', 'ActionController@run')->name('forms.actions.run');
+        Route::post('forms/actions/list', 'ActionController@bulkActions')->name('forms.actions.bulk');
         Route::post('forms/{form}/submissions/actions', 'SubmissionActionController@run')->name('forms.submissions.actions.run');
         Route::post('forms/{form}/submissions/actions/list', 'SubmissionActionController@bulkActions')->name('forms.submissions.actions.bulk');
         Route::resource('forms', 'FormsController');

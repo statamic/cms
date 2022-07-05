@@ -2,6 +2,7 @@
 
 namespace Tests\Search;
 
+use Illuminate\Support\Carbon;
 use Statamic\Search\QueryBuilder;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -51,6 +52,102 @@ class QueryBuilderTest extends TestCase
     public function results_are_found_using_or_where_in()
     {
         $this->markTestSkipped();
+    }
+
+    /** @test **/
+    public function results_are_found_using_where_date()
+    {
+        $items = $this->createWhereDateTestItems();
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereDate('test_date', '2021-11-15')->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereDate('test_date', 1637000264)->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereDate('test_date', '>=', '2021-11-15')->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_where_month()
+    {
+        $items = $this->createWhereDateTestItems();
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereMonth('test_date', 11)->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals(['a', 'b', 'c'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereMonth('test_date', '<', 11)->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals(['d'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_where_day()
+    {
+        $items = $this->createWhereDateTestItems();
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereDay('test_date', 15)->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereDay('test_date', '<', 15)->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['b', 'd'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_where_year()
+    {
+        $items = $this->createWhereDateTestItems();
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereYear('test_date', 2021)->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals(['a', 'b', 'c'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereYear('test_date', '<', 2021)->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals(['d'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_where_time()
+    {
+        $items = $this->createWhereDateTestItems();
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereTime('test_date', '09:00')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals(['b'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereTime('test_date', '>', '09:00')->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'd'], $results->map->reference->all());
+    }
+
+    private function createWhereDateTestItems()
+    {
+        return collect([
+            ['reference' => 'a', 'test_date' => Carbon::parse('2021-11-15 20:31:04')],
+            ['reference' => 'b', 'test_date' => Carbon::parse('2021-11-14 09:00:00')],
+            ['reference' => 'c', 'test_date' => Carbon::parse('2021-11-15 00:00:00')],
+            ['reference' => 'd', 'test_date' => Carbon::parse('2020-09-13 14:44:24')],
+            ['reference' => 'e', 'test_date' => null],
+        ]);
     }
 
     /** @test */
@@ -450,6 +547,23 @@ class QueryBuilderTest extends TestCase
 
         $this->assertCount(2, $results);
         $this->assertEquals(['a', 'c'], $results->map->reference->all());
+    }
+
+    /** @test */
+    public function results_are_found_using_offset()
+    {
+        $items = collect([
+            ['reference' => 'a'],
+            ['reference' => 'b'],
+            ['reference' => 'c'],
+            ['reference' => 'd'],
+        ]);
+
+        $query = (new FakeQueryBuilder($items))->withoutData();
+
+        $this->assertEquals(['a', 'b', 'c', 'd'], $query->get()->map->reference->all());
+
+        $this->assertEquals(['b', 'c', 'd'], $query->offset(1)->get()->map->reference->all());
     }
 }
 

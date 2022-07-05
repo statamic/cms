@@ -2,6 +2,7 @@
 
 namespace Statamic\Extend;
 
+use Composer\Package\Version\VersionParser;
 use Facades\Statamic\Licensing\LicenseManager;
 use ReflectionClass;
 use Statamic\Facades\File;
@@ -375,7 +376,12 @@ final class Addon
             return true;
         }
 
-        return version_compare($this->version, $this->latestVersion, '=');
+        $versionParser = new VersionParser;
+
+        $version = $versionParser->normalize($this->version);
+        $latestVersion = $versionParser->normalize($this->latestVersion);
+
+        return version_compare($version, $latestVersion, '=');
     }
 
     public function license()

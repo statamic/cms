@@ -2,6 +2,8 @@
 
 namespace Statamic\Query;
 
+use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Support\Str;
 
 class ResolveValue
@@ -12,7 +14,7 @@ class ResolveValue
 
         while (! empty($nameExploded)) {
             $name = array_shift($nameExploded);
-            $item = $this->getItemPartValue($item, $name);
+            $item = $this->resolveItemPartValue($item, $name);
 
             if (is_null($item)) {
                 return;
@@ -20,6 +22,15 @@ class ResolveValue
         }
 
         return $item;
+    }
+
+    private function resolveItemPartValue($item, $name)
+    {
+        $value = $this->getItemPartValue($item, $name);
+
+        return $value instanceof QueryableValue
+            ? $value->toQueryableValue()
+            : $value;
     }
 
     private function getItemPartValue($item, $name)
@@ -30,6 +41,10 @@ class ResolveValue
 
         if (is_scalar($item)) {
             return null;
+        }
+
+        if ($item instanceof ContainsQueryableValues) {
+            return $item->getQueryableValue($name);
         }
 
         if (method_exists($item, $method = Str::camel($name))) {

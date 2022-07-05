@@ -100,6 +100,7 @@ export default {
         this.codemirror = CodeMirror(this.$refs.codemirror, {
             value: this.value.code || '',
             mode: this.mode,
+            direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             addModeClass: true,
             keyMap: this.config.key_map,
             tabSize: this.config.indent_size,
@@ -109,6 +110,7 @@ export default {
             matchBrackets: true,
             readOnly: this.readOnlyOption,
             theme: this.exactTheme,
+            inputStyle: 'contenteditable',
         });
 
         this.codemirror.on('change', (cm) => {

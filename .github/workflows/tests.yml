@@ -13,29 +13,28 @@ jobs:
 
     strategy:
       matrix:
-        php: [7.4, 7.3, 7.2, 8.0, 8.1]
-        laravel: [8.*, 7.*, 6.*]
+        php: [7.4, 8.0, 8.1]
+        laravel: [8.*, 9.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
           - laravel: 8.*
-            framework: ^8.24.0
-          - laravel: 7.*
-            framework: ^7.30.4
-          - laravel: 6.*
-            framework: ^6.20.14
+            framework: ^8.48.0
+          - laravel: 9.*
+            framework: ^9.0
           - os: windows-latest
-            php: 8.0
+            php: 7.4
             laravel: 8.*
-            framework: ^8.24.0
+            framework: ^8.48.0
+            stability: prefer-stable
+          - os: windows-latest
+            php: 8.1
+            laravel: 9.*
+            framework: ^9.0
             stability: prefer-stable
         exclude:
-          - laravel: 8.*
-            php: 7.2
-          - laravel: 7.*
-            php: 8.1
-          - laravel: 6.*
-            php: 8.1
+          - laravel: 9.*
+            php: 7.4
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -79,6 +78,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v1
+
+      - name: Install required npm version
+        run: npm -g install npm@8.5.5
 
       - name: Install dependencies
         run: npm ci

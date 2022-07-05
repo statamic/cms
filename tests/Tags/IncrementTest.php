@@ -76,7 +76,7 @@ EOT;
 EOT;
 
         $this->assertSame(
-            'One-0-Two-10-Three-60-Four-70-',
+            'One-60-Two-70-Three-60-Four-70-',
             $this->tag($template, $this->data)
         );
     }

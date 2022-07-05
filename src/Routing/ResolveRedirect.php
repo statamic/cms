@@ -16,6 +16,10 @@ class ResolveRedirect
 
     public function resolve($redirect, $parent = null)
     {
+        if (is_null($redirect)) {
+            return null;
+        }
+
         if ($redirect === '@child') {
             $redirect = $this->firstChildUrl($parent);
         }

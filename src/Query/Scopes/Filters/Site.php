@@ -39,7 +39,9 @@ class Site extends Filter
 
     public function badge($values)
     {
-        return __('Site').': '.strtolower($values['site']);
+        $site = Facades\Site::get($values['site']);
+
+        return __('Site').': '.$site->name();
     }
 
     public function visibleTo($key)
