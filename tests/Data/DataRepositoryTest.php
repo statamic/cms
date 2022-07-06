@@ -7,6 +7,7 @@ use Mockery;
 use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Data\DataRepository;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -114,6 +115,11 @@ class DataRepositoryTest extends TestCase
      */
     public function it_finds_by_request_url($requestUrl, $entryId)
     {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
         config([
             'statamic.amp.enabled' => false,
             'statamic.amp.route' => 'plop',
@@ -128,10 +134,29 @@ class DataRepositoryTest extends TestCase
      */
     public function it_finds_by_request_url_with_amp_enabled($requestUrl, $entryId)
     {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
         config([
             'statamic.amp.enabled' => true,
             'statamic.amp.route' => 'plop',
         ]);
+
+        $this->findByRequestUrlTest($requestUrl, $entryId);
+    }
+
+    /**
+     * @test
+     * @dataProvider findByRequestUrlNoRootSiteProvider
+     */
+    public function it_finds_by_request_url_with_no_root_site($requestUrl, $entryId)
+    {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/en/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
 
         $this->findByRequestUrlTest($requestUrl, $entryId);
     }
@@ -206,18 +231,59 @@ class DataRepositoryTest extends TestCase
         ];
     }
 
+    public function findByRequestUrlNoRootSiteProvider()
+    {
+        return [
+            'root' => ['http://localhost', null],
+            'root with slash' => ['http://localhost/', null],
+            'root with query' => ['http://localhost?a=b', null],
+            'root with query and slash' => ['http://localhost/?a=b', null],
+
+            'missing' => ['http://localhost/unknown', null],
+            'missing with slash' => ['http://localhost/unknown/', null],
+            'missing with query' => ['http://localhost/unknown?a=b', null],
+            'missing with query and slash' => ['http://localhost/unknown/?a=b', null],
+
+            'home' => ['http://localhost/en', 'home'],
+            'home with slash' => ['http://localhost/en/', 'home'],
+            'home with query' => ['http://localhost/en?a=b', 'home'],
+            'home with query and slash' => ['http://localhost/en/?a=b', 'home'],
+
+            'fr home' => ['http://localhost/fr', 'le-home'],
+            'fr home with slash' => ['http://localhost/fr/', 'le-home'],
+            'fr home with query' => ['http://localhost/fr?a=b', 'le-home'],
+            'fr home with query and slash' => ['http://localhost/fr/?a=b', 'le-home'],
+
+            'dir' => ['http://localhost/en/foo', 'foo'],
+            'dir with slash' => ['http://localhost/en/foo/', 'foo'],
+            'dir with query' => ['http://localhost/en/foo?a=b', 'foo'],
+            'dir with query and slash' => ['http://localhost/en/foo/?a=b', 'foo'],
+
+            'fr dir' => ['http://localhost/fr/le-foo', 'le-foo'],
+            'fr dir with slash' => ['http://localhost/fr/le-foo/', 'le-foo'],
+            'fr dir with query' => ['http://localhost/fr/le-foo?a=b', 'le-foo'],
+            'fr dir with query and slash' => ['http://localhost/fr/le-foo/?a=b', 'le-foo'],
+        ];
+    }
+
     private function findByRequestUrlTest($requestUrl, $entryId)
     {
-        self::$functions->shouldReceive('method_exists')->with(EntryRepository::class, 'findByUri')->once()->andReturnTrue();
+        self::$functions->shouldReceive('method_exists')->with(EntryRepository::class, 'findByUri')->andReturnTrue();
         $this->data->setRepository('entry', EntryRepository::class);
 
-        $c = tap(Collection::make('pages')->routes('{slug}')->structureContents(['root' => true]))->save();
-        EntryFactory::collection('pages')->id('home')->slug('home')->create();
-        EntryFactory::collection('pages')->id('foo')->slug('foo')->create();
+        $c = tap(Collection::make('pages')->sites(['english', 'french'])->routes('{slug}')->structureContents(['root' => true]))->save();
+        EntryFactory::collection('pages')->id('home')->slug('home')->locale('english')->create();
+        EntryFactory::collection('pages')->id('foo')->slug('foo')->locale('english')->create();
+        EntryFactory::collection('pages')->id('le-home')->slug('le-home')->locale('french')->origin('home')->create();
+        EntryFactory::collection('pages')->id('le-foo')->slug('le-foo')->locale('french')->origin('foo')->create();
 
-        $c->structure()->in('en')->tree([
+        $c->structure()->in('english')->tree([
             ['entry' => 'home'],
             ['entry' => 'foo'],
+        ])->save();
+        $c->structure()->in('french')->tree([
+            ['entry' => 'le-home'],
+            ['entry' => 'le-foo'],
         ])->save();
 
         $found = $this->data->findByRequestUrl($requestUrl);
