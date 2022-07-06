@@ -53,7 +53,13 @@ return [
     */
 
     'exclude' => [
-        //
+
+        'class' => null,
+
+        'urls' => [
+            //
+        ],
+
     ],
 
     /*
