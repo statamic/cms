@@ -39,6 +39,8 @@ class BrowserController extends CpController
                 'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
+                'sort_field' => $container->sortField(),
+                'sort_direction' => $container->sortDirection(),
             ],
             'folder' => $path,
         ]);
@@ -75,6 +77,8 @@ class BrowserController extends CpController
 
         if ($request->sort) {
             $query->orderBy($request->sort, $request->order ?? 'asc');
+        } else {
+            $query->orderBy($container->sortField(), $container->sortDirection());
         }
 
         $assets = $query->paginate(request('perPage'));

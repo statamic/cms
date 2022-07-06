@@ -14,15 +14,17 @@ use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Ignition\Value as IgnitionViewValue;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class Parser
+class Parser implements ParserContract
 {
     // Instance state
     protected $cascade;
@@ -309,6 +311,10 @@ class Parser
                 $value = $value->toAugmentedArray();
             }
 
+            if ($value instanceof Values) {
+                $value = $value->toArray();
+            }
+
             // If the value of the current iteration is *not* already an array (ie. we're
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
@@ -387,7 +393,7 @@ class Parser
      *                        {{ var or anothervar }}
      *                        {{ var | modifier or anothervar }}
      * @param  array|object  $data  The data
-     * @return string
+     * @return string|void
      */
     protected function parseStringVariableTag($var, $text, $data)
     {
@@ -399,7 +405,7 @@ class Parser
         // Null coalescence through "or", "??" or "?:"
         if (Str::contains($var, [' or ', ' ?? ', ' ?: '])) {
             $isCoalesce = true;
-            $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, null, PREG_SPLIT_NO_EMPTY);
+            $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, -1, PREG_SPLIT_NO_EMPTY);
         } else {
             $isCoalesce = false;
             $vars = [$var];
@@ -568,9 +574,11 @@ class Parser
             // If there's a matching value in the context, we would have intentionally treated it as
             // a callback. If it's a query builder instance, we want to use the Query tag's index
             // method to handle the logic. We'll pass the builder into the builder parameter.
-            if (isset($data[$name])) {
-                if ($data[$name] instanceof Builder) {
-                    $parameters['builder'] = $data[$name];
+            [$exists, $value] = $this->getVariableExistenceAndValue($name, $data);
+            if ($exists) {
+                $value = $value instanceof Value ? $value->value() : $value;
+                if ($value instanceof Builder) {
+                    $parameters['builder'] = $value;
                     $name = 'query';
                 }
             }
@@ -643,7 +651,7 @@ class Parser
                 $replacement = $this->valueToLiteral($replacement);
             }
 
-            $text = $this->preg_replace('/'.preg_quote($tag, '/').'/m', addcslashes($replacement, '\\$'), $text, 1);
+            $text = $this->preg_replace('/'.preg_quote($tag, '/').'/m', addcslashes((string) $replacement, '\\$'), $text, 1);
             $text = $this->injectExtractions($text, 'nested_tag_pair');
         }
 
@@ -763,7 +771,7 @@ class Parser
                     [$if_true, $if_false] = explode(': ', $bits[1]);
 
                     // Build a PHP string to evaluate
-                    $conditional = '<?php echo('.$condition.') ? "'.addslashes($this->getVariable(trim($if_true), $data)).'" : "'.addslashes($this->getVariable(trim($if_false), $data)).'"; ?>';
+                    $conditional = '<?php echo('.$condition.') ? "'.addslashes($this->getVariable(trim($if_true), $data, '')).'" : "'.addslashes($this->getVariable(trim($if_false), $data, '')).'"; ?>';
 
                     // Do the evaluation
                     $output = stripslashes($this->parsePhp($conditional));
@@ -1052,13 +1060,18 @@ class Parser
             return $value->getBags() ? 'true' : 'false';
         } elseif (is_array($value)) {
             return ! empty($value) ? 'true' : 'false';
-        } elseif (is_object($value) and is_callable([$value, '__toString'])) {
+        } elseif (is_object($value) and method_exists($value, '__toString')) {
             return var_export((string) $value, true);
         } elseif (is_object($value)) {
             return 'true';
         } else {
             return var_export($value, true);
         }
+    }
+
+    public function valueWithNoparse($text)
+    {
+        return $this->extractNoparse(str_replace('{{', '@{{', $text));
     }
 
     /**
@@ -1233,6 +1246,10 @@ class Parser
 
         if ($context instanceof Value) {
             $context = $context->value();
+        }
+
+        if ($context instanceof Builder) {
+            $context = $context->get();
         }
 
         if ($context instanceof Augmentable) {

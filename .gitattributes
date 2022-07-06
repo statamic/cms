@@ -1,5 +1,5 @@
-* text eol=lf
-*.tar.gz text=auto
+* text=auto
+*.php eol=lf
 /.github export-ignore
 /tests export-ignore
 .babelrc export-ignore

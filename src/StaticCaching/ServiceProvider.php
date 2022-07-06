@@ -29,6 +29,25 @@ class ServiceProvider extends LaravelServiceProvider
                 $app['config']['statamic.static_caching.invalidation.rules']
             );
         });
+
+        $this->app->bind(UrlExcluder::class, function ($app) {
+            $class = config('statamic.static_caching.exclude.class') ?? DefaultUrlExcluder::class;
+
+            return $app[$class];
+        });
+
+        $this->app->bind(DefaultUrlExcluder::class, function ($app) {
+            $config = $app['config']['statamic.static_caching.exclude'];
+
+            // Before the urls sub-array was introduced, you could define
+            // the urls to be excluded at the top "exclude" array level.
+            $urls = $config['urls'] ?? $config;
+
+            return new DefaultUrlExcluder(
+                $app[Cacher::class]->getBaseUrl(),
+                $urls
+            );
+        });
     }
 
     public function boot()

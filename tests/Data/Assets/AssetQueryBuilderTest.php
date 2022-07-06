@@ -5,6 +5,7 @@ namespace Tests\Data\Assets;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -16,7 +17,7 @@ class AssetQueryBuilderTest extends TestCase
     {
         parent::setUp();
 
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
 
         Storage::disk('test')->put('a.jpg', '');
         Storage::disk('test')->put('b.txt', '');
@@ -71,7 +72,103 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['d', 'e'], $assets->map->filename()->all());
     }
 
+    private function createWhereDateTestAssets()
+    {
+        $blueprint = Blueprint::makeFromFields(['test_date' => ['type' => 'date', 'time_enabled' => true]]);
+        Blueprint::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+
+        Asset::find('test::a.jpg')->data(['test_date' => '2021-11-15 20:31:04'])->save();
+        Asset::find('test::b.txt')->data(['test_date' => '2021-11-14 09:00:00'])->save();
+        Asset::find('test::c.txt')->data(['test_date' => '2021-11-15 00:00:00'])->save();
+        Asset::find('test::d.jpg')->data(['test_date' => '2020-09-13 14:44:24'])->save();
+        Asset::find('test::e.jpg')->data(['test_date' => null])->save();
+    }
+
     /** @test **/
+    public function assets_are_found_using_where_date()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereDate('test_date', '2021-11-15')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereDate('test_date', 1637000264)->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereDate('test_date', '>=', '2021-11-15')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_month()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereMonth('test_date', 11)->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'b', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereMonth('test_date', '<', 11)->get();
+
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['d'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_day()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereDay('test_date', 15)->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereDay('test_date', '<', 15)->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['b', 'd'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_year()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereYear('test_date', 2021)->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'b', 'c'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereYear('test_date', '<', 2021)->get();
+
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['d'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_time()
+    {
+        $this->createWhereDateTestAssets();
+
+        $assets = $this->container->queryAssets()->whereTime('test_date', '09:00')->get();
+
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['b'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereTime('test_date', '>', '09:00')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'd'], $assets->map->filename()->all());
+    }
+
     public function assets_are_found_using_where_null()
     {
         Asset::find('test::a.jpg')->data(['text' => 'Text 1'])->save();
@@ -235,6 +332,93 @@ class AssetQueryBuilderTest extends TestCase
     }
 
     /** @test **/
+    public function assets_are_found_using_where_json_contains()
+    {
+        Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $assets = $this->container->queryAssets()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'c', 'e'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_json_doesnt_contain()
+    {
+        Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+        Asset::find('test::f.jpg')->data(['test_taxonomy' => ['taxonomy-1']])->save();
+
+        $assets = $this->container->queryAssets()->whereJsonDoesntContain('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['b', 'd', 'e'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->whereJsonDoesntContain('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['b', 'd', 'e'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_or_where_json_contains()
+    {
+        Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $assets = $this->container->queryAssets()->whereJsonContains('test_taxonomy', ['taxonomy-1'])->orWhereJsonContains('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['a', 'c', 'e'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_or_where_json_doesnt_contain()
+    {
+        Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+        Asset::find('test::f.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $assets = $this->container->queryAssets()->whereJsonContains('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntContain('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $assets);
+        $this->assertEquals(['a', 'c', 'b', 'd'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
+    public function assets_are_found_using_where_json_length()
+    {
+        Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $assets = $this->container->queryAssets()->whereJsonLength('test_taxonomy', 1)->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['b', 'e'], $assets->map->filename()->all());
+    }
+
+    /** @test **/
     public function assets_are_found_using_array_of_wheres()
     {
         $assets = $this->container->queryAssets()
@@ -289,5 +473,62 @@ class AssetQueryBuilderTest extends TestCase
 
         $this->assertCount(4, $entries);
         $this->assertEquals(['Post 1', 'Post 2', 'Post 5', 'Post 6'], $entries->map->foo->all());
+    }
+
+    /** @test */
+    public function it_can_get_assets_using_when()
+    {
+        $assets = $this->container->queryAssets()->when(true, function ($query) {
+            $query->where('filename', 'a');
+        })->get();
+
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['a'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->when(false, function ($query) {
+            $query->where('filename', 'a');
+        })->get();
+
+        $this->assertCount(6, $assets);
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $assets->map->filename()->all());
+    }
+
+    /** @test */
+    public function it_can_get_assets_using_unless()
+    {
+        $assets = $this->container->queryAssets()->unless(true, function ($query) {
+            $query->where('filename', 'a');
+        })->get();
+
+        $this->assertCount(6, $assets);
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $assets->map->filename()->all());
+
+        $assets = $this->container->queryAssets()->unless(false, function ($query) {
+            $query->where('filename', 'a');
+        })->get();
+
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['a'], $assets->map->filename()->all());
+    }
+
+    /** @test */
+    public function it_can_get_assets_using_tap()
+    {
+        $assets = $this->container->queryAssets()->tap(function ($query) {
+            $query->where('filename', 'a');
+        })->get();
+
+        $this->assertCount(1, $assets);
+        $this->assertEquals(['a'], $assets->map->filename()->all());
+    }
+
+    /** @test */
+    public function assets_are_found_using_offset()
+    {
+        $query = $this->container->queryAssets()->limit(3);
+
+        $this->assertEquals(['a.jpg', 'b.txt', 'c.txt'], $query->get()->map->path()->all());
+
+        $this->assertEquals(['b.txt', 'c.txt', 'd.jpg'], $query->offset(1)->get()->map->path()->all());
     }
 }

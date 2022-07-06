@@ -27,6 +27,7 @@
                     v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
                 <dropdown-list class="-mt-sm">
                     <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
+                    <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
@@ -35,14 +36,14 @@
         <div class="replicator-set-body" v-if="!collapsed">
             <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, fieldPath(field))"
                 :key="field.handle"
                 :field="field"
                 :meta="meta[field.handle]"
                 :value="values[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                :error-key="errorKey(field)"
+                :field-path="fieldPath(field)"
                 :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
@@ -104,7 +105,7 @@ export default {
             type: String,
             required: true
         },
-        errorKeyPrefix: {
+        fieldPathPrefix: {
             type: String,
             required: true
         },
@@ -118,8 +119,15 @@ export default {
         sortableHandleClass: {
             type: String
         },
+        canAddSet: {
+            type: Boolean,
+            default: true
+        },
         isReadOnly: Boolean,
         previews: Object,
+        showFieldPreviews: {
+            type: Boolean
+        }
     },
 
     computed: {
@@ -180,7 +188,7 @@ export default {
         },
 
         toggleEnabledState() {
-            Vue.set(this.values, 'enabled', ! this.values.enabled);
+            this.updated('enabled', ! this.values.enabled);
         },
 
         toggleCollapsedState() {
@@ -199,9 +207,13 @@ export default {
             this.$emit('expanded');
         },
 
-        errorKey(field) {
-            return `${this.errorKeyPrefix}.${this.index}.${field.handle}`;
-        }
+        duplicate() {
+            this.$emit('duplicated');
+        },
+
+        fieldPath(field) {
+            return `${this.fieldPathPrefix}.${this.index}.${field.handle}`;
+        },
 
     }
 

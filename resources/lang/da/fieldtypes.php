@@ -67,6 +67,7 @@ return [
     'hidden.title' => 'Hidden',
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
+    'link.config.container' => 'Vælg hvilken medie beholder, der skal bruges til dette felt.',
     'link.title' => 'Link',
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Aktiverer automatiske linjeskift.',

@@ -41,7 +41,7 @@ class TaxonomiesController extends CpController
             'taxonomies' => $taxonomies,
             'columns' => [
                 Column::make('title')->label(__('Title')),
-                Column::make('terms')->label(__('Terms')),
+                Column::make('terms')->label(__('Terms'))->numeric(true),
             ],
         ]);
     }
@@ -104,7 +104,7 @@ class TaxonomiesController extends CpController
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        if (Collection::find($handle)) {
+        if (Taxonomy::findByHandle($handle)) {
             throw new \Exception('Taxonomy already exists');
         }
 
@@ -132,6 +132,7 @@ class TaxonomiesController extends CpController
             'blueprints' => $taxonomy->termBlueprints()->map->handle()->all(),
             'collections' => $taxonomy->collections()->map->handle()->all(),
             'sites' => $taxonomy->sites()->all(),
+            'preview_targets' => $taxonomy->basePreviewTargets(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
@@ -159,7 +160,9 @@ class TaxonomiesController extends CpController
 
         $values = $fields->process()->values()->all();
 
-        $taxonomy->title($values['title']);
+        $taxonomy
+            ->title($values['title'])
+            ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
@@ -268,6 +271,33 @@ class TaxonomiesController extends CpController
                 ],
             ];
         }
+
+        $fields = array_merge($fields, [
+            'routing' => [
+                'display' => __('Routing & URLs'),
+                'fields' => [
+                    'preview_targets' => [
+                        'display' => __('Preview Targets'),
+                        'instructions' => __('statamic::messages.taxonomies_preview_targets_instructions'),
+                        'type' => 'grid',
+                        'fields' => [
+                            [
+                                'handle' => 'label',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                            [
+                                'handle' => 'format',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
         return Blueprint::makeFromSections($fields);
     }

@@ -9,13 +9,16 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Query\ItemQueryBuilder;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\GetsQuerySelectKeys;
+use Statamic\Tags\Concerns\QueriesConditions;
 
 class Structure extends Tags
 {
     use GetsQuerySelectKeys;
+    use QueriesConditions;
 
     protected $currentUrl;
     protected $siteAbsoluteUrl;
@@ -53,8 +56,8 @@ class Structure extends Tags
 
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
+            'query' => $this->query($handle),
             'include_home' => $this->params->get('include_home'),
-            'show_unpublished' => $this->params->get('show_unpublished', false),
             'site' => $this->params->get('site', Site::current()->handle()),
             'from' => $this->params->get('from'),
             'max_depth' => $this->params->get('max_depth'),
@@ -73,6 +76,46 @@ class Structure extends Tags
         }
 
         throw_unless(Nav::findByHandle($handle), new NavigationNotFoundException($handle));
+    }
+
+    protected function query($handle)
+    {
+        $query = new ItemQueryBuilder();
+
+        return Str::startsWith($handle, 'collection::')
+            ? $this->queryForCollection($query)
+            : $this->queryForNav($query);
+    }
+
+    protected function queryForCollection($query)
+    {
+        if (! $this->isQueryingStatus()) {
+            $this->queryStatus($query);
+        }
+        $this->queryConditions($query);
+
+        return $query;
+    }
+
+    protected function queryForNav($query)
+    {
+        return $this->queryStatus($query);
+    }
+
+    protected function queryStatus($query)
+    {
+        if (! $this->params->get('show_unpublished')) {
+            $query->whereIn('status', ['published', null]);
+        }
+
+        return $query;
+    }
+
+    protected function isQueryingStatus()
+    {
+        return
+            $this->isQueryingCondition('status') ||
+            $this->isQueryingCondition('published');
     }
 
     public function toArray($tree, $parent = null, $depth = 1)
@@ -94,23 +137,21 @@ class Structure extends Tags
                 'count'       => $index + 1,
                 'first'       => $index === 0,
                 'last'        => $index === count($tree) - 1,
-                'is_current'  => rtrim($this->currentUrl, '/') === rtrim($url, '/'),
-                'is_parent'   => $this->siteAbsoluteUrl === $absoluteUrl ? false : URL::isAncestorOf($this->currentUrl, $url),
-                'is_external' => URL::isExternal($absoluteUrl),
+                'is_current'  => ! is_null($url) && rtrim($url, '/') === rtrim($this->currentUrl, '/'),
+                'is_parent'   => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
+                'is_external' => URL::isExternal((string) $absoluteUrl),
             ]);
         })->filter()->values();
 
-        $this->addIsParent($pages);
+        $this->updateIsParent($pages);
 
         return $pages->all();
     }
 
-    protected function addIsParent($pages, &$parent = null)
+    protected function updateIsParent($pages, &$parent = null)
     {
         $pages->transform(function ($page) use (&$parent) {
-            $page['is_parent'] = false;
-
-            $this->addIsParent(collect($page['children'] ?? []), $page);
+            $this->updateIsParent(collect($page['children'] ?? []), $page);
 
             if ($parent && ($page['is_current'] || $page['is_parent'])) {
                 $parent['is_parent'] = true;

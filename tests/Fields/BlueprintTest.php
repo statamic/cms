@@ -5,8 +5,10 @@ namespace Tests\Fields;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Facades;
@@ -357,6 +359,8 @@ class BlueprintTest extends TestCase
                             'append' => null,
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                     ],
                 ],
@@ -378,6 +382,8 @@ class BlueprintTest extends TestCase
                             'component' => 'textarea',
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                     ],
                 ],
@@ -452,6 +458,8 @@ class BlueprintTest extends TestCase
                             'required' => false,
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                         [
                             'handle' => 'nested_deeper_two',
@@ -468,6 +476,8 @@ class BlueprintTest extends TestCase
                             'required' => false,
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                     ],
                 ],
@@ -561,7 +571,7 @@ class BlueprintTest extends TestCase
             ],
         ]]);
 
-        $fields = $blueprint->ensureFieldHasConfig('author', ['read_only' => true])->fields();
+        $fields = $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only'])->fields();
 
         $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
         $this->assertEquals(['type' => 'text'], $fields->get('content')->config());
@@ -569,7 +579,7 @@ class BlueprintTest extends TestCase
         $expectedConfig = [
             'type' => 'text',
             'do_not_touch_other_config' => true,
-            'read_only' => true,
+            'visibility' => 'read_only',
         ];
 
         $this->assertEquals($expectedConfig, $fields->get('author')->config());
@@ -1038,5 +1048,35 @@ class BlueprintTest extends TestCase
         $this->assertEquals('test', Facades\Antlers::parse('{{ blueprint }}', ['blueprint' => $blueprint]));
 
         $this->assertEquals('test Test', Facades\Antlers::parse('{{ blueprint }}{{ handle }} {{ title }}{{ /blueprint }}', ['blueprint' => $blueprint]));
+    }
+
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $blueprint
+            ->toAugmentedCollection()
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $this->assertInstanceOf(Arrayable::class, $blueprint);
+
+        collect($blueprint->toArray())
+            ->each(fn ($value, $key) => $this->assertEquals($value, $blueprint->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value, $blueprint[$key]));
+    }
+
+    /** @test */
+    public function it_resolves_itself_to_a_queryable_value()
+    {
+        $blueprint = (new Blueprint)->setHandle('test');
+        $this->assertInstanceOf(QueryableValue::class, $blueprint);
+        $this->assertEquals('test', $blueprint->toQueryableValue());
     }
 }

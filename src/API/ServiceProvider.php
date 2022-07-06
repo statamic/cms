@@ -2,8 +2,10 @@
 
 namespace Statamic\API;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Statamic\Http\Middleware\HandleToken;
 use Statamic\Http\Resources\API\Resource;
 
 class ServiceProvider extends LaravelServiceProvider
@@ -29,5 +31,7 @@ class ServiceProvider extends LaravelServiceProvider
     public function boot()
     {
         Event::subscribe(Subscriber::class);
+
+        $this->app[Kernel::class]->appendMiddlewareToGroup(config('statamic.api.middleware'), HandleToken::class);
     }
 }

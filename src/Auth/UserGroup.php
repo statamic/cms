@@ -2,6 +2,8 @@
 
 namespace Statamic\Auth;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -11,7 +13,7 @@ use Statamic\Events\UserGroupSaved;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
 
-abstract class UserGroup implements UserGroupContract, Augmentable
+abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess, Arrayable
 {
     protected $title;
     protected $handle;

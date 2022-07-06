@@ -6,10 +6,14 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+/**
+ * @group array
+ */
 class GroupByTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
@@ -45,6 +49,47 @@ class GroupByTest extends TestCase
                     'group' => 'baseball',
                     'items' => collect([
                         ['sport' => 'baseball', 'team' => 'yankees'],
+                    ]),
+                ],
+            ]),
+        ]);
+
+        $this->assertEquals($expected, $this->modify($items, 'sport'));
+    }
+
+    /** @test */
+    public function it_groups_values_instances()
+    {
+        // eg. grids
+
+        $items = [
+            $one = new Values(['sport' => 'basketball', 'team' => 'jazz']),
+            $two = new Values(['sport' => 'baseball', 'team' => 'yankees']),
+            $three = new Values(['sport' => 'basketball', 'team' => 'bulls']),
+        ];
+
+        $expected = collect([
+            'basketball' => collect([
+                $one,
+                $three,
+            ]),
+            'baseball' => collect([
+                $two,
+            ]),
+            'groups' => collect([
+                [
+                    'key' => 'basketball',
+                    'group' => 'basketball',
+                    'items' => collect([
+                        $one,
+                        $three,
+                    ]),
+                ],
+                [
+                    'key' => 'baseball',
+                    'group' => 'baseball',
+                    'items' => collect([
+                        $two,
                     ]),
                 ],
             ]),
@@ -201,13 +246,13 @@ class GroupByTest extends TestCase
             ]),
         ]);
 
-        $this->assertEquals($expected, $this->modify($items, 'when|a'));
+        $this->assertEquals($expected, $this->modify($items, ['when', 'a']));
     }
 
     /** @test */
     public function it_groups_by_date_with_custom_group_format()
     {
-        Carbon::setTestNow(now()->setMonth(9)->startOfDay());
+        Carbon::setTestNow(Carbon::parse('2022-09-01'));
 
         $items = [
             ['when' => now()->setHour(14), 'title' => '2pm'],
@@ -245,7 +290,7 @@ class GroupByTest extends TestCase
             ]),
         ]);
 
-        $this->assertEquals($expected, $this->modify($items, 'when|a|F A'));
+        $this->assertEquals($expected, $this->modify($items, ['when', 'a', 'F A']));
     }
 
     public function modify($items, $value)

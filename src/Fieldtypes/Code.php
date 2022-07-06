@@ -57,7 +57,6 @@ class Code extends Fieldtype
                     'xml' => 'XML',
                     'yaml-frontmatter' => 'YAML',
                 ],
-                'width' => 50,
             ],
             'mode_selectable' => [
                 'display' => __('Selectable Mode'),
@@ -126,6 +125,10 @@ class Code extends Fieldtype
 
     public function process($value)
     {
+        if (! $value) {
+            return null;
+        }
+
         if (! $this->isModeSelectable()) {
             return $value['code'];
         }

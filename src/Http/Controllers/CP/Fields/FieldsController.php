@@ -77,7 +77,6 @@ class FieldsController extends CpController
             'length',
             'reference',
             'resource',
-            'type',
             'unless',
             'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
         ];
@@ -111,7 +110,7 @@ class FieldsController extends CpController
                     'below' => __('Below'),
                 ],
                 'default' => 'above',
-                'width' => 50,
+                'width' => 33,
             ],
             'listable' => [
                 'display' => __('Listable'),
@@ -124,10 +123,22 @@ class FieldsController extends CpController
                     'false' => __('Not listable'),
                 ],
                 'default' => 'hidden',
-                'width' => 50,
+                'width' => 33,
                 'unless' => [
                     'type' => 'section',
                 ],
+            ],
+            'visibility' => [
+                'display' => __('Visibility'),
+                'instructions' => __('statamic::messages.fields_visibility_instructions'),
+                'options' => [
+                    'visible' => __('Visible'),
+                    'read_only' => __('Read Only'),
+                    'hidden' => __('Hidden'),
+                ],
+                'default' => 'visible',
+                'type' => 'select',
+                'width' => 33,
             ],
         ]);
 

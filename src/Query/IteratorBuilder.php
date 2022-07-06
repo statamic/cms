@@ -27,7 +27,7 @@ abstract class IteratorBuilder extends Builder
             $items = $items->multisort($sort)->values();
         }
 
-        return $this->limitItems($items);
+        return $this->limitItems($items)->values();
     }
 
     protected function getFilteredItems()
@@ -164,9 +164,157 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function filterWhereJsonContains($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return ! empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntContain($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (! is_array($value)) {
+                return true;
+            }
+
+            return empty(array_intersect($value, $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonLength($entries, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (! is_array($value)) {
+                return false;
+            }
+
+            return $this->{$method}(count($value), $where['value']);
+        });
+    }
+
+    protected function filterWhereDate($entries, $where)
+    {
+        $method = $this->operatorToCarbonMethod($where['operator']);
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $value->copy()->startOfDay()->$method($where['value']);
+        });
+    }
+
+    protected function filterWhereMonth($entries, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $this->{$method}($value->format('m'), $where['value']);
+        });
+    }
+
+    protected function filterWhereDay($entries, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $this->{$method}($value->format('j'), $where['value']);
+        });
+    }
+
+    protected function filterWhereYear($entries, $where)
+    {
+        $method = 'filterTest'.$this->operators[$where['operator']];
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            return $this->{$method}($value->format('Y'), $where['value']);
+        });
+    }
+
+    protected function filterWhereTime($entries, $where)
+    {
+        $method = $this->operatorToCarbonMethod($where['operator']);
+
+        return $entries->filter(function ($entry) use ($method, $where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value)) {
+                return false;
+            }
+
+            $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
+
+            return $value->$method($compareValue);
+        });
+    }
+
     protected function getFilterItemValue($item, $column)
     {
         return (new ResolveValue)($item, $column);
+    }
+
+    protected function operatorToCarbonMethod($operator)
+    {
+        $method = 'eq';
+
+        switch ($operator) {
+            case '<>':
+            case '!=':
+                $method = 'neq';
+            break;
+
+            case '>':
+                $method = 'gt';
+            break;
+
+            case '>=':
+                $method = 'gte';
+            break;
+
+            case '<':
+                $method = 'lt';
+            break;
+
+            case '<=':
+                $method = 'lte';
+            break;
+        }
+
+        return $method;
     }
 
     abstract protected function getBaseItems();

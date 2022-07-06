@@ -2,6 +2,8 @@
 
 namespace Statamic\Entries;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
@@ -25,7 +27,7 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Collection implements Contract, AugmentableContract
+class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayable
 {
     use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
 
@@ -53,6 +55,7 @@ class Collection implements Contract, AugmentableContract
     protected $taxonomies = [];
     protected $requiresSlugs = true;
     protected $titleFormats = [];
+    protected $previewTargets = [];
 
     public function __construct()
     {
@@ -197,6 +200,17 @@ class Collection implements Contract, AugmentableContract
                 return config('statamic.amp.enabled') && $ampable;
             })
             ->args(func_get_args());
+    }
+
+    public function absoluteUrl($site = null)
+    {
+        if (! $mount = $this->mount()) {
+            return null;
+        }
+
+        $site = $site ?? $this->sites()->first();
+
+        return optional($mount->in($site))->absoluteUrl();
     }
 
     public function url($site = null)
@@ -469,7 +483,31 @@ class Collection implements Contract, AugmentableContract
 
     public function fileData()
     {
-        $array = Arr::except($this->toArray(), [
+        $formerlyToArray = [
+            'title' => $this->title,
+            'handle' => $this->handle,
+            'routes' => $this->routes,
+            'dated' => $this->dated,
+            'past_date_behavior' => $this->pastDateBehavior(),
+            'future_date_behavior' => $this->futureDateBehavior(),
+            'default_publish_state' => $this->defaultPublishState,
+            'amp' => $this->ampable,
+            'sites' => $this->sites,
+            'propagate' => $this->propagate(),
+            'template' => $this->template,
+            'layout' => $this->layout,
+            'cascade' => $this->cascade->all(),
+            'blueprints' => $this->blueprints,
+            'search_index' => $this->searchIndex,
+            'orderable' => $this->orderable(),
+            'structured' => $this->hasStructure(),
+            'mount' => $this->mount,
+            'taxonomies' => $this->taxonomies,
+            'revisions' => $this->revisions,
+            'title_format' => $this->titleFormats,
+        ];
+
+        $array = Arr::except($formerlyToArray, [
             'handle',
             'past_date_behavior',
             'future_date_behavior',
@@ -494,6 +532,7 @@ class Collection implements Contract, AugmentableContract
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
             ],
+            'preview_targets' => $this->previewTargetsForFile(),
         ]));
 
         if (! Site::hasMultiple()) {
@@ -531,33 +570,6 @@ class Collection implements Contract, AugmentableContract
                 return $this->revisionsEnabled() ? false : $state;
             })
             ->args(func_get_args());
-    }
-
-    public function toArray()
-    {
-        return [
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'routes' => $this->routes,
-            'dated' => $this->dated,
-            'past_date_behavior' => $this->pastDateBehavior(),
-            'future_date_behavior' => $this->futureDateBehavior(),
-            'default_publish_state' => $this->defaultPublishState,
-            'amp' => $this->ampable,
-            'sites' => $this->sites,
-            'propagate' => $this->propagate(),
-            'template' => $this->template,
-            'layout' => $this->layout,
-            'cascade' => $this->cascade->all(),
-            'blueprints' => $this->blueprints,
-            'search_index' => $this->searchIndex,
-            'orderable' => $this->orderable(),
-            'structured' => $this->hasStructure(),
-            'mount' => $this->mount,
-            'taxonomies' => $this->taxonomies,
-            'revisions' => $this->revisions,
-            'title_format' => $this->titleFormats,
-        ];
     }
 
     public function pastDateBehavior($behavior = null)
@@ -668,6 +680,13 @@ class Collection implements Contract, AugmentableContract
         return true;
     }
 
+    public function truncate()
+    {
+        $this->queryEntries()->get()->each->delete();
+
+        return true;
+    }
+
     public function mount($page = null)
     {
         return $this
@@ -698,6 +717,62 @@ class Collection implements Contract, AugmentableContract
                 });
             })
             ->args(func_get_args());
+    }
+
+    public function previewTargets($targets = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('previewTargets')
+            ->getter(function () {
+                return $this->basePreviewTargets()->merge($this->additionalPreviewTargets());
+            })
+            ->args(func_get_args());
+    }
+
+    public function basePreviewTargets()
+    {
+        $targets = empty($this->previewTargets)
+            ? $this->defaultPreviewTargets()
+            : $this->previewTargets;
+
+        return collect($targets);
+    }
+
+    public function addPreviewTargets($targets)
+    {
+        Facades\Collection::addPreviewTargets($this->handle, $targets);
+
+        return $this;
+    }
+
+    public function additionalPreviewTargets()
+    {
+        return Facades\Collection::additionalPreviewTargets($this->handle);
+    }
+
+    private function defaultPreviewTargets()
+    {
+        return [['label' => 'Entry', 'format' => '{permalink}']];
+    }
+
+    private function previewTargetsForFile()
+    {
+        $targets = $this->previewTargets;
+
+        if ($targets === $this->defaultPreviewTargets()) {
+            return null;
+        }
+
+        return collect($targets)->map(function ($target) {
+            if (! $target['format']) {
+                return null;
+            }
+
+            return [
+                'label' => $target['label'],
+                'url' => $target['format'],
+            ];
+        })->filter()->values()->all();
     }
 
     public function deleteFile()

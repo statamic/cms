@@ -27,12 +27,12 @@
         :initial-is-working-copy="{{ $str::bool($hasWorkingCopy) }}"
         :initial-is-root="{{ $str::bool($isRoot) }}"
         :revisions-enabled="{{ $str::bool($revisionsEnabled) }}"
-        {{-- :amp="{{ $str::bool($term->ampable()) }}" --}}
         :initial-read-only="{{ $str::bool($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         create-another-url="{{ cp_route('taxonomies.terms.create', [$taxonomy, $locale]) }}"
         listing-url="{{ cp_route('taxonomies.show', $taxonomy) }}"
+        :preview-targets="{{ json_encode($previewTargets) }}"
     ></term-publish-form>
 
 @endsection

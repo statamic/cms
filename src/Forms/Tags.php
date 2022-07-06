@@ -7,7 +7,9 @@ use DebugBar\DebugBarException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
+use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -37,7 +39,7 @@ class Tags extends BaseTags
      *
      * Allows you to inject the formset into the context so child tags can use it.
      *
-     * @return string
+     * @return array
      */
     public function set()
     {
@@ -57,8 +59,17 @@ class Tags extends BaseTags
         $form = $this->form();
 
         $data = $this->getFormSession($this->sessionHandle());
-        $data['fields'] = $this->getFields($this->sessionHandle());
+
+        $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
+
+        $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver);
         $data['honeypot'] = $form->honeypot();
+
+        if ($jsDriver) {
+            $data['js_driver'] = $jsDriver->handle();
+            $data['show_field'] = $jsDriver->copyShowFieldToFormData($data['fields']);
+            $data = array_merge($data, $jsDriver->addToFormData($form, $data));
+        }
 
         $this->addToDebugBar($data, $formHandle);
 
@@ -66,12 +77,20 @@ class Tags extends BaseTags
             $this->params->put('files', $form->hasFiles());
         }
 
-        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect', 'files']);
+        $knownParams = array_merge(static::HANDLE_PARAM, [
+            'redirect', 'error_redirect', 'allow_request_redirect', 'csrf', 'files', 'js',
+        ]);
 
-        $action = $this->params->get('action', route('statamic.forms.submit', $formHandle));
+        $action = $this->params->get('action', $form->actionUrl());
         $method = $this->params->get('method', 'POST');
 
-        $html = $this->formOpen($action, $method, $knownParams);
+        $attrs = [];
+
+        if ($jsDriver) {
+            $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams, $attrs);
 
         $params = [];
 
@@ -89,13 +108,17 @@ class Tags extends BaseTags
 
         $html .= $this->formClose();
 
+        if ($jsDriver) {
+            return $jsDriver->render($html);
+        }
+
         return $html;
     }
 
     /**
      * Maps to {{ form:errors }}.
      *
-     * @return string
+     * @return bool|string
      */
     public function errors()
     {
@@ -129,7 +152,7 @@ class Tags extends BaseTags
     /**
      * Maps to {{ form:submission }}.
      *
-     * @return array
+     * @return array|void
      */
     public function submission()
     {
@@ -182,16 +205,73 @@ class Tags extends BaseTags
      * Get fields with extra data for looping over and rendering.
      *
      * @param  string  $sessionHandle
+     * @param  JsDriver  $jsDriver
      * @return array
      */
-    protected function getFields($sessionHandle)
+    protected function getFields($sessionHandle, $jsDriver)
     {
         return $this->form()->fields()
-            ->map(function ($field) use ($sessionHandle) {
-                return $this->getRenderableField($field, $sessionHandle);
+            ->map(function ($field) use ($sessionHandle, $jsDriver) {
+                return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
+                    return $jsDriver
+                        ? $this->mergeJsDataWithRenderableFieldData($data, $field, $jsDriver)
+                        : $data;
+                });
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Merge JS field data with renderable field data.
+     *
+     * @param  array  $data
+     * @param  \Statamic\Fields\Field  $field
+     * @param  JsDriver  $jsDriver
+     * @return array
+     */
+    protected function mergeJsDataWithRenderableFieldData($data, $field, $jsDriver)
+    {
+        $data['js_driver'] = $jsDriver->handle();
+        $data['js_attributes'] = $this->renderAttributes($jsDriver->addToRenderableFieldAttributes($field));
+
+        return array_merge($data, $jsDriver->addToRenderableFieldData($field, $data));
+    }
+
+    /**
+     * Parse JS param to get driver and related options.
+     *
+     * @param  null|string  $value
+     * @param  \Statamic\Forms\Form  $form
+     * @return bool|JsDriver
+     */
+    protected function parseJsParamDriverAndOptions($value, $form)
+    {
+        if (! $value) {
+            return false;
+        }
+
+        $handle = $value;
+        $options = [];
+
+        if (Str::contains($value, ':')) {
+            $options = explode(':', $value);
+            $handle = array_shift($options);
+        }
+
+        $class = app('statamic.form-js-drivers')->get($handle);
+
+        if (! $class) {
+            throw new \Exception("Cannot find JS driver class for [{$handle}]!");
+        }
+
+        $instance = new $class($form, $options);
+
+        if (! $instance instanceof JsDriver) {
+            throw new \Exception("JS driver must implement [Statamic\Forms\JsDrivers\JsDriver] interface!");
+        }
+
+        return $instance;
     }
 
     /**

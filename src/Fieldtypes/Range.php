@@ -40,7 +40,8 @@ class Range extends Fieldtype
             'default' => [
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),
-                'type' => 'integer',
+                'type' => 'text',
+                'input_type' => 'number',
                 'default' => null,
                 'width' => 50,
             ],
@@ -57,6 +58,11 @@ class Range extends Fieldtype
                 'width' => 50,
             ],
         ];
+    }
+
+    public function process($data)
+    {
+        return (int) $data;
     }
 
     public function toGqlType()

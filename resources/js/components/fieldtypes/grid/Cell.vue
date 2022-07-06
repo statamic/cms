@@ -9,7 +9,7 @@
                 :meta="meta"
                 :handle="field.handle"
                 :name-prefix="namePrefix"
-                :error-key-prefix="errorKey"
+                :field-path-prefix="fieldPath"
                 :read-only="grid.isReadOnly"
                 @input="$emit('updated', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -59,7 +59,7 @@ export default {
             type: Array,
             required: true
         },
-        errorKey: {
+        fieldPath: {
             type: String,
             required: true
         }
