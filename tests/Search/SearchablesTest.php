@@ -344,18 +344,21 @@ class SearchablesTest extends TestCase
             'config' => config('statamic.search.indexes.default'),
         ]);
 
-        $customCollection = collect([
-            ['title' => 'Custom 1'],
-            ['title' => 'Custom 2'],
-        ]);
+        $a = new TestCustomSearchable(['title' => 'Custom 1']);
+        $b = new TestCustomSearchable(['title' => 'Custom 2']);
+        $c = new TestCustomSearchable(['title' => 'Custom 3']);
 
-        Searchables::register('custom', function ($resource, $config) use ($customCollection) {
-            return $customCollection;
+        // Todo: rework how custom searchables are registered.
+        Searchables::register('custom', function ($resource, $config) use ($a, $b) {
+            return collect([$a, $b]);
         });
 
         $searchables = new Searchables($index);
 
-        $this->assertEquals($customCollection, $searchables->all());
+        $this->assertEquals([$a, $b], $searchables->all()->all());
+        $this->assertTrue($searchables->contains($a));
+        $this->assertTrue($searchables->contains($b));
+        $this->assertFalse($searchables->contains($c));
     }
 
     private function makeSearchables($config)
@@ -369,6 +372,11 @@ class SearchablesTest extends TestCase
 }
 
 class NotSearchable
+{
+    //
+}
+
+class TestCustomSearchable
 {
     //
 }
