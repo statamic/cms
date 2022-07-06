@@ -60,7 +60,7 @@ class DuplicateForm extends Action
         $handle = $form->handle();
 
         if ($attempt == 1) {
-            $title = $title . __(' (Duplicated)');
+            $title = $title.__(' (Duplicated)');
         }
 
         if ($attempt !== 1) {
@@ -68,10 +68,10 @@ class DuplicateForm extends Action
                 $title .= __(' (Duplicated)');
             }
 
-            $title .= ' (' . $attempt . ')';
+            $title .= ' ('.$attempt.')';
         }
 
-        $handle .= '-' . $attempt;
+        $handle .= '-'.$attempt;
 
         // If the slug we've just built already exists, we'll try again, recursively.
         if (FormAPI::find($handle)) {

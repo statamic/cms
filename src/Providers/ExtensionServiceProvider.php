@@ -221,7 +221,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app->instance(Manifest::class, new Manifest(
             new Filesystem,
             $this->app->basePath(),
-            $this->app->bootstrapPath() . '/cache/addons.php'
+            $this->app->bootstrapPath().'/cache/addons.php'
         ));
     }
 
@@ -272,7 +272,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected function registerBindingAlias($key, $class)
     {
-        return $this->app->bind('statamic.' . $key, function ($app) use ($class) {
+        return $this->app->bind('statamic.'.$key, function ($app) use ($class) {
             return $app['statamic.extensions'][$class];
         });
     }
@@ -292,7 +292,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->app['files']->files($path) as $file) {
             $class = $file->getBasename('.php');
-            $fqcn = $this->app->getNamespace() . "{$folder}\\{$class}";
+            $fqcn = $this->app->getNamespace()."{$folder}\\{$class}";
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $fqcn::register();
             }
@@ -305,11 +305,11 @@ class ExtensionServiceProvider extends ServiceProvider
         $methods = array_diff(get_class_methods(CoreModifiers::class), get_class_methods(Modifier::class));
 
         foreach ($methods as $method) {
-            $modifiers[Str::snake($method)] = CoreModifiers::class . '@' . $method;
+            $modifiers[Str::snake($method)] = CoreModifiers::class.'@'.$method;
         }
 
         foreach ($this->modifierAliases as $alias => $actual) {
-            $modifiers[$alias] = CoreModifiers::class . '@' . $actual;
+            $modifiers[$alias] = CoreModifiers::class.'@'.$actual;
         }
 
         $this->app['statamic.extensions'][Modifier::class] = collect()

@@ -59,7 +59,7 @@ class DuplicateTerm extends Action
         $slug = $term->slug();
 
         if ($attempt == 1) {
-            $title = $title . __(' (Duplicated)');
+            $title = $title.__(' (Duplicated)');
         }
 
         if ($attempt !== 1) {
@@ -67,10 +67,10 @@ class DuplicateTerm extends Action
                 $title .= __(' (Duplicated)');
             }
 
-            $title .= ' (' . $attempt . ')';
+            $title .= ' ('.$attempt.')';
         }
 
-        $slug .= '-' . $attempt;
+        $slug .= '-'.$attempt;
 
         // If the slug we've just built already exists, we'll try again, recursively.
         if (TermAPI::findBySlug($slug, $term->taxonomy()->handle())) {
