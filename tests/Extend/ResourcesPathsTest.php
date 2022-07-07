@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class ResourcesPathsTest extends TestCase
 {
-
     /** @test */
     public function scripts_will_automatically_be_versioned()
     {
@@ -20,7 +19,7 @@ class ResourcesPathsTest extends TestCase
         $this->assertArrayHasKey('test-a', $allScripts);
 
         $testScript = $allScripts['test-a'][0];
-        
+
         $this->assertTrue(Str::startsWith($testScript, 'test.js?v='));
         // Check if the version is 16 characters long.
         $this->assertEquals(16, strlen(Str::of($testScript)->after('.js?v=')));
