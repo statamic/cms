@@ -8,7 +8,7 @@ abstract class Provider implements ProvidesSearchables
 {
     protected $keys;
 
-    public function setKeys(array $keys): static
+    public function setKeys(array $keys): self
     {
         $this->keys = $keys;
 

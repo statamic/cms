@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 interface ProvidesSearchables
 {
-    public function setKeys(array $keys): static;
+    public function setKeys(array $keys): self;
 
     public function provide(): Collection;
 
