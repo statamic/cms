@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
+use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
