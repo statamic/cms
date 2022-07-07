@@ -3,17 +3,17 @@
 namespace Statamic;
 
 use Closure;
-use Illuminate\Http\Request;
 use Laravel\Nova\Nova;
-use Statamic\Facades\File;
-use Statamic\Facades\Preference;
-use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\Site;
+use Stringy\StaticStringy;
+use Illuminate\Http\Request;
+use Statamic\Tags\FluentTag;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\DateFormat;
-use Statamic\Support\Str;
-use Statamic\Tags\FluentTag;
-use Stringy\StaticStringy;
+use Illuminate\Support\Facades\Cache;
 
 class Statamic
 {
@@ -68,7 +68,7 @@ class Statamic
 
     public static function script($name, $path)
     {
-        static::$scripts[$name][] = str_finish($path, '.js');
+        static::$scripts[$name][] = self::createVersionedAssetPath($name, $path, 'script');
 
         return new static;
     }
@@ -92,7 +92,7 @@ class Statamic
 
     public static function style($name, $path)
     {
-        static::$styles[$name][] = str_finish($path, '.css');
+        static::$styles[$name][] = self::createVersionedAssetPath($name, $path, 'style');
 
         return new static;
     }
@@ -373,5 +373,28 @@ class Statamic
         }
 
         return $line;
+    }
+
+    private static function createVersionedAssetPath($name, $path, $type)
+    {
+        $ttl = now()->addDay();
+
+        return Cache::remember("statamic-{$type}-{$name}", $ttl, function () use ($path, $type) {
+            // If passing a path versioned by laravel mix, it will contain ?id=
+            // Do nothing and return that path. 
+            if (Str::contains($path, '?id=')) {
+                return (string) $path;
+            }
+
+            // In case a file without any version will be passed,
+            // a random version number will be created.
+            if (! Str::contains($path, '?v=')) {
+                $version = str_random();
+                $extension = $type === 'style' ? 'css' : 'js';
+                $path = str_finish($path, ".{$extension}?v={$version}");
+            }
+
+            return $path;
+        });
     }
 }
