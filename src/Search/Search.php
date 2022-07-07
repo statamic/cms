@@ -2,6 +2,8 @@
 
 namespace Statamic\Search;
 
+use Statamic\Search\Searchables\Providers;
+
 class Search
 {
     protected $indexes;
@@ -39,6 +41,11 @@ class Search
     public function extend($driver, $callback)
     {
         app(IndexManager::class)->extend($driver, $callback);
+    }
+
+    public function registerSearchableProvider(string $key, string $class)
+    {
+        app(Providers::class)->register($key, $class);
     }
 
     public function __call($method, $parameters)

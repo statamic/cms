@@ -4,15 +4,20 @@ namespace Tests\Search;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
+use Mockery;
 use Statamic\Assets\AssetCollection;
 use Statamic\Auth\UserCollection;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Search;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Search\Searchables;
+use Statamic\Search\Searchables\Provider;
+use Statamic\Stache\Query\EntryQueryBuilder;
+use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -80,8 +85,9 @@ class SearchablesTest extends TestCase
         Asset::shouldReceive('all')->never();
         Asset::shouldReceive('whereContainer')->never();
         User::shouldReceive('all')->never();
-        Entry::shouldReceive('whereCollection')->with('blog')->once()->andReturn(EntryCollection::make($blog));
-        Entry::shouldReceive('whereCollection')->with('pages')->once()->andReturn(EntryCollection::make($pages));
+        $entryQuery = Mockery::mock(EntryQueryBuilder::class);
+        $entryQuery->shouldReceive('get')->andReturn(EntryCollection::make(array_merge($blog, $pages)));
+        Entry::shouldReceive('query->whereIn')->with('collection', ['blog', 'pages'])->once()->andReturn($entryQuery);
 
         $searchables = $this->makeSearchables(['searchables' => ['collection:blog', 'collection:pages']]);
 
@@ -137,8 +143,9 @@ class SearchablesTest extends TestCase
         Asset::shouldReceive('all')->never();
         Asset::shouldReceive('whereContainer')->never();
         User::shouldReceive('all')->never();
-        Term::shouldReceive('whereTaxonomy')->with('tags')->once()->andReturn(TermCollection::make($tags));
-        Term::shouldReceive('whereTaxonomy')->with('categories')->once()->andReturn(TermCollection::make($categories));
+        $termQuery = Mockery::mock(TermQueryBuilder::class);
+        $termQuery->shouldReceive('get')->andReturn(TermCollection::make(array_merge($tags, $categories)));
+        Term::shouldReceive('query->whereIn')->with('taxonomy', ['tags', 'categories'])->once()->andReturn($termQuery);
 
         $searchables = $this->makeSearchables(['searchables' => ['taxonomy:tags', 'taxonomy:categories']]);
 
@@ -332,33 +339,26 @@ class SearchablesTest extends TestCase
     /** @test */
     public function can_register_a_custom_searchable_and_get_results()
     {
-        config()->set('statamic.search.indexes.default', [
-            'fields' => [
-                'title',
-            ],
-            'searchables' => 'custom:*',
-        ]);
-
-        $index = app(\Statamic\Search\Comb\Index::class, [
-            'name' => 'default',
-            'config' => config('statamic.search.indexes.default'),
-        ]);
-
         $a = new TestCustomSearchable(['title' => 'Custom 1']);
         $b = new TestCustomSearchable(['title' => 'Custom 2']);
-        $c = new TestCustomSearchable(['title' => 'Custom 3']);
+        $c = new NotSearchable;
+        app()->instance('all-custom-searchables', collect([$a, $b]));
 
-        // Todo: rework how custom searchables are registered.
-        Searchables::register('custom', function ($resource, $config) use ($a, $b) {
-            return collect([$a, $b]);
-        });
+        Search::registerSearchableProvider('custom', TestCustomSearchables::class);
 
-        $searchables = new Searchables($index);
+        $searchables = $this->makeSearchables(['searchables' => ['custom']]);
 
         $this->assertEquals([$a, $b], $searchables->all()->all());
         $this->assertTrue($searchables->contains($a));
         $this->assertTrue($searchables->contains($b));
         $this->assertFalse($searchables->contains($c));
+    }
+
+    /** @test */
+    public function it_throws_exception_when_using_unknown_searchable()
+    {
+        $this->expectExceptionMessage('Unknown searchable [test]');
+        $this->makeSearchables(['searchables' => ['test']]);
     }
 
     private function makeSearchables($config)
@@ -379,4 +379,22 @@ class NotSearchable
 class TestCustomSearchable
 {
     //
+}
+
+class TestCustomSearchables extends Provider
+{
+    public function provide(): Collection
+    {
+        return app('all-custom-searchables');
+    }
+
+    public function contains($searchable): bool
+    {
+        return $searchable instanceof TestCustomSearchable;
+    }
+
+    public function isSearchable($searchable): bool
+    {
+        return true;
+    }
 }
