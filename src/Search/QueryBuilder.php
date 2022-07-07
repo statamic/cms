@@ -47,8 +47,9 @@ abstract class QueryBuilder extends BaseQueryBuilder
         }
 
         return $this->collect($results)->map(function ($result) {
+            /** @var \Statamic\Contracts\Search\Searchable $data */
             if ($data = Data::find($result['reference'])) {
-                $data->setSupplement('search_score', $result['search_score'] ?? null);
+                $data->setSearchScore($result['score'] ?? null);
             }
 
             return $data;

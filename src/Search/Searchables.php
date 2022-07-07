@@ -4,7 +4,7 @@ namespace Statamic\Search;
 
 use Closure;
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Searchables\Providers;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -67,19 +67,13 @@ class Searchables
         return false;
     }
 
-    public function fields($searchable): array
+    public function fields(Searchable $searchable): array
     {
         $fields = $this->index->config()['fields'];
         $transformers = $this->index->config()['transformers'] ?? [];
 
         return collect($fields)->mapWithKeys(function ($field) use ($searchable) {
-            if (method_exists($searchable, $field)) {
-                $value = $searchable->{$field}();
-            } else {
-                $value = $searchable instanceof EntryContract ? $searchable->value($field) : $searchable->get($field);
-            }
-
-            return [$field => $value];
+            return [$field => $searchable->getSearchValue($field)];
         })->flatMap(function ($value, $field) use ($transformers) {
             if (! isset($transformers[$field]) || ! $transformers[$field] instanceof Closure) {
                 return [$field => $value];

@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\Data\ContainsSupplementalData;
@@ -39,7 +40,8 @@ class LocalizedTerm implements
     ResolvesValuesContract,
     ArrayAccess,
     Arrayable,
-    ContainsQueryableValues
+    ContainsQueryableValues,
+    Searchable
 {
     use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues;
 
@@ -515,5 +517,35 @@ class LocalizedTerm implements
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getSearchReference(): string
+    {
+        return $this->term()->getSearchReference();
+    }
+
+    public function getSearchValue(string $field)
+    {
+        return $this->term()->getSearchValue($field);
+    }
+
+    public function setSearchScore(int $score = null)
+    {
+        return $this->term()->setSearchScore($score);
+    }
+
+    public function getCpSearchResultTitle(): string
+    {
+        return $this->term()->getCpSearchResultTitle();
+    }
+
+    public function getCpSearchResultUrl(): string
+    {
+        return $this->term()->getCpSearchResultUrl();
+    }
+
+    public function getCpSearchResultBadge(): string
+    {
+        return $this->term()->getCpSearchResultBadge();
     }
 }

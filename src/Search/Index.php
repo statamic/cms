@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Statamic\Contracts\Search\Searchable;
 use Statamic\Support\Arr;
 
 abstract class Index
@@ -70,8 +71,8 @@ abstract class Index
 
     public function insertMultiple($documents)
     {
-        $documents = (new Documents($documents))->mapWithKeys(function ($item) {
-            return [$item->reference() => $this->searchables()->fields($item)];
+        $documents = (new Documents($documents))->mapWithKeys(function (Searchable $item) {
+            return [$item->getSearchReference() => $this->searchables()->fields($item)];
         });
 
         $this->insertDocuments($documents);
