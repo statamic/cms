@@ -36,7 +36,7 @@ class ResourcesPathsTest extends TestCase
         $this->assertArrayHasKey('test-b', $allStyles);
 
         $testStyle = $allStyles['test-b'][0];
-        
+
         $this->assertTrue(Str::startsWith($testStyle, 'test.css?v='));
         // Check if the version is 16 characters long.
         $this->assertEquals(16, strlen(Str::of($testStyle)->after('.css?v=')));
@@ -45,12 +45,11 @@ class ResourcesPathsTest extends TestCase
     /** @test */
     public function scripts_can_be_passed_with_a_laravel_mix_version()
     {
-
         $path = 'test.js?id=some-random-laravel-mix-version';
 
         // We can't test the mix helper, so we emulate it by adding `?id=`, as this is
         // the versioning syntax provied by Laravel Mix.
-        // Statamic::script('test', mix('your-path')); 
+        // Statamic::script('test', mix('your-path'));
 
         Statamic::script('test-c', $path);
 
@@ -59,7 +58,7 @@ class ResourcesPathsTest extends TestCase
         $this->assertArrayHasKey('test-c', $allScripts);
 
         $testScript = $allScripts['test-c'][0];
-        
+
         $this->assertEquals($testScript, $path);
     }
 
@@ -70,7 +69,7 @@ class ResourcesPathsTest extends TestCase
 
         // We can't test the mix helper, so we emulate it by adding `?id=`, as this is
         // the versioning syntax provied by Laravel Mix.
-        // Statamic::script('test', mix('your-path')); 
+        // Statamic::script('test', mix('your-path'));
 
         Statamic::style('test-d', $path);
 
@@ -79,7 +78,7 @@ class ResourcesPathsTest extends TestCase
         $this->assertArrayHasKey('test-d', $allStyles);
 
         $testStyle = $allStyles['test-d'][0];
-        
+
         $this->assertEquals($testStyle, $path);
     }
 }

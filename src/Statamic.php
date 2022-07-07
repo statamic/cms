@@ -3,17 +3,17 @@
 namespace Statamic;
 
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Nova\Nova;
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
-use Stringy\StaticStringy;
-use Illuminate\Http\Request;
-use Statamic\Tags\FluentTag;
+use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\DateFormat;
-use Illuminate\Support\Facades\Cache;
+use Statamic\Support\Str;
+use Statamic\Tags\FluentTag;
+use Stringy\StaticStringy;
 
 class Statamic
 {
@@ -381,7 +381,7 @@ class Statamic
 
         return Cache::remember("statamic-{$type}-{$name}", $ttl, function () use ($path, $type) {
             // If passing a path versioned by laravel mix, it will contain ?id=
-            // Do nothing and return that path. 
+            // Do nothing and return that path.
             if (Str::contains($path, '?id=')) {
                 return (string) $path;
             }
