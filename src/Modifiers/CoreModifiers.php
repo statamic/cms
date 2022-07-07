@@ -185,7 +185,8 @@ class CoreModifiers extends Modifier
     {
         if ($value instanceof Value) {
             $value = $value->raw();
-        } elseif (Arr::isAssoc($value)) {
+        }
+        if (Arr::isAssoc($value)) {
             $value = [$value];
         }
 
@@ -211,20 +212,21 @@ class CoreModifiers extends Modifier
     {
         if ($value instanceof Value) {
             $value = $value->raw();
-        } elseif (Arr::isAssoc($value)) {
+        }
+        if (Arr::isAssoc($value)) {
             $value = [$value];
         }
 
-        $items = [];
+        $text = '';
         while (count($value)) {
             $item = array_shift($value);
             if ($item['type'] === 'text') {
-                $items[] = $item['text'] ?? '';
+                $text .= ($item['text'] ?? '').' ';
             }
             array_unshift($value, ...($item['content'] ?? []));
         }
 
-        return implode(' ', $items);
+        return Stringy::collapseWhitespace($text);
     }
 
     public function boolString($value)
