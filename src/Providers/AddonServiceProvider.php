@@ -408,7 +408,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ], $this->getAddon()->slug());
 
-        Statamic::style($name, "{$filename}.js?v={$version}");
+        Statamic::style($name, "{$filename}.css?v={$version}");
     }
 
     public function registerExternalStylesheet(string $url)
