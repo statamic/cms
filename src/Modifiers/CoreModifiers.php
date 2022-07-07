@@ -226,7 +226,7 @@ class CoreModifiers extends Modifier
             array_unshift($value, ...($item['content'] ?? []));
         }
 
-        return Stringy::collapseWhitespace($text);
+        return $text;
     }
 
     public function boolString($value)

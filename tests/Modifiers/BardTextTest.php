@@ -44,7 +44,7 @@ class BardTextTest extends TestCase
             ],
         ];
 
-        $expected = 'This is a paragraph with bold and italic text. Another paragraph.';
+        $expected = 'This is a paragraph with  bold  and  italic  text. Another paragraph. ';
 
         $this->assertEquals($expected, $this->modify($data));
     }
@@ -59,7 +59,7 @@ class BardTextTest extends TestCase
             ],
         ];
 
-        $expected = 'This is a paragraph.';
+        $expected = 'This is a paragraph. ';
 
         $this->assertEquals($expected, $this->modify($data));
     }
@@ -76,7 +76,7 @@ class BardTextTest extends TestCase
             ],
         ], 'content', new Bard());
 
-        $expected = 'This is a paragraph.';
+        $expected = 'This is a paragraph. ';
 
         $this->assertEquals($expected, $this->modify($data));
     }
