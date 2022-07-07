@@ -202,6 +202,17 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function absoluteUrl($site = null)
+    {
+        if (! $mount = $this->mount()) {
+            return null;
+        }
+
+        $site = $site ?? $this->sites()->first();
+
+        return optional($mount->in($site))->absoluteUrl();
+    }
+
     public function url($site = null)
     {
         if (! $mount = $this->mount()) {
@@ -665,6 +676,13 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         Facades\Collection::delete($this);
 
         CollectionDeleted::dispatch($this);
+
+        return true;
+    }
+
+    public function truncate()
+    {
+        $this->queryEntries()->get()->each->delete();
 
         return true;
     }

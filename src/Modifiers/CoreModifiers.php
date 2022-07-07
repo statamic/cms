@@ -222,7 +222,7 @@ class CoreModifiers extends Modifier
     /**
      * Breaks arrays or collections into smaller ones of a given size.
      *
-     * @param  $value
+     * @param  mixed  $value
      * @param  array  $params
      * @return array
      */
@@ -289,7 +289,7 @@ class CoreModifiers extends Modifier
     /**
      * Debug a value with a call to JavaScript's console.log.
      *
-     * @param  $value
+     * @param  mixed  $value
      * @return string
      */
     public function consoleLog($value)
@@ -357,7 +357,7 @@ class CoreModifiers extends Modifier
     /**
      * Returns the number of items in an array.
      *
-     * @param  $value
+     * @param  mixed  $value
      * @return int
      */
     public function count($value)
@@ -1981,9 +1981,9 @@ class CoreModifiers extends Modifier
     /**
      * Returns a segment by number from any valid URL or UI.
      *
-     * @param  $value
-     * @param  $params
-     * @param  $context
+     * @param  mixed  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return string
      */
     public function segment($value, $params, $context)
@@ -2095,6 +2095,10 @@ class CoreModifiers extends Modifier
     public function shuffle($value, array $params)
     {
         $seed = Arr::get($params, 0);
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
 
         if (is_array($value)) {
             return collect($value)->shuffle($seed)->all();
@@ -2461,6 +2465,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Convert value to a boolean.
+     *
+     * @param $params
+     * @param $value
+     * @return bool
+     */
+    public function toBool($value, $params)
+    {
+        if (is_string($value)) {
+            return Str::toBool($value);
+        }
+
+        return boolval($value);
+    }
+
+    /**
      * Converts the data to json.
      *
      * @param $value
@@ -2567,8 +2587,8 @@ class CoreModifiers extends Modifier
     /**
      * Converts a Carbon instance to a timestamp.
      *
-     * @param  $value
-     * @param  $params
+     * @param  Carbon  $value
+     * @param  array  $params
      * @return int
      */
     public function timestamp($value)
@@ -2582,8 +2602,8 @@ class CoreModifiers extends Modifier
      * Accepts a timezone string as a parameter. If none is provided, then
      * the timezone defined in the system settings will be used.
      *
-     * @param  $value
-     * @param  $params
+     * @param  string  $value
+     * @param  array  $params
      * @return Carbon
      */
     public function timezone($value, $params)

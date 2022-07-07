@@ -269,6 +269,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     {
         $this->parent = $parent;
 
+        $this->resetFieldsCache();
+
         return $this;
     }
 
@@ -340,8 +342,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
                     ->fieldtype($field->fieldtype()->indexComponent())
                     ->label(__($field->display()))
                     ->listable($field->isListable())
-                    ->defaultVisibility($field->isVisible())
-                    ->visible($field->isVisible())
+                    ->defaultVisibility($field->isVisibleOnListing())
+                    ->visible($field->isVisibleOnListing())
                     ->sortable($field->isSortable())
                     ->defaultOrder($index + 1);
             })
