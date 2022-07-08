@@ -37,7 +37,7 @@
         </div>
 
         <div class="flex justify-between">
-            <div ref="publishSectionWrapper" class="publish-section-wrapper w-full">
+            <div ref="publishSectionWrapper" class="publish-section-wrapper w-full min-w-0">
                 <div
                     role="tabpanel"
                     class="publish-section w-full"
