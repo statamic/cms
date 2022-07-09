@@ -79,6 +79,77 @@ EOT;
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
 
         $template = <<<'EOT'
+{{ nav:main include_home="true" }}
+<div>ONE: {{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+
+{{ nav:main include_home="true" }}
+<div>TWO: {{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+EOT;
+
+        $expected = <<<'EOT'
+<div>ONE: 1 Home</div>
+
+
+<div>ONE: 1 About</div>
+
+<div>ONE: 2 Team</div>
+
+
+<div>ONE: 2 Leadership</div>
+
+
+
+<div>ONE: 1 Projects</div>
+
+<div>ONE: 2 Project-1</div>
+
+
+<div>ONE: 2 Project-2</div>
+
+<div>ONE: 3 Project 2 Nested</div>
+
+
+
+
+<div>ONE: 1 Contact</div>
+
+
+
+
+<div>TWO: 1 Home</div>
+
+
+<div>TWO: 1 About</div>
+
+<div>TWO: 2 Team</div>
+
+
+<div>TWO: 2 Leadership</div>
+
+
+
+<div>TWO: 1 Projects</div>
+
+<div>TWO: 2 Project-1</div>
+
+
+<div>TWO: 2 Project-2</div>
+
+<div>TWO: 3 Project 2 Nested</div>
+
+
+
+
+<div>TWO: 1 Contact</div>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
 <ul class="parent-menu">
 {{ nav:main }}
 {{ if depth == 1 }}
