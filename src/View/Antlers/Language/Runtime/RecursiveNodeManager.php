@@ -41,7 +41,7 @@ class RecursiveNodeManager
 
         self::$namedDepthMapping[$namedDepthMapping] += 1;
 
-        if (!$node instanceof RecursiveNode || !$node->isNestedRecursive) {
+        if (! $node instanceof RecursiveNode || ! $node->isNestedRecursive) {
             self::$depthMapping[$rootRef] += 1;
         }
     }
@@ -52,7 +52,7 @@ class RecursiveNodeManager
 
         self::$namedDepthMapping[$namedDepthMapping] -= 1;
 
-        if (!$node instanceof RecursiveNode || !$node->isNestedRecursive) {
+        if (! $node instanceof RecursiveNode || ! $node->isNestedRecursive) {
             self::$depthMapping[$node->getRootRef()] -= 1;
         }
     }
