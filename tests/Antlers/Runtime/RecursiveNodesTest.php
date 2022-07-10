@@ -150,6 +150,128 @@ EOT;
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
 
         $template = <<<'EOT'
+<ul>
+{{ nav:main }}
+{{ if depth === 1 }}
+<li class="if-depth-one">
+{{ title }} - {{ depth }}<br />
+{{ if children }}
+<ul class="if-depth-one-children">
+{{ *recursive children* }}
+</ul>
+{{ /if }}
+
+</li>
+{{ elseif depth == 2 }}
+<li class="else-depth-two">
+{{ title }} - {{ depth }}<br />
+{{ if children }}
+<ul class="if-else-depth-two-children">
+{{ *recursive children* }}
+</ul>
+{{ /if }}
+</li>
+
+{{ else }}
+<li class="else-other-depths">
+{{ title }} -- {{ depth }}
+</li>
+{{ /if }}
+{{ /nav:main }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+
+
+<li class="if-depth-one">
+Home - 1<br />
+
+
+</li>
+
+
+
+<li class="if-depth-one">
+About - 1<br />
+
+<ul class="if-depth-one-children">
+
+
+<li class="else-depth-two">
+Team - 2<br />
+
+</li>
+
+
+
+
+<li class="else-depth-two">
+Leadership - 2<br />
+
+</li>
+
+
+
+</ul>
+
+
+</li>
+
+
+
+<li class="if-depth-one">
+Projects - 1<br />
+
+<ul class="if-depth-one-children">
+
+
+<li class="else-depth-two">
+Project-1 - 2<br />
+
+</li>
+
+
+
+
+<li class="else-depth-two">
+Project-2 - 2<br />
+
+<ul class="if-else-depth-two-children">
+
+
+<li class="else-other-depths">
+Project 2 Nested -- 3
+</li>
+
+
+</ul>
+
+</li>
+
+
+
+</ul>
+
+
+</li>
+
+
+
+<li class="if-depth-one">
+Contact - 1<br />
+
+
+</li>
+
+
+</ul>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
 <ul class="parent-menu">
 {{ nav:main }}
 {{ if depth == 1 }}
