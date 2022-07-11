@@ -23,7 +23,7 @@ class View
 
     public static function make($template = null, $data = [])
     {
-        return (new static)
+        return app(static::class)
             ->template($template)
             ->with($data);
     }
@@ -84,8 +84,6 @@ class View
 
     public function render(): string
     {
-        GlobalRuntimeState::resetGlobalState();
-
         $cascade = $this->gatherData();
 
         if ($this->shouldUseLayout()) {
@@ -119,7 +117,7 @@ class View
         return $renderedContents;
     }
 
-    private function shouldUseLayout()
+    protected function shouldUseLayout()
     {
         if (! $this->layout) {
             return false;
@@ -145,19 +143,19 @@ class View
         return $this->isUsingXmlTemplate() || $this->isUsingXmlLayout();
     }
 
-    private function isUsingAntlersTemplate()
+    protected function isUsingAntlersTemplate()
     {
         return Str::endsWith($this->templateViewPath(), collect(AntlersEngine::EXTENSIONS)->map(function ($extension) {
             return '.'.$extension;
         })->all());
     }
 
-    private function isUsingXmlTemplate()
+    protected function isUsingXmlTemplate()
     {
         return Str::endsWith($this->templateViewPath(), '.xml');
     }
 
-    private function isUsingXmlLayout()
+    protected function isUsingXmlLayout()
     {
         if (! $this->layout) {
             return false;
@@ -166,12 +164,12 @@ class View
         return Str::endsWith($this->layoutViewPath(), '.xml');
     }
 
-    private function templateViewPath()
+    protected function templateViewPath()
     {
         return view($this->templateViewName())->getPath();
     }
 
-    private function layoutViewPath()
+    protected function layoutViewPath()
     {
         return view($this->layoutViewName())->getPath();
     }
@@ -200,7 +198,7 @@ class View
         return $this->render();
     }
 
-    private function layoutViewName()
+    protected function layoutViewName()
     {
         $view = $this->layout;
 
@@ -211,7 +209,7 @@ class View
         return $view;
     }
 
-    private function templateViewName()
+    protected function templateViewName()
     {
         $view = $this->template;
 

@@ -129,6 +129,10 @@ export default {
 
         hasError() {
             return this.options.bard.setsWithErrors.includes(this.index);
+        },
+
+        showFieldPreviews() {
+            return this.options.bard.config.previews;
         }
 
     },

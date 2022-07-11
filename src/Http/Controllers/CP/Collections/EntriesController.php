@@ -84,8 +84,10 @@ class EntriesController extends CpController
             throw new BlueprintNotFoundException($entry->value('blueprint'), 'collections/'.$collection->handle());
         }
 
+        $blueprint->setParent($entry);
+
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
@@ -248,7 +250,7 @@ class EntriesController extends CpController
         }
 
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
         $values = [];
@@ -451,15 +453,10 @@ class EntriesController extends CpController
             ->values();
     }
 
-    protected function toCarbonInstanceForSaving($date)
+    protected function toCarbonInstanceForSaving($date): Carbon
     {
-        // The date will be the value from the Date fieldtype's Vue component.
-        // If time is enabled, it will include hours/minutes/seconds, even if seconds are disabled.
-        // If time is disabled, it will just be the date portion.
-
-        return (strlen($date) > 10)
-            ? Carbon::createFromFormat('Y-m-d H:i:s', $date)
-            : Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+        // Since assume `Y-m-d ...` format, we can use `parse` here.
+        return Carbon::parse($date);
     }
 
     private function validateUniqueUri($entry, $tree, $parent)
