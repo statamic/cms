@@ -225,8 +225,8 @@ EOT;
         $data = [
             'clients' => $builder,
             'nested' => [
-                'clients' => $builder
-            ]
+                'clients' => $builder,
+            ],
         ];
 
         VarTest::register();
