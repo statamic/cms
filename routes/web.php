@@ -48,7 +48,9 @@ Route::name('statamic.')->group(function () {
         Statamic::additionalActionRoutes();
     });
 
-    Route::prefix(config('statamic.routes.action'))->post('nocache', '\Statamic\StaticCaching\NoCache\Controller');
+    Route::prefix(config('statamic.routes.action'))
+        ->post('nocache', '\Statamic\StaticCaching\NoCache\Controller')
+        ->withoutMiddleware('App\Http\Middleware\VerifyCsrfToken');
 
     if (OAuth::enabled()) {
         Route::get(config('statamic.oauth.routes.login'), 'OAuthController@redirectToProvider')->name('oauth.login');
