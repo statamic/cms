@@ -220,10 +220,13 @@ EOT;
         ];
 
         $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('get')->once()->andReturn(collect($clientData));
+        $builder->shouldReceive('get')->times(4)->andReturn(collect($clientData));
 
         $data = [
             'clients' => $builder,
+            'nested' => [
+                'clients' => $builder
+            ]
         ];
 
         VarTest::register();
@@ -241,6 +244,18 @@ EOT;
 EOT;
 
         $this->renderString($template, $data, true);
+        $this->assertSame(VarTest::$var, $builder);
+
+        $this->renderString('{{ var_test :variable="clients.0.title" }}', $data, true);
+        $this->assertSame('Foo', VarTest::$var);
+
+        $this->renderString('{{ var_test :variable="clients.1.title" }}', $data, true);
+        $this->assertSame('Baz', VarTest::$var);
+
+        $this->renderString('{{ var_test :variable="clients.2.title" }}', $data, true);
+        $this->assertSame('Bar', VarTest::$var);
+
+        $this->renderString('{{ var_test :variable="nested.clients" }}', $data, true);
         $this->assertSame(VarTest::$var, $builder);
     }
 
