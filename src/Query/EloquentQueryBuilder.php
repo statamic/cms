@@ -2,10 +2,12 @@
 
 namespace Statamic\Query;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 abstract class EloquentQueryBuilder implements Builder
 {
@@ -19,6 +21,16 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function __call($method, $args)
     {
+        if (Str::startsWith($method, ['where', 'orWhere', 'firstWhere'])) {
+            if (is_string($args[0])) {
+                $args[0] = $this->column($args[0]);
+            }
+            if ($args[0] instanceof Closure) {
+                $builder = app(static::class);
+                $args[0]($builder);
+                $args[0] = fn ($query) => $query->setQuery($builder->getQuery());
+            }
+        }
         $this->builder->$method(...$args);
 
         return $this;
@@ -78,18 +90,20 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->builder->count();
     }
 
-    public function where($column, $operator = null, $value = null)
+    public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
     {
-        $this->builder->where($this->column($column), $operator, $value);
+        if (func_num_args() === 2) {
+            [$second, $operator] = [$operator, '='];
+        }
+
+        $this->builder->whereColumn($this->column($first), $operator, $this->column($second), $boolean);
 
         return $this;
     }
 
-    public function whereIn($column, $values)
+    public function orWhereColumn($first, $operator = null, $second = null)
     {
-        $this->builder->whereIn($this->column($column), $values);
-
-        return $this;
+        return $this->whereColumn($first, $operator, $second, 'or');
     }
 
     public function orderBy($column, $direction = 'asc')
@@ -97,6 +111,16 @@ abstract class EloquentQueryBuilder implements Builder
         $this->builder->orderBy($this->column($column), $direction);
 
         return $this;
+    }
+
+    public function getQuery()
+    {
+        return $this->builder->getQuery();
+    }
+
+    public function setQuery($query)
+    {
+        $this->builder->setQuery($query);
     }
 
     protected function column($column)
