@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\NoCache;
 
 use Illuminate\Http\Request;
+use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\StaticCaching\Replacers\NoCacheReplacer;
 
 class Controller
@@ -15,9 +16,15 @@ class Controller
 
         $replacer = new NoCacheReplacer($session);
 
-        return $session
-            ->regions()
-            ->map->render()
-            ->map(fn ($contents) => $replacer->replace($contents));
+        return [
+            'csrf' => [
+                'token' => csrf_token(),
+                'placeholder' => CsrfTokenReplacer::REPLACEMENT,
+            ],
+            'regions' => $session
+                ->regions()
+                ->map->render()
+                ->map(fn ($contents) => $replacer->replace($contents)),
+        ];
     }
 }

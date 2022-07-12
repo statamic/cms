@@ -202,8 +202,20 @@ fetch('/!/nocache', {
 })
 .then((response) => response.json())
 .then((data) => {
-    for (var key in data) {
-        map[key].outerHTML = data[key];
+    let regions = data.regions;
+    for (var key in regions) {
+        map[key].outerHTML = regions[key];
+    }
+
+    let csrf = data.csrf;
+    let els = document.querySelectorAll('input[value='+csrf.placeholder+']');
+    for (var i = 0; i < els.length; i++) {
+        els[i].value = csrf.token;
+    }
+
+    els = document.querySelectorAll('meta[content='+csrf.placeholder+']');
+    for (var i = 0; i < els.length; i++) {
+        els[i].content = csrf.token;
     }
 });
 EOT;
