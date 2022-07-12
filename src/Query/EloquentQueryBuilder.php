@@ -118,11 +118,6 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->builder->getQuery();
     }
 
-    public function setQuery($query)
-    {
-        $this->builder->setQuery($query);
-    }
-
     protected function column($column)
     {
         return $column;
