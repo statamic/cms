@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
+use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -184,7 +185,9 @@ class FileCacher extends AbstractCacher
 
     public function getNocacheJs(): string
     {
-        $default = <<<'EOT'
+        $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
+
+        $default = <<<EOT
 var els = document.getElementsByClassName('nocache');
 var map = {};
 for (var i = 0; i < els.length; i++) {
@@ -208,14 +211,14 @@ fetch('/!/nocache', {
     }
 
     let csrf = data.csrf;
-    let els = document.querySelectorAll('input[value='+csrf.placeholder+']');
+    let els = document.querySelectorAll('input[value=$csrfPlaceholder]');
     for (var i = 0; i < els.length; i++) {
-        els[i].value = csrf.token;
+        els[i].value = csrf;
     }
 
-    els = document.querySelectorAll('meta[content='+csrf.placeholder+']');
+    els = document.querySelectorAll('meta[content=$csrfPlaceholder]');
     for (var i = 0; i < els.length; i++) {
-        els[i].content = csrf.token;
+        els[i].content = csrf;
     }
 });
 EOT;

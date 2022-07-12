@@ -3,7 +3,6 @@
 namespace Tests\StaticCaching;
 
 use Statamic\StaticCaching\NoCache\Session;
-use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Tests\FakesContent;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -62,10 +61,7 @@ EOT;
             ->postJson('/!/nocache', ['url' => 'http://localhost/test'])
             ->assertOk()
             ->assertExactJson([
-                'csrf' => [
-                    'token' => csrf_token(),
-                    'placeholder' => CsrfTokenReplacer::REPLACEMENT,
-                ],
+                'csrf' => csrf_token(),
                 'regions' => [
                     $regionOne->key() => 'First 1 Dustin Test',
                     $regionTwo->key() => $secondExpectation,
