@@ -207,7 +207,7 @@ fetch('/!/nocache', {
 .then((data) => {
     const regions = data.regions;
     for (var key in regions) {
-        map[key].outerHTML = regions[key];
+        if (map[key]) map[key].outerHTML = regions[key];
     }
 
     for (const input of document.querySelectorAll('input[value=$csrfPlaceholder]')) {
