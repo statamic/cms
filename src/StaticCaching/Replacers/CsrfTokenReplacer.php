@@ -7,7 +7,7 @@ use Statamic\StaticCaching\Replacer;
 
 class CsrfTokenReplacer implements Replacer
 {
-    const REPLACEMENT = '<statamic-cache-crsf-token>';
+    const REPLACEMENT = 'STATAMIC_CSRF_TOKEN';
 
     public function prepareResponseToCache(Response $response, Response $initial)
     {
@@ -16,10 +16,10 @@ class CsrfTokenReplacer implements Replacer
         }
 
         $response->setContent(str_replace(
-             csrf_token(),
-             self::REPLACEMENT,
-             $response->getContent()
-         ));
+            csrf_token(),
+            self::REPLACEMENT,
+            $response->getContent()
+        ));
     }
 
     public function replaceInCachedResponse(Response $response)
@@ -29,9 +29,9 @@ class CsrfTokenReplacer implements Replacer
         }
 
         $response->setContent(str_replace(
-             self::REPLACEMENT,
-             csrf_token(),
-             $response->getContent()
-         ));
+            self::REPLACEMENT,
+            csrf_token(),
+            $response->getContent()
+        ));
     }
 }
