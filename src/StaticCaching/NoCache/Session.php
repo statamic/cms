@@ -87,7 +87,7 @@ class Session
             return;
         }
 
-        Cache::forever('nocache::urls', Cache::get('nocache::urls', collect())->push($this->url)->unique());
+        Cache::forever('nocache::urls', collect(Cache::get('nocache::urls', []))->push($this->url)->unique()->all());
 
         Cache::forever('nocache::session.'.md5($this->url), [
             'regions' => $this->regions,

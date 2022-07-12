@@ -86,6 +86,21 @@ class NoCacheSessionTest extends TestCase
             ->with('nocache::session.'.md5('/foo'), Mockery::any())
             ->once();
 
+        // ...and that the urls are tracked in the cache.
+
+        Cache::shouldReceive('get')
+            ->with('nocache::urls', [])
+            ->times(2)
+            ->andReturn([], ['/']);
+
+        Cache::shouldReceive('forever')
+            ->with('nocache::urls', ['/'])
+            ->once();
+
+        Cache::shouldReceive('forever')
+            ->with('nocache::urls', ['/', '/foo'])
+            ->once();
+
         tap(new Session('/'), function ($session) {
             $session->pushRegion('test', [], '.html');
         })->write();

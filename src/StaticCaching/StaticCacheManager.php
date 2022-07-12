@@ -55,7 +55,7 @@ class StaticCacheManager extends Manager
     {
         $this->driver()->flush();
 
-        Cache::get('nocache::urls', collect())->each(function ($url) {
+        collect(Cache::get('nocache::urls', []))->each(function ($url) {
             Cache::forget('nocache::session.'.md5($url));
         });
 
