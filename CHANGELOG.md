@@ -1,5 +1,27 @@
 # Release Notes
 
+## 3.3.19 (2022-07-12)
+
+### What's new
+- Ability to use a class to determine static cache url exclusions. [#5469](https://github.com/statamic/cms/issues/5469) by @FrittenKeeZ
+- Ability to hide Replicator/Bard set field previews. [#6022](https://github.com/statamic/cms/issues/6022) by @edalzell
+- Added Czech translation. [#6320](https://github.com/statamic/cms/issues/6320) by @MarvelousMartin
+
+### What's improved
+- French translations. [#6311](https://github.com/statamic/cms/issues/6311) by @ebeauchamps
+- Dutch translations [#6305](https://github.com/statamic/cms/issues/6305) by @robdekort
+- Use Laravel Pint for code formatting. [#6298](https://github.com/statamic/cms/issues/6298) by @jesseleite
+
+### What's fixed
+- Runtime: Fix issue when using `recursive children` multiple times. [#6321](https://github.com/statamic/cms/issues/6321) by @JohnathonKoster
+- Runtime: Fix dynamic binding and query builders. [#6324](https://github.com/statamic/cms/issues/6324) by @JohnathonKoster
+- Fix long lines/words in code mirror breaking the layout width. [#6316](https://github.com/statamic/cms/issues/6316) by @jacksleight
+- Fix bard nested table styling. [#6315](https://github.com/statamic/cms/issues/6315) by @jacksleight
+- Fix finding data by request url when theres no root-based site. [#6306](https://github.com/statamic/cms/issues/6306) by @jasonvarga
+- Tag state gets reset between subsequent requests. [#6193](https://github.com/statamic/cms/issues/6193) by @JohnathonKoster
+
+
+
 ## 3.3.18 (2022-07-05)
 
 ### What's new
