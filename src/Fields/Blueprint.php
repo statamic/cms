@@ -134,6 +134,11 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         return "blueprint-contents-{$this->namespace()}-{$this->handle()}";
     }
 
+    private function fieldsBlinkKey()
+    {
+        return "blueprint-fields-{$this->namespace()}-{$this->handle()}";
+    }
+
     private function getContents()
     {
         $contents = $this->contents;
@@ -264,6 +269,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     {
         $this->parent = $parent;
 
+        $this->resetFieldsCache();
+
         return $this;
     }
 
@@ -285,9 +292,15 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
             return $this->fieldsCache;
         }
 
-        $this->validateUniqueHandles();
+        $fn = function () {
+            $this->validateUniqueHandles();
 
-        $fields = new Fields($this->sections()->map->fields()->flatMap->items(), $this->parent);
+            return new Fields($this->sections()->map->fields()->flatMap->items());
+        };
+
+        $fields = $this->handle() ? Blink::once($this->fieldsBlinkKey(), $fn) : $fn();
+
+        $fields->setParent($this->parent);
 
         $this->fieldsCache = $fields;
 
@@ -329,8 +342,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
                     ->fieldtype($field->fieldtype()->indexComponent())
                     ->label(__($field->display()))
                     ->listable($field->isListable())
-                    ->defaultVisibility($field->isVisible())
-                    ->visible($field->isVisible())
+                    ->defaultVisibility($field->isVisibleOnListing())
+                    ->visible($field->isVisibleOnListing())
                     ->sortable($field->isSortable())
                     ->defaultOrder($index + 1);
             })
@@ -384,7 +397,11 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 
     public function ensureFieldInSection($handle, $config, $section, $prepend = false)
     {
-        $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'config');
+        if (isset($this->ensuredFields[$handle])) {
+            return $this;
+        }
+
+        $this->ensuredFields[$handle] = compact('handle', 'section', 'prepend', 'config');
 
         $this->resetFieldsCache();
 
@@ -394,10 +411,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     public function ensureFieldsInSection($fields, $section, $prepend = false)
     {
         foreach ($fields as $handle => $config) {
-            $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'config');
+            $this->ensureFieldInSection($handle, $config, $section, $prepend);
         }
-
-        $this->resetFieldsCache();
 
         return $this;
     }
@@ -507,6 +522,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         $this->fieldsCache = null;
 
         Blink::forget($this->contentsBlinkKey());
+        Blink::forget($this->fieldsBlinkKey());
 
         return $this;
     }

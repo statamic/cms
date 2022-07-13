@@ -24,4 +24,15 @@ return [
 
     'submissions' => storage_path('forms'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Email View Folder
+    |--------------------------------------------------------------------------
+    |
+    | The folder under resources/views where your email templates are found.
+    |
+    */
+
+    'email_view_folder' => null,
+
 ];

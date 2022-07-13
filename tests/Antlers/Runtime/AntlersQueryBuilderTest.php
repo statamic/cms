@@ -43,6 +43,53 @@ EOT;
         $this->assertSame('FooBazBar', $this->renderString($template, $data));
     }
 
+    public function test_query_builder_array_plucking_on_tag_pairs()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Baz'],
+            ['title' => 'Bar'],
+        ]));
+
+        $builder->shouldReceive('orderBy')->withArgs(function ($field, $direction) {
+            return $field == 'title' && $direction == 'desc';
+        });
+
+        $data = [
+            'items' => $builder,
+            'nested' => [
+                'items' => $builder,
+                'level_two' => [
+                    'level-three' => [
+                        ['items' => []],
+                        ['items' => $builder],
+                        ['items' => []],
+                    ],
+                ],
+            ],
+            'pluck_item' => 2,
+        ];
+
+        $template = <<<'EOT'
+<{{ items.0 }}{{ title }}{{ /items.0 }}>
+<{{ items[pluck_item] }}{{ title }}{{ /items[pluck_item] }}>
+<{{ nested:items.0 }}{{ title }}{{ /nested:items.0 }}>
+<{{ nested:items[pluck_item] }}{{ title }}{{ /nested:items[pluck_item] }}>
+{{ nested.level_two:level-three.1.items order_by="title:desc" }}<{{ title }}>{{ /nested.level_two:level-three.1.items }}
+EOT;
+
+        $expected = <<<'EOT'
+<Foo>
+<Bar>
+<Foo>
+<Bar>
+<Foo><Baz><Bar>
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data));
+    }
+
     public function test_query_builder_loops_receive_tag_parameters_and_can_be_scoped()
     {
         $builder = Mockery::mock(Builder::class);
@@ -173,10 +220,13 @@ EOT;
         ];
 
         $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('get')->once()->andReturn(collect($clientData));
+        $builder->shouldReceive('get')->times(4)->andReturn(collect($clientData));
 
         $data = [
             'clients' => $builder,
+            'nested' => [
+                'clients' => $builder,
+            ],
         ];
 
         VarTest::register();
@@ -194,6 +244,18 @@ EOT;
 EOT;
 
         $this->renderString($template, $data, true);
+        $this->assertSame(VarTest::$var, $builder);
+
+        $this->renderString('{{ var_test :variable="clients.0.title" }}', $data, true);
+        $this->assertSame('Foo', VarTest::$var);
+
+        $this->renderString('{{ var_test :variable="clients.1.title" }}', $data, true);
+        $this->assertSame('Baz', VarTest::$var);
+
+        $this->renderString('{{ var_test :variable="clients.2.title" }}', $data, true);
+        $this->assertSame('Bar', VarTest::$var);
+
+        $this->renderString('{{ var_test :variable="nested.clients" }}', $data, true);
         $this->assertSame(VarTest::$var, $builder);
     }
 
@@ -317,5 +379,47 @@ Statamic\Contracts\Query\Builder
 EOT;
 
         $this->assertSame($expected, $this->renderString($template, $data));
+    }
+
+    public function test_nested_query_builders_process_assignments_correctly()
+    {
+        $totals = [];
+        GlobalRuntimeState::$peekCallbacks = [];
+        GlobalRuntimeState::$peekCallbacks[] = function (NodeProcessor $processor) use (&$totals) {
+            $data = $processor->getActiveData();
+            $totals[] = intval($data['total_time']);
+        };
+
+        $builderOne = Mockery::mock(Builder::class);
+        $builderTwo = Mockery::mock(Builder::class);
+
+        $builderTwo->shouldReceive('get')->andReturn(collect([
+            ['title' => 'Builder-2 One', 'duration' => 10],
+            ['title' => 'Builder-2 Two', 'duration' => 10],
+        ]));
+
+        $builderOne->shouldReceive('get')->andReturn(collect([
+            ['title' => 'Builder-1 One', 'nested_builder' => $builderTwo],
+            ['title' => 'Builder-1 Two', 'nested_builder' => $builderTwo],
+            ['title' => 'Builder-1 Three', 'nested_builder' => $builderTwo],
+        ]));
+
+        $data = [
+            'items' => $builderOne,
+        ];
+
+        $template = <<<'EOT'
+{{ total_time = 0 }}
+{{ items }}
+    {{ nested_builder }}
+        {{ total_time += duration }}
+        {{ ___internal_debug:peek }}
+    {{ /nested_builder }}
+{{ /items }}
+Total: {{ total_time }}
+EOT;
+
+        $this->assertSame('Total: 60', trim($this->renderString($template, $data)));
+        $this->assertSame([10, 20, 30, 40, 50, 60], $totals);
     }
 }

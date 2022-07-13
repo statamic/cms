@@ -5,6 +5,7 @@ namespace Tests\Data\Taxonomies;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -230,6 +231,21 @@ class TaxonomyTest extends TestCase
             ['label' => 'Baz', 'format' => '{baz}'],
             ['label' => 'Qux', 'format' => '{qux}'],
         ], $taxonomy->additionalPreviewTargets()->all());
+    }
+
+    /** @test */
+    public function it_trucates_terms()
+    {
+        $taxonomy = tap(Facades\Taxonomy::make('tags'))->save();
+        Facades\Term::make()->taxonomy('tags')->slug('one')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('two')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('three')->data([])->save();
+
+        $this->assertCount(3, $taxonomy->queryTerms()->get());
+
+        $taxonomy->truncate();
+
+        $this->assertCount(0, $taxonomy->queryTerms()->get());
     }
 
     public function additionalPreviewTargetProvider()

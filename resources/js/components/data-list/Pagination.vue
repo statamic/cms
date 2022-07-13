@@ -2,7 +2,11 @@
 
     <div class="w-full flex">
 
-        <div class="flex-1" v-if="! inline"></div>
+        <div class="flex flex-1 items-center" v-if="! inline">
+            <div class="text-xs text-grey-70" v-if="showTotals && totalItems > 0">
+                {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
+            </div>
+        </div>
 
         <ul v-if="hasMultiplePages" class="pagination" :class="{'pagination-inline': inline}">
 
@@ -52,6 +56,10 @@ export default {
 
     props: {
         inline: {
+            type: Boolean,
+            default: false
+        },
+        showTotals: {
             type: Boolean,
             default: false
         },
@@ -131,7 +139,7 @@ export default {
 
         perPageOptions() {
             let defaultPaginationSize = Statamic.$config.get('paginationSize');
-            let defaultOptions = [10, 25, 50, 100, 500].filter(size => size !== defaultPaginationSize);
+            let defaultOptions = Statamic.$config.get('paginationSizeOptions').filter(size => size !== defaultPaginationSize);
             let options = this.normalizeInputOptions(defaultOptions);
 
             options.push({
@@ -144,6 +152,18 @@ export default {
 
         isPerPageEvenUseful() {
             return this.resourceMeta.total > this.perPageOptions[0].value;
+        },
+
+        fromItem() {
+            return this.resourceMeta.from || 0;
+        },
+
+        toItem() {
+            return this.resourceMeta.to || 0;
+        },
+
+        totalItems() {
+            return this.resourceMeta.total;
         },
 
     },

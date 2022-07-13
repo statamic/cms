@@ -19,6 +19,13 @@ class Template extends Fieldtype
                 'default' => true,
                 'width' => 50,
             ],
+            'folder' => [
+                'display' => __('Folder'),
+                'instructions' => __('statamic::fieldtypes.template.config.folder'),
+                'type' => 'template_folder',
+                'max_items' => 1,
+                'width' => 50,
+            ],
         ];
     }
 

@@ -30,6 +30,7 @@
 
                     <data-list-bulk-actions
                         :url="actionUrl"
+                        :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -63,6 +64,7 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
+                    :show-totals="true"
                     @page-selected="selectPage"
                     @per-page-changed="changePerPage"
                 />
@@ -89,6 +91,12 @@ export default {
             preferencesPrefix: `forms.${this.form}`,
             requestUrl: cp_url(`forms/${this.form}/submissions`),
         }
+    },
+
+    computed: {
+        actionContext() {
+            return {form: this.form};
+        },
     },
 
 }

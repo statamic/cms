@@ -27,6 +27,8 @@ class AssetContainersStore extends BasicStore
             ->createFolders(array_get($data, 'create_folders'))
             ->glideSourcePreset(array_get($data, 'glide_source_preset'))
             ->glideWarmPresets(array_get($data, 'glide_warm_presets'))
-            ->searchIndex(array_get($data, 'search_index'));
+            ->searchIndex(array_get($data, 'search_index'))
+            ->sortField(array_get($data, 'sort_by'))
+            ->sortDirection(array_get($data, 'sort_dir'));
     }
 }

@@ -81,4 +81,13 @@ abstract class AbstractNode
     {
         return $this->content;
     }
+
+    public function getRootRef()
+    {
+        if ($this->parent != null) {
+            return $this->parent->getRootRef();
+        }
+
+        return $this->refId;
+    }
 }

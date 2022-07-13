@@ -51,7 +51,7 @@ class RecursiveParentAnalyzer
                                 break;
                             }
                         } else {
-                            if (Str::contains($subNode->runtimeContent, $recursiveContent) && mb_substr_count($subNode->runtimeContent, '*recursive') == 1) {
+                            if (Str::contains($subNode->runtimeContent, $recursiveContent) && mb_substr_count($subNode->runtimeContent, '*recursive') == 1 && $node->getRootRef() == $subNode->getRootRef()) {
                                 $lastNode = $subNode;
                                 continue;
                             } else {

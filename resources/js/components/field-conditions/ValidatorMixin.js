@@ -11,25 +11,31 @@ export default {
     methods: {
         showField(field, dottedKey) {
             let dottedFieldPath = dottedKey || field.handle;
-            let dottedPrefix = dottedKey? dottedKey.replace(new RegExp('\.'+field.handle+'$'), '') : '';
+            let dottedPrefix = dottedKey ? dottedKey.replace(new RegExp('\.'+field.handle+'$'), '') : '';
 
-            if (this.shouldForceHiddenField(dottedFieldPath)) {
+            // If we know the field is to permanently hidden, bypass validation.
+            if (field.visibility === 'hidden' || this.shouldForceHiddenField(dottedFieldPath)) {
+                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                    dottedKey: dottedFieldPath,
+                    hidden: 'force',
+                    omitValue: false,
+                });
+
                 return false;
             }
 
+            // Use validation to determine whether field should be shown.
             let validator = new Validator(field, this.values, this.$store, this.storeName);
             let passes = validator.passesConditions();
 
-            // TODO: The next tick here is necessary to fix #6018, but not sure it's the _right_ fix.
-            // Something is loading differently, causing the below `hiddenByRevealerField` check
-            // to fail, when the replicator is configured to collapse all sets by default 🤔
+            // Ensure DOM is updated to ensure all revealers are properly loaded and tracked before committing to store.
             this.$nextTick(() => {
-                let hiddenByRevealerField = validator.hasRevealerCondition(dottedPrefix);
+                let hasRevealerCondition = validator.hasRevealerCondition(dottedPrefix);
 
                 this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
                     dottedKey: dottedFieldPath,
                     hidden: ! passes,
-                    omitValue: ! hiddenByRevealerField,
+                    omitValue: (! passes) && (! hasRevealerCondition),
                 });
             });
 

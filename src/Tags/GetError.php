@@ -15,6 +15,10 @@ class GetError extends GetErrors
             return false;
         }
 
-        return ['message' => $errors->first($name)];
+        if (! $error = $errors->first($name)) {
+            return false;
+        }
+
+        return ['message' => $error];
     }
 }
