@@ -4,6 +4,7 @@ namespace Statamic\Query;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Support\Arr;
@@ -270,7 +271,7 @@ abstract class EloquentQueryBuilder implements Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $this->builder->whereDate($this->column($column), $operator, $value, $boolean);
+        $this->builder->whereDay($this->column($column), $operator, $value, $boolean);
 
         return $this;
     }
@@ -314,7 +315,7 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function whereNested(Closure $callback, $boolean = 'and')
     {
-        $query = (new (get_class($this))(clone $this->builder));
+        $query = app(static::class);
         $callback($query);
 
         $this->builder->getQuery()->addNestedWhereQuery($query->builder->getQuery(), $boolean);
