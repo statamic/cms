@@ -1,5 +1,15 @@
 # Release Notes
 
+## 3.3.20 (2022-07-13)
+
+### What's new
+- Ability to keep sections dynamic while using static caching. Adds a `nocache` tag. [#6231](https://github.com/statamic/cms/issues/6231) by @jasonvarga
+
+### What's fixed
+- Fix breadcrumb translation issue. [#6331](https://github.com/statamic/cms/issues/6331) by @jasonvarga
+
+
+
 ## 3.3.19 (2022-07-12)
 
 ### What's new

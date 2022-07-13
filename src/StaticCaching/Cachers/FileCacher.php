@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
+use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -15,6 +16,21 @@ class FileCacher extends AbstractCacher
      * @var Writer
      */
     private $writer;
+
+    /**
+     * @var bool
+     */
+    private $shouldOutputJs = false;
+
+    /**
+     * @var string
+     */
+    private $nocacheJs;
+
+    /**
+     * @var string
+     */
+    private $nocachePlaceholder;
 
     /**
      * @param  Writer  $writer
@@ -165,5 +181,70 @@ class FileCacher extends AbstractCacher
     private function isLongQueryStringPath($path)
     {
         return Str::contains($path, '_lqs_');
+    }
+
+    public function setNocacheJs(string $js)
+    {
+        $this->nocacheJs = $js;
+    }
+
+    public function getNocacheJs(): string
+    {
+        $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
+
+        $default = <<<EOT
+var els = document.getElementsByClassName('nocache');
+var map = {};
+for (var i = 0; i < els.length; i++) {
+    var section = els[i].getAttribute('data-nocache');
+    map[section] = els[i];
+}
+
+fetch('/!/nocache', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        url: window.location.href,
+        sections: Object.keys(map)
+    })
+})
+.then((response) => response.json())
+.then((data) => {
+    const regions = data.regions;
+    for (var key in regions) {
+        if (map[key]) map[key].outerHTML = regions[key];
+    }
+
+    for (const input of document.querySelectorAll('input[value=$csrfPlaceholder]')) {
+        input.value = data.csrf;
+    }
+
+    for (const meta of document.querySelectorAll('meta[content=$csrfPlaceholder]')) {
+        meta.content = data.csrf;
+    }
+});
+EOT;
+
+        return $this->nocacheJs ?? $default;
+    }
+
+    public function shouldOutputJs(): bool
+    {
+        return $this->shouldOutputJs;
+    }
+
+    public function includeJs()
+    {
+        $this->shouldOutputJs = true;
+    }
+
+    public function setNocachePlaceholder(string $content)
+    {
+        $this->nocachePlaceholder = $content;
+    }
+
+    public function getNocachePlaceholder()
+    {
+        return $this->nocachePlaceholder ?? '';
     }
 }

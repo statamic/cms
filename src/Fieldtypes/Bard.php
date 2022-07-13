@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use ProseMirrorToHtml\Renderer;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -241,7 +240,7 @@ class Bard extends Replicator
 
         if (is_string($value)) {
             $value = str_replace('statamic://', '', $value);
-            $doc = (new \HtmlToProseMirror\Renderer)->render($value);
+            $doc = (new Augmentor($this))->renderHtmlToProsemirror($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
@@ -286,9 +285,7 @@ class Bard extends Replicator
             return $value['type'] === 'set';
         })->values();
 
-        $renderer = new Renderer;
-
-        return $renderer->render([
+        return (new Augmentor($this))->renderProsemirrorToHtml([
             'type' => 'doc',
             'content' => $data,
         ]);
@@ -357,7 +354,7 @@ class Bard extends Replicator
                 if (empty($set['text'])) {
                     return;
                 }
-                $doc = (new \HtmlToProseMirror\Renderer)->render($set['text']);
+                $doc = (new Augmentor($this))->renderHtmlToProsemirror($set['text']);
 
                 return $doc['content'];
             }
