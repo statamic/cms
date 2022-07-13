@@ -295,8 +295,10 @@
         }
     }
 
-    blockquote, ol, ul {
-        p {
+    blockquote,
+    ol li,
+    ul li {
+        > p {
             margin-top: 0;
             margin-bottom: .85em;
         }
@@ -405,7 +407,10 @@
         margin-bottom: 0;
     }
 
-    .tableWrapper table {
+    .tableWrapper table,
+    blockquote > .tableWrapper table,
+    ol li > .tableWrapper table,
+    ul li > .tableWrapper table {
         @apply w-full overflow-hidden m-0 mb-2 bg-white text-sm ;
         border-collapse: collapse;
         table-layout: fixed;

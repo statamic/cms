@@ -71,7 +71,7 @@ return [
     'fields_instructions_instructions' => 'Shown under the field\'s display label, like this very text. Markdown is supported.',
     'fields_instructions_position_instructions' => 'Show instructions above or below the field.',
     'fields_listable_instructions' => 'Control the listing column visibility.',
-    'fields_read_only_instructions' => 'Disable editing in the control panel.',
+    'fields_visibility_instructions' => 'Control field visibility on publish forms.',
     'fieldset_import_fieldset_instructions' => 'The fieldset to be imported.',
     'fieldset_import_prefix_instructions' => 'The prefix that should be applied to each field when they are imported. eg. hero_',
     'fieldset_intro' => 'Fieldsets are an optional companion to blueprints, acting as reusable partials that can be used within blueprints.',

@@ -35,6 +35,13 @@ class Bard extends Replicator
                 'default' => false,
                 'width' => 50,
             ],
+            'previews' => [
+                'display' => __('Field Previews'),
+                'instructions' => __('statamic::fieldtypes.bard.config.previews'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'sets' => [
                 'display' => __('Sets'),
                 'instructions' => __('statamic::fieldtypes.bard.config.sets'),

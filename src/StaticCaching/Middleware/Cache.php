@@ -3,8 +3,11 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\NoCache\Session;
+use Statamic\StaticCaching\Replacer;
 
 class Cache
 {
@@ -13,9 +16,15 @@ class Cache
      */
     private $cacher;
 
-    public function __construct(Cacher $cacher)
+    /**
+     * @var Session
+     */
+    protected $nocache;
+
+    public function __construct(Cacher $cacher, Session $nocache)
     {
         $this->cacher = $cacher;
+        $this->nocache = $nocache;
     }
 
     /**
@@ -28,16 +37,36 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return response($this->cacher->getCachedPage($request));
+            $response = response($this->cacher->getCachedPage($request));
+
+            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
+
+            return $response;
         }
 
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
-            $this->cacher->cachePage($request, $response);
+            $this->makeReplacementsAndCacheResponse($request, $response);
+
+            $this->nocache->write();
         }
 
         return $response;
+    }
+
+    private function makeReplacementsAndCacheResponse($request, $response)
+    {
+        $cachedResponse = clone $response;
+
+        $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
+
+        $this->cacher->cachePage($request, $cachedResponse);
+    }
+
+    private function getReplacers(): Collection
+    {
+        return collect(config('statamic.static_caching.replacers'))->map(fn ($class) => app($class));
     }
 
     private function canBeCached($request)

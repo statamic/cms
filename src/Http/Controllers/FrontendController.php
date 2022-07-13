@@ -5,11 +5,8 @@ namespace Statamic\Http\Controllers;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Data;
-use Statamic\Facades\Site;
 use Statamic\Http\Responses\DataResponse;
-use Statamic\Statamic;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\View\View;
 
 /**
@@ -29,21 +26,7 @@ class FrontendController extends Controller
      */
     public function index(Request $request)
     {
-        $url = Site::current()->relativePath($request->getUri());
-
-        if (Statamic::isAmpRequest()) {
-            $url = Str::ensureLeft(Str::after($url, '/'.config('statamic.amp.route')), '/');
-        }
-
-        if (Str::contains($url, '?')) {
-            $url = substr($url, 0, strpos($url, '?'));
-        }
-
-        if (Str::endsWith($url, '/') && Str::length($url) > 1) {
-            $url = rtrim($url, '/');
-        }
-
-        if ($data = Data::findByUri($url, Site::current()->handle())) {
+        if ($data = Data::findByRequestUrl($request->url())) {
             return $data;
         }
 
@@ -57,7 +40,7 @@ class FrontendController extends Controller
         $data = Arr::pull($params, 'data');
         $data = array_merge($params, $data);
 
-        $view = (new View)
+        $view = app(View::class)
             ->template($view)
             ->layout(Arr::get($data, 'layout', 'layout'))
             ->with($data)

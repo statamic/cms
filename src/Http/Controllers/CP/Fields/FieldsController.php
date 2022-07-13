@@ -128,11 +128,16 @@ class FieldsController extends CpController
                     'type' => 'section',
                 ],
             ],
-            'read_only' => [
-                'display' => __('Read Only'),
-                'instructions' => __('statamic::messages.fields_read_only_instructions'),
-                'type' => 'toggle',
-                'validate' => 'boolean',
+            'visibility' => [
+                'display' => __('Visibility'),
+                'instructions' => __('statamic::messages.fields_visibility_instructions'),
+                'options' => [
+                    'visible' => __('Visible'),
+                    'read_only' => __('Read Only'),
+                    'hidden' => __('Hidden'),
+                ],
+                'default' => 'visible',
+                'type' => 'select',
                 'width' => 33,
             ],
         ]);

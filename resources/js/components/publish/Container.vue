@@ -127,7 +127,13 @@ export default {
                             state.jsonSubmittingFields.push(dottedKey);
                         }
                     },
-                    setRevealerFields(state, dottedKey) {
+                    unsetFieldSubmitsJson(state, dottedKey) {
+                        const index = state.jsonSubmittingFields.indexOf(dottedKey);
+                        if (index !== -1) {
+                            state.jsonSubmittingFields.splice(index, 1);
+                        }
+                    },
+                    setRevealerField(state, dottedKey) {
                         if (state.revealerFields.indexOf(dottedKey) === -1) {
                             state.revealerFields.push(dottedKey);
                         }

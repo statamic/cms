@@ -3,6 +3,8 @@
 namespace Tests\StaticCaching;
 
 use Mockery;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Globals\GlobalSet;
@@ -28,6 +30,35 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $invalidator = new Invalidator($cacher, 'all');
 
         $this->assertNull($invalidator->invalidate($item));
+    }
+
+    /** @test */
+    public function assets_can_trigger_url_invalidation()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/page/one', '/page/two']);
+        });
+
+        $container = tap(Mockery::mock(AssetContainer::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('main');
+        });
+
+        $asset = tap(Mockery::mock(Asset::class), function ($m) use ($container) {
+            $m->shouldReceive('container')->andReturn($container);
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'assets' => [
+                'main' => [
+                    'urls' => [
+                        '/page/one',
+                        '/page/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($asset));
     }
 
     /** @test */
