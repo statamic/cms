@@ -4,7 +4,7 @@ export default class CustomDoc extends Doc {
 
     get schema() {
         return {
-            content: '(block | set)+',
+            content: '(block | root)+',
         }
     }
 

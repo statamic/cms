@@ -44,8 +44,33 @@ class GlideImageManipulator implements ImageManipulator
      * @var array
      */
     private $api = [
-        'or', 'crop', 'w', 'h', 'fit', 'dpr', 'bri', 'con', 'gam', 'sharp', 'blur', 'pixel', 'filt',
-        'mark', 'markw', 'markx', 'marky', 'markpad', 'markpos', 'bg', 'border', 'q', 'fm', 'p',
+        'bg',
+        'blur',
+        'border',
+        'bri',
+        'con',
+        'crop',
+        'dpr',
+        'filt',
+        'fit',
+        'fm',
+        'gam',
+        'h',
+        'mark',
+        'markalpha',
+        'markfit',
+        'markh',
+        'markpad',
+        'markpos',
+        'markw',
+        'markx',
+        'marky',
+        'or',
+        'p',
+        'pixel',
+        'q',
+        'sharp',
+        'w',
     ];
 
     /**

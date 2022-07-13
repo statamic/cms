@@ -27,9 +27,11 @@
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
-                    <data-list-table 
+                    <data-list-table
                         v-show="items.length"
                         :allow-bulk-actions="true"
+                        :allow-column-picker="true"
+                        :column-preferences-key="preferencesKey('columns')"
                         @sorted="sorted"
                     >
                         <template slot="cell-email" slot-scope="{ row: user, value }">
@@ -42,6 +44,9 @@
                             <span v-if="user.super" class="badge-pill-sm mr-sm">{{ __('Super Admin') }}</span>
                             <span v-if="!roles || roles.length === 0" />
                             <span v-for="role in (roles || [])" class="badge-pill-sm mr-sm">{{ role.title }}</span>
+                        </template>
+                        <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
+                            <span v-for="group in (groups || [])" class="badge-pill-sm mr-sm">{{ group.title }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
@@ -63,6 +68,7 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
+                    :show-totals="true"
                     @page-selected="selectPage"
                     @per-page-changed="changePerPage"
                 />
@@ -86,6 +92,7 @@ export default {
 
     data() {
         return {
+            preferencesPrefix: 'users',
             requestUrl: cp_url('users'),
         }
     },

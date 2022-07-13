@@ -27,7 +27,7 @@ class Nav extends Structure
         }
 
         $crumbs = collect($segments)->map(function () use (&$segments) {
-            $uri = URL::tidy(join('/', $segments));
+            $uri = URL::tidy(implode('/', $segments));
             array_pop($segments);
 
             return $uri;
@@ -50,6 +50,10 @@ class Nav extends Structure
 
             return $crumb;
         });
+
+        if (! $this->parser) {
+            return $crumbs;
+        }
 
         $output = $this->parseLoop($crumbs->toAugmentedArray());
 
