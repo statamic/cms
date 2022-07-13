@@ -64,16 +64,21 @@ class StaticCacheManager extends Manager
 
     public function nocacheJs(string $js)
     {
-        $this->driver()->setNocacheJs($js);
+        $this->fileDriver()->setNocacheJs($js);
     }
 
     public function nocachePlaceholder(string $placeholder)
     {
-        $this->driver()->setNocachePlaceholder($placeholder);
+        $this->fileDriver()->setNocachePlaceholder($placeholder);
     }
 
     public function includeJs()
     {
-        $this->driver()->includeJs();
+        $this->fileDriver()->includeJs();
+    }
+
+    private function fileDriver()
+    {
+        return ($driver = $this->driver()) instanceof FileCacher ? $driver : optional();
     }
 }
