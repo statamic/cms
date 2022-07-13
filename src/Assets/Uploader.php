@@ -66,6 +66,32 @@ class Uploader
     }
 
     /**
+     * Get safe filename.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function getSafeFilename($string)
+    {
+        $replacements = [
+            ' ' => '-',
+            '#' => '-',
+        ];
+
+        $str = Stringy::create(urldecode($string))->toAscii();
+
+        foreach ($replacements as $from => $to) {
+            $str = $str->replace($from, $to);
+        }
+
+        if (config('statamic.assets.lowercase')) {
+            $str = strtolower($str);
+        }
+
+        return (string) $str;
+    }
+
+    /**
      * Get the container's filesystem disk instance.
      *
      * @return \Statamic\Filesystem\FlysystemAdapter
@@ -84,7 +110,7 @@ class Uploader
     private function getSafeUploadPath(UploadedFile $file)
     {
         $ext = $file->getClientOriginalExtension();
-        $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $filename = self::getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
 
         $directory = $this->asset->folder();
         $directory = ($directory === '.') ? '/' : $directory;
@@ -98,28 +124,6 @@ class Uploader
         }
 
         return $path;
-    }
-
-    /**
-     * Get safe filename.
-     *
-     * @param  string  $string
-     * @return string
-     */
-    private function getSafeFilename($string)
-    {
-        $replacements = [
-            ' ' => '-',
-            '#' => '-',
-        ];
-
-        $str = Stringy::create(urldecode($string))->toAscii();
-
-        foreach ($replacements as $from => $to) {
-            $str = $str->replace($from, $to);
-        }
-
-        return (string) $str;
     }
 
     /**
