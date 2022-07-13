@@ -16,7 +16,11 @@ class CsrfTokenReplacer implements Replacer
             return;
         }
 
-        if (! str_contains($content, $token = csrf_token())) {
+        if (! $token = csrf_token()) {
+            return;
+        }
+
+        if (! str_contains($content, $token)) {
             return;
         }
 
