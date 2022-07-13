@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Replacers;
 
 use Illuminate\Http\Response;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Replacer;
 
 class CsrfTokenReplacer implements Replacer
@@ -11,14 +12,20 @@ class CsrfTokenReplacer implements Replacer
 
     public function prepareResponseToCache(Response $response, Response $initial)
     {
-        if (! $response->getContent()) {
+        if (! $content = $response->getContent()) {
             return;
         }
 
+        if (! str_contains($content, $token = csrf_token())) {
+            return;
+        }
+
+        StaticCache::includeJs();
+
         $response->setContent(str_replace(
-            csrf_token(),
+            $token,
             self::REPLACEMENT,
-            $response->getContent()
+            $content
         ));
     }
 

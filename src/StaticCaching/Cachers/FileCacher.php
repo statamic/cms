@@ -18,6 +18,11 @@ class FileCacher extends AbstractCacher
     private $writer;
 
     /**
+     * @var bool
+     */
+    private $shouldOutputJs = false;
+
+    /**
      * @var string
      */
     private $nocacheJs;
@@ -221,6 +226,16 @@ fetch('/!/nocache', {
 EOT;
 
         return $this->nocacheJs ?? $default;
+    }
+
+    public function shouldOutputJs(): bool
+    {
+        return $this->shouldOutputJs;
+    }
+
+    public function includeJs()
+    {
+        $this->shouldOutputJs = true;
     }
 
     public function setNocachePlaceholder(string $content)

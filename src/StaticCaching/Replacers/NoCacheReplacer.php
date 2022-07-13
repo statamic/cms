@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Replacers;
 
 use Illuminate\Http\Response;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\NoCache\Session;
@@ -39,6 +40,8 @@ class NoCacheReplacer implements Replacer
 
         if (preg_match(self::PATTERN, $content)) {
             $this->session->restore();
+
+            StaticCache::includeJs();
         }
 
         $response->setContent($this->replace($content));
@@ -72,9 +75,12 @@ class NoCacheReplacer implements Replacer
             return;
         }
 
-        $js = $cacher->getNocacheJs();
+        $contents = $response->getContent();
 
-        $contents = str_replace('</body>', '<script type="text/javascript">'.$js.'</script></body>', $response->getContent());
+        if ($cacher->shouldOutputJs()) {
+            $js = $cacher->getNocacheJs();
+            $contents = str_replace('</body>', '<script type="text/javascript">'.$js.'</script></body>', $contents);
+        }
 
         $contents = str_replace('NOCACHE_PLACEHOLDER', $cacher->getNocachePlaceholder(), $contents);
 

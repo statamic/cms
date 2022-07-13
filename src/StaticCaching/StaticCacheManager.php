@@ -71,4 +71,9 @@ class StaticCacheManager extends Manager
     {
         $this->driver()->setNocachePlaceholder($placeholder);
     }
+
+    public function includeJs()
+    {
+        $this->driver()->includeJs();
+    }
 }
