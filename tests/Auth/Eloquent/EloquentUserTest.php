@@ -29,7 +29,11 @@ class EloquentUserTest extends TestCase
 
         Carbon::setTestNow(Carbon::create(2019, 11, 21, 23, 39, 29));
 
-        config(['statamic.users.repository' => 'eloquent']);
+        config([
+            'statamic.users.repository' => 'eloquent',
+            'statamic.users.tables.groups' => 'groups',
+            'statamic.users.tables.roles' => 'roles',
+        ]);
 
         $this->migrationsDir = __DIR__.'/__migrations__';
 
@@ -38,7 +42,7 @@ class EloquentUserTest extends TestCase
         $tmpDir = $this->migrationsDir.'/tmp';
 
         if (! self::$migrationsGenerated) {
-            $this->please('auth:migration', ['--path' => $tmpDir, '--test' => true]);
+            $this->please('auth:migration', ['--path' => $tmpDir]);
 
             self::$migrationsGenerated = true;
         }

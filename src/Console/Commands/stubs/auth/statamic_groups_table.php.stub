@@ -15,7 +15,7 @@ class StatamicGroupsTable extends Migration
     {
         Schema::create('GROUPS_TABLE', function (Blueprint $table) {
             $table->id();
-            $table->string('handle');
+            $table->string('handle')->unique();
             $table->string('title');
             $table->json('roles')->nullable();
             $table->timestamps();

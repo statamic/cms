@@ -5,6 +5,7 @@ namespace Statamic\Auth\Eloquent;
 use Illuminate\Support\Collection;
 use Statamic\Auth\File\UserGroupRepository as BaseRepository;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
+use Statamic\Facades\Blink;
 
 class UserGroupRepository extends BaseRepository
 {
@@ -24,6 +25,8 @@ class UserGroupRepository extends BaseRepository
         $model->save();
 
         $userGroup->model($model->fresh());
+
+        Blink::forget("eloquent-groups-{$userGroup->handle()}");
     }
 
     public function delete($userGroup)
@@ -33,6 +36,9 @@ class UserGroupRepository extends BaseRepository
         }
 
         $userGroup->model()->delete();
+
+        Blink::forget("eloquent-groups-{$userGroup->handle()}");
+        Blink::forget('eloquent-groups-all');
     }
 
     public static function bindings(): array
@@ -48,8 +54,13 @@ class UserGroupRepository extends BaseRepository
             return parent::all();
         }
 
-        return UserGroupModel::all()->map(function ($model) {
-            return (new UserGroup)::fromModel($model);
+        return Blink::once('eloquent-groups-all', function () {
+            return UserGroupModel::all()
+                ->map(function ($model) {
+                    return Blink::once("eloquent-groups-{$model->handle}", function () use ($model) {
+                        return (new UserGroup)->fromModel($model);
+                    });
+                });
         });
     }
 
@@ -59,9 +70,11 @@ class UserGroupRepository extends BaseRepository
             return parent::find($id);
         }
 
-        $model = UserGroupModel::whereHandle($id)->first();
+        return Blink::once("eloquent-groups-{$handle}", function () use ($handle) {
+            $model = UserGroupModel::whereHandle($handle)->first();
 
-        return $model ? (new UserGroup)->fromModel($model) : null;
+            return $model ? (new UserGroup)->fromModel($model) : null;
+        });
     }
 
     private function isEloquentEnabled()

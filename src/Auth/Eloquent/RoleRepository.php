@@ -5,6 +5,7 @@ namespace Statamic\Auth\Eloquent;
 use Illuminate\Support\Collection;
 use Statamic\Auth\RoleRepository as BaseRepository;
 use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Facades\Blink;
 
 class RoleRepository extends BaseRepository
 {
@@ -23,6 +24,8 @@ class RoleRepository extends BaseRepository
         $model->save();
 
         $role->model($model->fresh());
+
+        Blink::forget("eloquent-roles-{$role->handle()}");
     }
 
     public function delete($role)
@@ -32,6 +35,9 @@ class RoleRepository extends BaseRepository
         }
 
         $role->model()->delete();
+
+        Blink::forget("eloquent-roles-{$role->handle()}");
+        Blink::forget('eloquent-roles-all');
     }
 
     public static function bindings(): array
@@ -47,8 +53,13 @@ class RoleRepository extends BaseRepository
             return parent::all();
         }
 
-        return RoleModel::all()->map(function ($model) {
-            return (new Role)::fromModel($model);
+        return Blink::once('eloquent-roles-all', function () {
+            return RoleModel::all()
+                ->map(function ($model) {
+                    return Blink::once("eloquent-roles-{$model->handle}", function () use ($model) {
+                        return (new Role)->fromModel($model);
+                    });
+                });
         });
     }
 
@@ -58,9 +69,11 @@ class RoleRepository extends BaseRepository
             return parent::find($handle);
         }
 
-        $model = RoleModel::whereHandle($handle)->first();
+        return Blink::once("eloquent-roles-{$handle}", function () use ($handle) {
+            $model = RoleModel::whereHandle($handle)->first();
 
-        return $model ? (new Role)->fromModel($model) : null;
+            return $model ? (new Role)->fromModel($model) : null;
+        });
     }
 
     private function isEloquentEnabled()
