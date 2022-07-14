@@ -378,9 +378,7 @@ class Statamic
 
     private static function createVersionedAssetPath($name, $path, $type)
     {
-        $ttl = now()->addDay();
-
-        return Cache::remember("statamic-{$type}-{$name}", $ttl, function () use ($path, $type) {
+        return Cache::rememberForever("statamic-{$type}-{$name}", $ttl, function () use ($path, $type) {
             // If passing a path versioned by laravel mix, it will contain ?id=
             // Do nothing and return that path.
             if (Str::contains($path, '?id=')) {
