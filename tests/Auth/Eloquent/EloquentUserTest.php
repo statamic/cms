@@ -29,11 +29,7 @@ class EloquentUserTest extends TestCase
 
         Carbon::setTestNow(Carbon::create(2019, 11, 21, 23, 39, 29));
 
-        config([
-            'statamic.users.repository' => 'eloquent',
-            'statamic.users.tables.groups' => 'groups',
-            'statamic.users.tables.roles' => 'roles',
-        ]);
+        config(['statamic.users.repository' => 'eloquent']);
 
         $this->migrationsDir = __DIR__.'/__migrations__';
 
