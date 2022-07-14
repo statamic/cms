@@ -39,6 +39,30 @@ sections:
           icon: array
           listable: hidden
       -
+        handle: replicator_blocks
+        field:
+          collapse: false
+          sets:
+            text:
+              display: Text
+              fields:
+                -
+                  handle: text
+                  field:
+                    antlers: false
+                    display: Text
+                    type: textarea
+                    icon: textarea
+                    listable: hidden
+                    instructions_position: above
+                    read_only: false
+          display: Blocks
+          type: replicator
+          icon: replicator
+          listable: hidden
+          instructions_position: above
+          read_only: false
+      -
         handle: array_keyed
         field:
           mode: keyed

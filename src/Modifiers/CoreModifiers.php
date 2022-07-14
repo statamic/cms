@@ -4,6 +4,7 @@ namespace Statamic\Modifiers;
 
 use ArrayAccess;
 use Carbon\Carbon;
+use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -21,6 +22,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -220,12 +222,16 @@ class CoreModifiers extends Modifier
     /**
      * Breaks arrays or collections into smaller ones of a given size.
      *
-     * @param  $value
+     * @param  mixed  $value
      * @param  array  $params
      * @return array
      */
     public function chunk($value, $params)
     {
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         return collect($value)
             ->chunk(Arr::get($params, 0))
             ->map(function ($chunk) {
@@ -283,7 +289,7 @@ class CoreModifiers extends Modifier
     /**
      * Debug a value with a call to JavaScript's console.log.
      *
-     * @param  $value
+     * @param  mixed  $value
      * @return string
      */
     public function consoleLog($value)
@@ -351,7 +357,7 @@ class CoreModifiers extends Modifier
     /**
      * Returns the number of items in an array.
      *
-     * @param  $value
+     * @param  mixed  $value
      * @return int
      */
     public function count($value)
@@ -801,7 +807,7 @@ class CoreModifiers extends Modifier
 
     private function getGroupByValue($item, $groupBy)
     {
-        $value = is_object($item)
+        $value = is_object($item) && ! $item instanceof Values
             ? $this->getGroupByValueFromObject($item, $groupBy)
             : $this->getGroupByValueFromArray($item, $groupBy);
 
@@ -1279,7 +1285,7 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
-        if (Compare::isQueryBuilder($value)) {
+        if (Compare::isQueryBuilder($value) || $value instanceof Countable) {
             return $value->count();
         }
 
@@ -1614,6 +1620,26 @@ class CoreModifiers extends Modifier
         if ($asset) {
             return $asset->disk()->get($asset->path());
         }
+    }
+
+    /**
+     * Get a path component.
+     *
+     * @param $value
+     * @return string
+     */
+    public function pathinfo($value, $params)
+    {
+        $key = Arr::get($params, 0);
+
+        $component = $key ? [
+            'dirname'   => PATHINFO_DIRNAME,
+            'basename'  => PATHINFO_BASENAME,
+            'extension' => PATHINFO_EXTENSION,
+            'filename'  => PATHINFO_FILENAME,
+        ][$key] : (defined('PATHINFO_ALL') ? PATHINFO_ALL : 15);
+
+        return pathinfo($value, $component);
     }
 
     /**
@@ -1955,9 +1981,9 @@ class CoreModifiers extends Modifier
     /**
      * Returns a segment by number from any valid URL or UI.
      *
-     * @param  $value
-     * @param  $params
-     * @param  $context
+     * @param  mixed  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return string
      */
     public function segment($value, $params, $context)
@@ -2070,6 +2096,10 @@ class CoreModifiers extends Modifier
     {
         $seed = Arr::get($params, 0);
 
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         if (is_array($value)) {
             return collect($value)->shuffle($seed)->all();
         }
@@ -2139,7 +2169,7 @@ class CoreModifiers extends Modifier
     public function sort($value, $params)
     {
         $key = Arr::get($params, 0, 'true');
-        $desc = strtolower(Arr::get($params, 1)) == 'desc';
+        $desc = strtolower(Arr::get($params, 1, 'asc')) == 'desc';
 
         $value = $value instanceof Collection ? $value : collect($value);
 
@@ -2228,6 +2258,66 @@ class CoreModifiers extends Modifier
         }
 
         return Str::stripTags($value, (array) $tags);
+    }
+
+    /**
+     * Make str_pad() with padding available as a modifier.
+     *
+     * Example: {{ my_index | str_pad:2:0:left }}
+     *
+     * @param  string  $value  The value to be modified.
+     * @param  array  $params  Any parameters used in the modifier.
+     * @return string
+     */
+    public function strPad(string $value, array $params): string
+    {
+        $pad_length = Arr::get($params, 0);
+        $pad_string = Arr::get($params, 1, ' ');
+        $pad_type = constant('STR_PAD_'.Str::upper(Arr::get($params, 2, 'RIGHT')));
+
+        return str_pad($value, $pad_length, $pad_string, $pad_type);
+    }
+
+    /**
+     * Make str_pad() with both padding available as a modifier.
+     *
+     * Example: {{ my_index | str_pad_both:2:0 }}
+     *
+     * @param  string  $value  The value to be modified.
+     * @param  array  $params  Any parameters used in the modifier.
+     * @return string
+     */
+    public function strPadBoth(string $value, array $params): string
+    {
+        return $this->strPad($value, array_merge($params, [2 => 'BOTH']));
+    }
+
+    /**
+     * Make str_pad() with left padding available as a modifier.
+     *
+     * Example: {{ my_index | str_pad_left:2:0 }}
+     *
+     * @param  string  $value  The value to be modified.
+     * @param  array  $params  Any parameters used in the modifier.
+     * @return string
+     */
+    public function strPadLeft(string $value, array $params): string
+    {
+        return $this->strPad($value, array_merge($params, [2 => 'LEFT']));
+    }
+
+    /**
+     * Make str_pad() with right padding available as a modifier.
+     *
+     * Example: {{ my_index | str_pad_right:2:0 }}
+     *
+     * @param  string  $value  The value to be modified.
+     * @param  array  $params  Any parameters used in the modifier.
+     * @return string
+     */
+    public function strPadRight(string $value, array $params): string
+    {
+        return $this->strPad($value, array_merge($params, [2 => 'RIGHT']));
     }
 
     /**
@@ -2375,6 +2465,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Convert value to a boolean.
+     *
+     * @param $params
+     * @param $value
+     * @return bool
+     */
+    public function toBool($value, $params)
+    {
+        if (is_string($value)) {
+            return Str::toBool($value);
+        }
+
+        return boolval($value);
+    }
+
+    /**
      * Converts the data to json.
      *
      * @param $value
@@ -2383,7 +2489,7 @@ class CoreModifiers extends Modifier
      */
     public function toJson($value, $params)
     {
-        $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : null;
+        $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : 0;
 
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
@@ -2481,8 +2587,8 @@ class CoreModifiers extends Modifier
     /**
      * Converts a Carbon instance to a timestamp.
      *
-     * @param  $value
-     * @param  $params
+     * @param  Carbon  $value
+     * @param  array  $params
      * @return int
      */
     public function timestamp($value)
@@ -2496,8 +2602,8 @@ class CoreModifiers extends Modifier
      * Accepts a timezone string as a parameter. If none is provided, then
      * the timezone defined in the system settings will be used.
      *
-     * @param  $value
-     * @param  $params
+     * @param  string  $value
+     * @param  array  $params
      * @return Carbon
      */
     public function timezone($value, $params)
@@ -2608,6 +2714,30 @@ class CoreModifiers extends Modifier
         $item = is_string($value) ? optional(Data::find($value)) : $value;
 
         return $item->url();
+    }
+
+    /**
+     * Get a URL component.
+     *
+     * @param $value
+     * @return string
+     */
+    public function parse_url($value, $params)
+    {
+        $key = Arr::get($params, 0);
+
+        $component = $key ? [
+            'scheme'   => PHP_URL_SCHEME,
+            'host'     => PHP_URL_HOST,
+            'port'     => PHP_URL_PORT,
+            'user'     => PHP_URL_USER,
+            'pass'     => PHP_URL_PASS,
+            'path'     => PHP_URL_PATH,
+            'query'    => PHP_URL_QUERY,
+            'fragment' => PHP_URL_FRAGMENT,
+        ][$key] : -1;
+
+        return parse_url($value, $component);
     }
 
     /**

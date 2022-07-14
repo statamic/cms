@@ -77,6 +77,308 @@ EOT;
 EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+{{ nav:main include_home="true" }}
+<div>ONE: {{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+
+{{ nav:main include_home="true" }}
+<div>TWO: {{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+EOT;
+
+        $expected = <<<'EOT'
+<div>ONE: 1 Home</div>
+
+
+<div>ONE: 1 About</div>
+
+<div>ONE: 2 Team</div>
+
+
+<div>ONE: 2 Leadership</div>
+
+
+
+<div>ONE: 1 Projects</div>
+
+<div>ONE: 2 Project-1</div>
+
+
+<div>ONE: 2 Project-2</div>
+
+<div>ONE: 3 Project 2 Nested</div>
+
+
+
+
+<div>ONE: 1 Contact</div>
+
+
+
+
+<div>TWO: 1 Home</div>
+
+
+<div>TWO: 1 About</div>
+
+<div>TWO: 2 Team</div>
+
+
+<div>TWO: 2 Leadership</div>
+
+
+
+<div>TWO: 1 Projects</div>
+
+<div>TWO: 2 Project-1</div>
+
+
+<div>TWO: 2 Project-2</div>
+
+<div>TWO: 3 Project 2 Nested</div>
+
+
+
+
+<div>TWO: 1 Contact</div>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+<ul>
+{{ nav:main }}
+{{ if depth === 1 }}
+<li class="if-depth-one">
+{{ title }} - {{ depth }}<br />
+{{ if children }}
+<ul class="if-depth-one-children">
+{{ *recursive children* }}
+</ul>
+{{ /if }}
+
+</li>
+{{ elseif depth == 2 }}
+<li class="else-depth-two">
+{{ title }} - {{ depth }}<br />
+{{ if children }}
+<ul class="if-else-depth-two-children">
+{{ *recursive children* }}
+</ul>
+{{ /if }}
+</li>
+
+{{ else }}
+<li class="else-other-depths">
+{{ title }} -- {{ depth }}
+</li>
+{{ /if }}
+{{ /nav:main }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+
+
+<li class="if-depth-one">
+Home - 1<br />
+
+
+</li>
+
+
+
+<li class="if-depth-one">
+About - 1<br />
+
+<ul class="if-depth-one-children">
+
+
+<li class="else-depth-two">
+Team - 2<br />
+
+</li>
+
+
+
+
+<li class="else-depth-two">
+Leadership - 2<br />
+
+</li>
+
+
+
+</ul>
+
+
+</li>
+
+
+
+<li class="if-depth-one">
+Projects - 1<br />
+
+<ul class="if-depth-one-children">
+
+
+<li class="else-depth-two">
+Project-1 - 2<br />
+
+</li>
+
+
+
+
+<li class="else-depth-two">
+Project-2 - 2<br />
+
+<ul class="if-else-depth-two-children">
+
+
+<li class="else-other-depths">
+Project 2 Nested -- 3
+</li>
+
+
+</ul>
+
+</li>
+
+
+
+</ul>
+
+
+</li>
+
+
+
+<li class="if-depth-one">
+Contact - 1<br />
+
+
+</li>
+
+
+</ul>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+<ul class="parent-menu">
+{{ nav:main }}
+{{ if depth == 1 }}
+<li {{ if children }} something{{ endif }}>
+<a>
+{{ title }}
+</a>
+{{ if children }}
+<ul class="child-menu">
+{{ *recursive children* }}
+</ul>
+{{ endif }}
+</li>
+{{ else }}
+<li>
+<a>
+{{ title }}
+</a>
+</li>
+{{ endif }}
+{{ /nav:main }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul class="parent-menu">
+
+
+<li >
+<a>
+Home
+</a>
+
+</li>
+
+
+
+<li  something>
+<a>
+About
+</a>
+
+<ul class="child-menu">
+
+
+<li>
+<a>
+Team
+</a>
+</li>
+
+
+
+<li>
+<a>
+Leadership
+</a>
+</li>
+
+
+</ul>
+
+</li>
+
+
+
+<li  something>
+<a>
+Projects
+</a>
+
+<ul class="child-menu">
+
+
+<li>
+<a>
+Project-1
+</a>
+</li>
+
+
+
+<li>
+<a>
+Project-2
+</a>
+</li>
+
+
+</ul>
+
+</li>
+
+
+
+<li >
+<a>
+Contact
+</a>
+
+</li>
+
+
+</ul>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
     }
 
     public function test_recursive_node_can_be_root()

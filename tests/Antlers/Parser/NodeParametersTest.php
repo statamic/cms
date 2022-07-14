@@ -46,6 +46,31 @@ EOT;
         $this->assertSame('sendForm()', $param2->value);
     }
 
+    public function test_tag_parameters_can_start_with_numbers()
+    {
+        $template = <<<'EOT'
+{{ tag lg:ratio="2" 2xl:ratio="7" }}
+EOT;
+
+        $nodes = $this->parseNodes($template);
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+
+        /** @var AntlersNode $node */
+        $node = $nodes[0];
+
+        $this->assertCount(2, $node->parameters);
+
+        $param1 = $node->parameters[0];
+        $param2 = $node->parameters[1];
+
+        $this->assertSame('lg:ratio', $param1->name);
+        $this->assertSame('2', $param1->value);
+
+        $this->assertSame('2xl:ratio', $param2->name);
+        $this->assertSame('7', $param2->value);
+    }
+
     public function test_node_parameter_escape_consistent_behavior()
     {
         // Ensure that the escape sequence behavior
@@ -225,5 +250,19 @@ EOT;
         $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
         $this->assertSame('<figure>', $nodes[0]->content);
         $this->assertSame('FINAL_LITERAL</figure>', $nodes[2]->content);
+
+        $template = <<<'EOT'
+ <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div> 
+EOT;
+
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(3, $nodes);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[0]);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[1]);
+        $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
+
+        $this->assertSame(' <div class="list-of-classes">     ', $nodes[0]->content);
+        $this->assertSame('FINAL_LITERAL </div> ', $nodes[2]->content);
     }
 }

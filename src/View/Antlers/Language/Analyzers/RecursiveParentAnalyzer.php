@@ -51,7 +51,7 @@ class RecursiveParentAnalyzer
                                 break;
                             }
                         } else {
-                            if (Str::contains($subNode->runtimeContent, $recursiveContent) && mb_substr_count($subNode->runtimeContent, '*recursive') == 1) {
+                            if (Str::contains($subNode->runtimeContent, $recursiveContent) && mb_substr_count($subNode->runtimeContent, '*recursive') == 1 && $node->getRootRef() == $subNode->getRootRef()) {
                                 $lastNode = $subNode;
                                 continue;
                             } else {
@@ -62,6 +62,8 @@ class RecursiveParentAnalyzer
                         }
                     }
                 }
+
+                $lastNode = self::findNextNonConditional($lastNode);
 
                 if ($lastNode == null) {
                     throw ErrorFactory::makeSyntaxError(
@@ -88,5 +90,18 @@ class RecursiveParentAnalyzer
                 }
             }
         }
+    }
+
+    private static function findNextNonConditional(AntlersNode $node)
+    {
+        if (ConditionPairAnalyzer::isConditionalStructure($node) == false) {
+            return $node;
+        }
+
+        if ($node->parent == null) {
+            return $node;
+        }
+
+        return self::findNextNonConditional($node->parent);
     }
 }

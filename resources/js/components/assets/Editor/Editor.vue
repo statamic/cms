@@ -77,10 +77,10 @@
                             </div>
 
                             <!-- Audio -->
-                            <audio v-else-if="asset.isAudio" :src="asset.url" controls preload="auto"></audio>
+                            <div class="w-full shadow-none" v-else-if="asset.isAudio"><audio :src="asset.url" class="w-full" controls preload="auto"></audio></div>
 
                             <!-- Video -->
-                            <video v-else-if="asset.isVideo" :src="asset.url" controls></video>
+                            <div class="w-full shadow-none" v-else-if="asset.isVideo"><video :src="asset.url" class="w-full" controls></video></div>
                         </div>
                     </div>
 

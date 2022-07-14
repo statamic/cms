@@ -3,6 +3,8 @@
 namespace Tests\Modifiers;
 
 use Illuminate\Support\Collection;
+use Mockery;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -45,6 +47,22 @@ class ChunkTest extends TestCase
 
         $modified = $this->modify($collection, [-3]);
         $this->assertCount(0, $modified);
+    }
+
+    /** @test */
+    public function it_chunks_values_from_query_builder()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->andReturn($this->collectionWithSixItems());
+
+        $modified = $this->modify($builder, [3]);
+        $this->assertCount(2, $modified);
+
+        $chunkOne = $modified[0]['chunk'];
+        $chunkTwo = $modified[1]['chunk'];
+
+        $this->assertCount(3, $chunkOne);
+        $this->assertCount(3, $chunkTwo);
     }
 
     private function modify($value, array $params)

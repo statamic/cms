@@ -5,12 +5,14 @@ import Keys from './keys/Keys';
 import Hooks from './Hooks';
 import Components from './Components';
 import FieldConditions from './FieldConditions';
+import Callbacks from './Callbacks';
 const echo = new Echo;
 const bard = new Bard;
 const keys = new Keys;
 const hooks = new Hooks;
 const components = new Components;
 const conditions = new FieldConditions;
+const callbacks = new Callbacks;
 
 export default new Vue({
     data() {
@@ -21,6 +23,10 @@ export default new Vue({
     },
 
     computed: {
+
+        $callbacks() {
+            return callbacks;
+        },
 
         $components() {
             return components;

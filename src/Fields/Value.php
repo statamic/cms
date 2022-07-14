@@ -9,6 +9,7 @@ use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
 
 class Value implements IteratorAggregate, JsonSerializable
 {
@@ -80,12 +81,21 @@ class Value implements IteratorAggregate, JsonSerializable
     public function antlersValue(Parser $parser, $variables)
     {
         $value = $this->value();
+        $shouldParseAntlers = $this->shouldParseAntlers();
+
+        if ($value instanceof  ArrayableString && $shouldParseAntlers) {
+            $value = (string) $value;
+        }
 
         if (! is_string($value)) {
             return $value;
         }
 
-        if ($this->shouldParseAntlers()) {
+        if ($shouldParseAntlers) {
+            if (config('statamic.antlers.version') === 'runtime') {
+                $value = (new DocumentTransformer())->correct($value);
+            }
+
             return $parser->parse($value, $variables);
         }
 

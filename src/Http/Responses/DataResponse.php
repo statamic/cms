@@ -37,7 +37,6 @@ class DataResponse implements Responsable
             ->protect()
             ->handleDraft()
             ->handlePrivateEntries()
-            ->addViewPaths()
             ->adjustResponseType()
             ->addContentHeaders()
             ->handleAmp();
@@ -143,7 +142,7 @@ class DataResponse implements Responsable
 
     protected function view()
     {
-        return (new View)
+        return app(View::class)
             ->template($this->data->template())
             ->layout($this->data->layout())
             ->with($this->with)

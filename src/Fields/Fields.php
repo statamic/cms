@@ -15,6 +15,8 @@ class Fields
     protected $fields;
     protected $parent;
     protected $parentField;
+    protected $filled = [];
+    protected $withValidatableValues = false;
 
     public function __construct($items = [], $parent = null, $parentField = null)
     {
@@ -48,12 +50,34 @@ class Fields
     {
         $this->parent = $parent;
 
+        if ($this->fields) {
+            $this->fields->each(fn ($f) => $f->setParent($parent));
+        }
+
         return $this;
     }
 
     public function setParentField($field)
     {
         $this->parentField = $field;
+
+        if ($this->fields) {
+            $this->fields->each(fn ($f) => $f->setParentField($field));
+        }
+
+        return $this;
+    }
+
+    public function setFilled($dottedKeys)
+    {
+        $this->filled = $dottedKeys;
+
+        return $this;
+    }
+
+    public function withValidatableValues()
+    {
+        $this->withValidatableValues = true;
 
         return $this;
     }
@@ -84,7 +108,8 @@ class Fields
             ->setParent($this->parent)
             ->setParentField($this->parentField)
             ->setItems($this->items)
-            ->setFields($this->fields);
+            ->setFields($this->fields)
+            ->setFilled($this->filled);
     }
 
     public function localizable()
@@ -118,27 +143,28 @@ class Fields
 
     public function addValues(array $values)
     {
+        $filled = array_keys($values);
+
         $fields = $this->fields->map(function ($field) use ($values) {
-            return Arr::has($values, $field->handle())
-                ? $field->newInstance()->fillValue(Arr::get($values, $field->handle()))
-                : $field->newInstance();
+            return $field->newInstance()->setValue(Arr::get($values, $field->handle()));
         });
 
-        return $this->newInstance()->setFields($fields);
+        return $this->newInstance()->setFilled($filled)->setFields($fields);
     }
 
     public function values()
     {
-        return $this->fields->mapWithKeys(function ($field) {
+        $values = $this->fields->mapWithKeys(function ($field) {
             return [$field->handle() => $field->value()];
         });
-    }
 
-    public function validatableValues()
-    {
-        return $this->values()->filter(function ($value, $handle) {
-            return $this->fields->get($handle)->isFilled();
-        });
+        if ($this->withValidatableValues) {
+            $values = $values->filter(function ($field, $handle) {
+                return in_array($handle, $this->filled);
+            });
+        }
+
+        return $values;
     }
 
     public function process()
@@ -159,7 +185,7 @@ class Fields
     {
         return $this->newInstance()->setFields(
             $this->fields->map->preProcessValidatable()
-        );
+        )->withValidatableValues();
     }
 
     public function augment()

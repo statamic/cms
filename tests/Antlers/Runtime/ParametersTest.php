@@ -8,9 +8,12 @@ use Tests\Antlers\Fixtures\Addon\Tags\EchoMethod;
 use Tests\Antlers\Fixtures\Addon\Tags\Test;
 use Tests\Antlers\Fixtures\MethodClasses\ClassTwo;
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesViews;
 
 class ParametersTest extends ParserTestCase
 {
+    use FakesViews;
+
     public function test_using_interpolations_with_variable_reference_resolves_correctly()
     {
         Test::register();
@@ -126,6 +129,14 @@ EOT;
 
         $this->assertSame('hello_world', $this->renderString($template, [
             'var_name' => 'hello_world',
+        ], true));
+
+        $template = <<<'EOT'
+{{ echo_method:components/{var_name}/{{ var_name}}/{2+5+10}/more/{var_name|upper} }}
+EOT;
+
+        $this->assertSame('components/button/button/17/more/BUTTON', $this->renderString($template, [
+            'var_name' => 'button',
         ], true));
     }
 
@@ -261,5 +272,21 @@ EOT;
 EOT;
 
         $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
+
+    public function test_parameters_with_numeric_variables()
+    {
+        $template = <<<'EOT'
+{{ partial:button :the_button_text="404:button_text" }}
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('button', '<{{ the_button_text }}>');
+
+        $this->assertSame('<The Button Text>', $this->renderString($template, [
+            404 => [
+                'button_text' => 'The Button Text',
+            ],
+        ]));
     }
 }

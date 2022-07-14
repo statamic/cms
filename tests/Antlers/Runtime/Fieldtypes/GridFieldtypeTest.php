@@ -15,4 +15,9 @@ class GridFieldtypeTest extends ParserTestCase
     {
         $this->runFieldTypeTest('stacked_grid');
     }
+
+    public function test_grid_array_plucking()
+    {
+        $this->runFieldTypeTest('grid_array_plucking', null, ['grid']);
+    }
 }

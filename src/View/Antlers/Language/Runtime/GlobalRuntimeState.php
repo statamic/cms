@@ -78,6 +78,7 @@ class GlobalRuntimeState
      * @var bool
      */
     public static $isEvaluatingUserData = false;
+    public static $isEvaluatingData = false;
 
     /**
      * A counter of the active tracer count.
@@ -184,6 +185,10 @@ class GlobalRuntimeState
 
     public static $containsLayout = false;
 
+    public static $requiresRuntimeIsolation = false;
+
+    public static $userContentEvalState = null;
+
     /**
      * A list of callbacks that will be invoked when ___internal_debug:peek is called.
      *
@@ -202,8 +207,9 @@ class GlobalRuntimeState
         self::$environmentId = StringUtilities::uuidv4();
         self::$yieldCount = 0;
         self::$yieldStacks = [];
-        StackReplacementManager::clearStackState();
 
+        StackReplacementManager::clearStackState();
+        LiteralReplacementManager::resetLiteralState();
         RecursiveNodeManager::resetRecursiveNodeState();
     }
 

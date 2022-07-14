@@ -98,7 +98,8 @@ class Terms extends Relationship
             && ! $this->field->parentField()
             && $parent
             && $parent instanceof Entry
-            && $this->field->handle() === $this->taxonomies()[0];
+            && $this->field->handle() === $this->taxonomies()[0]
+            && $parent->collection()->taxonomies()->map->handle()->contains($this->field->handle());
 
         if ($shouldQueryCollection) {
             $query->where('collection', $parent->collectionHandle());

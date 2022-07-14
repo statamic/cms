@@ -29,6 +29,13 @@ class RuntimeConfiguration
     public $fatalErrorOnUnpairedLoop = false;
 
     /**
+     * Controls whether attempting to render an object as a string throws an exception or not.
+     *
+     * @var bool
+     */
+    public $fatalErrorOnStringObject = false;
+
+    /**
      * Controls whether runtime tracing is enabled.
      *
      * @var bool

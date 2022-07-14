@@ -285,6 +285,53 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
+    public function deleting_a_folder_doesnt_overzealously_delete_from_cache()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $disk->makeDirectory('path/to/kit');
+        $disk->makeDirectory('path/to/kitten');
+        $disk->makeDirectory('path/to/kittens');
+        $disk->makeDirectory('path/to/kittens/subfolder');
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/kit',
+            'path/to/kitten',
+            'path/to/kittens',
+            'path/to/kittens/subfolder',
+        ], $container->folders()->all());
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('path/to/kit');
+
+        $return = $folder->delete();
+
+        $disk->assertMissing('path/to/kit');
+        $disk->assertExists('path/to/kitten');
+        $disk->assertExists('path/to/kittens/subfolder');
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/kitten',
+            'path/to/kittens',
+            'path/to/kittens/subfolder',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/kitten',
+            'path/to/kittens',
+            'path/to/kittens/subfolder',
+        ], $container->contents()->cached()->keys()->all());
+    }
+
+    /** @test */
     public function it_can_be_moved_to_another_folder()
     {
         $container = $this->containerWithDisk();

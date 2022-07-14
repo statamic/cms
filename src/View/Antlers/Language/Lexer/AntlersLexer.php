@@ -247,8 +247,8 @@ class AntlersLexer
             if ($this->isParsingString == false) {
                 if ($this->cur == DocumentParser::Punctuation_FullStop && $this->next == DocumentParser::Punctuation_Equals) {
                     $stringConcat = new StringConcatenationOperator();
-                    $stringConcat->startPosition = $node->relativeOffset($this->currentIndex);
-                    $stringConcat->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $stringConcat->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $stringConcat->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
                     $stringConcat->content = '.=';
                     $this->currentContent = [];
                     $this->runtimeNodes[] = $stringConcat;
@@ -275,7 +275,7 @@ class AntlersLexer
             if ($this->isInModifierParameterValue && ! $this->isParsingString) {
                 $breakForKeyword = false;
 
-                if (! $this->isParsingString && ctype_space($this->next)) {
+                if (! $this->isParsingString && $this->next != null && ctype_space($this->next)) {
                     $nextWord = strtolower(trim(implode($this->scanForwardTo(' ', 1))));
 
                     if (strlen($nextWord) > 0 && LanguageKeywords::isLanguageLogicalKeyword($nextWord)) {
@@ -309,8 +309,8 @@ class AntlersLexer
                         $modifierValueNode = new ModifierValueNode();
                         $modifierValueNode->name = $parsedValue;
                         $modifierValueNode->value = $this->adjustValueConsideringWhitespace($parsedValue);
-                        $modifierValueNode->startPosition = $node->relativeOffset($this->currentIndex - mb_strlen($parsedValue));
-                        $modifierValueNode->endPosition = $node->relativeOffset($this->currentIndex);
+                        $modifierValueNode->startPosition = $node->lexerRelativeOffset($this->currentIndex - mb_strlen($parsedValue));
+                        $modifierValueNode->endPosition = $node->lexerRelativeOffset($this->currentIndex);
 
                         $this->guardAgainstNeighboringTypesInModifier($modifierValueNode);
 
@@ -359,8 +359,8 @@ class AntlersLexer
                     $modifierValueNode = new ModifierValueNode();
                     $modifierValueNode->name = $parsedValue;
                     $modifierValueNode->value = $this->adjustValueConsideringWhitespace($parsedValue);
-                    $modifierValueNode->startPosition = $node->relativeOffset($this->currentIndex - mb_strlen($parsedValue));
-                    $modifierValueNode->endPosition = $node->relativeOffset($this->currentIndex);
+                    $modifierValueNode->startPosition = $node->lexerRelativeOffset($this->currentIndex - mb_strlen($parsedValue));
+                    $modifierValueNode->endPosition = $node->lexerRelativeOffset($this->currentIndex);
                     $this->runtimeNodes[] = $modifierValueNode;
 
                     $this->guardAgainstNeighboringTypesInModifier($modifierValueNode);
@@ -384,8 +384,8 @@ class AntlersLexer
                         $modifierValueNode = new ModifierValueNode();
                         $modifierValueNode->name = $parsedValue;
                         $modifierValueNode->value = $this->adjustValueConsideringWhitespace($parsedValue);
-                        $modifierValueNode->startPosition = $node->relativeOffset($stringStartedOn);
-                        $modifierValueNode->endPosition = $node->relativeOffset($this->currentIndex);
+                        $modifierValueNode->startPosition = $node->lexerRelativeOffset($stringStartedOn);
+                        $modifierValueNode->endPosition = $node->lexerRelativeOffset($this->currentIndex);
 
                         $this->runtimeNodes[] = $modifierValueNode;
 
@@ -400,8 +400,8 @@ class AntlersLexer
                     }
 
                     $stringNode = new StringValueNode();
-                    $stringNode->startPosition = $node->relativeOffset($stringStartedOn);
-                    $stringNode->endPosition = $node->relativeOffset($this->currentIndex);
+                    $stringNode->startPosition = $node->lexerRelativeOffset($stringStartedOn);
+                    $stringNode->endPosition = $node->lexerRelativeOffset($this->currentIndex);
                     $stringNode->sourceTerminator = $terminator;
                     $terminator = null;
                     $this->isParsingString = false;
@@ -460,14 +460,15 @@ class AntlersLexer
                     }
 
                     $parsedValue = trim(implode('', $this->currentContent));
+                    $lowerParsedValue = strtolower($parsedValue);
                     $valueLen = mb_strlen($parsedValue);
                     $valueStartIndex = $this->currentIndex - $valueLen;
-                    $startPosition = $node->relativeOffset($valueStartIndex);
-                    $endPosition = $node->relativeOffset($this->currentIndex);
+                    $startPosition = $node->lexerRelativeOffset($this->currentIndex - mb_strlen($parsedValue));
+                    $endPosition = $node->lexerRelativeOffset($this->currentIndex);
                     $this->currentContent = [];
 
                     // Check against internal keywords.
-                    if ($parsedValue == LanguageKeywords::LogicalAnd) {
+                    if ($lowerParsedValue == LanguageKeywords::LogicalAnd) {
                         $logicalAnd = new LogicalAndOperator();
                         $logicalAnd->content = LanguageKeywords::LogicalAnd;
                         $logicalAnd->startPosition = $startPosition;
@@ -476,7 +477,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $logicalAnd;
                         $this->lastNode = $logicalAnd;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::LogicalOr) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::LogicalOr) {
                         $logicalOr = new LogicalOrOperator();
                         $logicalOr->content = LanguageKeywords::LogicalOr;
                         $logicalOr->startPosition = $startPosition;
@@ -485,7 +486,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $logicalOr;
                         $this->lastNode = $logicalOr;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::LogicalXor) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::LogicalXor) {
                         $logicalXor = new LogicalXorOperator();
                         $logicalXor->content = LanguageKeywords::LogicalXor;
                         $logicalXor->startPosition = $startPosition;
@@ -494,7 +495,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $logicalXor;
                         $this->lastNode = $logicalXor;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::ConstNull) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::ConstNull) {
                         $constNull = new NullConstant();
                         $constNull->content = LanguageKeywords::ConstNull;
                         $constNull->startPosition = $startPosition;
@@ -503,16 +504,16 @@ class AntlersLexer
                         $this->runtimeNodes[] = $constNull;
                         $this->lastNode = $constNull;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::ConstTrue) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::ConstTrue) {
                         $constTrue = new TrueConstant();
-                        $constTrue->content = LanguageKeywords::ConstNull;
+                        $constTrue->content = LanguageKeywords::ConstTrue;
                         $constTrue->startPosition = $startPosition;
                         $constTrue->endPosition = $endPosition;
 
                         $this->runtimeNodes[] = $constTrue;
                         $this->lastNode = $constTrue;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::ConstFalse) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::ConstFalse) {
                         $constFalse = new FalseConstant();
                         $constFalse->content = LanguageKeywords::ConstFalse;
                         $constFalse->startPosition = $startPosition;
@@ -521,7 +522,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $constFalse;
                         $this->lastNode = $constFalse;
                         continue;
-                    } elseif ($parsedValue == LanguageKeywords::LogicalNot) {
+                    } elseif ($lowerParsedValue == LanguageKeywords::LogicalNot) {
                         $logicNegation = new LogicalNegationOperator();
                         $logicNegation->content = LanguageKeywords::LogicalNot;
                         $logicNegation->startPosition = $startPosition;
@@ -605,8 +606,8 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::Punctuation_Equals && $this->next == DocumentParser::Punctuation_GreaterThan) {
                     $scopeAssignment = new ScopeAssignmentOperator();
                     $scopeAssignment->content = '=>';
-                    $scopeAssignment->startPosition = $node->relativeOffset($this->currentIndex);
-                    $scopeAssignment->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $scopeAssignment->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $scopeAssignment->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $scopeAssignment;
                     $this->lastNode = $scopeAssignment;
@@ -620,8 +621,8 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::Punctuation_Comma) {
                     $argSeparator = new ArgSeparator();
                     $argSeparator->content = DocumentParser::Punctuation_Comma;
-                    $argSeparator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $argSeparator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $argSeparator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $argSeparator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $argSeparator;
                     $this->lastNode = $argSeparator;
@@ -632,8 +633,8 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::Punctuation_Semicolon) {
                     $statementSeparator = new StatementSeparatorNode();
                     $statementSeparator->content = DocumentParser::Punctuation_Semicolon;
-                    $statementSeparator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $statementSeparator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $statementSeparator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $statementSeparator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $statementSeparator;
                     $this->lastNode = $statementSeparator;
@@ -645,8 +646,8 @@ class AntlersLexer
                     if ($this->next == DocumentParser::Punctuation_Equals) {
                         $additionAssignment = new AdditionAssignmentOperator();
                         $additionAssignment->content = '+=';
-                        $additionAssignment->startPosition = $node->relativeOffset($this->currentIndex);
-                        $additionAssignment->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $additionAssignment->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $additionAssignment->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $additionAssignment;
                         $this->lastNode = $additionAssignment;
@@ -656,8 +657,8 @@ class AntlersLexer
 
                     $additionOperator = new AdditionOperator();
                     $additionOperator->content = '+';
-                    $additionOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $additionOperator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $additionOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $additionOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $additionOperator;
                     $this->lastNode = $additionOperator;
@@ -667,7 +668,7 @@ class AntlersLexer
                 // -
                 if ($this->isParsingModifierName == false && $this->cur == DocumentParser::Punctuation_Minus) {
                     if (ctype_digit($this->next) && (
-                            ctype_digit($this->prev) == false &&
+                            ctype_digit((string) $this->prev) == false &&
                             $this->prev != DocumentParser::RightParent) && $this->isRightOfInterpolationRegion() == false) {
                         $this->currentContent[] = $this->cur;
                         continue;
@@ -676,8 +677,8 @@ class AntlersLexer
                     if ($this->next == DocumentParser::Punctuation_Equals) {
                         $subtractionAssignment = new SubtractionAssignmentOperator();
                         $subtractionAssignment->content = '-=';
-                        $subtractionAssignment->startPosition = $node->relativeOffset($this->currentIndex);
-                        $subtractionAssignment->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $subtractionAssignment->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $subtractionAssignment->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $subtractionAssignment;
                         $this->lastNode = $subtractionAssignment;
@@ -686,8 +687,8 @@ class AntlersLexer
                     } elseif ($this->next == DocumentParser::Punctuation_GreaterThan) {
                         $methodInvocation = new MethodInvocationNode();
                         $methodInvocation->content = '->';
-                        $methodInvocation->startPosition = $node->relativeOffset($this->currentIndex);
-                        $methodInvocation->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $methodInvocation->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $methodInvocation->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $methodInvocation;
                         $this->lastNode = $methodInvocation;
@@ -697,8 +698,8 @@ class AntlersLexer
 
                     $subtractionOperator = new SubtractionOperator();
                     $subtractionOperator->content = '-';
-                    $subtractionOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $subtractionOperator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $subtractionOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $subtractionOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $subtractionOperator;
                     $this->lastNode = $subtractionOperator;
@@ -710,8 +711,8 @@ class AntlersLexer
                     if ($this->next == DocumentParser::Punctuation_Asterisk) {
                         $exponentiationOperator = new ExponentiationOperator();
                         $exponentiationOperator->content = '**';
-                        $exponentiationOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                        $exponentiationOperator->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $exponentiationOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $exponentiationOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $exponentiationOperator;
                         $this->lastNode = $exponentiationOperator;
@@ -720,8 +721,8 @@ class AntlersLexer
                     } elseif ($this->next == DocumentParser::Punctuation_Equals) {
                         $multiplicationAssignment = new MultiplicationAssignmentOperator();
                         $multiplicationAssignment->content = '*=';
-                        $multiplicationAssignment->startPosition = $node->relativeOffset($this->currentIndex);
-                        $multiplicationAssignment->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $multiplicationAssignment->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $multiplicationAssignment->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $multiplicationAssignment;
                         $this->lastNode = $multiplicationAssignment;
@@ -732,8 +733,8 @@ class AntlersLexer
                     // *
                     $multiplicationOperator = new MultiplicationOperator();
                     $multiplicationOperator->content = '*';
-                    $multiplicationOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $multiplicationOperator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $multiplicationOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $multiplicationOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $multiplicationOperator;
                     $this->lastNode = $multiplicationOperator;
@@ -745,8 +746,8 @@ class AntlersLexer
                     if ($this->next == DocumentParser::Punctuation_Equals) {
                         $divisionAssignment = new DivisionAssignmentOperator();
                         $divisionAssignment->content = '/=';
-                        $divisionAssignment->startPosition = $node->relativeOffset($this->currentIndex);
-                        $divisionAssignment->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $divisionAssignment->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $divisionAssignment->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $divisionAssignment;
                         $this->lastNode = $divisionAssignment;
@@ -756,8 +757,8 @@ class AntlersLexer
 
                     $divisionOperator = new DivisionOperator();
                     $divisionOperator->content = '/';
-                    $divisionOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $divisionOperator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $divisionOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $divisionOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $divisionOperator;
                     $this->lastNode = $divisionOperator;
@@ -769,8 +770,8 @@ class AntlersLexer
                     if ($this->next == DocumentParser::Punctuation_Equals) {
                         $modulusAssignment = new ModulusAssignmentOperator();
                         $modulusAssignment->content = '%=';
-                        $modulusAssignment->startPosition = $node->relativeOffset($this->currentIndex);
-                        $modulusAssignment->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $modulusAssignment->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $modulusAssignment->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $modulusAssignment;
                         $this->lastNode = $modulusAssignment;
@@ -780,8 +781,8 @@ class AntlersLexer
 
                     $modulusOperator = new ModulusOperator();
                     $modulusOperator->content = '%';
-                    $modulusOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $modulusOperator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $modulusOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $modulusOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $modulusOperator;
                     $this->lastNode = $modulusOperator;
@@ -800,8 +801,8 @@ class AntlersLexer
                         if ($peek == DocumentParser::Punctuation_GreaterThan) {
                             $spaceshipOperator = new SpaceshipCompOperator();
                             $spaceshipOperator->content = '<=>';
-                            $spaceshipOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                            $spaceshipOperator->endPosition = $node->relativeOffset($this->currentIndex + 3);
+                            $spaceshipOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                            $spaceshipOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 3);
 
                             $this->runtimeNodes[] = $spaceshipOperator;
                             $this->lastNode = $spaceshipOperator;
@@ -812,8 +813,8 @@ class AntlersLexer
                         // <=
                         $lessThanEqual = new LessThanEqualCompOperator();
                         $lessThanEqual->content = '<=';
-                        $lessThanEqual->startPosition = $node->relativeOffset($this->currentIndex);
-                        $lessThanEqual->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $lessThanEqual->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $lessThanEqual->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $lessThanEqual;
                         $this->lastNode = $lessThanEqual;
@@ -824,8 +825,8 @@ class AntlersLexer
                     // <
                     $lessThan = new LessThanCompOperator();
                     $lessThan->content = '<';
-                    $lessThan->startPosition = $node->relativeOffset($this->currentIndex);
-                    $lessThan->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $lessThan->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $lessThan->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $lessThan;
                     $this->lastNode = $lessThan;
@@ -837,8 +838,8 @@ class AntlersLexer
                     if ($this->next == DocumentParser::Punctuation_Equals) {
                         $greaterThanEqual = new GreaterThanEqualCompOperator();
                         $greaterThanEqual->content = '>=';
-                        $greaterThanEqual->startPosition = $node->relativeOffset($this->currentIndex);
-                        $greaterThanEqual->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $greaterThanEqual->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $greaterThanEqual->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $greaterThanEqual;
                         $this->lastNode = $greaterThanEqual;
@@ -848,8 +849,8 @@ class AntlersLexer
 
                     $greaterThan = new GreaterThanCompOperator();
                     $greaterThan->content = '>';
-                    $greaterThan->startPosition = $node->relativeOffset($this->currentIndex);
-                    $greaterThan->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $greaterThan->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $greaterThan->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $greaterThan;
                     $this->lastNode = $greaterThan;
@@ -859,8 +860,8 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::Punctuation_Equals && $this->next != DocumentParser::Punctuation_Equals) {
                     $leftAssignment = new LeftAssignmentOperator();
                     $leftAssignment->content = '=';
-                    $leftAssignment->startPosition = $node->relativeOffset($this->currentIndex);
-                    $leftAssignment->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $leftAssignment->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $leftAssignment->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $leftAssignment;
                     $this->lastNode = $leftAssignment;
@@ -878,8 +879,8 @@ class AntlersLexer
                         // ===
                         $strictEqual = new StrictEqualCompOperator();
                         $strictEqual->content = '===';
-                        $strictEqual->startPosition = $node->relativeOffset($this->currentIndex);
-                        $strictEqual->endPosition = $node->relativeOffset($this->currentIndex + 3);
+                        $strictEqual->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $strictEqual->endPosition = $node->lexerRelativeOffset($this->currentIndex + 3);
 
                         $this->runtimeNodes[] = $strictEqual;
                         $this->lastNode = $strictEqual;
@@ -888,8 +889,8 @@ class AntlersLexer
                         // ==
                         $equalOperator = new EqualCompOperator();
                         $equalOperator->content = '==';
-                        $equalOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                        $equalOperator->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $equalOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $equalOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $equalOperator;
                         $this->lastNode = $equalOperator;
@@ -903,8 +904,8 @@ class AntlersLexer
                     if ($this->next == DocumentParser::Punctuation_Ampersand) {
                         $logicalAnd = new LogicalAndOperator();
                         $logicalAnd->content = '&&';
-                        $logicalAnd->startPosition = $node->relativeOffset($this->currentIndex);
-                        $logicalAnd->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $logicalAnd->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $logicalAnd->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $logicalAnd;
                         $this->lastNode = $logicalAnd;
@@ -915,8 +916,8 @@ class AntlersLexer
                     if ($this->next == DocumentParser::Punctuation_Equals) {
                         $concatOperator = new StringConcatenationOperator();
                         $concatOperator->content = '&=';
-                        $concatOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                        $concatOperator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                        $concatOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $concatOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                         $this->runtimeNodes[] = $concatOperator;
                         $this->lastNode = $concatOperator;
@@ -926,8 +927,8 @@ class AntlersLexer
 
                     $logicalAnd = new LogicalAndOperator();
                     $logicalAnd->content = '&';
-                    $logicalAnd->startPosition = $node->relativeOffset($this->currentIndex);
-                    $logicalAnd->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $logicalAnd->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $logicalAnd->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $logicalAnd;
                     $this->lastNode = $logicalAnd;
@@ -937,8 +938,8 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::Punctuation_Pipe && $this->next != DocumentParser::Punctuation_Pipe) {
                     $modifierSeparator = new ModifierSeparator();
                     $modifierSeparator->content = '|';
-                    $modifierSeparator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $modifierSeparator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $modifierSeparator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $modifierSeparator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $modifierSeparator;
                     $this->lastNode = $modifierSeparator;
@@ -951,8 +952,8 @@ class AntlersLexer
                     // ||
                     $logicalOr = new LogicalOrOperator();
                     $logicalOr->content = '||';
-                    $logicalOr->startPosition = $node->relativeOffset($this->currentIndex);
-                    $logicalOr->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                    $logicalOr->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $logicalOr->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                     $this->runtimeNodes[] = $logicalOr;
                     $this->lastNode = $logicalOr;
@@ -972,8 +973,8 @@ class AntlersLexer
                             // !==
                             $strictNotEqual = new NotStrictEqualCompOperator();
                             $strictNotEqual->content = '!==';
-                            $strictNotEqual->startPosition = $node->relativeOffset($this->currentIndex);
-                            $strictNotEqual->endPosition = $node->relativeOffset($this->currentIndex + 3);
+                            $strictNotEqual->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                            $strictNotEqual->endPosition = $node->lexerRelativeOffset($this->currentIndex + 3);
 
                             $this->runtimeNodes[] = $strictNotEqual;
                             $this->lastNode = $strictNotEqual;
@@ -984,8 +985,8 @@ class AntlersLexer
                         // !=
                         $notEqual = new NotEqualCompOperator();
                         $notEqual->content = '!=';
-                        $notEqual->startPosition = $node->relativeOffset($this->currentIndex);
-                        $notEqual->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                        $notEqual->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $notEqual->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                         $this->runtimeNodes[] = $notEqual;
                         $this->lastNode = $notEqual;
@@ -996,8 +997,8 @@ class AntlersLexer
                     // !
                     $logicalNot = new LogicalNegationOperator();
                     $logicalNot->content = '!';
-                    $logicalNot->startPosition = $node->relativeOffset($this->currentIndex);
-                    $logicalNot->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $logicalNot->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $logicalNot->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $logicalNot;
                     $this->lastNode = $logicalNot;
@@ -1008,8 +1009,8 @@ class AntlersLexer
                     // ?=
                     $conditionalFallback = new ConditionalVariableFallbackOperator();
                     $conditionalFallback->content = '?=';
-                    $conditionalFallback->startPosition = $node->relativeOffset($this->currentIndex);
-                    $conditionalFallback->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                    $conditionalFallback->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $conditionalFallback->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                     $this->runtimeNodes[] = $conditionalFallback;
                     $this->lastNode = $conditionalFallback;
@@ -1021,8 +1022,8 @@ class AntlersLexer
                     // ??
                     $nullCoalesceOperator = new NullCoalesceOperator();
                     $nullCoalesceOperator->content = '??';
-                    $nullCoalesceOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $nullCoalesceOperator->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                    $nullCoalesceOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $nullCoalesceOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                     $this->runtimeNodes[] = $nullCoalesceOperator;
                     $this->lastNode = $nullCoalesceOperator;
@@ -1034,8 +1035,8 @@ class AntlersLexer
                     // ?:
                     $nullCoalesceOperator = new NullCoalesceOperator();
                     $nullCoalesceOperator->content = '?:';
-                    $nullCoalesceOperator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $nullCoalesceOperator->endPosition = $node->relativeOffset($this->currentIndex + 2);
+                    $nullCoalesceOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $nullCoalesceOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 2);
 
                     $this->runtimeNodes[] = $nullCoalesceOperator;
                     $this->lastNode = $nullCoalesceOperator;
@@ -1047,8 +1048,8 @@ class AntlersLexer
                     // ?
                     $ternarySeparator = new InlineTernarySeparator();
                     $ternarySeparator->content = '?';
-                    $ternarySeparator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $ternarySeparator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $ternarySeparator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $ternarySeparator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $ternarySeparator;
                     $this->lastNode = $ternarySeparator;
@@ -1058,8 +1059,8 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::LeftParen) {
                     $logicalGroupBegin = new LogicGroupBegin();
                     $logicalGroupBegin->content = '(';
-                    $logicalGroupBegin->startPosition = $node->relativeOffset($this->currentIndex);
-                    $logicalGroupBegin->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $logicalGroupBegin->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $logicalGroupBegin->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $logicalGroupBegin;
                     $this->lastNode = $logicalGroupBegin;
@@ -1069,8 +1070,8 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::RightParent) {
                     $logicalGroupEnd = new LogicGroupEnd();
                     $logicalGroupEnd->content = ')';
-                    $logicalGroupEnd->startPosition = $node->relativeOffset($this->currentIndex);
-                    $logicalGroupEnd->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $logicalGroupEnd->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $logicalGroupEnd->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $logicalGroupEnd;
                     $this->lastNode = $logicalGroupEnd;
@@ -1084,8 +1085,8 @@ class AntlersLexer
                         if ($lastItem instanceof ModifierNameNode) {
                             $modifierValueSeparator = new ModifierValueSeparator();
                             $modifierValueSeparator->content = ':';
-                            $modifierValueSeparator->startPosition = $node->relativeOffset($this->currentIndex);
-                            $modifierValueSeparator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                            $modifierValueSeparator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                            $modifierValueSeparator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                             $this->runtimeNodes[] = $modifierValueSeparator;
 
@@ -1102,8 +1103,8 @@ class AntlersLexer
 
                     $branchSeparator = new InlineBranchSeparator();
                     $branchSeparator->content = ':';
-                    $branchSeparator->startPosition = $node->relativeOffset($this->currentIndex);
-                    $branchSeparator->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $branchSeparator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $branchSeparator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $branchSeparator;
                     $this->lastNode = $branchSeparator;
@@ -1114,8 +1115,8 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::LeftBracket) {
                     $implicitArrayBegin = new ImplicitArrayBegin();
                     $implicitArrayBegin->content = '[';
-                    $implicitArrayBegin->startPosition = $node->relativeOffset($this->currentIndex);
-                    $implicitArrayBegin->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $implicitArrayBegin->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $implicitArrayBegin->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $implicitArrayBegin;
                     $this->lastNode = $implicitArrayBegin;
@@ -1125,8 +1126,8 @@ class AntlersLexer
                 if ($this->cur == DocumentParser::RightBracket) {
                     $implicitArrayEnd = new ImplicitArrayEnd();
                     $implicitArrayEnd->content = ']';
-                    $implicitArrayEnd->startPosition = $node->relativeOffset($this->currentIndex);
-                    $implicitArrayEnd->endPosition = $node->relativeOffset($this->currentIndex + 1);
+                    $implicitArrayEnd->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $implicitArrayEnd->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
 
                     $this->runtimeNodes[] = $implicitArrayEnd;
                     $this->lastNode = $implicitArrayEnd;

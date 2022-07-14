@@ -23,6 +23,6 @@ trait QueriesScopes
     {
         $scopes = Arr::getFirst($this->params, ['query_scope', 'filter']);
 
-        return collect(explode('|', $scopes));
+        return collect(explode('|', $scopes ?? ''));
     }
 }
