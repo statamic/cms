@@ -1,4 +1,5 @@
 import Validator from './Validator.js';
+import { data_get } from  '../../bootstrap/globals.js'
 
 export default {
     inject: {
@@ -9,14 +10,40 @@ export default {
 
     methods: {
         showField(field, dottedKey) {
-            let passes = new Validator(field, this.values, this.$store, this.storeName).passesConditions();
+            let dottedFieldPath = dottedKey || field.handle;
+            let dottedPrefix = dottedKey ? dottedKey.replace(new RegExp('\.'+field.handle+'$'), '') : '';
 
-            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
-                dottedKey: dottedKey || field.handle,
-                hidden: ! passes,
+            // If we know the field is to permanently hidden, bypass validation.
+            if (field.visibility === 'hidden' || this.shouldForceHiddenField(dottedFieldPath)) {
+                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                    dottedKey: dottedFieldPath,
+                    hidden: 'force',
+                    omitValue: false,
+                });
+
+                return false;
+            }
+
+            // Use validation to determine whether field should be shown.
+            let validator = new Validator(field, this.values, this.$store, this.storeName);
+            let passes = validator.passesConditions();
+
+            // Ensure DOM is updated to ensure all revealers are properly loaded and tracked before committing to store.
+            this.$nextTick(() => {
+                let hasRevealerCondition = validator.hasRevealerCondition(dottedPrefix);
+
+                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                    dottedKey: dottedFieldPath,
+                    hidden: ! passes,
+                    omitValue: (! passes) && (! hasRevealerCondition),
+                });
             });
 
             return passes;
-        }
+        },
+
+        shouldForceHiddenField(dottedFieldPath) {
+            return data_get(this.$store.state.publish[this.storeName].hiddenFields[dottedFieldPath], 'hidden') === 'force';
+        },
     }
 }

@@ -202,6 +202,17 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function absoluteUrl($site = null)
+    {
+        if (! $mount = $this->mount()) {
+            return null;
+        }
+
+        $site = $site ?? $this->sites()->first();
+
+        return optional($mount->in($site))->absoluteUrl();
+    }
+
     public function url($site = null)
     {
         if (! $mount = $this->mount()) {
@@ -669,6 +680,13 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return true;
     }
 
+    public function truncate()
+    {
+        $this->queryEntries()->get()->each->delete();
+
+        return true;
+    }
+
     public function mount($page = null)
     {
         return $this
@@ -705,14 +723,31 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     {
         return $this
             ->fluentlyGetOrSet('previewTargets')
-            ->getter(function ($targets) {
-                if (empty($targets)) {
-                    $targets = $this->defaultPreviewTargets();
-                }
-
-                return collect($targets);
+            ->getter(function () {
+                return $this->basePreviewTargets()->merge($this->additionalPreviewTargets());
             })
             ->args(func_get_args());
+    }
+
+    public function basePreviewTargets()
+    {
+        $targets = empty($this->previewTargets)
+            ? $this->defaultPreviewTargets()
+            : $this->previewTargets;
+
+        return collect($targets);
+    }
+
+    public function addPreviewTargets($targets)
+    {
+        Facades\Collection::addPreviewTargets($this->handle, $targets);
+
+        return $this;
+    }
+
+    public function additionalPreviewTargets()
+    {
+        return Facades\Collection::additionalPreviewTargets($this->handle);
     }
 
     private function defaultPreviewTargets()

@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags;
 
+use Statamic\View\State\StateManager;
+
 class Loader
 {
     public function load($name, $properties)
@@ -16,6 +18,8 @@ class Loader
     private function init($class, $properties)
     {
         $tag = is_string($class) ? app($class) : $class;
+
+        StateManager::track($class);
 
         return tap($tag, function ($tag) use ($properties) {
             $tag->setProperties($properties);

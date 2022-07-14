@@ -79,4 +79,18 @@ class GlideUrlBuilderTest extends TestCase
             $this->builder->build('/foo.jpg', ['w' => '100'], 'custom.png')
         );
     }
+
+    public function testMarkWithAsset()
+    {
+        $asset = new Asset;
+        $asset->container((new AssetContainer)->handle('main'));
+        $asset->path('img/foo.jpg');
+
+        $encoded = rawurlencode(base64_encode('main/img/foo.jpg'));
+
+        $this->assertEquals(
+            "/img/foo.jpg?w=100&mark=asset%3A%3A$encoded",
+            $this->builder->build('/foo.jpg', ['w' => '100', 'mark' => $asset])
+        );
+    }
 }

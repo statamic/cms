@@ -235,7 +235,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom($origin, $slug);
 
         $this->publishes([
-            $origin => app()->langPath("vendor/{$slug}"),
+            $origin => app()->langPath()."/vendor/{$slug}",
         ], "{$slug}-translations");
 
         return $this;
@@ -424,7 +424,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this->getAddon()->namespace();
     }
 
-    private function getAddon()
+    protected function getAddon()
     {
         throw_unless($this->app->isBooted(), new NotBootedException);
 
