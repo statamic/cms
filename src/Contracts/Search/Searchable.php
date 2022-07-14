@@ -8,11 +8,5 @@ interface Searchable
 
     public function getSearchReference(): string;
 
-    public function setSearchScore(int $score);
-
-    public function getCpSearchResultTitle(): string;
-
-    public function getCpSearchResultUrl(): string;
-
-    public function getCpSearchResultBadge(): string;
+    public function toSearchResult(): Result;
 }

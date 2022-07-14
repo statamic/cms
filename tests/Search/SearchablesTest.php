@@ -344,7 +344,7 @@ class SearchablesTest extends TestCase
         $c = new NotSearchable;
         app()->instance('all-custom-searchables', collect([$a, $b]));
 
-        Search::registerSearchableProvider('custom', TestCustomSearchables::class);
+        Search::registerSearchableProvider('custom', new TestCustomSearchables);
 
         $searchables = $this->makeSearchables(['searchables' => ['custom']]);
 
@@ -383,6 +383,15 @@ class TestCustomSearchable
 
 class TestCustomSearchables extends Provider
 {
+    public function find(array $keys): Collection
+    {
+    }
+
+    public function referencePrefix(): string
+    {
+        return 'customprefix';
+    }
+
     public function provide(): Collection
     {
         return app('all-custom-searchables');

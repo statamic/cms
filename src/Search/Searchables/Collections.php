@@ -8,6 +8,11 @@ use Statamic\Facades\Entry;
 
 class Collections extends Provider
 {
+    public function referencePrefix(): string
+    {
+        return 'entry';
+    }
+
     public function provide(): Collection
     {
         if ($this->usesWildcard()) {
@@ -29,5 +34,10 @@ class Collections extends Provider
     public function isSearchable($searchable): bool
     {
         return $searchable instanceof EntryContract;
+    }
+
+    public function find(array $ids): Collection
+    {
+        return Entry::query()->whereIn('id', $ids)->get();
     }
 }

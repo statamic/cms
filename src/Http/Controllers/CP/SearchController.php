@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
-use Statamic\Contracts\Search\Searchable;
+use Statamic\Contracts\Search\Result;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
 
@@ -15,16 +15,16 @@ class SearchController extends CpController
             ->ensureExists()
             ->search($request->query('q'))
             ->get()
-            ->filter(function ($item) {
-                return User::current()->can('view', $item);
+            ->filter(function (Result $item) {
+                return User::current()->can('view', $item->getSearchable());
             })
             ->take(10)
-            ->map(function (Searchable $item) {
+            ->map(function (Result $result) {
                 return [
-                    'reference' => $item->getSearchReference(),
-                    'title' => $item->getCpSearchResultTitle(),
-                    'url' => $item->getCpSearchResultUrl(),
-                    'badge' => $item->getCpSearchResultBadge(),
+                    'reference' => $result->getReference(),
+                    'title' => $result->getCpTitle(),
+                    'url' => $result->getCpUrl(),
+                    'badge' => $result->getCpBadge(),
                 ];
             });
     }

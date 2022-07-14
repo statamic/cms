@@ -2,6 +2,9 @@
 
 namespace Statamic\Search;
 
+use Statamic\Contracts\Search\Result;
+use Statamic\Support\Str;
+
 trait Searchable
 {
     public function getSearchReference(): string
@@ -14,18 +17,8 @@ trait Searchable
         return method_exists($this, $field) ? $this->$field() : $this->get($field);
     }
 
-    public function setSearchScore(int $score = null)
+    public function toSearchResult(): Result
     {
-        $this->setSupplement('search_score', $score);
-    }
-
-    public function getCpSearchResultTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function getCpSearchResultUrl(): string
-    {
-        return $this->editUrl();
+        return new \Statamic\Search\Result($this, Str::before($this->reference(), '::'));
     }
 }

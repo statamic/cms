@@ -34,7 +34,7 @@ class GlobalSearchTest extends TestCase
             ->collection(tap(Collection::make('test-collection-2')->title('Test Collection 2'))->save())
         )->save();
 
-        $results = collect([$entry1, $entry2]);
+        $results = collect([$entry1, $entry2])->map->toSearchResult();
 
         $builder = $this->mock(QueryBuilder::class);
         $builder->shouldReceive('get')->once()->andReturn($results);

@@ -43,7 +43,7 @@ class Search
         app(IndexManager::class)->extend($driver, $callback);
     }
 
-    public function registerSearchableProvider(string $key, string $class)
+    public function registerSearchableProvider(string $key, $class)
     {
         app(Providers::class)->register($key, $class);
     }

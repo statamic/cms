@@ -3,6 +3,12 @@
 namespace Tests\Search;
 
 use Illuminate\Support\Carbon;
+use Mockery;
+use Statamic\Contracts\Search\Result;
+use Statamic\Contracts\Search\Result as SearchResult;
+use Statamic\Contracts\Search\Searchable;
+use Statamic\Facades\Search;
+use Statamic\Search\ProvidesSearchables;
 use Statamic\Search\QueryBuilder;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -24,6 +30,50 @@ class QueryBuilderTest extends TestCase
 
         $this->assertCount(3, $results);
         $this->assertEquals(['a', 'b', 'c'], $results->map->reference->all());
+    }
+
+    /** @test */
+    public function it_can_get_results_with_data()
+    {
+        $items = collect([
+            ['reference' => 'foo::a', 'search_score' => 2],
+            ['reference' => 'bar::b', 'search_score' => 1],
+            ['reference' => 'foo::c', 'search_score' => 3],
+        ]);
+
+        $resultA = Mockery::mock(SearchResult::class);
+        $resultA->shouldReceive('setScore')->with(2)->once();
+        $resultA->shouldReceive('getScore')->andReturn(2)->once();
+        $resultB = Mockery::mock(SearchResult::class);
+        $resultB->shouldReceive('setScore')->with(1)->once();
+        $resultB->shouldReceive('getScore')->andReturn(1)->once();
+        $resultC = Mockery::mock(SearchResult::class);
+        $resultC->shouldReceive('setScore')->with(3)->once();
+        $resultC->shouldReceive('getScore')->andReturn(3)->once();
+
+        $a = Mockery::mock(Searchable::class);
+        $a->shouldReceive('toSearchResult')->andReturn($resultA);
+        $b = Mockery::mock(Searchable::class);
+        $b->shouldReceive('toSearchResult')->andReturn($resultB);
+        $c = Mockery::mock(Searchable::class);
+        $c->shouldReceive('toSearchResult')->andReturn($resultC);
+
+        $foo = Mockery::mock(ProvidesSearchables::class);
+        $foo->shouldReceive('referencePrefix')->andReturn('foo');
+        $foo->shouldReceive('find')->with(['a', 'c'])->andReturn(collect([$a, $c]));
+
+        $bar = Mockery::mock(ProvidesSearchables::class);
+        $bar->shouldReceive('referencePrefix')->andReturn('bar');
+        $bar->shouldReceive('find')->with(['b'])->andReturn(collect([$b]));
+
+        Search::registerSearchableProvider('foo', $foo);
+        Search::registerSearchableProvider('bar', $bar);
+
+        $results = (new FakeQueryBuilder($items))->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEveryItemIsInstanceOf(Result::class, $results);
+        $this->assertEquals([$resultC, $resultA, $resultB], $results->all());
     }
 
     /** @test **/

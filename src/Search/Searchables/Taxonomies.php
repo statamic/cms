@@ -8,6 +8,11 @@ use Statamic\Facades\Term;
 
 class Taxonomies extends Provider
 {
+    public function referencePrefix(): string
+    {
+        return 'term';
+    }
+
     public function provide(): Collection
     {
         if ($this->usesWildcard()) {
@@ -29,5 +34,10 @@ class Taxonomies extends Provider
     public function isSearchable($searchable): bool
     {
         return $searchable instanceof TermContract;
+    }
+
+    public function find(array $ids): Collection
+    {
+        return Term::query()->whereIn('id', $ids)->get();
     }
 }

@@ -40,6 +40,6 @@ class ServiceProvider extends LaravelServiceProvider
             'taxonomy' => Taxonomies::class,
             'assets' => Assets::class,
             'users' => Users::class,
-        ])->each(fn ($provider, $key) => Search::registerSearchableProvider($key, $provider));
+        ])->each(fn ($provider, $key) => Search::registerSearchableProvider($key, new $provider));
     }
 }

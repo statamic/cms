@@ -8,6 +8,11 @@ use Statamic\Facades\User;
 
 class Users extends Provider
 {
+    public function referencePrefix(): string
+    {
+        return 'user';
+    }
+
     public function provide(): Collection
     {
         return User::all();
@@ -21,5 +26,10 @@ class Users extends Provider
     public function isSearchable($searchable): bool
     {
         return $searchable instanceof UserContract;
+    }
+
+    public function find(array $ids): Collection
+    {
+        return User::query()->whereIn('id', $ids)->get();
     }
 }

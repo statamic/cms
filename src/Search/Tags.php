@@ -42,44 +42,7 @@ class Tags extends BaseTags
 
         $results = $this->getQueryResults($builder);
 
-        // Backwards compatibility. This can be removed in 3.2.
-        if (! $this->params->get('as')) {
-            return $this->output($this->addResultTypes($results));
-        }
-
-        $results = $this->output($results);
-
-        return $this->addResultTypesToOutput($results);
-    }
-
-    protected function addResultTypesToOutput($output)
-    {
-        if (! $this->params->get('paginate') && ! $this->params->get('as')) {
-            return $this->addResultTypes($output);
-        }
-
-        $as = $this->getPaginationResultsKey();
-
-        $output[$as] = $this->addResultTypes($output[$as]);
-
-        return $output;
-    }
-
-    protected function addResultTypes($results)
-    {
-        return $results->map(function ($result) {
-            $reference = is_array($result) ? $result['reference'] : $result->reference();
-
-            [$type, $id] = explode('::', $reference, 2);
-
-            if (is_array($result)) {
-                $result['result_type'] = $type;
-            } else {
-                $result->setSupplement('result_type', $type);
-            }
-
-            return $result;
-        });
+        return $this->output($results);
     }
 
     protected function queryStatus($query)

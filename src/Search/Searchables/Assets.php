@@ -9,6 +9,11 @@ use Statamic\Facades\Asset;
 
 class Assets extends Provider
 {
+    public function referencePrefix(): string
+    {
+        return 'asset';
+    }
+
     public function provide(): Collection
     {
         if ($this->usesWildcard()) {
@@ -31,5 +36,20 @@ class Assets extends Provider
     public function isSearchable($searchable): bool
     {
         return $searchable instanceof AssetContract;
+    }
+
+    public function find(array $keys): Collection
+    {
+        return collect($keys)->map(function ($id) {
+            [$container, $path] = explode('::', $id);
+
+            return compact('container', 'path');
+        })
+        ->groupBy->container
+        ->flatMap(fn ($group, $container) => Asset::query()
+            ->where('container', $container)
+            ->whereIn('path', $group->map->path->all())
+            ->get()
+        );
     }
 }

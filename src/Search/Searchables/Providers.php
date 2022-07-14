@@ -2,21 +2,22 @@
 
 namespace Statamic\Search\Searchables;
 
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Collection;
 
 class Providers
 {
     protected $providers;
+    protected $prefixes;
 
     public function __construct()
     {
         $this->providers = Collection::make();
     }
 
-    public function register(string $name, string $class)
+    public function register(string $name, $class)
     {
         $this->providers[$name] = $class;
+        $this->prefixes[$class->referencePrefix()] = $name;
 
         return $this;
     }
@@ -26,14 +27,21 @@ class Providers
         return $this->providers;
     }
 
-    public function make(string $key, array $keys)
+    public function make(string $key, array $keys = null)
     {
-        try {
-            $provider = $this->providers()->get($key);
-
-            return app()->make($provider)->setKeys($keys);
-        } catch (BindingResolutionException $e) {
+        if (! $provider = $this->providers()->get($key)) {
             throw new \Exception('Unknown searchable ['.$key.']');
         }
+
+        if ($keys) {
+            $provider->setKeys($keys);
+        }
+
+        return $provider;
+    }
+
+    public function getByPrefix(string $prefix)
+    {
+        return $this->providers()->get($this->prefixes[$prefix]);
     }
 }
