@@ -3,7 +3,7 @@
 namespace Statamic\Query;
 
 use Closure;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
