@@ -56,8 +56,8 @@ export default {
             var options = [];
 
             // Prepend @blueprint as an option
-            if (this.config.prepend_blueprint) {
-                options.push({ label: '@blueprint', value: '@blueprint' });
+            if (this.config.blueprint) {
+                options.push({ label: __('Map to Blueprint'), value: '@blueprint' });
             }
 
             _.each(templates, (template) => {

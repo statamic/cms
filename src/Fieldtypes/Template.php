@@ -19,9 +19,9 @@ class Template extends Fieldtype
                 'default' => true,
                 'width' => 33,
             ],
-            'prepend_blueprint' => [
-                'display' => __('Prepend Blueprint'),
-                'instructions' => __('statamic::fieldtypes.template.config.prepend_blueprint'),
+            'blueprint' => [
+                'display' => __('Blueprint'),
+                'instructions' => __('statamic::fieldtypes.template.config.blueprint'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 33,
