@@ -65,11 +65,6 @@ class Site implements Augmentable
         return $this->config['attributes'] ?? [];
     }
 
-    public function transliterateSymbols()
-    {
-        return $this->config['transliterate_symbols'] ?? false;
-    }
-
     public function absoluteUrl()
     {
         if (Str::startsWith($url = $this->url(), '/')) {

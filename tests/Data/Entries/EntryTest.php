@@ -85,22 +85,16 @@ class EntryTest extends TestCase
     public function the_slug_gets_slugified()
     {
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
-            'en' => ['locale' => 'en_US', 'url' => '/', 'transliterate_symbols' => false],
-            'en_UK' => ['locale' => 'en_UK', 'url' => '/', 'transliterate_symbols' => true],
-            'da' => ['locale' => 'da_DK', 'url' => '/da/', 'transliterate_symbols' => true],
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'da' => ['locale' => 'da_DK', 'url' => '/da/'],
         ]]);
 
         $entry = new Entry;
         $entry->slug('foo bar & æøå');
         $this->assertEquals('foo-bar-aeoa', $entry->slug());
 
-        Facades\Site::setCurrent('en_UK');
-        $entry->locale('en_UK');
-        $this->assertEquals('foo-bar-and-aeoa', $entry->slug());
-
-        Facades\Site::setCurrent('da');
         $entry->locale('da');
-        $this->assertEquals('foo-bar-og-aeoeaa', $entry->slug()); // danish replaces æøå with aeoeaa
+        $this->assertEquals('foo-bar-aeoeaa', $entry->slug()); // danish replaces æøå with aeoeaa
     }
 
     /** @test */
