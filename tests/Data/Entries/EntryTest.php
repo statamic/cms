@@ -90,7 +90,7 @@ class EntryTest extends TestCase
         ]]);
 
         $entry = new Entry;
-        $entry->slug('foo bar & æøå');
+        $entry->slug('foo bar æøå');
         $this->assertEquals('foo-bar-aeoa', $entry->slug());
 
         $entry->locale('da');
