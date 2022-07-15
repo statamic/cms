@@ -130,6 +130,7 @@ return [
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Taxonomies',
     'template.config.hide_partials' => 'Partials are rarely intended to be used as templates.',
+    'template.config.prepend_blueprint' => 'Prepend `@blueprint` as an option. Learn more in the [documentation](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
     'template.config.folder' => 'Only show templates in this folder.',
     'template.title' => 'Template',
     'terms.config.create' => 'Allow creation of new terms.',

@@ -17,14 +17,21 @@ class Template extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.template.config.hide_partials'),
                 'type' => 'toggle',
                 'default' => true,
-                'width' => 50,
+                'width' => 33,
+            ],
+            'prepend_blueprint' => [
+                'display' => __('Prepend Blueprint'),
+                'instructions' => __('statamic::fieldtypes.template.config.prepend_blueprint'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 33,
             ],
             'folder' => [
                 'display' => __('Folder'),
                 'instructions' => __('statamic::fieldtypes.template.config.folder'),
                 'type' => 'template_folder',
                 'max_items' => 1,
-                'width' => 50,
+                'width' => 33,
             ],
         ];
     }

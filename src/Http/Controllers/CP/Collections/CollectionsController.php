@@ -429,6 +429,7 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_template_instructions'),
                         'type' => 'template',
                         'placeholder' => __('System default'),
+                        'prepend_blueprint' => true,
                     ],
                     'layout' => [
                         'display' => __('Layout'),
