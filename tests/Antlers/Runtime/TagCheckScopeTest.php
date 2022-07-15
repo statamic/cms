@@ -19,7 +19,6 @@ class TagCheckScopeTest extends TestCase
     private function createData()
     {
         $blueprint = new Blueprint();
-        $blueprint->setHandle('tag-check-scope-test');
         $blueprint->setContents([
             'fields' => [
                 [
