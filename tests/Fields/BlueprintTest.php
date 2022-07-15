@@ -532,7 +532,7 @@ class BlueprintTest extends TestCase
         $blueprint->save();
 
         Event::assertDispatched(BlueprintSaved::class, 3);
-        Event::assertDispatched(BlueprintCreated::class, 1); // TODO: fix
+        Event::assertDispatched(BlueprintCreated::class, 1);
     }
 
     /** @test */

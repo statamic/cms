@@ -233,7 +233,7 @@ class AssetContainerTest extends TestCase
         $container->save();
 
         Event::assertDispatched(AssetContainerSaved::class, 3);
-        Event::assertDispatched(AssetContainerCreated::class, 1); // TODO: fix this
+        Event::assertDispatched(AssetContainerCreated::class, 1);
     }
 
     /** @test */

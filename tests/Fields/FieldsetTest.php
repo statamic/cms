@@ -180,7 +180,7 @@ class FieldsetTest extends TestCase
         $fieldset->save();
 
         Event::assertDispatched(FieldsetSaved::class, 3);
-        Event::assertDispatched(FieldsetCreated::class, 1); // TODO: fix
+        Event::assertDispatched(FieldsetCreated::class, 1);
     }
 
     /** @test */
