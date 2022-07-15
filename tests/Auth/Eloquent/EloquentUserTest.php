@@ -25,7 +25,6 @@ class EloquentUserTest extends TestCase
         Carbon::setTestNow(Carbon::create(2019, 11, 21, 23, 39, 29));
 
         config(['statamic.users.repository' => 'eloquent']);
-        config(['auth.providers.users.model' => User::class]);
 
         // TODO: The migration has been added into the test, but the implementation could be broken if the real
         // migration is different from what's in here. We should find a way to reference the actual migrations.
