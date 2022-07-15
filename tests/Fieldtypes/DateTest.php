@@ -2,7 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Date;
 use Tests\TestCase;

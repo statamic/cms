@@ -315,6 +315,8 @@ export default {
 
     beforeDestroy() {
         this.editor.destroy();
+
+        this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
 
     watch: {
@@ -363,7 +365,12 @@ export default {
                 meta.previews = value;
                 this.updateMeta(meta);
             }
-        }
+        },
+
+        fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
+            this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
+            this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+        },
 
     },
 

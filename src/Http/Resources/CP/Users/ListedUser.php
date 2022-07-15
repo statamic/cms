@@ -30,7 +30,11 @@ class ListedUser extends JsonResource
         return [
             'id' => $this->id(),
             'last_login' => optional($this->lastLogin())->diffForHumans() ?? __('Never'),
-            $this->merge($this->values(['email' => $this->email()])),
+            $this->merge($this->values([
+                'email' => $this->email(),
+                'roles' => $this->roles()->map->handle()->all(),
+                'groups' => $this->groups()->map->handle()->all(),
+            ])),
             'super' => $this->isSuper(),
             'edit_url' => $this->editUrl(),
             'avatar' => $this->avatar(),

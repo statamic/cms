@@ -49,6 +49,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected $path;
     protected $meta;
     protected $syncOriginalProperties = ['path'];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -444,17 +445,34 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Save quietly without firing events.
+     *
+     * @return bool
+     */
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
+    /**
      * Save the asset.
      *
      * @return bool
      */
     public function save()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         Facades\Asset::save($this);
 
         $this->clearCaches();
 
-        AssetSaved::dispatch($this);
+        if ($withEvents) {
+            AssetSaved::dispatch($this);
+        }
 
         $this->syncOriginal();
 

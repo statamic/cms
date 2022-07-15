@@ -23,8 +23,8 @@ class Glide extends Tags
      *
      * Where `field` is the variable containing the image ID
      *
-     * @param  $method
-     * @param  $args
+     * @param  string  $method
+     * @param  array  $args
      * @return string
      */
     public function __call($method, $args)
