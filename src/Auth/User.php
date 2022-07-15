@@ -155,7 +155,7 @@ abstract class User implements
 
     public function save()
     {
-        $isNew = is_null(Facades\User::find($this->getAuthIdentifier()));
+        $isNew = is_null(Facades\User::find($this->id()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
