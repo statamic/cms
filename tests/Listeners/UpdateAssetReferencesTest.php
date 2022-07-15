@@ -1141,14 +1141,14 @@ EOT;
 
     protected function setSingleBlueprint($namespace, $blueprintContents)
     {
-        $blueprint = tap(Facades\Blueprint::make()->setContents($blueprintContents))->save();
+        $blueprint = tap(Facades\Blueprint::make('single-blueprint')->setContents($blueprintContents))->save();
 
         Facades\Blueprint::shouldReceive('find')->with($namespace)->andReturn($blueprint);
     }
 
     protected function setInBlueprints($namespace, $blueprintContents)
     {
-        $blueprint = tap(Facades\Blueprint::make()->setContents($blueprintContents))->save();
+        $blueprint = tap(Facades\Blueprint::make('set-in-blueprints')->setContents($blueprintContents))->save();
 
         Facades\Blueprint::shouldReceive('in')->with($namespace)->andReturn(collect([$blueprint]));
     }
