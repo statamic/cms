@@ -36,7 +36,7 @@ class EloquentRoleTest extends TestCase
         $tmpDir = $this->migrationsDir.'/tmp';
 
         if (! self::$migrationsGenerated) {
-            $this->please('auth:migration', ['--path' => $tmpDir, '--test' => true]);
+            $this->please('auth:migration', ['--path' => $tmpDir]);
 
             self::$migrationsGenerated = true;
         }

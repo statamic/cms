@@ -20,7 +20,7 @@ class UserGroupModel extends Eloquent
     {
         parent::__construct($attributes);
 
-        if ($table = config('statamic.users.groups', '')) {
+        if ($table = config('statamic.users.groups')) {
             $this->setTable($table);
         }
 
