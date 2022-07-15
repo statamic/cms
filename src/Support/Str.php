@@ -19,7 +19,7 @@ class Str extends \Illuminate\Support\Str
 
     public static function ascii($value, $language = 'en')
     {
-        return ASCII::to_ascii((string) $value, $language, false, Site::current()->transliterateSymbols());
+        return ASCII::to_ascii((string) $value, $language, true, Site::current()->transliterateSymbols());
     }
 
     /**
