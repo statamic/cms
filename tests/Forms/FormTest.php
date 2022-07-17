@@ -3,6 +3,10 @@
 namespace Tests\Forms;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\FormCreated;
+use Statamic\Events\FormSaved;
+use Statamic\Events\FormSaving;
 use Statamic\Facades\Form;
 use Statamic\Fields\Blueprint;
 use Tests\TestCase;
@@ -19,18 +23,89 @@ class FormTest extends TestCase
     /** @test */
     public function it_saves_a_form()
     {
+        Event::fake();
+
         $blueprint = (new Blueprint)->setHandle('post')->save();
 
-        Form::make('contact_us')
+        $form = Form::make('contact_us')
             ->title('Contact Us')
-            ->honeypot('winnie')
-            ->save();
+            ->honeypot('winnie');
 
-        $form = Form::find('contact_us');
+        $form->save();
 
         $this->assertEquals('contact_us', $form->handle());
         $this->assertEquals('Contact Us', $form->title());
         $this->assertEquals('winnie', $form->honeypot());
+
+        Event::assertDispatched(FormSaving::class, function ($event) use ($form) {
+            return $event->form === $form;
+        });
+
+        Event::assertDispatched(FormCreated::class, function ($event) use ($form) {
+            return $event->form === $form;
+        });
+
+        Event::assertDispatched(FormSaved::class, function ($event) use ($form) {
+            return $event->form === $form;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_form_created_only_once()
+    {
+        Event::fake();
+
+        $blueprint = (new Blueprint)->setHandle('post')->save();
+
+        $form = Form::make('contact_us')
+            ->title('Contact Us')
+            ->honeypot('winnie');
+
+        Form::shouldReceive('save')->with($form);
+        Form::shouldReceive('find')->with($form->handle())->times(3)->andReturn(null, $form, $form);
+
+        $form->save();
+        $form->save();
+        $form->save();
+
+        Event::assertDispatched(FormSaved::class, 3);
+        Event::assertDispatched(FormCreated::class, 1);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $blueprint = (new Blueprint)->setHandle('post')->save();
+
+        $form = Form::make('contact_us')
+            ->title('Contact Us')
+            ->honeypot('winnie')
+            ->saveQuietly();
+
+        Event::assertNotDispatched(FormSaving::class);
+        Event::assertNotDispatched(FormSaved::class);
+        Event::assertNotDispatched(FormCreated::class);
+    }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_form_doesnt_save()
+    {
+        Event::fake([FormSaved::class]);
+
+        Event::listen(FormSaving::class, function () {
+            return false;
+        });
+
+        $blueprint = (new Blueprint)->setHandle('post')->save();
+
+        $form = Form::make('contact_us')
+            ->title('Contact Us')
+            ->honeypot('winnie')
+            ->save();
+
+        Event::assertNotDispatched(FormSaved::class);
     }
 
     /** @test */

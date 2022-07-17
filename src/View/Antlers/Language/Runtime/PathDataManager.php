@@ -450,23 +450,33 @@ class PathDataManager
 
         if ($builderCheckValue instanceof Builder) {
             $nodeProcessor = $this->getNodeProcessor();
-            $activeNode = $nodeProcessor->getActiveNode();
 
-            if ($activeNode instanceof AntlersNode || $activeNode instanceof ConditionNode) {
-                $interceptResult = $nodeProcessor->evaluateDeferredNodeAsTag(
-                    $activeNode,
-                    'query',
-                    'index', ['builder' => $builderCheckValue]
-                );
+            if ($nodeProcessor != null) {
+                $activeNode = $nodeProcessor->getActiveNode();
 
-                $this->reducedVar = $interceptResult;
-            } else {
-                $this->reducedVar = $builderCheckValue->get();
+                if ($activeNode instanceof AntlersNode || $activeNode instanceof ConditionNode) {
+                    $interceptResult = $nodeProcessor->evaluateDeferredNodeAsTag(
+                        $activeNode,
+                        'query',
+                        'index', ['builder' => $builderCheckValue]
+                    );
 
-                if ($this->reducedVar instanceof Collection) {
-                    $this->reducedVar = $this->reducedVar->all();
+                    $this->reducedVar = $interceptResult;
+                } else {
+                    $this->collapseQueryBuilder($builderCheckValue);
                 }
+            } else {
+                $this->collapseQueryBuilder($builderCheckValue);
             }
+        }
+    }
+
+    private function collapseQueryBuilder($builder)
+    {
+        $this->reducedVar = $builder->get();
+
+        if ($this->reducedVar instanceof Collection) {
+            $this->reducedVar = $this->reducedVar->all();
         }
     }
 

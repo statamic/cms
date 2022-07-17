@@ -242,4 +242,21 @@ class StatamicTest extends TestCase
 
         $this->assertEquals($testStyle, $path);
     }
+
+    /**
+     * @test
+     * @define-env useFixtureTranslations
+     **/
+    public function it_makes_breadcrumbs()
+    {
+        // confirm the fake translations are being loaded
+        $this->assertIsArray(__('messages'));
+
+        $this->assertEquals('one ‹ messages ‹ two', Statamic::crumb('one', 'messages', 'two'));
+    }
+
+    public function useFixtureTranslations($app)
+    {
+        $app->useLangPath(__DIR__.'/__fixtures__/lang');
+    }
 }

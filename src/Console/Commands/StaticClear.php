@@ -4,7 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
-use Statamic\StaticCaching\Cacher as StaticCacher;
+use Statamic\Facades\StaticCache;
 
 class StaticClear extends Command
 {
@@ -31,7 +31,7 @@ class StaticClear extends Command
      */
     public function handle()
     {
-        app(StaticCacher::class)->flush();
+        StaticCache::flush();
 
         $this->info('Your static page cache is now so very, very empty.');
     }

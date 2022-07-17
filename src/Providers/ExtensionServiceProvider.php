@@ -183,6 +183,7 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Auth\Protect\Tags::class,
         \Statamic\OAuth\Tags::class,
         \Statamic\Search\Tags::class,
+        \Statamic\StaticCaching\NoCache\Tags::class,
     ];
 
     protected $widgets = [
