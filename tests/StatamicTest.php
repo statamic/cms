@@ -170,7 +170,7 @@ class StatamicTest extends TestCase
 
         Statamic::query('test');
     }
-    
+
     /** @test */
     public function scripts_will_automatically_be_versioned()
     {
