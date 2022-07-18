@@ -4,6 +4,7 @@ namespace Statamic;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
 use Statamic\Facades\Preference;
@@ -68,7 +69,7 @@ class Statamic
 
     public static function script($name, $path)
     {
-        static::$scripts[$name][] = str_finish($path, '.js');
+        static::$scripts[$name][] = self::createVersionedAssetPath($name, $path, 'js');
 
         return new static;
     }
@@ -92,7 +93,7 @@ class Statamic
 
     public static function style($name, $path)
     {
-        static::$styles[$name][] = str_finish($path, '.css');
+        static::$styles[$name][] = self::createVersionedAssetPath($name, $path, 'css');
 
         return new static;
     }
@@ -245,9 +246,19 @@ class Statamic
         return asset(URL::tidy('vendor/'.$url));
     }
 
+    public static function vendorPackageAssetUrl($package, $url = null, $type = null)
+    {
+        // If a vendor URL has already been provided, bypass the rest of the logic.
+        if (Str::startsWith($url, ['vendor', '/vendor'])) {
+            return self::vendorAssetUrl(Str::after($url, 'vendor/'));
+        }
+
+        return self::vendorAssetUrl($package.'/'.$type.'/'.$url);
+    }
+
     public static function cpAssetUrl($url = '/')
     {
-        return static::vendorAssetUrl('statamic/cp/'.$url);
+        return static::vendorPackageAssetUrl('statamic/cp', $url);
     }
 
     public static function cpDateFormat()
@@ -373,5 +384,26 @@ class Statamic
         }
 
         return $line;
+    }
+
+    private static function createVersionedAssetPath($name, $path, $extension)
+    {
+        // If passing a path versioned by laravel mix, it will contain ?id=
+        // Do nothing and return that path.
+        if (Str::contains($path, '?id=')) {
+            return (string) $path;
+        }
+
+        return Cache::rememberForever("statamic-{$extension}-{$name}", function () use ($path, $extension) {
+
+            // In case a file without any version will be passed,
+            // a random version number will be created.
+            if (! Str::contains($path, '?v=')) {
+                $version = str_random();
+                $path = str_finish($path, ".{$extension}?v={$version}");
+            }
+
+            return $path;
+        });
     }
 }
