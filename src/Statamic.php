@@ -69,7 +69,7 @@ class Statamic
 
     public static function script($name, $path)
     {
-        static::$scripts[$name][] = self::createVersionedAssetPath($name, $path, 'script');
+        static::$scripts[$name][] = self::createVersionedAssetPath($name, $path, 'js');
 
         return new static;
     }
@@ -93,7 +93,7 @@ class Statamic
 
     public static function style($name, $path)
     {
-        static::$styles[$name][] = self::createVersionedAssetPath($name, $path, 'style');
+        static::$styles[$name][] = self::createVersionedAssetPath($name, $path, 'css');
 
         return new static;
     }
@@ -386,7 +386,7 @@ class Statamic
         return $line;
     }
 
-    private static function createVersionedAssetPath($name, $path, $type)
+    private static function createVersionedAssetPath($name, $path, $extension)
     {
         // If passing a path versioned by laravel mix, it will contain ?id=
         // Do nothing and return that path.
@@ -394,13 +394,12 @@ class Statamic
             return (string) $path;
         }
 
-        return Cache::rememberForever("statamic-{$type}-{$name}", function () use ($path, $type) {
+        return Cache::rememberForever("statamic-{$extension}-{$name}", function () use ($path, $extension) {
 
             // In case a file without any version will be passed,
             // a random version number will be created.
             if (! Str::contains($path, '?v=')) {
                 $version = str_random();
-                $extension = $type === 'style' ? 'css' : 'js';
                 $path = str_finish($path, ".{$extension}?v={$version}");
             }
 
