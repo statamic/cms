@@ -1,5 +1,17 @@
 # Release Notes
 
+## 3.3.21 (2022-07-18)
+
+### What's new
+- Add `saveQuietly` methods and save-related events to a number of classes. [#3379](https://github.com/statamic/cms/issues/3379) [#6339](https://github.com/statamic/cms/issues/6339) by @duncanmcclean @jesseleite
+- Ability to replace extra ascii characters in slugs etc. [#5496](https://github.com/statamic/cms/issues/5496) by @FrittenKeeZ
+- The `templates` fieldtype can add a "map to blueprint" option. It's used on the collection configuration form. [#6337](https://github.com/statamic/cms/issues/6337) by @FrittenKeeZ
+
+### What's improved
+- Improve vendor asset cache-busting. [#6312](https://github.com/statamic/cms/issues/6312) by @jonassiewertsen
+
+
+
 ## 3.3.20 (2022-07-13)
 
 ### What's new
