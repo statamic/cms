@@ -246,9 +246,19 @@ class Statamic
         return asset(URL::tidy('vendor/'.$url));
     }
 
+    public static function vendorPackageAssetUrl($package, $url = null, $type = null)
+    {
+        // If a vendor URL has already been provided, bypass the rest of the logic.
+        if (Str::startsWith($url, ['vendor', '/vendor'])) {
+            return self::vendorAssetUrl(Str::after($url, 'vendor/'));
+        }
+
+        return self::vendorAssetUrl($package.'/'.$type.'/'.$url);
+    }
+
     public static function cpAssetUrl($url = '/')
     {
-        return static::vendorAssetUrl('statamic/cp/'.$url);
+        return static::vendorPackageAssetUrl('statamic/cp', $url);
     }
 
     public static function cpDateFormat()

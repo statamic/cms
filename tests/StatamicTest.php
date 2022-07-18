@@ -245,6 +245,43 @@ class StatamicTest extends TestCase
 
     /**
      * @test
+     * @dataProvider cpAssetUrlProvider
+     */
+    public function it_gets_a_cp_asset_url($url, $expected)
+    {
+        $this->assertEquals($expected, Statamic::cpAssetUrl($url));
+    }
+
+    public function cpAssetUrlProvider()
+    {
+        return [
+            'slash' => ['/foo/bar.jpg', 'http://localhost/vendor/statamic/cp/foo/bar.jpg'],
+            'no slash' => ['foo/bar.jpg', 'http://localhost/vendor/statamic/cp/foo/bar.jpg'],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider vendorPackageAssetUrlProvider
+     */
+    public function it_gets_the_vendor_package_asset_url($arguments, $expected)
+    {
+        $this->assertEquals($expected, Statamic::vendorPackageAssetUrl(...$arguments));
+    }
+
+    public function vendorPackageAssetUrlProvider()
+    {
+        return [
+            'package' => [['package', 'cp.js'], 'http://localhost/vendor/package/cp.js'],
+            'package with type' => [['package', 'test.jpg', 'images'], 'http://localhost/vendor/package/images/test.jpg'],
+            'statamic cp' => [['statamic/cp', 'cp.js'], 'http://localhost/vendor/statamic/cp/cp.js'],
+            'vendor url no slash' => [['irrelevant', 'vendor/foo/bar.js'], 'http://localhost/vendor/foo/bar.js'],
+            'vendor url with slash' => [['irrelevant', '/vendor/foo/bar.js'], 'http://localhost/vendor/foo/bar.js'],
+        ];
+    }
+
+    /**
+     * @test
      * @define-env useFixtureTranslations
      **/
     public function it_makes_breadcrumbs()
