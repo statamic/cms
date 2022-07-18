@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.3.22 (2022-07-18)
+
+### What's improved
+- An error is logged when contact with the Outpost fails. [#6341](https://github.com/statamic/cms/issues/6341) by @jasonvarga
+
+
+
 ## 3.3.21 (2022-07-18)
 
 ### What's new
