@@ -178,7 +178,7 @@ class AppServiceProvider extends ServiceProvider
         $addons = Addon::all();
 
         AboutCommand::add('Statamic', [
-            'Version' => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
+            'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
             'Antlers' => config('statamic.antlers.version'),
             'Addons' => $addons->count(),
         ]);
