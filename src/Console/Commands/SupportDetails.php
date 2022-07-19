@@ -18,18 +18,19 @@ class SupportDetails extends Command
 
     public function handle()
     {
-        if (class_exists(AboutCommand::class)) {
-            $this->replaceView();
-            $this->call('about');
-            $this->restoreView();
+        return class_exists(AboutCommand::class)
+            ? $this->handleUsingAboutCommand()
+            : $this->handleUsingStatamic();
+    }
 
-            return static::SUCCESS;
-        }
-
+    private function handleUsingStatamic()
+    {
         $this->line(sprintf('<info>Statamic</info> %s %s', Statamic::version(), Statamic::pro() ? 'Pro' : 'Solo'));
         $this->line('<info>Laravel</info> '.Application::VERSION);
         $this->line('<info>PHP</info> '.phpversion());
         $this->addons();
+
+        return static::SUCCESS;
     }
 
     private function addons()
@@ -43,6 +44,15 @@ class SupportDetails extends Command
         foreach ($addons as $addon) {
             $this->line(sprintf('<info>%s</info> %s', $addon->package(), $addon->version()));
         }
+    }
+
+    private function handleUsingAboutCommand()
+    {
+        $this->replaceView();
+        $this->call('about');
+        $this->restoreView();
+
+        return static::SUCCESS;
     }
 
     private function replaceView()
