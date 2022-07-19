@@ -4,6 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Console\AboutCommand;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Addon;
 use Statamic\Statamic;
@@ -17,6 +18,10 @@ class SupportDetails extends Command
 
     public function handle()
     {
+        if (class_exists(AboutCommand::class)) {
+            return $this->call('about');
+        }
+
         $this->line(sprintf('<info>Statamic</info> %s %s', Statamic::version(), Statamic::pro() ? 'Pro' : 'Solo'));
         $this->line('<info>Laravel</info> '.Application::VERSION);
         $this->line('<info>PHP</info> '.phpversion());
