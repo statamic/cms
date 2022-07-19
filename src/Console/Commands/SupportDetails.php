@@ -49,8 +49,12 @@ class SupportDetails extends Command
     private function handleUsingAboutCommand()
     {
         $this->replaceView();
-        $this->call('about');
-        $this->restoreView();
+
+        try {
+            $this->call('about');
+        } finally {
+            $this->restoreView();
+        }
 
         return static::SUCCESS;
     }
