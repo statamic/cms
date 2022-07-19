@@ -49,8 +49,7 @@ class SupportDetails extends Command
     {
         $view = <<<'EOT'
 <div class="flex mx-2 max-w-150">
-    <?php echo htmlspecialchars($first) ?>
-    <?php if ($second !== '') { ?> : <?php echo htmlspecialchars($second) ?> <?php } ?>
+    <?php echo htmlspecialchars($first) ?><?php if ($second !== '') { ?>: <?php echo htmlspecialchars($second) ?> <?php } ?>
 </div>
 EOT;
 
