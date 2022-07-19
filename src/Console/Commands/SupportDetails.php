@@ -53,16 +53,20 @@ class SupportDetails extends Command
 </div>
 EOT;
 
-        $dir = base_path('vendor/laravel/framework/src/Illuminate/Console/resources/views/components');
-
+        $dir = $this->viewDir();
         app('files')->move($dir.'/two-column-detail.php', $dir.'/two-column-detail.php.bak');
         app('files')->put($dir.'/two-column-detail.php', $view);
     }
 
     private function restoreView()
     {
-        $dir = base_path('vendor/laravel/framework/src/Illuminate/Console/resources/views/components');
+        $dir = $this->viewDir();
         app('files')->delete($dir.'/two-column-detail.php');
         app('files')->move($dir.'/two-column-detail.php.bak', $dir.'/two-column-detail.php');
+    }
+
+    private function viewDir()
+    {
+        return base_path('vendor/laravel/framework/src/Illuminate/Console/resources/views/components');
     }
 }
