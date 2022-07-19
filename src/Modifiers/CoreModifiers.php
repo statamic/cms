@@ -671,6 +671,8 @@ class CoreModifiers extends Modifier
     /**
      * Converts a string to a Carbon instance and formats it according to the whim of the Overlord.
      *
+     * @deprecated formatLocalized is deprecated since Carbon 2.55.0. You may want to use formatTranslated instead.
+     *
      * @param $value
      * @param $params
      * @return string
