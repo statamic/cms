@@ -19,7 +19,11 @@ class SupportDetails extends Command
     public function handle()
     {
         if (class_exists(AboutCommand::class)) {
-            return $this->call('about');
+            $this->replaceView();
+            $this->call('about');
+            $this->restoreView();
+
+            return static::SUCCESS;
         }
 
         $this->line(sprintf('<info>Statamic</info> %s %s', Statamic::version(), Statamic::pro() ? 'Pro' : 'Solo'));
@@ -39,5 +43,27 @@ class SupportDetails extends Command
         foreach ($addons as $addon) {
             $this->line(sprintf('<info>%s</info> %s', $addon->package(), $addon->version()));
         }
+    }
+
+    private function replaceView()
+    {
+        $view = <<<'EOT'
+<div class="flex mx-2 max-w-150">
+    <?php echo htmlspecialchars($first) ?>
+    <?php if ($second !== '') { ?> : <?php echo htmlspecialchars($second) ?> <?php } ?>
+</div>
+EOT;
+
+        $dir = base_path('vendor/laravel/framework/src/Illuminate/Console/resources/views/components');
+
+        app('files')->move($dir.'/two-column-detail.php', $dir.'/two-column-detail.php.bak');
+        app('files')->put($dir.'/two-column-detail.php', $view);
+    }
+
+    private function restoreView()
+    {
+        $dir = base_path('vendor/laravel/framework/src/Illuminate/Console/resources/views/components');
+        app('files')->delete($dir.'/two-column-detail.php');
+        app('files')->move($dir.'/two-column-detail.php.bak', $dir.'/two-column-detail.php');
     }
 }
