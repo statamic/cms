@@ -28,6 +28,7 @@ body:
         (Go ahead and just paste the output of the `php please support:details` command.)
     validations:
       required: true
+    render: text
   - type: dropdown
     attributes:
       label: Installation
