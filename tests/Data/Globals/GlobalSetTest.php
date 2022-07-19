@@ -9,10 +9,13 @@ use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades\GlobalSet as GlobalSetFacade;
 use Statamic\Facades\Site;
 use Statamic\Globals\GlobalSet;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class GlobalSetTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     public function it_gets_file_contents_for_saving_with_a_single_site()
     {
