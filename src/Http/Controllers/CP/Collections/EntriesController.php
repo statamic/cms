@@ -174,7 +174,11 @@ class EntriesController extends CpController
             $data['author'] = Arr::wrap($entry->value('author'));
         }
 
-        $fields = $entry->blueprint()->fields()->addValues($data);
+        $fields = $entry
+            ->blueprint()
+            ->ensureField('published', ['type' => 'toggle'])
+            ->fields()
+            ->addValues($data);
 
         $fields
             ->validator()
@@ -323,7 +327,10 @@ class EntriesController extends CpController
             $data['author'] = [User::current()->id()];
         }
 
-        $fields = $blueprint->fields()->addValues($data);
+        $fields = $blueprint
+            ->ensureField('published', ['type' => 'toggle'])
+            ->fields()
+            ->addValues($data);
 
         $fields
             ->validator()
