@@ -400,7 +400,12 @@ class Statamic
             // a random version number will be created.
             if (! Str::contains($path, '?v=')) {
                 $version = str_random();
-                $path = str_finish($path, ".{$extension}?v={$version}");
+                
+                // Add the file extension if not provided.
+                $path = str_finish($path, ".{$extension}");
+
+                // Add the version to the path.
+                $path = str_finish($path, "?v={$version}");
             }
 
             return $path;
