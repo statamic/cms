@@ -48,7 +48,7 @@ class SupportDetails extends Command
     private function replaceView()
     {
         $view = <<<'EOT'
-<div class="flex mx-2 max-w-150">
+<div class="flex">
     <?php echo htmlspecialchars($first) ?><?php if ($second !== '') { ?>: <?php echo htmlspecialchars($second) ?> <?php } ?>
 </div>
 EOT;
