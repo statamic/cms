@@ -25,10 +25,10 @@ body:
       label: Versions
       description: |
         The versions of Statamic, PHP, Laravel, and any addons that are installed.
-        (Go ahead and just paste the output of the `php please support:details` command.)
+        (Go ahead and just paste the output of the `php please support:details` command.)    
+      render: text
     validations:
       required: true
-    render: text
   - type: dropdown
     attributes:
       label: Installation
