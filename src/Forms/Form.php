@@ -182,8 +182,8 @@ class Form implements FormContract, Augmentable, Arrayable
             'title' => $this->title,
             'honeypot' => $this->honeypot,
             'email' => collect($this->email)->map(function ($email) {
-                $email['markdown'] = $email['markdown'] ?: null;
-                $email['attachments'] = $email['attachments'] ?: null;
+                $email['markdown'] = isset($email['markdown']) ? $email['markdown'] : null;
+                $email['attachments'] = isset($email['attachments']) ? $email['attachments'] : null;
 
                 return Arr::removeNullValues($email);
             })->all(),
