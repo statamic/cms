@@ -7,10 +7,10 @@ use Statamic\Fieldtypes\Bard;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-class BardTextTest extends TestCase
+class BardWordsTest extends TestCase
 {
     /** @test */
-    public function it_extracts_bard_text()
+    public function it_extracts_bard_words()
     {
         $data = [
             [
@@ -44,13 +44,13 @@ class BardTextTest extends TestCase
             ],
         ];
 
-        $expected = 'This is a paragraph with  bold  and  italic  text. Another paragraph. ';
+        $expected = 'This is a paragraph with bold and italic text. Another paragraph.';
 
         $this->assertEquals($expected, $this->modify($data));
     }
 
     /** @test */
-    public function it_extracts_bard_text_from_single_node()
+    public function it_extracts_bard_words_from_single_node()
     {
         $data = [
             'type' => 'paragraph',
@@ -59,13 +59,13 @@ class BardTextTest extends TestCase
             ],
         ];
 
-        $expected = 'This is a paragraph. ';
+        $expected = 'This is a paragraph.';
 
         $this->assertEquals($expected, $this->modify($data));
     }
 
     /** @test */
-    public function it_extracts_bard_text_from_value_object()
+    public function it_extracts_bard_words_from_value_object()
     {
         $data = new Value([
             [
@@ -76,13 +76,13 @@ class BardTextTest extends TestCase
             ],
         ], 'content', new Bard());
 
-        $expected = 'This is a paragraph. ';
+        $expected = 'This is a paragraph.';
 
         $this->assertEquals($expected, $this->modify($data));
     }
 
     public function modify($arr, ...$args)
     {
-        return Modify::value($arr)->bard_text($args)->fetch();
+        return Modify::value($arr)->bard_words($args)->fetch();
     }
 }

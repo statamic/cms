@@ -208,7 +208,7 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function bardText($value)
+    public function bardWords($value)
     {
         if ($value instanceof Value) {
             $value = $value->raw();
@@ -221,12 +221,12 @@ class CoreModifiers extends Modifier
         while (count($value)) {
             $item = array_shift($value);
             if ($item['type'] === 'text') {
-                $text .= ($item['text'] ?? '').' ';
+                $text .= ' '.($item['text'] ?? '');
             }
             array_unshift($value, ...($item['content'] ?? []));
         }
 
-        return $text;
+        return Stringy::collapseWhitespace($text);
     }
 
     public function boolString($value)
