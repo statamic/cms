@@ -23,6 +23,8 @@ use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Bard;
+use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -227,6 +229,28 @@ class CoreModifiers extends Modifier
         }
 
         return Stringy::collapseWhitespace($text);
+    }
+
+    /**
+     * Renders any bard value to an HTML string (removes sets).
+     *
+     * @param $value
+     * @return string
+     */
+    public function bardText($value)
+    {
+        if ($value instanceof Value) {
+            $value = $value->raw();
+        }
+        if (Arr::isAssoc($value)) {
+            $value = [$value];
+        }
+
+        $items = collect($value)
+            ->where(fn ($item) => $item['type'] !== 'set')
+            ->values();
+
+        return (new Augmentor(new Bard()))->augment($items);
     }
 
     public function boolString($value)
