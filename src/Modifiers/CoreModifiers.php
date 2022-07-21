@@ -178,7 +178,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Flattens a bard value into an array of nodes and marks.
+     * Converts a raw value from a bard field to a flat array of nodes and marks.
      *
      * @param $value
      * @return array
@@ -205,7 +205,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Flattens a bard value into a string of all text content.
+     * Converts a bard value (excluding sets) to plain text.
      *
      * @param $value
      * @return string
@@ -232,7 +232,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Renders any bard value to an HTML string (removes sets).
+     * Converts a bard value (excluding sets) to HTML.
      *
      * @param $value
      * @return string
