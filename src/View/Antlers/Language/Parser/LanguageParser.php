@@ -1538,6 +1538,7 @@ class LanguageParser
         $nodes = $this->groupNodesByType($nodes, DivisionOperator::class);
         $nodes = $this->groupNodesByType($nodes, AdditionOperator::class);
         $nodes = $this->groupNodesByType($nodes, SubtractionOperator::class);
+        $nodes = $this->groupNodesByType($nodes, ModulusOperator::class);
 
         return $nodes;
     }
