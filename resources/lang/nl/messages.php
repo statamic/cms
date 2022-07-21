@@ -14,7 +14,7 @@ return [
     'asset_container_intro' => 'Media en documenten worden opgeslagen in mappen op de server op op andere file-storage-diensten. Elke van deze locaties noemt men een container.',
     'asset_container_move_instructions' => 'Indien ingeschakeld, kunnen gebruikers bestanden verplaatsen binnenin deze container.',
     'asset_container_quick_download_instructions' => 'Indien ingeschakeld, wordt er een downloadknop weergegeven in de asset-manager.',
-    'asset_container_rename_instructions' => 'Indien ingeschakeld, kunnen gebruikers files hernoemen in deze container.',
+    'asset_container_rename_instructions' => 'Indien ingeschakeld, kunnen gebruikers bestanden hernoemen in deze container.',
     'asset_container_title_instructions' => 'Meestal een zelfstandig naamwoord in meervoud, zoals  Afbeeldingen of Documenten.',
     'asset_folders_directory_instructions' => 'We adviseren om spaties en speciale karakters niet te gebruiken om URL\'s netjes te houden.',
     'blueprints_hidden_instructions' => 'Toon deze blueprint niet in toevoeg-menu\'s in het CP.',
