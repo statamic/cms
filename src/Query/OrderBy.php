@@ -27,8 +27,16 @@ class OrderBy
      */
     public static function parse(string $orderBy)
     {
-        $sort = explode(':', $orderBy)[0];
-        $direction = explode(':', $orderBy)[1] ?? 'asc';
+        $parts = explode(':', $orderBy);
+        $lastPart = last($parts);
+
+        if (in_array($lastPart, ['asc', 'desc'])) {
+            $direction = $lastPart;
+            $sort = implode('->', array_slice($parts, 0, -1));
+        } else {
+            $direction = 'asc';
+            $sort = str_replace(':', '->', $orderBy);
+        }
 
         return new static($sort, $direction);
     }

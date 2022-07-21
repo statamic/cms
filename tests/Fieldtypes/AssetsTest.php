@@ -5,11 +5,17 @@ namespace Tests\Fieldtypes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Assets\QueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Field;
-use Statamic\Fieldtypes\Assets\AssetRule;
 use Statamic\Fieldtypes\Assets\Assets;
+use Statamic\Fieldtypes\Assets\DimensionsRule;
+use Statamic\Fieldtypes\Assets\ImageRule;
+use Statamic\Fieldtypes\Assets\MaxRule;
+use Statamic\Fieldtypes\Assets\MimesRule;
+use Statamic\Fieldtypes\Assets\MimetypesRule;
+use Statamic\Fieldtypes\Assets\MinRule;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -21,22 +27,31 @@ class AssetsTest extends TestCase
     {
         parent::setUp();
 
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         Storage::disk('test')->put('foo/one.txt', '');
         Storage::disk('test')->put('bar/two.txt', '');
+
         AssetContainer::make('test')->disk('test')->save();
     }
 
     /** @test */
-    public function it_augments_to_a_collection_of_assets()
+    public function it_augments_to_a_query_builder()
     {
         $augmented = $this->fieldtype()->augment(['foo/one.txt', 'bar/two.txt', 'unknown.txt']);
 
-        $this->assertInstanceOf(Collection::class, $augmented);
-        $this->assertCount(2, $augmented); // invalid assets get removed
-        $this->assertEveryItemIsInstanceOf(Asset::class, $augmented);
-        $this->assertEquals(['foo/one.txt', 'bar/two.txt'], $augmented->map->path()->all());
-        $this->assertEquals(['one.txt', 'two.txt'], $augmented->map->basename()->all());
+        $this->assertInstanceOf(QueryBuilder::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(Asset::class, $augmented->get());
+        $this->assertEquals(['foo/one.txt', 'bar/two.txt'], $augmented->get()->map->path()->all());
+        $this->assertEquals(['one.txt', 'two.txt'], $augmented->get()->map->basename()->all());
+    }
+
+    /** @test */
+    public function it_augments_to_a_query_builder_when_theres_no_value()
+    {
+        $augmented = $this->fieldtype()->augment(null);
+
+        $this->assertInstanceOf(QueryBuilder::class, $augmented);
+        $this->assertCount(0, $augmented->get());
     }
 
     /** @test */
@@ -93,7 +108,7 @@ class AssetsTest extends TestCase
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertInstanceOf(DimensionsRule::class, $replaced[0]);
         $this->assertEquals(__('statamic::validation.dimensions'), $replaced[0]->message());
     }
 
@@ -104,7 +119,7 @@ class AssetsTest extends TestCase
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertInstanceOf(ImageRule::class, $replaced[0]);
         $this->assertEquals(__('statamic::validation.image'), $replaced[0]->message());
     }
 
@@ -115,8 +130,8 @@ class AssetsTest extends TestCase
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
-        $this->assertEquals(__('statamic::validation.mimes', ['values' => 'jpg, png']), $replaced[0]->message());
+        $this->assertInstanceOf(MimesRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.mimes', ['values' => 'jpg, png, jpeg']), $replaced[0]->message());
     }
 
     /** @test */
@@ -126,18 +141,40 @@ class AssetsTest extends TestCase
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertInstanceOf(AssetRule::class, $replaced[0]);
+        $this->assertInstanceOf(MimetypesRule::class, $replaced[0]);
         $this->assertEquals(__('statamic::validation.mimetypes', ['values' => 'image/jpg, image/png']), $replaced[0]->message());
+    }
+
+    /** @test */
+    public function it_replaces_min_filesize_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['min_filesize:100']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(MinRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.min.file', ['min' => '100']), $replaced[0]->message());
+    }
+
+    /** @test */
+    public function it_replaces_max_filesize_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['max_filesize:100']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(MaxRule::class, $replaced[0]);
+        $this->assertEquals(__('statamic::validation.max.file', ['max' => '100']), $replaced[0]->message());
     }
 
     /** @test */
     public function it_doesnt_replace_non_image_related_rule()
     {
-        $replaced = $this->fieldtype(['validate' => ['min:3']])->fieldRules();
+        $replaced = $this->fieldtype(['validate' => ['file']])->fieldRules();
 
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
-        $this->assertEquals('min:3', $replaced[0]);
+        $this->assertEquals('file', $replaced[0]);
     }
 
     public function fieldtype($config = [])

@@ -33,8 +33,6 @@ class GetFiles extends Tags
 
     /**
      * Get all the files from the selected folders at the appropriate depth.
-     *
-     * @return \Illuminate\Support\Collection
      */
     private function getFiles()
     {

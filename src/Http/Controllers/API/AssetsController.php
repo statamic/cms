@@ -13,8 +13,12 @@ class AssetsController extends ApiController
     {
         $this->abortIfDisabled();
 
+        $with = $assetContainer->blueprint()
+            ->fields()->all()
+            ->filter->isRelationship()->keys()->all();
+
         return app(AssetResource::class)::collection(
-            $this->filterSortAndPaginate($assetContainer->queryAssets())
+            $this->filterSortAndPaginate($assetContainer->queryAssets()->with($with))
         );
     }
 

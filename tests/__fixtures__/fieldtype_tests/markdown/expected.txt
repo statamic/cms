@@ -1,0 +1,8 @@
+<p>Test before content</p>
+<pre><code>{{ noparse }}
+  Welcome to {{ fast_food_chain }},
+  home of the {{ fast_food_chain_specialty_item }},
+  can I take your order?
+{{ /noparse }}
+</code></pre>
+<p>Test after content</p>

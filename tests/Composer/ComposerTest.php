@@ -12,9 +12,7 @@ class ComposerTest extends TestCase
 {
     public function setUp(): void
     {
-        if ($this->isRunningWindows()) {
-            $this->markTestSkipped();
-        }
+        $this->markTestSkippedInWindows();
 
         parent::setUp();
 
@@ -24,16 +22,22 @@ class ComposerTest extends TestCase
         Cache::forget('composer.test/package');
 
         Composer::swap(new \Statamic\Console\Processes\Composer($this->basePath()));
+
+        $this->files = app('files');
+
+        if (! $this->files->exists($tmpDir = $this->basePath('tmp'))) {
+            $this->files->makeDirectory($tmpDir, 0755, true);
+        }
     }
 
     public function tearDown(): void
     {
-        $fs = app('files');
-        $fs->deleteDirectory($this->basePath('vendor'));
-        $fs->delete($this->basePath('composer.json'));
-        $fs->delete($this->basePath('composer.lock'));
-        $fs->move($this->basePath('composer.lock.bak'), $this->basePath('composer.lock'));
-        $fs->move($this->basePath('composer.json.bak'), $this->basePath('composer.json'));
+        $this->files->deleteDirectory($this->basePath('tmp'));
+        $this->files->deleteDirectory($this->basePath('vendor'));
+        $this->files->delete($this->basePath('composer.json'));
+        $this->files->delete($this->basePath('composer.lock'));
+        $this->files->move($this->basePath('composer.lock.bak'), $this->basePath('composer.lock'));
+        $this->files->move($this->basePath('composer.json.bak'), $this->basePath('composer.json'));
 
         parent::tearDown();
     }
@@ -206,6 +210,126 @@ class ComposerTest extends TestCase
         $this->assertStringNotContainsString('test/package', Composer::installed()->keys());
         $this->assertFileNotExists($this->basePath('vendor/test/package'));
         $this->assertStringContainsString('Removing test/package', Cache::get('composer.test/package')['output']);
+    }
+
+    /**
+     * This method is intentionally doing way too much, for the sake of test suite performance.
+     *
+     * @group integration
+     * @group slow
+     * @test
+     */
+    public function it_can_require_and_remove_multiple_packages_in_one_shot()
+    {
+        PackToTheFuture::generateComposerJson('test/one', '1.0.0', [], $this->basePath('tmp/one/composer.json'));
+        PackToTheFuture::generateComposerJson('test/two', '2.0.0', [], $this->basePath('tmp/two/composer.json'));
+
+        $repositories = [
+            'require' => [
+                'composer/composer' => '^2.0.0',
+            ],
+            'repositories' => [
+                ['type' => 'path', 'url' => $this->basePath('tmp/one'), 'options' => ['symlink' => false]],
+                ['type' => 'path', 'url' => $this->basePath('tmp/two'), 'options' => ['symlink' => false]],
+            ],
+        ];
+
+        PackToTheFuture::generateComposerJson('statamic/composer-test-app', '1.0.0', $repositories, $this->basePath('composer.json'));
+
+        // Test that the packages aren't installed yet...
+
+        $this->assertNotContains('test/one', Composer::installed()->keys());
+        $this->assertNotContains('test/two', Composer::installed()->keys());
+        $this->assertFileNotExists($this->basePath('vendor/test/one'));
+        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+
+        // Test that we can require multiple packages...
+
+        Composer::requireMultiple([
+            'test/one',
+            'test/two' => '2.0.0', // Test it can require explicit version.
+        ]);
+
+        $installed = Composer::installed();
+        $output = Cache::get('composer.test/one')['output'];
+        $this->assertTrue($installed->keys()->contains('test/one'));
+        $this->assertTrue($installed->keys()->contains('test/two'));
+        $this->assertFileExists($this->basePath('vendor/test/one'));
+        $this->assertFileExists($this->basePath('vendor/test/two'));
+        $this->assertEquals('1.0.0', $installed->get('test/one')->version);
+        $this->assertEquals('2.0.0', $installed->get('test/two')->version);
+        $this->assertFalse($installed->get('test/one')->dev);
+        $this->assertFalse($installed->get('test/two')->dev);
+        $this->assertStringContainsString('Installing test/one', $output);
+        $this->assertStringContainsString('Installing test/two', $output);
+
+        // Test that we can remove multiple packages...
+
+        Composer::removeMultiple(['test/one', 'test/two']);
+
+        $output = Cache::get('composer.test/one')['output'];
+        $this->assertStringNotContainsString('test/one', Composer::installed()->keys());
+        $this->assertStringNotContainsString('test/two', Composer::installed()->keys());
+        $this->assertFileNotExists($this->basePath('vendor/test/one'));
+        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+        $this->assertStringContainsString('Removing test/one', $output);
+        $this->assertStringContainsString('Removing test/two', $output);
+
+        // Test that we can add extra params when requiring...
+
+        Composer::requireMultiple(['test/one', 'test/two'], '--dry-run');
+
+        $output = Cache::get('composer.test/one')['output'];
+        $this->assertStringNotContainsString('test/one', Composer::installed()->keys());
+        $this->assertStringNotContainsString('test/two', Composer::installed()->keys());
+        $this->assertFileNotExists($this->basePath('vendor/test/one'));
+        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+        $this->assertStringContainsString('Installing test/one', $output);
+        $this->assertStringContainsString('Installing test/two', $output);
+
+        // Test that we can add extra params when requiring dev dependencies...
+
+        Composer::requireMultipleDev(['test/one', 'test/two'], '--dry-run');
+
+        $output = Cache::get('composer.test/one')['output'];
+        $this->assertStringNotContainsString('test/one', Composer::installed()->keys());
+        $this->assertStringNotContainsString('test/two', Composer::installed()->keys());
+        $this->assertFileNotExists($this->basePath('vendor/test/one'));
+        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+        $this->assertStringContainsString('Installing test/one', $output);
+        $this->assertStringContainsString('Installing test/two', $output);
+
+        // Test that we can require multiple packages as dev dependencies...
+
+        Composer::requireMultipleDev([
+            'test/one',
+            'test/two' => '2.0.0', // Test it can require explicit version.
+        ]);
+
+        $installed = Composer::installed();
+        $output = Cache::get('composer.test/one')['output'];
+        $this->assertTrue($installed->keys()->contains('test/one'));
+        $this->assertTrue($installed->keys()->contains('test/two'));
+        $this->assertFileExists($this->basePath('vendor/test/one'));
+        $this->assertFileExists($this->basePath('vendor/test/two'));
+        $this->assertEquals('1.0.0', $installed->get('test/one')->version);
+        $this->assertEquals('2.0.0', $installed->get('test/two')->version);
+        $this->assertTrue($installed->get('test/one')->dev);
+        $this->assertTrue($installed->get('test/two')->dev);
+        $this->assertStringContainsString('Installing test/one', $output);
+        $this->assertStringContainsString('Installing test/two', $output);
+
+        // Test that we can remove multiple dev dependencies...
+
+        Composer::removeMultipleDev(['test/one', 'test/two']);
+
+        $output = Cache::get('composer.test/one')['output'];
+        $this->assertStringNotContainsString('test/one', Composer::installed()->keys());
+        $this->assertStringNotContainsString('test/two', Composer::installed()->keys());
+        $this->assertFileNotExists($this->basePath('vendor/test/one'));
+        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+        $this->assertStringContainsString('Removing test/one', $output);
+        $this->assertStringContainsString('Removing test/two', $output);
     }
 
     private function basePath($path = null)

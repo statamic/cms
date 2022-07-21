@@ -17,6 +17,7 @@ use Statamic\Contracts\Entries\EntryRepository;
  * @method static void delete($entry)
  * @method static array createRules($collection, $site)
  * @method static array updateRules($collection, $entry)
+ * @method static void substitute($entry)
  *
  * @see \Statamic\Stache\Repositories\EntryRepository
  * @see \Statamic\Stache\Query\EntryQueryBuilder

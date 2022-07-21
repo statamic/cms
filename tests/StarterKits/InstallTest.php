@@ -59,6 +59,44 @@ class InstallTest extends TestCase
     }
 
     /** @test */
+    public function it_installs_from_custom_export_paths()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+                'copied.md',
+            ],
+            'export_as' => [
+                'README.md' => 'README-for-new-site.md',
+                'original-dir' => 'renamed-dir',
+            ],
+        ]);
+
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileNotExists($renamedFile = base_path('README.md'));
+        $this->assertFileNotExists($renamedFolder = base_path('original-dir'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileNotExists(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists($renamedFile);
+        $this->assertFileExists($renamedFolder);
+
+        $this->assertFileNotExists(base_path('README-for-new-site.md')); // This was renamed back to original path on install
+        $this->assertFileNotExists(base_path('renamed-dir')); // This was renamed back to original path on install
+
+        $this->assertFileHasContent('This readme should get installed to README.md.', $renamedFile);
+        $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
+        $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
+    }
+
+    /** @test */
     public function it_installs_from_github()
     {
         $this->assertFileNotExists($this->kitVendorPath());
@@ -614,6 +652,20 @@ class FakeComposer
         $this->fakeInstallVendorFiles($package);
     }
 
+    public function requireMultiple($packages, ...$extraParams)
+    {
+        foreach ($packages as $package => $version) {
+            $this->require($package, $version, ...$extraParams);
+        }
+    }
+
+    public function requireMultipleDev($packages, ...$extraParams)
+    {
+        foreach ($packages as $package => $version) {
+            $this->requireDev($package, $version, ...$extraParams);
+        }
+    }
+
     public function remove($package)
     {
         $this->removeFromComposerJson($package);
@@ -634,18 +686,21 @@ class FakeComposer
         }
 
         $requireMethod = $args->contains('--dev')
-            ? 'requireDev'
-            : 'require';
+            ? 'requireMultipleDev'
+            : 'requireMultiple';
 
-        $package = $args->first(function ($arg) {
-            return preg_match('/[^\/]+\/[^\/]+/', $arg);
-        });
+        $packages = $args
+            ->filter(function ($arg) {
+                return Str::contains($arg, '/');
+            })
+            ->mapWithKeys(function ($arg) {
+                $parts = explode(':', $arg);
 
-        $version = $args->first(function ($arg) {
-            return preg_match('/\./', $arg);
-        });
+                return [$parts[0] => $parts[1]];
+            })
+            ->all();
 
-        $this->{$requireMethod}($package, $version);
+        $this->{$requireMethod}($packages);
     }
 
     private function fakeInstallComposerJson($requireKey, $package, $version)

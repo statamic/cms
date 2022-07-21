@@ -2,6 +2,7 @@
 
 namespace Statamic\Routing;
 
+use Closure;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
@@ -16,8 +17,18 @@ trait Routable
 
     public function slug($slug = null)
     {
-        return $this->fluentlyGetOrSet('slug')->setter(function ($slug) {
-            return Str::slug($slug);
+        return $this->fluentlyGetOrSet('slug')->getter(function ($slug) {
+            if ($slug instanceof Closure) {
+                $slug = $slug($this);
+            }
+
+            if (! $slug) {
+                return null;
+            }
+
+            $lang = method_exists($this, 'site') ? $this->site()->lang() : null;
+
+            return Str::slug($slug, '-', $lang);
         })->args(func_get_args());
     }
 

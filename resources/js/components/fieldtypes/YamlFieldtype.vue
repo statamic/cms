@@ -29,6 +29,7 @@ export default {
         this.codemirror = CodeMirror(this.$refs.codemirror, {
             value: this.value || '',
             mode: 'yaml',
+            direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             tabSize: 2,
             indentUnit: 2,
             autoRefresh: true,
@@ -37,6 +38,7 @@ export default {
             lineWrapping: true,
             readOnly: this.readOnlyOption,
             theme: this.config.theme || 'material',
+            inputStyle: 'contenteditable',
         });
 
         this.codemirror.on('change', (cm) => {

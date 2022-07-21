@@ -2,14 +2,18 @@
 
 namespace Statamic\Assets;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
+use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
+use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blink;
@@ -18,9 +22,10 @@ use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable
+class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess, Arrayable
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -34,6 +39,10 @@ class AssetContainer implements AssetContainerContract, Augmentable
     protected $allowRenaming;
     protected $createFolders;
     protected $searchIndex;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
+    protected $sortField;
+    protected $sortDirection;
 
     public function id($id = null)
     {
@@ -44,6 +53,34 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+    }
+
+    public function sortField($field = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sortField')
+            ->getter(function ($sortField) {
+                if ($sortField) {
+                    return $sortField;
+                }
+
+                return 'basename';
+            })
+            ->args(func_get_args());
+    }
+
+    public function sortDirection($dir = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sortDirection')
+            ->getter(function ($sortDirection) {
+                if ($sortDirection) {
+                    return $sortDirection;
+                }
+
+                return 'asc';
+            })
+            ->args(func_get_args());
     }
 
     public function title($title = null)
@@ -91,36 +128,14 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return URL::makeAbsolute($this->url());
     }
 
-    /**
-     * Convert to an array.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        $array = [
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'disk' => $this->disk,
-            'search_index' => $this->searchIndex,
-            'allow_uploads' => $this->allowUploads,
-            'allow_downloading' => $this->allowDownloading,
-            'allow_renaming' => $this->allowRenaming,
-            'allow_moving' => $this->allowMoving,
-            'create_folders' => $this->createFolders,
-        ];
-
-        // if ($user = user()) {
-        //     $array['allow_uploads'] = user()->can('store', [AssetContract::class, $this]);
-        //     $array['create_folders'] = user()->can('create', [AssetFolder::class, $this]);
-        // }
-
-        return $array;
-    }
-
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedAssetContainer($this);
+    }
+
+    protected function excludedEvaluatedAugmentedArrayKeys()
+    {
+        return ['assets'];
     }
 
     /**
@@ -168,6 +183,20 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $blueprint;
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     /**
      * Save the container.
      *
@@ -175,9 +204,33 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function save()
     {
+        $isNew = is_null(Facades\AssetContainer::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (AssetContainerSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\AssetContainer::save($this);
 
-        AssetContainerSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                AssetContainerCreated::dispatch($this);
+            }
+
+            AssetContainerSaved::dispatch($this);
+        }
 
         return $this;
     }
@@ -283,10 +336,12 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $folder = null;
         }
 
-        if ($folder && $recursive) {
-            $query->where('folder', 'like', "{$folder}%");
-        } elseif ($folder) {
-            $query->where('folder', $folder);
+        if ($folder !== null) {
+            if ($recursive) {
+                $query->where('path', 'like', "{$folder}/%");
+            } else {
+                $query->where('folder', $folder);
+            }
         }
 
         return $query->get();
@@ -361,7 +416,15 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function accessible()
     {
-        return $this->disk()->filesystem()->getDriver()->getConfig()->get('url') !== null;
+        $config = $this->disk()->filesystem()->getConfig();
+
+        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
+        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
+        if (is_array($config)) {
+            $config = collect($config);
+        }
+
+        return $config->get('url') !== null;
     }
 
     /**
@@ -456,24 +519,23 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     public function fileData()
     {
-        $data = array_except($this->toArray(), 'handle');
+        $array = [
+            'title' => $this->title,
+            'disk' => $this->disk,
+            'search_index' => $this->searchIndex,
+            'allow_uploads' => $this->allowUploads,
+            'allow_downloading' => $this->allowDownloading,
+            'allow_renaming' => $this->allowRenaming,
+            'allow_moving' => $this->allowMoving,
+            'create_folders' => $this->createFolders,
+        ];
 
-        // @TODO: Determine why we were explicity unsetting this data
+        $array = Arr::removeNullValues(array_merge($array, [
+            'sort_by' => $this->sortField,
+            'sort_dir' => $this->sortDirection,
+        ]));
 
-        // if ($data['allow_uploads'] === true) {
-        //     unset($data['allow_uploads']);
-        // }
-
-        // if ($data['create_folders'] === true) {
-        //     unset($data['create_folders']);
-        // }
-
-        return $data;
-    }
-
-    public function toCacheableArray()
-    {
-        return $this->fileData();
+        return $array;
     }
 
     public function queryAssets()

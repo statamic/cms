@@ -3,14 +3,12 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
-use Illuminate\Support\Carbon;
-use Mockery;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\EntrySaving;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Folder;
 use Statamic\Facades\User;
-use Statamic\Fields\Blueprint;
-use Statamic\Fields\Fields;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -20,125 +18,200 @@ class StoreEntryTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        $this->markTestIncomplete('Needs to be updated for localization and when revisions are enabled/disabled.');
-        parent::setUp();
-        $this->dir = __DIR__.'/tmp';
-        config(['statamic.revisions.path' => $this->dir]);
-    }
-
-    public function tearDown(): void
-    {
-        Folder::delete($this->dir);
-        parent::tearDown();
-    }
-
     /** @test */
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = User::make()->assignRole('test');
-        Collection::make('blog')->sites(['en'])->save();
+        $user = tap(User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test'))->save();
 
         $this
-            ->from('/original')
             ->actingAs($user)
-            ->store([])
-            ->assertRedirect('/original')
-            ->assertSessionHas('error');
+            ->submit($collection, [])
+            ->assertForbidden();
     }
 
     /** @test */
     public function entry_gets_created()
     {
-        $now = Carbon::parse('2017-02-03');
-        Carbon::setTestNow($now);
-        $this->setTestBlueprint('test', ['title' => ['type' => 'text'], 'foo' => ['type' => 'text']]);
-        $this->setTestRoles(['test' => ['access cp', 'create blog entries']]);
-        $user = User::make()->assignRole('test');
-        Collection::make('blog')->sites(['en'])->save();
+        [$user, $collection] = $this->seedUserAndCollection();
+
         $this->assertCount(0, Entry::all());
 
-        $response = $this
+        $this
             ->actingAs($user)
-            ->store([
-                'blueprint' => 'test',
-                'title' => 'The title',
-                'slug' => 'the-slug',
-                'foo' => 'bar',
-            ])
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry'])
             ->assertOk();
+
+        // todo: assert response contents
 
         $this->assertCount(1, Entry::all());
         $entry = Entry::all()->first();
-
-        $response->assertJson([
-            'redirect' => "http://localhost/cp/collections/blog/entries/{$entry->id()}/the-slug/en",
-            'entry' => [],
-        ]);
-
-        $this->assertEquals('the-slug', $entry->slug());
-        $this->assertEquals([
-            'title' => 'The title',
-            'foo' => 'bar',
-            'updated_at' => $now->timestamp,
-            'updated_by' => $user->id(),
-        ], $entry->data());
-        $this->assertFalse($entry->published());
-        $this->assertCount(1, $entry->revisions());
-        $this->assertEquals('revision', $entry->latestRevision()->action());
+        $this->assertEquals('My Entry', $entry->value('title'));
+        $this->assertEquals('my-entry', $entry->slug());
     }
 
     /** @test */
-    public function validation_error_returns_back()
+    public function slug_is_not_required_and_will_get_created_from_the_submitted_title_if_slug_is_in_blueprint()
     {
-        $this->setTestBlueprint('test', ['title' => ['type' => 'text'], 'foo' => ['type' => 'text', 'validate' => 'required']]);
-        $this->setTestRoles(['test' => ['access cp', 'create blog entries']]);
-        $user = User::make()->assignRole('test');
-        Collection::make('blog')->sites(['en'])->save();
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this->assertTrue($collection->entryBlueprint()->hasField('slug'));
         $this->assertCount(0, Entry::all());
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->store([
-                'blueprint' => 'test',
-                'title' => 'The title',
-                'slug' => 'the-slug',
-                'foo' => '',
-            ])
-            ->assertRedirect('/original')
-            ->assertSessionHasErrors('foo');
+            ->submit($collection, ['title' => 'Test Entry', 'slug' => ''])
+            ->assertOk();
 
-        $this->assertCount(0, Entry::all());
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('Test Entry', $entry->value('title'));
+        $this->assertEquals('test-entry', $entry->slug());
+        $this->assertEquals('test-entry.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
     /** @test */
-    public function user_without_permission_to_manage_publish_state_cannot_change_publish_status()
+    public function slug_is_not_required_and_will_be_null_if_slug_is_not_in_the_blueprint()
     {
-        // when revisions are disabled
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->requiresSlugs(false);
 
-        $this->markTestIncomplete();
+        $this->assertFalse($collection->entryBlueprint()->hasField('slug'));
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Test Entry', 'slug' => ''])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('Test Entry', $entry->value('title'));
+        $this->assertNull($entry->slug());
+        $this->assertEquals($entry->id().'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    private function store($payload)
+    /** @test */
+    public function slug_is_not_required_and_will_get_created_from_auto_generated_title_when_using_title_format()
     {
-        return $this->post(cp_route('collections.entries.store', ['blog', 'en']), $payload);
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text']]);
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => '',
+                'slug' => '',
+                'foo' => 'bar',
+            ])->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('Auto bar', $entry->value('title'));
+        $this->assertEquals('auto-bar', $entry->slug());
+        $this->assertEquals('auto-bar.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    private function setTestBlueprint($handle, $fields)
+    /** @test */
+    public function submitted_slug_is_favored_over_auto_generated_title_when_using_title_format()
     {
-        $fields = collect($fields)->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        })->all();
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text']]);
 
-        $blueprint = Mockery::mock(Blueprint::class);
-        $blueprint->shouldReceive('fields')->andReturn(new Fields($fields));
+        $this->assertCount(0, Entry::all());
 
-        $blueprint->shouldReceive('ensureField')->andReturnSelf();
-        $blueprint->shouldReceive('ensureFieldPrepended')->andReturnSelf();
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => '',
+                'slug' => 'manually-entered-slug',
+                'foo' => 'bar',
+            ])->assertOk();
 
-        BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('Auto bar', $entry->value('title'));
+        $this->assertEquals('manually-entered-slug', $entry->slug());
+        $this->assertEquals('manually-entered-slug.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function slug_and_auto_title_get_generated_after_save()
+    {
+        // We want addons to be able to add/modify data that the auto title could rely on.
+        // Since they only get the change after it's saved, we need to generate the slug and title after that.
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {magic}')->save();
+
+        Event::listen(EntrySaving::class, function (EntrySaving $event) {
+            $event->entry->set('magic', 'Avada Kedavra');
+        });
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => '', 'slug' => ''])->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('Avada Kedavra', $entry->value('magic'));
+        $this->assertEquals('Auto Avada Kedavra', $entry->value('title'));
+        $this->assertEquals('auto-avada-kedavra', $entry->slug());
+        $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function it_can_validate_against_published_value()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this->seedBlueprintFields($collection, [
+            'test_field' => ['validate' => 'required_if:published,true'],
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Test', 'slug' => 'manually-entered-slug', 'published' => true])
+            ->assertStatus(422);
+    }
+
+    private function seedUserAndCollection()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test'))->save();
+
+        return [$user, $collection];
+    }
+
+    private function seedBlueprintFields($collection, $fields)
+    {
+        $blueprint = Blueprint::makeFromFields($fields);
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('in')
+            ->with('collections/'.$collection->handle())
+            ->andReturn(collect([$blueprint]));
+    }
+
+    private function submit($collection, $attrs = [])
+    {
+        $url = cp_route('collections.entries.store', [$collection->handle(), 'en']);
+
+        $payload = array_merge([
+            'title' => 'Test entry',
+            'slug' => 'test-entry',
+        ], $attrs);
+
+        return $this->postJson($url, $payload);
     }
 }

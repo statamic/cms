@@ -58,7 +58,28 @@ export default {
     methods: {
 
         initButtons() {
-            let available = addButtonHtml(availableButtons());
+            // Get all default buttons first
+            let available = availableButtons();
+
+            // Add custom buttons from a project or addon
+            this.$bard.buttonCallbacks.map(callback => {
+                // Since the developer uses the same callback to add buttons to the field itself, and for the
+                // button configurator, we need to make the button conditional when on the Bard fieldtype,
+                // but not here. Here we want to just show them all, so the user is able to toggle it.
+                const buttonFn = (button) => button;
+
+                let returned = callback(available, buttonFn);
+
+                // No return value means they intend to manipulate the
+                // buttons object manually. Just continue on.
+                if (!returned) return;
+
+                available = available.concat(
+                    Array.isArray(returned) ? returned : [returned]
+                );
+            })
+
+            available = addButtonHtml(available);
 
             let buttons = available.map(button => {
                 button.enabled = this.data.includes(button.name);

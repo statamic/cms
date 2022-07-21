@@ -104,71 +104,16 @@ class Submission implements SubmissionContract, Augmentable
     }
 
     /**
-     * Get or set the data.
+     * Upload files and return asset IDs.
      *
-     * @param  array|null  $data
+     * @param  array  $uploadedFiles
      * @return array
      */
-    public function data($data = null)
+    public function uploadFiles($uploadedFiles)
     {
-        if (func_num_args() === 0) {
-            return $this->data;
-        }
-
-        $data = collect($data)->intersectByKeys($this->fields())->all();
-
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * Upload files.
-     */
-    public function uploadFiles()
-    {
-        collect($this->fields())
-            ->filter(function ($config, $handle) {
-                return Arr::get($config, 'type') === 'assets' && request()->hasFile($handle);
-            })
-            ->each(function ($config, $handle) {
-                Arr::set($this->data, $handle, AssetsUploader::field($config)->upload(request()->file($handle)));
-            });
-
-        return $this;
-    }
-
-    /**
-     * Whether the submissin has the given key.
-     *
-     * @return bool
-     */
-    public function has($field)
-    {
-        return array_has($this->data(), $field);
-    }
-
-    /**
-     * Get a value of a field.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function get($field)
-    {
-        return array_get($this->data(), $field);
-    }
-
-    /**
-     * Set a value of a field.
-     *
-     * @param  string  $field
-     * @param  mixed  $value
-     * @return void
-     */
-    public function set($field, $value)
-    {
-        array_set($this->data, $field, $value);
+        return collect($uploadedFiles)->map(function ($files, $handle) {
+            return AssetsUploader::field($this->fields()->get($handle))->upload($files);
+        })->all();
     }
 
     /**
@@ -176,7 +121,7 @@ class Submission implements SubmissionContract, Augmentable
      */
     public function save()
     {
-        File::put($this->getPath(), YAML::dump($this->data()));
+        File::put($this->getPath(), YAML::dump(Arr::removeNullValues($this->data()->all())));
 
         SubmissionSaved::dispatch($this);
     }
@@ -234,5 +179,10 @@ class Submission implements SubmissionContract, Augmentable
     public function blueprint()
     {
         return $this->form->blueprint();
+    }
+
+    public function __get($key)
+    {
+        return $this->get($key);
     }
 }

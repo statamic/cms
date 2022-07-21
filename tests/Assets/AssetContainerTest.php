@@ -4,6 +4,7 @@ namespace Tests\Assets;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -13,6 +14,9 @@ use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerSaved;
+use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
@@ -84,10 +88,18 @@ class AssetContainerTest extends TestCase
 
         $return = $container->disk('test');
 
+        $config = $container->disk()->filesystem()->getConfig();
+
+        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
+        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
+        if (is_array($config)) {
+            $config = collect($config);
+        }
+
         $this->assertEquals($container, $return);
         $this->assertInstanceOf(FlysystemAdapter::class, $container->disk());
         $this->assertEquals('test', $container->diskHandle());
-        $this->assertEquals('/the-url', $container->disk()->filesystem()->getDriver()->getConfig()->get('url'));
+        $this->assertEquals('/the-url', $config->get('url'));
     }
 
     /** @test */
@@ -129,7 +141,7 @@ class AssetContainerTest extends TestCase
         $this->assertTrue($container->private());
         $this->assertFalse($container->accessible());
 
-        Storage::disk('test')->getDriver()->getConfig()->set('url', '/url');
+        Storage::fake('test', ['url' => '/url']);
 
         $this->assertFalse($container->private());
         $this->assertTrue($container->accessible());
@@ -183,6 +195,7 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_saves_the_container_through_the_api()
     {
+        Event::fake();
         Facades\AssetContainer::spy();
 
         $container = new AssetContainer;
@@ -190,7 +203,73 @@ class AssetContainerTest extends TestCase
         $return = $container->save();
 
         $this->assertEquals($container, $return);
-        Facades\AssetContainer::shouldHaveReceived('save')->with($container)->once();
+
+        Event::assertDispatched(AssetContainerSaving::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+
+        Event::assertDispatched(AssetContainerCreated::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+
+        Event::assertDispatched(AssetContainerSaved::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_asset_container_created_only_once()
+    {
+        Event::fake();
+        Facades\AssetContainer::spy();
+
+        $container = new AssetContainer;
+
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('find')->with($container->handle())->times(3)->andReturn(null, $container, $container);
+
+        $container->save();
+        $container->save();
+        $container->save();
+
+        Event::assertDispatched(AssetContainerSaved::class, 3);
+        Event::assertDispatched(AssetContainerCreated::class, 1);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+        Facades\AssetContainer::spy();
+
+        $container = new AssetContainer;
+
+        $return = $container->saveQuietly();
+
+        $this->assertEquals($container, $return);
+
+        Event::assertNotDispatched(AssetContainerSaving::class);
+        Event::assertNotDispatched(AssetContainerSaved::class);
+        Event::assertNotDispatched(AssetContainerCreated::class);
+    }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_asset_container_doesnt_save()
+    {
+        Event::fake([AssetContainerSaved::class]);
+        Facades\AssetContainer::spy();
+
+        Event::listen(AssetContainerSaving::class, function () {
+            return false;
+        });
+
+        $container = new AssetContainer;
+
+        $return = $container->saveQuietly();
+
+        $this->assertEquals($container, $return);
+
+        Event::assertNotDispatched(AssetContainerSaved::class);
     }
 
     /** @test */
@@ -520,6 +599,92 @@ class AssetContainerTest extends TestCase
         });
     }
 
+    /**
+     * @test
+     *
+     * @see https://github.com/statamic/cms/issues/5405
+     * @see https://github.com/statamic/cms/pull/5433
+     **/
+    public function it_can_get_assets_in_a_folder_named_zero()
+    {
+        $container = $this->containerWithDisk();
+
+        $container->disk()->delete('0');
+
+        $paths = [
+            '0/a.txt',
+            '0/b.txt',
+            '0/nested/c.txt',
+            '0/nested/d.txt',
+            '0/nested/e.txt',
+        ];
+
+        foreach ($paths as $path) {
+            $container->disk()->put($path, 'test');
+        }
+
+        tap($container->assets('0'), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertEquals([
+                '0/a.txt', '0/b.txt',
+            ], $assets->map->path()->values()->all());
+        });
+
+        tap($container->assets('0', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertEquals([
+                '0/a.txt', '0/b.txt',
+                '0/nested/c.txt', '0/nested/d.txt', '0/nested/e.txt',
+            ], $assets->map->path()->values()->all());
+        });
+
+        $container->disk()->delete('0');
+    }
+
+    /**
+     * @test
+     *
+     * @see https://github.com/statamic/cms/issues/5405
+     * @see https://github.com/statamic/cms/pull/5433
+     **/
+    public function it_wont_get_assets_that_share_a_similar_folder_prefix()
+    {
+        $container = $this->containerWithDisk();
+
+        $container->disk()->delete('test');
+
+        $paths = [
+            'test/cat/siamese.jpg',
+            'test/cat/tabby.jpg',
+            'test/cat/cartoon/cheshire.jpg',
+            'test/categories/favorite.jpg',
+            'test/categories/non-favorite.jpg',
+        ];
+
+        foreach ($paths as $path) {
+            $container->disk()->put($path, 'test');
+        }
+
+        tap($container->assets('test/cat'), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertEquals([
+                'test/cat/siamese.jpg',
+                'test/cat/tabby.jpg',
+            ], $assets->map->path()->values()->all());
+        });
+
+        tap($container->assets('test/cat', true), function ($assets) {
+            $this->assertInstanceOf(Collection::class, $assets);
+            $this->assertEquals([
+                'test/cat/cartoon/cheshire.jpg',
+                'test/cat/siamese.jpg',
+                'test/cat/tabby.jpg',
+            ], $assets->map->path()->values()->all());
+        });
+
+        $container->disk()->delete('test');
+    }
+
     /** @test */
     public function it_gets_an_asset_folder()
     {
@@ -532,6 +697,39 @@ class AssetContainerTest extends TestCase
         $this->assertEquals('foo', $folder->title());
         $this->assertEquals('foo', $folder->path());
         $this->assertEquals($container, $folder->container());
+    }
+
+    /** @test */
+    public function it_gets_evaluated_augmented_value_using_magic_property()
+    {
+        $container = $this->containerWithDisk();
+
+        $container
+            ->toAugmentedCollection()
+            ->except(['assets'])
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container->{$key}))
+            ->each(fn ($value, $key) => $this->assertEquals($value->value(), $container[$key]));
+    }
+
+    /** @test */
+    public function it_is_arrayable()
+    {
+        $container = $this->containerWithDisk();
+
+        $this->assertInstanceOf(Arrayable::class, $container);
+
+        $expectedAugmented = $container->toAugmentedCollection()->except('assets');
+
+        $array = $container->toArray();
+
+        $this->assertCount($expectedAugmented->count(), $array);
+
+        collect($array)
+            ->each(function ($value, $key) use ($container) {
+                $expected = $container->{$key};
+                $expected = $expected instanceof Arrayable ? $expected->toArray() : $expected;
+                $this->assertEquals($expected, $value);
+            });
     }
 
     private function containerWithDisk()

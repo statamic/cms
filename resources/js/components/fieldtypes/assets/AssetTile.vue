@@ -28,7 +28,7 @@
                     <template v-else>
                         <div v-if="canShowSvg"
                              class="svg-img"
-                             :style="'background-image:url('+asset.url+')'">
+                             :style="'background-image:url('+thumbnail+')'">
                         </div>
                         <file-icon v-else :extension="asset.extension" class="p-2 h-40 w-40" />
                     </template>
@@ -45,6 +45,26 @@
                         @click="remove"
                         class="btn btn-icon icon icon-trash"
                         :alt="__('Remove')"></button>
+                </div>
+
+                <div class="asset-controls" v-if="readOnly">
+                    <button
+                        v-if="asset.url && (asset.isImage || asset.isAudio || asset.isVideo) && this.canDownload"
+                        @click="open"
+                        class="btn btn-icon"
+                        :alt="__('Open in a new window')"
+                    >
+                        <svg-icon name="external-link" class="h-4 my-1"/>
+                    </button>
+
+                    <button
+                        v-if="asset.allowDownloading && this.canDownload"
+                        @click="download"
+                        class="btn btn-icon"
+                        :alt="__('Download file')"
+                    >
+                        <svg-icon name="download" class="h-4 my-1"/>
+                    </button>
                 </div>
             </div>
         </div>

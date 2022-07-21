@@ -6,6 +6,8 @@ use PHPUnit\Framework\Assert;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
+    use WindowsHelpers;
+
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
 
@@ -72,6 +74,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         foreach ($configs as $config) {
             $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
         }
+
+        $app['config']->set('statamic.antlers.version', 'runtime');
     }
 
     protected function getEnvironmentSetUp($app)
@@ -109,6 +113,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'file',
             'path' => storage_path('framework/cache/outpost-data'),
         ]);
+
+        $viewPaths = $app['config']->get('view.paths');
+        $viewPaths[] = __DIR__.'/__fixtures__/views/';
+
+        $app['config']->set('view.paths', $viewPaths);
+    }
+
+    public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
+    {
+        $args = static::normalizeArgsForWindows(func_get_args());
+
+        parent::assertEquals(...$args);
     }
 
     protected function assertEveryItem($items, $callback)
@@ -145,13 +161,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $this->assertEquals(count($items), $matches, 'Failed asserting that every item is an instance of '.$class);
     }
 
-    protected function assertFileEqualsString($filename, $expected)
-    {
-        $this->assertFileExists($filename);
-
-        $this->assertEquals($expected, file_get_contents($filename));
-    }
-
     protected function assertContainsHtml($string)
     {
         preg_match('/<[^<]+>/', $string, $matches);
@@ -163,11 +172,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         $class = version_compare(app()->version(), 7, '>=') ? \Illuminate\Testing\Assert::class : \Illuminate\Foundation\Testing\Assert::class;
         $class::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
-    }
-
-    protected function isRunningWindows()
-    {
-        return DIRECTORY_SEPARATOR === '\\';
     }
 
     // This method is unavailable on earlier versions of Laravel.
@@ -197,6 +201,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         method_exists(static::class, 'assertDirectoryDoesNotExist')
             ? static::assertDirectoryDoesNotExist($filename, $message)
             : parent::assertDirectoryNotExists($filename, $message);
+    }
+
+    public static function assertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
+    {
+        method_exists(\PHPUnit\Framework\Assert::class, 'assertMatchesRegularExpression')
+            ? parent::assertMatchesRegularExpression($pattern, $string, $message)
+            : parent::assertRegExp($pattern, $string, $message);
     }
 
     private function addGqlMacros()

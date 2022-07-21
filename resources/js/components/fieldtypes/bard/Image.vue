@@ -7,7 +7,7 @@
                 <img :src="src" class="block mx-auto" data-drag-handle />
             </div>
 
-            <div class="flex items-center p-1 pt-0 rounded-b">
+            <div class="flex items-center p-1 pt-0 rounded-b" @paste.stop>
                 <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
                 <button class="btn-flat mr-1" @click="openSelector">
                     {{ __('Replace') }}
@@ -112,7 +112,8 @@ export default {
             this.assetId = src.substr(7);
         }
 
-        this.loadAsset(this.assetId || src);
+        let id = this.assetId || src;
+        if (id) this.loadAsset(id);
     },
 
     watch: {
@@ -158,8 +159,11 @@ export default {
             let preloaded = _.find(this.$store.state.publish[this.storeName].preloadedAssets, asset => asset.id === id);
 
             if (preloaded) {
-                this.setAsset(preloaded);
-                return;
+                // TODO
+                // Disabling preloading temporarily. It's causing an infinite loop.
+                // It wasn't working on 3.2 anyway. It wasn't preloading, the AJAX request was always happening.
+                // this.setAsset(preloaded);
+                // return;
             }
 
             this.$axios.get(cp_url('assets-fieldtype'), {

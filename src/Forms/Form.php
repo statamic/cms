@@ -2,24 +2,28 @@
 
 namespace Statamic\Forms;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
+use Statamic\Events\FormCreated;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
+use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Form implements FormContract, Augmentable
+class Form implements FormContract, Augmentable, Arrayable
 {
     use FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -30,6 +34,8 @@ class Form implements FormContract, Augmentable
     protected $store;
     protected $email;
     protected $metrics;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     /**
      * Get or set the handle.
@@ -139,16 +145,45 @@ class Form implements FormContract, Augmentable
         return config('statamic.forms.forms')."/{$this->handle()}.yaml";
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     /**
      * Save form.
      */
     public function save()
     {
+        $isNew = is_null(FormFacade::find($this->handle()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (FormSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         $data = collect([
             'title' => $this->title,
             'honeypot' => $this->honeypot,
             'email' => collect($this->email)->map(function ($email) {
                 $email['markdown'] = $email['markdown'] ?: null;
+                $email['attachments'] = $email['attachments'] ?: null;
 
                 return Arr::removeNullValues($email);
             })->all(),
@@ -161,7 +196,17 @@ class Form implements FormContract, Augmentable
 
         File::put($this->path(), YAML::dump($data));
 
-        FormSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                FormCreated::dispatch($this);
+            }
+
+            FormSaved::dispatch($this);
+        }
     }
 
     /**
@@ -313,22 +358,6 @@ class Form implements FormContract, Augmentable
         return Statamic::isCpRoute() ? Statamic::cpDateTimeFormat() : Statamic::dateTimeFormat();
     }
 
-    /**
-     * Convert to an array.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return [
-            'handle' => $this->handle,
-            'title' => $this->title,
-            'honeypot' => $this->honeypot(),
-            'store' => $this->store(),
-            'email' => $this->email,
-        ];
-    }
-
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {
@@ -341,7 +370,7 @@ class Form implements FormContract, Augmentable
         return new AugmentedForm($this);
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['handle', 'title', 'api_url'];
     }
@@ -349,5 +378,15 @@ class Form implements FormContract, Augmentable
     public function apiUrl()
     {
         return Statamic::apiRoute('forms.show', $this->handle());
+    }
+
+    /**
+     * Get the form action url.
+     *
+     * @return string
+     */
+    public function actionUrl()
+    {
+        return route('statamic.forms.submit', $this->handle());
     }
 }

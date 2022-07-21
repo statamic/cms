@@ -89,6 +89,7 @@ abstract class Tree implements Contract, Localization
             ->setTitle($branch['title'] ?? null)
             ->setRoute($this->route())
             ->setDepth(1)
+            ->setPageData($branch['data'] ?? [])
             ->setRoot(true);
     }
 
@@ -281,7 +282,7 @@ abstract class Tree implements Contract, Localization
         foreach ($branches as &$branch) {
             $children = $branch['children'] ?? [];
 
-            if ($branch[$this->idKey()] === $parent) {
+            if ($branch[$this->idKey()] == $parent) {
                 $children[] = $page;
                 $branch['children'] = $children;
                 break;
@@ -332,7 +333,7 @@ abstract class Tree implements Contract, Localization
         $match = null;
 
         foreach ($branches as $key => &$branch) {
-            if ($branch[$this->idKey()] === $entry) {
+            if ($branch[$this->idKey()] == $entry) {
                 $match = $branch;
                 unset($branches[$key]);
                 break;

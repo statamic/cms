@@ -25,6 +25,10 @@ button {
     }
 }
 
+.btn-height {
+    height: 2.375rem; // 38px
+}
+
 // Default, non-primary action button
 .btn, .btn-default {
     @apply text-grey-80 shadow-button;
@@ -152,19 +156,19 @@ button {
     @apply flex items-center p-0;
     height: 2.375rem;
 
-    > button {
+    button {
         @apply rounded-none;
     }
 
-    > button:not(:last-child):not(.active) {
+    button:not(:last-child):not(.active) {
         @apply border-r-0;
     }
 
-    > button.active + button {
+    button.active + button {
         @apply border-l-0;
     }
 
-    > button:first-child {
+    button:first-child {
         @apply rounded-l;
     }
 

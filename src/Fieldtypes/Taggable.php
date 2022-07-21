@@ -7,6 +7,7 @@ use Statamic\Fields\Fieldtype;
 
 class Taggable extends Fieldtype
 {
+    protected $categories = ['structured'];
     protected $component = 'tags';
     protected $icon = 'tags';
 

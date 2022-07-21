@@ -2,7 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
-use Carbon\Carbon;
+use Carbon\Exceptions\InvalidFormatException;
+use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
@@ -13,8 +15,11 @@ use Statamic\Support\DateFormat;
 
 class Date extends Fieldtype
 {
+    protected $categories = ['special'];
+
     const DEFAULT_DATE_FORMAT = 'Y-m-d';
     const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i';
+    const DEFAULT_DATETIME_WITH_SECONDS_FORMAT = 'Y-m-d H:i:s';
 
     protected function configFieldItems(): array
     {
@@ -32,20 +37,6 @@ class Date extends Fieldtype
                     'range' => __('Range'),
                 ],
             ],
-            'time_enabled'  => [
-                'display' => __('Time Enabled'),
-                'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'time_required' => [
-                'display' => __('Time Required'),
-                'instructions' => __('statamic::fieldtypes.date.config.time_required'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
             'format' => [
                 'display' => __('Format'),
                 'instructions' => __('statamic::fieldtypes.date.config.format'),
@@ -62,6 +53,20 @@ class Date extends Fieldtype
                 'display' => __('Latest Date'),
                 'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
                 'type' => 'date',
+                'width' => 50,
+            ],
+            'time_enabled'  => [
+                'display' => __('Time Enabled'),
+                'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'time_seconds_enabled'  => [
+                'display' => __('Show Seconds'),
+                'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
+                'type' => 'toggle',
+                'default' => false,
                 'width' => 50,
             ],
             'full_width' => [
@@ -107,7 +112,7 @@ class Date extends Fieldtype
 
     private function preProcessSingle($value)
     {
-        $vueFormat = $this->config('time_enabled') ? self::DEFAULT_DATETIME_FORMAT : self::DEFAULT_DATE_FORMAT;
+        $vueFormat = $this->defaultFormat();
 
         if (! $value) {
             return $this->isRequired() ? Carbon::now()->format($vueFormat) : null;
@@ -118,14 +123,14 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        $date = Carbon::createFromFormat($this->saveFormat($value), $value);
+        $date = $this->parseSaved($value);
 
         return $date->format($vueFormat);
     }
 
     private function preProcessRange($value)
     {
-        $vueFormat = self::DEFAULT_DATE_FORMAT;
+        $vueFormat = $this->defaultFormat();
 
         if (! $value) {
             return $this->isRequired() ? [
@@ -141,8 +146,8 @@ class Date extends Fieldtype
         }
 
         return [
-            'start' => Carbon::createFromFormat($this->saveFormat($value['start']), $value['start'])->format($vueFormat),
-            'end' => Carbon::createFromFormat($this->saveFormat($value['end']), $value['end'])->format($vueFormat),
+            'start' => $this->parseSaved($value['start'])->format($vueFormat),
+            'end' => $this->parseSaved($value['end'])->format($vueFormat),
         ];
     }
 
@@ -164,7 +169,7 @@ class Date extends Fieldtype
 
         $date = Carbon::parse($data);
 
-        return $this->formatAndCast($date, $this->saveFormat($data));
+        return $this->formatAndCast($date, $this->saveFormat());
     }
 
     private function processRange($data)
@@ -195,21 +200,14 @@ class Date extends Fieldtype
         return Carbon::parse($data)->format($this->indexDisplayFormat());
     }
 
-    private function saveFormat($date)
+    private function saveFormat()
     {
-        return $this->config(
-            'format',
-            strlen($date) > 10 ? self::DEFAULT_DATETIME_FORMAT : self::DEFAULT_DATE_FORMAT
-        );
+        return $this->config('format', $this->defaultFormat());
     }
 
     public function indexDisplayFormat()
     {
-        if (! $this->config('time_enabled')) {
-            return Statamic::cpDateFormat();
-        }
-
-        return $this->config('format') || strlen($this->field->value()) > 10
+        return $this->config('time_enabled')
             ? Statamic::cpDateTimeFormat()
             : Statamic::cpDateFormat();
     }
@@ -217,6 +215,17 @@ class Date extends Fieldtype
     public function fieldDisplayFormat()
     {
         return Statamic::cpDateFormat();
+    }
+
+    private function defaultFormat()
+    {
+        if ($this->config('time_enabled') && $this->config('mode') === 'single') {
+            return $this->config('time_seconds_enabled')
+                ? self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
+                : self::DEFAULT_DATETIME_FORMAT;
+        }
+
+        return self::DEFAULT_DATE_FORMAT;
     }
 
     private function formatAndCast(Carbon $date, $format)
@@ -249,19 +258,17 @@ class Date extends Fieldtype
 
         if ($this->config('mode') === 'range') {
             return [
-                'start' => Carbon::createFromFormat($this->saveFormat($value['start']), $value['start'])->startOfDay(),
-                'end' => Carbon::createFromFormat($this->saveFormat($value['end']), $value['end'])->startOfDay(),
+                'start' => $this->parseSaved($value['start'])->startOfDay(),
+                'end' => $this->parseSaved($value['end'])->startOfDay(),
             ];
         }
 
-        $date = Carbon::createFromFormat($this->saveFormat($value), $value);
+        $date = $this->parseSaved($value);
 
-        // Make sure that if it was only a date saved, then the time would be reset
-        // to the beginning of the day, otherwise it would inherit the hour and
-        // minute from the current time. If they've defined a custom format
-        // we'll skip this since it'll already be what they wanted.
-        if (! $this->config('format') && strlen($value) === 10) {
+        if (! $this->config('time_enabled')) {
             $date->startOfDay();
+        } elseif (! $this->config('time_seconds_enabled')) {
+            $date->startOfMinute();
         }
 
         return $date;
@@ -274,5 +281,19 @@ class Date extends Fieldtype
         }
 
         return new DateField;
+    }
+
+    public function toQueryableValue($value)
+    {
+        return $this->augment($value);
+    }
+
+    private function parseSaved($value)
+    {
+        try {
+            return Carbon::createFromFormat($this->saveFormat(), $value);
+        } catch (InvalidFormatException|InvalidArgumentException $e) {
+            return Carbon::parse($value);
+        }
     }
 }

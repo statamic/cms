@@ -22,7 +22,7 @@ export default {
             default: false
         },
         namePrefix: String,
-        errorKeyPrefix: String,
+        fieldPathPrefix: String,
     },
 
     methods: {
@@ -49,7 +49,7 @@ export default {
         },
 
         isReadOnly() {
-            return this.readOnly || this.config.read_only || false;
+            return this.readOnly || this.config.visibility === 'read_only' || false;
         },
 
         replicatorPreview() {

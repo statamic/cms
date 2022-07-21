@@ -6,6 +6,7 @@ use Statamic\Data\AbstractAugmented;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
+use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
 class AugmentedUser extends AbstractAugmented
@@ -38,22 +39,22 @@ class AugmentedUser extends AbstractAugmented
         ];
     }
 
-    public function get($handle)
+    public function get($handle): Value
     {
         if ($handle === 'is_user') {
-            return true;
+            return new Value(true, 'is_user', null, $this->data);
         }
 
         if ($handle === 'is_super') {
-            return $this->data->isSuper();
+            return new Value($this->data->isSuper(), 'is_super', null, $this->data);
         }
 
         if (Str::startsWith($handle, 'is_')) {
-            return in_array(Str::after($handle, 'is_'), $this->roles());
+            return new Value(in_array(Str::after($handle, 'is_'), $this->roles()), $handle, null, $this->data);
         }
 
         if (Str::startsWith($handle, 'in_')) {
-            return in_array(Str::after($handle, 'in_'), $this->groups());
+            return new Value(in_array(Str::after($handle, 'in_'), $this->groups()), $handle, null, $this->data);
         }
 
         return parent::get($handle);

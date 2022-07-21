@@ -3,6 +3,7 @@
 namespace Tests\Filesystem;
 
 use Illuminate\Support\Collection;
+use RuntimeException;
 use Statamic\Support\FileCollection;
 
 trait FilesystemAdapterTests
@@ -37,9 +38,11 @@ trait FilesystemAdapterTests
     }
 
     /** @test */
-    public function assumes_existence_if_checking_on_the_root()
+    public function cannot_check_if_null_exists()
     {
-        $this->assertTrue($this->adapter->exists());
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Path must be a string.');
+        $this->adapter->exists(null);
     }
 
     /** @test */
@@ -62,6 +65,14 @@ trait FilesystemAdapterTests
         file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
         $this->adapter->delete('filename.txt');
         $this->assertFileNotExists($this->tempDir.'/filename.txt');
+    }
+
+    /** @test */
+    public function cannot_delete_null()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Path must be a string.');
+        $this->adapter->delete(null);
     }
 
     /** @test */

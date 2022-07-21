@@ -269,10 +269,11 @@ final class Installer
      */
     protected function ensureExportPathsExist()
     {
-        $this->exportPaths()
-             ->reject(function ($path) {
-                 return $this->files->exists($this->starterKitPath($path));
-             })
+        $this
+            ->exportPaths()
+            ->reject(function ($path) {
+                return $this->files->exists($this->starterKitPath($path));
+            })
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");
             });
@@ -291,13 +292,13 @@ final class Installer
             return $this;
         }
 
-        $this->installableDependencies('dependencies')->each(function ($version, $package) {
-            $this->ensureCompatibleDependency($package, $version);
-        });
+        if ($packages = $this->installableDependencies('dependencies')) {
+            $this->ensureCanRequireDependencies($packages);
+        }
 
-        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
-            $this->ensureCompatibleDependency($package, $version, true);
-        });
+        if ($packages = $this->installableDependencies('dependencies_dev')) {
+            $this->ensureCanRequireDependencies($packages, true);
+        }
 
         return $this;
     }
@@ -376,61 +377,60 @@ final class Installer
             return $this;
         }
 
-        $this->installableDependencies('dependencies')->each(function ($version, $package) {
-            $this->installDependency($package, $version);
-        });
+        if ($packages = $this->installableDependencies('dependencies')) {
+            $this->requireDependencies($packages);
+        }
 
-        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
-            $this->installDependency($package, $version, true);
-        });
+        if ($packages = $this->installableDependencies('dependencies_dev')) {
+            $this->requireDependencies($packages, true);
+        }
 
         return $this;
     }
 
     /**
-     * Ensure compatible dependency by performing a dry-run.
+     * Ensure dependencies are installable by performing a dry-run.
      *
-     * @param  string  $package
-     * @param  string  $version
+     * @param  array  $packages
      * @param  bool  $dev
      */
-    protected function ensureCompatibleDependency($package, $version, $dev = false)
+    protected function ensureCanRequireDependencies($packages, $dev = false)
     {
-        $requireMethod = $dev ? 'requireDev' : 'require';
+        $requireMethod = $dev ? 'requireMultipleDev' : 'requireMultiple';
 
         try {
-            Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($package, $version, '--dry-run');
+            Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($packages, '--dry-run');
         } catch (ProcessException $exception) {
-            $this->rollbackWithError("Cannot install due to error with [{$package}] dependency.", $exception->getMessage());
+            $this->rollbackWithError('Cannot install due to dependency conflict.', $exception->getMessage());
         }
     }
 
     /**
      * Install starter kit dependency permanently into app.
      *
-     * @param  string  $package
-     * @param  string  $version
+     * @param  array  $packages
      * @param  bool  $dev
      */
-    protected function installDependency($package, $version, $dev = false)
+    protected function requireDependencies($packages, $dev = false)
     {
-        $this->console->info("Installing dependency [{$package}]...");
+        if ($dev) {
+            $this->console->info('Installing development dependencies...');
+        } else {
+            $this->console->info('Installing dependencies...');
+        }
 
-        $args = ['require'];
+        $args = array_merge(['require'], $this->normalizePackagesArrayToRequireArgs($packages));
 
         if ($dev) {
             $args[] = '--dev';
         }
-
-        $args[] = $package;
-        $args[] = $version;
 
         try {
             Composer::withoutQueue()->throwOnFailure()->runAndOperateOnOutput($args, function ($output) {
                 return $this->outputFromSymfonyProcess($output);
             });
         } catch (ProcessException $exception) {
-            $this->console->error("Error installing [{$package}].");
+            $this->console->error('Error installing dependencies.');
         }
     }
 
@@ -581,6 +581,15 @@ final class Installer
      */
     protected function tidyComposerErrorOutput($output)
     {
+        if (Str::contains($output, 'github.com') && Str::contains($output, ['access', 'permission', 'credential', 'authenticate'])) {
+            return collect([
+                'Composer could not authenticate with GitHub!',
+                'Please generate a personal access token at: https://github.com/settings/tokens/new',
+                'Then save your token for future use by running the following command:',
+                'composer config --global --auth github-oauth.github.com [your-token-here]',
+            ])->implode(PHP_EOL);
+        }
+
         return preg_replace("/\\n\\nrequire \[.*$/", '', $output);
     }
 
@@ -619,7 +628,7 @@ final class Installer
     }
 
     /**
-     * Get export paths.
+     * Get `export_paths` paths from config.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -631,38 +640,67 @@ final class Installer
     }
 
     /**
+     * Get `export_as` paths (to be renamed on install) from config.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function exportAsPaths()
+    {
+        $config = YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml')));
+
+        return collect($config['export_as'] ?? []);
+    }
+
+    /**
      * Get installable files.
      *
      * @return \Illuminate\Support\Collection
      */
     protected function installableFiles()
     {
-        return $this
+        $installableFromExportPaths = $this
             ->exportPaths()
             ->flatMap(function ($path) {
                 return $this->expandConfigExportPaths($path);
-            })
-            ->mapWithKeys(function ($path) {
-                $path = Path::tidy($path);
-
-                return [$path => str_replace("/vendor/{$this->package}", '', $path)];
             });
+
+        $installableFromExportAsPaths = $this
+            ->exportAsPaths()
+            ->flip()
+            ->flatMap(function ($to, $from) {
+                return $this->expandConfigExportPaths($to, $from);
+            });
+
+        return collect()
+            ->merge($installableFromExportPaths)
+            ->merge($installableFromExportAsPaths);
     }
 
     /**
-     * Expand export paths.
+     * Expand config export path to `[$from => $to]` array format, normalizing directories to files.
      *
-     * @param  string  $path
+     * @param  string  $to
+     * @param  string  $from
+     * @return \Illuminate\Support\Collection
      */
-    protected function expandConfigExportPaths($path)
+    protected function expandConfigExportPaths($to, $from = null)
     {
-        $path = $this->starterKitPath($path);
+        $to = Path::tidy($this->starterKitPath($to));
+        $from = Path::tidy($from ? $this->starterKitPath($from) : $to);
 
-        if ($this->files->isDirectory($path)) {
-            return collect($this->files->allFiles($path))->map->getPathname()->all();
+        $paths = collect([$from => $to]);
+
+        if ($this->files->isDirectory($from)) {
+            $paths = collect($this->files->allFiles($from))
+                ->map->getPathname()
+                ->mapWithKeys(function ($path) use ($from, $to) {
+                    return [$path => str_replace($from, $to, $path)];
+                });
         }
 
-        return [$path];
+        return $paths->mapWithKeys(function ($to, $from) {
+            return [Path::tidy($from) => Path::tidy(str_replace("/vendor/{$this->package}", '', $to))];
+        });
     }
 
     /**
@@ -675,13 +713,13 @@ final class Installer
     {
         $directory = $this->files->isDirectory($path)
             ? $path
-            : preg_replace('/(.*)\/[^\/]*/', '$1', $path);
+            : preg_replace('/(.*)\/[^\/]*/', '$1', Path::tidy($path));
 
         if (! $this->files->exists($directory)) {
             $this->files->makeDirectory($directory, 0755, true);
         }
 
-        return $path;
+        return Path::tidy($path);
     }
 
     /**
@@ -704,12 +742,30 @@ final class Installer
      * Get installable dependencies from appropriate require key in composer.json.
      *
      * @param  string  $configKey
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
     protected function installableDependencies($configKey)
     {
         return collect($this->config($configKey))->filter(function ($version, $package) {
             return Str::contains($package, '/');
-        });
+        })->all();
+    }
+
+    /**
+     * Normalize packages array to require args, with version handling if `package => version` array structure is passed.
+     *
+     * @param  array  $packages
+     * @return array
+     */
+    private function normalizePackagesArrayToRequireArgs(array $packages)
+    {
+        return collect($packages)
+            ->map(function ($value, $key) {
+                return Str::contains($key, '/')
+                    ? "{$key}:{$value}"
+                    : "{$value}";
+            })
+            ->values()
+            ->all();
     }
 }
