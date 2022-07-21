@@ -246,9 +246,7 @@ class CoreModifiers extends Modifier
             $value = [$value];
         }
 
-        $items = collect($value)
-            ->where(fn ($item) => $item['type'] !== 'set')
-            ->values();
+        $items = array_values(Arr::where($value, fn ($item) => $item['type'] !== 'set'));
 
         return (new Augmentor(new Bard()))->augment($items);
     }
