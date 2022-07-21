@@ -205,7 +205,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Converts a bard value (excluding sets) to plain text.
+     * Converts a bard value to plain text (excluding sets).
      *
      * @param $value
      * @return string
@@ -232,7 +232,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Converts a bard value (excluding sets) to HTML.
+     * Converts a bard value to HTML (excluding sets).
      *
      * @param $value
      * @return string
