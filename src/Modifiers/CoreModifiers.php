@@ -178,7 +178,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Converts a raw value from a bard field to a flat array of nodes and marks.
+     * Converts a bard value to a flat array of nodes and marks.
      *
      * @param $value
      * @return array
