@@ -131,7 +131,7 @@ return [
     'taxonomies.title' => 'Taxonomies',
     'template.config.folder' => 'Toon alleen templates in deze map.',
     'template.config.hide_partials' => 'Partials zijn zelden bedoeld om als templates te worden gebruikt.',
-    'template.config.blueprint' => 'Voegt een "Toekennen aan blueprint" optie toe. Lees meer in de [documentatie](https://statamic.dev/views#inferring-templates-from-entry-blueprints).'
+    'template.config.blueprint' => 'Voegt een "map to blueprint" optie toe. Lees meer in de [documentatie](https://statamic.dev/views#inferring-templates-from-entry-blueprints).'
     'template.title' => 'Template',
     'terms.config.create' => 'Het aanmaken van nieuwe termen toestaan.',
     'terms.title' => 'Taxonomy Terms',
