@@ -1,5 +1,22 @@
 # Release Notes
 
+## 3.3.23 (2022-07-21)
+
+### What's new
+- Added Statamic information to the new "about" command. [#6351](https://github.com/statamic/cms/issues/6351) by @jasonvarga
+- Custom fields can be added to the Collection GraphQL type. [#6362](https://github.com/statamic/cms/issues/6362) by @jasonvarga
+
+### What's fixed
+- Fix toggle field casting to boolean when field is hidden. [#6348](https://github.com/statamic/cms/issues/6348) by @jesseleite
+- Allow validation against `published` value on entry publish form. [#6353](https://github.com/statamic/cms/issues/6353) by @jesseleite
+- Runtime: Fix error when using modulo in a condition. [#6363](https://github.com/statamic/cms/issues/6363) by @JohnathonKoster
+- Fix versioned asset path having a double extension. [#6346](https://github.com/statamic/cms/issues/6346) by @jonassiewertsen
+- Fix infinite loop when user file doesn't have id. [#6361](https://github.com/statamic/cms/issues/6361) by @jasonvarga
+- Fix assets fieldtype being sortable when read-only. [#6358](https://github.com/statamic/cms/issues/6358) by @jesseleite
+- Clean up leftover files in global set test. [#6350](https://github.com/statamic/cms/issues/6350) by @jasonvarga
+
+
+
 ## 3.3.22 (2022-07-18)
 
 ### What's improved
