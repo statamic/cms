@@ -24,6 +24,7 @@ return [
     'bard.config.link_collections' => 'Entries uit deze collecties zijn beschikbaar in de linkselector. Als je dit leeg laat worden alle vermeldingen beschikbaar.',
     'bard.config.link_noopener' => 'Gebruik `rel="noopener"` op alle links.',
     'bard.config.link_noreferrer' => 'Gebruik `rel="noreferrer"` op alle links.',
+    'bard.config.previews' => 'Tonen wanneer sets zijn samengevouwen.',
     'bard.config.reading_time' => 'Toon de geschatte leestijd onderaan het veld.',
     'bard.config.save_html' => 'Bewaar HTML in plaats van gestructureerde gegevens. Dit vereenvoudigt maar beperkt de controle over je template markup.',
     'bard.config.sets' => 'Sets zijn configureerbare blokken met velden die overal in je Bard-inhoud kunnen worden toegevoegd.',
@@ -109,6 +110,7 @@ return [
     'replicator.config.collapse.disabled' => 'Alle sets zijn standaard uitgevouwen',
     'replicator.config.collapse.enabled' => 'Alle sets zijn standaard samengevouwen',
     'replicator.config.max_sets' => 'Het maximale aantal sets.',
+    'replicator.config.previews' => 'Tonen wanneer sets zijn samengevouwen.',
     'replicator.title' => 'Replicator',
     'revealer.config.mode' => 'Kies de layoutstijl van je voorkeur.',
     'revealer.title' => 'Revealer',
@@ -129,6 +131,7 @@ return [
     'taxonomies.title' => 'Taxonomies',
     'template.config.folder' => 'Toon alleen templates in deze map.',
     'template.config.hide_partials' => 'Partials zijn zelden bedoeld om als templates te worden gebruikt.',
+    'template.config.blueprint' => 'Voegt een "Toekennen aan blueprint" optie toe. Lees meer in de [documentatie](https://statamic.dev/views#inferring-templates-from-entry-blueprints).'
     'template.title' => 'Template',
     'terms.config.create' => 'Het aanmaken van nieuwe termen toestaan.',
     'terms.title' => 'Taxonomy Terms',
