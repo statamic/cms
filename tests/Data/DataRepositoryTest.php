@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Mockery;
 use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Data\DataRepository;
+use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -269,6 +270,9 @@ class DataRepositoryTest extends TestCase
     private function findByRequestUrlTest($requestUrl, $entryId)
     {
         self::$functions->shouldReceive('method_exists')->with(EntryRepository::class, 'findByUri')->andReturnTrue();
+        self::$functions->shouldReceive('method_exists')->with(Entry::class, 'computedData')->andReturnTrue();
+        self::$functions->shouldReceive('method_exists')->with(Entry::class, 'getComputedCallbacks')->andReturnTrue();
+
         $this->data->setRepository('entry', EntryRepository::class);
 
         $c = tap(Collection::make('pages')->sites(['english', 'french'])->routes('{slug}')->structureContents(['root' => true]))->save();
