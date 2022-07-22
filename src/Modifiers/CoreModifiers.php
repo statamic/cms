@@ -2824,7 +2824,7 @@ class CoreModifiers extends Modifier
         // adapted mb_str_word_count from https://stackoverflow.com/a/17725577
         $words = empty($string = trim($value)) ? [] : preg_split('~[^\p{L}\p{N}\']+~u', $value);
 
-        return count($words);
+        return count(array_filter($words));
     }
 
     /**

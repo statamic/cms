@@ -217,7 +217,7 @@ EOT;
 
     public function test_word_count()
     {
-        $this->assertSame('2', $this->result('{{  "one two"|word_count }}'));
+        $this->assertSame('8', $this->result('{{  "There are probably seven words in this sentence."|word_count }}'));
     }
 
     public function test_where()
