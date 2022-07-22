@@ -61,7 +61,7 @@ abstract class User implements
     public function value($key)
     {
         if ($this->hasComputedCallback($key)) {
-            return $this->computedValue($key, $this->get($key));
+            return $this->getComputed($key);
         }
 
         return $this->get($key);
