@@ -125,6 +125,9 @@ export default {
         },
         isReadOnly: Boolean,
         previews: Object,
+        showFieldPreviews: {
+            type: Boolean
+        }
     },
 
     computed: {

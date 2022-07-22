@@ -46,6 +46,31 @@ EOT;
         $this->assertSame('sendForm()', $param2->value);
     }
 
+    public function test_tag_parameters_can_start_with_numbers()
+    {
+        $template = <<<'EOT'
+{{ tag lg:ratio="2" 2xl:ratio="7" }}
+EOT;
+
+        $nodes = $this->parseNodes($template);
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+
+        /** @var AntlersNode $node */
+        $node = $nodes[0];
+
+        $this->assertCount(2, $node->parameters);
+
+        $param1 = $node->parameters[0];
+        $param2 = $node->parameters[1];
+
+        $this->assertSame('lg:ratio', $param1->name);
+        $this->assertSame('2', $param1->value);
+
+        $this->assertSame('2xl:ratio', $param2->name);
+        $this->assertSame('7', $param2->value);
+    }
+
     public function test_node_parameter_escape_consistent_behavior()
     {
         // Ensure that the escape sequence behavior

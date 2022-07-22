@@ -59,7 +59,7 @@ class CsvExporter extends AbstractExporter
             unset($submission['id']);
 
             return collect($submission)->map(function ($value) {
-                return (is_array($value)) ? join(', ', $value) : $value;
+                return (is_array($value)) ? implode(', ', $value) : $value;
             })->all();
         })->all();
 

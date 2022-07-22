@@ -55,6 +55,11 @@ export default {
             // Set default
             var options = [];
 
+            // Prepend @blueprint as an option
+            if (this.config.blueprint) {
+                options.push({ label: __('Map to Blueprint'), value: '@blueprint' });
+            }
+
             _.each(templates, (template) => {
                 options.push({
                     label: this.config.folder

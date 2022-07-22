@@ -84,8 +84,6 @@ class View
 
     public function render(): string
     {
-        GlobalRuntimeState::resetGlobalState();
-
         $cascade = $this->gatherData();
 
         if ($this->shouldUseLayout()) {
