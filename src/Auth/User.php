@@ -50,13 +50,20 @@ abstract class User implements
 
     abstract public function get($key, $fallback = null);
 
-    abstract public function value($key);
-
     abstract public function has($key);
 
     abstract public function set($key, $value);
 
     abstract public function remove($key);
+
+    public function value($key)
+    {
+        if ($this->hasComputedCallback($key)) {
+            return $this->computedValue($key, $this->get($key));
+        }
+
+        return $this->get($key);
+    }
 
     public function reference()
     {

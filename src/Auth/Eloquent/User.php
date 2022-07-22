@@ -284,15 +284,6 @@ class User extends BaseUser
         return is_null($value) ? $default : $value;
     }
 
-    public function value($key)
-    {
-        if ($this->hasComputedCallback($key)) {
-            return $this->computedValue($key, $this->get($key));
-        }
-
-        return $this->get($key);
-    }
-
     public function set($key, $value)
     {
         if ($key === 'password') {

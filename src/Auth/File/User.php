@@ -57,15 +57,6 @@ class User extends BaseUser
         return $this;
     }
 
-    public function value($key)
-    {
-        if ($this->hasComputedCallback($key)) {
-            return $this->computedValue($key, $this->get($key));
-        }
-
-        return $this->get($key);
-    }
-
     public function id($id = null)
     {
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
