@@ -8,22 +8,26 @@ trait ContainsComputedData
 
     public function computedData()
     {
-        if (! method_exists($this, 'getComputedCallbacks') || ! $this->withComputedData) {
+        if (! method_exists($this, 'getComputedCallbacks')) {
             return collect();
         }
 
         return collect($this->getComputedCallbacks())->map(function ($callback, $field) {
-            return $callback($this->instanceWithoutComputed(), method_exists($this, 'get') ? $this->get($field) : null);
+            return $this->getComputed($field);
         });
     }
 
-    public function computedValue($key, $fallback = null)
+    public function getComputed($key)
     {
+        $instance = $this->instanceWithoutComputed();
+
+        $value = method_exists($this, 'get') ? $instance->get($key) : null;
+
         if ($this->withComputedData && $callback = $this->getComputedCallbacks()->get($key)) {
-            return $callback($this->instanceWithoutComputed(), $fallback);
+            return $callback($instance, $value);
         }
 
-        return $fallback;
+        return $value;
     }
 
     protected function hasComputedCallback($key)
