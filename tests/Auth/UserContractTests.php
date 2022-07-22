@@ -114,6 +114,18 @@ trait UserContractTests
     }
 
     /** @test */
+    public function it_doesnt_recursively_get_computed_data_when_callback_uses_value_method()
+    {
+        Facades\User::computed('balance', function ($user) {
+            return $user->value('balance') ?? $user->name().'\'s balance is $25 owing.';
+        });
+
+        $user = $this->makeUser()->data(['name' => 'Han Solo']);
+
+        $this->assertEquals('Han Solo\'s balance is $25 owing.', $user->value('balance'));
+    }
+
+    /** @test */
     public function it_can_use_actual_data_to_compose_computed_data()
     {
         Facades\User::computed('nickname', function ($user, $attribute) {

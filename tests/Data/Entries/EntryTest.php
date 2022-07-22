@@ -379,6 +379,19 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_doesnt_recursively_get_computed_data_when_callback_uses_value_methods()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->value('title').' '.$entry->values()->get('suffix');
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks', 'suffix' => 'AND MORE!']);
+
+        $this->assertEquals('Pop Rocks AND MORE!', $entry->value('description'));
+    }
+
+    /** @test */
     public function it_can_use_actual_data_to_compose_computed_data()
     {
         Facades\Collection::computed('articles', 'description', function ($user, $attribute) {
