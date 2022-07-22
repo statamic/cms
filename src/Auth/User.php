@@ -48,6 +48,8 @@ abstract class User implements
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
+    abstract public function data($data = null);
+
     abstract public function get($key, $fallback = null);
 
     abstract public function has($key);
