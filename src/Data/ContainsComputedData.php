@@ -26,12 +26,12 @@ trait ContainsComputedData
         return $fallback;
     }
 
-    public function hasComputedCallback($key)
+    protected function hasComputedCallback($key)
     {
         return $this->getComputedCallbacks()->has($key);
     }
 
-    public function instanceWithoutComputed()
+    protected function instanceWithoutComputed()
     {
         $clone = clone $this;
 
