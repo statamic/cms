@@ -24,10 +24,7 @@ trait OutputsItems
         $extra = [];
 
         $extra['total_results'] = $items->count();
-
-        if ($items->isEmpty()) {
-            $extra['no_results'] = true;
-        }
+        $extra['no_results'] = $items->isEmpty();
 
         return $extra;
     }
