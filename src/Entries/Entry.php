@@ -735,9 +735,14 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return Facades\Entry::find($origin);
     }
 
-    public function values()
+    protected function getOriginFallbackValues()
     {
-        return $this->collection()->cascade()->merge($this->originValues());
+        return $this->collection()->cascade();
+    }
+
+    protected function getOriginFallbackValue($key)
+    {
+        return $this->collection()->cascade()->get($key);
     }
 
     public function defaultAugmentedArrayKeys()
