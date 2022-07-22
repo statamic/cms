@@ -394,20 +394,42 @@ class EntryTest extends TestCase
     /** @test */
     public function it_can_use_actual_data_to_compose_computed_data()
     {
-        Facades\Collection::computed('articles', 'description', function ($user, $attribute) {
-            return $attribute ?? 'N/A';
+        Facades\Collection::computed('articles', 'description', function ($entry, $value) {
+            return $value ?? 'N/A';
         });
 
         $collection = tap(Collection::make('articles'))->save();
 
-        $entry = (new Entry)->collection($collection)->data([
-            'title' => 'Pop Rocks',
-        ]);
+        $entry = (new Entry)->collection($collection);
 
         $this->assertEquals('N/A', $entry->value('description'));
 
         $entry->data(['description' => 'Raddest article ever!']);
 
+        $this->assertEquals('Raddest article ever!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_can_use_origin_data_to_compose_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry, $value) {
+            return $entry->value('description') ?? 'N/A';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+
+        (new Entry)->collection($collection)->id('origin')->data([
+            'description' => 'Dill Pickles',
+        ])->save();
+
+        $entry = (new Entry)->collection($collection)->origin('origin');
+
+        $this->assertEquals('Dill Pickles', $entry->values()->get('description'));
+        $this->assertEquals('Dill Pickles', $entry->value('description'));
+
+        $entry->data(['description' => 'Raddest article ever!']);
+
+        $this->assertEquals('Raddest article ever!', $entry->values()->get('description'));
         $this->assertEquals('Raddest article ever!', $entry->value('description'));
     }
 

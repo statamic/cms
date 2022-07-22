@@ -128,8 +128,8 @@ trait UserContractTests
     /** @test */
     public function it_can_use_actual_data_to_compose_computed_data()
     {
-        Facades\User::computed('nickname', function ($user, $attribute) {
-            return $attribute ?? 'Nameless';
+        Facades\User::computed('nickname', function ($user, $value) {
+            return $value ?? 'Nameless';
         });
 
         $user = $this->makeUser();
