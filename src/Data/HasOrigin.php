@@ -29,7 +29,7 @@ trait HasOrigin
 
         $value = $this->has($key) ? $this->get($key) : $originValue;
 
-        if ($this->hasComputedCallback($key)) {
+        if (method_exists($this, 'hasComputedCallback') && $this->hasComputedCallback($key)) {
             return $this->getComputed($key) ?? $value;
         }
 
