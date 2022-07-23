@@ -111,7 +111,7 @@ export default {
                 mutations: {
                     setFieldValue(state, payload) {
                         const { handle, value } = payload;
-                        state.values[handle] = value;
+                        data_set(state.values, handle, value);
                     },
                     setValues(state, values) {
                         state.values = values;

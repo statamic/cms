@@ -1,5 +1,6 @@
 import { marked } from 'marked';
 import { translate, translateChoice } from '../translations/translator';
+import { default as set } from './set';
 
 export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;
@@ -33,6 +34,10 @@ export function data_get(obj, path, fallback=null) {
     var value = properties.reduce((prev, curr) => prev && prev[curr], obj);
     return value !== undefined ? value : fallback;
 };
+
+export function data_set(obj, path, value) {
+    set(obj, path.split('.'), value);
+}
 
 export function clone(value) {
     if (value === undefined) return undefined;
