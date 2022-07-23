@@ -22,7 +22,7 @@
 
             <!-- Entry select -->
             <relationship-fieldtype
-                v-if="option === 'entry'"
+                v-show="option === 'entry'"
                 ref="entries"
                 handle="entry"
                 :value="selectedEntries"
@@ -34,7 +34,7 @@
 
             <!-- Asset select -->
             <assets-fieldtype
-                v-if="option === 'asset'"
+                v-show="option === 'asset'"
                 ref="assets"
                 handle="asset"
                 :value="selectedAssets"
@@ -121,6 +121,28 @@ export default {
             this.selectedEntries = meta.initialSelectedEntries;
             this.selectedAssets = meta.initialSelectedAssets;
             this.$nextTick(() => this.metaChanging = false);
+        },
+
+        value(value) {
+            let option = this.option;
+
+            if (!value || !value.startsWith('entry::')) this.selectedEntries = [];
+            if (!value || !value.startsWith('asset::')) this.selectedAssets = [];
+
+            if (value === null) {
+                if (option === 'url') this.option = null;
+            } else if (value === '@child') {
+                this.option = 'first-child';
+            } else if (value.startsWith('entry::')) {
+                this.option = 'entry';
+                this.selectedEntries = [value.replace('entry::', '')];
+            } else if (value.startsWith('asset::')) {
+                this.option = 'asset'
+                this.selectedAssets = [value.replace('asset::', '')];
+            } else {
+                this.option = 'url';
+                this.urlValue = value;
+            }
         }
 
     },
