@@ -270,6 +270,7 @@ class DataRepositoryTest extends TestCase
     private function findByRequestUrlTest($requestUrl, $entryId)
     {
         self::$functions->shouldReceive('method_exists')->with(EntryRepository::class, 'findByUri')->andReturnTrue();
+        self::$functions->shouldReceive('method_exists')->with(Entry::class, 'hasComputedCallback')->andReturnFalse();
         self::$functions->shouldReceive('method_exists')->with(Entry::class, 'computedData')->andReturn([]);
         self::$functions->shouldReceive('method_exists')->with(Entry::class, 'getOriginFallbackValues')->andReturn([]);
         self::$functions->shouldReceive('method_exists')->with(Entry::class, 'getOriginFallbackValue')->andReturn(null);
