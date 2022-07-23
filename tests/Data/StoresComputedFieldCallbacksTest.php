@@ -14,11 +14,11 @@ class StoresComputedFieldCallbacksTest extends TestCase
     {
         $repository = new FakeRepository;
 
-        $repository->computed('some_field', function ($item, $attribute) {
+        $repository->computed('some_field', function ($item, $value) {
             //
         });
 
-        $repository->computed('another_field', function ($item, $attribute) {
+        $repository->computed('another_field', function ($item, $value) {
             //
         });
 
@@ -33,7 +33,7 @@ class StoresComputedFieldCallbacksTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Number of arguments required: 2');
 
-        $repository->computed('articles', 'some_field', function ($item, $attribute) {
+        $repository->computed('articles', 'some_field', function ($item, $value) {
             //
         });
     }
@@ -53,11 +53,11 @@ class StoresComputedFieldCallbacksTest extends TestCase
     {
         $repository = new FakeRepositoryWithScopedCallbacks;
 
-        $repository->computed('articles', 'some_field', function ($item, $attribute) {
+        $repository->computed('articles', 'some_field', function ($item, $value) {
             //
         });
 
-        $repository->computed('articles', 'another_field', function ($item, $attribute) {
+        $repository->computed('articles', 'another_field', function ($item, $value) {
             //
         });
 
@@ -72,7 +72,7 @@ class StoresComputedFieldCallbacksTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Number of arguments required: 3');
 
-        $repository->computed('some_field', function ($item, $attribute) {
+        $repository->computed('some_field', function ($item, $value) {
             //
         });
     }
@@ -92,15 +92,15 @@ class StoresComputedFieldCallbacksTest extends TestCase
     {
         $repository = new FakeRepositoryWithScopedCallbacks;
 
-        $repository->computed('events', 'some_field', function ($item, $attribute) {
+        $repository->computed('events', 'some_field', function ($item, $value) {
             //
         });
 
-        $repository->computed('articles', 'some_field', function ($item, $attribute) {
+        $repository->computed('articles', 'some_field', function ($item, $value) {
             //
         });
 
-        $repository->computed('articles', 'another_field', function ($item, $attribute) {
+        $repository->computed('articles', 'another_field', function ($item, $value) {
             //
         });
 
