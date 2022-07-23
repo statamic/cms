@@ -201,6 +201,13 @@ export default {
         itemData(data, olddata) {
             if (this.initializing) return;
             this.$emit('item-data-updated', data);
+        },
+
+        value(value) {
+            // If all the values already have their data stored, then don't bother fetching it again.
+            if (value.every(id => this.data.map(item => item.id).includes(id))) return;
+
+            this.getDataForSelections(value);
         }
 
     },
