@@ -322,6 +322,19 @@ export default {
                 this.editor.commands.clearContent()
                 this.editor.commands.setContent(content, true);
             }
+
+            let sets = content.content.filter(node => node.type === 'set');
+
+            // Add or update meta for each set in the value.
+            sets.forEach(set => {
+                let id = set.attrs.id;
+                if (!this.meta.existing[id]) this.updateSetMeta(id, this.meta.new[set.attrs.values.type]);
+            });
+
+            // Remove any meta for sets that are no longer in the value.
+            Object.keys(this.meta.existing).forEach(id => {
+                if (!sets.find(set => set.attrs.id === id)) this.removeSetMeta(id);
+            });
         },
 
         readOnly(readOnly) {
@@ -362,8 +375,6 @@ export default {
             Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
             this.previews = Object.assign({}, this.previews, { [id]: previews });
 
-            this.updateSetMeta(id, this.meta.new[handle]);
-
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
                 this.editor.commands.set({ id, values });
@@ -377,8 +388,6 @@ export default {
 
             let previews = Object.assign({}, this.previews[old_id]);
             this.previews = Object.assign({}, this.previews, { [id]: previews });
-
-            this.updateSetMeta(id, this.meta.existing[old_id]);
 
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {

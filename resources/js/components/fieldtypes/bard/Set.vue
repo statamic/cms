@@ -1,7 +1,9 @@
 <template>
 
     <node-view-wrapper>
-        <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
+        <div
+            v-if="meta"
+            class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
             :class="{ 'border-blue-lighter': selected, 'has-error': hasError }"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
@@ -99,7 +101,7 @@ export default {
         },
 
         previews() {
-            return this.extension.options.bard.meta.previews[this.node.attrs.id];
+            return this.extension.options.bard.meta.previews[this.node.attrs.id] || {};
         },
 
         collapsed() {
