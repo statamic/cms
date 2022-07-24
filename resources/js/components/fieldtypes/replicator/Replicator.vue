@@ -19,7 +19,7 @@
         >
             <div slot-scope="{}" class="replicator-set-container">
                 <replicator-set
-                    v-for="(set, index) in value"
+                    v-for="(set, index) in sets"
                     :key="set._id"
                     :index="index"
                     :values="set"
@@ -118,6 +118,14 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        sets() {
+            // Get all the values, but only ones that have corresponding meta data.
+            // Since meta data is added by a watcher after the value is updated,
+            // there will be a moment where the set will be missing meta data.
+            // We don't want to render a set's component without meta data.
+            return this.value.filter(set => this.meta.existing[set._id]);
         }
     },
 
@@ -132,8 +140,6 @@ export default {
         },
 
         removed(set, index) {
-            this.removeSetMeta(set._id);
-
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
@@ -150,8 +156,6 @@ export default {
             };
 
             this.updateSetPreviews(set._id, {});
-
-            this.updateSetMeta(set._id, this.meta.new[handle]);
 
             this.update([
                 ...this.value.slice(0, index),
@@ -171,8 +175,6 @@ export default {
             };
 
             this.updateSetPreviews(set._id, {});
-
-            this.updateSetMeta(set._id, this.meta.existing[old_id]);
 
             this.update([
                 ...this.value.slice(0, index + 1),
@@ -255,6 +257,18 @@ export default {
         collapsed(collapsed) {
             this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
         },
+
+        value(value) {
+            // Add or update meta for each set in the value.
+            value.forEach(set => {
+                if (!this.meta.existing[set._id]) this.updateSetMeta(set._id, this.meta.new[set.type]);
+            });
+
+            // Remove any meta for sets that are no longer in the value.
+            Object.keys(this.meta.existing).forEach(id => {
+                if (!value.find(v => v._id === id)) this.removeSetMeta(id);
+            });
+        }
 
     }
 
