@@ -12,6 +12,14 @@
             </h1>
 
             <dropdown-list class="mr-2" v-if="canEditBlueprint">
+                <data-list-inline-actions
+                    :item="values.id"
+                    :url="listActionUrl"
+                    :actions="listActions"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                />
+                <div class="divider" v-if="listActions.length" />
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
             </dropdown-list>
 
@@ -258,12 +266,14 @@ import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../data-list/HasHiddenFields';
+import HasListActions from '../publish/HasListActions';
 
 export default {
 
     mixins: [
         HasPreferences,
         HasHiddenFields,
+        HasListActions,
     ],
 
     components: {
@@ -304,6 +314,8 @@ export default {
         listingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
+        listActions: Array,
+        listActionUrl: String,
     },
 
     data() {

@@ -52,5 +52,9 @@ class Delete extends Action
     public function run($items, $values)
     {
         $items->each->delete();
+
+        if ($this->context['edit'] ?? false) {
+            return ['back' => true];
+        }
     }
 }

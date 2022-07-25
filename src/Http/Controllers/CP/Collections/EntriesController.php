@@ -7,6 +7,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -106,6 +107,7 @@ class EntriesController extends CpController
                 'createRevision' => $entry->createRevisionUrl(),
                 'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
+            'listActions' => Action::for($entry, ['collection' => $collection->handle(), 'edit' => true]),
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
             'collection' => $collection->handle(),
