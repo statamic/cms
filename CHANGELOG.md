@@ -1,5 +1,19 @@
 # Release Notes
 
+## 3.3.24 (2022-07-26)
+
+### What's improved
+- Always include `no_results` in tags that output items. [#6368](http://github.com/statamic/cms/issues/6368) by @jacksleight
+- Dutch translations. [#6364](http://github.com/statamic/cms/issues/6364) by @erwinromkes
+
+### What's fixed
+- Fix `rememberWithExpiration` cache macro not found error. [#6380](http://github.com/statamic/cms/issues/6380) by @JohnathonKoster
+- Fix word count in `CoreModifiers` treating punctuation as a word. [#6367](http://github.com/statamic/cms/issues/6367) by @johnnoel
+- Fix reordering entries in a collection named literally `collection`. [#6371](http://github.com/statamic/cms/issues/6371) by @jasonvarga
+- Deprecate `format_localized` modifier. [#6370](http://github.com/statamic/cms/issues/6370) by @jasonvarga
+
+
+
 ## 3.3.23 (2022-07-21)
 
 ### What's new
