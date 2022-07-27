@@ -10,8 +10,10 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
+use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
+use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blink;
@@ -37,6 +39,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     protected $allowRenaming;
     protected $createFolders;
     protected $searchIndex;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
     protected $sortField;
     protected $sortDirection;
 
@@ -179,6 +183,20 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         return $blueprint;
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     /**
      * Save the container.
      *
@@ -186,9 +204,33 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function save()
     {
+        $isNew = is_null(Facades\AssetContainer::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (AssetContainerSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\AssetContainer::save($this);
 
-        AssetContainerSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                AssetContainerCreated::dispatch($this);
+            }
+
+            AssetContainerSaved::dispatch($this);
+        }
 
         return $this;
     }

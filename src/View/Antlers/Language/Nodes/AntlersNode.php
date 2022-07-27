@@ -429,11 +429,14 @@ class AntlersNode extends AbstractNode
                 $value = Antlers::parser()->getVariable($pathToParse, $data, null);
             } else {
                 $pathParser = new PathParser();
+                $path = $pathParser->parse($pathToParse);
+                $doIntercept = count($path->pathParts) > 1;
+
                 $retriever = new PathDataManager();
                 $retriever->setIsPaired(false)->setReduceFinal(false)
                     ->cascade($processor->getCascade())
-                    ->setShouldDoValueIntercept(false);
-                $value = $retriever->getData($pathParser->parse($pathToParse), $data);
+                    ->setShouldDoValueIntercept($doIntercept);
+                $value = $retriever->getData($path, $data);
             }
         } else {
             $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);

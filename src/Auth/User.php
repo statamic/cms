@@ -21,8 +21,10 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\UserCreated;
 use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
+use Statamic\Events\UserSaving;
 use Statamic\Facades;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
@@ -45,6 +47,9 @@ abstract class User implements
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, HasDirtyState, SyncsOriginalState;
 
     protected $syncOriginalProperties = [];
+
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     abstract public function get($key, $fallback = null);
 
@@ -145,13 +150,44 @@ abstract class User implements
         return Facades\User::blueprint();
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
+        $isNew = is_null(Facades\User::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (UserSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\User::save($this);
 
         $this->syncOriginal();
 
-        UserSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                UserCreated::dispatch($this);
+            }
+
+            UserSaved::dispatch($this);
+        }
 
         return $this;
     }

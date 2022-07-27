@@ -36,6 +36,10 @@ class Toggle extends Fieldtype
 
     public function process($data)
     {
+        if (is_null($data)) {
+            return null;
+        }
+
         return (bool) $data;
     }
 

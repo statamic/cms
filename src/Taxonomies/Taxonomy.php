@@ -179,6 +179,13 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return true;
     }
 
+    public function truncate()
+    {
+        $this->queryTerms()->get()->each->delete();
+
+        return true;
+    }
+
     public function fileData()
     {
         $data = [

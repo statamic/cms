@@ -68,6 +68,7 @@
                         handle-class="asset-thumb-container"
                         @dragstart="$emit('focus')"
                         @dragend="$emit('blur')"
+                        :disabled="isReadOnly"
                     >
                         <div
                             class="asset-grid-listing border rounded overflow-hidden"
@@ -94,6 +95,7 @@
                                 :vertical="true"
                                 item-class="asset-row"
                                 handle-class="asset-row"
+                                :disabled="isReadOnly"
                             >
                                 <tbody ref="assets">
                                     <tr is="assetRow"

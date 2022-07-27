@@ -742,6 +742,21 @@ class CollectionTest extends TestCase
         ], $collection->additionalPreviewTargets()->all());
     }
 
+    /** @test */
+    public function it_trucates_entries()
+    {
+        $collection = Facades\Collection::make('test')->save();
+        Facades\Entry::make()->collection('test')->id('1')->slug('one')->save();
+        Facades\Entry::make()->collection('test')->id('2')->slug('two')->save();
+        Facades\Entry::make()->collection('test')->id('3')->slug('three')->save();
+
+        $this->assertCount(3, $collection->queryEntries()->get());
+
+        $collection->truncate();
+
+        $this->assertCount(0, $collection->queryEntries()->get());
+    }
+
     public function additionalPreviewTargetProvider()
     {
         return [
