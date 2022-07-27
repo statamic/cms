@@ -26,7 +26,11 @@ a {
 
 #overlays {
    z-index: 22;
-   scroll-behavior: contain;
+   overscroll-behavior: contain;
+}
+
+.vue-portal-target {
+   z-index: 21;
 }
 
 @screen md {

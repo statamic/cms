@@ -34,7 +34,8 @@
         @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-50;
         top: 36px;
         left: -1px; // border offset
-        z-index: 999;
+        max-height: calc(100vh - 52px);
+        overflow-y: auto;
     }
 
     .global-search-loading-indicator {

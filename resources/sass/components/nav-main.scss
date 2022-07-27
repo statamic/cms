@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .nav-main {
-    @apply bg-white shadow h-screen fixed left-0 overflow-auto w-56 z-20;
+    @apply bg-white shadow h-screen fixed left-0 overflow-y-auto overscroll-contain w-56 z-20;
     
     top: 52px;
     transform: translateX(-100%);
@@ -26,6 +26,7 @@
     li {
         @apply p-0 text-sm;
         margin-top: 6px;
+        word-break: break-all;
     }
 
     li a {

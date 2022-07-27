@@ -20,9 +20,11 @@
                         'showing-license-banner': showBanner
                   }">
 
-                  <div class="page-wrapper flex flex-col h-full w-full" :class="wrapperClass">
+                  <div class="page-wrapper flex flex-col h-full w-full overflow-hidden" :class="wrapperClass">
                         @yield('content')
                   </div>
+
+                  <portal-target name="outside"></portal-target>
 
             </main>
 
@@ -59,14 +61,12 @@
 
                   <portal-target name="pane" :slim="true"></portal-target>
 
-                  <portal-target name="outside"></portal-target>
-
             </div>
 
       </div>
 
-      @include('statamic::partials.scripts')
-      @yield('scripts')
+@include('statamic::partials.scripts')
+@yield('scripts')
 
 </body>
 </html>

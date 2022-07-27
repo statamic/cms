@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="h-full">
 
         <div v-if="initializing" class="card loading">
             <loading-graphic />
@@ -8,6 +8,7 @@
         <slot name="no-results" v-if="!loading && !searchQuery && items.length === 0" />
 
         <data-list
+            class="h-full"
             v-else-if="!initializing"
             :columns="columns"
             :rows="items"
@@ -17,23 +18,25 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0 relative">
-                    <div class="data-list-header min-h-16">
-                        <data-list-filters
-                            :search-query="searchQuery"
-                            @search-changed="searchChanged"
-                            @reset="filtersReset"
-                        />
+                <div class="card p-0 relative overflow-x-auto h-full">
+                    <div class="sticky top-0 right-0 left-0 z-10 w-full">
+                        <div class="data-list-header min-h-16">
+                            <data-list-filters
+                                :search-query="searchQuery"
+                                @search-changed="searchChanged"
+                                @reset="filtersReset"
+                            />
+                            <data-list-bulk-actions
+                                :url="actionUrl"
+                                :context="actionContext"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
+                        </div>
+
+                        <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+
                     </div>
-
-                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
-
-                    <data-list-bulk-actions
-                        :url="actionUrl"
-                        :context="actionContext"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
 
                     <data-list-table
                         v-if="items.length"

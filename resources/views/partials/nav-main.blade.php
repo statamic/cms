@@ -35,6 +35,7 @@
                 </ul>
             @endforeach
         </div>
+        <portal-target name="outside"></portal-target>
     </nav>
 @stop
 
