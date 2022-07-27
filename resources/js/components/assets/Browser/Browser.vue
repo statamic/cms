@@ -1,6 +1,6 @@
 <template>
 
-    <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
+    <div class="min-h-100" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
         <div v-if="initializing" class="loading">
             <loading-graphic  />
         </div>
@@ -15,7 +15,7 @@
             @upload-complete="uploadCompleted"
             @error="uploadError"
         >
-            <div slot-scope="{ dragging }" class="min-h-screen">
+            <div slot-scope="{ dragging }" class="min-h-100">
                 <div class="drag-notification" v-show="dragging">
                     <svg-icon name="upload" class="h-12 w-12 m-2" />
                     <span>{{ __('Drop File to Upload') }}</span>
@@ -44,45 +44,52 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }" :class="modeClass">
-                        <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
-                            <div class="relative w-full">
+                        <div class="card p-0 relative overflow-x-auto h-full" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
+                            <div class="sticky top-0 right-0 left-0 z-10 w-full">
 
                                 <div class="data-list-header">
-                                    <data-list-search v-model="searchQuery" />
 
-                                    <template v-if="! hasSelections">
-                                        <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
-                                            <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
-                                            <span>{{ __('Create Folder') }}</span>
-                                        </button>
+                                    <div class="flex flex-wrap w-full">
 
-                                        <button v-if="canUpload" class="btn-flat btn-icon-only ml-2" @click="openFileBrowser">
-                                            <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
-                                            <span>{{ __('Upload') }}</span>
-                                        </button>
-                                    </template>
+                                        <data-list-search v-model="searchQuery" />
 
-                                    <div class="btn-group ml-2">
-                                        <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
-                                            <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
-                                        </button>
-                                        <button class="btn-flat px-2" @click="setMode('table')" :class="{'active': mode === 'table'}">
-                                            <svg-icon name="assets-mode-table" class="h-4 w-4" />
-                                        </button>
+                                        <template v-if="! hasSelections">
+                                            <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
+                                                <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
+                                                <span>{{ __('Create Folder') }}</span>
+                                            </button>
+
+                                            <button v-if="canUpload" class="btn-flat btn-icon-only ml-2" @click="openFileBrowser">
+                                                <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
+                                                <span>{{ __('Upload') }}</span>
+                                            </button>
+                                        </template>
+
+                                        <div class="btn-group ml-2">
+                                            <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
+                                                <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
+                                            </button>
+                                            <button class="btn-flat px-2" @click="setMode('table')" :class="{'active': mode === 'table'}">
+                                                <svg-icon name="assets-mode-table" class="h-4 w-4" />
+                                            </button>
+                                        </div>
+
                                     </div>
+
+
+                                    <data-list-bulk-actions
+                                        :url="actionUrl"
+                                        :context="actionContext"
+                                        :show-always="mode === 'grid'"
+                                        @started="actionStarted"
+                                        @completed="actionCompleted"
+                                    />
 
                                 </div>
 
-                                <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
-
-                                <data-list-bulk-actions
-                                    :url="actionUrl"
-                                    :context="actionContext"
-                                    :show-always="mode === 'grid'"
-                                    @started="actionStarted"
-                                    @completed="actionCompleted"
-                                />
                             </div>
+
+                            <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
 
                             <uploads
                                 v-if="uploads.length"
@@ -174,7 +181,7 @@
 
                             <!-- Grid Mode -->
                             <div class="data-grid" v-if="mode === 'grid' && ! containerIsEmpty">
-                                <div class="asset-browser-grid flex flex-wrap -mx-1 px-2 pt-2">
+                                <div class="asset-browser-grid flex flex-wrap px-2 pt-2">
                                     <!-- Parent Folder -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="(folder && folder.parent_path) && !restrictFolderNavigation">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.parent_path)">

@@ -1,8 +1,12 @@
 @php use function Statamic\trans as __; @endphp
 
 @section('nav-main')
-    <nav class="nav-main" v-cloak>
-        <div class="nav-main-inner">
+    <nav
+        class="nav-main"
+        :class="{
+              'nav-closed': ! navOpen
+        }">
+        <div class="nav-main-inner" v-cloak>
             @foreach ($nav as $section => $items)
                 @if ($section !== 'Top Level')
                     <h6>{{ __($section) }}</h6>

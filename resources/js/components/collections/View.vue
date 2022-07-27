@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="h-full w-full flex flex-col">
 
         <header class="mb-3">
 

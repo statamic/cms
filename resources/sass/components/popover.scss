@@ -5,12 +5,12 @@
 .popover {
     pointer-events: none;
     visibility: hidden;
-    z-index: 999;
     position: absolute;
     top: auto;
     bottom: auto;
     left: auto;
     right: auto;
+    z-index: 15;
 
     .popover-content {
         min-width: 180px;

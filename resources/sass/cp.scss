@@ -48,7 +48,6 @@
 @import "components/metrics";
 @import "components/modal";
 @import "components/nav-main";
-@import "components/nav-mobile";
 @import "components/notifications";
 @import "components/page-tree";
 @import "components/pagination";
@@ -100,6 +99,18 @@
 #statamic {
     transition: all 0.3s ease;
     min-height: 100vh;
+}
+
+.statamic-inside {
+    display: flex;
+    flex-direction: column;
+}
+
+@screen md {
+    #statamic {
+        flex-direction: row;
+        flex-wrap: wrap;
+    } 
 }
 
 .pane-slide-enter-active,

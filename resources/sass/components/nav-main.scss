@@ -3,9 +3,19 @@
    ========================================================================== */
 
 .nav-main {
-    @apply hidden select-none bg-white shadow h-screen absolute left-0 overflow-scroll w-56;
+    @apply bg-white shadow h-screen fixed left-0 overflow-auto w-56 z-20;
+    
+    top: 52px;
+    transform: translateX(-100%);
     transition: all .3s;
-    z-index: 9998;
+
+    html:dir(rtl) & {
+       transform: translateX(100%); 
+    }
+
+    &.nav-closed {
+        transform: translateX(0);
+    }
 
     h6 { @apply mt-3; }
 
@@ -62,19 +72,27 @@
     }
 }
 
-@screen md {
-    .nav-main {
-        @apply fixed flex bg-transparent shadow-none overflow-auto border-r;
-        z-index: 1;
-        height: calc(100% - 52px);
-        .showing-license-banner & {
-            height: calc(100% - 120px);
-        }
-    }
+.nav-main-inner {
+    @apply pl-2 pr-2 pt-1 pb-2;
 }
 
-.nav-main-inner {
-    @apply pl-3 pr-2 pt-1;
+@screen md {
+    .nav-main {
+        @apply flex bg-transparent shadow-none overflow-auto border-r sticky;
+        height: calc(100vh - 52px);
+        transform: translateX(0);
+        transform: none;
+        .showing-license-banner & {
+            height: calc(100vh - 120px);
+        }
+
+        &.nav-closed {
+            transform: translateX(-100%);
+        }
+    }
+    .nav-main-inner {
+        @apply pl-3
+    }
 }
 
 .nav-toggle {

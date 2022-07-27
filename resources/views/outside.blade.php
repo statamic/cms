@@ -4,7 +4,7 @@
         @include('statamic::partials.head')
     </head>
     <body class="outside {{ config('statamic.cp.theme') }}-theme @yield('body_class')">
-        <div id="statamic">
+        <div id="statamic" class="statamic-outside">
             @yield('content')
         </div>
         @include('statamic::partials.scripts')

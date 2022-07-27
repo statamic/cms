@@ -2,8 +2,13 @@
    GLOBAL CONTROL PANEL LAYOUT ELEMENTS
    ========================================================================== */
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    @apply .w-full .bg-grey-30 relative;
+    @apply .w-full .bg-grey-30;
+    overflow-y: scroll;
 }
 
 a {
@@ -12,29 +17,29 @@ a {
 }
 
 #main {
-    @apply flex;
+    position: relative;
+    z-index: 19;
+    width: 100%;
     padding-bottom: 72px;
+    transition: padding .3s;
 }
 
-#main .workspace {
-    transition: padding .3s;
-    @apply w-full;
+#overlays {
+   z-index: 22;
+   scroll-behavior: contain;
 }
 
 @screen md {
 
     #main {
-        padding-top: 52px;
-    }
-
-    #main .workspace {
-        padding-left: 14rem;
+        width: calc(100% - 14rem - 1px);
+        &.nav-closed {
+            width: 100%;
+            margin-left: -14rem;
+        }
     }
 
     #main.nav-closed {
-        .nav-main {
-            left: -14rem;
-        }
 
         .workspace {
             padding-left: 0;

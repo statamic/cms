@@ -10,18 +10,6 @@
     text-overflow: ellipsis;
 }
 
-/* Sticky Header
-  ========================================================================== */
-
-.sticky {
-    background: linear-gradient($bg 95%, rgba($bg, 0));
-    position: sticky;
-    top: 0;
-    padding: 12px 24px 16px;
-    margin: -16px 0 8px !important;
-    z-index: 102;
-}
-
 /* Rotation
   ========================================================================== */
 .rotate-90 { transform: rotate(90deg); }
