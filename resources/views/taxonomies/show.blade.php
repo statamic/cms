@@ -43,6 +43,7 @@
     @if ($hasTerms)
 
         <term-list
+            class="h-full"
             taxonomy="{{ $taxonomy->handle() }}"
             initial-sort-column="{{ $taxonomy->sortField() }}"
             initial-sort-direction="{{ $taxonomy->sortDirection() }}"

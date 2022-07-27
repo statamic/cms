@@ -44,28 +44,28 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }" :class="modeClass">
-                        <div class="card p-0 relative overflow-x-auto h-full" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
+                        <div class="data-list-container card" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
                             <div class="sticky top-0 right-0 left-0 z-10 w-full">
 
                                 <div class="data-list-header">
 
-                                    <div class="flex flex-wrap w-full">
+                                    <div class="flex flex-wrap w-full gap-2">
 
                                         <data-list-search v-model="searchQuery" />
 
                                         <template v-if="! hasSelections">
-                                            <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
+                                            <button v-if="canCreateFolders" class="btn-flat btn-icon-only" @click="creatingFolder = true">
                                                 <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
                                                 <span>{{ __('Create Folder') }}</span>
                                             </button>
 
-                                            <button v-if="canUpload" class="btn-flat btn-icon-only ml-2" @click="openFileBrowser">
+                                            <button v-if="canUpload" class="btn-flat btn-icon-only" @click="openFileBrowser">
                                                 <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
                                                 <span>{{ __('Upload') }}</span>
                                             </button>
                                         </template>
 
-                                        <div class="btn-group ml-2">
+                                        <div class="btn-group">
                                             <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                                 <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                             </button>
@@ -87,9 +87,9 @@
 
                                 </div>
 
-                            </div>
+                                <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
 
-                            <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
+                            </div>
 
                             <uploads
                                 v-if="uploads.length"

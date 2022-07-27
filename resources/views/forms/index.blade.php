@@ -5,13 +5,13 @@
 
     @unless($forms->isEmpty())
 
-        <div class="flex items-center mb-3">
-            <h1 class="flex-1">{{ __('Forms') }}</h1>
+        <header class="flex items-center mb-3">
+            <h1 class="flex-1 break-words max-w-full">{{ __('Forms') }}</h1>
 
             @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Forms\Form'))
                 <a href="{{ cp_route('forms.create') }}" class="btn-primary">{{ __('Create Form') }}</a>
             @endif
-        </div>
+        </header>
 
         <form-listing
             :initial-columns="{{ json_encode($initialColumns) }}"

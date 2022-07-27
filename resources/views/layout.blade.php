@@ -17,6 +17,7 @@
                   class="flex flex-col @yield('content-class')"
                   :class="{
                         'nav-closed': ! navOpen,
+                        'nav-mobile-open': mobileNavOpen,
                         'showing-license-banner': showBanner
                   }">
 

@@ -1,11 +1,12 @@
 <template>
-    <div>
+    <div class="h-full">
 
         <div v-if="initializing" class="card loading">
             <loading-graphic />
         </div>
 
         <data-list
+            class="h-full"
             v-if="!initializing"
             :rows="items"
             :columns="columns"
@@ -15,42 +16,44 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0 relative">
-                    <data-list-filter-presets
-                        ref="presets"
-                        :active-preset="activePreset"
-                        :preferences-prefix="preferencesPrefix"
-                        @selected="selectPreset"
-                        @reset="filtersReset"
-                    />
-                    <div class="data-list-header">
-                        <data-list-filters
-                            :filters="filters"
+                <div class="data-list-container card">
+                    <div class="sticky top-0 right-0 left-0 z-10 w-full">
+                        <data-list-filter-presets
+                            ref="presets"
                             :active-preset="activePreset"
-                            :active-preset-payload="activePresetPayload"
-                            :active-filters="activeFilters"
-                            :active-filter-badges="activeFilterBadges"
-                            :active-count="activeFilterCount"
-                            :search-query="searchQuery"
-                            :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
-                            @filter-changed="filterChanged"
-                            @search-changed="searchChanged"
-                            @saved="$refs.presets.setPreset($event)"
-                            @deleted="$refs.presets.refreshPresets()"
-                            @restore-preset="$refs.presets.viewPreset($event)"
+                            @selected="selectPreset"
                             @reset="filtersReset"
                         />
+                        <div class="data-list-header">
+                            <data-list-filters
+                                :filters="filters"
+                                :active-preset="activePreset"
+                                :active-preset-payload="activePresetPayload"
+                                :active-filters="activeFilters"
+                                :active-filter-badges="activeFilterBadges"
+                                :active-count="activeFilterCount"
+                                :search-query="searchQuery"
+                                :saves-presets="true"
+                                :preferences-prefix="preferencesPrefix"
+                                @filter-changed="filterChanged"
+                                @search-changed="searchChanged"
+                                @saved="$refs.presets.setPreset($event)"
+                                @deleted="$refs.presets.refreshPresets()"
+                                @restore-preset="$refs.presets.viewPreset($event)"
+                                @reset="filtersReset"
+                            />
+                            <data-list-bulk-actions
+                                :url="actionUrl"
+                                :context="actionContext"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
+                        </div>
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
 
-                    <data-list-bulk-actions
-                        :url="actionUrl"
-                        :context="actionContext"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
 
                     <data-list-table
                         v-show="items.length"

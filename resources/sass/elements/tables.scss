@@ -2,6 +2,14 @@
    TABLES
    ========================================================================== */
 
+.data-list-container {
+	@apply p-0 relative overflow-x-auto h-full;
+	min-height: 480px;
+	&.card {
+		padding: 0;
+	}
+}
+
 .data-list-header {
     @apply p-2 flex flex-wrap items-center;
 }

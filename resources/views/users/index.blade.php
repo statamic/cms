@@ -4,10 +4,10 @@
 
 @section('content')
 
+<div class="h-full">
+
     <header class="flex items-center mb-3">
-        <h1 class="flex-1">
-            {{ __('Users') }}
-        </h1>
+        <h1 class="flex-1">{{ __('Users') }}</h1>
 
         @can('configure fields')
             <dropdown-list class="mr-1">
@@ -21,6 +21,7 @@
     </header>
 
     <user-listing
+        class="h-full"
         listing-key="users"
         initial-sort-column="email"
         initial-sort-direction="asc"
@@ -32,5 +33,7 @@
         'topic' => __('Users'),
         'url' => Statamic::docsUrl('users')
     ])
+
+</div>
 
 @endsection

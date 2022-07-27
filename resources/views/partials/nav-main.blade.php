@@ -4,7 +4,8 @@
     <nav
         class="nav-main"
         :class="{
-              'nav-closed': ! navOpen
+              'nav-closed': ! navOpen,
+              'nav-mobile-open': mobileNavOpen
         }">
         <div class="nav-main-inner" v-cloak>
             @foreach ($nav as $section => $items)

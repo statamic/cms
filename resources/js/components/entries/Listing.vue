@@ -16,7 +16,7 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0 relative overflow-x-auto h-full">
+                <div class="data-list-container card">
                     <div class="sticky top-0 right-0 left-0 z-10 w-full">
                         <data-list-filter-presets
                             v-if="!reordering"
@@ -26,6 +26,7 @@
                             @selected="selectPreset"
                             @reset="filtersReset"
                         />
+
                         <div class="data-list-header" v-if="!reordering">
                             <data-list-filters
                                 :filters="filters"

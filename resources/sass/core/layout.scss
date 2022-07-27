@@ -2,6 +2,10 @@
    GLOBAL CONTROL PANEL LAYOUT ELEMENTS
    ========================================================================== */
 
+html, body {
+    height: 100%;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -20,6 +24,7 @@ a {
     position: relative;
     z-index: 19;
     width: 100%;
+    min-height: calc(100vh - 52px);
     padding-bottom: 72px;
     transition: padding .3s;
 }

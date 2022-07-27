@@ -6,14 +6,14 @@
 
             <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
 
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+            <div class="flex flex-wrap items-center max-w-full gap-2">
+                <h1 class="flex-1 break-words max-w-full" v-text="title" />
 
-                <dropdown-list class="mr-1" v-if="!!this.$scopedSlots.twirldown">
+                <dropdown-list v-if="!!this.$scopedSlots.twirldown">
                     <slot name="twirldown" />
                 </dropdown-list>
 
-                <div class="btn-group mr-2" v-if="canUseStructureTree && !treeIsDirty">
+                <div class="btn-group" v-if="canUseStructureTree && !treeIsDirty">
                     <button class="btn px-2" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                         <svg-icon name="structures" class="h-4 w-4"/>
                     </button>

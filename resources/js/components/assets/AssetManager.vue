@@ -2,8 +2,8 @@
 
     <div class="asset-manager">
 
-        <div class="flex items-center mb-3">
-            <h1 class="flex-1">{{ container.title }}</h1>
+        <div class="flex flex-wrap items-center mb-3 max-w-full">
+            <h1 class="flex-1 break-words max-w-full">{{ container.title }}</h1>
 
             <dropdown-list v-if="container.can_edit || container.can_delete" class="ml-2">
                 <dropdown-item

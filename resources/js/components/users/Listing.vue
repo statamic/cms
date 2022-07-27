@@ -1,32 +1,37 @@
-    <template>
-    <div>
+<template>
+    <div class="h-full">
 
         <div v-if="initializing" class="card loading">
             <loading-graphic />
         </div>
 
         <data-list
+            class="h-full"
             v-if="!initializing"
-            :columns="columns"
             :rows="items"
+            :columns="columns"
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0 relative">
-                    <div class="data-list-header">
-                        <data-list-search v-model="searchQuery" />
+                <div class="data-list-container card">
+                    <div class="sticky top-0 right-0 left-0 z-10 w-full">
+                        <div class="data-list-header">
+                            <data-list-search v-model="searchQuery" />
+                            
+                            <data-list-bulk-actions
+                                class="rounded"
+                                :url="actionUrl"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
+                        </div>
+
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
 
-                    <data-list-bulk-actions
-                        class="rounded"
-                        :url="actionUrl"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
                     <data-list-table
                         v-show="items.length"
                         :allow-bulk-actions="true"

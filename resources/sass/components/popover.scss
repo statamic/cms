@@ -21,7 +21,7 @@
         transition: all .05s ease-in;
         will-change: transform, opacity;
         background-clip: padding-box;
-        max-height: 66vh;
+        max-height: 320px;
         overflow-y: auto;
         overscroll-behavior: contain;
     }

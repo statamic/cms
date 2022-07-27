@@ -9,12 +9,12 @@
             'url' => cp_route('forms.index'),
             'title' => __('Forms')
         ])
-        <div class="flex items-center">
-            <h1 class="flex-1">
+        <div class="flex flex-wrap items-center max-w-full gap-2">
+            <h1 class="flex-1 break-words">
                 {{ $form->title() }}
             </h1>
 
-            <dropdown-list class="mr-1">
+            <dropdown-list>
                 @can('edit', $form)
                     <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
                 @endcan
