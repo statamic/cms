@@ -18,7 +18,7 @@ trait SyncsOriginalState
             }
         }
 
-        if (method_exists($this, 'getDirtyArray')) {
+        if (is_callable([$this, 'getDirtyArray'])) {
             $this->original = array_merge($this->getDirtyArray(), $this->original);
         }
 
