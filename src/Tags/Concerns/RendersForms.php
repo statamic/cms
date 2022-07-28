@@ -103,7 +103,7 @@ trait RendersForms
     protected function minifyFieldHtml($html)
     {
         // Trim whitespace between elements.
-        $html = preg_replace('/>\s*([^<>]*)\s*</', '>$1<', $html);
+        $html = preg_replace('/<!--(.*?)-->|\s{2,}\B/m', '', $html);
 
         return $html;
     }
