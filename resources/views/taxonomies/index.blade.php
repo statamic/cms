@@ -5,13 +5,15 @@
 
     @unless($taxonomies->isEmpty())
 
-        <div class="flex mb-3">
-            <h1 class="flex-1">{{ __('Taxonomies') }}</h1>
+        <header class="mb-3">
+            <div class="flex flex-wrap items-center max-w-full gap-2">
+                <h1 class="flex-1 break-words max-w-full">{{ __('Taxonomies') }}</h1>
 
-            @can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
-                <a href="{{ cp_route('taxonomies.create') }}" class="btn-primary">{{ __('Create Taxonomy') }}</a>
-            @endcan
-        </div>
+                @can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
+                    <a href="{{ cp_route('taxonomies.create') }}" class="btn-primary">{{ __('Create Taxonomy') }}</a>
+                @endcan
+            </div>
+        </header>
 
         <taxonomy-list
             :initial-rows="{{ json_encode($taxonomies) }}"

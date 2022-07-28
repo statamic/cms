@@ -1,30 +1,37 @@
 <template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows">
-        <div class="card p-0" slot-scope="{ filteredRows: rows }">
-            <data-list-table>
-                <template slot="cell-title" slot-scope="{ row: fieldset }">
-                    <a :href="fieldset.edit_url">{{ fieldset.title }}</a>
-                </template>
-                <template slot="cell-handle" slot-scope="{ value }">
-                    <span class="font-mono text-xs">{{ value }}</span>
-                </template>
-                <template slot="actions" slot-scope="{ row: fieldset, index }">
-                    <dropdown-list>
-                        <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
-                        <dropdown-item
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="$refs[`deleter_${fieldset.id}`].confirm()"
-                        >
-                            <resource-deleter
-                                :ref="`deleter_${fieldset.id}`"
-                                :resource="fieldset"
-                                @deleted="removeRow(fieldset)">
-                            </resource-deleter>
-                        </dropdown-item>
-                    </dropdown-list>
-                </template>
-            </data-list-table>
+    <data-list
+        class="h-full"
+        :visible-columns="columns"
+        :columns="columns"
+        :rows="rows"
+    >
+        <div slot-scope="{ filteredRows: rows }">
+            <div class="card p-0 relative overflow-x-auto h-full">
+                <data-list-table>
+                    <template slot="cell-title" slot-scope="{ row: fieldset }">
+                        <a :href="fieldset.edit_url">{{ fieldset.title }}</a>
+                    </template>
+                    <template slot="cell-handle" slot-scope="{ value }">
+                        <span class="font-mono text-xs">{{ value }}</span>
+                    </template>
+                    <template slot="actions" slot-scope="{ row: fieldset, index }">
+                        <dropdown-list>
+                            <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
+                            <dropdown-item
+                                :text="__('Delete')"
+                                class="warning"
+                                @click="$refs[`deleter_${fieldset.id}`].confirm()"
+                            >
+                                <resource-deleter
+                                    :ref="`deleter_${fieldset.id}`"
+                                    :resource="fieldset"
+                                    @deleted="removeRow(fieldset)">
+                                </resource-deleter>
+                            </dropdown-item>
+                        </dropdown-list>
+                    </template>
+                </data-list-table>
+            </div>
         </div>
     </data-list>
 </template>

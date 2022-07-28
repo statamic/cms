@@ -5,12 +5,13 @@
 
     @unless($groups->isEmpty())
 
-        <div class="flex mb-3">
-            <h1 class="flex-1">
-                {{ __('User Groups') }}
-            </h1>
-            <a href="{{ cp_route('user-groups.create') }}" class="btn-primary">{{ __('Create User Group') }}</a>
-        </div>
+        <header class="mb-3">
+            <div class="flex flex-wrap items-center max-w-full gap-2">
+                <h1 class="flex-1 break-words max-w-full">{{ __('User Groups') }}</h1>
+                
+                <a href="{{ cp_route('user-groups.create') }}" class="btn-primary">{{ __('Create User Group') }}</a>
+            </div>
+        </header>
 
         <user-group-listing :initial-rows="{{ json_encode($groups) }}"></user-group-listing>
 

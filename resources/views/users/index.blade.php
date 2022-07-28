@@ -4,20 +4,20 @@
 
 @section('content')
 
-<div class="h-full">
+    <header class="mb-3">
+        <div class="flex flex-wrap items-center max-w-full gap-2">
+            <h1 class="flex-1 break-words max-w-full">{{ __('Users') }}</h1>
 
-    <header class="flex items-center mb-3">
-        <h1 class="flex-1">{{ __('Users') }}</h1>
+            @can('configure fields')
+                <dropdown-list>
+                    <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('users.blueprint.edit') }}"></dropdown-item>
+                </dropdown-list>
+            @endcan
 
-        @can('configure fields')
-            <dropdown-list class="mr-1">
-                <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('users.blueprint.edit') }}"></dropdown-item>
-            </dropdown-list>
-        @endcan
-
-        @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
-            <a href="{{ cp_route('users.create') }}" class="btn-primary ml-2">{{ __('Create User') }}</a>
-        @endif
+            @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
+                <a href="{{ cp_route('users.create') }}" class="btn-primary">{{ __('Create User') }}</a>
+            @endif
+        </div>
     </header>
 
     <user-listing
@@ -33,7 +33,5 @@
         'topic' => __('Users'),
         'url' => Statamic::docsUrl('users')
     ])
-
-</div>
 
 @endsection

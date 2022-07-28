@@ -1,5 +1,9 @@
 <template>
-    <data-list :rows="rows" :columns="columns">
+
+    <data-list
+        :rows="rows"
+        :columns="columns"
+    >
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table>
                 <template slot="cell-title" slot-scope="{ row: global }">

@@ -5,10 +5,10 @@
         <header class="mb-3" v-if="mounted">
             <breadcrumb :url="breadcrumbUrl" :title="__('Navigation')" />
 
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+            <div class="flex flex-wrap items-center max-w-full gap-2">
+                <h1 class="flex-1 break-words max-w-full" v-text="title" />
 
-                <dropdown-list class="mr-1">
+                <dropdown-list>
                     <slot name="twirldown" />
                 </dropdown-list>
 
@@ -30,7 +30,7 @@
                             @click="addLink"
                         >
                             {{ __('Add Nav Item') }}
-                            <svg-icon name="chevron-down-xs" class="w-2 ml-2" v-if="hasCollections" />
+                            <svg-icon name="chevron-down-xs" class="w-2" v-if="hasCollections" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="linkPage()" />
@@ -38,7 +38,7 @@
                 </dropdown-list>
 
                 <button
-                    class="btn-primary ml-2"
+                    class="btn-primary"
                     :class="{ 'disabled': !changed }"
                     :disabled="!changed"
                     @click="$refs.tree.save"

@@ -5,12 +5,17 @@
 
     @unless($fieldsets->isEmpty())
 
-        <div class="flex mb-3">
-            <h1 class="flex-1">{{ __('Fieldsets') }}</h1>
-            <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ __('Create Fieldset') }}</a>
-        </div>
+        <header class="mb-3">
+            <div class="flex flex-wrap items-center max-w-full gap-2">
+                <h1 class="flex-1 break-words max-w-full">{{ __('Fieldsets') }}</h1>
 
-        <fieldset-listing :initial-rows="{{ json_encode($fieldsets) }}"></fieldset-listing>
+                <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ __('Create Fieldset') }}</a>
+            </div>
+        </header>
+
+        <fieldset-listing
+            :initial-rows="{{ json_encode($fieldsets) }}">
+        </fieldset-listing>
 
     @else
 

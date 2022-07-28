@@ -9,10 +9,10 @@
             'url' => cp_route('taxonomies.index'),
             'title' => __('Taxonomies')
         ])
-        <div class="flex items-center">
-            <h1 class="flex-1">{{ $taxonomy->title() }}</h1>
+        <div class="flex flex-wrap items-center max-w-full gap-2">
+            <h1 class="flex-1 break-words max-w-full">{{ $taxonomy->title() }}</h1>
 
-            <dropdown-list class="mr-1">
+            <dropdown-list>
                 @can('edit', $taxonomy)
                     <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
                 @endcan

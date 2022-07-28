@@ -4,14 +4,16 @@
 @section('content')
 
     @unless($collections->isEmpty())
+    
+        <header class="mb-3">
+            <div class="flex flex-wrap items-center max-w-full gap-2">
+                <h1 class="flex-1 break-words max-w-full">{{ __('Collections') }}</h1>
 
-        <div class="flex items-center justify-between mb-3">
-            <h1>{{ __('Collections') }}</h1>
-
-            @can('create', 'Statamic\Contracts\Entries\Collection')
-                <a href="{{ cp_route('collections.create') }}" class="btn-primary">{{ __('Create Collection') }}</a>
-            @endcan
-        </div>
+                @can('create', 'Statamic\Contracts\Entries\Collection')
+                    <a href="{{ cp_route('collections.create') }}" class="btn-primary">{{ __('Create Collection') }}</a>
+                @endcan
+            </div>
+        </header>
 
         <collection-list
             :initial-rows="{{ json_encode($collections) }}"

@@ -2,10 +2,10 @@
 
     <div class="asset-manager">
 
-        <div class="flex flex-wrap items-center mb-3 max-w-full">
+        <header class="flex flex-wrap items-center mb-3 max-w-full gap-2">
             <h1 class="flex-1 break-words max-w-full">{{ container.title }}</h1>
 
-            <dropdown-list v-if="container.can_edit || container.can_delete" class="ml-2">
+            <dropdown-list v-if="container.can_edit || container.can_delete">
                 <dropdown-item
                     v-if="container.can_edit"
                     v-text="__('Edit Container')"
@@ -29,8 +29,8 @@
                 </dropdown-item>
             </dropdown-list>
 
-            <a :href="createContainerUrl" class="btn ml-2" v-if="canCreateContainers">{{ __('Create Container') }}</a>
-        </div>
+            <a :href="createContainerUrl" class="btn" v-if="canCreateContainers">{{ __('Create Container') }}</a>
+        </header>
 
         <asset-browser
             ref="browser"

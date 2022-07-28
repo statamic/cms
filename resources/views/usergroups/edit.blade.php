@@ -3,12 +3,13 @@
 
 @section('content')
 
-    @include('statamic::partials.breadcrumb', [
-        'url' => cp_route('user-groups.show', $group->handle()),
-        'title' => $group->title()
-    ])
-
-    <h1 class="mb-3">@yield('title')</h1>
+    <header class="mb-3">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('user-groups.show', $group->handle()),
+            'title' => $group->title()
+        ])
+        <h1>@yield('title')</h1>
+    </header>
 
     <collection-edit-form>
     </collection-edit-form>

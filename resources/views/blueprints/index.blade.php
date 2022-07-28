@@ -3,29 +3,31 @@
 
 @section('content')
 
-    <div class="flex justify-between items-center mb-3">
-        <h1>@yield('title')</h1>
-        <div v-cloak>
-        <dropdown-list class="inline-block">
-            <template v-slot:trigger>
-                <button class="button btn-primary flex items-center pr-2">
-                    {{ __('Create Blueprint') }}
-                    <svg-icon name="chevron-down-xs" class="w-2 ml-1" />
-                </button>
-            </template>
+    <header class="mb-3">
+        <div class="flex flex-wrap items-center max-w-full gap-2">
+            <h1 class="flex-1 break-words max-w-full">@yield('title')</h1>
+            <div v-cloak>
+            <dropdown-list class="inline-block">
+                <template v-slot:trigger>
+                    <button class="button btn-primary flex items-center pr-2">
+                        {{ __('Create Blueprint') }}
+                        <svg-icon name="chevron-down-xs" class="w-2 ml-1" />
+                    </button>
+                </template>
 
-            @foreach (Statamic\Facades\Collection::all() as $collection)
-                @if ($loop->first)<h6 class="p-1">{{ __('Collections') }}</h6>@endif
-                <dropdown-item redirect="{{ cp_route('collections.blueprints.create', $collection) }}">{{ $collection->title() }}</dropdown-item>
-            @endforeach
+                @foreach (Statamic\Facades\Collection::all() as $collection)
+                    @if ($loop->first)<h6 class="p-1">{{ __('Collections') }}</h6>@endif
+                    <dropdown-item redirect="{{ cp_route('collections.blueprints.create', $collection) }}">{{ $collection->title() }}</dropdown-item>
+                @endforeach
 
-            @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
-                @if ($loop->first)<h6 class="p-1 mt-2">{{ __('Taxonomies') }}</h6>@endif
-                <dropdown-item redirect="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}">{{ $taxonomy->title() }}</dropdown-item>
-            @endforeach
-        </dropdown-list>
+                @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
+                    @if ($loop->first)<h6 class="p-1 mt-2">{{ __('Taxonomies') }}</h6>@endif
+                    <dropdown-item redirect="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}">{{ $taxonomy->title() }}</dropdown-item>
+                @endforeach
+            </dropdown-list>
+            </div>
         </div>
-    </div>
+    </header>
 
     @foreach (Statamic\Facades\Collection::all() as $collection)
         @if ($loop->first)

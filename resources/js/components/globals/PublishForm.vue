@@ -5,34 +5,36 @@
             <breadcrumb :url="globalsUrl" :title="__('Globals')" />
 
             <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+                <div class="flex flex-wrap items-center max-w-full gap-2">
+                    <h1 class="flex-1 break-words max-w-full" v-text="title" />
 
-                <div class="pt-px text-2xs text-grey-60 ml-2 flex" v-if="! canEdit">
-                    <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
+                    <div class="pt-px text-2xs text-grey-60 ml-2 flex" v-if="! canEdit">
+                        <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
+                    </div>
+
+                    <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-1">
+                        <dropdown-item v-if="canConfigure" v-text="__('Configure')" :redirect="configureUrl" />
+                        <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                    </dropdown-list>
+
+                    <site-selector
+                        v-if="localizations.length > 1"
+                        class="mr-2"
+                        :sites="localizations"
+                        :value="site"
+                        @input="localizationSelected"
+                    />
+
+                    <button
+                        v-if="canEdit"
+                        class="btn-primary min-w-100"
+                        :class="{ 'opacity-25': !canSave }"
+                        :disabled="!canSave"
+                        @click.prevent="save"
+                        v-text="__('Save')" />
+
+                    <slot name="action-buttons-right" />
                 </div>
-
-                <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-1">
-                    <dropdown-item v-if="canConfigure" v-text="__('Configure')" :redirect="configureUrl" />
-                    <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
-                </dropdown-list>
-
-                <site-selector
-                    v-if="localizations.length > 1"
-                    class="mr-2"
-                    :sites="localizations"
-                    :value="site"
-                    @input="localizationSelected"
-                />
-
-                <button
-                    v-if="canEdit"
-                    class="btn-primary min-w-100"
-                    :class="{ 'opacity-25': !canSave }"
-                    :disabled="!canSave"
-                    @click.prevent="save"
-                    v-text="__('Save')" />
-
-                <slot name="action-buttons-right" />
             </div>
         </header>
 

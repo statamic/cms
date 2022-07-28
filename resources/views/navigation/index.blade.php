@@ -5,12 +5,14 @@
 
     @unless($navs->isEmpty())
 
-        <header class="flex items-center justify-between mb-3">
-            <h1>{{ __('Navigation') }}</h1>
+        <header class="mb-3">
+            <div class="flex flex-wrap items-center max-w-full gap-2">
+                <h1 class="flex-1 break-words max-w-full">{{ __('Navigation') }}</h1>
 
-            @can('create', 'Statamic\Contracts\Structures\Nav')
-                <a href="{{ cp_route('navigation.create') }}" class="btn-primary">{{ __('Create Navigation') }}</a>
-            @endcan
+                @can('create', 'Statamic\Contracts\Structures\Nav')
+                    <a href="{{ cp_route('navigation.create') }}" class="btn-primary">{{ __('Create Navigation') }}</a>
+                @endcan
+            </div>
         </header>
 
         <navigation-listing

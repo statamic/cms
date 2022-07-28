@@ -1,9 +1,16 @@
 <template>
-    <data-list :columns="columns" :rows="rows">
+
+    <data-list
+        :rows="rows"
+        :columns="columns"
+    >
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: structure }">
                     <a :href="structure.show_url" class="flex items-center" v-text="structure.title" />
+                </template>
+                <template slot="cell-handle" slot-scope="{ value: handle }">
+                    <span class="font-mono text-2xs">{{ handle }}</span>
                 </template>
                 <template slot="actions" slot-scope="{ row: structure, index }">
                     <dropdown-list>
@@ -43,6 +50,7 @@ export default {
             rows: this.initialRows,
             columns: [
                 { label: __('Title'), field: 'title', visible: true },
+                { label: __('Handle'), field: 'handle' },
             ]
         }
     }
