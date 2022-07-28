@@ -58,6 +58,34 @@ class RendersFormsTest extends TestCase
     {
         $this->assertEquals('</form>', $this->tag->formClose());
     }
+
+    /** @test */
+    public function it_minifies_space_between_field_html_elements()
+    {
+        $fields = <<<'EOT'
+            <select>
+                <option>One</option>
+                <option>
+                    Two
+                </option>
+            </select>
+            <label>
+                <input type="checkbox">
+                Option <a href="/link">with link</a> text or <span class="tailwind">style</span> class
+            </label>
+            <label>
+                <input type="radio">
+                Intentionally<a href="/link">tight</a>link or<span class="tailwind">style</span>class
+            </label>
+            <textarea>
+                Some <a href="/link">link</a> or <span class="tailwind">styled text
+            </textarea>
+EOT;
+
+        $expected = '<select><option>One</option><option>Two</option></select><label><input type="checkbox">Option <a href="/link">with link</a> text or <span class="tailwind">style</span> class</label><label><input type="radio">Intentionally<a href="/link">tight</a>link or<span class="tailwind">style</span>class</label><textarea>Some <a href="/link">link</a> or <span class="tailwind">styled text</textarea>';
+
+        $this->assertEquals($expected, $this->tag->minifyFieldHtml($fields));
+    }
 }
 
 class FakeTagWithRendersForms extends Tags
