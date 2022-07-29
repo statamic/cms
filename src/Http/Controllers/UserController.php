@@ -11,6 +11,7 @@ use Statamic\Auth\ThrottlesLogins;
 use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Exceptions\UnauthorizedHttpException;
 use Statamic\Facades\User;
 
 class UserController extends Controller
@@ -69,6 +70,7 @@ class UserController extends Controller
             return $this->userRegistrationFailure($validator->errors());
         }
 
+        // $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
         $user = User::make()
@@ -101,6 +103,65 @@ class UserController extends Controller
         return $this->userRegistrationSuccess();
     }
 
+    public function profile(Request $request)
+    {
+        throw_unless($user = User::current(), new UnauthorizedHttpException(403));
+
+        $blueprint = User::blueprint();
+
+        $fields = $blueprint->fields()->addValues($request->all());
+
+        $fieldRules = $fields->validator()->withRules([
+            'email' => ['required', 'email', 'unique_user_value:'.$user->id()],
+        ])->rules();
+
+        $validator = Validator::make($request->all(), $fieldRules);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+
+            return back()->withInput()->withErrors($errors, 'user.profile');
+        }
+
+        // $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
+        $values = $fields->process()->values()->except(['email', 'password', 'groups', 'roles']);
+
+        $user->email($request->email);
+        foreach ($values as $key => $value) {
+            $user->set($key, $value);
+        }
+
+        $user->save();
+
+        session()->flash('user.profile.success', __('Update successful.'));
+
+        return request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+    }
+
+    public function changePassword(Request $request)
+    {
+        throw_unless($user = User::current(), new UnauthorizedHttpException(403));
+
+        $validator = Validator::make($request->all(), [
+            'current_password' => ['required', 'current_password'],
+            'password'         => ['required', 'confirmed', PasswordDefaults::rules()],
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+
+            return back()->withInput()->withErrors($errors, 'user.password');
+        }
+
+        $user->password($request->password);
+
+        $user->save();
+
+        session()->flash('user.password.success', __('Change successful.'));
+
+        return request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+    }
+
     public function username()
     {
         return 'email';
@@ -121,5 +182,41 @@ class UserController extends Controller
         session()->flash('user.register.user_created', ! $silentFailure);
 
         return $response;
+    }
+
+    protected function assetRules($fields)
+    {
+        return $fields->all()
+            ->filter(function ($field) {
+                return $field->fieldtype()->handle() === 'assets';
+            })
+            ->mapWithKeys(function ($field) {
+                return [$field->handle().'.*' => 'file'];
+            })
+            ->all();
+    }
+
+    protected function normalizeAssetValues($fields, $request)
+    {
+        return $fields->all()
+            ->filter(function ($field) {
+                return $field->fieldtype()->handle() === 'assets' && $field->get('max_files') === 1;
+            })
+            ->map(function ($field) use ($request) {
+                return Arr::wrap($request->file($field->handle()));
+            })
+            ->all();
+    }
+
+    protected function uploadAssetFiles($fields)
+    {
+        return $fields->all()
+            ->filter(function ($field) {
+                return $field->fieldtype()->handle() === 'assets' && request()->hasFile($field->handle());
+            })
+            ->map(function ($field) {
+                return AssetsUploader::field($field)->upload(request()->file($field->handle()));
+            })
+            ->all();
     }
 }

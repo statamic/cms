@@ -277,19 +277,19 @@ class UserTags extends Tags
     }
 
     /**
-     * Output a update form.
+     * Output a profile form.
      *
-     * Maps to {{ user:update_form }}
+     * Maps to {{ user:profile_form }}
      *
      * @return string
      */
-    public function updateForm()
+    public function profileForm()
     {
         if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
 
-        $data = $this->getFormSession();
+        $data = $this->getFormSession('user.profile');
 
         if (! $this->params->has('redirect')) {
             $this->params->put('redirect', request()->getPathInfo());
@@ -297,9 +297,41 @@ class UserTags extends Tags
 
         $knownParams = ['redirect'];
 
-        $html = $this->formOpen(route('statamic.user.update'), 'POST', $knownParams);
+        $html = $this->formOpen(route('statamic.profile'), 'POST', $knownParams);
 
-        $html .= '<input type="hidden" name="token" value="'.request('token').'" />';
+        if ($redirect = $this->params->get('redirect')) {
+            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+        }
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
+     * Output a password change form.
+     *
+     * Maps to {{ user:password_form }}
+     *
+     * @return string
+     */
+    public function passwordForm()
+    {
+        if (session()->has('status')) {
+            return $this->parse(['success' => true]);
+        }
+
+        $data = $this->getFormSession('user.password');
+
+        if (! $this->params->has('redirect')) {
+            $this->params->put('redirect', request()->getPathInfo());
+        }
+
+        $knownParams = ['redirect'];
+
+        $html = $this->formOpen(route('statamic.password'), 'POST', $knownParams);
 
         if ($redirect = $this->params->get('redirect')) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
