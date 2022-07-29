@@ -8,9 +8,11 @@ use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Mockery;
+use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Entries\AugmentedEntry;
@@ -1041,6 +1043,23 @@ class EntryTest extends TestCase
         Event::assertNotDispatched(EntrySaving::class);
         Event::assertNotDispatched(EntrySaved::class);
         Event::assertNotDispatched(EntryCreated::class);
+    }
+
+    /** @test */
+    public function when_saving_quietly_the_cached_entrys_withEvents_flag_will_be_set_back_to_true()
+    {
+        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+
+        $entry = EntryFactory::collection('blog')->id('1')->create();
+
+        $entry->saveQuietly();
+
+        $cached = Cache::get('stache::items::entries::blog::1');
+        $reflection = new ReflectionClass($cached);
+        $property = $reflection->getProperty('withEvents');
+        $property->setAccessible(true);
+        $withEvents = $property->getValue($cached);
+        $this->assertTrue($withEvents);
     }
 
     /** @test */

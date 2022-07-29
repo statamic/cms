@@ -10,8 +10,10 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
+use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
+use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blink;
@@ -20,6 +22,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess, Arrayable
@@ -36,6 +39,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     protected $allowRenaming;
     protected $createFolders;
     protected $searchIndex;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
+    protected $sortField;
+    protected $sortDirection;
 
     public function id($id = null)
     {
@@ -46,6 +53,34 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+    }
+
+    public function sortField($field = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sortField')
+            ->getter(function ($sortField) {
+                if ($sortField) {
+                    return $sortField;
+                }
+
+                return 'basename';
+            })
+            ->args(func_get_args());
+    }
+
+    public function sortDirection($dir = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sortDirection')
+            ->getter(function ($sortDirection) {
+                if ($sortDirection) {
+                    return $sortDirection;
+                }
+
+                return 'asc';
+            })
+            ->args(func_get_args());
     }
 
     public function title($title = null)
@@ -148,6 +183,20 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         return $blueprint;
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     /**
      * Save the container.
      *
@@ -155,9 +204,33 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function save()
     {
+        $isNew = is_null(Facades\AssetContainer::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (AssetContainerSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\AssetContainer::save($this);
 
-        AssetContainerSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                AssetContainerCreated::dispatch($this);
+            }
+
+            AssetContainerSaved::dispatch($this);
+        }
 
         return $this;
     }
@@ -446,7 +519,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 
     public function fileData()
     {
-        return [
+        $array = [
             'title' => $this->title,
             'disk' => $this->disk,
             'search_index' => $this->searchIndex,
@@ -456,6 +529,13 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             'allow_moving' => $this->allowMoving,
             'create_folders' => $this->createFolders,
         ];
+
+        $array = Arr::removeNullValues(array_merge($array, [
+            'sort_by' => $this->sortField,
+            'sort_dir' => $this->sortDirection,
+        ]));
+
+        return $array;
     }
 
     public function queryAssets()

@@ -1742,9 +1742,9 @@ EOT;
     public function it_can_reach_into_the_cascade()
     {
         $cascade = $this->mock(Cascade::class, function ($m) {
-            $m->shouldReceive('get')->with('page')->once()->andReturn(['drink' => 'juice']);
-            $m->shouldReceive('get')->with('global')->once()->andReturn(['drink' => 'water']);
-            $m->shouldReceive('get')->with('menu')->once()->andReturn(['drink' => 'vodka']);
+            $m->shouldReceive('get')->with('page')->andReturn(['drink' => 'juice']);
+            $m->shouldReceive('get')->with('global')->andReturn(['drink' => 'water']);
+            $m->shouldReceive('get')->with('menu')->andReturn(['drink' => 'vodka']);
             $m->shouldNotReceive('get')->with('nested');
             $m->shouldNotReceive('get')->with('augmented');
         });
@@ -2395,6 +2395,22 @@ EOT;
 
         $this->assertEquals('<Bar><Foo>', $this->renderString('<{{ my_query:1:title }}><{{ my_query:0:title }}>', [
             'my_query' => new Value($builder),
+        ]));
+    }
+
+    /** @test */
+    public function it_can_get_nested_query_builders()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->andReturn(collect([
+            ['title' => 'Foo'],
+            ['title' => 'Bar'],
+        ]));
+
+        $this->assertEquals('<Foo><Bar>', $this->renderString('{{ nested:my_query }}<{{ title }}>{{ /nested:my_query }}', [
+            'nested' => [
+                'my_query' => $builder,
+            ],
         ]));
     }
 

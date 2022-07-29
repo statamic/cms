@@ -235,7 +235,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom($origin, $slug);
 
         $this->publishes([
-            $origin => app()->langPath("vendor/{$slug}"),
+            $origin => app()->langPath()."/vendor/{$slug}",
         ], "{$slug}-translations");
 
         return $this;
@@ -383,13 +383,14 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerScript(string $path)
     {
         $name = $this->getAddon()->packageName();
+        $version = $this->getAddon()->version();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
             $path => public_path("vendor/{$name}/js/{$filename}.js"),
         ], $this->getAddon()->slug());
 
-        Statamic::script($name, $filename);
+        Statamic::script($name, "{$filename}.js?v={$version}");
     }
 
     public function registerExternalScript(string $url)
@@ -400,13 +401,14 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerStylesheet(string $path)
     {
         $name = $this->getAddon()->packageName();
+        $version = $this->getAddon()->version();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ], $this->getAddon()->slug());
 
-        Statamic::style($name, $filename);
+        Statamic::style($name, "{$filename}.css?v={$version}");
     }
 
     public function registerExternalStylesheet(string $url)
@@ -424,7 +426,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this->getAddon()->namespace();
     }
 
-    private function getAddon()
+    protected function getAddon()
     {
         throw_unless($this->app->isBooted(), new NotBootedException);
 

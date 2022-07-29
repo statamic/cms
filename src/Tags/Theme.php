@@ -162,7 +162,14 @@ class Theme extends Tags
 
     private function versioned($type, $file)
     {
+        $file = "{$type}/{$file}.{$type}";
+
         [$manifest, $method] = $this->getManifestAndMethod();
+
+        if (! $manifest) {
+            return '/'.$file;
+        }
+
         $manifest = json_decode($manifest, true);
 
         // Mix prepends filenames with slashes.
@@ -171,7 +178,7 @@ class Theme extends Tags
             return [ltrim($key, '/') => ltrim($path, '/')];
         });
 
-        if (! $manifest->has($file = "{$type}/{$file}.{$type}")) {
+        if (! $manifest->has($file)) {
             return '/'.$file;
         }
 

@@ -132,4 +132,9 @@ trait HasAugmentedInstance
     {
         throw new \Exception('Method offsetUnset is not currently supported.');
     }
+
+    public function __isset($key)
+    {
+        return $this->offsetExists($key);
+    }
 }

@@ -35,7 +35,10 @@ trait RendersForms
         $paramAttrs = $this->renderAttributesFromParams(array_merge(['method', 'action'], $knownTagParams));
 
         $html = collect(['<form', $attrs, $paramAttrs])->filter()->implode(' ').'>';
-        $html .= csrf_field();
+
+        if ($this->params->bool('csrf', true)) {
+            $html .= csrf_field();
+        }
 
         $method = strtoupper($method);
 

@@ -72,4 +72,17 @@ EOT;
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), $this->renderString($template, $data, true));
     }
+
+    public function test_comments_are_ignored_when_checking_for_named_slots()
+    {
+        $template = <<<'EOT'
+{{ partial src="prefixed" }}
+ {{# comment #}}
+ <{{ content }}>
+ {{# comment #}}
+{{ /partial }}
+EOT;
+
+        $this->assertSame('<The Content>', $this->renderString($template, ['content' => 'The Content'], true));
+    }
 }

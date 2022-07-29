@@ -2,7 +2,11 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Statamic\Fields\Value;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Cascade;
 use Tests\Antlers\ParserTestCase;
 
 class LoopTest extends ParserTestCase
@@ -66,5 +70,112 @@ EOT;
 EOT;
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), $this->renderString($template, $data));
+    }
+
+    public function test_empty_collections_do_not_print_brackets()
+    {
+        $data = [
+            'taxonomy' => collect(),
+        ];
+
+        $this->assertSame('', $this->renderString('{{ taxonomy }}', $data, true));
+    }
+
+    public function test_strict_variable_syntax_can_be_used_for_loops()
+    {
+        $cascade = $this->mock(Cascade::class, function ($m) {
+            $m->shouldReceive('get')->with('theme')->andReturn([
+                'social_links' => [
+                    'one',
+                    'two',
+                    'three',
+                ],
+            ]);
+        });
+
+        $template = <<<'EOT'
+{{ theme:social_links }}<{{ value }}>{{ /theme:social_links }}
+EOT;
+        $templateTwo = <<<'EOT'
+{{ $theme:social_links }}<{{ value }}>{{ /$theme:social_links }}
+EOT;
+
+        $results = (string) $this->parser()->cascade($cascade)->parse($template, []);
+        $resultsTwo = (string) $this->parser()->cascade($cascade)->parse($template, []);
+
+        $this->assertSame('<one><two><three>', $results);
+        $this->assertSame('<one><two><three>', $resultsTwo);
+    }
+
+    public function test_runtime_resets_data_manager_paired_state()
+    {
+        $value = new Value(['one', 'two', 'three']);
+        $data = [
+            'value' => 'a value',
+            'loop' => $value,
+        ];
+
+        $isPaired = null;
+
+        // Reset the callbacks from any other tests.
+        GlobalRuntimeState::$peekCallbacks = [];
+        GlobalRuntimeState::$peekCallbacks[] = function (NodeProcessor $processor) use (&$isPaired) {
+            $isPaired = $processor->getPathDataManager()->getIsPaired();
+        };
+
+        $template = <<<'EOT'
+{{ loop  }}
+<{{ value }}>
+<{{ value ensure_right="test" }}>
+{{ ___internal_debug:peek }}
+{{ /loop }}
+EOT;
+
+        $expected = <<<'EOT'
+<one>
+<onetest>
+
+
+<two>
+<twotest>
+
+
+<three>
+<threetest>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, $data, true)));
+        $this->assertTrue($isPaired);
+    }
+
+    public function test_runtime_does_not_attempt_evaluate_modifiers_twice()
+    {
+        mt_srand(1234);
+
+        $data = [
+            'widths' => [
+                '25',
+                '50',
+                '75',
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{ loop from="1" to="10" }}<{{ value }}><{{ widths | shuffle | limit:1 }}width-{{ value }}{{ /widths }}><{{ value }}>{{ unless last }}|{{ /unless}}{{ /loop }}
+EOT;
+
+        $expected = <<<'EXPECTED'
+<1><width-75><1>|<2><width-75><2>|<3><width-50><3>|<4><width-75><4>|<5><width-25><5>|<6><width-75><6>|<7><width-75><7>|<8><width-50><8>|<9><width-50><9>|<10><width-50><10>
+EXPECTED;
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
+
+        mt_srand(1234);
+
+        $template = <<<'EOT'
+{{ loop from="1" to="10" }}<{{ value }}><{{ widths | shuffle | limit:1 }}width-{{ value }}{{ /widths | shuffle | limit:1 }}><{{ value }}>{{ unless last }}|{{ /unless }}{{ /loop }}
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
     }
 }

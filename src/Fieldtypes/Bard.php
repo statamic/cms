@@ -36,6 +36,13 @@ class Bard extends Replicator
                 'default' => false,
                 'width' => 50,
             ],
+            'previews' => [
+                'display' => __('Field Previews'),
+                'instructions' => __('statamic::fieldtypes.bard.config.previews'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
             'sets' => [
                 'display' => __('Sets'),
                 'instructions' => __('statamic::fieldtypes.bard.config.sets'),
@@ -426,7 +433,7 @@ class Bard extends Replicator
             return $value;
         }
 
-        $value = json_decode($value, true);
+        $value = json_decode($value ?? '[]', true);
 
         return collect($value)->map(function ($item) {
             if ($item['type'] !== 'set') {

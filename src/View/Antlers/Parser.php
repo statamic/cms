@@ -405,7 +405,7 @@ class Parser implements ParserContract
         // Null coalescence through "or", "??" or "?:"
         if (Str::contains($var, [' or ', ' ?? ', ' ?: '])) {
             $isCoalesce = true;
-            $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, null, PREG_SPLIT_NO_EMPTY);
+            $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, -1, PREG_SPLIT_NO_EMPTY);
         } else {
             $isCoalesce = false;
             $vars = [$var];
@@ -574,8 +574,8 @@ class Parser implements ParserContract
             // If there's a matching value in the context, we would have intentionally treated it as
             // a callback. If it's a query builder instance, we want to use the Query tag's index
             // method to handle the logic. We'll pass the builder into the builder parameter.
-            if (isset($data[$name])) {
-                $value = $data[$name];
+            [$exists, $value] = $this->getVariableExistenceAndValue($name, $data);
+            if ($exists) {
                 $value = $value instanceof Value ? $value->value() : $value;
                 if ($value instanceof Builder) {
                     $parameters['builder'] = $value;
@@ -651,7 +651,7 @@ class Parser implements ParserContract
                 $replacement = $this->valueToLiteral($replacement);
             }
 
-            $text = $this->preg_replace('/'.preg_quote($tag, '/').'/m', addcslashes($replacement, '\\$'), $text, 1);
+            $text = $this->preg_replace('/'.preg_quote($tag, '/').'/m', addcslashes((string) $replacement, '\\$'), $text, 1);
             $text = $this->injectExtractions($text, 'nested_tag_pair');
         }
 
@@ -771,7 +771,7 @@ class Parser implements ParserContract
                     [$if_true, $if_false] = explode(': ', $bits[1]);
 
                     // Build a PHP string to evaluate
-                    $conditional = '<?php echo('.$condition.') ? "'.addslashes($this->getVariable(trim($if_true), $data)).'" : "'.addslashes($this->getVariable(trim($if_false), $data)).'"; ?>';
+                    $conditional = '<?php echo('.$condition.') ? "'.addslashes($this->getVariable(trim($if_true), $data, '')).'" : "'.addslashes($this->getVariable(trim($if_false), $data, '')).'"; ?>';
 
                     // Do the evaluation
                     $output = stripslashes($this->parsePhp($conditional));

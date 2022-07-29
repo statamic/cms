@@ -7,10 +7,11 @@ use BadMethodCallException;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use IteratorAggregate;
+use JsonSerializable;
 use Statamic\Facades\Compare;
 use Traversable;
 
-class Values implements ArrayAccess, Arrayable, IteratorAggregate
+class Values implements ArrayAccess, Arrayable, IteratorAggregate, JsonSerializable
 {
     protected $instance;
 
@@ -108,5 +109,11 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate
     public function all()
     {
         return $this->getProxiedInstance()->all();
+    }
+
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return $this->all();
     }
 }

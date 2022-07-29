@@ -19,7 +19,6 @@ class Field implements Arrayable
     protected $value;
     protected $parent;
     protected $parentField;
-    protected $filled = false;
     protected $validationContext;
 
     public function __construct($handle, array $config)
@@ -33,8 +32,7 @@ class Field implements Arrayable
         return (new static($this->handle, $this->config))
             ->setParent($this->parent)
             ->setParentField($this->parentField)
-            ->setValue($this->value)
-            ->setFilled($this->filled);
+            ->setValue($this->value);
     }
 
     public function setHandle(string $handle)
@@ -88,6 +86,19 @@ class Field implements Arrayable
     public function instructions()
     {
         return array_get($this->config, 'instructions');
+    }
+
+    public function visibility()
+    {
+        $visibility = Arr::get($this->config, 'visibility');
+
+        $legacyReadOnly = Arr::get($this->config, 'read_only');
+
+        if ($legacyReadOnly && ! $visibility) {
+            return 'read_only';
+        }
+
+        return $visibility ?? 'visible';
     }
 
     public function rules()
@@ -167,20 +178,28 @@ class Field implements Arrayable
             return true;
         }
 
-        if ($this->config()['type'] === 'section') {
+        if ($this->type() === 'section') {
             return false;
         }
 
         return (bool) $this->get('listable');
     }
 
-    public function isVisible()
+    public function isVisibleOnListing()
     {
         if (is_null($this->get('listable'))) {
             return in_array($this->handle, ['title', 'slug', 'date', 'author']);
         }
 
         return ! in_array($this->get('listable'), [false, 'hidden'], true);
+    }
+
+    /**
+     * @deprecated  Use isVisibleOnListing() instead.
+     */
+    public function isVisible()
+    {
+        return $this->isVisibleOnListing();
     }
 
     public function isSortable()
@@ -201,11 +220,6 @@ class Field implements Arrayable
         return (bool) $this->get('filterable');
     }
 
-    public function isFilled()
-    {
-        return (bool) $this->filled;
-    }
-
     public function toPublishArray()
     {
         return array_merge($this->preProcessedConfig(), [
@@ -215,6 +229,8 @@ class Field implements Arrayable
             'display' => $this->display(),
             'instructions' => $this->instructions(),
             'required' => $this->isRequired(),
+            'visibility' => $this->visibility(),
+            'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
         ]);
     }
 
@@ -232,24 +248,9 @@ class Field implements Arrayable
         ];
     }
 
-    public function setFilled($filled)
-    {
-        $this->filled = $filled;
-
-        return $this;
-    }
-
     public function setValue($value)
     {
         $this->value = $value;
-
-        return $this;
-    }
-
-    public function fillValue($value)
-    {
-        $this->value = $value;
-        $this->filled = true;
 
         return $this;
     }

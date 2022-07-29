@@ -927,11 +927,16 @@ class LanguageParser
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::STRUCT_SWITCH) {
                     if ($i + 1 >= $tokenCount) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_SWITCH_GROUP,
-                            $token,
-                            'Unexpected end of input while parsing [T_SWITCH_GROUP].'
-                        );
+                        if ($token->originalAbstractNode instanceof VariableNode == false) {
+                            throw ErrorFactory::makeSyntaxError(
+                                AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_SWITCH_GROUP,
+                                $token,
+                                'Unexpected end of input while parsing [T_SWITCH_GROUP].'
+                            );
+                        }
+
+                        $newTokens[] = $token->originalAbstractNode;
+                        continue;
                     }
 
                     /** @var ScopedLogicGroup $next */
@@ -1533,6 +1538,7 @@ class LanguageParser
         $nodes = $this->groupNodesByType($nodes, DivisionOperator::class);
         $nodes = $this->groupNodesByType($nodes, AdditionOperator::class);
         $nodes = $this->groupNodesByType($nodes, SubtractionOperator::class);
+        $nodes = $this->groupNodesByType($nodes, ModulusOperator::class);
 
         return $nodes;
     }
@@ -1789,6 +1795,14 @@ class LanguageParser
                     $right = $this->wrapNumberInVariable($right);
                 }
 
+                if (($right instanceof NullConstant || $right instanceof TrueConstant || $right instanceof FalseConstant) && NodeHelpers::distance($left, $right) === 1) {
+                    $right = $this->wrapConstantInVariable($right);
+                }
+
+                if ($left instanceof NumberNode && $right instanceof VariableNode) {
+                    $left = $this->wrapNumberInVariable($left);
+                }
+
                 if ($left instanceof VariableNode && $right instanceof VariableNode && NodeHelpers::distance($left, $right) === 1) {
                     // Note: It is important when we do this merge
                     // that we start from the right, and merge
@@ -1883,7 +1897,7 @@ class LanguageParser
 
                 if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) < 1) {
                     array_pop($newNodes);
-                    NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
+                    NodeHelpers::mergeVarContentLeft($node->getVariableContent(), $node, $left);
                     $newNodes[] = $left;
                 } else {
                     $newNodes[] = $node;
@@ -2107,6 +2121,21 @@ class LanguageParser
         return $variableNode;
     }
 
+    private function wrapConstantInVariable(AbstractNode $node)
+    {
+        $variableNode = new VariableNode();
+        $variableNode->startPosition = $node->startPosition;
+        $variableNode->endPosition = $node->endPosition;
+        $variableNode->name = strval($node->content);
+        $variableNode->content = strval($node->content);
+        $variableNode->originalAbstractNode = $node;
+        $variableNode->refId = $node->refId;
+        $variableNode->modifierChain = $node->modifierChain;
+        $variableNode->index = $node->index;
+
+        return $variableNode;
+    }
+
     /**
      * Wraps an arithmetic node in a ModifierNameNode.
      *
@@ -2231,6 +2260,18 @@ class LanguageParser
 
                 if (NodeHelpers::distance($last, $subToken) > 1) {
                     break;
+                }
+            }
+
+            if ($subToken instanceof StringValueNode || $subToken instanceof VariableNode || $subToken instanceof NumberNode) {
+                $subTokenCount = count($subTokens);
+
+                if ($subTokenCount > 0) {
+                    $last = $subTokens[$subTokenCount - 1];
+
+                    if ($last instanceof LogicGroup) {
+                        break;
+                    }
                 }
             }
 

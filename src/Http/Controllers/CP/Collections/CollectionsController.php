@@ -161,7 +161,7 @@ class CollectionsController extends CpController
             'title_formats' => $collection->titleFormats()->unique()->count() === 1
                 ? $collection->titleFormats()->first()
                 : $collection->titleFormats()->all(),
-            'preview_targets' => $collection->previewTargets(),
+            'preview_targets' => $collection->basePreviewTargets(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))
@@ -429,6 +429,7 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_template_instructions'),
                         'type' => 'template',
                         'placeholder' => __('System default'),
+                        'blueprint' => true,
                     ],
                     'layout' => [
                         'display' => __('Layout'),

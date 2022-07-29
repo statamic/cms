@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Facades\Tests\Factories\EntryFactory;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Select;
@@ -9,6 +10,7 @@ use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
 use Statamic\Taxonomies\TermCollection;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
+use Statamic\View\Cascade;
 use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
 use Tests\Antlers\ParserTestCase;
 
@@ -694,5 +696,63 @@ EOT;
         $this->assertStringContainsString('https://static.cloudflareinsights.com/beacon.min.js', $result);
         $this->assertStringContainsString('<link rel="canonical" href="The permalink">', $result);
         $this->assertStringContainsString('<script type="application/ld+json">json_ld</script>', $result);
+    }
+
+    public function test_conditions_lock_processor_scope_before_processing()
+    {
+        EntryFactory::collection('blog')->id('1')->data(['title' => '1-One'])->create();
+        EntryFactory::collection('blog')->id('2')->data(['title' => '2-Two'])->create();
+        EntryFactory::collection('blog')->id('3')->data(['title' => '3-Three'])->create();
+
+        $data = [
+            'data' => 'root value',
+        ];
+
+        $template = <<<'EOT'
+{{ collection:blog limit="2" sort="title|asc" as="entries" }}
+{{ if entries.0.title == '1-One' }}
+<{{ entries.0.title }}><{{ data }}><{{ entries.1.title }}><{{ data }}><{{ entries.0.title }}><{{ data }}>
+{{ /if }}
+
+{{ if entries.0.title == 'Two' }}
+<{{ entries.0.title }}><{{ data }}>
+<{{ entries.1.title }}><{{ data }}>
+<{{ entries.0.title }}><{{ data }}>
+{{ else }}
+<else><{{ entries.0.title }}><{{ data }}><else><{{ entries.1.title }}><{{ data }}><else><{{ entries.0.title }}><{{ data }}>
+{{ /if }}
+{{ /collection:blog }}
+EOT;
+
+        $result = $this->renderString($template, $data, true);
+
+        $this->assertStringContainsString('<1-One><root value><2-Two><root value><1-One><root value>', $result);
+        $this->assertStringContainsString('<else><1-One><root value><else><2-Two><root value><else><1-One><root value>', $result);
+    }
+
+    public function test_conditions_reach_into_the_cascade()
+    {
+        $cascade = $this->mock(Cascade::class, function ($m) {
+            $value = new LabeledValue('entry', 'Privacy Statement Type');
+
+            $m->shouldReceive('get')->with('configuration')->andReturn([
+                'privacy_statement_type' => $value,
+            ]);
+        });
+
+        $template = <<<'EOT'
+{{ if configuration:privacy_statement_type == 'entry' }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('Yes', (string) $this->parser()->cascade($cascade)->parse($template));
+    }
+
+    public function test_uppercase_logical_keywords_in_conditions()
+    {
+        $template = <<<'EOT'
+{{ if true AND false }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('No', $this->renderString($template));
     }
 }

@@ -65,6 +65,7 @@ class EditNavigationPageTest extends TestCase
             ],
         ])->save();
         $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
 
         $this
@@ -109,6 +110,7 @@ class EditNavigationPageTest extends TestCase
             ],
         ])->save();
         $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
 
         $this
@@ -166,6 +168,7 @@ class EditNavigationPageTest extends TestCase
             'baz' => ['type' => 'text'],
         ]);
 
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($navBlueprint);
         BlueprintRepository::shouldReceive('in')->with('collections/articles')->andReturn(collect(['articles' => $entryBlueprint]));
 

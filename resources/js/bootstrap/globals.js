@@ -23,10 +23,6 @@ export function relative_url(url) {
     return url.replace(/^(?:\/\/|[^/]+)*\//, '/');
 }
 
-export function file_icon(extension) {
-    return resource_url('img/filetypes/'+ extension +'.png');
-};
-
 export function dd(args) {
     console.log(args);
 };

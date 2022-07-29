@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Statamic\Contracts\Entries\QueryBuilder;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
@@ -91,6 +91,7 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $dataManagerInterpolations = [];
+    protected $evaluatedModifiers = false;
 
     /**
      * @var LanguageOperatorManager|null
@@ -180,6 +181,7 @@ class Environment
     {
         $this->nodeProcessor = $processor;
 
+        $this->cascade($processor->getCascade());
         $this->operatorManager->setNodeProcessor($this->nodeProcessor);
 
         return $this;
@@ -309,6 +311,8 @@ class Environment
      */
     public function evaluate($nodes)
     {
+        $this->evaluatedModifiers = false;
+
         if (count($nodes) == 0) {
             return null;
         }
@@ -318,6 +322,20 @@ class Environment
         }
 
         return $this->process($nodes);
+    }
+
+    private function lock()
+    {
+        if ($this->nodeProcessor != null) {
+            $this->nodeProcessor->createLockData();
+        }
+    }
+
+    private function unlock()
+    {
+        if ($this->nodeProcessor != null) {
+            $this->nodeProcessor->restoreLockedData();
+        }
     }
 
     /**
@@ -332,31 +350,48 @@ class Environment
      */
     public function evaluateBool($nodes)
     {
+        $this->lock();
         $this->isEvaluatingTruthValue = true;
         $result = $this->getValue($this->evaluate($nodes));
         $this->isEvaluatingTruthValue = false;
 
         if (is_object($result)) {
             if ($result instanceof ArrayableString) {
-                return $this->getTruthValue($result->value());
-            } elseif ($result instanceof QueryBuilder) {
+                $value = $this->getTruthValue($result->value());
+                $this->unlock();
+
+                return $value;
+            } elseif ($result instanceof Builder) {
                 $builderResults = $result->count();
+                $this->unlock();
 
                 return $builderResults > 0;
             } elseif ($result instanceof Collection) {
-                return $result->count() > 0;
+                $value = $result->count() > 0;
+                $this->unlock();
+
+                return $value;
             }
+
+            $this->unlock();
 
             return true;
         }
 
         if (is_bool($result)) {
+            $this->unlock();
+
             return $result;
         }
 
         if (is_numeric($result)) {
-            return $result >= 1;
+            $value = $result >= 1;
+            $this->unlock();
+
+            return $value;
         }
+
+        $this->unlock();
 
         return null;
     }
@@ -1129,11 +1164,12 @@ class Environment
      * Returns the current value associated with the provided variable name.
      *
      * @param  string|VariableReference  $name  The variable name.
+     * @param  AbstractNode|null  $originalNode  The original node, if available.
      * @return array|ArrayAccess|mixed|string|null
      *
      * @throws RuntimeException
      */
-    private function scopeValue($name)
+    private function scopeValue($name, $originalNode = null)
     {
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
@@ -1142,6 +1178,16 @@ class Environment
                 }
 
                 $this->dataRetriever->setReduceFinal(false);
+            }
+
+            if ($originalNode != null && $originalNode->hasModifiers()) {
+                $doIntercept = $this->dataRetriever->getShouldDoValueIntercept();
+
+                $this->dataRetriever->setShouldDoValueIntercept(false);
+                $value = $this->dataRetriever->getData($name, $this->data);
+                $this->dataRetriever->setShouldDoValueIntercept($doIntercept);
+
+                return $value;
             }
 
             return $this->dataRetriever->getData($name, $this->data);
@@ -1210,7 +1256,14 @@ class Environment
      */
     private function applyModifiers($value, ModifierChainNode $modifierChain)
     {
+        $this->evaluatedModifiers = true;
+
         return ModifierManager::evaluate($value, $this, $modifierChain, $this->data);
+    }
+
+    public function getDidEvaluateModifiers()
+    {
+        return $this->evaluatedModifiers;
     }
 
     /**
@@ -1244,7 +1297,12 @@ class Environment
         if ($value instanceof Value) {
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
+                GlobalRuntimeState::$userContentEvalState = [
+                    $value,
+                    $this->nodeProcessor->getActiveNode(),
+                ];
                 $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                GlobalRuntimeState::$userContentEvalState = null;
             } else {
                 if (! $hasModifiers) {
                     $value = $value->value();
@@ -1347,8 +1405,8 @@ class Environment
         foreach ($argumentGroup->args as $arg) {
             if ($arg instanceof NamedArgumentNode) {
                 // if ($arg->name instanceof VariableNode) {
-                    // TODO: Determine if this system is still useful in other areas.
-                    // $namedArgs[$arg->name->name] = $env->evaluate([$arg->value]);
+                // TODO: Determine if this system is still useful in other areas.
+                // $namedArgs[$arg->name->name] = $env->evaluate([$arg->value]);
                 // }
             } else {
                 $normalArgs[] = $env->evaluate([$arg]);
@@ -1450,9 +1508,9 @@ class Environment
                 return $interpolationValue;
             }
 
-            $scopeValue = $this->scopeValue($varName);
+            $scopeValue = $this->scopeValue($varName, $val);
 
-            if ($scopeValue instanceof Collection) {
+            if ($scopeValue instanceof Collection && ! $val->hasModifiers()) {
                 $scopeValue = $scopeValue->all();
             }
 
@@ -1478,7 +1536,7 @@ class Environment
 
                 $returnVal = $stringValue;
             } else {
-                $returnVal = $this->applyEscapeSequences($val->value);
+                $returnVal = DocumentParser::applyEscapeSequences($val->value);
             }
         } elseif ($val instanceof NullCoalescenceGroup) {
             $returnVal = $this->evaluateNullCoalescence($val);
@@ -1486,10 +1544,10 @@ class Environment
             $returnVal = $this->evaluateTernaryGroup($val);
         } elseif ($val instanceof ModifierValueNode) {
             if (is_string($val->value) && in_array(trim($val->value), GlobalRuntimeState::$interpolatedVariables)) {
-                return $this->applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
+                return DocumentParser::applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
             }
 
-            $returnVal = $this->applyEscapeSequences($val->value);
+            $returnVal = DocumentParser::applyEscapeSequences($val->value);
         } elseif ($val instanceof ArrayNode) {
             $returnVal = $this->resolveArrayValue($val);
         }
@@ -1523,13 +1581,5 @@ class Environment
         }
 
         return $this->adjustValue($returnVal, $val);
-    }
-
-    private function applyEscapeSequences($string)
-    {
-        $string = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $string);
-        $string = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $string);
-
-        return $string;
     }
 }

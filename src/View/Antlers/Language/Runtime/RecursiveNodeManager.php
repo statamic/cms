@@ -12,6 +12,14 @@ class RecursiveNodeManager
     protected static $depthMapping = [];
     protected static $namedDepthMapping = [];
 
+    public static function resetRecursiveNodeState()
+    {
+        self::$registry = [];
+        self::$dataRegistry = [];
+        self::$depthMapping = [];
+        self::$namedDepthMapping = [];
+    }
+
     public static function getNamedMappings()
     {
         return self::$namedDepthMapping;
@@ -19,8 +27,10 @@ class RecursiveNodeManager
 
     public static function incrementDepth(AntlersNode $node)
     {
-        if (! array_key_exists($node->refId, self::$depthMapping)) {
-            self::$depthMapping[$node->refId] = 0;
+        $rootRef = $node->getRootRef();
+
+        if (! array_key_exists($rootRef, self::$depthMapping)) {
+            self::$depthMapping[$rootRef] = 0;
         }
 
         $namedDepthMapping = $node->content.'_depth';
@@ -29,32 +39,52 @@ class RecursiveNodeManager
             self::$namedDepthMapping[$namedDepthMapping] = 0;
         }
 
-        self::$depthMapping[$node->refId] += 1;
         self::$namedDepthMapping[$namedDepthMapping] += 1;
+
+        if (! $node instanceof RecursiveNode || ! $node->isNestedRecursive) {
+            self::$depthMapping[$rootRef] += 1;
+        }
     }
 
     public static function decrementDepth(AntlersNode $node)
     {
         $namedDepthMapping = $node->content.'_depth';
 
-        self::$depthMapping[$node->refId] -= 1;
         self::$namedDepthMapping[$namedDepthMapping] -= 1;
+
+        if (! $node instanceof RecursiveNode || ! $node->isNestedRecursive) {
+            self::$depthMapping[$node->getRootRef()] -= 1;
+        }
     }
 
     public static function getNodeDepth(AntlersNode $node)
     {
-        if (! array_key_exists($node->refId, self::$depthMapping)) {
+        $rootRef = $node->getRootRef();
+
+        if (! array_key_exists($rootRef, self::$depthMapping)) {
             return 1;
         }
 
-        return self::$depthMapping[$node->refId];
+        if ($node instanceof RecursiveNode && $node->isNestedRecursive) {
+            $namedDepthMapping = $node->content.'_depth';
+
+            return self::$namedDepthMapping[$namedDepthMapping];
+        }
+
+        return self::$depthMapping[$rootRef];
     }
 
     public static function releaseRecursiveNode(AntlersNode $node)
     {
         $namedDepthMapping = $node->content.'_depth';
 
-        unset(self::$depthMapping[$node->refId]);
+        if (array_key_exists($namedDepthMapping, self::$namedDepthMapping) && self::$namedDepthMapping[$namedDepthMapping] > 1) {
+            self::decrementDepth($node);
+
+            return;
+        }
+
+        unset(self::$depthMapping[$node->getRootRef()]);
         unset(self::$namedDepthMapping[$namedDepthMapping]);
     }
 

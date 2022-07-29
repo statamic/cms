@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
+use ReflectionClass;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
@@ -55,7 +57,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_sets_and_gets_data_values()
     {
-        $asset = (new Asset)->container($this->container);
+        $asset = (new Asset)->path('test.txt')->container($this->container);
         $this->assertNull($asset->get('foo'));
 
         $return = $asset->set('foo', 'bar');
@@ -69,7 +71,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_removes_data_values()
     {
-        $asset = (new Asset)->container($this->container);
+        $asset = (new Asset)->path('test.txt')->container($this->container);
 
         $this->assertNull($asset->get('foo'));
 
@@ -86,7 +88,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_sets_data_values_using_magic_properties()
     {
-        $asset = (new Asset)->container($this->container);
+        $asset = (new Asset)->path('test.txt')->container($this->container);
         $this->assertNull($asset->get('foo'));
 
         $asset->foo = 'bar';
@@ -145,7 +147,7 @@ class AssetTest extends TestCase
         $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'test']]);
         BlueprintRepository::shouldReceive('find')->with('assets/test_container')->andReturn($blueprint);
 
-        $asset = (new Asset)->container($this->container);
+        $asset = (new Asset)->path('test.txt')->container($this->container);
         $asset->set('foo', 'delta');
 
         $this->assertEquals('query builder results', $asset->foo);
@@ -168,13 +170,13 @@ class AssetTest extends TestCase
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Call to undefined method Statamic\Assets\Asset::thisFieldDoesntExist()');
 
-        (new Asset)->container($this->container)->thisFieldDoesntExist();
+        (new Asset)->path('test.txt')->container($this->container)->thisFieldDoesntExist();
     }
 
     /** @test */
     public function it_gets_and_sets_all_data()
     {
-        $asset = (new Asset)->container($this->container);
+        $asset = (new Asset)->path('test.txt')->container($this->container);
         $this->assertEquals([], $asset->data()->all());
 
         $return = $asset->data(['foo' => 'bar']);
@@ -559,6 +561,42 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+        Storage::fake('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('save')->with($asset);
+
+        $return = $asset->saveQuietly();
+
+        $this->assertTrue($return);
+
+        Event::assertNotDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function when_saving_quietly_the_cached_assetss_withEvents_flag_will_be_set_back_to_true()
+    {
+        Event::fake();
+        Storage::fake('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('save')->with($asset);
+
+        $return = $asset->saveQuietly();
+
+        $this->assertTrue($return);
+
+        $reflection = new ReflectionClass($asset);
+        $property = $reflection->getProperty('withEvents');
+        $property->setAccessible(true);
+        $withEvents = $property->getValue($asset);
+        $this->assertTrue($withEvents);
+    }
+
+    /** @test */
     public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist()
     {
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
@@ -702,6 +740,50 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_lowercases_when_moving_to_another_folder_with_a_new_filename()
+    {
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt');
+        $asset->save();
+
+        $return = $asset->move('new', 'lowercase-THIS-file');
+
+        $disk->assertExists('new/lowercase-this-file.txt');
+        $disk->assertExists('new/.meta/lowercase-this-file.txt.yaml');
+        $this->assertEquals([
+            'new/lowercase-this-file.txt',
+        ], $container->assets('/', true)->map->path()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_lowercase_moved_files_when_configured()
+    {
+        config(['statamic.assets.lowercase' => false]);
+
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt');
+        $asset->save();
+
+        $return = $asset->move('new', 'do-NOT-lowercase-THIS-file');
+
+        $disk->assertExists('new/do-NOT-lowercase-THIS-file.txt');
+        $disk->assertExists('new/.meta/do-NOT-lowercase-THIS-file.txt.yaml');
+        $this->assertEquals([
+            'new/do-NOT-lowercase-THIS-file.txt',
+        ], $container->assets('/', true)->map->path()->all());
+    }
+
+    /** @test */
     public function it_renames()
     {
         Event::fake();
@@ -743,6 +825,66 @@ class AssetTest extends TestCase
         $this->assertEquals([
             'old',
             'old/newfilename.txt',
+        ], $container->contents()->cached()->keys()->all());
+        Event::assertDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function it_lowercases_when_renaming_by_default()
+    {
+        Event::fake();
+        $disk = Storage::fake('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt');
+        $asset->save();
+
+        $return = $asset->rename('lowercase-THIS-file');
+
+        $disk->assertExists('old/lowercase-this-file.txt');
+        $disk->assertExists('old/.meta/lowercase-this-file.txt.yaml');
+        $this->assertEquals([
+            'old/lowercase-this-file.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'old/lowercase-this-file.txt',
+        ], $container->assets('/', true)->map->path()->all());
+        $this->assertEquals([
+            'old',
+            'old/lowercase-this-file.txt',
+        ], $container->contents()->cached()->keys()->all());
+        Event::assertDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function it_doesnt_lowercase_renamed_files_when_configured()
+    {
+        config(['statamic.assets.lowercase' => false]);
+
+        Event::fake();
+        $disk = Storage::fake('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt');
+        $asset->save();
+
+        $return = $asset->rename('do-NOT-lowercase-THIS-file');
+
+        $disk->assertExists('old/do-NOT-lowercase-THIS-file.txt');
+        $disk->assertExists('old/.meta/do-NOT-lowercase-THIS-file.txt.yaml');
+        $this->assertEquals([
+            'old/do-NOT-lowercase-THIS-file.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'old/do-NOT-lowercase-THIS-file.txt',
+        ], $container->assets('/', true)->map->path()->all());
+        $this->assertEquals([
+            'old',
+            'old/do-NOT-lowercase-THIS-file.txt',
         ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetSaved::class);
     }
@@ -805,6 +947,7 @@ class AssetTest extends TestCase
     public function it_doesnt_regenerate_the_meta_file_when_getting_non_image_dimensions()
     {
         $asset = $this->partialMock(Asset::class);
+        $asset->shouldReceive('extension')->andReturn('txt');
 
         $asset->shouldReceive('meta')->times(0);
 
@@ -833,10 +976,10 @@ class AssetTest extends TestCase
             ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
 
         $asset = (new Asset)
+            ->path('path/to/asset.jpg')
             ->container($this->container)
             ->set('title', 'test')
-            ->setSupplement('foo', 'bar')
-            ->path('path/to/asset.jpg');
+            ->setSupplement('foo', 'bar');
 
         $array = $asset->toAugmentedArray();
 
@@ -875,9 +1018,9 @@ class AssetTest extends TestCase
             ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
 
         $array = (new Asset)
+            ->path('path/to/asset.jpg')
             ->container($this->container)
             ->set('title', 'test')
-            ->path('path/to/asset.jpg')
             ->set('foo', 'bar')
             ->set('bar', 'baz')
             ->toAugmentedArray();
@@ -917,6 +1060,7 @@ class AssetTest extends TestCase
             ->set('focus', '75-25');
 
         $this->assertSame($asset->augmentedValue('focus_css')->value(), '75% 25%');
+        $this->assertTrue($asset->augmentedValue('has_focus')->value());
     }
 
     /** @test */
@@ -931,6 +1075,7 @@ class AssetTest extends TestCase
             ->path('path/to/asset.jpg');
 
         $this->assertSame($asset->augmentedValue('focus_css')->value(), '50% 50%');
+        $this->assertFalse($asset->augmentedValue('has_focus')->value());
     }
 
     /** @test */
@@ -999,6 +1144,40 @@ class AssetTest extends TestCase
 
         Storage::disk('test')->assertExists('path/to/asset-1549914700.jpg');
         $this->assertEquals('path/to/asset-1549914700.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+    }
+
+    /** @test */
+    public function it_lowercases_uploaded_filenames_by_default()
+    {
+        Event::fake();
+        $asset = $this->container->makeAsset('path/to/lowercase-THIS-asset.jpg');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->image('lowercase-THIS-asset.jpg'));
+
+        Storage::disk('test')->assertExists('path/to/lowercase-this-asset.jpg');
+        $this->assertEquals('path/to/lowercase-this-asset.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+    }
+
+    /** @test */
+    public function it_doesnt_lowercase_uploaded_filenames_when_configured()
+    {
+        config(['statamic.assets.lowercase' => false]);
+
+        Event::fake();
+        $asset = $this->container->makeAsset('path/to/do-NOT-lowercase-THIS-asset.jpg');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->image('do-NOT-lowercase-THIS-asset.jpg'));
+
+        Storage::disk('test')->assertExists('path/to/do-NOT-lowercase-THIS-asset.jpg');
+        $this->assertEquals('path/to/do-NOT-lowercase-THIS-asset.jpg', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
@@ -1184,5 +1363,23 @@ class AssetTest extends TestCase
             'bravo' => ['a', 'b'],
             'charlie' => ['augmented c', 'augmented d'],
         ], Arr::only($asset->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
+    }
+
+    /** @test */
+    public function it_augments_in_the_parser()
+    {
+        $container = Mockery::mock($this->container)->makePartial();
+        $container->shouldReceive('private')->andReturnFalse();
+        $container->shouldReceive('url')->andReturn('/container');
+        $asset = (new Asset)->container($container)->path('path/to/test.txt');
+
+        $this->assertEquals('/container/path/to/test.txt', Antlers::parse('{{ asset }}', ['asset' => $asset]));
+
+        $this->assertEquals('path/to/test.txt', Antlers::parse('{{ asset }}{{ path }}{{ /asset }}', ['asset' => $asset]));
+
+        $this->assertEquals('test.txt', Antlers::parse('{{ asset:basename }}', ['asset' => $asset]));
+
+        // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
+        $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
     }
 }

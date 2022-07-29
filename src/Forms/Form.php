@@ -9,11 +9,14 @@ use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
+use Statamic\Events\FormCreated;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
+use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Statamic;
@@ -31,6 +34,8 @@ class Form implements FormContract, Augmentable, Arrayable
     protected $store;
     protected $email;
     protected $metrics;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     /**
      * Get or set the handle.
@@ -140,11 +145,39 @@ class Form implements FormContract, Augmentable, Arrayable
         return config('statamic.forms.forms')."/{$this->handle()}.yaml";
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     /**
      * Save form.
      */
     public function save()
     {
+        $isNew = is_null(FormFacade::find($this->handle()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (FormSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         $data = collect([
             'title' => $this->title,
             'honeypot' => $this->honeypot,
@@ -163,7 +196,17 @@ class Form implements FormContract, Augmentable, Arrayable
 
         File::put($this->path(), YAML::dump($data));
 
-        FormSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                FormCreated::dispatch($this);
+            }
+
+            FormSaved::dispatch($this);
+        }
     }
 
     /**
@@ -335,5 +378,15 @@ class Form implements FormContract, Augmentable, Arrayable
     public function apiUrl()
     {
         return Statamic::apiRoute('forms.show', $this->handle());
+    }
+
+    /**
+     * Get the form action url.
+     *
+     * @return string
+     */
+    public function actionUrl()
+    {
+        return route('statamic.forms.submit', $this->handle());
     }
 }

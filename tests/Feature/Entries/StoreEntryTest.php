@@ -27,9 +27,8 @@ class StoreEntryTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->from('/original')
             ->submit($collection, [])
-            ->assertRedirect('/original');
+            ->assertForbidden();
     }
 
     /** @test */
@@ -170,6 +169,21 @@ class StoreEntryTest extends TestCase
         $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
+    /** @test */
+    public function it_can_validate_against_published_value()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this->seedBlueprintFields($collection, [
+            'test_field' => ['validate' => 'required_if:published,true'],
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Test', 'slug' => 'manually-entered-slug', 'published' => true])
+            ->assertStatus(422);
+    }
+
     private function seedUserAndCollection()
     {
         $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
@@ -183,6 +197,7 @@ class StoreEntryTest extends TestCase
     {
         $blueprint = Blueprint::makeFromFields($fields);
 
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('in')
             ->with('collections/'.$collection->handle())
             ->andReturn(collect([$blueprint]));
@@ -197,6 +212,6 @@ class StoreEntryTest extends TestCase
             'slug' => 'test-entry',
         ], $attrs);
 
-        return $this->post($url, $payload);
+        return $this->postJson($url, $payload);
     }
 }
