@@ -101,4 +101,36 @@ class PartialTagsTest extends TestCase
             $this->partialTag('mypartial', 'foo="baz"')
         );
     }
+
+    /** @test */
+    public function parameters_can_be_accessed_within_slots()
+    {
+        $this->viewShouldReturnRaw('mypartial', '{{ slot }}');
+
+        $this->assertEquals(
+            'slot start bar slot end',
+            $this->tag('{{ partial:mypartial foo="bar" }}slot start {{ foo }} slot end{{ /partial:mypartial }}')
+        );
+    }
+
+    /** @test */
+    public function parameters_can_be_accessed_within_named_slots()
+    {
+        $this->viewShouldReturnRaw('mypartial', '<slot>{{ slot }}</slot><named:slot>{{ slot:footer | upper }}</named:slot>');
+
+        $template = <<<'EOT'
+{{ partial:mypartial foo="bar" }}
+    {{ slot:footer }}
+        Footer: {{ foo }}
+    {{ /slot:footer }}
+    
+    Slot: {{ foo }}
+{{ /partial:mypartial }}
+EOT;
+
+        $this->assertEquals(
+            '<slot>Slot: bar</slot><named:slot>FOOTER: BAR</named:slot>',
+            $this->tag($template)
+        );
+    }
 }

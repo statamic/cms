@@ -1368,7 +1368,7 @@ class NodeProcessor
                                 $namedSlots = $namedSlotResults[1];
 
                                 $slotProcessor = $this->cloneProcessor();
-                                $slotProcessor->setData($tagActiveData);
+                                $slotProcessor->setData(array_merge($tagActiveData, $tagParameters));
 
                                 /** @var AntlersNode $slot */
                                 foreach ($namedSlots as $slotName => $slot) {
