@@ -492,7 +492,7 @@ class UserTags extends Tags
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function eventUrl($url, $relative = false)
     {
