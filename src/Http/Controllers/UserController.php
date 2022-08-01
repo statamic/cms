@@ -68,7 +68,7 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', PasswordDefaults::rules()],
         ], $this->assetRules($fields)))->rules();
 
-        $validator = Validator::make($request->all(), $fieldRules);
+        $validator = Validator::make($values, $fieldRules);
 
         if ($validator->fails()) {
             return $this->userRegistrationFailure($validator->errors());
@@ -148,7 +148,7 @@ class UserController extends Controller
         return request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
     }
 
-    public function changePassword(Request $request)
+    public function password(Request $request)
     {
         throw_unless($user = User::current(), new UnauthorizedHttpException(403));
 
