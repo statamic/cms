@@ -102,8 +102,11 @@ trait RendersForms
      */
     protected function minifyFieldHtml($html)
     {
-        // Trim whitespace between elements.
-        $html = preg_replace('/>\s*([^<>]*)\s*</', '>$1<', $html);
+        // Leave whitespace around these html elements.
+        $ignoredHtmlElements = collect(['a', 'span'])->implode('|');
+
+        // Trim whitespace between all other html elements.
+        $html = preg_replace('/\s*(<(?!\/*('.$ignoredHtmlElements.'))[^>]+>)\s*/', '$1', $html);
 
         return $html;
     }
