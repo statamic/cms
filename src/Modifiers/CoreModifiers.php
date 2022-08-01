@@ -1097,17 +1097,6 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns true if the value is is a query builder.
-     *
-     * @param $value
-     * @return bool
-     */
-    public function isQueryBuilder($value)
-    {
-        return Compare::isQueryBuilder($value);
-    }
-
-    /**
      * Returns true if the value is iterable.
      *
      * @param $value
