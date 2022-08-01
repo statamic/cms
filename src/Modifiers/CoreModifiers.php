@@ -2853,10 +2853,17 @@ class CoreModifiers extends Modifier
         if (Str::contains($url, 'vimeo')) {
             $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
 
+            [$url, $hash] = $this->handleUnlistedVimeoUrls($url);
+
+            $paramsToAdd = '?dnt=1';
+            if ($hash) {
+                $paramsToAdd .= '&h='.$hash;
+            }
+
             if (Str::contains($url, '?')) {
-                $url = str_replace('?', '?dnt=1&', $url);
+                $url = str_replace('?', $paramsToAdd.'&', $url);
             } else {
-                $url .= '?dnt=1';
+                $url .= $paramsToAdd;
             }
 
             return $url;
@@ -2997,5 +3004,22 @@ class CoreModifiers extends Modifier
         return $this->usingRuntimeMethodSyntax($context) ?
                 $params[$key] :
                 Arr::get($context, $params[$key], $params[$key]);
+    }
+
+    // unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param
+    private function handleUnlistedVimeoUrls($url)
+    {
+        $hash = '';
+        if (Str::substrCount($url, '/') > 4) {
+            $hash = Str::afterLast($url, '/');
+            $url = Str::beforeLast($url, '/');
+
+            if (Str::contains($hash, '?')) {
+                $url .= '?'.Str::after($hash, '?');
+                $hash = Str::before($hash, '?');
+            }
+        }
+
+        return [$url, $hash];
     }
 }
