@@ -12,8 +12,8 @@ use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Exceptions\UnauthorizedHttpException;
-use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Facades\User;
+use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Arr;
 
 class UserController extends Controller
