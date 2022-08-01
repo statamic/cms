@@ -12,7 +12,9 @@ use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Exceptions\UnauthorizedHttpException;
+use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 
 class UserController extends Controller
 {
@@ -57,12 +59,14 @@ class UserController extends Controller
     {
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $fields = $blueprint->fields();
+        $values = array_merge($request->all(), $this->normalizeAssetValues($fields, $request));
+        $fields = $fields->addValues($values);
 
-        $fieldRules = $fields->validator()->withRules([
+        $fieldRules = $fields->validator()->withRules(array_merge([
             'email' => ['required', 'email', 'unique_user_value'],
             'password' => ['required', 'confirmed', PasswordDefaults::rules()],
-        ])->rules();
+        ], $this->assetRules($fields)))->rules();
 
         $validator = Validator::make($request->all(), $fieldRules);
 
@@ -70,8 +74,9 @@ class UserController extends Controller
             return $this->userRegistrationFailure($validator->errors());
         }
 
-        // $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
+        $fields = $fields->addValues($values);
+        $values = $fields->process()->values()->only(array_keys($values))->except(['email', 'groups', 'roles']);
 
         $user = User::make()
             ->email($request->email)
@@ -109,13 +114,15 @@ class UserController extends Controller
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $fields = $blueprint->fields();
+        $values = array_merge($request->all(), $this->normalizeAssetValues($fields, $request));
+        $fields = $fields->addValues($values);
 
-        $fieldRules = $fields->validator()->withRules([
+        $fieldRules = $fields->validator()->withRules(array_merge([
             'email' => ['required', 'email', 'unique_user_value:'.$user->id()],
-        ])->rules();
+        ], $this->assetRules($fields)))->rules();
 
-        $validator = Validator::make($request->all(), $fieldRules);
+        $validator = Validator::make($values, $fieldRules);
 
         if ($validator->fails()) {
             $errors = $validator->errors();
@@ -123,10 +130,13 @@ class UserController extends Controller
             return back()->withInput()->withErrors($errors, 'user.profile');
         }
 
-        // $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
-        $values = $fields->process()->values()->except(['email', 'password', 'groups', 'roles']);
+        $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
+        $fields = $fields->addValues($values);
+        $values = $fields->process()->values()->only(array_keys($values))->except(['email', 'password', 'groups', 'roles']);
 
-        $user->email($request->email);
+        if ($request->email) {
+            $user->email($request->email);
+        }
         foreach ($values as $key => $value) {
             $user->set($key, $value);
         }
@@ -216,6 +226,15 @@ class UserController extends Controller
             })
             ->map(function ($field) {
                 return AssetsUploader::field($field)->upload(request()->file($field->handle()));
+            })
+            ->all();
+    }
+
+    protected function filterEmptyAssetFields($fields)
+    {
+        return $fields->all()
+            ->filter(function ($field) {
+                return $field->fieldtype()->handle() !== 'assets' || request()->hasFile($field->handle());
             })
             ->all();
     }
