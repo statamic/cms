@@ -76,7 +76,7 @@ class UserController extends Controller
 
         $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
         $fields = $fields->addValues($values);
-        $values = $fields->process()->values()->only(array_keys($values))->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
         $user = User::make()
             ->email($request->email)
