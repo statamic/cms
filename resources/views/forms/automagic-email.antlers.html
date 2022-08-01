@@ -4,7 +4,7 @@
     {{ if value }}
 
         {{ if fieldtype == "assets" }}
-            {{ if value|is_iterable }}
+            {{ if value|is_query_builder }}
                 {{ value }}{{ permalink }}{{ if !last }}, {{ /if }}{{ /value }}
             {{ else }}
                 {{ value:permalink }}
