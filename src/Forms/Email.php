@@ -98,9 +98,9 @@ class Email extends Mailable
             ->each(function ($field) {
                 $value = $field['value']->value();
 
-                if (array_get($field, 'config.max_files') === 1) {
-                    $value = collect([$value])->filter();
-                }
+                $value = array_get($field, 'config.max_files') === 1
+                    ? collect([$value])->filter()
+                    : $value->get();
 
                 foreach ($value as $file) {
                     $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
