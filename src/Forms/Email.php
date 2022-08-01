@@ -6,7 +6,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Facades\Compare;
 use Statamic\Facades\Config;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
@@ -99,11 +98,9 @@ class Email extends Mailable
             ->each(function ($field) {
                 $value = $field['value']->value();
 
-                if (array_get($field, 'config.max_files') === 1) {
-                    $value = collect([$value])->filter();
-                } elseif (Compare::isQueryBuilder($value)) {
-                    $value = $value->get();
-                }
+                $value = array_get($field, 'config.max_files') === 1
+                    ? collect([$value])->filter()
+                    : $value->get();
 
                 foreach ($value as $file) {
                     $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
