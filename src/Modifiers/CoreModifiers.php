@@ -2853,10 +2853,27 @@ class CoreModifiers extends Modifier
         if (Str::contains($url, 'vimeo')) {
             $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
 
+            // private vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param
+            $hash = '';
+            if (Str::substrCount($url, '/') > 4) {
+                $hash = Str::afterLast($url, '/');
+                $url = Str::beforeLast($url, '/');
+
+                if (Str::contains($hash, '?')) {
+                    $url .= '?'.Str::after($hash, '?');
+                    $hash = Str::before($hash, '?');
+                }
+            }
+
+            $paramsToAdd = '?dnt=1';
+            if ($hash) {
+                $paramsToAdd .= '&h='.$hash;
+            }
+
             if (Str::contains($url, '?')) {
-                $url = str_replace('?', '?dnt=1&', $url);
+                $url = str_replace('?', $paramsToAdd.'&', $url);
             } else {
-                $url .= '?dnt=1';
+                $url .= $paramsToAdd;
             }
 
             return $url;
