@@ -111,7 +111,7 @@ EOT;
     public function test_method_calls_can_have_modifiers_applied()
     {
         $data = [
-            'date' => Carbon::parse('October 1st, 2012')
+            'date' => Carbon::parse('October 1st, 2012'),
         ];
 
         $template = <<<'EOT'
