@@ -1985,7 +1985,7 @@ class LanguageParser
                 $targetNodes[] = $lastNode;
 
                 // Scan backwards to find the variable this references.
-                while($lastNode instanceof VariableNode == false) {
+                while ($lastNode instanceof VariableNode == false) {
                     $lastNode = array_pop($newNodes);
                     $targetNodes[] = $lastNode;
                 }
