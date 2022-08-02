@@ -157,12 +157,16 @@ class Augmentor
 
     public function renderHtmlToProsemirror(string $value)
     {
-        return (new Editor(['extensions' => $this->extensions()]))->setContent($value)->getDocument();
+        return app()->makeWith(Editor::class, [
+            'configuration' => ['extensions' => $this->extensions(),
+        ]])->setContent($value)->getDocument();
     }
 
     public function renderProsemirrorToHtml(array $value)
     {
-        return (new Editor(['extensions' => $this->extensions()]))->setContent($value)->getHTML();
+        return app()->makeWith(Editor::class, [
+            'configuration' => ['extensions' => $this->extensions(),
+        ]])->setContent($value)->getHTML();
     }
 
     public function extensions()
