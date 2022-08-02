@@ -3,37 +3,56 @@ import Vuex from 'vuex';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
 Vue.use(Vuex);
 
+
 const Store = new Vuex.Store({
-    state: {
-        publish: {
-            base: {
-                values: {},
-                hiddenFields: {},
-            }
-        },
+    modules: {
         statamic: {
-            conditions: {},
+            namespaced: true,
+            state: {
+                conditions: {},
+            },
+            mutations: {
+                setCondition(state, payload) {
+                    state.conditions[payload.name] = payload.condition;
+                },
+            },
         },
+        publish: {
+            namespaced: true,
+            modules: {
+                base: {
+                    namespaced: true,
+                    state: {
+                        values: {},
+                        hiddenFields: {},
+                        revealerFields: [],
+                        // statamic: {
+                        //     conditions: {},
+                        // },
+                    },
+                    mutations: {
+                        setValues(state, values) {
+                            state.values = values;
+                        },
+                        setHiddenField(state, field) {
+                            state.hiddenFields[field.dottedKey] = {
+                                hidden: field.hidden,
+                                omitValue: field.omitValue,
+                            };
+                        },
+                        setRevealerField(state, field) {
+                            state.revealerFields.push(field.dottedKey);
+                        },
+                    }
+                }
+            }
+        }
     },
-    mutations: {
-        setValues(state, values) {
-            state.publish.base.values = values;
-        },
-        setHiddenField(state, field) {
-            state.publish.base.hiddenFields[field.dottedKey] = {
-                hidden: field.hidden,
-                omitValue: field.omitValue,
-            };
-        },
-        setCondition(state, payload) {
-            state.statamic.conditions[payload.name] = payload.condition;
-        },
-    }
 });
 
 const Statamic = {
     $conditions: {
-        add: (name, condition) => Store.commit('setCondition', {name, condition})
+        add: (name, condition) => Store.commit('statamic/setCondition', {name, condition})
     }
 };
 
@@ -49,10 +68,10 @@ const Fields = new Vue({
     methods: {
         setValues(values) {
             this.values = values;
-            Store.commit('setValues', values);
+            Store.commit('publish/base/setValues', values);
         },
         setStoreValues(values) {
-            Store.commit('setValues', values);
+            Store.commit('publish/base/setValues', values);
         }
     }
 });
@@ -398,13 +417,13 @@ test('it can externally force hide a field before validator conditions are evalu
     expect(Fields.showField({handle: 'some_field'})).toBe(true);
     expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(true);
 
-    Store.commit('setHiddenField', {
+    Store.commit('publish/base/setHiddenField', {
         dottedKey: 'last_name',
         hidden: 'force',
         omitValue: true,
     });
 
-    Store.commit('setHiddenField', {
+    Store.commit('publish/base/setHiddenField', {
         dottedKey: 'some_field',
         hidden: 'force',
         omitValue: true,
