@@ -133,7 +133,7 @@ class Augmentor
 
     protected function textValue($value)
     {
-        $fieldtype = (new Text())->setField(new Field('text', [
+        $fieldtype = (new Text)->setField(new Field('text', [
             'antlers' => $this->fieldtype->config('antlers'),
         ]));
 
