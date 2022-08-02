@@ -13,9 +13,9 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Str;
-use Statamic\Statamic;
 
 class CollectionsController extends CpController
 {
