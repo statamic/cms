@@ -133,7 +133,7 @@ class Augmentor
 
     protected function textValue($value)
     {
-        $fieldtype = (new Text)->setField(new Field('text', [
+        $fieldtype = (new Text())->setField(new Field('text', [
             'antlers' => $this->fieldtype->config('antlers'),
         ]));
 
@@ -158,20 +158,24 @@ class Augmentor
     public function renderHtmlToProsemirror(string $value)
     {
         return app()->makeWith(Editor::class, [
-            'configuration' => ['extensions' => $this->extensions(),
-        ]])->setContent($value)->getDocument();
+            'configuration' => [
+                'extensions' => $this->extensions(),
+            ],
+        ])->setContent($value)->getDocument();
     }
 
     public function renderProsemirrorToHtml(array $value)
     {
         return app()->makeWith(Editor::class, [
-            'configuration' => ['extensions' => $this->extensions(),
-        ]])->setContent($value)->getHTML();
+            'configuration' => [
+                'extensions' => $this->extensions(),
+            ],
+        ])->setContent($value)->getHTML();
     }
 
     public function extensions()
     {
-        $this->addExtension('image', $this->withStatamicImageUrls ? new StatamicImageNode : new ImageNode);
+        $this->addExtension('image', $this->withStatamicImageUrls ? new StatamicImageNode() : new ImageNode());
 
         foreach (self::$replaceExtensions as $name => $replacement) {
             self::$extensions[$name] = $replacement;
