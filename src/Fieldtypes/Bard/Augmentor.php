@@ -175,7 +175,7 @@ class Augmentor
 
     public function extensions()
     {
-        $this->addExtension('image', $this->withStatamicImageUrls ? new StatamicImageNode() : new ImageNode());
+        $this->addExtension('image', $this->withStatamicImageUrls ? new StatamicImageNode : new ImageNode);
 
         foreach (self::$replaceExtensions as $name => $replacement) {
             self::$extensions[$name] = $replacement;
