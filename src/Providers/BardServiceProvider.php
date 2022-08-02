@@ -19,7 +19,11 @@ class BardServiceProvider extends ServiceProvider
             'hardBreak' => new \Tiptap\Nodes\HardBreak(),
             'heading' => new \Tiptap\Nodes\Heading(),
             'horizontalRule' => new \Tiptap\Nodes\HorizontalRule(),
-            // An 'image' is defined as well. @see Statamic\Fieldtypes\Bard;
+            'image' => function ($bard, $withStatamicImageUrls) {
+                return $withStatamicImageUrls
+                    ? new \Statamic\Fieldtypes\Bard\StatamicImageNode
+                    : new \Statamic\Fieldtypes\Bard\ImageNode;
+            },
             'italic' => new \Tiptap\Marks\Italic(),
             'link' => new \Statamic\Fieldtypes\Bard\LinkMark(),
             'listItem' => new \Tiptap\Nodes\ListItem(),
