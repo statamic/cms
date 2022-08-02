@@ -455,7 +455,7 @@ class CollectionsController extends CpController
                     'revisions' => [
                         'type' => 'toggle',
                         'display' => __('Enable Revisions'),
-                        'instructions' => __('statamic::messages.collection_configure_propagate_instructions'),
+                        'instructions' => __('statamic::messages.collection_revisions_instructions'),
                     ],
                 ],
             ];
