@@ -14,7 +14,7 @@ export default {
 
         visibleValues() {
             let omittableFields = _.chain(this.hiddenFields)
-                .pick(field => field.hidden && field.omitValue)
+                .pick(field => field.omitValue)
                 .keys()
                 .value();
 
