@@ -426,20 +426,30 @@ test('it can externally force hide a field before validator conditions are evalu
     Fields.setHiddenField({
         dottedKey: 'last_name',
         hidden: 'force',
-        omitValue: true,
+        omitValue: false,
     });
 
     Fields.setHiddenField({
         dottedKey: 'some_field',
         hidden: 'force',
-        omitValue: true,
+        omitValue: false,
     });
 
     expect(Fields.showField({handle: 'some_field'})).toBe(false);
     expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(false);
 });
 
-test('it omits hidden fields by default', async () => {
+test('it force hides fields with hidden visibility config', async () => {
+    // Triggering these showField() checks and waiting a tick should set their `hidden` state in the store...
+    expect(Fields.showField({handle: 'first_name'})).toBe(true);
+    expect(Fields.showField({handle: 'last_name', visibility: 'hidden'})).toBe(false);
+    await Vue.nextTick();
+
+    expect(Store.state.publish.base.hiddenFields.first_name.hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields.last_name.hidden).toBe('force');
+});
+
+test('it tells omitter to omit hidden fields by default', async () => {
     Fields.setValues({
         is_online_event: false,
         event_venue: false,
@@ -454,7 +464,7 @@ test('it omits hidden fields by default', async () => {
     expect(Store.state.publish.base.hiddenFields.event_venue.omitValue).toBe(true);
 });
 
-test('it does not omit revealer hidden fields', async () => {
+test('it tells omitter not omit revealer hidden fields', async () => {
     Fields.setValues({
         show_more_info: false,
         event_venue: false,
