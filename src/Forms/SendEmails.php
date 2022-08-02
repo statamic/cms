@@ -54,7 +54,7 @@ class SendEmails implements ShouldQueue
         $config = isset($config['to']) ? [$config] : $config;
 
         return collect($config)->map(function ($config) use ($submission) {
-            return $this->parseAntlersInConfig($config, $submission->data());
+            return $this->parseAntlersInConfig($config, $submission->toAugmentedArray());
         });
     }
 
