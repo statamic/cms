@@ -114,9 +114,9 @@ class Augmentor
         static::$extensions[$name] = $extension;
     }
 
-    public static function replaceExtension($name, $extensionReplacement)
+    public static function replaceExtension($name, $extension)
     {
-        static::$extensionReplacements[$name] = $extensionReplacement;
+        static::$extensionReplacements[$name] = $extension;
     }
 
     protected function convertToSets($html)
