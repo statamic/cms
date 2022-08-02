@@ -485,7 +485,7 @@ test('it tells omitter to omit revealer fields', async () => {
     expect(Store.state.publish.base.hiddenFields.regular_toggle.omitValue).toBe(false);
 });
 
-test('it tells omitter not omit revealer hidden fields', async () => {
+test('it tells omitter not omit revealer-hidden fields', async () => {
     Fields.setValues({
         show_more_info: false,
         event_venue: false,
@@ -502,4 +502,42 @@ test('it tells omitter not omit revealer hidden fields', async () => {
     expect(Store.state.publish.base.hiddenFields.event_venue.hidden).toBe(true);
     expect(Store.state.publish.base.hiddenFields.show_more_info.omitValue).toBe(true);
     expect(Store.state.publish.base.hiddenFields.event_venue.omitValue).toBe(false);
+});
+
+test('it properly handles and omits values hidden by revealers and omit when multiple conditions are set', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        has_second_event_venue: true,
+        has_third_event_venue: false,
+        event_venue_one: 'Stadium One',
+        event_venue_two: 'Stadium Two',
+        event_venue_three: false,
+    });
+
+    Fields.setRevealerField('show_more_info');
+
+    // Triggering these showField() checks and waiting a tick should set their `omitValue` state in the store...
+    expect(Fields.showField({handle: 'show_more_info', type: 'revealer'})).toBe(true);
+    expect(Fields.showField({handle: 'has_second_event_venue', type: 'toggle', if: {show_more_info: true}})).toBe(false);
+    expect(Fields.showField({handle: 'has_third_event_venue', type: 'toggle', if: {show_more_info: true}})).toBe(false);
+    expect(Fields.showField({handle: 'event_venue_one', if: {show_more_info: true}})).toBe(false);
+    expect(Fields.showField({handle: 'event_venue_two', if: {show_more_info: true, has_second_event_venue: true}})).toBe(false);
+    expect(Fields.showField({handle: 'event_venue_three', if: {show_more_info: true, has_third_event_venue: true}})).toBe(false);
+    await Vue.nextTick();
+
+    expect(Store.state.publish.base.hiddenFields.show_more_info.hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields.has_second_event_venue.hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields.has_third_event_venue.hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields.event_venue_one.hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields.event_venue_two.hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields.event_venue_three.hidden).toBe(true);
+
+    expect(Store.state.publish.base.hiddenFields.show_more_info.omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields.has_second_event_venue.omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields.has_third_event_venue.omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields.event_venue_one.omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields.event_venue_two.omitValue).toBe(false);
+
+    // Though this third venue is hidden by a revealer, it's also disabled by a regular toggle condition, so it should actually be omitted...
+    expect(Store.state.publish.base.hiddenFields.event_venue_three.omitValue).toBe(true);
 });
