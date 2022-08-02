@@ -432,16 +432,3 @@ test('it can externally force hide a field before validator conditions are evalu
     expect(Fields.showField({handle: 'some_field'})).toBe(false);
     expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(false);
 });
-
-// TODO: Implement wildcards using asterisks? Is this useful?
-// test('it can run conditions on nested data using wildcards', () => {
-//     Fields.setValues({
-//         related_posts: [
-//             {title: 'Learning Laravel', slug: 'learning-laravel'},
-//             {title: 'Learning Vue', slug: 'learning-vue'},
-//         ]
-//     });
-
-//     expect(showFieldIf({'related_posts.*.title': 'Learning Vue'})).toBe(true);
-//     expect(showFieldIf({'related_posts.*.title': 'Learning Vim'})).toBe(false);
-// });
