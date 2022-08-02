@@ -72,7 +72,13 @@ const Fields = new Vue({
         },
         setStoreValues(values) {
             Store.commit('publish/base/setValues', values);
-        }
+        },
+        setHiddenField(payload) {
+            Store.commit('publish/base/setHiddenField', payload);
+        },
+        setRevealerField(dottedKey) {
+            Store.commit('publish/base/setRevealerField', {dottedKey});
+        },
     }
 });
 
@@ -417,13 +423,13 @@ test('it can externally force hide a field before validator conditions are evalu
     expect(Fields.showField({handle: 'some_field'})).toBe(true);
     expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(true);
 
-    Store.commit('publish/base/setHiddenField', {
+    Fields.setHiddenField({
         dottedKey: 'last_name',
         hidden: 'force',
         omitValue: true,
     });
 
-    Store.commit('publish/base/setHiddenField', {
+    Fields.setHiddenField({
         dottedKey: 'some_field',
         hidden: 'force',
         omitValue: true,
@@ -431,4 +437,36 @@ test('it can externally force hide a field before validator conditions are evalu
 
     expect(Fields.showField({handle: 'some_field'})).toBe(false);
     expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(false);
+});
+
+test('it omits hidden fields by default', async () => {
+    Fields.setValues({
+        is_online_event: false,
+        event_venue: false,
+    });
+
+    // Triggering these showField() checks and waiting a tick should set their `omitValue` state in the store...
+    Fields.showField({handle: 'is_online_event'});
+    Fields.showField({handle: 'event_venue', if: {is_online_event: true}});
+    await Vue.nextTick();
+
+    expect(Store.state.publish.base.hiddenFields.is_online_event.omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields.event_venue.omitValue).toBe(true);
+});
+
+test('it does not omit revealer hidden fields', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        event_venue: false,
+    });
+
+    Fields.setRevealerField('show_more_info');
+
+    // Triggering these showField() checks and waiting a tick should set their `omitValue` state in the store...
+    Fields.showField({handle: 'show_more_info'});
+    Fields.showField({handle: 'event_venue', if: {show_more_info: true}});
+    await Vue.nextTick();
+
+    expect(Store.state.publish.base.hiddenFields.show_more_info.omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields.event_venue.omitValue).toBe(false);
 });
