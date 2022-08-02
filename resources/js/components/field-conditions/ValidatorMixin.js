@@ -30,12 +30,10 @@ export default {
 
             // Ensure DOM is updated to ensure all revealers are properly loaded and tracked before committing to store.
             this.$nextTick(() => {
-                let hasRevealerCondition = validator.hasRevealerCondition(dottedPrefix);
-
                 this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
                     dottedKey: dottedFieldPath,
                     hidden: ! passes,
-                    omitValue: (! passes) && (! hasRevealerCondition),
+                    omitValue: field.type === 'revealer' || (! passes && ! validator.isHiddenByRevealer(dottedPrefix)),
                 });
             });
 

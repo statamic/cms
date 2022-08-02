@@ -283,7 +283,7 @@ export default class {
         return checkedFields;
     }
 
-    hasRevealerCondition(dottedPrefix) {
+    isHiddenByRevealer(dottedPrefix) {
         if (! this.store || ! this.storeName) {
             return false;
         }
