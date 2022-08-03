@@ -9,11 +9,12 @@ import map from 'underscore/modules/map.js'
 import each from 'underscore/modules/each.js'
 import filter from 'underscore/modules/filter.js'
 import reject from 'underscore/modules/reject.js'
+import omit from 'underscore/modules/omit.js'
 import first from 'underscore/modules/first.js'
 import chain from 'underscore/modules/chain.js'
 import chainable from 'underscore/modules/mixin.js'
 
-chainable({ chain, map, each, filter, reject, first, isEmpty });
+chainable({ chain, map, each, filter, reject, omit, first, isEmpty });
 
 const NUMBER_SPECIFIC_COMPARISONS = [
     '>', '>=', '<', '<='
@@ -31,8 +32,8 @@ export default class {
         this.converter = new Converter;
     }
 
-    passesConditions() {
-        let conditions = this.getConditions();
+    passesConditions(specificConditions) {
+        let conditions = specificConditions || this.getConditions();
 
         if (conditions === undefined) {
             return true;
@@ -283,7 +284,7 @@ export default class {
         return checkedFields;
     }
 
-    isHiddenByRevealer(dottedPrefix) {
+    isHiddenByRevealerOnly(dottedPrefix) {
         if (! this.store || ! this.storeName) {
             return false;
         }
@@ -291,6 +292,14 @@ export default class {
         let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
 
         if (! revealerFields.length) {
+            return false;
+        }
+
+        let nonRevealerConditions = chain(this.getConditions())
+            .omit((rhs, lhs) => revealerFields.includes(lhs))
+            .value();
+
+        if (! this.passesConditions(nonRevealerConditions)) {
             return false;
         }
 
