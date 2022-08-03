@@ -1104,7 +1104,7 @@ class LanguageParser
 
                     $subNodes = $nextToken->nodes;
 
-                    if ($subNodes[0] instanceof SemanticGroup) {
+                    if (count($subNodes) > 0 && $subNodes[0] instanceof SemanticGroup) {
                         $subNodes = $subNodes[0]->nodes;
                     }
 
