@@ -5,7 +5,7 @@
         :rows="items"
     >
         <div slot-scope="{ filteredRows: rows }">
-            <div class="card p-0 relative overflow-x-auto">
+            <div class="data-list-container card">
                 <div class="sticky top-0 right-0 left-0 z-10 w-full">
                     <data-list-bulk-actions
                         class="rounded data-list-header"

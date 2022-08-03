@@ -21,7 +21,6 @@
     </header>
 
     <user-listing
-        class="h-full"
         listing-key="users"
         initial-sort-column="email"
         initial-sort-direction="asc"

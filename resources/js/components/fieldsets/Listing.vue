@@ -6,7 +6,7 @@
         :rows="rows"
     >
         <div slot-scope="{ filteredRows: rows }">
-            <div class="card p-0 relative overflow-x-auto h-full">
+            <div class="data-list-container card">
                 <data-list-table>
                     <template slot="cell-title" slot-scope="{ row: fieldset }">
                         <a :href="fieldset.edit_url">{{ fieldset.title }}</a>

@@ -1,6 +1,6 @@
 <template>
     <data-list :rows="rows" :columns="columns">
-        <div class="card p-0" slot-scope="{ }">
+        <div class="data-list-container card" slot-scope="{ }">
             <data-list-table>
                 <template slot="cell-title" slot-scope="{ row: group, index }">
                     <a :href="group.show_url">{{ group.title }}</a>

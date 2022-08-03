@@ -4,7 +4,7 @@
 
 .data-list-container {
 	@apply p-0 relative overflow-x-auto h-full;
-	min-height: 480px;
+	min-height: 480px; // prevent scrollbar because of popover menu
 	&.card {
 		padding: 0;
 	}
