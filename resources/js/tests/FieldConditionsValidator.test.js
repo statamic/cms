@@ -26,9 +26,6 @@ const Store = new Vuex.Store({
                         values: {},
                         hiddenFields: {},
                         revealerFields: [],
-                        // statamic: {
-                        //     conditions: {},
-                        // },
                     },
                     mutations: {
                         setValues(state, values) {
