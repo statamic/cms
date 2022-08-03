@@ -6,13 +6,10 @@ html, body {
     height: 100%;
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
 body {
     @apply .w-full .bg-grey-30;
     overflow-y: scroll;
+    scroll-behavior: smooth;
 }
 
 a {
@@ -22,7 +19,7 @@ a {
 
 #main {
     position: relative;
-    z-index: 19;
+    z-index: 9;
     width: 100%;
     min-height: calc(100vh - 52px);
     padding-bottom: 72px;
@@ -30,12 +27,12 @@ a {
 }
 
 #overlays {
-   z-index: 22;
+   z-index: 12;
    overscroll-behavior: contain;
 }
 
 .vue-portal-target {
-   z-index: 21;
+   z-index: 11;
 }
 
 @screen md {

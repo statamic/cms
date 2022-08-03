@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .nav-main {
-    @apply bg-white shadow h-screen fixed left-0 overflow-y-auto overscroll-contain w-56 z-20;
+    @apply bg-white shadow h-screen fixed left-0 overflow-y-auto overscroll-contain w-56 z-10;
     
     top: 52px;
     transform: translateX(-100%);

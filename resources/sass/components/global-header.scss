@@ -4,7 +4,7 @@
 
 .global-header {
     @apply bg-white shadow pr-2 h-13 items-center flex sticky top-0 right-0 left-0 w-full;
-    z-index: 21; // Let Live Preview stack on top
+    z-index: 11; // Let Live Preview stack on top
     flex-shrink: 0;
 }
 
