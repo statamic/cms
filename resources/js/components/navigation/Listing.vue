@@ -9,9 +9,6 @@
                 <template slot="cell-title" slot-scope="{ row: structure }">
                     <a :href="structure.show_url" class="flex items-center" v-text="structure.title" />
                 </template>
-                <template slot="cell-handle" slot-scope="{ value: handle }">
-                    <span class="font-mono text-2xs">{{ handle }}</span>
-                </template>
                 <template slot="actions" slot-scope="{ row: structure, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="structure.edit_url" />
@@ -49,8 +46,7 @@ export default {
         return {
             rows: this.initialRows,
             columns: [
-                { label: __('Title'), field: 'title', visible: true },
-                { label: __('Handle'), field: 'handle' },
+                { label: __('Title'), field: 'title', visible: true }
             ]
         }
     }
