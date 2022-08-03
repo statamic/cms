@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Replicator;
 use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
@@ -366,5 +367,13 @@ class ReplicatorTest extends TestCase
             ['type' => 'a', 'words' => 'one (augmented)'],
             ['type' => 'a', 'words' => 'two (augmented)'],
         ], collect($augmented)->toArray());
+    }
+
+    /** @test */
+    public function it_converts_a_queryable_value()
+    {
+        $this->assertNull((new Replicator)->toQueryableValue(null));
+        $this->assertNull((new Replicator)->toQueryableValue([]));
+        $this->assertEquals([['foo' => 'bar']], (new Replicator)->toQueryableValue([['foo' => 'bar']]));
     }
 }

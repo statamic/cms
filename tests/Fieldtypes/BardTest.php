@@ -536,6 +536,14 @@ EOT;
         $this->assertEquals($expected, $bard->augment($html));
     }
 
+    /** @test */
+    public function it_converts_a_queryable_value()
+    {
+        $this->assertNull((new Bard)->toQueryableValue(null));
+        $this->assertNull((new Bard)->toQueryableValue([]));
+        $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
