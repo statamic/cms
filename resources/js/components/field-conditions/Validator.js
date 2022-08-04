@@ -262,47 +262,23 @@ export default class {
         return this.showOnPass ? passes : ! passes;
     }
 
-    getCheckedFieldPaths(dottedPrefix) {
-        let conditions = this.getConditions();
-
-        if (conditions === undefined || isString(conditions)) {
-            return false;
-        }
-
-        let checkedFields = this.converter
-            .fromBlueprint(conditions, this.field.prefix)
-            .map(field => field.field);
-
-        if (dottedPrefix) {
-            checkedFields = checkedFields.map(field => {
-                return field.startsWith('root.')
-                    ? field.replace(/^root\./, '')
-                    : dottedPrefix + '.' + field;
-            });
-        }
-
-        return checkedFields;
-    }
-
-    isHiddenByRevealerOnly(dottedPrefix) {
-        if (! this.store || ! this.storeName) {
-            return false;
-        }
-
+    passesNonRevealerConditions(dottedPrefix) {
         let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
 
-        if (! revealerFields.length) {
-            return false;
-        }
-
         let nonRevealerConditions = chain(this.getConditions())
-            .omit((rhs, lhs) => revealerFields.includes(lhs))
+            .omit((rhs, lhs) => revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix)))
             .value();
 
-        if (! this.passesConditions(nonRevealerConditions)) {
-            return false;
+        return this.passesConditions(nonRevealerConditions);
+    }
+
+    relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix) {
+        if (! dottedPrefix) {
+            return lhs;
         }
 
-        return intersection(this.getCheckedFieldPaths(dottedPrefix), revealerFields).length > 0;
+        return lhs.startsWith('root.')
+            ? lhs.replace(/^root\./, '')
+            : dottedPrefix + '.' + lhs;
     }
 }

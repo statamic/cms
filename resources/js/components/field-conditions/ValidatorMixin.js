@@ -33,7 +33,7 @@ export default {
                 this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
                     dottedKey: dottedFieldPath,
                     hidden: ! passes,
-                    omitValue: field.type === 'revealer' || (! passes && ! validator.isHiddenByRevealerOnly(dottedPrefix)),
+                    omitValue: field.type === 'revealer' || ! validator.passesNonRevealerConditions(dottedPrefix),
                 });
             });
 
