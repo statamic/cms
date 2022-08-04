@@ -3,7 +3,6 @@ import Vuex from 'vuex';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
 Vue.use(Vuex);
 
-
 const Store = new Vuex.Store({
     modules: {
         statamic: {
@@ -471,7 +470,7 @@ test('it tells omitter to omit revealer fields', async () => {
         regular_toggle: false,
     });
 
-    // Triggering these showField() checks and waiting a tick should set their `omitValue` state in the store...
+    // Triggering these showField() checks and waiting a tick should set their `hiddenFields` state in the store...
     expect(Fields.showField({handle: 'revealer_toggle', type: 'revealer'})).toBe(true);
     expect(Fields.showField({handle: 'regular_toggle', type: 'toggle'})).toBe(true);
     await Vue.nextTick();
@@ -490,7 +489,7 @@ test('it tells omitter not omit revealer-hidden fields', async () => {
 
     Fields.setRevealerField('show_more_info');
 
-    // Triggering these showField() checks and waiting a tick should set their `omitValue` state in the store...
+    // Triggering these showField() checks and waiting a tick should set their `hiddenFields` state in the store...
     expect(Fields.showField({handle: 'show_more_info', type: 'revealer'})).toBe(true);
     expect(Fields.showField({handle: 'event_venue', if: {show_more_info: true}})).toBe(false);
     await Vue.nextTick();
@@ -513,7 +512,7 @@ test('it properly handles and omits values hidden by revealers and omit when mul
 
     Fields.setRevealerField('show_more_info');
 
-    // Triggering these showField() checks and waiting a tick should set their `omitValue` state in the store...
+    // Triggering these showField() checks and waiting a tick should set their `hiddenFields` state in the store...
     expect(Fields.showField({handle: 'show_more_info', type: 'revealer'})).toBe(true);
     expect(Fields.showField({handle: 'has_second_event_venue', type: 'toggle', if: {show_more_info: true}})).toBe(false);
     expect(Fields.showField({handle: 'has_third_event_venue', type: 'toggle', if: {show_more_info: true}})).toBe(false);
