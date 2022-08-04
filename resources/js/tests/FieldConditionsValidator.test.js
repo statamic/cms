@@ -449,3 +449,37 @@ test('it can externally force hide a field before validator conditions are evalu
     expect(Fields.showField({handle: 'some_field'})).toBe(false);
     expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(false);
 });
+
+test('it never omits fields with always_save config', async () => {
+    Fields.setValues({
+        is_online_event: false,
+        venue: false,
+    });
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'is_online_event'},
+        {handle: 'venue', if: {is_online_event: true}, always_save: true},
+    ]);
+
+    expect(Store.state.publish.base.hiddenFields['is_online_event'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['is_online_event'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
+});
+
+test('it never omits nested fields with always_save config', async () => {
+    Fields.setValues({
+        is_online_event: false,
+        venue: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'is_online_event'},
+        {handle: 'venue', if: {is_online_event: true}, always_save: true},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+});
