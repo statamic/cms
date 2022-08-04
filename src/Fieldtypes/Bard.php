@@ -255,7 +255,9 @@ class Bard extends Replicator
 
     protected function shouldRemoveParagraph($value)
     {
-        return Arr::get($value, 'type') === 'paragraph'
+        $type = Arr::get($value, 'type');
+
+        return in_array($type, ['heading', 'paragraph'])
             && ! Arr::has($value, 'content');
     }
 
