@@ -248,7 +248,6 @@ EOT;
 <div>1 Contact</div>
 EOT;
 
-
         $this->assertSame($expected, trim($this->renderString($mainTemplate, [], true)));
     }
 
