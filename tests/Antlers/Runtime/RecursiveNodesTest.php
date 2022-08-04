@@ -5,13 +5,15 @@ namespace Tests\Antlers\Runtime;
 use Statamic\Facades\Nav;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class RecursiveNodesTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk,
+        FakesViews;
 
-    public function test_recursive_nodes_on_structures()
+    private function makeNavTree()
     {
         $tree = [
             ['id' => 'home', 'title' => 'Home', 'url' => '/'],
@@ -40,6 +42,218 @@ class RecursiveNodesTest extends ParserTestCase
         $nav = Nav::make('main');
         $nav->makeTree('en', $tree)->save();
         $nav->save();
+    }
+
+    public function test_recursive_nodes_on_structures_inside_partials()
+    {
+        $this->makeNavTree();
+
+        $this->withFakeViews();
+
+        $navTemplate = <<<'EOT'
+{{ nav:main include_home="true" }}
+<div>{{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+EOT;
+
+        $this->viewShouldReturnRaw('nav', $navTemplate);
+
+        $mainTemplate = <<<'EOT'
+{{ partial:nav }}
+{{ partial:nav }}
+--------------------------------------------------------------------------------
+{{ nav:main include_home="true" }}
+<div>{{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+--------------------------------------------------------------------------------
+{{ nav:main include_home="true" }}
+<div>{{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+--------------------------------------------------------------------------------
+{{ partial:nav }}
+{{ partial:nav }}
+EOT;
+
+        $expected = <<<'EOT'
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+--------------------------------------------------------------------------------
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+--------------------------------------------------------------------------------
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+--------------------------------------------------------------------------------
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($mainTemplate, [], true)));
+    }
+
+    public function test_recursive_nodes_on_structures()
+    {
+        $this->makeNavTree();
 
         $template = <<<'EOT'
 {{ nav:main include_home="true" }}
