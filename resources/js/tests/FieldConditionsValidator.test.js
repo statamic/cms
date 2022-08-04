@@ -36,8 +36,8 @@ const Store = new Vuex.Store({
                                 omitValue: field.omitValue,
                             };
                         },
-                        setRevealerField(state, field) {
-                            state.revealerFields.push(field.dottedKey);
+                        setRevealerField(state, dottedKey) {
+                            state.revealerFields.push(dottedKey);
                         },
                     }
                 }
@@ -62,15 +62,14 @@ const Fields = new Vue({
         }
     },
     methods: {
-        setValues(values) {
+        setValues(values, nestedKey) {
             this.values = values;
-            Store.commit('publish/base/setValues', values);
-        },
-        setNestedValues(nestedKey, values) {
-            this.values = values;
-
             let storeValues = {};
-            storeValues[nestedKey] = values;
+            if (nestedKey) {
+                storeValues[nestedKey] = values;
+            } else {
+                storeValues = values;
+            }
             Store.commit('publish/base/setValues', storeValues);
         },
         setStoreValues(values) {
@@ -79,8 +78,14 @@ const Fields = new Vue({
         setHiddenField(payload) {
             Store.commit('publish/base/setHiddenField', payload);
         },
-        setRevealerField(dottedKey) {
-            Store.commit('publish/base/setRevealerField', {dottedKey});
+        setHiddenFieldsState: async (fieldConfigs, dottedPrefix) => {
+            fieldConfigs.filter(fieldConfig => fieldConfig.type === 'revealer').forEach(fieldConfig => {
+                Store.commit('publish/base/setRevealerField', dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}`: fieldConfig.handle)
+            });
+            fieldConfigs.forEach(fieldConfig => {
+                Fields.showField(fieldConfig, dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}`: null)
+            });
+            await Vue.nextTick();
         },
     }
 });
@@ -298,12 +303,15 @@ test('it shows or hides when any of the conditions are met', () => {
 });
 
 test('it can run conditions on nested data', () => {
-    Fields.setNestedValues('user', {
+    Fields.setValues({
+        name: 'Han',
         address: {
             country: 'Canada'
         }
-    });
+    }, 'user');
 
+    expect(showFieldIf({'name': 'Han'})).toBe(true);
+    expect(showFieldIf({'name': 'Chewy'})).toBe(false);
     expect(showFieldIf({'address.country': 'Canada'})).toBe(true);
     expect(showFieldIf({'address.country': 'Australia'})).toBe(false);
     expect(showFieldIf({'root.user.address.country': 'Canada'})).toBe(true);
@@ -443,32 +451,49 @@ test('it can externally force hide a field before validator conditions are evalu
 });
 
 test('it force hides fields with hidden visibility config', async () => {
-    // Triggering these showField() checks and waiting a tick should set their `hidden` state in the store...
-    expect(Fields.showField({handle: 'first_name'})).toBe(true);
-    expect(Fields.showField({handle: 'last_name', visibility: 'hidden'})).toBe(false);
-    await Vue.nextTick();
+    await Fields.setHiddenFieldsState([
+        {handle: 'first_name'},
+        {handle: 'last_name', visibility: 'hidden'},
+    ]);
 
-    expect(Store.state.publish.base.hiddenFields.first_name.hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.last_name.hidden).toBe('force');
-    expect(Store.state.publish.base.hiddenFields.first_name.omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.last_name.omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['first_name'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['last_name'].hidden).toBe('force');
+    expect(Store.state.publish.base.hiddenFields['first_name'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['last_name'].omitValue).toBe(false);
 });
 
 test('it tells omitter to omit hidden fields by default', async () => {
     Fields.setValues({
         is_online_event: false,
-        event_venue: false,
+        venue: false,
     });
 
-    // Triggering these showField() checks and waiting a tick should set their `omitValue` state in the store...
-    expect(Fields.showField({handle: 'is_online_event'})).toBe(true);
-    expect(Fields.showField({handle: 'event_venue', if: {is_online_event: true}})).toBe(false);
-    await Vue.nextTick();
+    await Fields.setHiddenFieldsState([
+        {handle: 'is_online_event'},
+        {handle: 'venue', if: {is_online_event: true}},
+    ]);
 
-    expect(Store.state.publish.base.hiddenFields.is_online_event.hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.event_venue.hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields.is_online_event.omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.event_venue.omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['is_online_event'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['is_online_event'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(true);
+});
+
+test('it tells omitter to omit nested hidden fields by default', async () => {
+    Fields.setValues({
+        is_online_event: false,
+        event_venue: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'is_online_event'},
+        {handle: 'venue', if: {is_online_event: true}},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(true);
 });
 
 test('it tells omitter to omit revealer fields', async () => {
@@ -477,15 +502,32 @@ test('it tells omitter to omit revealer fields', async () => {
         regular_toggle: false,
     });
 
-    // Triggering these showField() checks and waiting a tick should set their `hiddenFields` state in the store...
-    expect(Fields.showField({handle: 'revealer_toggle', type: 'revealer'})).toBe(true);
-    expect(Fields.showField({handle: 'regular_toggle', type: 'toggle'})).toBe(true);
-    await Vue.nextTick();
+    await Fields.setHiddenFieldsState([
+        {handle: 'revealer_toggle', type: 'revealer'},
+        {handle: 'regular_toggle', type: 'regular'},
+    ]);
 
-    expect(Store.state.publish.base.hiddenFields.revealer_toggle.hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.regular_toggle.hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.revealer_toggle.omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields.regular_toggle.omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['revealer_toggle'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['regular_toggle'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['revealer_toggle'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['regular_toggle'].omitValue).toBe(false);
+});
+
+test('it tells omitter to omit nested revealer fields', async () => {
+    Fields.setValues({
+        revealer_toggle: false,
+        regular_toggle: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'revealer_toggle', type: 'revealer'},
+        {handle: 'regular_toggle', type: 'regular'},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.revealer_toggle'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.regular_toggle'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.revealer_toggle'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.regular_toggle'].omitValue).toBe(false);
 });
 
 test('it tells omitter not omit revealer-hidden fields', async () => {
@@ -494,20 +536,35 @@ test('it tells omitter not omit revealer-hidden fields', async () => {
         event_venue: false,
     });
 
-    Fields.setRevealerField('show_more_info');
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {show_more_info: true}},
+    ]);
 
-    // Triggering these showField() checks and waiting a tick should set their `hiddenFields` state in the store...
-    expect(Fields.showField({handle: 'show_more_info', type: 'revealer'})).toBe(true);
-    expect(Fields.showField({handle: 'event_venue', if: {show_more_info: true}})).toBe(false);
-    await Vue.nextTick();
-
-    expect(Store.state.publish.base.hiddenFields.show_more_info.hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.event_venue.hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields.show_more_info.omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields.event_venue.omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
 });
 
-test('it properly handles and omits values hidden by revealers and omit when multiple conditions are set', async () => {
+test('it tells omitter not omit nested revealer-hidden fields', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        event_venue: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {show_more_info: true}},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+});
+
+test('it properly omits revealer-hidden fields when multiple conditions are set', async () => {
     Fields.setValues({
         show_more_info: false,
         has_second_event_venue: true,
@@ -517,30 +574,64 @@ test('it properly handles and omits values hidden by revealers and omit when mul
         event_venue_three: false,
     });
 
-    Fields.setRevealerField('show_more_info');
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'has_second_event_venue', type: 'toggle', if: {show_more_info: true}},
+        {handle: 'has_third_event_venue', type: 'toggle', if: {show_more_info: true}},
+        {handle: 'event_venue_one', if: {show_more_info: true}},
+        {handle: 'event_venue_two', if: {show_more_info: true, has_second_event_venue: true}},
+        {handle: 'event_venue_three', if: {show_more_info: true, has_third_event_venue: true}},
+    ]);
 
-    // Triggering these showField() checks and waiting a tick should set their `hiddenFields` state in the store...
-    expect(Fields.showField({handle: 'show_more_info', type: 'revealer'})).toBe(true);
-    expect(Fields.showField({handle: 'has_second_event_venue', type: 'toggle', if: {show_more_info: true}})).toBe(false);
-    expect(Fields.showField({handle: 'has_third_event_venue', type: 'toggle', if: {show_more_info: true}})).toBe(false);
-    expect(Fields.showField({handle: 'event_venue_one', if: {show_more_info: true}})).toBe(false);
-    expect(Fields.showField({handle: 'event_venue_two', if: {show_more_info: true, has_second_event_venue: true}})).toBe(false);
-    expect(Fields.showField({handle: 'event_venue_three', if: {show_more_info: true, has_third_event_venue: true}})).toBe(false);
-    await Vue.nextTick();
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['has_second_event_venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['has_third_event_venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['event_venue_one'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['event_venue_two'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['event_venue_three'].hidden).toBe(true);
 
-    expect(Store.state.publish.base.hiddenFields.show_more_info.hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.has_second_event_venue.hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields.has_third_event_venue.hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields.event_venue_one.hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields.event_venue_two.hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields.event_venue_three.hidden).toBe(true);
-
-    expect(Store.state.publish.base.hiddenFields.show_more_info.omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields.has_second_event_venue.omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.has_third_event_venue.omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.event_venue_one.omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields.event_venue_two.omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['has_second_event_venue'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['has_third_event_venue'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['event_venue_one'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['event_venue_two'].omitValue).toBe(false);
 
     // Though this third venue is hidden by a revealer, it's also disabled by a regular toggle condition, so it should actually be omitted...
-    expect(Store.state.publish.base.hiddenFields.event_venue_three.omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['event_venue_three'].omitValue).toBe(true);
+});
+
+test('it properly omits nested revealer-hidden fields when multiple conditions are set', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        has_second_event_venue: true,
+        has_third_event_venue: false,
+        event_venue_one: 'Stadium One',
+        event_venue_two: 'Stadium Two',
+        event_venue_three: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'has_second_event_venue', type: 'toggle', if: {show_more_info: true}},
+        {handle: 'has_third_event_venue', type: 'toggle', if: {show_more_info: true}},
+        {handle: 'event_venue_one', if: {show_more_info: true}},
+        {handle: 'event_venue_two', if: {show_more_info: true, has_second_event_venue: true}},
+        {handle: 'event_venue_three', if: {show_more_info: true, has_third_event_venue: true}},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.has_second_event_venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.has_third_event_venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.event_venue_one'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.event_venue_two'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.event_venue_three'].hidden).toBe(true);
+
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.has_second_event_venue'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.has_third_event_venue'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.event_venue_one'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.event_venue_two'].omitValue).toBe(false);
+
+    // Though this third venue is hidden by a revealer, it's also disabled by a regular toggle condition, so it should actually be omitted...
+    expect(Store.state.publish.base.hiddenFields['nested.event_venue_three'].omitValue).toBe(true);
 });
