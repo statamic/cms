@@ -79,7 +79,6 @@ class RecursiveNodeManager
     {
         $namedDepthMapping = $node->content.'_depth';
 
-
         if ($node instanceof RecursiveNode && $node->recursiveParent != null) {
             $refId = $node->recursiveParent->getRootRef();
 
@@ -93,6 +92,7 @@ class RecursiveNodeManager
                     unset(self::$recursionStack[$refId]);
                     unset(self::$depthMapping[$node->getRootRef()]);
                     unset(self::$namedDepthMapping[$namedDepthMapping]);
+
                     return;
                 }
             }
