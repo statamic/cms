@@ -4,36 +4,51 @@ import ValidatesFieldConditions from '../components/field-conditions/ValidatorMi
 Vue.use(Vuex);
 
 const Store = new Vuex.Store({
-    state: {
-        publish: {
-            base: {
-                values: {},
-                hiddenFields: {},
-            }
-        },
+    modules: {
         statamic: {
-            conditions: {},
+            namespaced: true,
+            state: {
+                conditions: {},
+            },
+            mutations: {
+                setCondition(state, payload) {
+                    state.conditions[payload.name] = payload.condition;
+                },
+            },
         },
+        publish: {
+            namespaced: true,
+            modules: {
+                base: {
+                    namespaced: true,
+                    state: {
+                        values: {},
+                        hiddenFields: {},
+                        revealerFields: [],
+                    },
+                    mutations: {
+                        setValues(state, values) {
+                            state.values = values;
+                        },
+                        setHiddenField(state, field) {
+                            state.hiddenFields[field.dottedKey] = {
+                                hidden: field.hidden,
+                                omitValue: field.omitValue,
+                            };
+                        },
+                        setRevealerField(state, dottedKey) {
+                            state.revealerFields.push(dottedKey);
+                        },
+                    }
+                }
+            }
+        }
     },
-    mutations: {
-        setValues(state, values) {
-            state.publish.base.values = values;
-        },
-        setHiddenField(state, field) {
-            state.publish.base.hiddenFields[field.dottedKey] = {
-                hidden: field.hidden,
-                omitValue: field.omitValue,
-            };
-        },
-        setCondition(state, payload) {
-            state.statamic.conditions[payload.name] = payload.condition;
-        },
-    }
 });
 
 const Statamic = {
     $conditions: {
-        add: (name, condition) => Store.commit('setCondition', {name, condition})
+        add: (name, condition) => Store.commit('statamic/setCondition', {name, condition})
     }
 };
 
@@ -47,13 +62,31 @@ const Fields = new Vue({
         }
     },
     methods: {
-        setValues(values) {
+        setValues(values, nestedKey) {
             this.values = values;
-            Store.commit('setValues', values);
+            let storeValues = {};
+            if (nestedKey) {
+                storeValues[nestedKey] = values;
+            } else {
+                storeValues = values;
+            }
+            Store.commit('publish/base/setValues', storeValues);
         },
         setStoreValues(values) {
-            Store.commit('setValues', values);
-        }
+            Store.commit('publish/base/setValues', values);
+        },
+        setHiddenField(payload) {
+            Store.commit('publish/base/setHiddenField', payload);
+        },
+        setHiddenFieldsState: async (fieldConfigs, dottedPrefix) => {
+            fieldConfigs.filter(fieldConfig => fieldConfig.type === 'revealer').forEach(fieldConfig => {
+                Store.commit('publish/base/setRevealerField', dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}`: fieldConfig.handle)
+            });
+            fieldConfigs.forEach(fieldConfig => {
+                Fields.showField(fieldConfig, dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}`: null)
+            });
+            await Vue.nextTick();
+        },
     }
 });
 
@@ -271,15 +304,18 @@ test('it shows or hides when any of the conditions are met', () => {
 
 test('it can run conditions on nested data', () => {
     Fields.setValues({
-        user: {
-            address: {
-                country: 'Canada'
-            }
+        name: 'Han',
+        address: {
+            country: 'Canada'
         }
-    });
+    }, 'user');
 
-    expect(showFieldIf({'user.address.country': 'Canada'})).toBe(true);
-    expect(showFieldIf({'user.address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({'name': 'Han'})).toBe(true);
+    expect(showFieldIf({'name': 'Chewy'})).toBe(false);
+    expect(showFieldIf({'address.country': 'Canada'})).toBe(true);
+    expect(showFieldIf({'address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({'root.user.address.country': 'Canada'})).toBe(true);
+    expect(showFieldIf({'root.user.address.country': 'Australia'})).toBe(false);
 });
 
 test('it can run conditions on root store values', () => {
@@ -398,31 +434,18 @@ test('it can externally force hide a field before validator conditions are evalu
     expect(Fields.showField({handle: 'some_field'})).toBe(true);
     expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(true);
 
-    Store.commit('setHiddenField', {
+    Fields.setHiddenField({
         dottedKey: 'last_name',
         hidden: 'force',
-        omitValue: true,
+        omitValue: false,
     });
 
-    Store.commit('setHiddenField', {
+    Fields.setHiddenField({
         dottedKey: 'some_field',
         hidden: 'force',
-        omitValue: true,
+        omitValue: false,
     });
 
     expect(Fields.showField({handle: 'some_field'})).toBe(false);
     expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(false);
 });
-
-// TODO: Implement wildcards using asterisks? Is this useful?
-// test('it can run conditions on nested data using wildcards', () => {
-//     Fields.setValues({
-//         related_posts: [
-//             {title: 'Learning Laravel', slug: 'learning-laravel'},
-//             {title: 'Learning Vue', slug: 'learning-vue'},
-//         ]
-//     });
-
-//     expect(showFieldIf({'related_posts.*.title': 'Learning Vue'})).toBe(true);
-//     expect(showFieldIf({'related_posts.*.title': 'Learning Vim'})).toBe(false);
-// });
