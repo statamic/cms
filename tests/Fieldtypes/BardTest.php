@@ -397,43 +397,46 @@ class BardTest extends TestCase
     }
 
     /** @test */
-    public function it_removes_empty_paragraphs()
+    public function it_removes_empty_nodes()
     {
         $content = '[
             {"type":"paragraph"},
-            {"type":"paragraph"},
+            {"type":"heading"},
             {"type":"paragraph", "content": "foo"},
+            {"type":"heading"},
             {"type":"paragraph"},
-            {"type":"paragraph", "content": "foo"},
+            {"type":"heading", "content": "foo"},
             {"type":"paragraph"},
-            {"type":"paragraph"}
+            {"type":"heading"}
         ]';
 
-        $containsAllEmptyParagraphs = $this->bard(['remove_empty_paragraphs' => false])->process($content);
+        $containsAllEmptyNodes = $this->bard(['remove_empty_nodes' => false])->process($content);
 
-        $this->assertEquals($containsAllEmptyParagraphs, [
+        $this->assertEquals($containsAllEmptyNodes, [
             ['type' => 'paragraph'],
-            ['type' => 'paragraph'],
+            ['type' => 'heading'],
             ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
             ['type' => 'paragraph'],
-            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading', 'content' => 'foo'],
             ['type' => 'paragraph'],
-            ['type' => 'paragraph'],
+            ['type' => 'heading'],
         ]);
 
-        $removedAllEmptyParagraphs = $this->bard(['remove_empty_paragraphs' => true])->process($content);
+        $removedAllEmptyNodes = $this->bard(['remove_empty_nodes' => true])->process($content);
 
-        $this->assertEquals($removedAllEmptyParagraphs, [
+        $this->assertEquals($removedAllEmptyNodes, [
             ['type' => 'paragraph', 'content' => 'foo'],
-            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading', 'content' => 'foo'],
         ]);
 
-        $trimmedEmptyParagraphs = $this->bard(['remove_empty_paragraphs' => 'trim'])->process($content);
+        $trimmedEmptyNodes = $this->bard(['remove_empty_nodes' => 'trim'])->process($content);
 
-        $this->assertEquals($trimmedEmptyParagraphs, [
+        $this->assertEquals($trimmedEmptyNodes, [
             ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
             ['type' => 'paragraph'],
-            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading', 'content' => 'foo'],
         ]);
     }
 

@@ -161,15 +161,15 @@ class Bard extends Replicator
                 'type' => 'toggle',
                 'width' => 50,
             ],
-            'remove_empty_paragraphs' => [
-                'display' => __('Remove Empty Paragraphs'),
-                'instructions' => __('statamic::fieldtypes.bard.config.remove_empty_paragraphs'),
+            'remove_empty_nodes' => [
+                'display' => __('Remove Empty Nodes'),
+                'instructions' => __('statamic::fieldtypes.bard.config.remove_empty_nodes'),
                 'type' => 'select',
                 'cast_booleans' => true,
                 'options' => [
-                    'false' => __("Don't remove empty paragraphs"),
-                    'true' => __('Remove all empty paragraphs'),
-                    'trim' => __('Remove empty paragraphs at the start and end'),
+                    'false' => __("Don't remove empty nodes"),
+                    'true' => __('Remove all empty nodes'),
+                    'trim' => __('Remove empty nodes at the start and end'),
                 ],
                 'default' => 'false',
                 'width' => 50,
@@ -199,7 +199,7 @@ class Bard extends Replicator
     {
         $value = json_decode($value, true);
 
-        $value = $this->removeEmptyParagraphs($value);
+        $value = $this->removeEmptyNodes($value);
 
         $structure = collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
@@ -224,38 +224,40 @@ class Bard extends Replicator
         return $structure;
     }
 
-    protected function removeEmptyParagraphs($value)
+    protected function removeEmptyNodes($value)
     {
         $value = collect($value);
 
-        if ($this->config('remove_empty_paragraphs') === true) {
+        if ($this->config('remove_empty_nodes') === true) {
             $empty = $value->filter(function ($value) {
-                return $this->shouldRemoveParagraph($value);
+                return $this->shouldRemoveNode($value);
             });
 
             return $value->diffKeys($empty)->values();
         }
 
-        if ($this->config('remove_empty_paragraphs') === 'trim') {
-            if ($this->shouldRemoveParagraph($value->first())) {
+        if ($this->config('remove_empty_nodes') === 'trim') {
+            if ($this->shouldRemoveNode($value->first())) {
                 $value->shift();
 
-                return $this->removeEmptyParagraphs($value);
+                return $this->removeEmptyNodes($value);
             }
 
-            if ($this->shouldRemoveParagraph($value->last())) {
+            if ($this->shouldRemoveNode($value->last())) {
                 $value->pop();
 
-                return $this->removeEmptyParagraphs($value);
+                return $this->removeEmptyNodes($value);
             }
         }
 
         return $value;
     }
 
-    protected function shouldRemoveParagraph($value)
+    protected function shouldRemoveNode($value)
     {
-        return Arr::get($value, 'type') === 'paragraph'
+        $type = Arr::get($value, 'type');
+
+        return in_array($type, ['heading', 'paragraph'])
             && ! Arr::has($value, 'content');
     }
 
