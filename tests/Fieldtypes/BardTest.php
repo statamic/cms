@@ -397,6 +397,47 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    public function it_removes_empty_paragraphs()
+    {
+        $content = '[
+            {"type":"paragraph"},
+            {"type":"paragraph"},
+            {"type":"paragraph", "content": "foo"},
+            {"type":"paragraph"},
+            {"type":"paragraph", "content": "foo"},
+            {"type":"paragraph"},
+            {"type":"paragraph"}
+        ]';
+
+        $containsAllEmptyParagraphs = $this->bard(['remove_empty_paragraphs' => false])->process($content);
+
+        $this->assertEquals($containsAllEmptyParagraphs, [
+            ['type' => 'paragraph'],
+            ['type' => 'paragraph'],
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'paragraph'],
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'paragraph'],
+            ['type' => 'paragraph'],
+        ]);
+
+        $removedAllEmptyParagraphs = $this->bard(['remove_empty_paragraphs' => true])->process($content);
+
+        $this->assertEquals($removedAllEmptyParagraphs, [
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'paragraph', 'content' => 'foo'],
+        ]);
+
+        $trimmedEmptyParagraphs = $this->bard(['remove_empty_paragraphs' => 'trim'])->process($content);
+
+        $this->assertEquals($trimmedEmptyParagraphs, [
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'paragraph'],
+            ['type' => 'paragraph', 'content' => 'foo'],
+        ]);
+    }
+
+    /** @test */
     public function it_preloads_preprocessed_default_values()
     {
         $field = (new Field('test', [

@@ -161,6 +161,19 @@ class Bard extends Replicator
                 'type' => 'toggle',
                 'width' => 50,
             ],
+            'remove_empty_paragraphs' => [
+                'display' => __('Remove Empty Paragraphs'),
+                'instructions' => __('statamic::fieldtypes.bard.config.remove_empty_paragraphs'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'options' => [
+                    'false' => __("Don't remove empty paragraphs"),
+                    'true' => __('Remove all empty paragraphs'),
+                    'trim' => __('Remove empty paragraphs at the start and end'),
+                ],
+                'default' => 'false',
+                'width' => 50,
+            ],
         ];
     }
 
@@ -186,6 +199,8 @@ class Bard extends Replicator
     {
         $value = json_decode($value, true);
 
+        $value = $this->removeEmptyParagraphs($value);
+
         $structure = collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
                 return $row;
@@ -207,6 +222,41 @@ class Bard extends Replicator
         }
 
         return $structure;
+    }
+
+    protected function removeEmptyParagraphs($value)
+    {
+        $value = collect($value);
+
+        if ($this->config('remove_empty_paragraphs') === true) {
+            $empty = $value->filter(function ($value) {
+                return $this->shouldRemoveParagraph($value);
+            });
+
+            return $value->diffKeys($empty)->values();
+        }
+
+        if ($this->config('remove_empty_paragraphs') === 'trim') {
+            if ($this->shouldRemoveParagraph($value->first())) {
+                $value->shift();
+
+                return $this->removeEmptyParagraphs($value);
+            }
+
+            if ($this->shouldRemoveParagraph($value->last())) {
+                $value->pop();
+
+                return $this->removeEmptyParagraphs($value);
+            }
+        }
+
+        return $value;
+    }
+
+    protected function shouldRemoveParagraph($value)
+    {
+        return Arr::get($value, 'type') === 'paragraph'
+            && ! Arr::has($value, 'content');
     }
 
     protected function shouldSaveHtml()
