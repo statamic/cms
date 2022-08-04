@@ -239,11 +239,13 @@ class Bard extends Replicator
         if ($this->config('remove_empty_paragraphs') === 'trim') {
             if ($this->shouldRemoveParagraph($value->first())) {
                 $value->shift();
+
                 return $this->removeEmptyParagraphs($value);
             }
 
             if ($this->shouldRemoveParagraph($value->last())) {
                 $value->pop();
+
                 return $this->removeEmptyParagraphs($value);
             }
         }
