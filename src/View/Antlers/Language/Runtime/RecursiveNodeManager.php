@@ -11,6 +11,7 @@ class RecursiveNodeManager
     protected static $dataRegistry = [];
     protected static $depthMapping = [];
     protected static $namedDepthMapping = [];
+    protected static $recursionStack = [];
 
     public static function resetRecursiveNodeState()
     {
@@ -78,6 +79,25 @@ class RecursiveNodeManager
     {
         $namedDepthMapping = $node->content.'_depth';
 
+
+        if ($node instanceof RecursiveNode && $node->recursiveParent != null) {
+            $refId = $node->recursiveParent->getRootRef();
+
+            if (array_key_exists($refId, self::$recursionStack)) {
+                // Reduce the depth of the parent node.
+                self::$recursionStack[$refId] -= 1;
+
+                if (self::$recursionStack[$refId] < 0) {
+                    // At this point we've released the ultimate parent and are moving on.
+                    // We will do a hard reset instead of the normal depth decrement.
+                    unset(self::$recursionStack[$refId]);
+                    unset(self::$depthMapping[$node->getRootRef()]);
+                    unset(self::$namedDepthMapping[$namedDepthMapping]);
+                    return;
+                }
+            }
+        }
+
         if (array_key_exists($namedDepthMapping, self::$namedDepthMapping) && self::$namedDepthMapping[$namedDepthMapping] > 1) {
             self::decrementDepth($node);
 
@@ -98,6 +118,16 @@ class RecursiveNodeManager
         if ($node->recursiveReference == null) {
             return;
         }
+
+        // Get the reference id for the ultimate recursive parent.
+        $refId = $node->recursiveReference->recursiveParent->getRootRef();
+
+        if (! array_key_exists($refId, self::$recursionStack)) {
+            self::$recursionStack[$refId] = 0;
+        }
+
+        // Keep track of how nested we are inside the recursive node.
+        self::$recursionStack[$refId] += 1;
 
         self::$registry[$node->recursiveReference->name->name] = $node;
         self::$dataRegistry[$node->recursiveReference->name->name] = $data;
