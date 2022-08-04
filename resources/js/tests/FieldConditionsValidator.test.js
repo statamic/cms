@@ -66,6 +66,13 @@ const Fields = new Vue({
             this.values = values;
             Store.commit('publish/base/setValues', values);
         },
+        setNestedValues(nestedKey, values) {
+            this.values = values;
+
+            let storeValues = {};
+            storeValues[nestedKey] = values;
+            Store.commit('publish/base/setValues', storeValues);
+        },
         setStoreValues(values) {
             Store.commit('publish/base/setValues', values);
         },
@@ -291,16 +298,16 @@ test('it shows or hides when any of the conditions are met', () => {
 });
 
 test('it can run conditions on nested data', () => {
-    Fields.setValues({
-        user: {
-            address: {
-                country: 'Canada'
-            }
+    Fields.setNestedValues('user', {
+        address: {
+            country: 'Canada'
         }
     });
 
-    expect(showFieldIf({'user.address.country': 'Canada'})).toBe(true);
-    expect(showFieldIf({'user.address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({'address.country': 'Canada'})).toBe(true);
+    expect(showFieldIf({'address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({'root.user.address.country': 'Canada'})).toBe(true);
+    expect(showFieldIf({'root.user.address.country': 'Australia'})).toBe(false);
 });
 
 test('it can run conditions on root store values', () => {
