@@ -169,7 +169,7 @@ class Bard extends Replicator
                 'options' => [
                     'false' => __("Don't remove empty paragraphs"),
                     'true' => __('Remove all empty paragraphs'),
-                    'trim' => __('Remove empty paragraphs at the top and the bottom'),
+                    'trim' => __('Remove empty paragraphs at the start and end'),
                 ],
                 'default' => 'false',
                 'width' => 50,
