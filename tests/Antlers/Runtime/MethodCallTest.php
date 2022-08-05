@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Carbon\Carbon;
+use Tests\Antlers\Fixtures\MethodClasses\CallCounter;
 use Tests\Antlers\Fixtures\MethodClasses\ClassOne;
 use Tests\Antlers\Fixtures\MethodClasses\StringLengthObject;
 use Tests\Antlers\ParserTestCase;
@@ -217,5 +218,16 @@ EOT;
 EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, $data, true)));
+    }
+
+    public function test_method_calls_not_get_called_more_than_declared()
+    {
+        $counter = new CallCounter();
+
+        $template = <<<'EOT'
+{{ counter:increment():increment():increment() }}
+EOT;
+
+        $this->assertSame('Count: 3', $this->renderString($template, ['counter' => $counter]));
     }
 }
