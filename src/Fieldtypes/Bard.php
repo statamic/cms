@@ -28,6 +28,18 @@ class Bard extends Replicator
     protected function configFieldItems(): array
     {
         return [
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+            'character_limit' => [
+                'display' => __('Character Limit'),
+                'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
+                'type' => 'text',
+                'width' => 50,
+            ],
             'always_show_set_button' => [
                 'display' => __('Always Show Set Button'),
                 'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),

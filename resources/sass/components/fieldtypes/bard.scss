@@ -461,6 +461,17 @@
     }
 }
 
+/* Placeholder
+========================================================================== */
+
+.bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
+    @apply text-grey-60;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}  
+
 /* Link toolbar
   ========================================================================== */
 
