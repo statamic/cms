@@ -7,6 +7,8 @@ class FormSubmissionsTest extends FormTestCase
     /** @test */
     public function it_renders_submissions()
     {
+        $this->app->make('stache')->store('form-submissions')->directory(__DIR__.'/../../__fixtures__/content/submissions');
+
         $this
             ->post('/!/forms/contact', [
                 'email' => 'san@holo.com',
