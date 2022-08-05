@@ -75,6 +75,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
         }
 
+        $app['config']->set('statamic.forms.submissions', __DIR__.'/__fixtures__/content/submissions');
         $app['config']->set('statamic.antlers.version', 'runtime');
     }
 
@@ -104,6 +105,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
         $app['config']->set('statamic.stache.stores.nav-trees.directory', __DIR__.'/__fixtures__/content/structures/navigation');
         $app['config']->set('statamic.stache.stores.collection-trees.directory', __DIR__.'/__fixtures__/content/structures/collections');
+        $app['config']->set('statamic.stache.stores.form-submissions.directory', __DIR__.'/__fixtures__/content/submissions');
 
         $app['config']->set('statamic.api.enabled', true);
         $app['config']->set('statamic.graphql.enabled', true);
