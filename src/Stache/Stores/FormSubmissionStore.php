@@ -24,11 +24,6 @@ class FormSubmissionStore extends ChildStore
         return $item->id();
     }
 
-    // public function getItem($key)
-    // {
-    //     dd($key);
-    // }
-
     public function getItemFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory(), '/');
