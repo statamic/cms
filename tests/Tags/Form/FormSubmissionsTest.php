@@ -7,7 +7,7 @@ class FormSubmissionsTest extends FormTestCase
     /** @test */
     public function it_renders_submissions()
     {
-        $this->app->make('stache')->store('form-submissions')->directory(__DIR__.'/../../__fixtures__/content/submissions');
+        $this->resetSubmissionStache();
 
         $this
             ->post('/!/forms/contact', [

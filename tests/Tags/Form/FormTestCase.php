@@ -120,4 +120,9 @@ abstract class FormTestCase extends TestCase
     {
         Form::find('contact')->submissions()->each->delete();
     }
+
+    protected function resetSubmissionStache()
+    {
+        $this->app->make('stache')->store('form-submissions')->directory(__DIR__.'/../../__fixtures__/content/submissions');
+    }
 }
