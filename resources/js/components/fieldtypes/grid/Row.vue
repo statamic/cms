@@ -14,6 +14,7 @@
             :grid-name="name"
             :errors="errors(field.handle)"
             :field-path="fieldPath(field.handle)"
+            :field-path-placeholder="fieldPathPlaceholder(field.handle)"
             @updated="updated(field.handle, $event)"
             @meta-updated="metaUpdated(field.handle, $event)"
             @focus="$emit('focus')"
@@ -110,6 +111,10 @@ export default {
 
         fieldPath(handle) {
             return `${this.fieldPathPrefix}.${this.index}.${handle}`;
+        },
+
+        fieldPathPlaceholder(handle) {
+            return `${this.fieldPathPrefix}.{grid:${this.values._id}}.${handle}`;
         },
 
         errors(handle) {

@@ -44,6 +44,7 @@
                 :parent-name="parentName"
                 :set-index="index"
                 :field-path="fieldPath(field)"
+                :field-path-placeholder="fieldPathPlaceholder(field)"
                 :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
@@ -213,6 +214,10 @@ export default {
 
         fieldPath(field) {
             return `${this.fieldPathPrefix}.${this.index}.${field.handle}`;
+        },
+
+        fieldPathPlaceholder(field) {
+            return `${this.fieldPathPrefix}.{replicator:${this.values._id}}.${field.handle}`;
         },
 
     }

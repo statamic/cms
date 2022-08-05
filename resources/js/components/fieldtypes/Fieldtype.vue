@@ -23,11 +23,20 @@ export default {
         },
         namePrefix: String,
         fieldPathPrefix: String,
+        fieldPathPlaceholder: String,
+    },
+
+    inject: {
+        publishContainer: {
+            default: () => null
+        },
     },
 
     methods: {
         update(value) {
-            this.$emit('input', value);
+            let handle = this.fieldPathPlaceholder || this.handle;
+
+            this.publishContainer.setFieldValue(handle, value);
         },
 
         updateDebounced: _.debounce(function (value) {

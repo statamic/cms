@@ -21,6 +21,7 @@
             :handle="field.handle"
             :name-prefix="namePrefix"
             :field-path-prefix="fieldPath"
+            :field-path-placeholder="fieldPathPlaceholder"
             :has-error="hasError || hasNestedError"
             :read-only="isReadOnly"
             @input="$emit('updated', $event)"
@@ -66,6 +67,9 @@ export default {
             required: true
         },
         fieldPath: {
+            type: String
+        },
+        fieldPathPlaceholder: {
             type: String
         },
         readOnly: Boolean,

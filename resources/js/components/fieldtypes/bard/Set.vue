@@ -48,6 +48,7 @@
                     :parent-name="parentName"
                     :set-index="index"
                     :field-path="fieldPath(field)"
+                    :field-path-placeholder="fieldPathPlaceholder(field)"
                     :read-only="isReadOnly"
                     @updated="updated(field.handle, $event)"
                     @meta-updated="metaUpdated(field.handle, $event)"
@@ -203,6 +204,11 @@ export default {
         fieldPath(field) {
             let prefix = this.extension.options.bard.fieldPathPrefix || this.extension.options.bard.handle;
             return `${prefix}.${this.index}.attrs.values.${field.handle}`;
+        },
+
+        fieldPathPlaceholder(field) {
+            let prefix = this.extension.options.bard.fieldPathPrefix || this.extension.options.bard.handle;
+            return `${prefix}.{bard:${this.node.attrs.id}}.${field.handle}`;
         },
 
     }

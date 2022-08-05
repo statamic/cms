@@ -10,6 +10,7 @@
                 :handle="field.handle"
                 :name-prefix="namePrefix"
                 :field-path-prefix="fieldPath"
+                :field-path-placeholder="fieldPathPlaceholder"
                 :read-only="grid.isReadOnly"
                 @input="$emit('updated', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -62,7 +63,10 @@ export default {
         fieldPath: {
             type: String,
             required: true
-        }
+        },
+        fieldPathPlaceholder: {
+            type: String
+        },
     },
 
     inject: ['grid'],

@@ -1,6 +1,7 @@
 <script>
 import uniqid from 'uniqid';
 import Component from '../Component';
+import resolvePath from './FieldPathResolver';
 
 export default {
 
@@ -66,7 +67,8 @@ export default {
 
     provide() {
         return {
-            storeName: this.name
+            storeName: this.name,
+            publishContainer: this,
         }
     },
 
@@ -111,7 +113,15 @@ export default {
                 mutations: {
                     setFieldValue(state, payload) {
                         const { handle, value } = payload;
-                        data_set(state.values, handle, value);
+
+                        let resolvedHandle = resolvePath(handle, state.values);
+
+                        data_set(state.values, resolvedHandle, value);
+
+                        // Communicate to collaboration that the field has been changed, somehow.
+                        // Maybe through some sort of callback associated with this container/store.
+                        // Provide the unresolved handle, and let the other side resolve it themselves.
+                        // Statamic.collaboration.callbacks[storename](handle, value)
                     },
                     setValues(state, values) {
                         state.values = values;
