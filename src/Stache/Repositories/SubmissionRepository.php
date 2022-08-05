@@ -44,14 +44,14 @@ class SubmissionRepository implements RepositoryContract
     public function save($submission)
     {
         $this->store
-            ->store($submission->form())
+            ->store($submission->form()->handle())
             ->save($submission);
     }
 
     public function delete($submission)
     {
         $this->store
-            ->store($submission->form())
+            ->store($submission->form()->handle())
             ->delete($submission);
     }
 

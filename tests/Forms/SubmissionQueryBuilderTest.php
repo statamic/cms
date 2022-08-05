@@ -189,7 +189,7 @@ class SubmissionQueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_where_date()
+    public function submissions_are_found_using_where_date()
     {
         $this->markTestSkipped(); // for now
 
@@ -212,7 +212,7 @@ class SubmissionQueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_where_month()
+    public function submissions_are_found_using_where_month()
     {
         $this->markTestSkipped(); // for now
 
@@ -230,7 +230,7 @@ class SubmissionQueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_where_day()
+    public function submissions_are_found_using_where_day()
     {
         $this->markTestSkipped(); // for now
 
@@ -248,7 +248,7 @@ class SubmissionQueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_where_year()
+    public function submissions_are_found_using_where_year()
     {
         $this->markTestSkipped(); // for now
 
@@ -266,7 +266,7 @@ class SubmissionQueryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function entries_are_found_using_where_time()
+    public function submissions_are_found_using_where_time()
     {
         $this->markTestSkipped(); // for now
 
