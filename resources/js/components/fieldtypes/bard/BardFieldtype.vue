@@ -574,12 +574,12 @@ export default {
             if (btns.includes('h6')) levels.push(6);
             if (levels.length) exts.push(Heading.configure({ levels }));
 
-            let aligns = [];
-            if (btns.includes('alignleft')) aligns.push('left');
-            if (btns.includes('aligncenter')) aligns.push('center');
-            if (btns.includes('alignright')) aligns.push('right');
-            if (btns.includes('alignjustify')) aligns.push('justify');
-            if (aligns.length) exts.push(TextAlign.configure({ types: ['heading', 'paragraph'], aligns }));
+            let alignments = [];
+            if (btns.includes('alignleft')) alignments.push('left');
+            if (btns.includes('aligncenter')) alignments.push('center');
+            if (btns.includes('alignright')) alignments.push('right');
+            if (btns.includes('alignjustify')) alignments.push('justify');
+            if (alignments.length) exts.push(TextAlign.configure({ types: ['heading', 'paragraph'], alignments }));
 
             if (btns.includes('table')) {
                 exts.push(
