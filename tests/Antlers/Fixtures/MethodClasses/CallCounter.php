@@ -15,6 +15,6 @@ class CallCounter
 
     public function __toString(): string
     {
-        return 'Count: ' . $this->count;
+        return 'Count: '.$this->count;
     }
 }
