@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
@@ -21,7 +22,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Submission implements SubmissionContract, Augmentable
 {
-    use ContainsData, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations;
 
     /**
      * @var string
@@ -187,6 +188,11 @@ class Submission implements SubmissionContract, Augmentable
      * @return string
      */
     public function getPath()
+    {
+        return $this->path();
+    }
+
+    public function path()
     {
         return config('statamic.forms.submissions').'/'.$this->form()->handle().'/'.$this->id().'.yaml';
     }
