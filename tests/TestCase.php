@@ -75,7 +75,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
         }
 
-        $app['config']->set('statamic.forms.submissions', __DIR__.'/__fixtures__/content/submissions');
         $app['config']->set('statamic.antlers.version', 'runtime');
     }
 
