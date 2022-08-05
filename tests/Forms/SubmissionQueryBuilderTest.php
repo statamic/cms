@@ -6,10 +6,6 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
-use Statamic\Facades\Path;
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
-use Statamic\Stache\Stores\SubmissionsStore;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
