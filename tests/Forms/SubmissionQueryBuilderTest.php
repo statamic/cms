@@ -390,9 +390,9 @@ class SubmissionQueryBuilderTest extends TestCase
     public function submissions_are_found_using_offset()
     {
         $form = tap(Form::make('test'))->save();
-        FormSubmission::make()->form($form)->data(['id' => 'a', ])->save();
-        FormSubmission::make()->form($form)->data(['id' => 'b', ])->save();
-        FormSubmission::make()->form($form)->data(['id' => 'c', ])->save();
+        FormSubmission::make()->form($form)->data(['id' => 'a'])->save();
+        FormSubmission::make()->form($form)->data(['id' => 'b'])->save();
+        FormSubmission::make()->form($form)->data(['id' => 'c'])->save();
 
         $submissions = FormSubmission::query()->get();
         $this->assertEquals(['a', 'b', 'c'], $submissions->map->get('id')->all());
