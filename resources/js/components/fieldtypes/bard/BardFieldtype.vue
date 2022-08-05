@@ -95,6 +95,7 @@ import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import Text from '@tiptap/extension-text';
+import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import BardSource from './Source.vue';
 import Document from './Document';
@@ -572,6 +573,13 @@ export default {
             if (btns.includes('h5')) levels.push(5);
             if (btns.includes('h6')) levels.push(6);
             if (levels.length) exts.push(Heading.configure({ levels }));
+
+            let aligns = [];
+            if (btns.includes('alignleft')) aligns.push('left');
+            if (btns.includes('aligncenter')) aligns.push('center');
+            if (btns.includes('alignright')) aligns.push('right');
+            if (btns.includes('alignjustify')) aligns.push('justify');
+            if (aligns.length) exts.push(TextAlign.configure({ types: ['heading', 'paragraph'], aligns }));
 
             if (btns.includes('table')) {
                 exts.push(
