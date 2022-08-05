@@ -15,6 +15,7 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\File;
+use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Arr;
@@ -194,7 +195,11 @@ class Submission implements SubmissionContract, Augmentable
 
     public function path()
     {
-        return config('statamic.forms.submissions').'/'.$this->form()->handle().'/'.$this->id().'.yaml';
+        return vsprintf('%s/%s/%s.yaml', [
+            rtrim(Stache::store('form-submissions')->directory(), '/'),
+            $this->form()->handle(),
+            $this->id(),
+        ]);
     }
 
     /**
