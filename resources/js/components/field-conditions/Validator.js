@@ -9,12 +9,11 @@ import map from 'underscore/modules/map.js'
 import each from 'underscore/modules/each.js'
 import filter from 'underscore/modules/filter.js'
 import reject from 'underscore/modules/reject.js'
-import omit from 'underscore/modules/omit.js'
 import first from 'underscore/modules/first.js'
 import chain from 'underscore/modules/chain.js'
 import chainable from 'underscore/modules/mixin.js'
 
-chainable({ chain, map, each, filter, reject, omit, first, isEmpty });
+chainable({ chain, map, each, filter, reject, first, isEmpty });
 
 const NUMBER_SPECIFIC_COMPARISONS = [
     '>', '>=', '<', '<='
@@ -37,11 +36,9 @@ export default class {
 
         if (conditions === undefined) {
             return true;
-        } else if (isString(conditions)) {
+        } else if (this.isCustomCondition(conditions)) {
             return this.passesCustomCondition(this.prepareCondition(conditions));
         }
-
-        conditions = this.converter.fromBlueprint(conditions, this.field.prefix);
 
         let passes = this.passOnAny
             ? this.passesAnyConditions(conditions)
@@ -68,7 +65,15 @@ export default class {
             this.showOnPass = false;
         }
 
-        return this.field[key];
+        let conditions = this.field[key];
+
+        return this.isCustomCondition(conditions)
+            ? conditions
+            : this.converter.fromBlueprint(conditions, this.field.prefix);
+    }
+
+    isCustomCondition(conditions) {
+        return isString(conditions);
     }
 
     passesAllConditions(conditions) {
@@ -263,10 +268,16 @@ export default class {
     }
 
     passesNonRevealerConditions(dottedPrefix) {
+        let conditions = this.getConditions();
+
+        if (this.isCustomCondition(conditions)) {
+            return this.passesConditions(conditions);
+        }
+
         let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
 
         let nonRevealerConditions = chain(this.getConditions())
-            .omit((rhs, lhs) => revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix)))
+            .reject(condition => revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)))
             .value();
 
         return this.passesConditions(nonRevealerConditions);
