@@ -3,12 +3,6 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\Form;
-use Statamic\Facades\FormSubmission;
-use Statamic\Facades\Path;
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
-use Statamic\Facades\YAML;
-use Symfony\Component\Finder\SplFileInfo;
 
 class SubmissionsStore extends AggregateStore
 {

@@ -5,10 +5,7 @@ namespace Statamic\Stache\Stores;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Path;
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
-use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Value;
 use Symfony\Component\Finder\SplFileInfo;
 

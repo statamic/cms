@@ -7,7 +7,6 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Contracts\Forms\SubmissionRepository as RepositoryContract;
 use Statamic\Stache\Query\SubmissionQueryBuilder;
 use Statamic\Stache\Stache;
-use Statamic\Support\Str;
 
 class SubmissionRepository implements RepositoryContract
 {
