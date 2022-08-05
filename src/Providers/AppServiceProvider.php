@@ -111,6 +111,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Structures\NavigationRepository::class => \Statamic\Stache\Repositories\NavigationRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
+            \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -144,9 +145,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         collect([
-            'entries' => fn () => Facades\Entry::query(),
-            'terms' => fn () => Facades\Term::query(),
             'assets' => fn () => Facades\Asset::query(),
+            'entries' => fn () => Facades\Entry::query(),
+            'formsubmissions' => fn () => Facades\FormSubmission::query(),
+            'terms' => fn () => Facades\Term::query(),
             'users' => fn () => Facades\User::query(),
         ])->each(function ($binding, $alias) {
             app()->bind('statamic.queries.'.$alias, $binding);

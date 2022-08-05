@@ -7,6 +7,8 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
@@ -17,9 +19,10 @@ use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+
 class Submission implements SubmissionContract, Augmentable
 {
-    use ContainsData, FluentlyGetsAndSets, HasAugmentedData;
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations;
 
     /**
      * @var string

@@ -84,6 +84,11 @@ return [
             'directory' => base_path('users'),
         ],
 
+        'form-submissions' => [
+            'class' => Stores\SubmissionsStore::class,
+            'directory' => storage_path('statamic/forms'),
+        ],
+
     ],
 
     /*
