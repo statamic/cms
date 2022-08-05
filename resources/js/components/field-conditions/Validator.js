@@ -36,7 +36,7 @@ export default class {
 
         if (conditions === undefined) {
             return true;
-        } else if (this.isCustomCondition(conditions)) {
+        } else if (this.isCustomConditionWithoutTarget(conditions)) {
             return this.passesCustomCondition(this.prepareCondition(conditions));
         }
 
@@ -67,12 +67,12 @@ export default class {
 
         let conditions = this.field[key];
 
-        return this.isCustomCondition(conditions)
+        return this.isCustomConditionWithoutTarget(conditions)
             ? conditions
             : this.converter.fromBlueprint(conditions, this.field.prefix);
     }
 
-    isCustomCondition(conditions) {
+    isCustomConditionWithoutTarget(conditions) {
         return isString(conditions);
     }
 
@@ -270,7 +270,7 @@ export default class {
     passesNonRevealerConditions(dottedPrefix) {
         let conditions = this.getConditions();
 
-        if (this.isCustomCondition(conditions)) {
+        if (this.isCustomConditionWithoutTarget(conditions)) {
             return this.passesConditions(conditions);
         }
 
