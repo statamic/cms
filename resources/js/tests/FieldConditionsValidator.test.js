@@ -39,6 +39,11 @@ const Store = new Vuex.Store({
                         setRevealerField(state, dottedKey) {
                             state.revealerFields.push(dottedKey);
                         },
+                        reset(state) {
+                            state.values = {};
+                            state.hiddenFields = {};
+                            state.revealerFields = [];
+                        },
                     }
                 }
             }
@@ -96,6 +101,7 @@ let showFieldIf = function (conditions=null) {
 
 afterEach(() => {
     Fields.values = {};
+    Store.commit('publish/base/reset');
 });
 
 test('it shows field by default', () => {
@@ -325,6 +331,28 @@ test('it can run conditions on root store values', () => {
 
     expect(showFieldIf({'favorite_foods': 'contains lasagna'})).toBe(false);
     expect(showFieldIf({'root.favorite_foods': 'contains lasagna'})).toBe(true);
+});
+
+test('it can run conditions on prefixed fields', async () => {
+    Fields.setValues({
+        prefixed_first_name: 'Rincess',
+        prefixed_last_name: 'Pleia'
+    });
+
+    expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
+    expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
+});
+
+test('it can run conditions on nested prefixed fields', async () => {
+    Fields.setValues({
+        prefixed_first_name: 'Rincess',
+        prefixed_last_name: 'Pleia'
+    }, 'nested');
+
+    expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
+    expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
+    expect(Fields.showField({if: {'root.nested.prefixed_last_name': 'is Pleia'}})).toBe(true);
+    expect(Fields.showField({if: {'root.nested.prefixed_last_name': 'is Holo'}})).toBe(false);
 });
 
 test('it can call a custom function', () => {
@@ -562,6 +590,40 @@ test('it tells omitter not omit nested revealer-hidden fields', async () => {
     expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
     expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
     expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+});
+
+test('it tells omitter not omit prefixed revealer-hidden fields', async () => {
+    Fields.setValues({
+        prefixed_show_more_info: false,
+        prefixed_event_venue: false,
+    });
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'prefixed_show_more_info', prefix: 'prefixed_', type: 'revealer'},
+        {handle: 'prefixed_venue', prefix: 'prefixed_', if: {show_more_info: true}},
+    ]);
+
+    expect(Store.state.publish.base.hiddenFields['prefixed_show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['prefixed_venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['prefixed_show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['prefixed_venue'].omitValue).toBe(false);
+});
+
+test('it tells omitter not omit nested prefixed revealer-hidden fields', async () => {
+    Fields.setValues({
+        prefixed_show_more_info: false,
+        prefixed_event_venue: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'prefixed_show_more_info', prefix: 'prefixed_', type: 'revealer'},
+        {handle: 'prefixed_venue', prefix: 'prefixed_', if: {show_more_info: true}},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.prefixed_show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.prefixed_venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.prefixed_show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.prefixed_venue'].omitValue).toBe(false);
 });
 
 test('it properly omits revealer-hidden fields when multiple conditions are set', async () => {
