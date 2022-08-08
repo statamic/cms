@@ -180,7 +180,7 @@ class EmailTest extends TestCase
 
     private function makeEmailWithSubmission(Submission $submission)
     {
-        return tap(new Email($submission, [], Site::default()))->build();
+        return tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
     }
 
     private function makeEmailWithConfig(array $config)
@@ -198,7 +198,7 @@ class EmailTest extends TestCase
 
         return tap(new Email(
             $submission,
-            $config,
+            array_merge(['to' => 'test@test.com'], $config),
             Site::default()
         ))->build();
     }
@@ -216,7 +216,7 @@ class EmailTest extends TestCase
             $submission = Mockery::mock(Submission::class);
             $submission->shouldReceive('toAugmentedArray')->andReturn([]);
 
-            return tap(new Email($submission, [], $site))->build();
+            return tap(new Email($submission, ['to' => 'test@test.com'], $site))->build();
         };
 
         $this->assertEquals('en', $makeEmail(Site::get('one'))->locale);
