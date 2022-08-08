@@ -169,6 +169,10 @@ class Locales extends Tags
 
     private function workaroundForCollectionTaxonomyTerm($id, $data)
     {
+        if (! $this->params->bool('collection_term_workaround', true)) {
+            return $data;
+        }
+
         if (! $data instanceof LocalizedTerm) {
             return $data;
         }
