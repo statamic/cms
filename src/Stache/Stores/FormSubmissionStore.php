@@ -14,6 +14,7 @@ class FormSubmissionStore extends ChildStore
     protected $valueIndex = Value::class;
     protected $storeIndexes = [
         'form',
+        'date' => \Statamic\Stache\Indexes\Date::class,
     ];
 
     public function getItemKey($item)

@@ -4,6 +4,7 @@ namespace Tests\Forms;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -191,109 +192,95 @@ class SubmissionQueryBuilderTest extends TestCase
     /** @test **/
     public function submissions_are_found_using_where_date()
     {
-        $this->markTestSkipped(); // for now
-
         $this->createWhereDateTestTerms();
 
-        $entries = FormSubmission::query()->whereDate('test_date', '2021-11-15')->get();
+        $entries = FormSubmission::query()->whereDate('date', '2021-11-15')->get();
 
         $this->assertCount(2, $entries);
-        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->sort()->values()->all());
 
-        $entries = FormSubmission::query()->whereDate('test_date', 1637000264)->get();
-
-        $this->assertCount(2, $entries);
-        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
-
-        $entries = FormSubmission::query()->whereDate('test_date', '>=', '2021-11-15')->get();
+        $entries = FormSubmission::query()->whereDate('date', 1637000264)->get();
 
         $this->assertCount(2, $entries);
-        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->sort()->values()->all());
+
+        $entries = FormSubmission::query()->whereDate('date', '>=', '2021-11-15')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->sort()->values()->all());
     }
 
     /** @test **/
     public function submissions_are_found_using_where_month()
     {
-        $this->markTestSkipped(); // for now
-
         $this->createWhereDateTestTerms();
 
-        $entries = FormSubmission::query()->whereMonth('test_date', 11)->get();
+        $entries = FormSubmission::query()->whereMonth('date', 11)->get();
 
         $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->sort()->values()->all());
 
-        $entries = FormSubmission::query()->whereMonth('test_date', '<', 11)->get();
+        $entries = FormSubmission::query()->whereMonth('date', '<', 11)->get();
 
         $this->assertCount(1, $entries);
-        $this->assertEquals(['Post 4'], $entries->map->title->all());
+        $this->assertEquals(['Post 4'], $entries->map->title->sort()->values()->all());
     }
 
     /** @test **/
     public function submissions_are_found_using_where_day()
     {
-        $this->markTestSkipped(); // for now
-
         $this->createWhereDateTestTerms();
 
-        $entries = FormSubmission::query()->whereDay('test_date', 15)->get();
+        $entries = FormSubmission::query()->whereDay('date', 15)->get();
 
         $this->assertCount(2, $entries);
-        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->sort()->values()->all());
 
-        $entries = FormSubmission::query()->whereDay('test_date', '<', 15)->get();
+        $entries = FormSubmission::query()->whereDay('date', '<', 15)->get();
 
         $this->assertCount(2, $entries);
-        $this->assertEquals(['Post 2', 'Post 4'], $entries->map->title->all());
+        $this->assertEquals(['Post 2', 'Post 4'], $entries->map->title->sort()->values()->all());
     }
 
     /** @test **/
     public function submissions_are_found_using_where_year()
     {
-        $this->markTestSkipped(); // for now
-
         $this->createWhereDateTestTerms();
 
-        $entries = FormSubmission::query()->whereYear('test_date', 2021)->get();
+        $entries = FormSubmission::query()->whereYear('date', 2021)->get();
 
         $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
+        $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->sort()->values()->all());
 
-        $entries = FormSubmission::query()->whereYear('test_date', '<', 2021)->get();
+        $entries = FormSubmission::query()->whereYear('date', '<', 2021)->get();
 
         $this->assertCount(1, $entries);
-        $this->assertEquals(['Post 4'], $entries->map->title->all());
+        $this->assertEquals(['Post 4'], $entries->map->title->sort()->values()->all());
     }
 
     /** @test **/
     public function submissions_are_found_using_where_time()
     {
-        $this->markTestSkipped(); // for now
-
         $this->createWhereDateTestTerms();
 
-        $entries = FormSubmission::query()->whereTime('test_date', '09:00')->get();
+        $entries = FormSubmission::query()->whereTime('date', '09:00')->get();
 
         $this->assertCount(1, $entries);
-        $this->assertEquals(['Post 2'], $entries->map->title->all());
+        $this->assertEquals(['Post 2'], $entries->map->title->sort()->values()->all());
 
-        $entries = FormSubmission::query()->whereTime('test_date', '>', '09:00')->get();
+        $entries = FormSubmission::query()->whereTime('date', '>', '09:00')->get();
 
         $this->assertCount(2, $entries);
-        $this->assertEquals(['Post 1', 'Post 4'], $entries->map->title->all());
+        $this->assertEquals(['Post 1', 'Post 4'], $entries->map->title->sort()->values()->all());
     }
 
     private function createWhereDateTestTerms()
     {
-        $blueprint = Blueprint::makeFromFields(['test_date' => ['type' => 'date', 'time_enabled' => true]]);
-        Blueprint::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
-
         $form = tap(Form::make('test'))->save();
-        FormSubmission::make()->form($form)->data(['title' => 'Post 1', 'test_date' => '2021-11-15 20:31:04'])->save();
-        FormSubmission::make()->form($form)->data(['title' => 'Post 2', 'test_date' => '2021-11-14 09:00:00'])->save();
-        FormSubmission::make()->form($form)->data(['title' => 'Post 3', 'test_date' => '2021-11-15 00:00:00'])->save();
-        FormSubmission::make()->form($form)->data(['title' => 'Post 4', 'test_date' => '2020-09-13 14:44:24'])->save();
-        FormSubmission::make()->form($form)->data(['title' => 'Post 5', 'test_date' => null])->save();
+        FormSubmission::make()->form($form)->data(['title' => 'Post 1'])->id(1637008264)->save();
+        FormSubmission::make()->form($form)->data(['title' => 'Post 2'])->id(1636621200)->save();
+        FormSubmission::make()->form($form)->data(['title' => 'Post 3'])->id(1636934400)->save();
+        FormSubmission::make()->form($form)->data(['title' => 'Post 4'])->id(1600008264)->save();
     }
 
     /** @test **/
