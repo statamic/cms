@@ -4,7 +4,6 @@ namespace Tests\Forms;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Tests\PreventSavingStacheItemsToDisk;

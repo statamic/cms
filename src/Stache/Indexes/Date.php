@@ -2,8 +2,6 @@
 
 namespace Statamic\Stache\Indexes;
 
-use Statamic\Query\ResolveValue;
-
 class Date extends Index
 {
     public function getItems()
