@@ -25,7 +25,8 @@ use Statamic\Widgets\Widget;
 abstract class AddonServiceProvider extends ServiceProvider
 {
     /**
-     * Array of event class => Listener class
+     * Array of event class => Listener class.
+     *
      * @var array<class-string, class-string[]>
      */
     protected $listen = [];
@@ -108,12 +109,14 @@ abstract class AddonServiceProvider extends ServiceProvider
      * of `cp`, `web`, `actions`.
      *
      * @template TType of 'cp'|'web'|'actions'
+     *
      * @var array<TType, string>
      */
     protected $routes = [];
 
     /**
-     * Map of group name => Middlewares to apply
+     * Map of group name => Middlewares to apply.
+     *
      * @var array<string, class-string[]>
      */
     protected $middlewareGroups = [];
