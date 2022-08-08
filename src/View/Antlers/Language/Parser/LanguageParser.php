@@ -199,18 +199,20 @@ class LanguageParser
                 $wrapperGroup->nodes[] = $lastNode;
                 $wrapperGroup->nodes[] = $thisNode;
 
+                $doBreak = false;
+
                 if ($i != $lastNodeIndex) {
                     for ($j = $i + 1; $j < $nodeLen; $j++) {
                         if ($nodes[$j] instanceof MethodInvocationNode) {
                             $wrapperGroup->nodes[] = $nodes[$j];
 
                             if ($j == $lastNodeIndex) {
-                                $i += 1; // Force the outer loop to break as well.
+                                $doBreak = true;
                                 break;
                             }
                         } else {
                             if ($j == $lastNodeIndex) {
-                                $i += 1; // Force the outer loop to break as well.
+                                $doBreak = true;
                                 break;
                             }
 
@@ -223,6 +225,10 @@ class LanguageParser
                 $wrapperGroup->endPosition = $wrapperGroup->nodes[count($wrapperGroup->nodes) - 1]->endPosition;
 
                 $newNodes[] = $wrapperGroup;
+
+                if ($doBreak) {
+                    break;
+                }
             } else {
                 $newNodes[] = $thisNode;
             }
