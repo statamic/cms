@@ -6,7 +6,7 @@
 - Fix assets not being attached to, or listed in form submission emails. [#6408](https://github.com/statamic/cms/issues/6408) by @jacksleight
 - The `embed_url` modifier handles unlisted Vimeo URLs. [#6413](https://github.com/statamic/cms/issues/6413) by @ryanmitchell
 - The `toggle` field's `inline_label` option uses markdown. [#6412](https://github.com/statamic/cms/issues/6412) by @jesseleite
-- Fix parameters not being available within partial slots. [#6405](https://github.com/statamic/cms/issues/6405) by @JohnathonKoster
+- ~~Fix parameters not being available within partial slots.~~ Reverted in 3.3.26 [#6405](https://github.com/statamic/cms/issues/6405) by @JohnathonKoster
 - Fix aggressiveness of html minification when rendering form fields. [#6394](https://github.com/statamic/cms/issues/6394) by @jesseleite
 - Fix password reset for unactivated user accounts. [#6406](https://github.com/statamic/cms/issues/6406) by @jasonvarga
 - Bump `moment` from 2.29.2 to 2.29.4 [#6410](https://github.com/statamic/cms/issues/6410) by @dependabot
