@@ -5,7 +5,6 @@ namespace Statamic\Providers;
 use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -27,7 +26,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 {
     /**
      * Array of event class => Listener class
-     * @var array<class-string<Dispatchable>, class-string[]>
+     * @var array<class-string, class-string[]>
      */
     protected $listen = [];
 
