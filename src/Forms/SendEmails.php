@@ -2,18 +2,15 @@
 
 namespace Statamic\Forms;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Sites\Site;
 
-class SendEmails implements ShouldQueue
+class SendEmails
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, SerializesModels;
 
     protected $submission;
     protected $site;
@@ -26,8 +23,17 @@ class SendEmails implements ShouldQueue
 
     public function handle()
     {
-        $this->emailConfigs($this->submission)->each(function ($config) {
-            Mail::send(new Email($this->submission, $config, $this->site));
+        $this->buildJobs()->each(function ($job) {
+            Bus::dispatch($job);
+        });
+    }
+
+    public function buildJobs()
+    {
+        return $this->emailConfigs($this->submission)->map(function ($config) {
+            $sendJobClass = config('statamic.forms.send_mail_job');
+
+            return new $sendJobClass($this->submission, $this->site, $config);
         });
     }
 

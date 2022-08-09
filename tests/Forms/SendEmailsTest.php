@@ -36,7 +36,9 @@ class SendEmailsTest extends TestCase
         (new SendEmails(
             $submission = $form->makeSubmission(),
             $site = Mockery::mock(Site::class)
-        ))->handle();
+        ))->buildJobs()->each(function ($job) {
+            $job->handle();
+        });
 
         Mail::assertSent(Email::class, 2);
 
@@ -83,7 +85,9 @@ class SendEmailsTest extends TestCase
         (new SendEmails(
             $submission = $form->makeSubmission(),
             $site = Mockery::mock(Site::class)
-        ))->handle();
+        ))->buildJobs()->each(function ($job) {
+            $job->handle();
+        });
 
         Mail::assertSent(Email::class, 1);
 

@@ -35,4 +35,15 @@ return [
 
     'email_view_folder' => null,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Form Email send Job.
+    |--------------------------------------------------------------------------
+    |
+    | The Job to send a single Form Email.
+    |
+    */
+
+    'send_mail_job' => \Statamic\Forms\SendEmail::class,
+
 ];
