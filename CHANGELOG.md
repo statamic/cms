@@ -1,5 +1,21 @@
 # Release Notes
 
+## 3.3.27 (2022-08-09)
+
+### What's improved
+- Auto generated entry titles get trimmed. [#6473](https://github.com/statamic/cms/issues/6473) by @aerni
+- Reorderable select field options are styled with grab handles. [#6451](https://github.com/statamic/cms/issues/6451) by @jacksleight
+- Added phpdoc type information to AddonServiceProvider. [#6465](https://github.com/statamic/cms/issues/6465) by @j6s
+
+### What's fixed
+- Fix terms not resolving query builders (e.g. nested entries or terms) in GraphQL. [#6379](https://github.com/statamic/cms/issues/6379) by @boydseltenrijch
+- Fix `locales` tag not outputting collection specific term URLs. [#6466](https://github.com/statamic/cms/issues/6466) by @jasonvarga
+- Fix methods getting called more than expected in Antlers. [#6458](https://github.com/statamic/cms/issues/6458) by @JohnathonKoster
+- Prevent `theme:output` tag from rendering files outside of the `resources` directory. [#6456](https://github.com/statamic/cms/issues/6456) by @jasonvarga
+- Remove redundant `orWhere` methods in entry and term query builders. [#6460](https://github.com/statamic/cms/issues/6460) by @ryanmitchell
+
+
+
 ## 3.3.26 (2022-08-08)
 
 ### What's new
