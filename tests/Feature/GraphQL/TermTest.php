@@ -227,13 +227,13 @@ GQL;
     /** @test */
     public function it_resolves_query_builders()
     {
-        $blueprint = Blueprint::makeFromFields([])->setHandle('test');
-        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
+        $blueprint = Blueprint::makeFromFields([]);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint->setHandle('test')]));
         EntryFactory::collection('test')->id('bravo')->data(['title' => 'Bravo'])->create();
         EntryFactory::collection('test')->id('charlie')->data(['title' => 'Charlie'])->create();
 
-        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']])->setHandle('tags');
-        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint->setHandle('tags')]));
 
         Taxonomy::make('tags')->save();
         Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alpha')->data([
