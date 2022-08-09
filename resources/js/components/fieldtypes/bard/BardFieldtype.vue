@@ -64,8 +64,11 @@
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
-        <div class="bard-footer-toolbar" v-if="config.reading_time">
-            {{ readingTime }} {{ __('Reading Time') }}
+        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit)">
+            <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
+            <div v-else />
+
+            <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
         </div>
     </div>
 
@@ -77,6 +80,7 @@ import { BubbleMenu, Editor, EditorContent, FloatingMenu } from '@tiptap/vue-2';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
 import BulletList from '@tiptap/extension-bullet-list';
+import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import HardBreak from '@tiptap/extension-hard-break';
@@ -87,6 +91,7 @@ import Italic from '@tiptap/extension-italic';
 import ListItem from '@tiptap/extension-list-item';
 import OrderedList from '@tiptap/extension-ordered-list';
 import Paragraph from '@tiptap/extension-paragraph';
+import Placeholder from '@tiptap/extension-placeholder';
 import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
@@ -537,10 +542,12 @@ export default {
 
         getExtensions() {
             let exts = [
+                CharacterCount.configure({ limit: this.config.character_limit }),
                 Document,
                 HardBreak,
                 History,
                 Paragraph,
+                Placeholder.configure({ placeholder: this.config.placeholder }),
                 Set.configure({ bard: this }),
                 Text
             ];
