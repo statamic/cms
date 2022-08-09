@@ -177,9 +177,7 @@
 	@include clickable;
 	@apply flex items-center text-sm rounded py-0 px-1 mr-1;
 
-    &.sortable-item,
-	&.sortable-tag,
-	&.sortable-rule { @apply cursor-grab; }
+    &.sortable-item { @apply cursor-grab; }
 }
 
 .vs__deselect {
