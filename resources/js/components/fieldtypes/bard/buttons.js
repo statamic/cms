@@ -22,6 +22,10 @@ const availableButtons = () => [
     { name: 'code', text: __('Inline Code'), command: (editor) => editor.commands.toggleCode(), svg: 'angle-brackets-bold' },
     { name: 'codeblock', text: __('Code Block'), command: (editor) => editor.commands.toggleCodeBlock(), svg: 'code-block' },
     { name: 'horizontalrule', text: __('Horizontal Rule'), command: (editor) => editor.commands.setHorizontalRule(), svg: 'range' },
+    { name: 'alignleft', text: __('Align Left'), command: (editor) => editor.chain().focus().setTextAlign('left').run(), icon: 'align-left' },
+    { name: 'aligncenter', text: __('Align Center'), command: (editor) => editor.chain().focus().setTextAlign('center').run(), icon: 'align-center' },
+    { name: 'alignright', text: __('Align Right'), command: (editor) => editor.chain().focus().setTextAlign('right').run(), icon: 'align-right' },
+    { name: 'alignjustify', text: __('Align Justify'), command: (editor) => editor.chain().focus().setTextAlign('justify').run(), icon: 'align-justify' },
 ];
 
 const addButtonHtml = (buttons) => {

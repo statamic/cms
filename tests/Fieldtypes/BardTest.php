@@ -221,6 +221,7 @@ class BardTest extends TestCase
         $expected = [
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'This is a paragraph with '],
                     ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
@@ -229,6 +230,7 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Second '],
                     ['type' => 'text', 'text' => 'paragraph', 'marks' => [
@@ -311,6 +313,7 @@ class BardTest extends TestCase
         $expected = [
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'This is a paragraph with '],
                     ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
@@ -319,6 +322,7 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Second paragraph.'],
                 ],
@@ -337,6 +341,7 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Another paragraph.'],
                 ],
