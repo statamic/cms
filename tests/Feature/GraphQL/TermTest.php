@@ -19,13 +19,6 @@ class TermTest extends TestCase
 
     protected $enabledQueries = ['taxonomies'];
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        BlueprintRepository::partialMock();
-    }
-
     /**
      * @test
      * @environment-setup disableQueries
@@ -227,13 +220,15 @@ GQL;
     /** @test */
     public function it_resolves_query_builders()
     {
-        $blueprint = Blueprint::makeFromFields([]);
-        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint->setHandle('test')]));
+        BlueprintRepository::partialMock();
+
+        $blueprint = Blueprint::makeFromFields([])->setHandle('test');
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
         EntryFactory::collection('test')->id('bravo')->data(['title' => 'Bravo'])->create();
         EntryFactory::collection('test')->id('charlie')->data(['title' => 'Charlie'])->create();
 
-        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
-        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint->setHandle('tags')]));
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']])->setHandle('tags');
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
 
         Taxonomy::make('tags')->save();
         Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alpha')->data([
