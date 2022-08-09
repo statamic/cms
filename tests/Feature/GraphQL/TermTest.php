@@ -19,13 +19,6 @@ class TermTest extends TestCase
 
     protected $enabledQueries = ['taxonomies'];
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        BlueprintRepository::partialMock();
-    }
-
     /**
      * @test
      * @environment-setup disableQueries
@@ -228,6 +221,9 @@ GQL;
     public function it_resolves_query_builders()
     {
         $blueprint = Blueprint::makeFromFields([])->setHandle('test');
+
+        BlueprintRepository::partialMock();
+
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
         EntryFactory::collection('test')->id('bravo')->data(['title' => 'Bravo'])->create();
         EntryFactory::collection('test')->id('charlie')->data(['title' => 'Charlie'])->create();
@@ -270,6 +266,65 @@ GQL;
                         [
                             'id' => 'charlie',
                             'title' => 'Charlie',
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_resolves_sub_terms()
+    {
+        $blueprint = Blueprint::makeFromFields([])->setHandle('test');
+
+        BlueprintRepository::partialMock();
+
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/colors')->andReturn(collect(['colors' => $blueprint]));
+
+        Taxonomy::make('colors')->save();
+        Term::make()->taxonomy('colors')->inDefaultLocale()->slug('red')->data(['title' => 'Red'])->save();
+        Term::make()->taxonomy('colors')->inDefaultLocale()->slug('blue')->data(['title' => 'Blue'])->save();
+
+        $blueprint = Blueprint::makeFromFields(['colors' => ['type' => 'terms', 'taxonomies' => 'colors']])->setHandle('test');
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
+
+        Taxonomy::make('tags')->save();
+        Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alpha')->data([
+            'title' => 'Alpha',
+            'colors' => ['red', 'blue'],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        id
+        ... on Term_Tags_Test {
+            colors {
+                id
+                ... on Term_Colors_Test {
+                    title
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'term' => [
+                    'id' => 'tags::alpha',
+                    'colors' => [
+                        [
+                            'id' => 'colors::red',
+                            'title' => 'Red',
+                        ],
+                        [
+                            'id' => 'colors::blue',
+                            'title' => 'Blue',
                         ],
                     ],
                 ],
