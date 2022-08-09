@@ -136,7 +136,7 @@ export default {
         },
 
         showFieldPreviews() {
-            return this.options.bard.config.previews;
+            return this.extension.options.bard.config.previews;
         },
 
     },
