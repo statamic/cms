@@ -125,9 +125,7 @@ class UserController extends Controller
         $validator = Validator::make($values, $fieldRules);
 
         if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            return back()->withInput()->withErrors($errors, 'user.profile');
+            return $this->userProfileFailure($validator->errors());
         }
 
         $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
@@ -146,7 +144,7 @@ class UserController extends Controller
 
         session()->flash('user.profile.success', __('Update successful.'));
 
-        return request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+        return $this->userProfileSuccess();
     }
 
     public function password(Request $request)
@@ -159,9 +157,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            return back()->withInput()->withErrors($errors, 'user.password');
+            return $this->userPasswordFailure($validator->errors());
         }
 
         $user->password($request->password);
@@ -170,7 +166,7 @@ class UserController extends Controller
 
         session()->flash('user.password.success', __('Change successful.'));
 
-        return request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+        return $this->userPasswordSuccess();
     }
 
     public function username()
@@ -191,6 +187,38 @@ class UserController extends Controller
 
         session()->flash('user.register.success', __('Registration successful.'));
         session()->flash('user.register.user_created', ! $silentFailure);
+
+        return $response;
+    }
+
+    private function userProfileFailure($errors = null)
+    {
+        $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
+
+        return $errorResponse->withInput()->withErrors($errors, 'user.profile');
+    }
+
+    private function userProfileSuccess(bool $silentFailure = false)
+    {
+        $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+
+        session()->flash('user.profile.success', __('Update successful.'));
+
+        return $response;
+    }
+
+    private function userPasswordFailure($errors = null)
+    {
+        $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
+
+        return $errorResponse->withInput()->withErrors($errors, 'user.password');
+    }
+
+    private function userPasswordSuccess(bool $silentFailure = false)
+    {
+        $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+
+        session()->flash('user.password.success', __('Change successful.'));
 
         return $response;
     }
