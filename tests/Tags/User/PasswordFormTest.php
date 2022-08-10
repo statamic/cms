@@ -156,7 +156,7 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The password is incorrect.',
+            'validation.current_password',
         ];
 
         $this->assertEmpty($success[1]);
@@ -261,7 +261,7 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The password is incorrect.',
+            'validation.current_password',
         ];
 
         $this->assertEmpty($success[1]);

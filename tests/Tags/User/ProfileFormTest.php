@@ -73,8 +73,8 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Name</label><input type="text" name="name" value="Test User">',
             '<label>Email Address</label><input type="email" name="email" value="test@example.com">',
+            '<label>Name</label><input type="text" name="name" value="Test User">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
