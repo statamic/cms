@@ -155,13 +155,15 @@ EOT
         preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
-        $expected = [
+        $expected = [[
             'validation.current_password',
-        ];
+        ], [
+            'The password is incorrect.',
+        ]];
 
         $this->assertEmpty($success[1]);
-        $this->assertEquals($expected, $errors[1]);
-        $this->assertEquals($expected, $inlineErrors[1]);
+        $this->assertContains($errors[1], $expected);
+        $this->assertContains($inlineErrors[1], $expected);
     }
 
     /** @test */
@@ -260,13 +262,15 @@ EOT
         preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
-        $expected = [
+        $expected = [[
             'validation.current_password',
-        ];
+        ], [
+            'The password is incorrect.',
+        ]];
 
         $this->assertEmpty($success[1]);
-        $this->assertEquals($expected, $errors[1]);
-        $this->assertEquals($expected, $inlineErrors[1]);
+        $this->assertContains($errors[1], $expected);
+        $this->assertContains($inlineErrors[1], $expected);
     }
 
     /** @test */
