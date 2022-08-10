@@ -33,7 +33,7 @@ class PasswordFormTest extends TestCase
     public function it_renders_form_with_params()
     {
         $this->actingAs(User::make()->password('mypassword')->save());
-        
+
         $output = $this->tag('{{ user:password_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:password_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/password" class="form" id="form">', $output);

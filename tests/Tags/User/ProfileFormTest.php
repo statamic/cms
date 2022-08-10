@@ -34,7 +34,7 @@ class ProfileFormTest extends TestCase
     public function it_renders_form_with_params()
     {
         $this->actingAs(User::make()->save());
-        
+
         $output = $this->tag('{{ user:profile_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:profile_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/profile" class="form" id="form">', $output);
