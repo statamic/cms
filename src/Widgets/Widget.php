@@ -38,7 +38,6 @@ abstract class Widget
      * Set config when loading widget.
      *
      * @param  array  $config
-     * @return array
      */
     public function setConfig($config)
     {

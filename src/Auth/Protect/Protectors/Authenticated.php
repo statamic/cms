@@ -42,7 +42,7 @@ class Authenticated extends Protector
 
     protected function isLoginUrl()
     {
-        return parse_url($this->url, PHP_URL_PATH) === parse_url($this->getLoginUrl(), PHP_URL_PATH);
+        return parse_url($this->url, PHP_URL_PATH) === parse_url((string) $this->getLoginUrl(), PHP_URL_PATH);
     }
 
     protected function shouldAppendRedirect()

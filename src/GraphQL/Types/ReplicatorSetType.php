@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL\Types;
 
+use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Value;
 
@@ -29,7 +30,13 @@ class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
                 $field['resolve'] = function ($row, $args, $context, $info) {
                     $value = $row[$info->fieldName];
 
-                    return $value instanceof Value ? $value->value() : $value;
+                    $value = $value instanceof Value ? $value->value() : $value;
+
+                    if ($value instanceof Builder) {
+                        $value = $value->get();
+                    }
+
+                    return $value;
                 };
 
                 return $field;

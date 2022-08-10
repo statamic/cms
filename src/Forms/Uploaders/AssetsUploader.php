@@ -2,8 +2,11 @@
 
 namespace Statamic\Forms\Uploaders;
 
+use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Path;
+use Statamic\Fieldtypes\Assets\UndefinedContainerException;
 use Statamic\Support\Arr;
 
 class AssetsUploader
@@ -32,20 +35,20 @@ class AssetsUploader
     }
 
     /**
-     * Upload the files and return their paths.
+     * Upload the files and return their IDs.
      *
      * @param  mixed  $files
      * @return array|string
      */
     public function upload($files)
     {
-        $paths = $this->getUploadableFiles($files)->map(function ($file) {
-            return $this->createAsset($file)->path();
+        $ids = $this->getUploadableFiles($files)->map(function ($file) {
+            return $this->createAsset($file)->id();
         });
 
         return $this->isSingleFile()
-            ? $paths->first()
-            : $paths->all();
+            ? $ids->first()
+            : $ids->all();
     }
 
     /**
@@ -76,12 +79,34 @@ class AssetsUploader
         $path = Path::assemble($this->config->get('folder'), $file->getClientOriginalName());
 
         $asset = Asset::make()
-            ->container($this->config->get('container'))
+            ->container($this->assetContainer())
             ->path(ltrim($path, '/'));
 
         $asset->upload($file)->save();
 
         return $asset;
+    }
+
+    /**
+     * Find the asset container.
+     *
+     * @return \Statamic\Contracts\Assets\AssetContainer
+     */
+    protected function assetContainer()
+    {
+        if ($configured = $this->config->get('container')) {
+            if ($container = AssetContainer::find($configured)) {
+                return $container;
+            }
+
+            throw new AssetContainerNotFoundException($configured);
+        }
+
+        if (($containers = AssetContainer::all())->count() === 1) {
+            return $containers->first();
+        }
+
+        throw new UndefinedContainerException;
     }
 
     /**

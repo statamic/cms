@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Indexes;
 
-use Statamic\Support\Str;
+use Statamic\Query\ResolveValue;
 
 class Value extends Index
 {
@@ -15,29 +15,6 @@ class Value extends Index
 
     public function getItemValue($item)
     {
-        $method = Str::camel($this->name);
-
-        if ($method === 'blueprint') {
-            return $item->blueprint()->handle();
-        }
-
-        if ($method === 'entriesCount') {
-            return $item->entriesCount();
-        }
-
-        // Don't want to use the authors() method, which would happen right after this.
-        if ($method === 'authors') {
-            return $item->value('authors');
-        }
-
-        if (method_exists($item, $method)) {
-            return $item->{$method}();
-        }
-
-        if (method_exists($item, 'value')) {
-            return $item->value($this->name);
-        }
-
-        return $item->get($this->name);
+        return (new ResolveValue)($item, $this->name);
     }
 }

@@ -2,7 +2,7 @@
 
     <div class="blueprint-section"
         :class="{
-            'w-full md:w-1/2 2xl:w-1/3': !isEditing && !isSingle,
+            'w-full md:w-1/2': !isEditing && !isSingle,
             'w-full': isEditing || isSingle
         }"
     >

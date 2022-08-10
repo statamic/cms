@@ -4,10 +4,12 @@ namespace Statamic\GraphQL;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelProvider;
+use Rebing\GraphQL\GraphQLController;
 use Statamic\Contracts\GraphQL\ResponseCache;
 use Statamic\GraphQL\ResponseCache\DefaultCache;
 use Statamic\GraphQL\ResponseCache\NullCache;
 use Statamic\Http\Middleware\API\SwapExceptionHandler;
+use Statamic\Http\Middleware\HandleToken;
 use Statamic\Http\Middleware\RequireStatamicPro;
 
 class ServiceProvider extends LaravelProvider
@@ -26,10 +28,9 @@ class ServiceProvider extends LaravelProvider
             }
 
             if (! config('statamic.graphql.enabled')) {
-                config(['graphql.routes' => false]);
+                $this->disableGraphqlRoutes();
             }
 
-            $this->addMiddleware();
             $this->disableGraphiql();
             $this->setDefaultSchema();
         });
@@ -38,6 +39,8 @@ class ServiceProvider extends LaravelProvider
     public function boot()
     {
         Event::subscribe(Subscriber::class);
+
+        $this->app->booted(fn () => $this->addMiddleware());
     }
 
     private function hasPublishedConfig()
@@ -45,12 +48,22 @@ class ServiceProvider extends LaravelProvider
         return $this->app['files']->exists(config_path('graphql.php'));
     }
 
+    private function disableGraphqlRoutes()
+    {
+        $key = $this->isLegacyRebingGraphql() ? 'graphql.routes' : 'graphql.route';
+
+        config([$key => false]);
+    }
+
     private function addMiddleware()
     {
-        config(['graphql.middleware' => [
-            SwapExceptionHandler::class,
-            RequireStatamicPro::class,
-        ]]);
+        collect($this->app['router']->getRoutes()->getRoutes())
+            ->filter(fn ($route) => $route->getAction()['uses'] === GraphQLController::class.'@query')
+            ->each(fn ($route) => $route->middleware([
+                SwapExceptionHandler::class,
+                RequireStatamicPro::class,
+                HandleToken::class,
+            ]));
     }
 
     private function disableGraphiql()
@@ -61,5 +74,10 @@ class ServiceProvider extends LaravelProvider
     private function setDefaultSchema()
     {
         config(['graphql.schemas.default' => DefaultSchema::class]);
+    }
+
+    protected function isLegacyRebingGraphql()
+    {
+        return class_exists('\Rebing\GraphQL\Support\ResolveInfoFieldsAndArguments');
     }
 }

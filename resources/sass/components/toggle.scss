@@ -8,6 +8,16 @@ $toggle_radius: 20px;
     height: 32px;
     display: flex;
     align-items: center;
+
+    .inline-label {
+        @apply .ml-1 .font-normal .text-grey-70;
+        a {
+            @apply .text-grey-80 underline;
+            &:hover {
+                @apply .text-blue-darker;
+            }
+        }
+    }
 }
 
 .locale-status-field .toggle-fieldtype-wrapper {
@@ -66,6 +76,12 @@ $toggle_radius: 20px;
 
     .toggle-knob:focus {
         box-shadow: 0 0 10px rgba(#64BD63, .7);
+    }
+}
+
+.toggle-container.on.read-only {
+    .toggle-slider {
+        @apply bg-grey-50;
     }
 }
 

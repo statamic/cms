@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
@@ -18,12 +19,11 @@ use Statamic\Tags\Concerns;
 class Entries
 {
     use Concerns\QueriesScopes,
-        Concerns\GetsQueryResults;
+        Concerns\QueriesOrderBys,
+        Concerns\GetsQueryResults,
+        Concerns\GetsQuerySelectKeys;
     use Concerns\QueriesConditions {
         queryableConditionParams as traitQueryableConditionParams;
-    }
-    use Concerns\QueriesOrderBys {
-        queryOrderBys as traitQueryOrderBys;
     }
 
     protected $ignoredParams = ['as'];
@@ -144,6 +144,7 @@ class Entries
         $query = Entry::query()
             ->whereIn('collection', $this->collections->map->handle()->all());
 
+        $this->querySelect($query);
         $this->querySite($query);
         $this->queryStatus($query);
         $this->queryPastFuture($query);
@@ -210,13 +211,14 @@ class Entries
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
 
-        if ($collection->orderable()) {
-            return 'order:asc';
-        } elseif ($collection->dated()) {
-            return 'date:desc|title:asc';
-        }
+        return $collection->sortField().':'.$collection->sortDirection();
+    }
 
-        return 'title:asc';
+    protected function querySelect($query)
+    {
+        if ($keys = $this->getQuerySelectKeys(Entry::make())) {
+            $query->select($keys);
+        }
     }
 
     protected function querySite($query)
@@ -305,6 +307,10 @@ class Entries
             $taxonomy = substr($param, 9);
             [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, 'any');
 
+            if (Compare::isQueryBuilder($values)) {
+                $values = $values->get();
+            }
+
             if (is_string($values)) {
                 $values = array_filter(explode('|', $values));
             }
@@ -325,30 +331,16 @@ class Entries
                 $values->each(function ($value) use ($query) {
                     $query->whereTaxonomy($value);
                 });
+            } elseif ($modifier === 'not') {
+                $query->whereTaxonomyNotIn($values->all());
             } elseif ($modifier === 'any') {
                 $query->whereTaxonomyIn($values->all());
             } else {
                 throw new InvalidArgumentException(
-                    'Unknown taxonomy query modifier ['.$modifier.']. Valid values are "any" and "all".'
+                    'Unknown taxonomy query modifier ['.$modifier.']. Valid values are "any", "not", and "all".'
                 );
             }
         });
-    }
-
-    protected function queryOrderBys($query)
-    {
-        $isSortingByOrder = null !== $this->orderBys->first(function ($orderBy) {
-            return $orderBy->sort === 'order';
-        });
-
-        if ($isSortingByOrder) {
-            $nonOrderableCollections = $this->collections->reject->orderable();
-            if ($nonOrderableCollections->isNotEmpty()) {
-                throw new \LogicException('Cannot sort a nested collection by order.');
-            }
-        }
-
-        return $this->traitQueryOrderBys($query);
     }
 
     protected function queryRedirects($query)

@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Statamic\Data\ContainsData;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -46,15 +45,18 @@ class FluentlyGetsAndSetsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_and_set_into_the_data_property_through_magic_methods_in_parent()
+    public function it_can_get_and_set_via_magic_getter()
     {
-        $entry = new EntryContainingData;
-        $this->assertNull($entry->get('template'));
+        // A class that has __get and __set methods.
+        // We'll use them to store the values in a "data" array property.
+        $entry = new EntryWithMagicGetter;
+
+        $this->assertEquals([], $entry->data);
         $this->assertEquals('default', $entry->template());
 
         $entry->template('foo');
 
-        $this->assertEquals('foo', $entry->get('template'));
+        $this->assertEquals(['template' => 'foo'], $entry->data);
         $this->assertEquals('foo', $entry->template());
     }
 
@@ -105,7 +107,7 @@ class Entry
     {
         return $this->fluentlyGetOrSet('title')
             ->getter(function ($title) {
-                return Str::title($title) ?: null;
+                return $title ? Str::title($title) : null;
             })
             ->setter(function ($title) {
                 return Str::plural($title);
@@ -123,9 +125,9 @@ class Entry
     }
 }
 
-class EntryContainingData extends Entry
+class EntryWithMagicGetter extends Entry
 {
-    use ContainsData;
+    public $data = [];
 
     public function template($template = null)
     {
@@ -135,5 +137,15 @@ class EntryContainingData extends Entry
                 return $template ?? 'default';
             })
             ->args(func_get_args());
+    }
+
+    public function __get($key)
+    {
+        return $this->data[$key] ?? null;
+    }
+
+    public function __set($key, $value)
+    {
+        $this->data[$key] = $value;
     }
 }

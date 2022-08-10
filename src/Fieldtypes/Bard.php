@@ -22,7 +22,7 @@ class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls;
 
-    public $category = ['text', 'structured'];
+    protected $categories = ['text', 'structured'];
     protected $defaultValue = '[]';
     protected $rules = [];
 
@@ -34,6 +34,13 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
                 'type' => 'toggle',
                 'default' => false,
+                'width' => 50,
+            ],
+            'previews' => [
+                'display' => __('Field Previews'),
+                'instructions' => __('statamic::fieldtypes.bard.config.previews'),
+                'type' => 'toggle',
+                'default' => true,
                 'width' => 50,
             ],
             'sets' => [
@@ -154,6 +161,19 @@ class Bard extends Replicator
                 'type' => 'toggle',
                 'width' => 50,
             ],
+            'remove_empty_nodes' => [
+                'display' => __('Remove Empty Nodes'),
+                'instructions' => __('statamic::fieldtypes.bard.config.remove_empty_nodes'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'options' => [
+                    'false' => __("Don't remove empty nodes"),
+                    'true' => __('Remove all empty nodes'),
+                    'trim' => __('Remove empty nodes at the start and end'),
+                ],
+                'default' => 'false',
+                'width' => 50,
+            ],
         ];
     }
 
@@ -179,6 +199,8 @@ class Bard extends Replicator
     {
         $value = json_decode($value, true);
 
+        $value = $this->removeEmptyNodes($value);
+
         $structure = collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
                 return $row;
@@ -200,6 +222,43 @@ class Bard extends Replicator
         }
 
         return $structure;
+    }
+
+    protected function removeEmptyNodes($value)
+    {
+        $value = collect($value);
+
+        if ($this->config('remove_empty_nodes') === true) {
+            $empty = $value->filter(function ($value) {
+                return $this->shouldRemoveNode($value);
+            });
+
+            return $value->diffKeys($empty)->values();
+        }
+
+        if ($this->config('remove_empty_nodes') === 'trim') {
+            if ($this->shouldRemoveNode($value->first())) {
+                $value->shift();
+
+                return $this->removeEmptyNodes($value);
+            }
+
+            if ($this->shouldRemoveNode($value->last())) {
+                $value->pop();
+
+                return $this->removeEmptyNodes($value);
+            }
+        }
+
+        return $value;
+    }
+
+    protected function shouldRemoveNode($value)
+    {
+        $type = Arr::get($value, 'type');
+
+        return in_array($type, ['heading', 'paragraph'])
+            && ! Arr::has($value, 'content');
     }
 
     protected function shouldSaveHtml()
@@ -304,9 +363,26 @@ class Bard extends Replicator
         }, collect())->all();
     }
 
-    protected function setRuleFieldKey($handle, $index)
+    protected function setRuleFieldPrefix($index)
     {
-        return "{$this->field->handle()}.{$index}.attrs.values.{$handle}";
+        return "{$this->field->handle()}.{$index}.attrs.values";
+    }
+
+    public function extraValidationAttributes(): array
+    {
+        if (! $this->config('sets')) {
+            return [];
+        }
+
+        return collect($this->field->value())->filter(function ($set) {
+            return $set['type'] === 'set';
+        })->map(function ($set, $index) {
+            $set = $set['attrs']['values'];
+
+            return $this->setValidationAttributes($set['type'], $set, $index);
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
     }
 
     public function isLegacyData($value)
@@ -409,7 +485,7 @@ class Bard extends Replicator
             return $value;
         }
 
-        $value = json_decode($value, true);
+        $value = json_decode($value ?? '[]', true);
 
         return collect($value)->map(function ($item) {
             if ($item['type'] !== 'set') {

@@ -3,9 +3,7 @@
 namespace Tests\Filesystem;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Filesystem\FilesystemAdapter as IlluminateFilesystemAdapter;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem as Flysystem;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Filesystem\FlysystemAdapter;
 use Tests\TestCase;
 
@@ -17,8 +15,11 @@ class FlysystemAdapterTest extends TestCase
     {
         parent::setUp();
 
-        $this->tempDir = __DIR__.'/tmp';
-        mkdir($this->tempDir);
+        if (version_compare(app()->version(), '8.48.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        mkdir($this->tempDir = __DIR__.'/tmp');
 
         $this->adapter = $this->makeAdapter();
     }
@@ -32,20 +33,12 @@ class FlysystemAdapterTest extends TestCase
 
     protected function makeAdapter()
     {
-        // Equivalent to `Storage::disk()`
-        $this->filesystem = new IlluminateFilesystemAdapter(
-            new Flysystem(new Local($this->tempDir))
-        );
+        $this->filesystem = Storage::build([
+            'driver' => 'local',
+            'root' => $this->tempDir,
+        ]);
 
         return new FlysystemAdapter($this->filesystem);
-    }
-
-    /** @test */
-    public function gets_fallback_if_a_file_doesnt_exist_and_asserts_are_disabled()
-    {
-        $this->filesystem->getConfig()->set('disable_asserts', true);
-
-        $this->assertEquals('Hello World', $this->adapter->get('filename.txt', 'Hello World'));
     }
 
     /** @test */

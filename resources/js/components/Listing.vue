@@ -21,6 +21,7 @@ export default {
             default: () => [],
         },
         filters: Array,
+        actionUrl: String,
     },
 
     data() {

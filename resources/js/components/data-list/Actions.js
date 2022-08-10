@@ -46,6 +46,7 @@ export default {
             this.$axios.post(this.url, payload, { responseType: 'blob' }).then(response => {
                 if (response.headers['content-disposition']) {
                     this.downloadFile(response);
+                    this.$emit('completed', true);
                 }
 
                 // We need a blob for file downloads, but we need to convert it back to JSON to handle a redirect

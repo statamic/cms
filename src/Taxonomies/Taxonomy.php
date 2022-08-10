@@ -2,6 +2,8 @@
 
 namespace Statamic\Taxonomies;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
@@ -9,8 +11,10 @@ use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomyDeleted;
 use Statamic\Events\TaxonomySaved;
+use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
@@ -23,7 +27,7 @@ use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Taxonomy implements Contract, Responsable, AugmentableContract
+class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess, Arrayable
 {
     use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
 
@@ -35,6 +39,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     protected $defaultPublishState = true;
     protected $revisions = false;
     protected $searchIndex;
+    protected $previewTargets = [];
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -156,11 +163,45 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return $query;
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
+        $isNew = is_null(Facades\Taxonomy::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (TaxonomySaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\Taxonomy::save($this);
 
-        TaxonomySaved::dispatch($this);
+        if ($withEvents) {
+            if ($isNew) {
+                TaxonomyCreated::dispatch($this);
+            }
+
+            TaxonomySaved::dispatch($this);
+        }
 
         return true;
     }
@@ -176,11 +217,19 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return true;
     }
 
+    public function truncate()
+    {
+        $this->queryTerms()->get()->each->delete();
+
+        return true;
+    }
+
     public function fileData()
     {
         $data = [
             'title' => $this->title,
             'blueprints' => $this->blueprints,
+            'preview_targets' => $this->previewTargetsForFile(),
         ];
 
         if (Site::hasMultiple()) {
@@ -195,15 +244,6 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     public function defaultPublishState($state = null)
     {
         return $this->fluentlyGetOrSet('defaultPublishState')->args(func_get_args());
-    }
-
-    public function toArray()
-    {
-        return [
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'blueprints' => $this->blueprints,
-        ];
     }
 
     public function sites($sites = null)
@@ -345,5 +385,61 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
             'url' => $this->url(),
             'permalink' => $this->absoluteUrl(),
         ], $this->supplements->all());
+    }
+
+    public function previewTargets($targets = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('previewTargets')
+            ->getter(function () {
+                return $this->basePreviewTargets()->merge($this->additionalPreviewTargets());
+            })
+            ->args(func_get_args());
+    }
+
+    public function basePreviewTargets()
+    {
+        $targets = empty($this->previewTargets)
+            ? $this->defaultPreviewTargets()
+            : $this->previewTargets;
+
+        return collect($targets);
+    }
+
+    public function addPreviewTargets($targets)
+    {
+        Facades\Taxonomy::addPreviewTargets($this->handle, $targets);
+
+        return $this;
+    }
+
+    public function additionalPreviewTargets()
+    {
+        return Facades\Taxonomy::additionalPreviewTargets($this->handle);
+    }
+
+    private function defaultPreviewTargets()
+    {
+        return [['label' => 'Term', 'format' => '{permalink}']];
+    }
+
+    private function previewTargetsForFile()
+    {
+        $targets = $this->previewTargets;
+
+        if ($targets === $this->defaultPreviewTargets()) {
+            return null;
+        }
+
+        return collect($targets)->map(function ($target) {
+            if (! $target['format']) {
+                return null;
+            }
+
+            return [
+                'label' => $target['label'],
+                'url' => $target['format'],
+            ];
+        })->filter()->values()->all();
     }
 }

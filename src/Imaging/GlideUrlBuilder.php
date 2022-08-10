@@ -4,6 +4,7 @@ namespace Statamic\Imaging;
 
 use Exception;
 use League\Glide\Urls\UrlBuilderFactory;
+use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
@@ -57,6 +58,11 @@ class GlideUrlBuilder extends ImageUrlBuilder
 
         if ($filename) {
             $path .= Str::ensureLeft(URL::encode($filename), '/');
+        }
+
+        if (isset($params['mark']) && $params['mark'] instanceof Asset) {
+            $asset = $params['mark'];
+            $params['mark'] = 'asset::'.base64_encode($asset->containerId().'/'.$asset->path());
         }
 
         return URL::prependSiteRoot($builder->getUrl($path, $params));

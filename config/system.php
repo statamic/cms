@@ -112,4 +112,31 @@ return [
     'ajax_timeout' => '600000',
     'pcre_backtrack_limit' => '-1',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Debugbar Integration
+    |--------------------------------------------------------------------------
+    |
+    | Statamic integrates with Laravel Debugbar to bring more detail to your
+    | debugging experience. Here you may adjust various default options.
+    |
+    */
+
+    'debugbar' => [
+        'pretty_print_variables' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | ASCII
+    |--------------------------------------------------------------------------
+    |
+    | During various string manipulations (e.g. slugification), Statamic will
+    | need to make ASCII character conversions. Here you may define whether
+    | or not extra characters get converted. e.g. "%" becomes "percent".
+    |
+    */
+
+    'ascii_replace_extra_symbols' => false,
+
 ];

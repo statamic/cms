@@ -25,7 +25,7 @@
                     v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
                 ></button>
             </div>
-            <dropdown-list class="ml-1 v-cloak" v-if="showHiddenTabsDropdown">
+            <dropdown-list class="ml-1" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
                     v-for="(section, index) in mainSections"
                     v-show="isTabHidden(index)"
@@ -37,7 +37,7 @@
         </div>
 
         <div class="flex justify-between">
-            <div ref="publishSectionWrapper" class="publish-section-wrapper w-full">
+            <div ref="publishSectionWrapper" class="publish-section-wrapper w-full min-w-0">
                 <div
                     role="tabpanel"
                     class="publish-section w-full"
@@ -156,24 +156,17 @@ export default {
             return this.state.errors;
         },
 
-        // A mapping of fields to which section they are in.
-        sectionFields() {
-            let fields = {};
-            this.sections.forEach(section => {
-                section.fields.forEach(field => {
-                    fields[field.handle] = section.handle;
-                })
-            });
-            return fields;
-        },
+        sectionsWithErrors() {
+            const handles = Object.keys(this.errors).map((fieldHandle) => {
+                const topFieldHandle = fieldHandle.split('.')[0];
+                const section = this.sections.find(section =>
+                    section.fields.some(field => field.handle === topFieldHandle)
+                );
 
-        // A mapping of fields with errors to which section they are in.
-        sectionErrors() {
-            let errors = {};
-            Object.keys(this.errors).forEach(field => {
-                errors[field] = this.sectionFields[field];
+                return section && section.handle
             });
-            return errors;
+
+            return _.uniq(handles);
         },
 
         actionsPortal() {
@@ -204,7 +197,7 @@ export default {
     methods: {
 
         sectionHasError(handle) {
-            return _.chain(this.sectionErrors).values().contains(handle).value();
+            return this.sectionsWithErrors.includes(handle);
         },
 
         setActive(tab) {

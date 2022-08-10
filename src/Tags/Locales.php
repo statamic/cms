@@ -7,9 +7,13 @@ use Illuminate\Support\Collection;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
+use Statamic\Tags\Concerns\GetsQuerySelectKeys;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class Locales extends Tags
 {
+    use GetsQuerySelectKeys;
+
     /**
      * @var \Statamic\Contracts\Data\Content\Content
      */
@@ -138,7 +142,9 @@ class Locales extends Tags
             return null;
         }
 
-        return $localized->toAugmentedArray();
+        $keys = $this->getQuerySelectKeys($localized);
+
+        return $localized->toAugmentedArray($keys);
     }
 
     /**
@@ -152,9 +158,32 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $id = $this->params->get('id', $this->context->get('id'));
+        $id = $this->params->get('id', $this->context->value('id'));
 
-        return $this->data = Data::find($id);
+        $data = Data::find($id);
+
+        $data = $this->workaroundForCollectionTaxonomyTerm($id, $data);
+
+        return $this->data = $data;
+    }
+
+    private function workaroundForCollectionTaxonomyTerm($id, $data)
+    {
+        if (! $this->params->bool('collection_term_workaround', true)) {
+            return $data;
+        }
+
+        if (! $data instanceof LocalizedTerm) {
+            return $data;
+        }
+
+        // If the ID is the same as the root "page" item, then we'll just use that
+        // term instead, as it'll have the collection associated with it already.
+        if ($id === ($page = $this->context->get('page'))->id()) {
+            return $page;
+        }
+
+        return $data;
     }
 
     /**
@@ -234,7 +263,7 @@ class Locales extends Tags
             return false;
         }
 
-        if (! $this->params->bool('self', true) && $item['locale']['handle'] === $this->data->locale()) {
+        if (! $this->params->bool('self', true) && $item['locale']['handle']->value() === $this->data->locale()) {
             return false;
         }
 

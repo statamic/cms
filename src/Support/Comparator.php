@@ -110,4 +110,11 @@ class Comparator
 
         return 0;
     }
+
+    public function isQueryBuilder($value)
+    {
+        return $value instanceof \Statamic\Contracts\Query\Builder
+            || $value instanceof \Illuminate\Database\Query\Builder
+            || $value instanceof \Illuminate\Database\Eloquent\Builder;
+    }
 }

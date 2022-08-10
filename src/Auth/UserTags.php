@@ -22,7 +22,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:variable_name }}
      *
-     * @return string
+     * @return void|\Statamic\Contracts\Auth\User
      */
     public function __call($method, $args)
     {
@@ -247,17 +247,11 @@ class UserTags extends Tags
      */
     public function resetPasswordForm()
     {
-        $data = [
-            'errors' => [],
-        ];
-
         if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
 
-        if (session('errors')) {
-            $data['errors'] = session('errors')->all();
-        }
+        $data = $this->getFormSession();
 
         $data['url_invalid'] = request()->isNotFilled('token');
 
@@ -287,7 +281,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:can }}
      *
-     * @return string
+     * @return string|void
      */
     public function can()
     {
@@ -336,7 +330,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:is }}
      *
-     * @return string
+     * @return string|void
      */
     public function is()
     {
@@ -385,7 +379,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:in }}
      *
-     * @return string
+     * @return string|void
      */
     public function in()
     {

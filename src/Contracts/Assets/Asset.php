@@ -78,4 +78,11 @@ interface Asset
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function download(string $name = null, array $headers = []);
+
+    /**
+     * Get the asset file contents.
+     *
+     * @return mixed
+     */
+    public function contents();
 }
