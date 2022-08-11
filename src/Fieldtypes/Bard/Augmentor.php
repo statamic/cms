@@ -169,15 +169,16 @@ class Augmentor
     public function extensions()
     {
         $extensions = [];
+        $options = ['withStatamicImageUrls' => $this->withStatamicImageUrls];
 
         foreach (static::$extensions as $name => $extension) {
             $extensions[$name] = $extension instanceof Closure
-                ? $extension($this->fieldtype, $this->withStatamicImageUrls)
+                ? $extension($this->fieldtype, $options)
                 : $extension;
         }
         foreach (static::$extensionReplacements as $name => $extension) {
             $extensions[$name] = $extension instanceof Closure
-                ? $extension($extensions[$name] ?? null, $this->fieldtype, $this->withStatamicImageUrls)
+                ? $extension($extensions[$name] ?? null, $this->fieldtype, $options)
                 : $extension;
         }
 
