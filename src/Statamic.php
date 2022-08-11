@@ -394,9 +394,7 @@ class Statamic
             return (string) $path;
         }
 
-        $cachePath = substr($path, -40);
-
-        return Cache::rememberForever("statamic-{$extension}-{$name}-{$cachePath}", function () use ($path, $extension) {
+        return Cache::rememberForever("statamic-{$extension}-{$name}-{md5($path)}", function () use ($path, $extension) {
             // In case a file without any version will be passed,
             // a random version number will be created.
             if (! Str::contains($path, '?v=')) {
