@@ -21,7 +21,7 @@ class NotFoundHttpException extends SymfonyException
 
     protected function contents()
     {
-        return (new View)
+        return app(View::class)
             ->template('errors.404')
             ->layout($this->layout())
             ->with(['response_code' => 404])

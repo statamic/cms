@@ -298,7 +298,7 @@ class CoreModifiers extends Modifier
     /**
      * Breaks arrays or collections into smaller ones of a given size.
      *
-     * @param  $value
+     * @param  mixed  $value
      * @param  array  $params
      * @return array
      */
@@ -365,7 +365,7 @@ class CoreModifiers extends Modifier
     /**
      * Debug a value with a call to JavaScript's console.log.
      *
-     * @param  $value
+     * @param  mixed  $value
      * @return string
      */
     public function consoleLog($value)
@@ -433,7 +433,7 @@ class CoreModifiers extends Modifier
     /**
      * Returns the number of items in an array.
      *
-     * @param  $value
+     * @param  mixed  $value
      * @return int
      */
     public function count($value)
@@ -746,6 +746,8 @@ class CoreModifiers extends Modifier
 
     /**
      * Converts a string to a Carbon instance and formats it according to the whim of the Overlord.
+     *
+     * @deprecated formatLocalized is deprecated since Carbon 2.55.0. You may want to use isoFormat instead.
      *
      * @param $value
      * @param $params
@@ -2057,9 +2059,9 @@ class CoreModifiers extends Modifier
     /**
      * Returns a segment by number from any valid URL or UI.
      *
-     * @param  $value
-     * @param  $params
-     * @param  $context
+     * @param  mixed  $value
+     * @param  array  $params
+     * @param  array  $context
      * @return string
      */
     public function segment($value, $params, $context)
@@ -2171,6 +2173,10 @@ class CoreModifiers extends Modifier
     public function shuffle($value, array $params)
     {
         $seed = Arr::get($params, 0);
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
 
         if (is_array($value)) {
             return collect($value)->shuffle($seed)->all();
@@ -2537,6 +2543,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Convert value to a boolean.
+     *
+     * @param $params
+     * @param $value
+     * @return bool
+     */
+    public function toBool($value, $params)
+    {
+        if (is_string($value)) {
+            return Str::toBool($value);
+        }
+
+        return boolval($value);
+    }
+
+    /**
      * Converts the data to json.
      *
      * @param $value
@@ -2643,8 +2665,8 @@ class CoreModifiers extends Modifier
     /**
      * Converts a Carbon instance to a timestamp.
      *
-     * @param  $value
-     * @param  $params
+     * @param  Carbon  $value
+     * @param  array  $params
      * @return int
      */
     public function timestamp($value)
@@ -2658,8 +2680,8 @@ class CoreModifiers extends Modifier
      * Accepts a timezone string as a parameter. If none is provided, then
      * the timezone defined in the system settings will be used.
      *
-     * @param  $value
-     * @param  $params
+     * @param  string  $value
+     * @param  array  $params
      * @return Carbon
      */
     public function timezone($value, $params)
@@ -2880,7 +2902,7 @@ class CoreModifiers extends Modifier
         // adapted mb_str_word_count from https://stackoverflow.com/a/17725577
         $words = empty($string = trim($value)) ? [] : preg_split('~[^\p{L}\p{N}\']+~u', $value);
 
-        return count($words);
+        return count(array_filter($words));
     }
 
     /**
@@ -2907,10 +2929,17 @@ class CoreModifiers extends Modifier
         if (Str::contains($url, 'vimeo')) {
             $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
 
+            [$url, $hash] = $this->handleUnlistedVimeoUrls($url);
+
+            $paramsToAdd = '?dnt=1';
+            if ($hash) {
+                $paramsToAdd .= '&h='.$hash;
+            }
+
             if (Str::contains($url, '?')) {
-                $url = str_replace('?', '?dnt=1&', $url);
+                $url = str_replace('?', $paramsToAdd.'&', $url);
             } else {
-                $url .= '?dnt=1';
+                $url .= $paramsToAdd;
             }
 
             return $url;
@@ -3051,5 +3080,22 @@ class CoreModifiers extends Modifier
         return $this->usingRuntimeMethodSyntax($context) ?
                 $params[$key] :
                 Arr::get($context, $params[$key], $params[$key]);
+    }
+
+    // unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param
+    private function handleUnlistedVimeoUrls($url)
+    {
+        $hash = '';
+        if (Str::substrCount($url, '/') > 4) {
+            $hash = Str::afterLast($url, '/');
+            $url = Str::beforeLast($url, '/');
+
+            if (Str::contains($hash, '?')) {
+                $url .= '?'.Str::after($hash, '?');
+                $hash = Str::before($hash, '?');
+            }
+        }
+
+        return [$url, $hash];
     }
 }

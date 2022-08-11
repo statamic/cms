@@ -7,10 +7,14 @@ use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Events\BlueprintCreated;
+use Statamic\Events\BlueprintSaved;
+use Statamic\Events\BlueprintSaving;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
@@ -359,6 +363,8 @@ class BlueprintTest extends TestCase
                             'append' => null,
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                     ],
                 ],
@@ -380,6 +386,8 @@ class BlueprintTest extends TestCase
                             'component' => 'textarea',
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                     ],
                 ],
@@ -454,6 +462,8 @@ class BlueprintTest extends TestCase
                             'required' => false,
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                         [
                             'handle' => 'nested_deeper_two',
@@ -470,6 +480,8 @@ class BlueprintTest extends TestCase
                             'required' => false,
                             'antlers' => false,
                             'default' => null,
+                            'visibility' => 'visible',
+                            'read_only' => false, // deprecated
                         ],
                     ],
                 ],
@@ -481,11 +493,86 @@ class BlueprintTest extends TestCase
     /** @test */
     public function it_saves_through_the_repository()
     {
-        BlueprintRepository::shouldReceive('save')->with($blueprint = new Blueprint)->once();
+        Event::fake();
+
+        $blueprint = new Blueprint;
+
+        BlueprintRepository::shouldReceive('find')->with($blueprint->handle());
+        BlueprintRepository::shouldReceive('save')->with($blueprint)->once();
 
         $return = $blueprint->save();
 
         $this->assertEquals($blueprint, $return);
+
+        Event::assertDispatched(BlueprintSaving::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint;
+        });
+
+        Event::assertDispatched(BlueprintCreated::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint;
+        });
+
+        Event::assertDispatched(BlueprintSaved::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_blueprint_created_only_once()
+    {
+        Event::fake();
+
+        $blueprint = new Blueprint;
+
+        BlueprintRepository::shouldReceive('save')->with($blueprint);
+        BlueprintRepository::shouldReceive('find')->with($blueprint->handle())->times(3)->andReturn(null, $blueprint, $blueprint);
+
+        $blueprint->save();
+        $blueprint->save();
+        $blueprint->save();
+
+        Event::assertDispatched(BlueprintSaved::class, 3);
+        Event::assertDispatched(BlueprintCreated::class, 1);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $blueprint = new Blueprint;
+
+        BlueprintRepository::shouldReceive('find')->with($blueprint->handle());
+        BlueprintRepository::shouldReceive('save')->with($blueprint)->once();
+
+        $return = $blueprint->saveQuietly();
+
+        $this->assertEquals($blueprint, $return);
+
+        Event::assertNotDispatched(BlueprintSaving::class);
+        Event::assertNotDispatched(BlueprintSaved::class);
+        Event::assertNotDispatched(BlueprintCreated::class);
+    }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_blueprint_doesnt_save()
+    {
+        Event::fake([BlueprintSaved::class]);
+
+        Event::listen(BlueprintSaving::class, function () {
+            return false;
+        });
+
+        $blueprint = new Blueprint;
+
+        BlueprintRepository::shouldReceive('find')->with($blueprint->handle());
+        BlueprintRepository::shouldReceive('save')->with($blueprint)->once();
+
+        $return = $blueprint->saveQuietly();
+
+        $this->assertEquals($blueprint, $return);
+
+        Event::assertNotDispatched(BlueprintSaved::class);
     }
 
     /** @test */
@@ -563,7 +650,7 @@ class BlueprintTest extends TestCase
             ],
         ]]);
 
-        $fields = $blueprint->ensureFieldHasConfig('author', ['read_only' => true])->fields();
+        $fields = $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only'])->fields();
 
         $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
         $this->assertEquals(['type' => 'text'], $fields->get('content')->config());
@@ -571,7 +658,7 @@ class BlueprintTest extends TestCase
         $expectedConfig = [
             'type' => 'text',
             'do_not_touch_other_config' => true,
-            'read_only' => true,
+            'visibility' => 'read_only',
         ];
 
         $this->assertEquals($expectedConfig, $fields->get('author')->config());

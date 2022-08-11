@@ -96,6 +96,7 @@ class LanguageParser
     protected $tokens = [];
 
     private $isRoot = true;
+    private $createdMethods = false;
 
     public function __construct()
     {
@@ -117,6 +118,7 @@ class LanguageParser
         $this->tokens = $this->createTupleLists($this->tokens);
 
         $this->tokens = $this->createOperatorInvocations($this->tokens);
+        $this->tokens = $this->createLogicGroupsAroundMethodCalls($this->tokens);
         $this->tokens = $this->associateModifiers($this->tokens);
         $this->tokens = $this->createNullCoalescenceGroups($this->tokens);
 
@@ -197,18 +199,20 @@ class LanguageParser
                 $wrapperGroup->nodes[] = $lastNode;
                 $wrapperGroup->nodes[] = $thisNode;
 
+                $doBreak = false;
+
                 if ($i != $lastNodeIndex) {
                     for ($j = $i + 1; $j < $nodeLen; $j++) {
                         if ($nodes[$j] instanceof MethodInvocationNode) {
                             $wrapperGroup->nodes[] = $nodes[$j];
 
                             if ($j == $lastNodeIndex) {
-                                $i += 1; // Force the outer loop to break as well.
+                                $doBreak = true;
                                 break;
                             }
                         } else {
                             if ($j == $lastNodeIndex) {
-                                $i += 1; // Force the outer loop to break as well.
+                                $doBreak = true;
                                 break;
                             }
 
@@ -221,6 +225,10 @@ class LanguageParser
                 $wrapperGroup->endPosition = $wrapperGroup->nodes[count($wrapperGroup->nodes) - 1]->endPosition;
 
                 $newNodes[] = $wrapperGroup;
+
+                if ($doBreak) {
+                    break;
+                }
             } else {
                 $newNodes[] = $thisNode;
             }
@@ -327,6 +335,7 @@ class LanguageParser
                 $methodInvocation->method = $thisNode;
 
                 $newTokens[] = $methodInvocation;
+                $this->createdMethods = true;
 
                 $i += 1;
                 continue;
@@ -364,6 +373,7 @@ class LanguageParser
                 }
 
                 $newTokens[] = $methodInvocation;
+                $this->createdMethods = true;
 
                 continue;
             } elseif ($thisNode instanceof VariableNode && $prevNode instanceof MethodInvocationNode) {
@@ -404,6 +414,7 @@ class LanguageParser
                 $methodInvocation->method = $thisNode;
 
                 $newTokens[] = $methodInvocation;
+                $this->createdMethods = true;
 
                 $i += 1;
                 continue;
@@ -454,6 +465,7 @@ class LanguageParser
                 $methodInvocation->method = $next;
 
                 $newTokens[] = $methodInvocation;
+                $this->createdMethods = true;
 
                 $i += 2;
                 continue;
@@ -1104,7 +1116,7 @@ class LanguageParser
 
                     $subNodes = $nextToken->nodes;
 
-                    if ($subNodes[0] instanceof SemanticGroup) {
+                    if (count($subNodes) > 0 && $subNodes[0] instanceof SemanticGroup) {
                         $subNodes = $subNodes[0]->nodes;
                     }
 
@@ -1538,6 +1550,7 @@ class LanguageParser
         $nodes = $this->groupNodesByType($nodes, DivisionOperator::class);
         $nodes = $this->groupNodesByType($nodes, AdditionOperator::class);
         $nodes = $this->groupNodesByType($nodes, SubtractionOperator::class);
+        $nodes = $this->groupNodesByType($nodes, ModulusOperator::class);
 
         return $nodes;
     }
@@ -1935,6 +1948,86 @@ class LanguageParser
 
                     throw $antlersException;
                 }
+            }
+        }
+
+        return $newNodes;
+    }
+
+    private function createLogicGroupsAroundMethodCalls($nodes)
+    {
+        // Bail early if we have not created any method calls anyway :)
+        if (! $this->createdMethods) {
+            return $nodes;
+        }
+
+        $newNodes = [];
+        $nodeLen = count($nodes);
+
+        for ($i = 0; $i < $nodeLen; $i++) {
+            $thisNode = $nodes[$i];
+
+            if ($thisNode instanceof MethodInvocationNode) {
+                // Check to see if we should continue.
+                $doContinue = false;
+                if ($i + 1 < $nodeLen) {
+                    for ($j = $i + 1; $j < $nodeLen; $j++) {
+                        $checkNode = $nodes[$j];
+
+                        if ($checkNode instanceof ModifierSeparator) {
+                            $doContinue = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (! $doContinue) {
+                    $newNodes[] = $thisNode;
+                    continue;
+                }
+
+                $targetNodes = [];
+                $lastNode = array_pop($newNodes);
+                $targetNodes[] = $lastNode;
+
+                // Scan backwards to find the variable this references.
+                while ($lastNode instanceof VariableNode == false) {
+                    $lastNode = array_pop($newNodes);
+                    $targetNodes[] = $lastNode;
+                }
+
+                // Add the current invocation.
+                $targetNodes[] = $thisNode;
+
+                // Scan forwards to collect all chained calls.
+                if ($i + 1 < $nodeLen && $nodes[$i + 1] instanceof  MethodInvocationNode) {
+                    $skipTo = $i;
+
+                    for ($j = $i + 1; $j < $nodeLen; $j++) {
+                        $chainedNode = $nodes[$j];
+
+                        if ($chainedNode instanceof MethodInvocationNode) {
+                            $targetNodes[] = $chainedNode;
+                        } else {
+                            $skipTo = $j;
+                            break;
+                        }
+                    }
+
+                    $i = $skipTo;
+                }
+
+                $wrapper = new LogicGroup();
+                $wrapper->startPosition = $targetNodes[0]->startPosition;
+                $wrapper->endPosition = $targetNodes[count($targetNodes) - 1]->endPosition;
+                $wrapper->nodes = $targetNodes;
+
+                $semanticWrapper = new SemanticGroup();
+                $semanticWrapper->nodes[] = $wrapper;
+
+                $newNodes[] = $semanticWrapper;
+            } else {
+                $newNodes[] = $thisNode;
             }
         }
 

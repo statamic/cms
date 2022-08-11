@@ -42,7 +42,7 @@ export default class {
     }
 
     dottedKeyToJsPath(dottedKey) {
-        return dottedKey.replace(/\.*(\d+)\./g, '[$1].');
+        return dottedKey.replace(/\.*\.(\d+)\./g, '[$1].');
     }
 
     missingValue(dottedKey) {

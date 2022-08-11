@@ -582,6 +582,16 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function revisions($enabled = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('revisions')
+            ->getter(function ($behavior) {
+                return $behavior ?? false;
+            })
+            ->args(func_get_args());
+    }
+
     public function revisionsEnabled($enabled = null)
     {
         return $this
@@ -676,6 +686,13 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         Facades\Collection::delete($this);
 
         CollectionDeleted::dispatch($this);
+
+        return true;
+    }
+
+    public function truncate()
+    {
+        $this->queryEntries()->get()->each->delete();
 
         return true;
     }

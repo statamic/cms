@@ -4,6 +4,7 @@ namespace Statamic\Support;
 
 use Statamic\Facades\Compare;
 use Stringy\StaticStringy;
+use voku\helper\ASCII;
 
 /**
  * Manipulating strings.
@@ -13,6 +14,11 @@ class Str extends \Illuminate\Support\Str
     public static function __callStatic($method, $parameters)
     {
         return call_user_func_array([StaticStringy::class, $method], $parameters);
+    }
+
+    public static function ascii($value, $language = 'en')
+    {
+        return ASCII::to_ascii((string) $value, $language, true, config('statamic.system.ascii_replace_extra_symbols'));
     }
 
     /**
@@ -30,16 +36,16 @@ class Str extends \Illuminate\Support\Str
         switch ($length) {
             case 0:
             case 1:
-                return join('', $list);
+                return implode('', $list);
                 break;
 
             case 2:
-                return join(' '.$glue.' ', $list);
+                return implode(' '.$glue.' ', $list);
                 break;
 
             default:
                 $last = array_pop($list);
-                $sentence = join(', ', $list);
+                $sentence = implode(', ', $list);
                 $sentence .= ($oxford_comma) ? ',' : '';
 
                 return $sentence.' '.$glue.' '.$last;
@@ -75,7 +81,7 @@ class Str extends \Illuminate\Support\Str
             ];
 
             $allowed_tags = array_diff($all_tags, $tags_list);
-            $allowed_tag_string = '<'.join('><', $allowed_tags).'>';
+            $allowed_tag_string = '<'.implode('><', $allowed_tags).'>';
 
             return strip_tags($html, $allowed_tag_string);
         }

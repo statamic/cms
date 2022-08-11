@@ -25,7 +25,7 @@
 
 @foreach (Statamic::availableStyles(request()) as $package => $paths)
     @foreach ($paths as $path)
-        <link href="{{ Statamic::vendorAssetUrl("$package/css/$path") }}" rel="stylesheet" />
+        <link href="{{ Statamic::vendorPackageAssetUrl($package, $path, 'css') }}" rel="stylesheet" />
     @endforeach
 @endforeach
 

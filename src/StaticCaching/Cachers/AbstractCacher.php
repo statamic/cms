@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request as RequestFacade;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
 
 abstract class AbstractCacher implements Cacher
@@ -245,24 +246,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function isExcluded($url)
     {
-        $exclusions = collect($this->config('exclude', []));
-
-        // Query strings should be ignored.
-        $url = explode('?', $url)[0];
-
-        $url = Str::removeLeft($url, $this->getBaseUrl());
-
-        foreach ($exclusions as $excluded) {
-            if (Str::endsWith($excluded, '*') && Str::startsWith($url, substr($excluded, 0, -1))) {
-                return true;
-            }
-
-            if ($url === $excluded) {
-                return true;
-            }
-        }
-
-        return false;
+        return app(UrlExcluder::class)->isExcluded($url);
     }
 
     /**

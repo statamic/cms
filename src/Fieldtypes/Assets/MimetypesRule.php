@@ -43,6 +43,6 @@ class MimetypesRule implements Rule
      */
     public function message()
     {
-        return str_replace(':values', join(', ', $this->parameters), __('statamic::validation.mimetypes'));
+        return str_replace(':values', implode(', ', $this->parameters), __('statamic::validation.mimetypes'));
     }
 }
