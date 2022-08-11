@@ -18,6 +18,10 @@ class UpdateAssetReferences implements ShouldQueue
      */
     public function subscribe($events)
     {
+        if (config('statamic.assets.update_references') === false) {
+            return;
+        }
+
         $events->listen(AssetSaved::class, self::class.'@handleSaved');
         $events->listen(AssetReplaced::class, self::class.'@handleReplaced');
     }
