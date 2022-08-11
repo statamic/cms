@@ -19,6 +19,7 @@ class Tags extends BaseTags
                 'errors' => [],
                 'no_token' => true,
             ];
+
             if (! $this->parser) {
                 return $data;
             }
