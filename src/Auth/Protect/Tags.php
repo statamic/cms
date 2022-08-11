@@ -20,11 +20,7 @@ class Tags extends BaseTags
                 'no_token' => true,
             ];
 
-            if (! $this->parser) {
-                return $data;
-            }
-
-            return $this->parse($data);
+            return $this->parser ? $this->parse($data) : $data;
         }
 
         $errors = session('errors', new ViewErrorBag)->passwordProtect;
