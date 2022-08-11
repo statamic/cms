@@ -23,17 +23,15 @@ class SendEmails
 
     public function handle()
     {
-        $this->buildJobs()->each(function ($job) {
-            Bus::dispatch($job);
-        });
+        $this->jobs()->each(fn ($job) => Bus::dispatch($job));
     }
 
-    public function buildJobs()
+    private function jobs()
     {
         return $this->emailConfigs($this->submission)->map(function ($config) {
-            $sendJobClass = config('statamic.forms.send_mail_job');
+            $class = config('statamic.forms.send_mail_job');
 
-            return new $sendJobClass($this->submission, $this->site, $config);
+            return new $class($this->submission, $this->site, $config);
         });
     }
 
