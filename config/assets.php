@@ -154,4 +154,17 @@ return [
 
     'lowercase' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Update References on Change
+    |--------------------------------------------------------------------------
+    |
+    | With this enabled, Statamic will attempt to update references to your
+    | assets when moving, renaming, replacing, deleting, etc. This will
+    | be queued, but can disabled as needed for performance reasons.
+    |
+    */
+
+    'update_references' => true,
+
 ];
