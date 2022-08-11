@@ -29,7 +29,7 @@ class SendEmails
     private function jobs()
     {
         return $this->emailConfigs($this->submission)->map(function ($config) {
-            $class = config('statamic.forms.send_mail_job');
+            $class = config('statamic.forms.send_email_job');
 
             return new $class($this->submission, $this->site, $config);
         });

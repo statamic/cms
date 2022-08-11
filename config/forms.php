@@ -37,13 +37,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Form Email send Job.
+    | Send Email Job
     |--------------------------------------------------------------------------
     |
-    | The Job to send a single Form Email.
+    | The class name of the job that will be used to send an email.
     |
     */
 
-    'send_mail_job' => \Statamic\Forms\SendEmail::class,
+    'send_email_job' => \Statamic\Forms\SendEmail::class,
 
 ];
