@@ -45,6 +45,10 @@ class ReplaceAsset extends Action
         $originalAsset = $assets->first();
         $newAsset = Facades\Asset::find($values['asset'][0]);
 
+        if ($values['delete_original']) {
+            $originalAsset->delete();
+        }
+
         AssetReplaced::dispatch($originalAsset, $newAsset);
     }
 
