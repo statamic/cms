@@ -37,7 +37,7 @@ class ReplaceAsset extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Are you sure you want to replace this asset?';
+        return 'Are you sure you want to replace this asset and all of its references?';
     }
 
     public function run($assets, $values)
