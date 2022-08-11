@@ -19,8 +19,8 @@ class BardServiceProvider extends ServiceProvider
             'hardBreak' => new \Tiptap\Nodes\HardBreak(),
             'heading' => new \Tiptap\Nodes\Heading(),
             'horizontalRule' => new \Tiptap\Nodes\HorizontalRule(),
-            'image' => function ($bard, $withStatamicImageUrls) {
-                return $withStatamicImageUrls
+            'image' => function ($bard, $options) {
+                return $options['withStatamicImageUrls']
                     ? new \Statamic\Fieldtypes\Bard\StatamicImageNode
                     : new \Statamic\Fieldtypes\Bard\ImageNode;
             },
