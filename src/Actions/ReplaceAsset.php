@@ -55,12 +55,18 @@ class ReplaceAsset extends Action
                 'display' => __('Asset'),
                 'type' => 'assets',
                 'container' => $this->context['container'],
+                'folder' => $this->context['folder'],
                 'max_files' => 1,
                 'validate' => 'required',
                 'mode' => 'list',
                 'restrict' => false,
                 'allow_uploads' => true,
                 'show_filename' => true,
+            ],
+            'delete_original' => [
+                'display' => __('Delete Original Asset'),
+                'type' => 'toggle',
+                'default' => true,
             ],
         ];
     }
