@@ -81,7 +81,7 @@ class Tags extends BaseTags
             'redirect', 'error_redirect', 'allow_request_redirect', 'csrf', 'files', 'js',
         ]);
 
-        $action = $this->params->get('action', route('statamic.forms.submit', $formHandle));
+        $action = $this->params->get('action', $form->actionUrl());
         $method = $this->params->get('method', 'POST');
 
         $attrs = [];

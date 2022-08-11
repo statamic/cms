@@ -650,13 +650,18 @@ class DocumentParser
         foreach ($this->nodes as $node) {
             if ($node instanceof AntlersNode && ! empty($node->interpolationRegions)) {
                 foreach ($node->interpolationRegions as $varName => $content) {
-                    $content = StringUtilities::substr($content, 1);
-                    $content = StringUtilities::substr($content, 0, -1);
-                    $content = '{{'.$content.'}}';
                     $docParser = new DocumentParser();
                     $docParser->setIsInterpolatedParser(true);
 
-                    $node->processedInterpolationRegions[$varName] = $docParser->parse($content);
+                    $parseResults = $docParser->parse($content);
+
+                    if (count($parseResults) > 1 && $parseResults[1] instanceof AntlersNode) {
+                        $parseResults = [$parseResults[1]];
+                    } elseif (count($parseResults) == 1 && ($parseResults[0] instanceof AntlersNode) == false) {
+                        $parseResults = [];
+                    }
+
+                    $node->processedInterpolationRegions[$varName] = $parseResults;
                 }
                 $node->hasProcessedInterpolationRegions = true;
             }
@@ -664,6 +669,22 @@ class DocumentParser
 
         $tagPairAnalyzer = new TagPairAnalyzer();
         $this->renderNodes = $tagPairAnalyzer->associate($this->nodes, $this);
+
+        foreach ($this->nodes as $node) {
+            if ($node instanceof AntlersNode && $node->isClosingTag && $node->isOpenedBy == null) {
+                $errorMessage = 'Unpaired closing tag.';
+
+                if ($node->isInterpolationNode) {
+                    $errorMessage .= ' Tag pairs are not supported within Antlers tags.';
+                }
+
+                throw ErrorFactory::makeSyntaxError(
+                    AntlersErrorCodes::TYPE_UNPAIRED_CLOSING_TAG,
+                    $node,
+                    $errorMessage
+                );
+            }
+        }
 
         RecursiveParentAnalyzer::associateRecursiveParent($this->nodes);
 
@@ -879,10 +900,13 @@ class DocumentParser
             $varContent .= str_repeat('x', $padLen);
         }
 
+        $parseContent = str_replace(DocumentParser::LeftBrace, '~', mb_substr($this->content, 0, $this->currentChunkOffset - mb_strlen($content))).'{'.$content.'}';
+
         return [
             $content,
             $varContent,
             $varContent,
+            $parseContent,
         ];
     }
 
@@ -921,6 +945,14 @@ class DocumentParser
         return str_split(self::getPipeEscape());
     }
 
+    public static function applyEscapeSequences($string)
+    {
+        $string = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $string);
+        $string = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $string);
+
+        return $string;
+    }
+
     private function getLeftBrace()
     {
         return str_split(self::getLeftBraceEscape());
@@ -956,11 +988,10 @@ class DocumentParser
 
             if ($this->cur == self::LeftBrace) {
                 $results = $this->scanToEndOfInterpolatedRegion();
-
                 GlobalRuntimeState::$interpolatedVariables[] = $results[2];
 
                 $this->currentContent = array_merge($this->currentContent, StringUtilities::split($results[2]));
-                $this->interpolationRegions[$results[1]] = $results[0];
+                $this->interpolationRegions[$results[1]] = $results[3];
                 continue;
             }
 
@@ -1075,6 +1106,7 @@ class DocumentParser
         $node->isSelfClosing = $isSelfClosing;
         $node->withParser($this);
         $node->content = implode('', $this->currentContent);
+        $node->isInterpolationNode = $this->isInterpolatedParser;
 
         $node->startPosition = $this->positionFromOffset(
             $this->startIndex + $this->seedOffset,
@@ -1137,9 +1169,11 @@ class DocumentParser
 
     /**
      * @param $offset
+     * @param $index
+     * @param  false  $isRelativeOffset
      * @return Position
      */
-    public function positionFromOffset($offset, $index)
+    public function positionFromOffset($offset, $index, $isRelativeOffset = false)
     {
         $lineToUse = 0;
         $charToUse = 0;
@@ -1160,9 +1194,21 @@ class DocumentParser
                 }
 
                 if ($nearestOffset != null) {
-                    $offsetDelta = $nearestOffset[self::K_CHAR] - $nearestOffsetIndex + $offset;
-                    $charToUse = $offsetDelta;
-                    $lineToUse = $nearestOffset[self::K_LINE];
+                    if ($isRelativeOffset) {
+                        $charToUse = $offset - $nearestOffset[self::K_CHAR];
+                        $lineToUse = $nearestOffset[self::K_LINE];
+
+                        if ($offset <= $nearestOffsetIndex) {
+                            $lineToUse = $nearestOffset[self::K_LINE];
+                            $charToUse = $offset + 1;
+                        } else {
+                            $lineToUse = $nearestOffset[self::K_LINE] + 1;
+                        }
+                    } else {
+                        $offsetDelta = $nearestOffset[self::K_CHAR] - $nearestOffsetIndex + $offset;
+                        $charToUse = $offsetDelta;
+                        $lineToUse = $nearestOffset[self::K_LINE];
+                    }
                 } else {
                     $lastOffsetKey = array_key_last($this->documentOffsets);
                     $lastOffset = $this->documentOffsets[$lastOffsetKey];

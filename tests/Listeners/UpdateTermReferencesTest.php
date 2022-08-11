@@ -789,7 +789,7 @@ class UpdateTermReferencesTest extends TestCase
     protected function setSingleBlueprint($namespace, $blueprintContents)
     {
         $topicsBlueprint = $this->topics->fallbackTermBlueprint();
-        $blueprint = tap(Facades\Blueprint::make()->setContents($blueprintContents))->save();
+        $blueprint = tap(Facades\Blueprint::make('single-blueprint')->setContents($blueprintContents))->save();
 
         Facades\Blueprint::shouldReceive('in')->with('taxonomies/topics')->andReturn(collect([$topicsBlueprint]));
         Facades\Blueprint::shouldReceive('find')->with($namespace)->andReturn($blueprint);
@@ -798,7 +798,7 @@ class UpdateTermReferencesTest extends TestCase
     protected function setInBlueprints($namespace, $blueprintContents)
     {
         $topicsBlueprint = $this->topics->fallbackTermBlueprint();
-        $blueprint = tap(Facades\Blueprint::make()->setContents($blueprintContents))->save();
+        $blueprint = tap(Facades\Blueprint::make('set-in-blueprints')->setContents($blueprintContents))->save();
 
         Facades\Blueprint::shouldReceive('in')->with('taxonomies/topics')->andReturn(collect([$topicsBlueprint]));
         Facades\Blueprint::shouldReceive('in')->with($namespace)->andReturn(collect([$blueprint]));

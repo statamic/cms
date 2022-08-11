@@ -49,6 +49,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected $path;
     protected $meta;
     protected $syncOriginalProperties = ['path'];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -444,17 +445,34 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Save quietly without firing events.
+     *
+     * @return bool
+     */
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
+    /**
      * Save the asset.
      *
      * @return bool
      */
     public function save()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         Facades\Asset::save($this);
 
         $this->clearCaches();
 
-        AssetSaved::dispatch($this);
+        if ($withEvents) {
+            AssetSaved::dispatch($this);
+        }
 
         $this->syncOriginal();
 
@@ -547,7 +565,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function move($folder, $filename = null)
     {
-        $filename = $filename ?: $this->filename();
+        $filename = $this->getSafeFilename($filename ?: $this->filename());
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
@@ -729,6 +747,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         foreach ($replacements as $from => $to) {
             $str = $str->replace($from, $to);
+        }
+
+        if (config('statamic.assets.lowercase')) {
+            $str = strtolower($str);
         }
 
         return (string) $str;

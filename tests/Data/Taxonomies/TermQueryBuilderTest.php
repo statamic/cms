@@ -566,4 +566,19 @@ class TermQueryBuilderTest extends TestCase
         $this->assertCount(2, $entries);
         $this->assertEquals(['2', '5'], $entries->map->slug()->all());
     }
+
+    /** @test */
+    public function terms_are_found_using_offset()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data([])->save();
+        Term::make('c')->taxonomy('tags')->data([])->save();
+
+        $terms = Term::query()->get();
+        $this->assertEquals(['a', 'b', 'c'], $terms->map->slug()->all());
+
+        $terms = Term::query()->offset(1)->get();
+        $this->assertEquals(['b', 'c'], $terms->map->slug()->all());
+    }
 }

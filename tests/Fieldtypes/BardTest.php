@@ -397,6 +397,50 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    public function it_removes_empty_nodes()
+    {
+        $content = '[
+            {"type":"paragraph"},
+            {"type":"heading"},
+            {"type":"paragraph", "content": "foo"},
+            {"type":"heading"},
+            {"type":"paragraph"},
+            {"type":"heading", "content": "foo"},
+            {"type":"paragraph"},
+            {"type":"heading"}
+        ]';
+
+        $containsAllEmptyNodes = $this->bard(['remove_empty_nodes' => false])->process($content);
+
+        $this->assertEquals($containsAllEmptyNodes, [
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading', 'content' => 'foo'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+        ]);
+
+        $removedAllEmptyNodes = $this->bard(['remove_empty_nodes' => true])->process($content);
+
+        $this->assertEquals($removedAllEmptyNodes, [
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading', 'content' => 'foo'],
+        ]);
+
+        $trimmedEmptyNodes = $this->bard(['remove_empty_nodes' => 'trim'])->process($content);
+
+        $this->assertEquals($trimmedEmptyNodes, [
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading', 'content' => 'foo'],
+        ]);
+    }
+
+    /** @test */
     public function it_preloads_preprocessed_default_values()
     {
         $field = (new Field('test', [
@@ -408,7 +452,7 @@ class BardTest extends TestCase
                     ],
                 ],
             ],
-        ]));
+        ]))->setValue('[]'); // what an empty value would get preprocessed into.
 
         $expected = [
             'things' => [],
@@ -443,7 +487,7 @@ class BardTest extends TestCase
                     ],
                 ],
             ],
-        ]));
+        ]))->setValue('[]'); // what an empty value would get preprocessed into.
 
         $expected = [
             '_' => '_',
@@ -534,6 +578,14 @@ EOT;
 EOT;
 
         $this->assertEquals($expected, $bard->augment($html));
+    }
+
+    /** @test */
+    public function it_converts_a_queryable_value()
+    {
+        $this->assertNull((new Bard)->toQueryableValue(null));
+        $this->assertNull((new Bard)->toQueryableValue([]));
+        $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
     }
 
     private function bard($config = [])

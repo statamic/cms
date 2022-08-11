@@ -18,7 +18,7 @@ class DeleteMultisiteEntry extends Delete
         return [
             'behavior' => [
                 'display' => __('Localizations'),
-                'instructions' => __('statamic::messages.choose_entry_localization_deletion_behavior').' <a href="'.Statamic::docsUrl('/knowledge-base/localizing-entries#deleting').'" target="_blank">'.__('Learn more').'</a>',
+                'instructions' => __('statamic::messages.choose_entry_localization_deletion_behavior').' <a href="'.Statamic::docsUrl('/tips/localizing-entries#deleting').'" target="_blank">'.__('Learn more').'</a>',
                 'type' => 'button_group',
                 'options' => [
                     'delete' => __('Delete'),

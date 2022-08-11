@@ -71,7 +71,6 @@ return [
     'fields_instructions_instructions' => 'Показывается под отображаемой меткой поля, как этот самый текст. Поддерживается Markdown.',
     'fields_instructions_position_instructions' => 'Где должны располагаться инструкции относительно поля.',
     'fields_listable_instructions' => 'Управление видимостью столбца этого поля.',
-    'fields_read_only_instructions' => 'Отключить редактирование в панели управления.',
     'fieldset_import_fieldset_instructions' => 'Набор полей, который необходимо импортировать.',
     'fieldset_import_prefix_instructions' => 'Префикс, который должен быть применен к каждому полю при импорте. Например, `hero_`',
     'fieldset_intro' => 'Наборы полей являются дополнением к чертежам, действуя как многократно используемые частицы.',

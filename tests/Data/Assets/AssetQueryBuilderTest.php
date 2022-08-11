@@ -521,4 +521,14 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertCount(1, $assets);
         $this->assertEquals(['a'], $assets->map->filename()->all());
     }
+
+    /** @test */
+    public function assets_are_found_using_offset()
+    {
+        $query = $this->container->queryAssets()->limit(3);
+
+        $this->assertEquals(['a.jpg', 'b.txt', 'c.txt'], $query->get()->map->path()->all());
+
+        $this->assertEquals(['b.txt', 'c.txt', 'd.jpg'], $query->offset(1)->get()->map->path()->all());
+    }
 }

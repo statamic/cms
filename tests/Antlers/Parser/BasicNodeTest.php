@@ -3,11 +3,16 @@
 namespace Tests\Antlers\Parser;
 
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
+use Statamic\View\Antlers\Language\Nodes\Constants\FalseConstant;
+use Statamic\View\Antlers\Language\Nodes\Constants\TrueConstant;
 use Statamic\View\Antlers\Language\Nodes\LiteralNode;
 use Statamic\View\Antlers\Language\Nodes\Operators\Comparison\EqualCompOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalAndOperator;
+use Statamic\View\Antlers\Language\Nodes\Operators\LogicalOrOperator;
 use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\Fixtures\Addon\Tags\EchoMethod;
@@ -51,7 +56,7 @@ class BasicNodeTest extends ParserTestCase
 
     public function test_it_removes_tags_from_node_content()
     {
-        $nodes = $this->parseNodes('{{ meta_title["No Title Set"] param="Test" }}{{ /if }}');
+        $nodes = $this->parseNodes('{{ meta_title["No Title Set"] param="Test" }}');
         $this->assertSame(' meta_title["No Title Set"] ', $nodes[0]->getContent());
     }
 
@@ -465,5 +470,74 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZ
 EOT;
 
         $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
+
+    public function test_variable_nodes_are_combined_neighboring_array_accessors()
+    {
+        $nodes = $this->getParsedRuntimeNodes('{{ posts[1]title }}');
+
+        $this->assertInstanceOf(SemanticGroup::class, $nodes[0]);
+
+        /** @var SemanticGroup $wrapperGroup */
+        $wrapperGroup = $nodes[0];
+        $this->assertCount(1, $wrapperGroup->nodes);
+
+        $this->assertInstanceOf(VariableNode::class, $wrapperGroup->nodes[0]);
+
+        /** @var VariableNode $variableNode */
+        $variableNode = $wrapperGroup->nodes[0];
+
+        $this->assertSame('posts[1]title', $variableNode->name);
+        $this->assertNotNull($variableNode->variableReference);
+
+        $this->assertCount(3, $variableNode->variableReference->pathParts);
+
+        $pathNode = $variableNode->variableReference->pathParts[0];
+        $this->assertInstanceOf(PathNode::class, $pathNode);
+        $this->assertSame('posts', $pathNode->name);
+
+        $varRef = $variableNode->variableReference->pathParts[1];
+        $this->assertInstanceOf(VariableReference::class, $varRef);
+        $this->assertCount(1, $varRef->pathParts);
+        $this->assertInstanceOf(PathNode::class, $varRef->pathParts[0]);
+
+        /** @var PathNode $innerPathNode */
+        $innerPathNode = $varRef->pathParts[0];
+        $this->assertSame('1', $innerPathNode->name);
+
+        $pathNode2 = $variableNode->variableReference->pathParts[2];
+        $this->assertInstanceOf(PathNode::class, $pathNode2);
+        $this->assertSame('title', $pathNode2->name);
+    }
+
+    public function test_uppercase_logical_keywords_are_parsed_into_keywords_and_not_variables()
+    {
+        $nodes = $this->getParsedRuntimeNodes('{{ TrUe AND FALSE oR something }}');
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(SemanticGroup::class, $nodes[0]);
+
+        /** @var SemanticGroup $semanticGroupWrapper */
+        $semanticGroupWrapper = $nodes[0];
+        $this->assertCount(1, $semanticGroupWrapper->nodes);
+        $this->assertInstanceOf(LogicGroup::class, $semanticGroupWrapper->nodes[0]);
+
+        /** @var LogicGroup $logicWrapper */
+        $logicWrapper = $semanticGroupWrapper->nodes[0];
+        $this->assertCount(3, $logicWrapper->nodes);
+
+        $this->assertInstanceOf(LogicGroup::class, $logicWrapper->nodes[0]);
+        $this->assertInstanceOf(LogicalOrOperator::class, $logicWrapper->nodes[1]);
+        $this->assertInstanceOf(VariableNode::class, $logicWrapper->nodes[2]);
+
+        /** @var LogicGroup $innerGroup */
+        $innerGroup = $logicWrapper->nodes[0];
+        $this->assertCount(3, $innerGroup->nodes);
+        $this->assertInstanceOf(TrueConstant::class, $innerGroup->nodes[0]);
+        $this->assertInstanceOf(LogicalAndOperator::class, $innerGroup->nodes[1]);
+        $this->assertInstanceOf(FalseConstant::class, $innerGroup->nodes[2]);
+
+        /** @var VariableNode $var */
+        $var = $logicWrapper->nodes[2];
+        $this->assertSame('something', $var->name);
     }
 }

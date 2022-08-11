@@ -2,11 +2,13 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Facades;
+use Statamic\Facades\Addon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Token;
 use Statamic\Sites\Sites;
@@ -82,6 +84,8 @@ class AppServiceProvider extends ServiceProvider
                 return Token::find($token);
             }
         });
+
+        $this->addAboutCommandInfo();
     }
 
     public function register()
@@ -159,8 +163,28 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\StacheLock::class,
             \Statamic\Http\Middleware\HandleToken::class,
             \Statamic\Http\Middleware\Localize::class,
+            \Statamic\Http\Middleware\AddViewPaths::class,
             \Statamic\Http\Middleware\AuthGuard::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
+    }
+
+    protected function addAboutCommandInfo()
+    {
+        if (! class_exists(AboutCommand::class)) {
+            return;
+        }
+
+        $addons = Addon::all();
+
+        AboutCommand::add('Statamic', [
+            'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
+            'Antlers' => config('statamic.antlers.version'),
+            'Addons' => $addons->count(),
+        ]);
+
+        foreach ($addons as $addon) {
+            AboutCommand::add('Statamic Addons', $addon->package(), $addon->version());
+        }
     }
 }

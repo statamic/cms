@@ -21,6 +21,12 @@ class EventServiceProvider extends ServiceProvider
         \Statamic\Events\EntryBlueprintFound::class => [
             \Statamic\Entries\AddSiteColumnToBlueprint::class,
         ],
+        \Statamic\Events\ResponseCreated::class => [
+            \Statamic\View\State\ClearState::class,
+        ],
+        \Illuminate\Foundation\Http\Events\RequestHandled::class => [
+            \Statamic\View\State\ClearState::class,
+        ],
     ];
 
     protected $subscribe = [
