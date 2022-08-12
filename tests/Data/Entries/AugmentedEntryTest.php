@@ -14,6 +14,7 @@ use Statamic\Entries\Entry;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
+use Statamic\Fields\Blueprint as FieldsBlueprint;
 use Tests\Data\AugmentedTestCase;
 
 class AugmentedEntryTest extends AugmentedTestCase
@@ -98,6 +99,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'order'         => ['type' => 'null', 'value' => null], // todo: test for when this is an int
             'is_entry'      => ['type' => 'bool', 'value' => true],
             'collection'    => ['type' => CollectionContract::class, 'value' => $collection],
+            'blueprint'     => ['type' => FieldsBlueprint::class, 'value' => $blueprint],
             'mount'         => ['type' => CollectionContract::class, 'value' => $mount],
             'locale'        => ['type' => 'string', 'value' => 'en'],
             'last_modified' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
