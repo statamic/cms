@@ -64,8 +64,10 @@ class ImageGeneratorTest extends TestCase
         $actualParams = array_merge($userParams, ['fit' => 'crop-50-50']);
         $md5 = $this->getGlideMd5($asset->basename(), $actualParams);
 
-        $expectedPath = "containers/test_container/foo/hoff.jpg/{$md5}.jpg";
+        $expectedPathPrefix = 'containers/test_container';
+        $expectedPath = "{$expectedPathPrefix}/foo/hoff.jpg/{$md5}.jpg";
 
+        $this->assertEquals($expectedPathPrefix, ImageGenerator::assetCachePathPrefix($asset));
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
         $this->assertContains($expectedPath, $paths);

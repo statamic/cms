@@ -158,7 +158,7 @@ class ImageGenerator
         $this->server->setSourcePathPrefix($this->asset->folder());
 
         // Set the cache path so files are saved appropriately.
-        $this->server->setCachePathPrefix('containers/'.$this->asset->container()->id().'/'.$this->asset->folder());
+        $this->server->setCachePathPrefix(self::assetCachePathPrefix($this->asset).'/'.$this->asset->folder());
 
         return $this->generate($this->asset->basename());
     }
@@ -323,5 +323,10 @@ class ImageGenerator
             'path' => Str::after($parsed['path'], '/'),
             'base' => $parsed['scheme'].'://'.$parsed['host'],
         ];
+    }
+
+    public static function assetCachePathPrefix($asset)
+    {
+        return 'containers/'.$asset->container()->id();
     }
 }
