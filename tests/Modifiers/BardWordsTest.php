@@ -89,7 +89,7 @@ class BardWordsTest extends TestCase
             [
                 'type' => 'paragraph',
                 'content' => [
-                    ['type' => 'text', 'text' => "This is {{ title }}!"],
+                    ['type' => 'text', 'text' => 'This is {{ title }}!'],
                 ],
             ],
         ];
