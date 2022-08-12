@@ -3,7 +3,9 @@
 namespace Statamic\Query;
 
 use Closure;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
@@ -13,6 +15,7 @@ abstract class EloquentQueryBuilder implements Builder
 {
     protected $builder;
     protected $columns;
+    protected $limit;
 
     protected $operators = [
         '=' => 'Equals',
@@ -89,9 +92,38 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->builder->getCountForPagination();
     }
 
+    public function limit($value)
+    {
+        $this->limit = $value;
+        $this->builder->limit($value);
+
+        return $this;
+    }
+
+    public function offset($value)
+    {
+        $this->builder->offset(max(0, $value));
+
+        if (! $this->limit) {
+            $this->limit(max(10, $value));
+        }
+
+        return $this;
+    }
+
     public function count()
     {
         return $this->builder->count();
+    }
+
+    public function dd()
+    {
+        return $this->builder->dd();
+    }
+
+    public function toSql()
+    {
+        return $this->builder->toSql();
     }
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
@@ -238,6 +270,10 @@ abstract class EloquentQueryBuilder implements Builder
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        if (! ($value instanceof DateTimeInterface)) {
+            $value = Carbon::parse($value);
+        }
 
         $this->builder->whereDate($this->column($column), $operator, $value, $boolean);
 
