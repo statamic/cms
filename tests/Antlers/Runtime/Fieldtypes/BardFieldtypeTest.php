@@ -43,7 +43,7 @@ class BardFieldtypeTest extends ParserTestCase
                         'marks' => [
                             [
                                 'type' => 'bold',
-                            ]
+                            ],
                         ],
                         'text' => 'World',
                     ],
