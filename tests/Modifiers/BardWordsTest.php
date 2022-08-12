@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use Statamic\Facades\Antlers;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Modifiers\Modify;
@@ -79,6 +80,29 @@ class BardWordsTest extends TestCase
         $expected = 'This is a paragraph.';
 
         $this->assertEquals($expected, $this->modify($data));
+    }
+
+    /** @test */
+    public function it_extracts_bard_words_and_parses_antlers()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => "This is {{ title }}!"],
+                ],
+            ],
+        ];
+
+        $expected = 'This is Antlers!';
+
+        $this->assertEquals(
+            $expected,
+            (string) Antlers::parser()->parse('{{ test }}', [
+                'test' => $this->modify($data, true),
+                'title' => 'Antlers',
+            ])
+        );
     }
 
     public function modify($arr, ...$args)
