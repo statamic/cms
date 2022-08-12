@@ -46,8 +46,6 @@ class RecursiveNodesTest extends ParserTestCase
         $nav->save();
     }
 
-
-
     public function test_recursive_nodes_dont_reset_towards_the_end()
     {
         $tree = [];
@@ -78,9 +76,9 @@ class RecursiveNodesTest extends ParserTestCase
                     ['id' => 'contact'.$i, 'title' => 'Contact.'.$i, 'url' => 'contact'.$i],
                 ],
             ];
-            $tree[] = [ 'id' => 'root-2'.$i, 'title' => 'Root-2.'.$i, 'url' => '/root-2'.$i ];
-            $tree[] = [ 'id' => 'root-3'.$i, 'title' => 'Root-3.'.$i, 'url' => '/root-3'.$i ];
-            $tree[] = [ 'id' => 'root-4'.$i, 'title' => 'Root-4.'.$i, 'url' => '/root-4'.$i ];
+            $tree[] = ['id' => 'root-2'.$i, 'title' => 'Root-2.'.$i, 'url' => '/root-2'.$i];
+            $tree[] = ['id' => 'root-3'.$i, 'title' => 'Root-3.'.$i, 'url' => '/root-3'.$i];
+            $tree[] = ['id' => 'root-4'.$i, 'title' => 'Root-4.'.$i, 'url' => '/root-4'.$i];
             $tree[] = [
                 'id' => 'fin-child-1.'.$i, 'title' => 'Fin Child 1.'.$i, 'url' => '/fin-child-1'.$i,
                 'children' => [
@@ -125,7 +123,7 @@ class RecursiveNodesTest extends ParserTestCase
                                                     ],
                                                 ],
                                             ],
-                                            ],
+                                        ],
                                     ],
                                 ],
 
@@ -135,7 +133,7 @@ class RecursiveNodesTest extends ParserTestCase
                     ],
                 ],
             ];
-            $tree[] = [ 'id' => 'tree-finish'.$i, 'title' => 'Tree-Finish.'.$i, 'url' => '/tree-finish'.$i ];
+            $tree[] = ['id' => 'tree-finish'.$i, 'title' => 'Tree-Finish.'.$i, 'url' => '/tree-finish'.$i];
         }
 
         $nav = Nav::make('main');
@@ -160,7 +158,7 @@ class RecursiveNodesTest extends ParserTestCase
                 $childDepth = $activeData['children_depth'];
             }
 
-            $runtimeTree[] = str_repeat(' ', $curDepth - 1).'depth: ' . $curDepth . ', title: ' . $title . ', childDepth: ' . $childDepth . ', branch: ' . $branch;
+            $runtimeTree[] = str_repeat(' ', $curDepth - 1).'depth: '.$curDepth.', title: '.$title.', childDepth: '.$childDepth.', branch: '.$branch;
         };
 
         $navTemplate = <<<'EOT'
