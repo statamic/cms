@@ -481,6 +481,7 @@ class PageTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value, $page[$key]));
 
         $this->assertEquals($page->collection()->toArray(), $arr['collection']);
+        $this->assertEquals($page->blueprint->toArray(), $arr['blueprint']);
     }
 
     protected function newTree()
