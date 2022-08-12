@@ -1277,7 +1277,7 @@ class Environment
     {
         if ($originalNode instanceof AbstractNode && $originalNode->modifierChain != null) {
             if (! empty($originalNode->modifierChain->modifierChain)) {
-                $value = $this->checkForFieldValue($value, true);
+                $value = $this->checkForFieldValue($value, true, $originalNode->modifierChain->modifierChain);
 
                 return $this->applyModifiers($value, $originalNode->modifierChain);
             }
@@ -1292,17 +1292,19 @@ class Environment
         return $this->checkForFieldValue($value);
     }
 
-    private function checkForFieldValue($value, $hasModifiers = false)
+    private function checkForFieldValue($value, $hasModifiers = false, $modifierChain = null)
     {
         if ($value instanceof Value) {
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
-                GlobalRuntimeState::$userContentEvalState = [
-                    $value,
-                    $this->nodeProcessor->getActiveNode(),
-                ];
-                $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
-                GlobalRuntimeState::$userContentEvalState = null;
+                if (! $hasModifiers || ($modifierChain != null && $modifierChain[0]->nameNode->name != 'raw')) {
+                    GlobalRuntimeState::$userContentEvalState = [
+                        $value,
+                        $this->nodeProcessor->getActiveNode(),
+                    ];
+                    $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                    GlobalRuntimeState::$userContentEvalState = null;
+                }
             } else {
                 if (! $hasModifiers) {
                     $value = $value->value();
