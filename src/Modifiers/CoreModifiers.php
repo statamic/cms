@@ -237,7 +237,7 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function bardText($value)
+    public function bardHtml($value)
     {
         if ($value instanceof Value) {
             $value = $value->raw();

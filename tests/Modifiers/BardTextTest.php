@@ -7,10 +7,10 @@ use Statamic\Fieldtypes\Bard;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-class BardTextTest extends TestCase
+class BardHtmlTest extends TestCase
 {
     /** @test */
-    public function it_extracts_bard_text()
+    public function it_extracts_bard_html()
     {
         $data = [
             [
@@ -50,7 +50,7 @@ class BardTextTest extends TestCase
     }
 
     /** @test */
-    public function it_extracts_bard_text_from_single_node()
+    public function it_extracts_bard_html_from_single_node()
     {
         $data = [
             'type' => 'paragraph',
@@ -65,7 +65,7 @@ class BardTextTest extends TestCase
     }
 
     /** @test */
-    public function it_extracts_bard_text_from_value_object()
+    public function it_extracts_bard_html_from_value_object()
     {
         $data = new Value([
             [
@@ -83,6 +83,6 @@ class BardTextTest extends TestCase
 
     public function modify($arr, ...$args)
     {
-        return Modify::value($arr)->bard_text($args)->fetch();
+        return Modify::value($arr)->bard_html($args)->fetch();
     }
 }
