@@ -50,21 +50,37 @@ jobs:
           coverage: none
 
       - name: Set PHP 7.4 Mockery
-        run: composer require "mockery/mockery >=1.2.3" --no-interaction --no-update
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "mockery/mockery >=1.2.3" --no-interaction --no-update
         if: matrix.php >= 7.4 && matrix.php <8.0
 
       - name: Set PHP 8 Mockery
-        run: composer require "mockery/mockery >=1.3.3" --no-interaction --no-update
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "mockery/mockery >=1.3.3" --no-interaction --no-update
         if: matrix.php >= 8.0
 
       - name: Set PHP 8.1 Testbench
-        run: composer require "orchestra/testbench ^6.22.0" --no-interaction --no-update
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "orchestra/testbench ^6.22.0" --no-interaction --no-update
         if: matrix.laravel == '8.*' && matrix.php >= 8.1
 
       - name: Install dependencies
-        run: |
-          composer require "laravel/framework:${{ matrix.framework }}" --no-interaction --no-update
-          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: |
+            composer require "laravel/framework:${{ matrix.framework }}" --no-interaction --no-update
+            composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Execute tests
         run: vendor/bin/phpunit
@@ -78,6 +94,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v1
+
+      - name: Install required npm version
+        run: npm -g install npm@8.5.5
 
       - name: Install dependencies
         run: npm ci

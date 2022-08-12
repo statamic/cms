@@ -572,6 +572,8 @@ export default {
             tabindex: 0,
             autoRefresh: true,
             readOnly: self.isReadOnly ? 'nocursor' : false,
+            inputStyle: 'contenteditable',
+            spellcheck: true,
             extraKeys: {
                 "Enter": "newlineAndIndentContinueMarkdownList",
                 "Cmd-Left": "goLineLeftSmart"

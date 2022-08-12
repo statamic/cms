@@ -506,7 +506,7 @@ class AntlersLexer
                         continue;
                     } elseif ($lowerParsedValue == LanguageKeywords::ConstTrue) {
                         $constTrue = new TrueConstant();
-                        $constTrue->content = LanguageKeywords::ConstNull;
+                        $constTrue->content = LanguageKeywords::ConstTrue;
                         $constTrue->startPosition = $startPosition;
                         $constTrue->endPosition = $endPosition;
 
@@ -668,7 +668,7 @@ class AntlersLexer
                 // -
                 if ($this->isParsingModifierName == false && $this->cur == DocumentParser::Punctuation_Minus) {
                     if (ctype_digit($this->next) && (
-                            ctype_digit($this->prev) == false &&
+                            ctype_digit((string) $this->prev) == false &&
                             $this->prev != DocumentParser::RightParent) && $this->isRightOfInterpolationRegion() == false) {
                         $this->currentContent[] = $this->cur;
                         continue;

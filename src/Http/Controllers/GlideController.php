@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use League\Glide\Server;
 use League\Glide\Signatures\SignatureException;
 use League\Glide\Signatures\SignatureFactory;
@@ -118,7 +119,7 @@ class GlideController extends Controller
 
         try {
             return $this->generator->$method($item, $this->request->all());
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException|UnableToReadFile $e) {
             throw new NotFoundHttpException;
         }
     }

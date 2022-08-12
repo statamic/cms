@@ -29,13 +29,13 @@
             </template>
             <template #footer="{ deselect }">
                 <sortable-list
-                    item-class="sortable-tag"
-                    handle-class="sortable-tag"
+                    item-class="sortable-item"
+                    handle-class="sortable-item"
                     :value="value"
                     @input="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="tag in value" :key="tag" class="vs__selected mt-1 sortable-tag">
+                        <span v-for="tag in value" :key="tag" class="vs__selected mt-1 sortable-item">
                             {{ tag }}
                             <button @click="deselect(tag)" type="button" :aria-label="__('Remove tag')" class="vs__deselect">
                                 <span>×</span>

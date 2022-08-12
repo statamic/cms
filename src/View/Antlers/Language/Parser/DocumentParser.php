@@ -945,6 +945,14 @@ class DocumentParser
         return str_split(self::getPipeEscape());
     }
 
+    public static function applyEscapeSequences($string)
+    {
+        $string = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $string);
+        $string = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $string);
+
+        return $string;
+    }
+
     private function getLeftBrace()
     {
         return str_split(self::getLeftBraceEscape());

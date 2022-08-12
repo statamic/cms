@@ -92,7 +92,7 @@ class Terms
             ? collect(Taxonomy::handles())
             : collect(explode('|', $from));
 
-        $excludedTaxonomies = collect(explode('|', $not))->filter();
+        $excludedTaxonomies = collect(explode('|', $not ?? ''))->filter();
 
         return $taxonomies
             ->diff($excludedTaxonomies)

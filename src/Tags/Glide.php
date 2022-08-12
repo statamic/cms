@@ -23,8 +23,8 @@ class Glide extends Tags
      *
      * Where `field` is the variable containing the image ID
      *
-     * @param  $method
-     * @param  $args
+     * @param  string  $method
+     * @param  array  $args
      * @return string
      */
     public function __call($method, $args)
@@ -149,11 +149,6 @@ class Glide extends Tags
      */
     private function output($url)
     {
-        if ($this->isPair) {
-            return $this->parse(
-                compact('url', 'width', 'height')
-            );
-        }
         if ($this->params->bool('tag')) {
             return "<img src=\"$url\" alt=\"{$this->params->get('alt')}\" />";
         }

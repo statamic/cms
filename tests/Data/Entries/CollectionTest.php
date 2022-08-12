@@ -634,8 +634,10 @@ class CollectionTest extends TestCase
         $mount->shouldReceive('in')->with('fr')->andReturn($frenchMount);
         $mount->shouldReceive('uri')->andReturn('/blog');
         $mount->shouldReceive('url')->andReturn('/en/blog');
+        $mount->shouldReceive('absoluteUrl')->andReturn('http://site1.com/en/blog');
         $frenchMount->shouldReceive('uri')->andReturn('/le-blog');
         $frenchMount->shouldReceive('url')->andReturn('/fr/le-blog');
+        $frenchMount->shouldReceive('absoluteUrl')->andReturn('http://site2.com/fr/le-blog');
 
         Facades\Entry::shouldReceive('find')->with('mounted')->andReturn($mount);
 
@@ -643,19 +645,25 @@ class CollectionTest extends TestCase
 
         $this->assertNull($collection->uri());
         $this->assertNull($collection->url());
+        $this->assertNull($collection->absoluteUrl());
         $this->assertNull($collection->uri('en'));
         $this->assertNull($collection->url('en'));
+        $this->assertNull($collection->absoluteUrl('en'));
         $this->assertNull($collection->uri('fr'));
         $this->assertNull($collection->url('fr'));
+        $this->assertNull($collection->absoluteUrl('fr'));
 
         $collection->mount('mounted');
 
         $this->assertEquals('/blog', $collection->uri());
         $this->assertEquals('/en/blog', $collection->url());
+        $this->assertEquals('http://site1.com/en/blog', $collection->absoluteUrl());
         $this->assertEquals('/blog', $collection->uri('en'));
         $this->assertEquals('/en/blog', $collection->url('en'));
+        $this->assertEquals('http://site1.com/en/blog', $collection->absoluteUrl('en'));
         $this->assertEquals('/le-blog', $collection->uri('fr'));
         $this->assertEquals('/fr/le-blog', $collection->url('fr'));
+        $this->assertEquals('http://site2.com/fr/le-blog', $collection->absoluteUrl('fr'));
     }
 
     /** @test */
@@ -732,6 +740,21 @@ class CollectionTest extends TestCase
             ['label' => 'Baz', 'format' => '{baz}'],
             ['label' => 'Qux', 'format' => '{qux}'],
         ], $collection->additionalPreviewTargets()->all());
+    }
+
+    /** @test */
+    public function it_trucates_entries()
+    {
+        $collection = Facades\Collection::make('test')->save();
+        Facades\Entry::make()->collection('test')->id('1')->slug('one')->save();
+        Facades\Entry::make()->collection('test')->id('2')->slug('two')->save();
+        Facades\Entry::make()->collection('test')->id('3')->slug('three')->save();
+
+        $this->assertCount(3, $collection->queryEntries()->get());
+
+        $collection->truncate();
+
+        $this->assertCount(0, $collection->queryEntries()->get());
     }
 
     public function additionalPreviewTargetProvider()
