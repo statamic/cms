@@ -103,6 +103,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Parses the value as an Antlers template.
+     *
+     * @param  mixed  $value
+     * @param  array  $params
+     * @return string
+     */
+    public function antlers($value, $params, $context)
+    {
+        return (string) Antlers::parse($value, $context);
+    }
+
+    /**
      * Alias an array variable.
      *
      * @param $value
