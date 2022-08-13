@@ -21,12 +21,10 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
-use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
-use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -212,7 +210,7 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function bardWords($value, $params)
+    public function bardWords($value)
     {
         if ($value instanceof Value) {
             $value = $value->raw();
@@ -230,14 +228,7 @@ class CoreModifiers extends Modifier
             array_unshift($value, ...($item['content'] ?? []));
         }
 
-        $value = Stringy::collapseWhitespace($text);
-
-        $antlers = Arr::get($params, 0, 'false');
-        $fieldtype = (new Text)->setField(new Field('text', [
-            'antlers' => in_array($antlers, [true, 'true'], true),
-        ]));
-
-        return new Value($value, 'text', $fieldtype);
+        return Stringy::collapseWhitespace($text);
     }
 
     /**
@@ -246,7 +237,7 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function bardHtml($value, $params)
+    public function bardHtml($value)
     {
         if ($value instanceof Value) {
             $value = $value->raw();
@@ -257,14 +248,7 @@ class CoreModifiers extends Modifier
 
         $items = array_values(Arr::where($value, fn ($item) => $item['type'] !== 'set'));
 
-        $value = (new Augmentor(new Bard()))->augment($items);
-
-        $antlers = Arr::get($params, 0, 'false');
-        $fieldtype = (new Text)->setField(new Field('text', [
-            'antlers' => in_array($antlers, [true, 'true'], true),
-        ]));
-
-        return new Value($value, 'text', $fieldtype);
+        return (new Augmentor(new Bard()))->augment($items);
     }
 
     public function boolString($value)
