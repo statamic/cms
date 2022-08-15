@@ -210,7 +210,7 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function bardWords($value)
+    public function bardText($value)
     {
         if ($value instanceof Value) {
             $value = $value->raw();
