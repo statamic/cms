@@ -38,9 +38,9 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function __call($method, $args)
     {
-        $this->builder->$method(...$args);
+        $response = $this->builder->$method(...$args);
 
-        return $this;
+        return $response instanceof EloquentBuilder ? $this : $response;
     }
 
     public function select($columns = ['*'])
@@ -109,21 +109,6 @@ abstract class EloquentQueryBuilder implements Builder
         }
 
         return $this;
-    }
-
-    public function count()
-    {
-        return $this->builder->count();
-    }
-
-    public function dd()
-    {
-        return $this->builder->dd();
-    }
-
-    public function toSql()
-    {
-        return $this->builder->toSql();
     }
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
