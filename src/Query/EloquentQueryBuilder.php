@@ -92,25 +92,6 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->builder->getCountForPagination();
     }
 
-    public function limit($value)
-    {
-        $this->limit = $value;
-        $this->builder->limit($value);
-
-        return $this;
-    }
-
-    public function offset($value)
-    {
-        $this->builder->offset(max(0, $value));
-
-        if (! $this->limit) {
-            $this->limit(max(10, $value));
-        }
-
-        return $this;
-    }
-
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if (is_array($column)) {
