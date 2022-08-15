@@ -4,17 +4,36 @@ namespace Tests\Imaging;
 
 use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Glide\Server;
 use Statamic\Contracts\Imaging\UrlBuilder;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\File;
 use Statamic\Facades\Glide;
+use Statamic\Facades\Path;
 use Statamic\Imaging\GlideUrlBuilder;
+use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\StaticUrlBuilder;
+use Statamic\Support\Str;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class GlideTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->clearGlideCache();
+    }
+
     /** @test */
     public function cache_false_will_make_a_filesystem_in_the_storage_directory()
     {
@@ -178,5 +197,52 @@ class GlideTest extends TestCase
         $prefixer = $property->getValue($adapter);
 
         return $prefixer->prefixPath('');
+    }
+
+    private function clearGlideCache()
+    {
+        Glide::cacheStore()->flush();
+        File::delete(storage_path('statamic/glide'));
+    }
+
+    private function glideCachePath($append = null)
+    {
+        return Path::tidy(collect([storage_path('statamic/glide'), $append])->filter()->implode('/'));
+    }
+
+    private function generatedImagePaths()
+    {
+        return File::getFilesRecursively($this->glideCachePath())
+            ->map(fn ($path) => (string) Str::of($path)->after($this->glideCachePath().'/'))
+            ->all();
+    }
+
+    private function createImageManipulations($containerHandle, $assetPath, $manipulationCount = 1)
+    {
+        $manifestCacheKey = "asset::{$containerHandle}::{$assetPath}";
+        $this->assertNull(Glide::cacheStore()->get($manifestCacheKey));
+
+        Storage::fake('test');
+        $filename = pathinfo($assetPath)['basename'];
+        $folder = pathinfo($assetPath)['dirname'];
+        $file = UploadedFile::fake()->image($assetPath, 30, 60);
+
+        Storage::disk('test')->putFileAs($folder, $file, $filename);
+        $container = tap(AssetContainer::make($containerHandle)->disk('test'))->save();
+        $asset = tap($container->makeAsset($assetPath))->save();
+        $generator = (new ImageGenerator($this->app->make(Server::class)));
+
+        foreach (range(1, $manipulationCount) as $i) {
+            $generator->generateByAsset($asset, ['w' => 100, 'h' => $i]);
+        }
+
+        $this->assertCount($manipulationCount, $manifest = Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertCount($manipulationCount, $this->generatedImagePaths());
+
+        foreach ($manifest as $cacheKey) {
+            $this->assertTrue(Str::startsWith($cacheKey, "asset::{$containerHandle}::{$assetPath}::"));
+        }
+
+        return collect(array_merge([$manifestCacheKey], $manifest));
     }
 }
