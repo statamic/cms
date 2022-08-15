@@ -13,13 +13,16 @@ Route::name('statamic.')->group(function () {
      * On-the-fly URL-based image transforms.
      */
     if (Glide::shouldServeByHttp()) {
-        Site::all()->map(function ($site) {
-            return URL::makeRelative($site->url());
-        })->unique()->each(function ($sitePrefix) {
-            Route::group(['prefix' => $sitePrefix.'/'.Glide::route()], function () {
-                Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
-                Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
-                Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
+        // Remove Glide routes from 'web' middleware.
+        Route::withoutMiddleware(config('statamic.routes.middleware', 'web'))->group(function() {
+            Site::all()->map(function ($site) {
+                return URL::makeRelative($site->url());
+            })->unique()->each(function ($sitePrefix) {
+                Route::group(['prefix' => $sitePrefix.'/'.Glide::route()], function () {
+                    Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
+                    Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
+                    Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
+                });
             });
         });
     }
