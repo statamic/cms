@@ -14,7 +14,7 @@ Route::name('statamic.')->group(function () {
      */
     if (Glide::shouldServeByHttp()) {
         // Remove Glide routes from 'web' middleware.
-        Route::withoutMiddleware(config('statamic.routes.middleware', 'web'))->group(function() {
+        Route::withoutMiddleware(config('statamic.routes.middleware', 'web'))->group(function () {
             Site::all()->map(function ($site) {
                 return URL::makeRelative($site->url());
             })->unique()->each(function ($sitePrefix) {
