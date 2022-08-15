@@ -27,11 +27,11 @@ class GlideTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
+    public function tearDown(): void
     {
-        parent::setUp();
-
         $this->clearGlideCache();
+
+        parent::tearDown();
     }
 
     /** @test */
