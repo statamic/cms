@@ -139,7 +139,7 @@ export default {
         isReadOnly() {
             if (this.storeState.isRoot === false && !this.config.localizable) return true;
 
-            return this.isLocked || this.readOnly || this.config.read_only || false;
+            return this.isLocked || this.readOnly || this.config.visibility === 'read_only' || false;
         },
 
         isLocalizable() {

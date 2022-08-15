@@ -46,6 +46,26 @@ test('it omits nested values', () => {
                 ],
             },
         ],
+        foo123: [
+            {
+                hello: 'alfa',
+                world: 'bravo'
+            },
+            {
+                hello: 'charlie',
+                world: 'delta'
+            }
+        ],
+        foo123bar: [
+            {
+                hello: 'alfa',
+                world: 'bravo'
+            },
+            {
+                hello: 'charlie',
+                world: 'delta'
+            }
+        ],
     };
 
     let omitted = new Omitter(values).omit([
@@ -53,6 +73,8 @@ test('it omits nested values', () => {
         'ship.completed_kessel_run',
         'bffs.0.type',
         'bffs.1.crush.0.name',
+        'foo123.0.hello',
+        'foo123bar.0.hello',
     ]);
 
     let expected = {
@@ -74,6 +96,24 @@ test('it omits nested values', () => {
                     }
                 ],
             },
+        ],
+        foo123: [
+            {
+                world: 'bravo'
+            },
+            {
+                hello: 'charlie',
+                world: 'delta'
+            }
+        ],
+        foo123bar: [
+            {
+                world: 'bravo'
+            },
+            {
+                hello: 'charlie',
+                world: 'delta'
+            }
         ],
     };
 

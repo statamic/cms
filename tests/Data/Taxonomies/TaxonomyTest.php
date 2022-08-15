@@ -4,7 +4,12 @@ namespace Tests\Data\Taxonomies;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Events\TaxonomyCreated;
+use Statamic\Events\TaxonomySaved;
+use Statamic\Events\TaxonomySaving;
+use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -230,6 +235,97 @@ class TaxonomyTest extends TestCase
             ['label' => 'Baz', 'format' => '{baz}'],
             ['label' => 'Qux', 'format' => '{qux}'],
         ], $taxonomy->additionalPreviewTargets()->all());
+    }
+
+    /** @test */
+    public function it_trucates_terms()
+    {
+        $taxonomy = tap(Facades\Taxonomy::make('tags'))->save();
+        Facades\Term::make()->taxonomy('tags')->slug('one')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('two')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('three')->data([])->save();
+
+        $this->assertCount(3, $taxonomy->queryTerms()->get());
+
+        $taxonomy->truncate();
+
+        $this->assertCount(0, $taxonomy->queryTerms()->get());
+    }
+
+    /** @test */
+    public function it_saves_through_the_api()
+    {
+        Event::fake();
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $return = $taxonomy->save();
+
+        $this->assertTrue($return);
+
+        Event::assertDispatched(TaxonomySaving::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy = $taxonomy;
+        });
+
+        Event::assertDispatched(TaxonomyCreated::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy = $taxonomy;
+        });
+
+        Event::assertDispatched(TaxonomySaved::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy = $taxonomy;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_taxonomy_created_only_once()
+    {
+        Event::fake();
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        Facades\Taxonomy::shouldReceive('save')->with($taxonomy);
+        Facades\Taxonomy::shouldReceive('find')->with($taxonomy->id())->times(3)->andReturn(null, $taxonomy, $taxonomy);
+
+        $taxonomy->save();
+        $taxonomy->save();
+        $taxonomy->save();
+
+        Event::assertDispatched(TaxonomySaved::class, 3);
+        Event::assertDispatched(TaxonomyCreated::class, 1);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $return = $taxonomy->saveQuietly();
+
+        $this->assertTrue($return);
+
+        Event::assertNotDispatched(TaxonomySaving::class);
+        Event::assertNotDispatched(TaxonomySaved::class);
+        Event::assertNotDispatched(TaxonomyCreated::class);
+    }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_taxonomy_doesnt_save()
+    {
+        Event::fake([TaxonomySaved::class]);
+
+        Event::listen(TaxonomySaving::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $return = $taxonomy->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(TaxonomySaved::class);
     }
 
     public function additionalPreviewTargetProvider()

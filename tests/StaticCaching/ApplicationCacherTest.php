@@ -67,4 +67,34 @@ class ApplicationCacherTest extends TestCase
         $this->assertEquals(['two' => '/two'], $cacher->getUrls()->all());
         $this->assertNull($cache->get('static-cache:responses:one'));
     }
+
+    /** @test */
+    public function it_flushes()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $cache->forever('static-cache:domains', [
+            'http://example.com',
+            'http://another.com',
+        ]);
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+            'one' => '/one', 'two' => '/two',
+        ]);
+        $cache->forever('static-cache:'.md5('http://another.com').'.urls', [
+            'three' => '/three', 'four' => '/four',
+        ]);
+        $cache->forever('static-cache:responses:one', 'html content');
+        $cache->forever('static-cache:responses:two', 'html content');
+        $cache->forever('static-cache:responses:three', 'html content');
+        $cache->forever('static-cache:responses:four', 'html content');
+
+        $cacher->flush();
+
+        $this->assertNull($cache->get('static-cache:responses:one'));
+        $this->assertNull($cache->get('static-cache:responses:two'));
+        $this->assertNull($cache->get('static-cache:responses:three'));
+        $this->assertNull($cache->get('static-cache:responses:four'));
+        $this->assertEquals([], $cacher->getUrls('http://example.com')->all());
+        $this->assertEquals([], $cacher->getUrls('http://another.com')->all());
+    }
 }

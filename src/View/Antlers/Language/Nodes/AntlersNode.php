@@ -52,6 +52,8 @@ class AntlersNode extends AbstractNode
      */
     public $runtimeContent = '';
 
+    public $activeDepth = 1;
+
     /**
      * Sets the internal DocumentParser instance.
      *
@@ -364,14 +366,57 @@ class AntlersNode extends AbstractNode
         foreach ($this->parameters as $param) {
             $value = $this->getSingleParameterValue($param, $processor, $data);
 
-            if (is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId) {
+            if ($this->isVoidValue($value)) {
                 continue;
+            }
+
+            if (is_string($value)) {
+                $value = DocumentParser::applyEscapeSequences($value);
             }
 
             $values[$param->name] = $value;
         }
 
         return $values;
+    }
+
+    protected function isVoidValue($value)
+    {
+        return is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId;
+    }
+
+    /**
+     * Returns the value of a single parameter by name.
+     *
+     * @param $parameterName
+     * @param  NodeProcessor  $processor
+     * @param $data
+     * @param $default
+     * @return array|mixed|\Statamic\Contracts\Query\Builder|string|string[]|null
+     */
+    public function getSingleParameterValueByName($parameterName, NodeProcessor $processor, $data, $default = null)
+    {
+        $result = $default;
+
+        if (empty($this->parameters)) {
+            return $result;
+        }
+
+        foreach ($this->parameters as $param) {
+            if ($param->name == $parameterName) {
+                $value = $this->getSingleParameterValue($param, $processor, $data);
+
+                if ($this->isVoidValue($value)) {
+                    break;
+                }
+
+                $result = $value;
+
+                break;
+            }
+        }
+
+        return $result;
     }
 
     public function getSingleParameterValue(ParameterNode $param, NodeProcessor $processor, $data = [])
@@ -386,13 +431,21 @@ class AntlersNode extends AbstractNode
                 $value = Antlers::parser()->getVariable($pathToParse, $data, null);
             } else {
                 $pathParser = new PathParser();
+                $path = $pathParser->parse($pathToParse);
+                $doIntercept = count($path->pathParts) > 1;
+
                 $retriever = new PathDataManager();
                 $retriever->setIsPaired(false)->setReduceFinal(false)
-                    ->setShouldDoValueIntercept(false);
-                $value = $retriever->getData($pathParser->parse($pathToParse), $data);
+                    ->cascade($processor->getCascade())
+                    ->setShouldDoValueIntercept($doIntercept);
+                $value = $retriever->getData($path, $data);
             }
         } else {
             $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
+        }
+
+        if (is_string($value)) {
+            $value = DocumentParser::applyEscapeSequences($value);
         }
 
         return $value;
@@ -419,9 +472,10 @@ class AntlersNode extends AbstractNode
                 if (array_key_exists($interpolationVar, $param->parent->processedInterpolationRegions)) {
                     $interpolationResult = $processor->cloneProcessor()
                         ->setData($data)
+                        ->cascade($processor->getCascade())
                         ->setIsInterpolationProcessor(true)
                         ->setIsProvidingParameterContent(true)
-                        ->render($param->parent->processedInterpolationRegions[$interpolationVar]);
+                        ->reduce($param->parent->processedInterpolationRegions[$interpolationVar]);
 
                     if ((is_object($interpolationResult) || is_array($interpolationResult)) && count($param->interpolations) == 1) {
                         return $interpolationResult;
@@ -447,12 +501,16 @@ class AntlersNode extends AbstractNode
             $retriever->setIsPaired($this->isClosedBy != null);
             $value = $retriever->getData($pathParser->parse($value), $data);
 
+            if (is_string($value)) {
+                $value = DocumentParser::applyEscapeSequences($value);
+            }
+
             $values[] = $value;
         } else {
             $pipeEscape = DocumentParser::getPipeEscape();
 
             $values = array_map(function ($item) use ($pipeEscape) {
-                return str_replace($pipeEscape, DocumentParser::Punctuation_Pipe, $item);
+                return DocumentParser::applyEscapeSequences(str_replace($pipeEscape, DocumentParser::Punctuation_Pipe, $item));
             }, explode('|', $value));
         }
 
@@ -559,6 +617,25 @@ class AntlersNode extends AbstractNode
     public function relativePositionFromOffset($offset, $index)
     {
         return $this->parser->positionFromOffset($this->contentOffset->offset + $offset, $index);
+    }
+
+    public function lexerRelativeOffset($offset)
+    {
+        if ($this->parser == null) {
+            $position = new Position();
+            $position->index = $offset;
+            $position->offset = $offset;
+
+            return $position;
+        }
+
+        $relativeIndex = $offset + strlen($this->rawStart);
+
+        if ($this->startPosition != null) {
+            $relativeIndex += $this->startPosition->index;
+        }
+
+        return $this->parser->positionFromOffset($relativeIndex, $relativeIndex, true);
     }
 
     public function relativeOffset($offset, $index = null)

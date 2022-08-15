@@ -1,9 +1,5 @@
 export default {
 
-    props: {
-        actionUrl: String,
-    },
-
     methods: {
 
         actionStarted() {
@@ -26,6 +22,10 @@ export default {
                 this.$toast.success(response.message || __("Action completed"));
             }
 
+            this.afterActionSuccessfullyCompleted();
+        },
+
+        afterActionSuccessfullyCompleted() {
             this.request();
         }
 

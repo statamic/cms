@@ -15,12 +15,15 @@ class UpdateCollectionTreeTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use FakesRoles;
 
-    /** @test */
-    public function it_updates_the_tree()
+    /**
+     * @test
+     * @dataProvider collectionTreeDataProvider
+     */
+    public function it_updates_the_tree($collectionHandle)
     {
         $this->withoutExceptionHandling();
         $user = tap(User::make()->makeSuper())->save();
-        $collection = tap(Collection::make('test')->routes('{parent_uri}/{slug}'))->save();
+        $collection = tap(Collection::make($collectionHandle)->routes('{parent_uri}/{slug}'))->save();
         EntryFactory::id('e1')->collection($collection)->slug('a')->create();
         EntryFactory::id('e2')->collection($collection)->slug('b')->create();
         EntryFactory::id('e3')->collection($collection)->slug('c')->create();
@@ -57,6 +60,17 @@ class UpdateCollectionTreeTest extends TestCase
             ['entry' => 'e1'],
             ['entry' => 'e2'],
         ], $collection->structure()->in('en')->tree());
+    }
+
+    public function collectionTreeDataProvider()
+    {
+        return [
+            'arbitrary handle' => ['pages'],
+            'handle of collection' => ['collection'],
+            'handle ending with collection' => ['foo_collection'],
+            'handle starting with collection' => ['collection_foo'],
+            'handle with collection inside' => ['foo_collection_foo'],
+        ];
     }
 
     /** @test */

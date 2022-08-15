@@ -2,8 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;

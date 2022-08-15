@@ -35,7 +35,7 @@ abstract class Builder extends BaseBuilder
             ->selectedQueryColumns($this->columns ?? $columns)
             ->selectedQueryRelations($this->with));
 
-        return $this->collect($items);
+        return $this->collect($items)->values();
     }
 
     abstract protected function getFilteredKeys();

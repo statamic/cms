@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -228,6 +229,41 @@ GQL;
                             ],
                         ],
                     ],
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_can_add_custom_fields()
+    {
+        Collection::make('blog')->title('Blog Posts')->save();
+
+        GraphQL::addField('Collection', 'custom', function () {
+            return [
+                'type' => GraphQL::string(),
+                'resolve' => function ($a) {
+                    return 'the custom value';
+                },
+            ];
+        });
+
+        $query = <<<'GQL'
+{
+    collection(handle: "blog") {
+        handle
+        custom
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'collection' => [
+                    'handle' => 'blog',
+                    'custom' => 'the custom value',
                 ],
             ]]);
     }

@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -212,5 +215,59 @@ GQL;
             ->assertJson(['errors' => [[
                 'message' => 'Cannot query field "one" on type "TermInterface". Did you mean to use an inline fragment on "Term_Tags_Tag"?',
             ]]]);
+    }
+
+    /** @test */
+    public function it_resolves_query_builders()
+    {
+        BlueprintRepository::partialMock();
+
+        $blueprint = Blueprint::makeFromFields([])->setHandle('test');
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
+        EntryFactory::collection('test')->id('bravo')->data(['title' => 'Bravo'])->create();
+        EntryFactory::collection('test')->id('charlie')->data(['title' => 'Charlie'])->create();
+
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']])->setHandle('tags');
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
+
+        Taxonomy::make('tags')->save();
+        Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alpha')->data([
+            'title' => 'Alpha',
+            'entries_field' => ['bravo', 'charlie'],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        id
+        ... on Term_Tags_Tags {
+            entries_field {
+                id
+                title
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'term' => [
+                    'id' => 'tags::alpha',
+                    'entries_field' => [
+                        [
+                            'id' => 'bravo',
+                            'title' => 'Bravo',
+                        ],
+                        [
+                            'id' => 'charlie',
+                            'title' => 'Charlie',
+                        ],
+                    ],
+                ],
+            ]]);
     }
 }
