@@ -56,11 +56,20 @@ class TaxonomiesStoreTest extends TestCase
     /** @test */
     public function it_makes_taxonomy_instances_from_files()
     {
-        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\nfoo: bar");
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\nfoo: bar\nlayout: other_layout");
 
         $this->assertInstanceOf(Taxonomy::class, $item);
         $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
+        $this->assertEquals('other_layout', $item->layout());
+    }
+
+    /** @test */
+    public function it_defaults_layout()
+    {
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\nfoo: bar");
+
+        $this->assertEquals('layout', $item->layout());
     }
 
     /** @test */
