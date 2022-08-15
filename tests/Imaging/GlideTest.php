@@ -142,6 +142,27 @@ class GlideTest extends TestCase
         $this->assertEquals(storage_path('framework/cache/glide'), $cache->getStore()->getDirectory());
     }
 
+    /** @test */
+    public function it_deletes_glide_cache_for_an_asset()
+    {
+        // Should return manifest cache key for an asset, along with 3 manipulation cache keys.
+        $this->assertCount(4, $cacheKeys = $this->createImageManipulations('test_container', 'foo/hoff.jpg', 3));
+
+        $this->assertFileExists($glidePath = $this->glideCachePath('containers/test_container/foo/hoff.jpg'));
+
+        $cacheKeys->each(function ($cacheKey) {
+            $this->assertTrue(Glide::cacheStore()->has($cacheKey));
+        });
+
+        Asset::find('test_container::foo/hoff.jpg')->delete();
+
+        $this->assertFileNotExists($glidePath);
+
+        $cacheKeys->each(function ($cacheKey) {
+            $this->assertFalse(Glide::cacheStore()->has($cacheKey));
+        });
+    }
+
     private function assertLocalAdapter($adapter)
     {
         if ($this->isUsingFlysystemV1()) {
