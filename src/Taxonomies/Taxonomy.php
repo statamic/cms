@@ -348,7 +348,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function layout()
     {
-        return 'layout';
+        return $this->fluentlyGetOrSet('layout')->args(func_get_args());
     }
 
     public function searchIndex($index = null)
