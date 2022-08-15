@@ -96,15 +96,16 @@ class ImageGeneratorTest extends TestCase
 
         // Generate the image twice to make sure it's cached.
         foreach (range(1, 2) as $i) {
-            $path = $this->makeGenerator()->generateByAsset(
+            $this->makeGenerator()->generateByAsset(
                 $asset,
-                $userParams[] = ['w' => 100, 'h' => $i] // Ensure unique params so that two manipulations get cached.
+                ['w' => 100, 'h' => $i] // Ensure unique params so that two manipulations get cached.
             );
         }
 
         Event::assertDispatchedTimes(GlideImageGenerated::class, 2);
 
         $this->assertCount(2, $manifest = Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertCount(2, $this->generatedImagePaths());
 
         foreach ($manifest as $cacheKey) {
             $this->assertTrue(Str::startsWith($cacheKey, 'asset::test_container::foo/hoff.jpg::'));
