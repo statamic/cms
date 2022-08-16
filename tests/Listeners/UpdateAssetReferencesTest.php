@@ -137,21 +137,32 @@ class UpdateAssetReferencesTest extends TestCase
                         'container' => 'test_container',
                     ],
                 ],
+                [
+                    'handle' => 'featured',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
             ],
         ]);
 
         $entry = tap(Facades\Entry::make()->collection($collection)->data([
             'avatar' => 'asset::test_container::hoff.jpg',
-            'product' => 'asset::test_container::surfboard.jpg',
+            'product' => 'asset::test_container::norris.jpg',
+            'featured' => 'asset::test_container::surfboard.jpg',
         ]))->save();
 
         $this->assertEquals('asset::test_container::hoff.jpg', $entry->get('avatar'));
-        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->get('product'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->get('product'));
+        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->get('featured'));
 
         $this->assetHoff->path('hoff-new.jpg')->save();
+        $this->assetNorris->delete();
 
         $this->assertEquals('asset::test_container::hoff-new.jpg', $entry->fresh()->get('avatar'));
-        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->fresh()->get('product'));
+        $this->assertFalse($entry->fresh()->has('product'));
+        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->fresh()->get('featured'));
     }
 
     /** @test */
