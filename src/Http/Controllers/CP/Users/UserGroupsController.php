@@ -102,11 +102,15 @@ class UserGroupsController extends CpController
             return $this->pageNotFound();
         }
 
-        $request->validate([
-            'title' => 'required',
-            'handle' => 'alpha_dash',
-            'roles' => 'array',
-        ]);
+        $fields = $group->blueprint()->fields()->addValues($request->all());
+
+        $fields->validate();
+
+        $values = $fields->process()->values()->except(['title', 'handle', 'roles']);
+
+        foreach ($values as $key => $value) {
+            $group->set($key, $value);
+        }
 
         $group
             ->title($request->title)
@@ -114,9 +118,7 @@ class UserGroupsController extends CpController
             ->roles($request->roles)
             ->save();
 
-        session()->flash('success', __('User group updated'));
-
-        return ['redirect' => cp_route('user-groups.show', $group->handle())];
+        return ['title' => $group->title()];
     }
 
     public function create()
@@ -130,20 +132,21 @@ class UserGroupsController extends CpController
     {
         $this->authorize('edit user groups');
 
-        $request->validate([
-            'title' => 'required',
-            'handle' => 'alpha_dash',
-            'roles' => 'array',
-        ]);
+        $blueprint = UserGrup::blueprint();
+
+        $fields = $blueprint->fields()->addValues($request->all());
+
+        $fields->validate();
+
+        $values = $fields->process()->values()->except(['title', 'handle', 'roles']);
 
         $group = UserGroup::make()
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title))
-            ->roles($request->roles);
+            ->roles($request->roles)
+            ->data($values);
 
         $group->save();
-
-        session()->flash('success', __('User group created'));
 
         return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }
