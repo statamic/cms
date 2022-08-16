@@ -180,10 +180,10 @@ abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess,
 
     public function augmentedArrayData()
     {
-        return [
+        return $this->data()->merge([
             'title' => $this->title(),
             'handle' => $this->handle(),
-        ];
+        ])->all();
     }
 
     /**
