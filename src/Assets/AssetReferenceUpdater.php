@@ -206,13 +206,19 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             return;
         }
 
-        $value = "asset::{$this->container}::{$this->newValue}";
+        $newValue = $this->newValue()
+            ? "asset::{$this->container}::{$this->newValue}"
+            : null;
 
-        if ($originalValue === $value) {
+        if ($originalValue === $newValue) {
             return;
         }
 
-        Arr::set($data, $dottedKey, $value);
+        if (is_null($newValue)) {
+            Arr::forget($data, $dottedKey);
+        } else {
+            Arr::set($data, $dottedKey, $newValue);
+        }
 
         $this->item->data($data);
 
