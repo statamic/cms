@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <user-publish-form
+    <user-group-publish-form
         :actions="{{ json_encode($actions) }}"
         method="patch"
         publish-container="base"
@@ -14,6 +14,6 @@
         :initial-meta="{{ json_encode($meta) }}"
         :can-edit-password="false"
         :can-edit-blueprint="{{ Statamic\Support\Str::bool($user->can('configure fields')) }}"
-    ></user-publish-form>
+    ></user-group-publish-form>
 
 @endsection

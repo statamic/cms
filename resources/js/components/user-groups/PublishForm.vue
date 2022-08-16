@@ -55,10 +55,6 @@ export default {
         HasHiddenFields,
     ],
 
-    components: {
-        ChangePassword,
-    },
-
     props: {
         publishContainer: String,
         initialFieldset: Object,
