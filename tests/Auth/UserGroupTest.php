@@ -346,4 +346,30 @@ class UserGroupTest extends TestCase
             'content' => 'Lorem Ipsum',
         ], $group->data()->all());
     }
+
+    /** @test */
+    public function it_gets_blueprint_values()
+    {
+        $blueprint = Facades\UserGroup::blueprint();
+        $contents = $blueprint->contents();
+        $contents['sections']['main']['fields'] = array_merge($contents['sections']['main']['fields'], [
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+            ['handle' => 'four', 'field' => ['type' => 'text']],
+            ['handle' => 'unused_in_bp', 'field' => ['type' => 'text']],
+        ]);
+        $blueprint->setContents($contents);
+        Facades\Blueprint::shouldReceive('find')->with('user_group')->andReturn($blueprint);
+
+        $data = [
+            'one' => 'the "one" value on the group',
+            'two' => 'the "two" value on the group and in the blueprint',
+        ];
+
+        $group = (new UserGroup)
+            ->handle('group_1')
+            ->data($data);
+
+        $this->assertEquals($group->get('one'), $data['one']);
+        $this->assertEquals($group->get('two'), $data['two']);
+    }
 }
