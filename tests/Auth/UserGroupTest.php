@@ -332,4 +332,18 @@ class UserGroupTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value, $group->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value, $group[$key]));
     }
+
+    /** @test */
+    public function it_gets_data()
+    {
+        $group = (new UserGroup)->handle('test')->data([
+            'foo' => 'bar',
+            'content' => 'Lorem Ipsum',
+        ]);
+
+        $this->assertEquals([
+            'foo' => 'bar',
+            'content' => 'Lorem Ipsum',
+        ], $group->data()->all());
+    }
 }
