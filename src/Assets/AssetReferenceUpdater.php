@@ -206,15 +206,15 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             return;
         }
 
-        $newValue = $this->newValue()
-            ? "asset::{$this->container}::{$this->newValue}"
-            : null;
+        $newValue = $this->isRemovingValue()
+            ? null
+            : "asset::{$this->container}::{$this->newValue}";
 
         if ($originalValue === $newValue) {
             return;
         }
 
-        if (is_null($newValue)) {
+        if ($this->isRemovingValue()) {
             Arr::forget($data, $dottedKey);
         } else {
             Arr::set($data, $dottedKey, $newValue);
