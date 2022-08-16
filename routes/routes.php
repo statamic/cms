@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Statamic\API\Middleware\Cache;
+use Statamic\Facades\Glide;
 use Statamic\Http\Middleware\API\SwapExceptionHandler as SwapAPIExceptionHandler;
 use Statamic\Http\Middleware\CP\SwapExceptionHandler as SwapCpExceptionHandler;
 use Statamic\Http\Middleware\RequireStatamicPro;
@@ -28,6 +29,12 @@ if (config('statamic.cp.enabled')) {
             ->namespace('Statamic\Http\Controllers\CP')
             ->group(__DIR__.'/cp.php');
     });
+}
+
+if (Glide::shouldServeByHttp()) {
+    Route::name('statamic.')
+        ->namespace('Statamic\Http\Controllers')
+        ->group(__DIR__.'/glide.php');
 }
 
 Route::middleware(config('statamic.routes.middleware', 'web'))
