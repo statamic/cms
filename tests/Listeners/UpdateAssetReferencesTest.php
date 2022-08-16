@@ -117,55 +117,6 @@ class UpdateAssetReferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_updates_link_fields()
-    {
-        $collection = tap(Facades\Collection::make('articles'))->save();
-
-        $this->setInBlueprints('collections/articles', [
-            'fields' => [
-                [
-                    'handle' => 'avatar',
-                    'field' => [
-                        'type' => 'link',
-                        'container' => 'test_container',
-                    ],
-                ],
-                [
-                    'handle' => 'product',
-                    'field' => [
-                        'type' => 'link',
-                        'container' => 'test_container',
-                    ],
-                ],
-                [
-                    'handle' => 'featured',
-                    'field' => [
-                        'type' => 'link',
-                        'container' => 'test_container',
-                    ],
-                ],
-            ],
-        ]);
-
-        $entry = tap(Facades\Entry::make()->collection($collection)->data([
-            'avatar' => 'asset::test_container::hoff.jpg',
-            'product' => 'asset::test_container::norris.jpg',
-            'featured' => 'asset::test_container::surfboard.jpg',
-        ]))->save();
-
-        $this->assertEquals('asset::test_container::hoff.jpg', $entry->get('avatar'));
-        $this->assertEquals('asset::test_container::norris.jpg', $entry->get('product'));
-        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->get('featured'));
-
-        $this->assetHoff->path('hoff-new.jpg')->save();
-        $this->assetNorris->delete();
-
-        $this->assertEquals('asset::test_container::hoff-new.jpg', $entry->fresh()->get('avatar'));
-        $this->assertFalse($entry->fresh()->has('product'));
-        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->fresh()->get('featured'));
-    }
-
-    /** @test */
     public function it_nullifies_references_when_deleting_an_asset()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -217,6 +168,55 @@ class UpdateAssetReferencesTest extends TestCase
 
         $this->assertFalse($entry->fresh()->has('products'));
         $this->assertFalse($entry->fresh()->has('featured'));
+    }
+
+    /** @test */
+    public function it_updates_link_fields()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'product',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'featured',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'asset::test_container::hoff.jpg',
+            'product' => 'asset::test_container::norris.jpg',
+            'featured' => 'asset::test_container::surfboard.jpg',
+        ]))->save();
+
+        $this->assertEquals('asset::test_container::hoff.jpg', $entry->get('avatar'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->get('product'));
+        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->get('featured'));
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+        $this->assetNorris->delete();
+
+        $this->assertEquals('asset::test_container::hoff-new.jpg', $entry->fresh()->get('avatar'));
+        $this->assertFalse($entry->fresh()->has('product'));
+        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->fresh()->get('featured'));
     }
 
     /** @test */
