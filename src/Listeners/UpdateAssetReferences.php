@@ -18,7 +18,7 @@ class UpdateAssetReferences implements ShouldQueue
      */
     public function subscribe($events)
     {
-        if (config('statamic.assets.update_references') === false) {
+        if (config('statamic.system.update_references') === false) {
             return;
         }
 
