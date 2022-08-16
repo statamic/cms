@@ -155,6 +155,60 @@ class UpdateAssetReferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_nullifies_references_when_deleting_an_asset()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'products',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'featured',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'hoff.jpg',
+            'products' => ['norris.jpg', 'hoff.jpg'],
+            'featured' => 'asset::test_container::norris.jpg',
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $entry->get('avatar'));
+        $this->assertEquals(['norris.jpg', 'hoff.jpg'], $entry->get('products'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->get('featured'));
+
+        $this->assetHoff->delete();
+
+        $this->assertFalse($entry->fresh()->has('avatar'));
+        $this->assertEquals(['norris.jpg'], $entry->fresh()->get('products'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->fresh()->get('featured'));
+
+        $this->assetNorris->delete();
+
+        $this->assertFalse($entry->fresh()->has('products'));
+        $this->assertFalse($entry->fresh()->has('featured'));
+    }
+
+    /** @test */
     public function it_updates_nested_asset_fields_within_replicator_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
