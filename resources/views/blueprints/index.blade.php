@@ -170,7 +170,7 @@
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 mr-2">@cp_svg('user_groups')</div>
-                        <a href="{{ cp_route('user-groups.blueprint.edit') }}">{{ __('User Groups') }}</a>
+                        <a href="{{ cp_route('user-groups.blueprint.edit') }}">{{ __('Groups') }}</a>
                     </div>
                 </td>
             </tr>
