@@ -802,7 +802,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+        $title = (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+
+        return trim($title);
     }
 
     public function previewTargets()

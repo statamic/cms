@@ -8,6 +8,16 @@ $toggle_radius: 20px;
     height: 32px;
     display: flex;
     align-items: center;
+
+    .inline-label {
+        @apply .ml-1 .font-normal .text-grey-70;
+        a {
+            @apply .text-grey-80 underline;
+            &:hover {
+                @apply .text-blue-darker;
+            }
+        }
+    }
 }
 
 .locale-status-field .toggle-fieldtype-wrapper {

@@ -1,5 +1,100 @@
 # Release Notes
 
+## 3.3.29 (2022-08-15)
+
+### What's new
+- Added `bard_text`, `bard_html`, and `bard_items` modifiers. [#6226](https://github.com/statamic/cms/issues/6226) by @jacksleight
+- Added `antlers` modifier. [#6489](https://github.com/statamic/cms/issues/6489) by @jasonvarga
+- Added `blueprint` to augmented entry data. [#6015](https://github.com/statamic/cms/issues/6015) by @jacksleight
+- Ability to add Form JS drivers to an addon's service provider. [#6499](https://github.com/statamic/cms/issues/6499) by @jacksleight
+
+### What's improved
+- Use singular nouns in default blueprint handles and titles. [#5941](https://github.com/statamic/cms/issues/5941) by @jacksleight
+
+### What's fixed
+- Fix stretched SVG thumbnails. [#6500](https://github.com/statamic/cms/issues/6500) by @jacksleight
+- Fix depth issues when using recursive children in Runtime Antlers. [#6490](https://github.com/statamic/cms/issues/6490) by @JohnathonKoster
+- Fix `raw` modifier on fields with `antlers: true` in Runtime Antlers. [#6484](https://github.com/statamic/cms/issues/6484) by @JohnathonKoster
+- Fix extra margin on narrow date only fields [#6435](https://github.com/statamic/cms/issues/6435) by @jacksleight
+- Fix error when filtering by collection in CP entry listing with multiple collections. [#5915](https://github.com/statamic/cms/issues/5915) by @psyao
+
+
+
+## 3.3.28 (2022-08-11)
+
+### What's new
+- Provide full form data when using form tags in Blade. [#5892](https://github.com/statamic/cms/issues/5892) by @jacksleight
+- Form emails are sent in separate jobs, and you can override the class in order to customize retries, backoff, etc. [#6481](https://github.com/statamic/cms/issues/6481) by @okaufmann
+
+### What's fixed
+- Fix asset versioning path conflicts. [#6444](https://github.com/statamic/cms/issues/6444) by @jonassiewertsen
+
+
+
+## 3.3.27 (2022-08-09)
+
+### What's improved
+- Auto generated entry titles get trimmed. [#6473](https://github.com/statamic/cms/issues/6473) by @aerni
+- Reorderable select field options are styled with grab handles. [#6451](https://github.com/statamic/cms/issues/6451) by @jacksleight
+- Added phpdoc type information to AddonServiceProvider. [#6465](https://github.com/statamic/cms/issues/6465) by @j6s
+
+### What's fixed
+- Fix terms not resolving query builders (e.g. nested entries or terms) in GraphQL. [#6379](https://github.com/statamic/cms/issues/6379) by @boydseltenrijch
+- Fix `locales` tag not outputting collection specific term URLs. [#6466](https://github.com/statamic/cms/issues/6466) by @jasonvarga
+- Fix methods getting called more than expected in Antlers. [#6458](https://github.com/statamic/cms/issues/6458) by @JohnathonKoster
+- Prevent `theme:output` tag from rendering files outside of the `resources` directory. [#6456](https://github.com/statamic/cms/issues/6456) by @jasonvarga
+- Remove redundant `orWhere` methods in entry and term query builders. [#6460](https://github.com/statamic/cms/issues/6460) by @ryanmitchell
+
+
+
+## 3.3.26 (2022-08-08)
+
+### What's new
+- Add option to remove empty Bard nodes. [#6438](https://github.com/statamic/cms/issues/6438), [#6447](https://github.com/statamic/cms/issues/6447) by @aerni
+- Add `saveQuietly` method and `afterSave` callbacks to `Taxonomy` and `Submission` classes. [#6427](https://github.com/statamic/cms/issues/6427) by @duncanmcclean
+- Add revisions option to Collection configuration form. [#6426](https://github.com/statamic/cms/issues/6426) by @jackmcdade
+
+### What's fixed
+- Revert "Fix parameters not being available within partial slots" added in 3.3.25 as it was discovered to be a breaking change. [#6463](https://github.com/statamic/cms/issues/6463) by @jasonvarga
+- Fix a couple of docs URLs. [#6461](https://github.com/statamic/cms/issues/6461) by @jackmcdade
+- Augment submission data in email config. [#6424](https://github.com/statamic/cms/issues/6424) by @aerni
+- Fix incorrect nav depth when using a partial multiple times. [#6440](https://github.com/statamic/cms/issues/6440) by @JohnathonKoster
+- Fix modifiers not being applied to method invocation without parenthesis. [#6416](https://github.com/statamic/cms/issues/6416) by @JohnathonKoster
+- Fix creating new empty arrays in Antlers. [#6437](https://github.com/statamic/cms/issues/6437) by @JohnathonKoster
+- Forms: Fix double parsing in email configs, some other small fixes, and add test coverage. [#6464](https://github.com/statamic/cms/issues/6464) by @jasonvarga
+- Make empty grid/replicator/bard fields be indexed as null instead of empty arrays. [#6428](https://github.com/statamic/cms/issues/6428) by @jasonvarga
+- Add vscode directory to gitignore [#6430](https://github.com/statamic/cms/issues/6430) by @MarvelousMartin
+
+
+
+## 3.3.25 (2022-08-01)
+
+### What's fixed
+- Fix assets not being attached to, or listed in form submission emails. [#6408](https://github.com/statamic/cms/issues/6408) by @jacksleight
+- The `embed_url` modifier handles unlisted Vimeo URLs. [#6413](https://github.com/statamic/cms/issues/6413) by @ryanmitchell
+- The `toggle` field's `inline_label` option uses markdown. [#6412](https://github.com/statamic/cms/issues/6412) by @jesseleite
+- ~~Fix parameters not being available within partial slots.~~ Reverted in 3.3.26 [#6405](https://github.com/statamic/cms/issues/6405) by @JohnathonKoster
+- Fix aggressiveness of html minification when rendering form fields. [#6394](https://github.com/statamic/cms/issues/6394) by @jesseleite
+- Fix password reset for unactivated user accounts. [#6406](https://github.com/statamic/cms/issues/6406) by @jasonvarga
+- Bump `moment` from 2.29.2 to 2.29.4 [#6410](https://github.com/statamic/cms/issues/6410) by @dependabot
+- Composer steps in the GitHub test workflow will retry on a failure. [#6409](https://github.com/statamic/cms/issues/6409) by @jasonvarga
+
+
+
+## 3.3.24 (2022-07-26)
+
+### What's improved
+- Always include `no_results` in tags that output items. [#6368](http://github.com/statamic/cms/issues/6368) by @jacksleight
+- Dutch translations. [#6364](http://github.com/statamic/cms/issues/6364) by @erwinromkes
+
+### What's fixed
+- Fix `rememberWithExpiration` cache macro not found error. [#6380](http://github.com/statamic/cms/issues/6380) by @JohnathonKoster
+- Fix word count in `CoreModifiers` treating punctuation as a word. [#6367](http://github.com/statamic/cms/issues/6367) by @johnnoel
+- Fix reordering entries in a collection named literally `collection`. [#6371](http://github.com/statamic/cms/issues/6371) by @jasonvarga
+- Deprecate `format_localized` modifier. [#6370](http://github.com/statamic/cms/issues/6370) by @jasonvarga
+
+
+
 ## 3.3.23 (2022-07-21)
 
 ### What's new

@@ -346,11 +346,11 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_collection()
+    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_singular_collection()
     {
-        $collection = (new Collection)->handle('blog');
+        $collection = (new Collection)->handle('articles');
 
-        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect());
+        BlueprintRepository::shouldReceive('in')->with('collections/articles')->andReturn(collect());
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn(
             $blueprint = (new Blueprint)
                 ->setHandle('thisll_change')
@@ -363,11 +363,11 @@ class CollectionTest extends TestCase
 
         tap($collection->entryBlueprint(), function ($default) use ($blueprint) {
             $this->assertEquals($blueprint, $default);
-            $this->assertEquals('blog', $default->handle());
-            $this->assertEquals('Blog', $default->title());
+            $this->assertEquals('article', $default->handle());
+            $this->assertEquals('Article', $default->title());
         });
 
-        $this->assertEquals($blueprint, $collection->entryBlueprint('blog'));
+        $this->assertEquals($blueprint, $collection->entryBlueprint('article'));
         $this->assertNull($collection->entryBlueprint('two'));
     }
 
