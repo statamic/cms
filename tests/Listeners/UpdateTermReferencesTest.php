@@ -101,6 +101,64 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_nullifies_references_when_deleting_a_term()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'non_favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'hoff',
+            'non_favourite' => 'norris',
+            'favourites' => ['hoff', 'norris'],
+        ]))->save();
+
+        $this->assertEquals('hoff', $entry->get('favourite'));
+        $this->assertEquals('norris', $entry->get('non_favourite'));
+        $this->assertEquals(['hoff', 'norris'], $entry->get('favourites'));
+
+        $this->termHoff->delete();
+
+        $this->assertFalse($entry->fresh()->has('favourite'));
+        $this->assertEquals('norris', $entry->fresh()->get('non_favourite'));
+        $this->assertEquals(['norris'], $entry->fresh()->get('favourites'));
+
+        $this->termNorris->delete();
+
+        $this->assertFalse($entry->fresh()->has('non_favourite'));
+        $this->assertFalse($entry->fresh()->has('favourites'));
+    }
+
+    /** @test */
     public function it_updates_scoped_single_term_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -166,6 +224,61 @@ class UpdateTermReferencesTest extends TestCase
         $this->termHoff->slug('hoff-new')->save();
 
         $this->assertEquals(['topics::hoff-new', 'topics::norris'], $entry->fresh()->get('favourites'));
+    }
+
+    /** @test */
+    public function it_nullifies_references_when_deleting_a_scoped_term()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'non_favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'topics::hoff',
+            'non_favourite' => 'topics::norris',
+            'favourites' => ['topics::hoff', 'topics::norris'],
+        ]))->save();
+
+        $this->assertEquals('topics::hoff', $entry->get('favourite'));
+        $this->assertEquals('topics::norris', $entry->get('non_favourite'));
+        $this->assertEquals(['topics::hoff', 'topics::norris'], $entry->get('favourites'));
+
+        $this->termHoff->delete();
+
+        $this->assertFalse($entry->fresh()->has('favourite'));
+        $this->assertEquals('topics::norris', $entry->fresh()->get('non_favourite'));
+        $this->assertEquals(['topics::norris'], $entry->fresh()->get('favourites'));
+
+        $this->termNorris->delete();
+
+        $this->assertFalse($entry->fresh()->has('non_favourite'));
+        $this->assertFalse($entry->fresh()->has('favourites'));
     }
 
     /** @test */
