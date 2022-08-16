@@ -8,6 +8,7 @@ use IteratorAggregate;
 use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\View\Antlers\Parser;
+use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
 
@@ -59,6 +60,10 @@ class Value implements IteratorAggregate, JsonSerializable
     public function jsonSerialize($options = 0)
     {
         $value = $this->value();
+
+        if ($value instanceof OrderedQueryBuilder) {
+            $value = $value->get();
+        }
 
         if ($value instanceof Augmentable || $value instanceof Collection) {
             $value = $value->toAugmentedArray();
