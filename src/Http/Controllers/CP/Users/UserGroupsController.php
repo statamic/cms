@@ -4,8 +4,8 @@ namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\Scope;
-use Statamic\Facades\UserGroup;
 use Statamic\Facades\User;
+use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
 
