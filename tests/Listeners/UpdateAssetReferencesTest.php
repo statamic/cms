@@ -48,6 +48,11 @@ class UpdateAssetReferencesTest extends TestCase
         parent::tearDown();
     }
 
+    protected function disableUpdateReferences($app)
+    {
+        $app['config']->set('statamic.system.update_references', false);
+    }
+
     /** @test */
     public function it_updates_single_assets_fields()
     {
@@ -168,6 +173,59 @@ class UpdateAssetReferencesTest extends TestCase
 
         $this->assertFalse($entry->fresh()->has('products'));
         $this->assertFalse($entry->fresh()->has('featured'));
+    }
+
+    /**
+     * @test
+     * @environment-setup disableUpdateReferences
+     **/
+    public function it_can_be_disabled()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'products',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'featured',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'hoff.jpg',
+            'products' => ['norris.jpg', 'hoff.jpg'],
+            'featured' => 'asset::test_container::norris.jpg',
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $entry->get('avatar'));
+        $this->assertEquals(['norris.jpg', 'hoff.jpg'], $entry->get('products'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->get('featured'));
+
+        $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
+
+        $this->assertEquals('hoff.jpg', $entry->fresh()->get('avatar'));
+        $this->assertEquals(['norris.jpg', 'hoff.jpg'], $entry->fresh()->get('products'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->fresh()->get('featured'));
     }
 
     /** @test */
