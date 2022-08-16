@@ -18,6 +18,10 @@ class UpdateTermReferences implements ShouldQueue
      */
     public function subscribe($events)
     {
+        if (config('statamic.system.update_references') === false) {
+            return;
+        }
+
         $events->listen(TermSaved::class, self::class.'@handleSaved');
         $events->listen(TermDeleted::class, self::class.'@handleDeleted');
     }
