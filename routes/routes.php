@@ -32,8 +32,7 @@ if (config('statamic.cp.enabled')) {
 }
 
 if (Glide::shouldServeByHttp()) {
-    Route::name('statamic.')
-        ->namespace('Statamic\Http\Controllers')
+    Route::namespace('Statamic\Http\Controllers')
         ->group(__DIR__.'/glide.php');
 }
 
