@@ -12,7 +12,6 @@
                     :class="{ 'text-grey-60': syncable && isSynced }"
                     v-text="labelText"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
-                    v-if="!config.hide_display"
                 />
                 <i class="required ml-sm" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
