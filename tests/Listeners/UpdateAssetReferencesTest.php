@@ -269,7 +269,7 @@ class UpdateAssetReferencesTest extends TestCase
                 [
                     'type' => 'set_one',
                     'product' => 'hoff.jpg',
-                    'pics' => ['hoff.jpg', 'norris.jpg'],
+                    'pics' => ['hoff.jpg', 'norris.jpg', 'lee.jpg'],
                 ],
             ],
         ]))->save();
@@ -278,15 +278,16 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'reppy.0.pics'));
         $this->assertEquals('not an asset', Arr::get($entry->data(), 'reppy.1.not_asset'));
         $this->assertEquals('hoff.jpg', Arr::get($entry->data(), 'reppy.2.product'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'reppy.2.pics'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'lee.jpg'], Arr::get($entry->data(), 'reppy.2.pics'));
 
         $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
 
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'reppy.0.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.0.pics'));
+        $this->assertEquals(['content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.0.pics'));
         $this->assertEquals('not an asset', Arr::get($entry->fresh()->data(), 'reppy.1.not_asset'));
-        $this->assertEquals('hoff.jpg', Arr::get($entry->fresh()->data(), 'reppy.2.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.2.pics'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'reppy.2.product'));
+        $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'reppy.2.pics'));
     }
 
     /** @test */
@@ -330,7 +331,7 @@ class UpdateAssetReferencesTest extends TestCase
                 ],
                 [
                     'product' => 'hoff.jpg',
-                    'pics' => ['hoff.jpg', 'norris.jpg'],
+                    'pics' => ['hoff.jpg', 'norris.jpg', 'lee.jpg'],
                 ],
             ],
         ]))->save();
@@ -338,14 +339,15 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('norris.jpg', Arr::get($entry->data(), 'griddy.0.product'));
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'griddy.0.pics'));
         $this->assertEquals('hoff.jpg', Arr::get($entry->data(), 'griddy.1.product'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'griddy.1.pics'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'lee.jpg'], Arr::get($entry->data(), 'griddy.1.pics'));
 
         $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
 
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'griddy.0.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'griddy.0.pics'));
-        $this->assertEquals('hoff.jpg', Arr::get($entry->fresh()->data(), 'griddy.1.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'griddy.1.pics'));
+        $this->assertEquals(['content/norris.jpg'], Arr::get($entry->fresh()->data(), 'griddy.0.pics'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'griddy.1.product'));
+        $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'griddy.1.pics'));
     }
 
     /** @test */
@@ -417,7 +419,7 @@ class UpdateAssetReferencesTest extends TestCase
                         'values' => [
                             'type' => 'set_one',
                             'product' => 'hoff.jpg',
-                            'pics' => ['hoff.jpg', 'norris.jpg'],
+                            'pics' => ['hoff.jpg', 'norris.jpg', 'lee.jpg'],
                         ],
                     ],
                 ],
@@ -428,15 +430,16 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'bardo.0.attrs.values.pics'));
         $this->assertEquals('not an asset', Arr::get($entry->data(), 'bardo.1.not_asset'));
         $this->assertEquals('hoff.jpg', Arr::get($entry->data(), 'bardo.2.attrs.values.product'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'bardo.2.attrs.values.pics'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'lee.jpg'], Arr::get($entry->data(), 'bardo.2.attrs.values.pics'));
 
         $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
 
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.pics'));
+        $this->assertEquals(['content/norris.jpg'], Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.pics'));
         $this->assertEquals('not an asset', Arr::get($entry->fresh()->data(), 'bardo.1.not_asset'));
-        $this->assertEquals('hoff.jpg', Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.pics'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'bardo.2.attrs.values.product'));
+        $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.pics'));
     }
 
     /** @test */
