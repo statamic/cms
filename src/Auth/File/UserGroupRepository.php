@@ -30,7 +30,8 @@ class UserGroupRepository extends BaseRepository
         return $this->groups = $this->raw()->map(function ($data, $handle) {
             $group = Facades\UserGroup::make()
                 ->handle($handle)
-                ->title(array_get($data, 'title'));
+                ->title(array_get($data, 'title'))
+                ->data($data);
 
             foreach ($data['roles'] ?? [] as $role) {
                 if ($role = Facades\Role::find($role)) {
@@ -46,10 +47,10 @@ class UserGroupRepository extends BaseRepository
     {
         $groups = $this->raw();
 
-        $groups->put($group->handle(), array_filter([
+        $groups->put($group->handle(), array_filter(array_merge($group->data()->all(), [
             'title' => $group->title(),
             'roles' => $group->roles()->map->handle()->values()->all(),
-        ]));
+        ])));
 
         if ($group->handle() !== $group->originalHandle()) {
             $groups->forget($group->originalHandle());

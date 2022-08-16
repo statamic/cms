@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Users;
 use Illuminate\Http\Request;
 use Statamic\Facades\Scope;
 use Statamic\Facades\UserGroup;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
 
@@ -55,7 +56,7 @@ class UserGroupsController extends CpController
         ]);
     }
 
-    public function edit($group)
+    public function edit(Request $request, $group)
     {
         $this->authorize('edit user groups');
 
@@ -63,11 +64,34 @@ class UserGroupsController extends CpController
             return $this->pageNotFound();
         }
 
-        return view('statamic::usergroups.edit', [
-            'group' => $group,
-            'roles' => $group->roles()->map->handle()->values()->all(),
-            'filters' => Scope::filters('usergroup-users'),
-        ]);
+        $blueprint = $group->blueprint();
+
+        if (! User::current()->can('edit roles')) {
+            $blueprint->ensureField('roles', ['visibility' => 'read_only']);
+        }
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($group->data()->merge(['handle' => $group->handle()])->all())
+            ->preProcess();
+
+        $viewData = [
+            'title' => $group->title(),
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta(),
+            'blueprint' => $group->blueprint()->toPublishArray(),
+            'reference' => $group->handle(),
+            'actions' => [
+                'save' => $group->updateUrl(),
+                'editBlueprint' => cp_route('user-groups.blueprint.edit'),
+            ],
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::usergroups.edit', $viewData);
     }
 
     public function update(Request $request, $group)
