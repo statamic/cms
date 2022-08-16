@@ -211,7 +211,13 @@ abstract class DataReferenceUpdater
             return;
         }
 
-        Arr::set($data, $dottedKey, $this->newValue());
+        $newValue = $this->newValue();
+
+        if (is_null($newValue)) {
+            Arr::forget($data, $dottedKey);
+        } else {
+            Arr::set($data, $dottedKey, $newValue);
+        }
 
         $this->item->data($data);
 
@@ -236,11 +242,18 @@ abstract class DataReferenceUpdater
             return;
         }
 
-        $fieldData->transform(function ($value) {
-            return $value === $this->originalValue() ? $this->newValue() : $value;
-        });
+        $fieldData = $fieldData
+            ->map(function ($value) {
+                return $value === $this->originalValue() ? $this->newValue() : $value;
+            })
+            ->filter()
+            ->values();
 
-        Arr::set($data, $dottedKey, $fieldData->all());
+        if ($fieldData->isEmpty()) {
+            Arr::forget($data, $dottedKey);
+        } else {
+            Arr::set($data, $dottedKey, $fieldData->all());
+        }
 
         $this->item->data($data);
 
