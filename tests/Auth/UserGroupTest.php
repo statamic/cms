@@ -29,22 +29,22 @@ class UserGroupTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_and_sets_the_handle()
-    {
-        $group = UserGroup::make();
-        $this->assertNull($group->handle());
-        $this->assertNull($group->originalHandle());
-
-        $return = $group->handle('test');
-
-        $this->assertEquals('test', $group->handle());
-        $this->assertEquals($group, $return);
-
-        $group->handle('modified');
-
-        $this->assertEquals('modified', $group->handle());
-        $this->assertEquals('test', $group->originalHandle());
-    }
+//     public function it_gets_and_sets_the_handle()
+//     {
+//         $group = UserGroup::make();
+//         $this->assertNull($group->handle());
+//         $this->assertNull($group->originalHandle());
+//
+//         $return = $group->handle('test');
+//
+//         $this->assertEquals('test', $group->handle());
+//         $this->assertEquals($group, $return);
+//
+//         $group->handle('modified');
+//
+//         $this->assertEquals('modified', $group->handle());
+//         $this->assertEquals('test', $group->originalHandle());
+//     }
 //
 //     /** @test */
 //     public function it_gets_all_the_users()
