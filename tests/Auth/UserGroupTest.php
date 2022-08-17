@@ -334,18 +334,18 @@ class UserGroupTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_data()
-    {
-        $group = (new UserGroup)->handle('test')->data([
-            'foo' => 'bar',
-            'content' => 'Lorem Ipsum',
-        ]);
-
-        $this->assertEquals([
-            'foo' => 'bar',
-            'content' => 'Lorem Ipsum',
-        ], $group->data()->all());
-    }
+//     public function it_gets_data()
+//     {
+//         $group = (new UserGroup)->handle('test')->data([
+//             'foo' => 'bar',
+//             'content' => 'Lorem Ipsum',
+//         ]);
+//
+//         $this->assertEquals([
+//             'foo' => 'bar',
+//             'content' => 'Lorem Ipsum',
+//         ], $group->data()->all());
+//     }
 
     /** @test */
 //     public function it_gets_blueprint_values()
