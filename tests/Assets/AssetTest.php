@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
+use ReflectionClass;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Events\AssetSaved;
@@ -557,6 +558,42 @@ class AssetTest extends TestCase
         });
 
         // Assertion about the meta file is in the AssetRepository test
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+        Storage::fake('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('save')->with($asset);
+
+        $return = $asset->saveQuietly();
+
+        $this->assertTrue($return);
+
+        Event::assertNotDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function when_saving_quietly_the_cached_assetss_withEvents_flag_will_be_set_back_to_true()
+    {
+        Event::fake();
+        Storage::fake('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('save')->with($asset);
+
+        $return = $asset->saveQuietly();
+
+        $this->assertTrue($return);
+
+        $reflection = new ReflectionClass($asset);
+        $property = $reflection->getProperty('withEvents');
+        $property->setAccessible(true);
+        $withEvents = $property->getValue($asset);
+        $this->assertTrue($withEvents);
     }
 
     /** @test */
