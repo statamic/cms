@@ -295,20 +295,20 @@ class UserGroupTest extends TestCase
 //     }
 
     /** @test */
-    public function it_can_be_saved()
-    {
-        $group = UserGroup::make();
-        Facades\UserGroup::shouldReceive('save')->with($group)->once()->andReturnTrue();
-        $this->assertTrue($group->save());
-    }
-
-    /** @test */
-    public function it_can_be_deleted()
-    {
-        $group = UserGroup::make();
-        Facades\UserGroup::shouldReceive('delete')->with($group)->once()->andReturnTrue();
-        $this->assertTrue($group->delete());
-    }
+//     public function it_can_be_saved()
+//     {
+//         $group = UserGroup::make();
+//         Facades\UserGroup::shouldReceive('save')->with($group)->once()->andReturnTrue();
+//         $this->assertTrue($group->save());
+//     }
+//
+//     /** @test */
+//     public function it_can_be_deleted()
+//     {
+//         $group = UserGroup::make();
+//         Facades\UserGroup::shouldReceive('delete')->with($group)->once()->andReturnTrue();
+//         $this->assertTrue($group->delete());
+//     }
 
     /** @test */
 //     public function it_gets_evaluated_augmented_value_using_magic_property()
