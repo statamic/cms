@@ -116,6 +116,7 @@ class ThemeTagsTest extends TestCase
         File::shouldReceive('disk')->andReturn($disk = \Mockery::mock());
         $disk->shouldReceive('exists')->with('test.txt')->once()->andReturnTrue();
         $disk->shouldReceive('get')->with('test.txt')->andReturn('contents');
+        $disk->shouldReceive('isWithinRoot')->with('test.txt')->andReturnTrue();
 
         $this->assertEquals(
             'contents',
@@ -123,9 +124,32 @@ class ThemeTagsTest extends TestCase
         );
     }
 
+    public function testDoesntOutputFileContentsIfFileDoesntExist()
+    {
+        File::shouldReceive('disk')->andReturn($disk = \Mockery::mock());
+        $disk->shouldReceive('exists')->with('test.txt')->once()->andReturnFalse();
+
+        $this->assertEquals(
+            '',
+            $this->tag('{{ theme:output src="test.txt" }}')
+        );
+    }
+
+    public function testDoesntOutputFileContentsIfOutsideOfResources()
+    {
+        File::shouldReceive('disk')->andReturn($disk = \Mockery::mock());
+        $disk->shouldReceive('exists')->with('test.txt')->once()->andReturnTrue();
+        $disk->shouldReceive('isWithinRoot')->with('test.txt')->andReturnFalse();
+
+        $this->assertEquals(
+            '',
+            $this->tag('{{ theme:output src="test.txt" }}')
+        );
+    }
+
     public function testAppendsTimestampForCacheBusting()
     {
-        File::shouldReceive('exists')->with(public_path('/js/foo.js'))->andReturnTrue();
+        File::shouldReceive('exists')->with(Path::tidy(public_path('/js/foo.js')))->andReturnTrue();
 
         File::shouldReceive('lastModified')
             ->withArgs(function ($arg) {

@@ -2,38 +2,11 @@
 
 namespace Tests\Tags\Form;
 
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
-use Statamic\Facades\Parse;
-use Statamic\Support\Arr;
-use Tests\NormalizesHtml;
-use Tests\PreventSavingStacheItemsToDisk;
-use Tests\TestCase;
+use Statamic\Statamic;
 
-class FormCreateTest extends TestCase
+class FormCreateTest extends FormTestCase
 {
-    use PreventSavingStacheItemsToDisk, NormalizesHtml;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->createContactForm();
-        $this->clearSubmissions();
-    }
-
-    public function tearDown(): void
-    {
-        $this->clearSubmissions();
-
-        parent::tearDown();
-    }
-
-    private function tag($tag)
-    {
-        return Parse::template($tag, []);
-    }
-
     /** @test */
     public function it_renders_form()
     {
@@ -177,7 +150,7 @@ EOT
             '<br>',
             '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat">Rat</label>',
+            '<label><input type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -185,7 +158,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ]);
@@ -195,7 +168,7 @@ EOT
             '<br>',
             '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat" checked>Rat</label>',
+            '<label><input type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -203,7 +176,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ], [
@@ -217,7 +190,7 @@ EOT
         $this->assertFieldRendersHtml([
             '<label><input type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
             '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat">Rat</label>',
+            '<label><input type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -226,7 +199,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ]);
@@ -234,7 +207,7 @@ EOT
         $this->assertFieldRendersHtml([
             '<label><input type="checkbox" name="favourite_animals[]" value="cat" checked>Cat</label>',
             '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat" checked>Rat</label>',
+            '<label><input type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -243,7 +216,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ], [
@@ -259,7 +232,7 @@ EOT
             '<br>',
             '<label><input type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="rat">Rat</label>',
+            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -267,7 +240,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ]);
@@ -277,7 +250,7 @@ EOT
             '<br>',
             '<label><input type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="rat">Rat</label>',
+            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -285,7 +258,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ], [
@@ -299,7 +272,7 @@ EOT
         $this->assertFieldRendersHtml([
             '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<label><input type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
-            '<label><input type="radio" name="favourite_animal" value="rat">Rat</label>',
+            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -308,7 +281,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ]);
@@ -316,7 +289,7 @@ EOT
         $this->assertFieldRendersHtml([
             '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<label><input type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
-            '<label><input type="radio" name="favourite_animal" value="rat">Rat</label>',
+            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -325,7 +298,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ], [
@@ -341,7 +314,7 @@ EOT
             '<option value>Please select...</option>',
             '<option value="cat">Cat</option>',
             '<option value="armadillo">Armadillo</option>',
-            '<option value="rat">Rat</option>',
+            '<option value="rat">rat</option>',
             '</select>',
         ], [
             'handle' => 'favourite_animal',
@@ -350,7 +323,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ]);
@@ -360,7 +333,7 @@ EOT
             '<option value>Please select...</option>',
             '<option value="cat" selected>Cat</option>',
             '<option value="armadillo">Armadillo</option>',
-            '<option value="rat">Rat</option>',
+            '<option value="rat">rat</option>',
             '</select>',
         ], [
             'handle' => 'favourite_animal',
@@ -369,7 +342,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ], [
@@ -384,7 +357,7 @@ EOT
             '<select name="favourite_animals[]" multiple>',
             '<option value="cat">Cat</option>',
             '<option value="armadillo">Armadillo</option>',
-            '<option value="rat">Rat</option>',
+            '<option value="rat">rat</option>',
             '</select>',
         ], [
             'handle' => 'favourite_animals',
@@ -394,7 +367,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ]);
@@ -403,7 +376,7 @@ EOT
             '<select name="favourite_animals[]" multiple>',
             '<option value="cat" selected>Cat</option>',
             '<option value="armadillo">Armadillo</option>',
-            '<option value="rat" selected>Rat</option>',
+            '<option value="rat" selected>rat</option>',
             '</select>',
         ], [
             'handle' => 'favourite_animals',
@@ -413,7 +386,7 @@ EOT
                 'options' => [
                     'cat' => 'Cat',
                     'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
+                    'rat' => null, // label should fall back to value
                 ],
             ],
         ], [
@@ -480,7 +453,11 @@ EOT
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this
-            ->post('/!/forms/contact')
+            ->post('/!/forms/contact', [
+                'name' => '',
+                'email' => '',
+                'message' => '',
+            ])
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
@@ -625,6 +602,9 @@ EOT
         $this
             ->post('/!/forms/contact', [
                 '_error_redirect' => '/submission-error',
+                'name' => '',
+                'email' => '',
+                'message' => '',
             ])
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/submission-error');
@@ -679,7 +659,11 @@ EOT
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this
-            ->post('/!/forms/contact', ['name' => '$'])
+            ->post('/!/forms/contact', [
+                'name' => '$',
+                'email' => '',
+                'message' => '',
+            ])
             ->assertSessionHasErrors(['name', 'email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
@@ -713,87 +697,28 @@ EOT
         $this->assertEquals($expectedInline, $inlineErrors[1]);
     }
 
-    private function createContactForm($fields = null)
+    /** @test */
+    public function it_fetches_form_data()
     {
-        $defaultFields = [
-            [
-                'handle' => 'name',
-                'field' => [
-                    'type' => 'text',
-                    'display' => 'Full Name',
-                    'validate' => 'min:3|alpha_num',
-                ],
-            ],
-            [
-                'handle' => 'email',
-                'field' => [
-                    'type' => 'text',
-                    'input_type' => 'email',
-                    'display' => 'Email Address',
-                    'validate' => 'required|email',
-                ],
-            ],
-            [
-                'handle' => 'message',
-                'field' => [
-                    'type' => 'textarea',
-                    'display' => 'Message',
-                    'validate' => 'required',
-                ],
-            ],
-        ];
+        $form = Statamic::tag('form:contact')->params([
+            'js' => 'alpine',
+            'files' => true,
+            'redirect' => 'http://localhost/',
+            'id' => 'my-form',
+        ])->fetch();
 
-        $blueprint = Blueprint::make()->setContents([
-            'fields' => $fields ?? $defaultFields,
-        ]);
+        $this->assertEquals($form['attrs']['action'], 'http://localhost/!/forms/contact');
+        $this->assertEquals($form['attrs']['method'], 'POST');
+        $this->assertEquals($form['attrs']['enctype'], 'multipart/form-data');
+        $this->assertEquals($form['attrs']['id'], 'my-form');
 
-        $handle = $fields ? $this->customFieldBlueprintHandle : 'contact';
+        $this->assertEquals($form['params']['_redirect'], 'http://localhost/');
+        $this->assertArrayHasKey('_token', $form['params']);
 
-        Blueprint::shouldReceive('find')->with("forms.{$handle}")->andReturn($blueprint);
-        Blueprint::makePartial();
+        $this->assertIsArray($form['errors']);
+        $this->assertIsArray($form['fields']);
 
-        $form = Form::make()->handle($handle)->honeypot('winnie');
-
-        Form::shouldReceive('find')->with($handle)->andReturn($form);
-        Form::makePartial();
-    }
-
-    private function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [])
-    {
-        $randomString = str_shuffle('nobodymesseswiththehoff');
-
-        $this->customFieldBlueprintHandle = $handle = $fieldConfig['handle'].'_'.$randomString;
-
-        $fields = $oldData
-            ? array_merge([['handle' => 'failing_field', 'field' => ['type' => 'text', 'validate' => 'required']]], [$fieldConfig])
-            : [$fieldConfig];
-
-        $this->createContactForm($fields);
-
-        if ($oldData) {
-            $this->post('/!/forms/'.$handle, $oldData)
-                ->assertSessionHasErrors(['failing_field'], null, "form.{$handle}")
-                ->assertLocation('/');
-        }
-
-        $output = $this->normalizeHtml(
-            $this->tag("{{ form:{$handle} }}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
-        );
-
-        $expected = collect(Arr::wrap($expectedHtmlParts))->implode('');
-
-        $this->assertStringContainsString($expected, $output);
-    }
-
-    public function post($uri, array $data = [], array $headers = [])
-    {
-        return parent::post($uri, $data, array_merge([
-            'Content-Type' => 'multipart/form-data',
-        ], $headers));
-    }
-
-    private function clearSubmissions()
-    {
-        Form::find('contact')->submissions()->each->delete();
+        $this->assertEquals($form['honeypot'], 'winnie');
+        $this->assertEquals($form['js_driver'], 'alpine');
     }
 }

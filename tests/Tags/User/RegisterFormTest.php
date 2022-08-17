@@ -5,6 +5,7 @@ namespace Tests\Tags\User;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Statamic\Statamic;
 use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -380,5 +381,16 @@ EOT
         Blueprint::shouldReceive('find')
             ->with('user')
             ->andReturn($blueprint);
+    }
+
+    /** @test */
+    public function it_fetches_form_data()
+    {
+        $form = Statamic::tag('user:register_form')->fetch();
+
+        $this->assertEquals($form['attrs']['action'], 'http://localhost/!/auth/register');
+        $this->assertEquals($form['attrs']['method'], 'POST');
+
+        $this->assertArrayHasKey('_token', $form['params']);
     }
 }

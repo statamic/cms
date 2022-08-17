@@ -5,7 +5,6 @@ namespace Tests\Data\Structures;
 use Mockery;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Blueprint;
-use Statamic\Fields\Value;
 use Statamic\Structures\AugmentedPage;
 use Statamic\Structures\Page;
 use Tests\Data\AugmentedTestCase;
@@ -91,7 +90,7 @@ class AugmentedPageTest extends AugmentedTestCase
             // entry blueprint
             'title', 'foo',
             // augmented entry keys
-            'amp_url', 'api_url', 'collection', 'date', 'edit_url', 'id', 'is_entry',
+            'amp_url', 'api_url', 'collection', 'blueprint', 'date', 'edit_url', 'id', 'origin_id', 'is_entry',
             'last_modified', 'locale', 'mount', 'order', 'permalink', 'private',
             'published', 'slug', 'status', 'updated_at', 'updated_by', 'uri', 'url',
             // page blueprint
@@ -145,8 +144,8 @@ class AugmentedPageTest extends AugmentedTestCase
             'url' => ['type' => 'string', 'value' => '/the-url'],
             'uri' => ['type' => 'string', 'value' => '/the-uri'],
             'permalink' => ['type' => 'string', 'value' => 'https://site.com/the-permalink'],
-            'one' => ['type' => Value::class, 'value' => 'two'],
-            'three' => ['type' => Value::class, 'value' => 'four'],
+            'one' => ['type' => 'string', 'value' => 'two'],
+            'three' => ['type' => 'string', 'value' => 'four'],
             'five' => ['type' => 'string', 'value' => 'six'],
             'seven' => ['type' => 'string', 'value' => 'eight'],
             'id' => ['type' => 'string', 'value' => 'page-id'],
@@ -211,12 +210,12 @@ class AugmentedPageTest extends AugmentedTestCase
         $augmented = new AugmentedPage($page);
 
         $expectations = [
-            'title' => ['type' => Value::class, 'value' => 'The Page Title'],
+            'title' => ['type' => 'string', 'value' => 'The Page Title'],
             'url' => ['type' => 'string', 'value' => '/the-url'],
             'uri' => ['type' => 'string', 'value' => '/the-uri'],
             'permalink' => ['type' => 'string', 'value' => 'https://site.com/the-permalink'],
-            'one' => ['type' => Value::class, 'value' => 'dos', 'fieldtype' => 'textarea'], // assert fieldtype to ensure the field from the page blueprint wins
-            'three' => ['type' => Value::class, 'value' => 'quatro'],
+            'one' => ['type' => 'string', 'value' => 'dos', 'fieldtype' => 'textarea'], // assert fieldtype to ensure the field from the page blueprint wins
+            'three' => ['type' => 'string', 'value' => 'quatro'],
             'five' => ['type' => 'string', 'value' => 'seis'],
             'seven' => ['type' => 'string', 'value' => 'ocho'],
             'id' => ['type' => 'string', 'value' => 'page-id'],

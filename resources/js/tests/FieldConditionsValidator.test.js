@@ -1,22 +1,33 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
-require('../bootstrap/globals');
-global._ = require('underscore');
 Vue.use(Vuex);
 
 const Store = new Vuex.Store({
     state: {
-        publish: {base: {values: {}}},
-        statamic: {conditions: {}}
+        publish: {
+            base: {
+                values: {},
+                hiddenFields: {},
+            }
+        },
+        statamic: {
+            conditions: {},
+        },
     },
     mutations: {
         setValues(state, values) {
             state.publish.base.values = values;
         },
+        setHiddenField(state, field) {
+            state.publish.base.hiddenFields[field.dottedKey] = {
+                hidden: field.hidden,
+                omitValue: field.omitValue,
+            };
+        },
         setCondition(state, payload) {
             state.statamic.conditions[payload.name] = payload.condition;
-        }
+        },
     }
 });
 
@@ -379,6 +390,28 @@ test('it can mix custom and non-custom conditions', () => {
     expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:h', age: 'custom isOlderThan:40'})).toBe(false);
     expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:16'})).toBe(false);
     expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:40'})).toBe(false);
+});
+
+test('it can externally force hide a field before validator conditions are evaluated', () => {
+    Fields.setValues({first_name: 'Jesse'});
+
+    expect(Fields.showField({handle: 'some_field'})).toBe(true);
+    expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(true);
+
+    Store.commit('setHiddenField', {
+        dottedKey: 'last_name',
+        hidden: 'force',
+        omitValue: true,
+    });
+
+    Store.commit('setHiddenField', {
+        dottedKey: 'some_field',
+        hidden: 'force',
+        omitValue: true,
+    });
+
+    expect(Fields.showField({handle: 'some_field'})).toBe(false);
+    expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(false);
 });
 
 // TODO: Implement wildcards using asterisks? Is this useful?

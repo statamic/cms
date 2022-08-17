@@ -10,6 +10,7 @@ use Statamic\Support\Arr;
 abstract class EloquentQueryBuilder implements Builder
 {
     protected $builder;
+    protected $columns;
 
     public function __construct(EloquentBuilder $builder)
     {
@@ -23,11 +24,26 @@ abstract class EloquentQueryBuilder implements Builder
         return $this;
     }
 
+    public function select($columns = ['*'])
+    {
+        $this->columns = $columns;
+
+        return $this;
+    }
+
     public function get($columns = ['*'])
     {
+        $columns = $this->columns ?? $columns;
+
         $items = $this->builder->get($this->selectableColumns($columns));
 
-        return $this->transform($items, $columns);
+        $items = $this->transform($items, $columns);
+
+        if (($first = $items->first()) && method_exists($first, 'selectedQueryColumns')) {
+            $items->each->selectedQueryColumns($columns);
+        }
+
+        return $items;
     }
 
     public function first()
@@ -35,9 +51,9 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->get()->first();
     }
 
-    public function paginate($perPage = null, $columns = [])
+    public function paginate($perPage = null, $columns = [], $pageName = 'page', $page = null)
     {
-        $paginator = $this->builder->paginate($perPage, $this->selectableColumns($columns));
+        $paginator = $this->builder->paginate($perPage, $this->selectableColumns($columns), $pageName, $page);
 
         $paginator = app()->makeWith(LengthAwarePaginator::class, [
             'items' => $paginator->items(),

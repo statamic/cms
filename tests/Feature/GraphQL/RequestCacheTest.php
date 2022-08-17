@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Form;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Token;
 use Statamic\GraphQL\Queries\PingQuery;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -89,6 +90,66 @@ class RequestCacheTest extends TestCase
         Carbon::setTestNow(now()->addMinutes(14));
 
         $this->assertFalse(Cache::has($key));
+    }
+
+    /**
+     * @test
+     * @dataProvider bypassCacheProvider
+     */
+    public function it_bypasses_cache_when_using_a_valid_token($url, $headers)
+    {
+        $this->withoutExceptionHandling();
+
+        app()->instance('request-tracking', $requests = Collection::make());
+
+        optional(Token::find('test-token'))->delete(); // garbage collection
+        Token::make('test-token', TestTokenHandler::class)->save();
+
+        Collection::times(2)->each(function () use ($url, $headers) {
+            $this
+                ->post($url, ['query' => '{one}'], $headers)
+                ->assertExactJson(['data' => ['one' => 'one']]);
+        });
+
+        $this->assertCount(2, $requests);
+        $this->assertEquals([
+            ['query' => '{one}', 'variables' => null],
+            ['query' => '{one}', 'variables' => null],
+        ], $requests->all());
+    }
+
+    /**
+     * @test
+     * @dataProvider bypassCacheProvider
+     */
+    public function it_doesnt_bypass_cache_when_using_an_invalid_token($url, $headers)
+    {
+        $this->withoutExceptionHandling();
+
+        app()->instance('request-tracking', $requests = Collection::make());
+
+        // No token should exist, but do garbage collection.
+        // There may be a leftover token from a previous test.
+        optional(Token::find('test-token'))->delete();
+
+        Collection::times(2)->each(function () use ($url, $headers) {
+            $this
+                ->post($url, ['query' => '{one}'], $headers)
+                ->assertExactJson(['data' => ['one' => 'one']]);
+        });
+
+        $this->assertCount(1, $requests);
+        $this->assertEquals([
+            ['query' => '{one}', 'variables' => null],
+        ], $requests->all());
+    }
+
+    public function bypassCacheProvider()
+    {
+        return [
+            ['/graphql?token=test-token', []],
+            ['/graphql', ['X-Statamic-Token' => 'test-token']],
+        ];
     }
 
     /** @test */
@@ -200,6 +261,14 @@ class TrackRequests
             'variables' => $request->input('variables'),
         ];
 
+        return $next($request);
+    }
+}
+
+class TestTokenHandler
+{
+    public function handle($token, $request, $next)
+    {
         return $next($request);
     }
 }

@@ -48,7 +48,11 @@
                         @if ($licenses->onlyAddonsAreInvalid())
                             {{ __('statamic::messages.licensing_production_alert_addons') }}
                         @elseif ($licenses->onlyStatamicIsInvalid())
-                            {{ __('statamic::messages.licensing_production_alert_statamic') }}
+                            @if ($licenses->statamicNeedsRenewal())
+                                {{ __('statamic::messages.licensing_production_alert_renew_statamic') }}
+                            @else
+                                {{ __('statamic::messages.licensing_production_alert_statamic') }}
+                            @endif
                         @else
                             {{ __('statamic::messages.licensing_production_alert') }}
                         @endif

@@ -70,12 +70,12 @@ class FieldsetController extends CpController
             'fields' => 'array',
         ]);
 
-        $fieldset->setContents([
+        $fieldset->setContents(array_merge($fieldset->contents(), [
             'title' => $request->title,
             'fields' => collect($request->fields)->map(function ($field) {
                 return FieldTransformer::fromVue($field);
             })->all(),
-        ])->save();
+        ]))->save();
 
         return response('', 204);
     }

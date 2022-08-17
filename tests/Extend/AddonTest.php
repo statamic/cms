@@ -7,6 +7,7 @@ use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Collection;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Tests\TestCase;
 
 class AddonTest extends TestCase
@@ -16,7 +17,7 @@ class AddonTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->addonFixtureDir = realpath(__DIR__.'/../Fixtures/Addon').'/';
+        $this->addonFixtureDir = Path::tidy(realpath(__DIR__.'/../Fixtures/Addon').'/');
     }
 
     /** @test */
@@ -238,6 +239,30 @@ class AddonTest extends TestCase
         ]));
 
         $this->assertEquals('the license', Addon::make('foo/bar')->license());
+    }
+
+    /**
+     * @test
+     * @dataProvider isLatestVersionProvider
+     **/
+    public function it_checks_if_its_the_latest_version($version, $latest, $isLatest)
+    {
+        $this->assertEquals($isLatest, $this->makeFromPackage([
+            'version' => $version,
+            'latestVersion' => $latest,
+        ])->isLatestVersion());
+    }
+
+    public function isLatestVersionProvider()
+    {
+        return [
+            ['1.0.0', '1.0.0', true],
+            ['1.0.1', '1.0.2', false],
+            ['1.0.1', '2.0.0', false],
+            ['2.0.0', '2.0.0', true],
+            ['1.0', '1.0.0', true],
+            ['1.0', '1.0.1', false],
+        ];
     }
 
     private function makeFromPackage($attributes = [])

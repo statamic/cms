@@ -26,7 +26,7 @@ class Permission
             return $this;
         }
 
-        return str_replace('{'.$this->placeholder.'}', $this->placeholderValue, $this->value);
+        return str_replace('{'.$this->placeholder.'}', (string) $this->placeholderValue, $this->value);
     }
 
     public function originalValue()

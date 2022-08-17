@@ -7,7 +7,9 @@ use Illuminate\Contracts\View\Engine as EngineInterface;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Exceptions;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Parse;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
@@ -157,6 +159,10 @@ class Engine implements EngineInterface
             ]);
 
             $output = call_user_func([$tag, $method]);
+
+            if (Compare::isQueryBuilder($output)) {
+                $output = $output->get();
+            }
 
             if ($output instanceof Collection) {
                 $output = $output->toAugmentedArray();

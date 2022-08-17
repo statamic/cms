@@ -22,7 +22,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:variable_name }}
      *
-     * @return string
+     * @return void|\Statamic\Contracts\Auth\User
      */
     public function __call($method, $args)
     {
@@ -100,7 +100,8 @@ class UserTags extends Tags
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
-        $html = $this->formOpen(route('statamic.login'), 'POST', $knownParams);
+        $action = route('statamic.login');
+        $method = 'POST';
 
         $params = [];
 
@@ -111,6 +112,15 @@ class UserTags extends Tags
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
 
         $html .= $this->formMetaFields($params);
 
@@ -136,7 +146,8 @@ class UserTags extends Tags
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
-        $html = $this->formOpen(route('statamic.register'), 'POST', $knownParams);
+        $action = route('statamic.register');
+        $method = 'POST';
 
         $params = [];
 
@@ -147,6 +158,15 @@ class UserTags extends Tags
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
 
         $html .= $this->formMetaFields($params);
 
@@ -213,7 +233,8 @@ class UserTags extends Tags
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect', 'reset_url'];
 
-        $html = $this->formOpen(route('statamic.password.email'), 'POST', $knownParams);
+        $action = route('statamic.password.email');
+        $method = 'POST';
 
         $params = [];
 
@@ -228,6 +249,15 @@ class UserTags extends Tags
         if ($resetUrl = $this->params->get('reset_url')) {
             $params['reset_url'] = $resetUrl;
         }
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
 
         $html .= $this->formMetaFields($params);
 
@@ -247,17 +277,11 @@ class UserTags extends Tags
      */
     public function resetPasswordForm()
     {
-        $data = [
-            'errors' => [],
-        ];
-
         if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
 
-        if (session('errors')) {
-            $data['errors'] = session('errors')->all();
-        }
+        $data = $this->getFormSession();
 
         $data['url_invalid'] = request()->isNotFilled('token');
 
@@ -267,11 +291,27 @@ class UserTags extends Tags
 
         $knownParams = ['redirect'];
 
-        $html = $this->formOpen(route('statamic.password.reset.action'), 'POST', $knownParams);
+        $action = route('statamic.password.email');
+        $method = 'POST';
+
+        $token = request('token');
+        $redirect = $this->params->get('redirect');
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => array_merge($this->formMetaPrefix($this->formParams($method)), [
+                    'token' => $token,
+                    'redirect' => $redirect,
+                ]),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
 
         $html .= '<input type="hidden" name="token" value="'.request('token').'" />';
 
-        if ($redirect = $this->params->get('redirect')) {
+        if ($redirect) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
         }
 
@@ -287,7 +327,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:can }}
      *
-     * @return string
+     * @return string|void
      */
     public function can()
     {
@@ -336,7 +376,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:is }}
      *
-     * @return string
+     * @return string|void
      */
     public function is()
     {
@@ -385,7 +425,7 @@ class UserTags extends Tags
      *
      * Maps to {{ user:in }}
      *
-     * @return string
+     * @return string|void
      */
     public function in()
     {
@@ -430,7 +470,7 @@ class UserTags extends Tags
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function eventUrl($url, $relative = false)
     {

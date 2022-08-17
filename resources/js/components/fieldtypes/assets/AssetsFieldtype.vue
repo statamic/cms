@@ -68,6 +68,7 @@
                         handle-class="asset-thumb-container"
                         @dragstart="$emit('focus')"
                         @dragend="$emit('blur')"
+                        :disabled="isReadOnly"
                     >
                         <div
                             class="asset-grid-listing border rounded overflow-hidden"
@@ -94,6 +95,7 @@
                                 :vertical="true"
                                 item-class="asset-row"
                                 handle-class="asset-row"
+                                :disabled="isReadOnly"
                             >
                                 <tbody ref="assets">
                                     <tr is="assetRow"
@@ -119,6 +121,7 @@
                         v-for="asset in assets"
                         :key="asset.id"
                         :asset="asset"
+                        :read-only="isReadOnly"
                         @updated="assetUpdated"
                         @removed="assetRemoved">
                     </asset-tile>
@@ -275,7 +278,14 @@ export default {
          * The asset browser expects an array of asset IDs to be passed in as a prop.
          */
         selectedAssets() {
-            return this.value;
+            return clone(this.value);
+        },
+
+        /**
+         * The IDs of the assets.
+         */
+        assetIds() {
+            return _.pluck(this.assets, 'id');
         },
 
         /**
@@ -333,7 +343,7 @@ export default {
                 return;
             }
 
-            this.assets = this.meta.data;
+            this.assets = clone(this.meta.data);
             this.$nextTick(() => {
                 this.initializing = false;
                 this.loading = false;
@@ -450,21 +460,22 @@ export default {
 
             // The components deal with passing around asset objects, however
             // our fieldtype is only concerned with their respective IDs.
-            this.update(_.pluck(assets, 'id'));
+            this.update(this.assetIds);
 
-            let meta = this.meta;
-            meta.data = assets;
-            this.updateMeta(meta);
+            this.updateMeta({
+                ...this.meta,
+                data: [...assets],
+            });
         },
 
         loading(loading) {
             this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
         },
 
-        value(value, oldValue) {
-            if (JSON.stringify(value) !== JSON.stringify(oldValue)) {
-                this.loadAssets(value);
-            }
+        value(value) {
+            if (_.isEqual(value, this.assetIds)) return;
+
+            this.loadAssets(value);
         },
 
         showSelector(selecting) {

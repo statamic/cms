@@ -39,4 +39,31 @@ class StatamicLicenseTest extends TestCase
         $this->assertEquals('3.4.5', $license->version());
         $this->assertEquals('6.7.8', $license->version());
     }
+
+    /** @test */
+    public function it_gets_the_invalid_reason_for_a_range_issue()
+    {
+        $license = $this->license([
+            'reason' => 'outside_license_range',
+            'range' => ['2', '4'],
+        ]);
+
+        $key = 'statamic::messages.licensing_error_outside_license_range';
+        $message = trans($key, ['start' => '2', 'end' => '4']);
+        $this->assertNotEquals($key, $message);
+        $this->assertEquals($message, $license->invalidReason());
+    }
+
+    /** @test */
+    public function it_needs_renewal_if_outside_license_range()
+    {
+        $license = $this->license(['valid' => true]);
+        $this->assertFalse($license->needsRenewal());
+
+        $license = $this->license(['valid' => false, 'reason' => 'unlicensed']);
+        $this->assertFalse($license->needsRenewal());
+
+        $license = $this->license(['valid' => false, 'reason' => 'outside_license_range']);
+        $this->assertTrue($license->needsRenewal());
+    }
 }

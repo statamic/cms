@@ -7,7 +7,9 @@ use DebugBar\DebugBarException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
+use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -37,7 +39,7 @@ class Tags extends BaseTags
      *
      * Allows you to inject the formset into the context so child tags can use it.
      *
-     * @return string
+     * @return array
      */
     public function set()
     {
@@ -54,12 +56,20 @@ class Tags extends BaseTags
     public function create()
     {
         $formHandle = $this->getForm();
-        $form = Form::find($formHandle);
-        $sessionHandle = "form.{$formHandle}";
+        $form = $this->form();
 
-        $data = $this->getFormSession($sessionHandle);
-        $data['fields'] = $this->getFields($sessionHandle);
+        $data = $this->getFormSession($this->sessionHandle());
+
+        $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
+
+        $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver);
         $data['honeypot'] = $form->honeypot();
+
+        if ($jsDriver) {
+            $data['js_driver'] = $jsDriver->handle();
+            $data['show_field'] = $jsDriver->copyShowFieldToFormData($data['fields']);
+            $data = array_merge($data, $jsDriver->addToFormData($form, $data));
+        }
 
         $this->addToDebugBar($data, $formHandle);
 
@@ -67,12 +77,18 @@ class Tags extends BaseTags
             $this->params->put('files', $form->hasFiles());
         }
 
-        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect', 'files']);
+        $knownParams = array_merge(static::HANDLE_PARAM, [
+            'redirect', 'error_redirect', 'allow_request_redirect', 'csrf', 'files', 'js',
+        ]);
 
-        $action = $this->params->get('action', route('statamic.forms.submit', $formHandle));
+        $action = $this->params->get('action', $form->actionUrl());
         $method = $this->params->get('method', 'POST');
 
-        $html = $this->formOpen($action, $method, $knownParams);
+        $attrs = [];
+
+        if ($jsDriver) {
+            $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
+        }
 
         $params = [];
 
@@ -84,11 +100,24 @@ class Tags extends BaseTags
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams, $attrs);
+
         $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
         $html .= $this->formClose();
+
+        if ($jsDriver) {
+            return $jsDriver->render($html);
+        }
 
         return $html;
     }
@@ -96,33 +125,22 @@ class Tags extends BaseTags
     /**
      * Maps to {{ form:errors }}.
      *
-     * @return string
+     * @return bool|string
      */
     public function errors()
     {
-        if (! $handle = $this->getForm()) {
-            return false;
+        $sessionHandle = $this->sessionHandle();
+
+        $errors = $this->getFormSession($sessionHandle)['errors'];
+
+        // If this is a single tag just output a boolean.
+        if ($this->content === '') {
+            return ! empty($errors);
         }
 
-        // TODO: Refactor this method to use GetsFormSession `getFormSession()` trait method.
-
-        $formHasErrors = session()->has('errors')
-            ? $this->getFormSession($handle)['errors']
-            : false;
-
-        if (! $formHasErrors) {
-            return false;
-        }
-
-        $errors = [];
-
-        foreach (session('errors')->getBag('form.'.$formset)->all() as $error) {
-            $errors[]['value'] = $error;
-        }
-
-        return ($this->content === '')    // If this is a single tag...
-            ? ! empty($errors)             // just output a boolean.
-            : $this->parseLoop($errors);  // Otherwise, parse the content loop.
+        return $this->parseLoop(collect($errors)->map(function ($error) {
+            return ['value' => $error];
+        }));
     }
 
     /**
@@ -132,20 +150,16 @@ class Tags extends BaseTags
      */
     public function success()
     {
-        if (! $formset = $this->getForm()) {
-            return false;
-        }
+        $sessionHandle = $this->sessionHandle();
 
-        // TODO: Refactor this method to use GetsFormSession `getFormSession()` trait method.
-        // Also should probably output success string instead of `true` boolean for consistency.
-
-        return session()->has("form.{$formset}.success");
+        // TODO: Should probably output success string instead of `true` boolean for consistency.
+        return $this->getFromFormSession($sessionHandle, 'success');
     }
 
     /**
      * Maps to {{ form:submission }}.
      *
-     * @return array
+     * @return array|void
      */
     public function submission()
     {
@@ -161,7 +175,7 @@ class Tags extends BaseTags
      */
     public function submissions()
     {
-        $submissions = Form::find($this->getForm())->submissions();
+        $submissions = $this->form()->submissions();
 
         return $this->output($submissions);
     }
@@ -183,31 +197,88 @@ class Tags extends BaseTags
      */
     protected function getForm()
     {
-        if (! $form = $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'))) {
+        if (! $handle = $this->formHandle()) {
             throw new \Exception('A form handle is required on Form tags. Please refer to the docs for more information.');
         }
 
-        if (! Form::find($form)) {
-            throw new \Exception("Form with handle [$form] cannot be found.");
+        if (! $this->form()) {
+            throw new \Exception("Form with handle [$handle] cannot be found.");
         }
 
-        return $form;
+        return $handle;
     }
 
     /**
      * Get fields with extra data for looping over and rendering.
      *
      * @param  string  $sessionHandle
+     * @param  JsDriver  $jsDriver
      * @return array
      */
-    protected function getFields($sessionHandle)
+    protected function getFields($sessionHandle, $jsDriver)
     {
-        return Form::find($this->getForm())->fields()
-            ->map(function ($field) use ($sessionHandle) {
-                return $this->getRenderableField($field, $sessionHandle);
+        return $this->form()->fields()
+            ->map(function ($field) use ($sessionHandle, $jsDriver) {
+                return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
+                    return $jsDriver
+                        ? $this->mergeJsDataWithRenderableFieldData($data, $field, $jsDriver)
+                        : $data;
+                });
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Merge JS field data with renderable field data.
+     *
+     * @param  array  $data
+     * @param  \Statamic\Fields\Field  $field
+     * @param  JsDriver  $jsDriver
+     * @return array
+     */
+    protected function mergeJsDataWithRenderableFieldData($data, $field, $jsDriver)
+    {
+        $data['js_driver'] = $jsDriver->handle();
+        $data['js_attributes'] = $this->renderAttributes($jsDriver->addToRenderableFieldAttributes($field));
+
+        return array_merge($data, $jsDriver->addToRenderableFieldData($field, $data));
+    }
+
+    /**
+     * Parse JS param to get driver and related options.
+     *
+     * @param  null|string  $value
+     * @param  \Statamic\Forms\Form  $form
+     * @return bool|JsDriver
+     */
+    protected function parseJsParamDriverAndOptions($value, $form)
+    {
+        if (! $value) {
+            return false;
+        }
+
+        $handle = $value;
+        $options = [];
+
+        if (Str::contains($value, ':')) {
+            $options = explode(':', $value);
+            $handle = array_shift($options);
+        }
+
+        $class = app('statamic.form-js-drivers')->get($handle);
+
+        if (! $class) {
+            throw new \Exception("Cannot find JS driver class for [{$handle}]!");
+        }
+
+        $instance = new $class($form, $options);
+
+        if (! $instance instanceof JsDriver) {
+            throw new \Exception("JS driver must implement [Statamic\Forms\JsDrivers\JsDriver] interface!");
+        }
+
+        return $instance;
     }
 
     /**
@@ -237,6 +308,25 @@ class Tags extends BaseTags
             // Collector doesn't exist yet. We'll create it.
             debugbar()->addCollector(new ConfigCollector($debug, 'Forms'));
         }
+    }
+
+    protected function sessionHandle()
+    {
+        return 'form.'.$this->getForm();
+    }
+
+    protected function form()
+    {
+        $handle = $this->formHandle();
+
+        return Blink::once("form-$handle", function () use ($handle) {
+            return Form::find($handle);
+        });
+    }
+
+    protected function formHandle()
+    {
+        return $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'));
     }
 
     public function eventUrl($url, $relative = true)

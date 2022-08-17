@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
+use Statamic\Facades\User;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 
@@ -143,13 +144,13 @@ class Cascade
 
             $global = $global->in($this->site->handle());
 
-            $this->set($global->handle(), $global->toAugmentedArray());
+            $this->set($global->handle(), $global);
         }
 
-        $mainGlobal = $this->get('global') ?? [];
-
-        foreach ($mainGlobal as $key => $value) {
-            $this->set($key, $value);
+        if ($mainGlobal = $this->get('global')) {
+            foreach ($mainGlobal->toAugmentedCollection() as $key => $value) {
+                $this->set($key, $value);
+            }
         }
 
         return $this;
@@ -169,7 +170,7 @@ class Cascade
             $this->set($key, $value);
         }
 
-        $this->set('page', $variables);
+        $this->set('page', $this->content);
 
         return $this;
     }
@@ -188,6 +189,7 @@ class Cascade
             // Auth
             'logged_in' => $loggedIn = auth()->check(),
             'logged_out' => ! $loggedIn,
+            'current_user' => User::current(),
 
             // Date
             'current_date' => $now = now(),
@@ -206,13 +208,14 @@ class Cascade
             'site' => $this->site,
             'sites' => Facades\Site::all()->values(),
             'homepage' => $this->site->url(),
+            'is_homepage' => $this->site->absoluteUrl() == $this->request->url(),
             'cp_url' => cp_route('index'),
         ];
     }
 
     protected function hydrateViewModel()
     {
-        if ($class = $this->get('view_model')) {
+        if ($class = optional($this->get('view_model'))->value()) {
             $viewModel = new $class($this);
             $this->data = array_merge($this->data, $viewModel->data());
         }

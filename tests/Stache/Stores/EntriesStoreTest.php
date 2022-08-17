@@ -22,7 +22,7 @@ class EntriesStoreTest extends TestCase
         parent::setUp();
 
         $this->parent = (new EntriesStore)->directory(
-            $this->directory = __DIR__.'/../__fixtures__/content/collections'
+            $this->directory = Path::tidy(__DIR__.'/../__fixtures__/content/collections')
         );
 
         Stache::registerStore($this->parent);
@@ -100,6 +100,54 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
+    public function if_slugs_are_not_required_the_filename_still_becomes_the_slug()
+    {
+        Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
+            (new \Statamic\Entries\Collection)->requiresSlugs(false)
+        );
+
+        $item = $this->parent->store('blog')->makeItemFromFile(
+            Path::tidy($this->directory).'/blog/the-slug.md',
+            "id: 123\ntitle: Example\nfoo: bar"
+        );
+
+        $this->assertEquals('123', $item->id());
+        $this->assertEquals('the-slug', $item->slug());
+    }
+
+    /** @test */
+    public function if_slugs_are_not_required_and_the_filename_is_the_same_as_the_id_then_slug_is_null()
+    {
+        Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
+            (new \Statamic\Entries\Collection)->requiresSlugs(false)
+        );
+
+        $item = $this->parent->store('blog')->makeItemFromFile(
+            Path::tidy($this->directory).'/blog/123.md',
+            "id: 123\ntitle: Example\nfoo: bar"
+        );
+
+        $this->assertEquals('123', $item->id());
+        $this->assertNull($item->slug());
+    }
+
+    /** @test */
+    public function if_slugs_are_required_and_the_filename_is_the_same_as_the_id_then_slug_is_the_id()
+    {
+        Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
+            (new \Statamic\Entries\Collection)->requiresSlugs(true)
+        );
+
+        $item = $this->parent->store('blog')->makeItemFromFile(
+            Path::tidy($this->directory).'/blog/123.md',
+            "id: 123\ntitle: Example\nfoo: bar"
+        );
+
+        $this->assertEquals('123', $item->id());
+        $this->assertEquals('123', $item->slug());
+    }
+
+    /** @test */
     public function it_uses_the_id_of_the_entry_as_the_item_key()
     {
         $entry = Mockery::mock();
@@ -123,7 +171,7 @@ class EntriesStoreTest extends TestCase
 
         $this->parent->store('blog')->save($entry);
 
-        $this->assertFileEqualsString($path = $this->directory.'/blog/2017-07-04.test.md', $entry->fileContents());
+        $this->assertStringEqualsFile($path = $this->directory.'/blog/2017-07-04.test.md', $entry->fileContents());
         @unlink($path);
         $this->assertFileNotExists($path);
 
@@ -141,13 +189,13 @@ class EntriesStoreTest extends TestCase
 
         $this->parent->store('blog')->save($entry);
 
-        $this->assertFileEqualsString($initialPath = $this->directory.'/blog/2017-07-04.test.md', $entry->fileContents());
+        $this->assertStringEqualsFile($initialPath = $this->directory.'/blog/2017-07-04.test.md', $entry->fileContents());
         $this->assertEquals($initialPath, $this->parent->store('blog')->paths()->get('123'));
 
         $entry->slug('updated');
         $entry->save();
 
-        $this->assertFileEqualsString($path = $this->directory.'/blog/2017-07-04.updated.md', $entry->fileContents());
+        $this->assertStringEqualsFile($path = $this->directory.'/blog/2017-07-04.updated.md', $entry->fileContents());
         $this->assertEquals($path, $this->parent->store('blog')->paths()->get('123'));
 
         @unlink($initialPath);
@@ -163,14 +211,14 @@ class EntriesStoreTest extends TestCase
         $entry = Facades\Entry::make()->id('new-id')->slug('test')->date('2017-07-04')->collection('blog');
         $this->parent->store('blog')->save($entry);
         $newPath = $this->directory.'/blog/2017-07-04.test.1.md';
-        $this->assertFileEqualsString($existingPath, $existingContents);
-        $this->assertFileEqualsString($newPath, $entry->fileContents());
+        $this->assertStringEqualsFile($existingPath, $existingContents);
+        $this->assertStringEqualsFile($newPath, $entry->fileContents());
 
         $anotherEntry = Facades\Entry::make()->id('another-new-id')->slug('test')->date('2017-07-04')->collection('blog');
         $this->parent->store('blog')->save($anotherEntry);
         $anotherNewPath = $this->directory.'/blog/2017-07-04.test.2.md';
-        $this->assertFileEqualsString($existingPath, $existingContents);
-        $this->assertFileEqualsString($anotherNewPath, $anotherEntry->fileContents());
+        $this->assertStringEqualsFile($existingPath, $existingContents);
+        $this->assertStringEqualsFile($anotherNewPath, $anotherEntry->fileContents());
 
         $this->assertEquals($newPath, $this->parent->store('blog')->paths()->get('new-id'));
         $this->assertEquals($anotherNewPath, $this->parent->store('blog')->paths()->get('another-new-id'));
@@ -198,7 +246,7 @@ class EntriesStoreTest extends TestCase
         $this->parent->store('blog')->save($entry);
 
         $pathWithSuffix = $this->directory.'/blog/2017-07-04.test.1.md';
-        $this->assertFileEqualsString($existingPath, $entry->fileContents());
+        $this->assertStringEqualsFile($existingPath, $entry->fileContents());
         $this->assertEquals($existingPath, $this->parent->store('blog')->paths()->get('the-id'));
 
         @unlink($existingPath);
@@ -223,7 +271,7 @@ class EntriesStoreTest extends TestCase
         $this->parent->store('blog')->save($entry);
 
         $pathWithIncrementedSuffix = $this->directory.'/blog/2017-07-04.test.2.md';
-        $this->assertFileEqualsString($suffixedExistingPath, $entry->fileContents());
+        $this->assertStringEqualsFile($suffixedExistingPath, $entry->fileContents());
         @unlink($suffixedExistingPath);
         $this->assertFileNotExists($pathWithIncrementedSuffix);
         $this->assertFileNotExists($suffixedExistingPath);
@@ -242,7 +290,7 @@ class EntriesStoreTest extends TestCase
 
         $this->parent->store('blog')->save($entry);
 
-        $this->assertFileEqualsString($existingPath, $entry->fileContents());
+        $this->assertStringEqualsFile($existingPath, $entry->fileContents());
         $this->assertFileNotExists($suffixlessPath);
 
         $this->assertEquals($existingPath, $this->parent->store('blog')->paths()->get('123'));
@@ -267,7 +315,7 @@ class EntriesStoreTest extends TestCase
 
         $this->parent->store('blog')->save($entry);
 
-        $this->assertFileEqualsString($newPath, $entry->fileContents());
+        $this->assertStringEqualsFile($newPath, $entry->fileContents());
         $this->assertFileNotExists($existingPath);
 
         $this->assertEquals($newPath, $this->parent->store('blog')->paths()->get('123'));

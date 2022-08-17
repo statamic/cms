@@ -6,7 +6,11 @@ use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\LiteralReplacementManager;
+use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Events\ViewRendered;
 
 class View
@@ -19,7 +23,7 @@ class View
 
     public static function make($template = null, $data = [])
     {
-        return (new static)
+        return app(static::class)
             ->template($template)
             ->with($data);
     }
@@ -58,7 +62,7 @@ class View
 
     public function layout($layout = null)
     {
-        if (count(func_get_args()) === 0) {
+        if (func_num_args() === 0) {
             return $this->layout;
         }
 
@@ -69,7 +73,7 @@ class View
 
     public function template($template = null)
     {
-        if (! $template) {
+        if (func_num_args() === 0) {
             return $this->template;
         }
 
@@ -82,20 +86,38 @@ class View
     {
         $cascade = $this->gatherData();
 
-        $contents = view($this->templateViewName(), $cascade);
-
         if ($this->shouldUseLayout()) {
+            GlobalRuntimeState::$containsLayout = true;
+
+            $contents = view($this->templateViewName(), $cascade);
+
+            if (Str::endsWith($this->layoutViewPath(), Engine::EXTENSIONS)) {
+                $contents = $contents->withoutExtractions();
+            }
+
+            $contents = $contents->render();
+            GlobalRuntimeState::$containsLayout = false;
+
             $contents = view($this->layoutViewName(), array_merge($cascade, [
-                'template_content' => $contents->withoutExtractions()->render(),
+                'template_content' => $contents,
             ]));
+        } else {
+            $contents = view($this->templateViewName(), $cascade);
         }
 
         ViewRendered::dispatch($this);
 
-        return $contents->render();
+        $renderedContents = $contents->render();
+
+        if (config('statamic.antlers.version') == 'runtime') {
+            $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
+            $renderedContents = StackReplacementManager::processReplacements($renderedContents);
+        }
+
+        return $renderedContents;
     }
 
-    private function shouldUseLayout()
+    protected function shouldUseLayout()
     {
         if (! $this->layout) {
             return false;
@@ -121,19 +143,19 @@ class View
         return $this->isUsingXmlTemplate() || $this->isUsingXmlLayout();
     }
 
-    private function isUsingAntlersTemplate()
+    protected function isUsingAntlersTemplate()
     {
         return Str::endsWith($this->templateViewPath(), collect(AntlersEngine::EXTENSIONS)->map(function ($extension) {
             return '.'.$extension;
         })->all());
     }
 
-    private function isUsingXmlTemplate()
+    protected function isUsingXmlTemplate()
     {
         return Str::endsWith($this->templateViewPath(), '.xml');
     }
 
-    private function isUsingXmlLayout()
+    protected function isUsingXmlLayout()
     {
         if (! $this->layout) {
             return false;
@@ -142,12 +164,12 @@ class View
         return Str::endsWith($this->layoutViewPath(), '.xml');
     }
 
-    private function templateViewPath()
+    protected function templateViewPath()
     {
         return view($this->templateViewName())->getPath();
     }
 
-    private function layoutViewPath()
+    protected function layoutViewPath()
     {
         return view($this->layoutViewName())->getPath();
     }
@@ -176,7 +198,7 @@ class View
         return $this->render();
     }
 
-    private function layoutViewName()
+    protected function layoutViewName()
     {
         $view = $this->layout;
 
@@ -187,7 +209,7 @@ class View
         return $view;
     }
 
-    private function templateViewName()
+    protected function templateViewName()
     {
         $view = $this->template;
 

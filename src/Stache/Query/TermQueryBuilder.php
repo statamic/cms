@@ -28,11 +28,6 @@ class TermQueryBuilder extends Builder
         return parent::where($column, $operator, $value, $boolean);
     }
 
-    public function orWhere($column, $operator = null, $value = null)
-    {
-        return $this->where($column, $operator, $value, 'or');
-    }
-
     public function whereIn($column, $values, $boolean = 'and')
     {
         if (in_array($column, ['taxonomy', 'taxonomies'])) {
@@ -50,14 +45,14 @@ class TermQueryBuilder extends Builder
         return parent::whereIn($column, $values, $boolean);
     }
 
-    public function orWhereIn($column, $values)
-    {
-        return $this->whereIn($column, $values, 'or');
-    }
-
     protected function collect($items = [])
     {
         return TermCollection::make($items);
+    }
+
+    protected function getItems($keys)
+    {
+        return Facades\Term::applySubstitutions(parent::getItems($keys));
     }
 
     protected function getFilteredKeys()
@@ -93,22 +88,23 @@ class TermQueryBuilder extends Builder
     protected function getKeysFromTaxonomiesWithWheres($taxonomies, $wheres)
     {
         return collect($wheres)->reduce(function ($ids, $where) use ($taxonomies) {
-            // Get a single array comprised of the items from the same index across all taxonomies.
-            $items = collect($taxonomies)->flatMap(function ($taxonomy) use ($where) {
-                return $this->store->store($taxonomy)
-                    ->index($where['column'])->items()
-                    ->mapWithKeys(function ($item, $key) use ($taxonomy) {
-                        return ["{$taxonomy}::{$key}" => $item];
-                    });
-            });
+            $keys = $where['type'] == 'Nested'
+                ? $this->getKeysFromTaxonomiesWithWheres($taxonomies, $where['query']->wheres)
+                : $this->getKeysFromTaxonomiesWithWhere($taxonomies, $where);
 
-            // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $method = 'filterWhere'.$where['type'];
-            $keys = $this->{$method}($items, $where)->keys();
-
-            // Continue intersecting the keys across the where clauses.
             return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
+    }
+
+    protected function getKeysFromTaxonomiesWithWhere($taxonomies, $where)
+    {
+        $items = collect($taxonomies)->flatMap(function ($taxonomy) use ($where) {
+            return $this->getWhereColumnKeysFromStore($taxonomy, $where);
+        });
+
+        $method = 'filterWhere'.$where['type'];
+
+        return $this->{$method}($items, $where)->keys();
     }
 
     protected function getOrderKeyValuesByIndex()
@@ -166,5 +162,22 @@ class TermQueryBuilder extends Builder
                     return $taxonomy.'::'.$item['slug'];
                 });
         })->all());
+    }
+
+    protected function getWhereColumnKeyValuesByIndex($column)
+    {
+        $taxonomies = empty($this->taxonomies)
+            ? Facades\Taxonomy::handles()
+            : $this->taxonomies;
+
+        if ($this->collections) {
+            $this->filterUsagesWithinCollections($taxonomies);
+        }
+
+        $items = collect($taxonomies)->flatMap(function ($taxonomy) use ($column) {
+            return $this->getWhereColumnKeysFromStore($taxonomy, ['column' => $column]);
+        });
+
+        return $items;
     }
 }

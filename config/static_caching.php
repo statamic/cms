@@ -53,7 +53,13 @@ return [
     */
 
     'exclude' => [
-        //
+
+        'class' => null,
+
+        'urls' => [
+            //
+        ],
+
     ],
 
     /*
@@ -91,5 +97,20 @@ return [
     */
 
     'ignore_query_strings' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Replacers
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define replacers that dynamically replace content within
+    | the response. Each replacer must implement the Replacer interface.
+    |
+    */
+
+    'replacers' => [
+        \Statamic\StaticCaching\Replacers\CsrfTokenReplacer::class,
+        \Statamic\StaticCaching\Replacers\NoCacheReplacer::class,
+    ],
 
 ];

@@ -4,6 +4,7 @@ namespace Statamic\Tags;
 
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
@@ -28,7 +29,7 @@ class Theme extends Tags
     {
         $src = $this->params->get('src');
 
-        $path = $dir.'/'.$src;
+        $path = Path::tidy($dir.'/'.$src);
 
         return $this->themeUrl($path);
     }
@@ -116,14 +117,15 @@ class Theme extends Tags
      */
     public function output()
     {
-        $src = $this->params->get('src');
+        $src = Path::tidy($this->params->get('src'));
+        $disk = File::disk('resources');
 
-        // Output nothing if the file doesn't exist.
-        if (! File::disk('resources')->exists($src)) {
+        // Output nothing if the file doesn't exist or is outside the resources directory.
+        if (! $disk->exists($src) || ! $disk->isWithinRoot($src)) {
             return '';
         }
 
-        $contents = File::disk('resources')->get($src);
+        $contents = $disk->get($src);
 
         // If its a tag pair, the contents should be inserted into a variable.
         // {{ output_contents }} by default, but can be changed using `as`.
@@ -148,7 +150,7 @@ class Theme extends Tags
         );
 
         if ($this->params->bool('cache_bust')) {
-            throw_if(! File::exists($path = public_path($path)), new \Exception("File $path does not exist."));
+            throw_if(! File::exists($path = Path::tidy(public_path($path))), new \Exception("File $path does not exist."));
             $url .= '?v='.File::lastModified($path);
         }
 
@@ -161,7 +163,14 @@ class Theme extends Tags
 
     private function versioned($type, $file)
     {
+        $file = "{$type}/{$file}.{$type}";
+
         [$manifest, $method] = $this->getManifestAndMethod();
+
+        if (! $manifest) {
+            return '/'.$file;
+        }
+
         $manifest = json_decode($manifest, true);
 
         // Mix prepends filenames with slashes.
@@ -170,7 +179,7 @@ class Theme extends Tags
             return [ltrim($key, '/') => ltrim($path, '/')];
         });
 
-        if (! $manifest->has($file = "{$type}/{$file}.{$type}")) {
+        if (! $manifest->has($file)) {
             return '/'.$file;
         }
 

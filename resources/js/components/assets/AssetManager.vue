@@ -29,7 +29,7 @@
                 </dropdown-item>
             </dropdown-list>
 
-            <a :href="createContainerUrl" class="btn-primary ml-2" v-if="canCreateContainers">{{ __('Create Container') }}</a>
+            <a :href="createContainerUrl" class="btn ml-2" v-if="canCreateContainers">{{ __('Create Container') }}</a>
         </div>
 
         <asset-browser

@@ -59,6 +59,8 @@ class TermsController extends CpController
     {
         $query = $taxonomy->queryTerms();
 
+        $query->where('site', Site::selected());
+
         if ($search = request('search')) {
             if ($taxonomy->hasSearchIndex()) {
                 return $taxonomy->searchIndex()->ensureExists()->search($search);
@@ -128,6 +130,7 @@ class TermsController extends CpController
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $term->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
+            'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
 
         if ($request->wantsJson()) {
@@ -233,6 +236,7 @@ class TermsController extends CpController
                 ];
             })->all(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
+            'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
 
         if ($request->wantsJson()) {
@@ -290,7 +294,7 @@ class TermsController extends CpController
             $term->updateLastModified(User::current())->save();
         }
 
-        return ['data' => ['redirect' => $term->editUrl()]];
+        return new TermResource($term);
     }
 
     protected function extractFromFields($term, $blueprint)

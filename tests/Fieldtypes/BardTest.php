@@ -7,6 +7,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -18,6 +20,16 @@ class BardTest extends TestCase
     /** @test */
     public function it_augments_prosemirror_structure_to_a_template_friendly_array()
     {
+        (new class extends Fieldtype
+        {
+            public static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
         $data = [
             [
                 'type' => 'set',
@@ -63,8 +75,8 @@ class BardTest extends TestCase
         $expected = [
             [
                 'type' => 'image',
-                'image' => 'test.jpg',
-                'caption' => 'test',
+                'image' => 'test.jpg (augmented)',
+                'caption' => 'test (augmented)',
             ],
             [
                 'type' => 'text',
@@ -72,8 +84,8 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'image',
-                'image' => 'test.jpg',
-                'caption' => 'test',
+                'image' => 'test.jpg (augmented)',
+                'caption' => 'test (augmented)',
             ],
             [
                 'type' => 'text',
@@ -81,7 +93,19 @@ class BardTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $this->bard()->augment($data));
+        $augmented = $this->bard([
+            'sets' => [
+                'image' => [
+                    'fields' => [
+                        ['handle' => 'image', 'field' => ['type' => 'test']],
+                        ['handle' => 'caption', 'field' => ['type' => 'test']],
+                    ],
+                ],
+            ],
+        ])->augment($data);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
     /** @test */
@@ -182,7 +206,10 @@ class BardTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $this->bard()->augment($data));
+        $augmented = $this->bard()->augment($data);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
     /** @test */
@@ -370,6 +397,50 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    public function it_removes_empty_nodes()
+    {
+        $content = '[
+            {"type":"paragraph"},
+            {"type":"heading"},
+            {"type":"paragraph", "content": "foo"},
+            {"type":"heading"},
+            {"type":"paragraph"},
+            {"type":"heading", "content": "foo"},
+            {"type":"paragraph"},
+            {"type":"heading"}
+        ]';
+
+        $containsAllEmptyNodes = $this->bard(['remove_empty_nodes' => false])->process($content);
+
+        $this->assertEquals($containsAllEmptyNodes, [
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading', 'content' => 'foo'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+        ]);
+
+        $removedAllEmptyNodes = $this->bard(['remove_empty_nodes' => true])->process($content);
+
+        $this->assertEquals($removedAllEmptyNodes, [
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading', 'content' => 'foo'],
+        ]);
+
+        $trimmedEmptyNodes = $this->bard(['remove_empty_nodes' => 'trim'])->process($content);
+
+        $this->assertEquals($trimmedEmptyNodes, [
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading', 'content' => 'foo'],
+        ]);
+    }
+
+    /** @test */
     public function it_preloads_preprocessed_default_values()
     {
         $field = (new Field('test', [
@@ -381,7 +452,7 @@ class BardTest extends TestCase
                     ],
                 ],
             ],
-        ]));
+        ]))->setValue('[]'); // what an empty value would get preprocessed into.
 
         $expected = [
             'things' => [],
@@ -416,7 +487,7 @@ class BardTest extends TestCase
                     ],
                 ],
             ],
-        ]));
+        ]))->setValue('[]'); // what an empty value would get preprocessed into.
 
         $expected = [
             '_' => '_',
@@ -473,7 +544,7 @@ EOT;
     /** @test */
     public function it_converts_statamic_asset_urls_when_stored_as_html()
     {
-        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
+        Storage::fake('test', ['url' => '/assets']);
         $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
         Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
 
@@ -507,6 +578,14 @@ EOT;
 EOT;
 
         $this->assertEquals($expected, $bard->augment($html));
+    }
+
+    /** @test */
+    public function it_converts_a_queryable_value()
+    {
+        $this->assertNull((new Bard)->toQueryableValue(null));
+        $this->assertNull((new Bard)->toQueryableValue([]));
+        $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
     }
 
     private function bard($config = [])

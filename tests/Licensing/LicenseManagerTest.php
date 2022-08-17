@@ -132,6 +132,22 @@ class LicenseManagerTest extends TestCase
     }
 
     /** @test */
+    public function it_checks_if_statamic_license_needs_renewal()
+    {
+        $this->assertFalse($this->managerWithResponse([
+            'statamic' => ['valid' => true],
+        ])->statamicNeedsRenewal());
+
+        $this->assertFalse($this->managerWithResponse([
+            'statamic' => ['valid' => false, 'reason' => 'unlicensed'],
+        ])->statamicNeedsRenewal());
+
+        $this->assertTrue($this->managerWithResponse([
+            'statamic' => ['valid' => false, 'reason' => 'outside_license_range'],
+        ])->statamicNeedsRenewal());
+    }
+
+    /** @test */
     public function it_checks_for_request_failures()
     {
         Carbon::setTestNow(now()->startOfMinute());

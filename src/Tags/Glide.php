@@ -2,11 +2,14 @@
 
 namespace Statamic\Tags;
 
+use Facades\Statamic\Imaging\Attributes;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Config;
+use Statamic\Facades\Glide as GlideManager;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -20,8 +23,8 @@ class Glide extends Tags
      *
      * Where `field` is the variable containing the image ID
      *
-     * @param  $method
-     * @param  $args
+     * @param  string  $method
+     * @param  array  $args
      * @return string
      */
     public function __call($method, $args)
@@ -95,6 +98,10 @@ class Glide extends Tags
     {
         $items = $items ?? $this->params->get(['src', 'id', 'path']);
 
+        if (Compare::isQueryBuilder($items)) {
+            $items = $items->get();
+        }
+
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
         return $items->map(function ($item) {
@@ -102,11 +109,8 @@ class Glide extends Tags
 
             if ($this->isResizable($item)) {
                 $path = $this->generateImage($item);
-
-                [$width, $height] = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
-
-                $data['width'] = $width;
-                $data['height'] = $height;
+                $attrs = Attributes::from(GlideManager::cacheDisk()->getDriver(), $path);
+                $data = array_merge($data, $attrs);
             }
 
             if ($item instanceof Augmentable) {
@@ -145,11 +149,6 @@ class Glide extends Tags
      */
     private function output($url)
     {
-        if ($this->isPair) {
-            return $this->parse(
-                compact('url', 'width', 'height')
-            );
-        }
         if ($this->params->bool('tag')) {
             return "<img src=\"$url\" alt=\"{$this->params->get('alt')}\" />";
         }
@@ -173,7 +172,7 @@ class Glide extends Tags
             return;
         }
 
-        $url = ($this->params->bool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+        $url = ($this->params->bool('absolute', $this->useAbsoluteUrls())) ? URL::makeAbsolute($url) : URL::makeRelative($url);
 
         return $url;
     }
@@ -311,5 +310,10 @@ class Glide extends Tags
         }
 
         throw new \Exception("Unsupported image manipulation driver [$driver]");
+    }
+
+    private function useAbsoluteUrls()
+    {
+        return Str::startsWith(GlideManager::url(), ['http://', 'https://']);
     }
 }

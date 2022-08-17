@@ -6,7 +6,10 @@
                 @reordered="$emit('reordered', $event)"
             >
                 <template slot="cell-title" slot-scope="{ row: blueprint }">
-                    <a :href="blueprint.edit_url">{{ blueprint.title }}</a>
+                    <div class="flex items-center">
+                        <div class="little-dot mr-1" :class="[blueprint.hidden ? 'hollow' : 'bg-green']" />
+                        <a :href="blueprint.edit_url">{{ blueprint.title }}</a>
+                    </div>
                 </template>
                 <template slot="cell-handle" slot-scope="{ value }">
                     <span class="font-mono text-xs">{{ value }}</span>

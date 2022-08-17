@@ -20,6 +20,7 @@ class Delete extends Action
             case $item instanceof Contracts\Taxonomies\Term:
             case $item instanceof Contracts\Assets\Asset:
             case $item instanceof Contracts\Assets\AssetFolder:
+            case $item instanceof Contracts\Forms\Form:
             case $item instanceof Contracts\Forms\Submission:
             case $item instanceof Contracts\Auth\User:
                 return true;
@@ -46,7 +47,7 @@ class Delete extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Are you sure you want to want to delete this?|Are you sure you want to delete these :count items?';
+        return 'Are you sure you want to delete this?|Are you sure you want to delete these :count items?';
     }
 
     public function run($items, $values)

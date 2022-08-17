@@ -7,8 +7,10 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
+use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Uploaders\AssetsUploader;
@@ -28,6 +30,9 @@ class Submission implements SubmissionContract, Augmentable
      * @var Form
      */
     public $form;
+
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -104,71 +109,30 @@ class Submission implements SubmissionContract, Augmentable
     }
 
     /**
-     * Get or set the data.
+     * Upload files and return asset IDs.
      *
-     * @param  array|null  $data
+     * @param  array  $uploadedFiles
      * @return array
      */
-    public function data($data = null)
+    public function uploadFiles($uploadedFiles)
     {
-        if (func_num_args() === 0) {
-            return $this->data;
-        }
+        return collect($uploadedFiles)->map(function ($files, $handle) {
+            return AssetsUploader::field($this->fields()->get($handle))->upload($files);
+        })->all();
+    }
 
-        $data = collect($data)->intersectByKeys($this->fields())->all();
-
-        $this->data = $data;
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
 
         return $this;
     }
 
-    /**
-     * Upload files.
-     */
-    public function uploadFiles()
+    public function saveQuietly()
     {
-        collect($this->fields())
-            ->filter(function ($config, $handle) {
-                return Arr::get($config, 'type') === 'assets' && request()->hasFile($handle);
-            })
-            ->each(function ($config, $handle) {
-                Arr::set($this->data, $handle, AssetsUploader::field($config)->upload(request()->file($handle)));
-            });
+        $this->withEvents = false;
 
-        return $this;
-    }
-
-    /**
-     * Whether the submissin has the given key.
-     *
-     * @return bool
-     */
-    public function has($field)
-    {
-        return array_has($this->data(), $field);
-    }
-
-    /**
-     * Get a value of a field.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function get($field)
-    {
-        return array_get($this->data(), $field);
-    }
-
-    /**
-     * Set a value of a field.
-     *
-     * @param  string  $field
-     * @param  mixed  $value
-     * @return void
-     */
-    public function set($field, $value)
-    {
-        array_set($this->data, $field, $value);
+        return $this->save();
     }
 
     /**
@@ -176,9 +140,33 @@ class Submission implements SubmissionContract, Augmentable
      */
     public function save()
     {
-        File::put($this->getPath(), YAML::dump($this->data()));
+        $isNew = is_null($this->form()->submission($this->id()));
 
-        SubmissionSaved::dispatch($this);
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (SubmissionSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
+        File::put($this->getPath(), YAML::dump(Arr::removeNullValues($this->data()->all())));
+
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                SubmissionCreated::dispatch($this);
+            }
+
+            SubmissionSaved::dispatch($this);
+        }
     }
 
     /**
@@ -234,5 +222,10 @@ class Submission implements SubmissionContract, Augmentable
     public function blueprint()
     {
         return $this->form->blueprint();
+    }
+
+    public function __get($key)
+    {
+        return $this->get($key);
     }
 }

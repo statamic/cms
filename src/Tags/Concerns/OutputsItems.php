@@ -24,10 +24,7 @@ trait OutputsItems
         $extra = [];
 
         $extra['total_results'] = $items->count();
-
-        if ($items->isEmpty()) {
-            $extra['no_results'] = true;
-        }
+        $extra['no_results'] = $items->isEmpty();
 
         return $extra;
     }
@@ -35,6 +32,11 @@ trait OutputsItems
     protected function paginatedOutput($paginator)
     {
         $paginator->withQueryString();
+
+        if ($window = $this->params->int('on_each_side')) {
+            $paginator->onEachSide($window);
+        }
+
         $as = $this->getPaginationResultsKey();
         $items = $paginator->getCollection()->supplement('total_results', $paginator->total());
 

@@ -148,6 +148,8 @@ class SectionTest extends TestCase
                     'append' => null,
                     'antlers' => false,
                     'default' => null,
+                    'visibility' => 'visible',
+                    'read_only' => false, // deprecated
                 ],
                 [
                     'handle' => 'two',
@@ -162,6 +164,8 @@ class SectionTest extends TestCase
                     'antlers' => false,
                     'placeholder' => null,
                     'default' => null,
+                    'visibility' => 'visible',
+                    'read_only' => false, // deprecated
                 ],
             ],
         ], $section->toPublishArray());
