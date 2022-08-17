@@ -28,6 +28,17 @@ export default {
             let validator = new Validator(field, this.values, this.$store, this.storeName);
             let passes = validator.passesConditions();
 
+            // If the field is configured to always save, never omit value.
+            if (field.always_save === true) {
+                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                    dottedKey: dottedFieldPath,
+                    hidden: ! passes,
+                    omitValue: false,
+                });
+
+                return passes;
+            }
+
             // Ensure DOM is updated to ensure all revealers are properly loaded and tracked before committing to store.
             this.$nextTick(() => {
                 this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
