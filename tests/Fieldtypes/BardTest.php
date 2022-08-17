@@ -546,7 +546,23 @@ EOT;
     }
 
     /** @test */
-    public function it_converts_statamic_asset_urls_when_stored_as_html()
+    public function it_doesnt_convert_statamic_asset_urls_when_saving_as_html()
+    {
+        $content = '[
+            {"type":"text","text":"one","marks":[{"type":"link","attrs":{"target":"_blank","href":"http://google.com"}}]},
+            {"type":"text","text":"two","marks":[{"type":"link","attrs":{"href":"entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80"}}]},
+            {"type":"text","text":"three","marks":[{"type":"link","attrs":{"target":"_blank","href":"statamic://asset::assets::myst.jpeg"}}]}
+        ]';
+
+        $expected = <<<'EOT'
+<a target="_blank" href="http://google.com">one</a><a href="entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80">two</a><a target="_blank" href="statamic://asset::assets::myst.jpeg">three</a>
+EOT;
+
+        $this->assertEquals($expected, $this->bard(['save_html' => true, 'sets' => null])->process($content));
+    }
+
+    /** @test */
+    public function it_augments_statamic_asset_urls_when_stored_as_html()
     {
         Storage::fake('test', ['url' => '/assets']);
         $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);

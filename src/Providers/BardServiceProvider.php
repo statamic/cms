@@ -25,7 +25,11 @@ class BardServiceProvider extends ServiceProvider
                     : new \Statamic\Fieldtypes\Bard\ImageNode;
             },
             'italic' => new \Tiptap\Marks\Italic(),
-            'link' => new \Statamic\Fieldtypes\Bard\LinkMark(),
+            'link' => function ($bard, $options) {
+                return $options['withStatamicImageUrls']
+                    ? new \Statamic\Fieldtypes\Bard\StatamicLinkMark
+                    : new \Statamic\Fieldtypes\Bard\LinkMark;
+            },
             'listItem' => new \Tiptap\Nodes\ListItem(),
             'orderedList' => new \Tiptap\Nodes\OrderedList(),
             'paragraph' => new \Tiptap\Nodes\Paragraph(),
