@@ -106,10 +106,11 @@ class Augmentor
     public function convertToHtml($value)
     {
         $customImageNode = $this->withStatamicImageUrls ? StatamicImageNode::class : CustomImageNode::class;
+        $customLinkMark = $this->withStatamicImageUrls ? StatamicLinkMark::class : CustomLinkMark::class;
 
         $renderer = (new Renderer)
             ->replaceNode(DefaultImageNode::class, $customImageNode)
-            ->replaceMark(DefaultLinkMark::class, CustomLinkMark::class)
+            ->replaceMark(DefaultLinkMark::class, $customLinkMark)
             ->addNode(SetNode::class)
             ->addNodes(static::$customNodes)
             ->addMarks(static::$customMarks);
