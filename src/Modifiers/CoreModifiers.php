@@ -23,6 +23,8 @@ use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Bard;
+use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -103,6 +105,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Parses the value as an Antlers template.
+     *
+     * @param  mixed  $value
+     * @param  array  $params
+     * @return string
+     */
+    public function antlers($value, $params, $context)
+    {
+        return (string) Antlers::parse($value, $context);
+    }
+
+    /**
      * Alias an array variable.
      *
      * @param $value
@@ -173,6 +187,80 @@ class CoreModifiers extends Modifier
         }
 
         return substr($value, 0, -$params[0]);
+    }
+
+    /**
+     * Converts a bard value to a flat array of nodes and marks.
+     *
+     * @param $value
+     * @return array
+     */
+    public function bardItems($value)
+    {
+        if ($value instanceof Value) {
+            $value = $value->raw();
+        }
+        if (Arr::isAssoc($value)) {
+            $value = [$value];
+        }
+
+        $items = [];
+        while (count($value)) {
+            $items[] = $item = array_shift($value);
+            // Marks are children of the text they apply to, but having access to that node
+            // would be useful when working with marks, so we add the node to the mark data
+            array_unshift($value, ...array_map(fn ($m) => $m + ['node' => $item], $item['marks'] ?? []));
+            array_unshift($value, ...($item['content'] ?? []));
+        }
+
+        return $items;
+    }
+
+    /**
+     * Converts a bard value to plain text (excluding sets).
+     *
+     * @param $value
+     * @return string
+     */
+    public function bardText($value)
+    {
+        if ($value instanceof Value) {
+            $value = $value->raw();
+        }
+        if (Arr::isAssoc($value)) {
+            $value = [$value];
+        }
+
+        $text = '';
+        while (count($value)) {
+            $item = array_shift($value);
+            if ($item['type'] === 'text') {
+                $text .= ' '.($item['text'] ?? '');
+            }
+            array_unshift($value, ...($item['content'] ?? []));
+        }
+
+        return Stringy::collapseWhitespace($text);
+    }
+
+    /**
+     * Converts a bard value to HTML (excluding sets).
+     *
+     * @param $value
+     * @return string
+     */
+    public function bardHtml($value)
+    {
+        if ($value instanceof Value) {
+            $value = $value->raw();
+        }
+        if (Arr::isAssoc($value)) {
+            $value = [$value];
+        }
+
+        $items = array_values(Arr::where($value, fn ($item) => $item['type'] !== 'set'));
+
+        return (new Augmentor(new Bard()))->augment($items);
     }
 
     public function boolString($value)
@@ -2853,10 +2941,17 @@ class CoreModifiers extends Modifier
         if (Str::contains($url, 'vimeo')) {
             $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
 
+            [$url, $hash] = $this->handleUnlistedVimeoUrls($url);
+
+            $paramsToAdd = '?dnt=1';
+            if ($hash) {
+                $paramsToAdd .= '&h='.$hash;
+            }
+
             if (Str::contains($url, '?')) {
-                $url = str_replace('?', '?dnt=1&', $url);
+                $url = str_replace('?', $paramsToAdd.'&', $url);
             } else {
-                $url .= '?dnt=1';
+                $url .= $paramsToAdd;
             }
 
             return $url;
@@ -2997,5 +3092,22 @@ class CoreModifiers extends Modifier
         return $this->usingRuntimeMethodSyntax($context) ?
                 $params[$key] :
                 Arr::get($context, $params[$key], $params[$key]);
+    }
+
+    // unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param
+    private function handleUnlistedVimeoUrls($url)
+    {
+        $hash = '';
+        if (Str::substrCount($url, '/') > 4) {
+            $hash = Str::afterLast($url, '/');
+            $url = Str::beforeLast($url, '/');
+
+            if (Str::contains($hash, '?')) {
+                $url .= '?'.Str::after($hash, '?');
+                $hash = Str::before($hash, '?');
+            }
+        }
+
+        return [$url, $hash];
     }
 }
