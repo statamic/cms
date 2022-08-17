@@ -167,9 +167,11 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             return;
         }
 
-        $value = preg_replace_callback('/([("]statamic:\/\/[^()"]*::)([^)"]*)([)"])/im', function ($matches) {
-            return $matches[2] === $this->originalValue
-                ? $matches[1].$this->newValue.$matches[3]
+        $value = preg_replace_callback('/([("])(statamic:\/\/[^()"]*::)([^)"]*)([)"])/im', function ($matches) {
+            $newValue = $this->isRemovingValue() ? '' : $matches[2].$this->newValue;
+
+            return $matches[3] === $this->originalValue
+                ? $matches[1].$newValue.$matches[4]
                 : $matches[0];
         }, $value);
 
@@ -206,13 +208,19 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             return;
         }
 
-        $value = "asset::{$this->container}::{$this->newValue}";
+        $newValue = $this->isRemovingValue()
+            ? null
+            : "asset::{$this->container}::{$this->newValue}";
 
-        if ($originalValue === $value) {
+        if ($originalValue === $newValue) {
             return;
         }
 
-        Arr::set($data, $dottedKey, $value);
+        if ($this->isRemovingValue()) {
+            Arr::forget($data, $dottedKey);
+        } else {
+            Arr::set($data, $dottedKey, $newValue);
+        }
 
         $this->item->data($data);
 
@@ -261,7 +269,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 return "asset::{$this->container}::{$this->newValue}";
             })
             ->each(function ($value, $key) use (&$bardPayload) {
-                Arr::set($bardPayload, $key, $value);
+                Arr::set($bardPayload, $key, $this->isRemovingValue() ? '' : $value);
             });
 
         if ($changed->isEmpty()) {
@@ -305,7 +313,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 return "statamic://asset::{$this->container}::{$this->newValue}";
             })
             ->each(function ($value, $key) use (&$bardPayload) {
-                Arr::set($bardPayload, $key, $value);
+                Arr::set($bardPayload, $key, $this->isRemovingValue() ? '' : $value);
             });
 
         if ($changed->isEmpty()) {
