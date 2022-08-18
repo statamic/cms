@@ -5,6 +5,8 @@ namespace Statamic\Auth;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\RoleRepository as RepositoryContract;
+use Statamic\Events\RoleBlueprintFound;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
@@ -90,4 +92,17 @@ abstract class RoleRepository implements RepositoryContract
     {
         File::put($this->path, YAML::dump($roles->all()));
     }
+
+    public function blueprint()
+    {
+        $blueprint = Blueprint::find('user_role') ?? Blueprint::makeFromFields([
+            'title' => ['type' => 'text', 'display' => __('Title'), 'listable' => true, 'validate' => ['required'], 'instructions' => __('Usually a singular noun, like Editor or Admin.')],
+            'handle' => ['type' => 'slug', 'display' => __('Handle'), 'listable' => true, 'validate' => ['required'], 'instructions' => __('Handles are used to reference this role on the frontend. Cannot be easily changed.')],
+            'super' => ['type' => 'toggle', 'display' => __('Super User'), 'listable' => true, 'instructions' => __('Super admins have complete control and access to everything in the control panel. Grant this role wisely.')],
+        ])->setHandle('user_role');
+
+        RoleBlueprintFound::dispatch($blueprint);
+
+        return $blueprint;
+     }
 }

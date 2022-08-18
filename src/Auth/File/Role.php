@@ -21,6 +21,7 @@ class Role extends BaseRole
 
     public function __construct()
     {
+        parent::__construct();
         $this->permissions = collect();
     }
 
