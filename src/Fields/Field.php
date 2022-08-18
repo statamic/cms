@@ -78,12 +78,9 @@ class Field implements Arrayable
         return FieldtypeRepository::find($this->type())->setField($this);
     }
 
-    public function display($useDefault = true)
+    public function display()
     {
-        return array_get(
-            $this->config,
-            'display',
-            $useDefault ? __(Str::slugToTitle($this->handle)) : null);
+        return array_get($this->config, 'display', __(Str::slugToTitle($this->handle)));
     }
 
     public function instructions()
@@ -229,7 +226,7 @@ class Field implements Arrayable
             'handle' => $this->handle,
             'prefix' => $this->prefix,
             'type' => $this->type(),
-            'display' => $this->display(false),
+            'display' => $this->display(),
             'instructions' => $this->instructions(),
             'required' => $this->isRequired(),
             'visibility' => $this->visibility(),
