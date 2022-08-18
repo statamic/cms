@@ -2,15 +2,17 @@
 
 namespace Statamic\Fieldtypes;
 
-use Facades\Statamic\Routing\ResolveRedirect;
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
-use Statamic\Facades\Blink;
+use Statamic\Support\Str;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
+use Statamic\Support\Arr;
+use Statamic\Facades\Blink;
 use Statamic\Fields\Fieldtype;
-use Statamic\Support\Str;
+use Statamic\Facades\Entry;
+use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Contracts\Entries\Collection;
+use Facades\Statamic\Routing\ResolveRedirect;
 
 class Link extends Fieldtype
 {
@@ -38,6 +40,33 @@ class Link extends Fieldtype
     public function augment($value)
     {
         $redirect = ResolveRedirect::resolve($value, $this->field->parent());
+
+        if (Site::hasMultiple() && Str::startsWith($value, 'entry::')) {
+            $site = Site::current()->handle();
+            if (($parent = $this->field()->parent()) && $parent instanceof Localization) {
+                $site = $parent->locale();
+            }
+
+            $selectedEntry = Str::after($value, 'entry::');
+
+            $idForCurrentSite = (new OrderedQueryBuilder(Entry::query(), $selectedEntry))
+                ->where('id', $selectedEntry)
+                ->get()
+                ->map(function ($entry) use ($site) {
+                    return optional($entry->in($site))->id();
+                })
+                ->filter()
+                ->first();
+
+            $entryForSite = (new OrderedQueryBuilder(Entry::query(), $idForCurrentSite))
+                ->where('id', $idForCurrentSite)
+                ->where('status', 'published')
+                ->first();
+
+            if ($entryForSite instanceof Statamic\Entries\Entry) {
+                $redirect = $entryForSite->url();
+            }
+        }
 
         return $redirect === 404 ? null : $redirect;
     }
