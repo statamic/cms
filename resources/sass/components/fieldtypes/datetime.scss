@@ -45,12 +45,8 @@
 .date-time-container.narrow {
     @apply block;
 
-    .date-container {
-        @apply mb-1;
-    }
-
     .time-container {
-        @apply ml-0;
+        @apply mt-1 ml-0;
     }
 }
 

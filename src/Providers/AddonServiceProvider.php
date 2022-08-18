@@ -14,6 +14,7 @@ use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Fields\Fieldtype;
+use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
@@ -65,6 +66,11 @@ abstract class AddonServiceProvider extends ServiceProvider
      * @var list<class-string<Widget>>
      */
     protected $widgets = [];
+
+    /**
+     * @var list<class-string<JsDriver>>
+     */
+    protected $formJsDrivers = [];
 
     /**
      * @var array<class-string, string>
@@ -161,6 +167,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootFieldtypes()
                 ->bootModifiers()
                 ->bootWidgets()
+                ->bootFormJsDrivers()
                 ->bootCommands()
                 ->bootSchedule()
                 ->bootPolicies()
@@ -246,6 +253,15 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootWidgets()
     {
         foreach ($this->widgets as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootFormJsDrivers()
+    {
+        foreach ($this->formJsDrivers as $class) {
             $class::register();
         }
 
