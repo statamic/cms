@@ -273,14 +273,6 @@ export default {
             } else {
                 return 'bg-grey-40';
             }
-        },
-
-        getTypeTitle(entry) {
-            if (entry.collection) {
-                return entry.collection.title;
-            } else if (entry.taxonomy) {
-                return entry.taxonomy.title;
-            }
         }
 
     }
