@@ -25,6 +25,12 @@ class Partial extends Tags
             ->render();
     }
 
+    /**
+     * Get the view name for the partial.
+     *
+     * @param  string  $partial
+     * @return string
+     */
     protected function viewName($partial)
     {
         $partial = str_replace('/', '.', $partial);
