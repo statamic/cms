@@ -21,6 +21,7 @@
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
                     </svg>
                 </th>
+                <th class="type-column" v-if="showType"></th>
                 <th class="actions-column">
                     <data-list-column-picker :preferences-key="columnPreferencesKey" v-if="allowColumnPicker" />
                 </th>
@@ -60,6 +61,12 @@
                     >
                         <table-field :handle="column.field" :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
                     </slot>
+                </td>
+                <td class="type-column" v-if="showType">
+                    <span v-if="row.is_entry || row.is_term" class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
+                        <template v-if="row.is_entry">{{ row.collection.title }}</template>
+                        <template v-if="row.is_term">{{ row.taxonomy.title }}</template>
+                    </span>
                 </td>
                 <td class="actions-column">
                     <slot
@@ -120,6 +127,10 @@ export default {
         },
         columnPreferencesKey: {
             type: String,
+        },
+        showType: {
+            type: Boolean,
+            default: false
         },
     },
 

@@ -41,6 +41,7 @@
                                 :loading="loading"
                                 :allow-bulk-actions="true"
                                 :toggle-selection-on-row-click="true"
+                                :show-type="true"
                                 @sorted="sorted"
                                 class="cursor-pointer"
                             >
@@ -271,6 +272,14 @@ export default {
                 return 'bg-green';
             } else {
                 return 'bg-grey-40';
+            }
+        },
+
+        getTypeTitle(entry) {
+            if (entry.collection) {
+                return entry.collection.title;
+            } else if (entry.taxonomy) {
+                return entry.taxonomy.title;
             }
         }
 

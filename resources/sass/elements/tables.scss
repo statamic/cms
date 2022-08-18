@@ -48,6 +48,9 @@
 				@apply text-grey-90;
 			}
 		}
+		.type-column {
+			text-align: right;
+		}
 		.actions-column {
 			@apply p-0 pr-2 text-right;
 			width: 24px;
@@ -95,6 +98,9 @@
             td {
                 @apply py-1 px-2 break-words;
             }
+		}
+		.type-column {
+			text-align: right;
 		}
 		.actions-column {
 			@apply p-0 text-right;
