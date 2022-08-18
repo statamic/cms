@@ -2,6 +2,9 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Facades\Site;
+use Statamic\Support\Str;
+
 class Partial extends Tags
 {
     public function wildcard($tag)
@@ -35,6 +38,12 @@ class Partial extends Tags
     {
         $partial = str_replace('/', '.', $partial);
 
+        if (Str::contains($partial, '::') &&
+            Site::hasMultiple() &&
+            view()->exists($withSitePrefix = $this->siteViewName($partial))) {
+            return $withSitePrefix;
+        }
+
         if (view()->exists($underscored = $this->underscoredViewName($partial))) {
             return $underscored;
         }
@@ -48,6 +57,19 @@ class Partial extends Tags
         }
 
         return $partial;
+    }
+
+    /**
+     * Get the view name for the partial with the current site as a prefix.
+     *
+     * @param  string  $namespacedPartial
+     * @return string
+     */
+    protected function siteViewName($namespacedPartial)
+    {
+        [$namespace, $partial] = explode('::', $namespacedPartial);
+
+        return $namespace.'::'.Site::current()->handle().'.'.$partial;
     }
 
     protected function underscoredViewName($partial)
