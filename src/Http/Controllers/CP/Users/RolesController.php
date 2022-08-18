@@ -59,16 +59,25 @@ class RolesController extends CpController
         $this->authorize('edit roles');
 
         $request->validate([
-            'title' => 'required',
-            'handle' => 'alpha_dash',
-            'super' => 'boolean',
             'permissions' => 'array',
         ]);
+
+        $blueprint = Role::blueprint();
+
+        $fields = $blueprint->fields()->addValues($request->all());
+
+        $fields->validate();
+
+        $values = $fields->process()->values()->except(['title', 'handle', 'super', 'permissions']);
+
+        var_dump($values);
+        exit();
 
         $role = Role::make()
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title))
             ->permissions($request->super ? ['super'] : $request->permissions)
+            ->data($values)
             ->save();
 
         session()->flash('success', __('Role created'));
@@ -76,7 +85,7 @@ class RolesController extends CpController
         return ['redirect' => cp_route('roles.index', $role->handle())];
     }
 
-    public function edit($role)
+    public function edit(Request $request, $role)
     {
         $this->authorize('edit roles');
 
@@ -84,11 +93,33 @@ class RolesController extends CpController
             return $this->pageNotFound();
         }
 
-        return view('statamic::roles.edit', [
+        $blueprint = $role->blueprint();
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($role->data()->merge(['handle' => $role->handle(), 'title' => $role->title(), 'super' => $role->isSuper()])->all())
+            ->preProcess();
+
+        $viewData = [
             'role' => $role,
+            'title' => $role->title(),
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta(),
+            'blueprint' => $role->blueprint()->toPublishArray(),
+            'reference' => $role->handle(),
+            'actions' => [
+                'save' => $role->updateUrl(),
+                'editBlueprint' => cp_route('roles.blueprint.edit'),
+            ],
             'super' => $role->isSuper(),
             'permissions' => $this->updateTree(Permission::tree(), $role),
-        ]);
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::roles.edit', $viewData);
     }
 
     public function update(Request $request, $role)
@@ -100,11 +131,18 @@ class RolesController extends CpController
         }
 
         $request->validate([
-            'title' => 'required',
-            'handle' => 'alpha_dash',
-            'super' => 'boolean',
             'permissions' => 'array',
         ]);
+
+        $fields = $role->blueprint()->fields()->addValues($request->all());
+
+        $fields->validate();
+
+        $values = $fields->process()->values()->except(['title', 'handle', 'super', 'permissions']);
+
+        foreach ($values as $key => $value) {
+            $role->set($key, $value);
+        }
 
         $role
             ->title($request->title)

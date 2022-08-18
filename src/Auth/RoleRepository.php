@@ -35,7 +35,8 @@ abstract class RoleRepository implements RepositoryContract
                 ->handle($handle)
                 ->title(array_get($role, 'title'))
                 ->addPermission(array_get($role, 'permissions', []))
-                ->preferences(array_get($role, 'preferences', []));
+                ->preferences(array_get($role, 'preferences', []))
+                ->data($role);
         });
     }
 
@@ -53,11 +54,11 @@ abstract class RoleRepository implements RepositoryContract
     {
         $roles = $this->raw();
 
-        $roles->put($role->handle(), Arr::removeNullValues([
+        $roles->put($role->handle(), Arr::removeNullValues(array_merge($role->data()->all(), [
             'title' => $role->title(),
             'permissions' => $role->permissions()->all(),
             'preferences' => $role->preferences(),
-        ]));
+        ])));
 
         if ($role->handle() !== $role->originalHandle()) {
             $roles->forget($role->originalHandle());

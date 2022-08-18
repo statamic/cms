@@ -3,45 +3,39 @@
         <div>
             <header class="mb-3">
                 <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
-                <h1 v-text="initialTitle || __('Create Role')" />
+                <div class="flex items-center justify-between">
+                    <h1 v-text="initialTitle || __('Create Role')" />
+
+                     <dropdown-list v-if="canEditBlueprint">
+                         <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                     </dropdown-list>
+
+                     <slot name="action-buttons-right" />
+                 </div>
             </header>
 
-            <publish-fields-container class="card p-0 mb-3 configure-section">
-
-                <form-group
-                    handle="title"
-                    class="border-b"
-                    :display="__('Title')"
-                    :errors="errors.title"
-                    :instructions="__('messages.role_title_instructions')"
-                    v-model="title"
-                    :focus="true"
-                />
-
-                <form-group
-                    class="border-b"
-                    fieldtype="slug"
-                    handle="handle"
-                    :display="__('Handle')"
-                    :instructions="__('messages.role_handle_instructions')"
-                    :errors="errors.title"
-                    v-model="handle"
-                />
-
-                <div class="text-xs text-red p-3 pt-0" v-if="initialHandle && handle != initialHandle">
-                    {{ __('messages.role_change_handle_warning') }}
-                </div>
-
-                <form-group
-                    class="toggle-fieldtype"
-                    fieldtype="toggle"
-                    handle="super"
-                    :display="__('permissions.super')"
-                    :instructions="__('permissions.super_desc')"
-                    v-model="isSuper"
-                />
-
-            </publish-fields-container>
+            <publish-container
+                 v-if="fieldset"
+                 ref="container"
+                 :name="publishContainer"
+                 :blueprint="fieldset"
+                 :values="values"
+                 :reference="initialReference"
+                 :meta="meta"
+                 :errors="errors"
+                 @updated="values = $event"
+             >
+                 <div slot-scope="{ container, setFieldValue, setFieldMeta }">
+                     <publish-sections
+                         :enable-sidebar="false"
+                         :can-toggle-labels="true"
+                         @updated="setFieldValue"
+                         @meta-updated="setFieldMeta"
+                         @focus="container.$emit('focus', $event)"
+                         @blur="container.$emit('blur', $event)"
+                     ></publish-sections>
+                 </div>
+            </publish-container>
 
             <div v-if="!isSuper">
                 <div class="mt-3 content" v-for="group in permissions" :key="group.handle">
@@ -60,6 +54,8 @@
 
 
 <script>
+import HasHiddenFields from '../data-list/HasHiddenFields';
+
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
         if (! permission.checked) return carry;
@@ -69,12 +65,22 @@ const checked = function (permissions) {
 
 export default {
 
+    mixins: [
+         HasHiddenFields,
+    ],
+
     props: {
+        publishContainer: String,
+        actions: Object,
+        canEditBlueprint: Boolean,
+        initialFieldset: Object,
+        initialValues: Object,
+        initialMeta: Object,
+        initialReference: String,
         initialTitle: String,
         initialHandle: String,
         initialPermissions: Array,
         initialSuper: Boolean,
-        action: String,
         method: String,
         breadcrumbUrl: String,
         indexUrl: String
@@ -82,6 +88,9 @@ export default {
 
     data() {
         return {
+            fieldset: _.clone(this.initialFieldset),
+            values: _.clone(this.initialValues),
+            meta: _.clone(this.initialMeta),
             error: null,
             errors: {},
             title: this.initialTitle,
@@ -92,8 +101,8 @@ export default {
     },
 
     watch: {
-        'title': function(display) {
-            this.handle = this.$slugify(display, '_');
+        'values.super': function(checked) {
+            this.isSuper = checked;
         }
     },
 
@@ -104,12 +113,9 @@ export default {
         },
 
         payload() {
-            return {
-                title: this.title,
-                handle: this.handle,
-                super: this.isSuper,
+            return _.assign(this.visibleValues, {
                 permissions: this.checkedPermissions
-            }
+            })
         },
 
         checkedPermissions() {
@@ -130,7 +136,7 @@ export default {
         save() {
             this.clearErrors();
 
-            this.$axios[this.method](this.action, this.payload).then(response => {
+            this.$axios[this.method](this.actions.save, this.payload).then(response => {
                 window.location = response.data.redirect;
             }).catch(e => {
                 if (e.response && e.response.status === 422) {

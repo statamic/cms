@@ -198,6 +198,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::patch('users/{user}/password', 'PasswordController@update')->name('users.password.update');
         Route::get('account', 'AccountController')->name('account');
         Route::resource('user-groups', 'UserGroupsController');
+        Route::get('roles/blueprint', 'RoleBlueprintController@edit')->name('roles.blueprint.edit');
+        Route::patch('roles/blueprint', 'RoleBlueprintController@update')->name('roles.blueprint.update');
         Route::resource('roles', 'RolesController');
         Route::resource('preferences', 'PreferenceController')->except('destroy');
         Route::post('preferences/{key}/delete', 'PreferenceController@destroy')->name('preferences.destroy');
