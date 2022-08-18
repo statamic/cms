@@ -12,7 +12,6 @@
         :initial-fieldset="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         :initial-meta="{{ json_encode($meta) }}"
-        :can-edit-password="false"
         :can-edit-blueprint="{{ Statamic\Support\Str::bool($user->can('configure fields')) }}"
     ></user-group-publish-form>
 
