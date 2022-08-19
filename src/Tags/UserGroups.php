@@ -7,14 +7,6 @@ use Statamic\Facades\UserGroup;
 class UserGroups extends Tags
 {
     /**
-     * {{ user_groups:* }} ... {{ /user_groups:* }}.
-     */
-    public function wildcard($tag)
-    {
-        return UserGroup::find($tag);
-    }
-
-    /**
      * {{ user_groups }} ... {{ /user_groups }}.
      */
     public function index()

@@ -57,22 +57,6 @@ class UserGroupsTagTest extends TestCase
         $this->assertEquals('nothing', $this->tag('{{ user_groups handle="test2|test3" }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_groups }}'));
     }
 
-    /** @test */
-    public function it_gets_a_group_using_shorthand()
-    {
-        UserGroup::make()->handle('test')->title('Test')->save();
-        UserGroup::make()->handle('test2')->title('Test 2')->save();
-        UserGroup::make()->handle('test3')->title('Test 3')->save();
-
-        $this->assertEquals('test2', $this->tag('{{ user_groups:test2 }}{{ handle }}{{ /user_groups:test2 }}'));
-    }
-
-    /** @test */
-    public function it_outputs_nothing_when_using_shorthand()
-    {
-        $this->assertEquals('', $this->tag('{{ user_groups:test2 }}{{ handle }}{{ /user_groups:test2 }}'));
-    }
-
     private function tag($tag, $data = [])
     {
         return (string) Parse::template($tag, $data);
