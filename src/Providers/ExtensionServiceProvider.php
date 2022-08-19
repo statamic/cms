@@ -174,6 +174,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Theme::class,
         Tags\Trans::class,
         Tags\TransChoice::class,
+        Tags\UserGroups::class,
         Tags\Users::class,
         Tags\Vite::class,
         Tags\Widont::class,
