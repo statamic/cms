@@ -6,14 +6,13 @@ use Illuminate\Support\Collection;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class FieldsetRepository
 {
     protected $fieldsets = [];
     protected $directory;
-    protected $fieldsetDirectories = [];
+    protected $hints = [];
 
     public function setDirectory($directory)
     {
@@ -34,47 +33,83 @@ class FieldsetRepository
         }
 
         $handle = str_replace('/', '.', $handle);
-        $path = str_replace('.', '/', $handle);
 
-        if (Str::contains($handle, '::')) {
-            [$key, $fieldsetHandle] = explode('::', $handle);
+        $path = Str::contains($handle, '::')
+            ? $this->findNamespacedFieldsetPath($handle)
+            : $this->findStandardFieldsetPath($handle);
 
-            // check the "override" folder first
-            if (File::exists($path = resource_path("fieldsets/vendor/{$key}/{$fieldsetHandle}.yaml"))) {
-                return $this->addFieldset($fieldsetHandle, $path);
-            }
-
-            // then check addon folder
-            if (! $directory = $this->getDirectory($key)) {
-                return null;
-            }
-
-            return $this->addFieldset($handle, "{$directory}/{$fieldsetHandle}.yaml");
-        }
-
-        if (! File::exists($path = "{$this->directory}/{$path}.yaml")) {
+        if (! $path) {
             return null;
         }
 
-        return $this->addFieldset($handle, $path);
+        $fieldset = $this
+            ->make($handle)
+            ->setContents(YAML::file($path)->parse());
+
+        $this->fieldsets[$handle] = $fieldset;
+
+        return $fieldset;
     }
 
-    public function exists(string $handle): bool
+    private function standardFieldsetPath(string $handle)
     {
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
-        if (Str::contains($handle, '::')) {
-            [$key, $fieldsetHandle] = explode('::', $handle);
+        return "{$this->directory}/{$path}.yaml";
+    }
 
-            if (! $directory = $this->getDirectory($key)) {
-                return false;
+    private function findStandardFieldsetPath(string $handle)
+    {
+        if (File::exists($path = $this->standardFieldsetPath($handle))) {
+            return $path;
+        }
+    }
+
+    private function findNamespacedFieldsetPath(string $handle)
+    {
+        $paths = [
+            $this->overriddenNamespacedFieldsetPath($handle),
+            $this->namespacedFieldsetPath($handle),
+        ];
+
+        foreach ($paths as $path) {
+            if (File::exists($path)) {
+                return $path;
             }
+        }
+    }
 
-            return File::exists("{$directory}/{$fieldsetHandle}.yaml");
+    private function namespacedFieldsetPath(string $handle)
+    {
+        [$namespace, $handle] = explode('::', $handle);
+
+        if (! isset($this->hints[$namespace])) {
+            return null;
         }
 
-        return File::exists("{$this->directory}/{$path}.yaml");
+        $handle = str_replace('/', '.', $handle);
+        $path = str_replace('.', '/', $handle);
+
+        return "{$this->hints[$namespace]}/{$path}.yaml";
+    }
+
+    private function overriddenNamespacedFieldsetPath(string $handle)
+    {
+        [$namespace, $handle] = explode('::', $handle);
+        $handle = str_replace('/', '.', $handle);
+        $path = str_replace('.', '/', $handle);
+
+        return "{$this->directory}/vendor/{$namespace}/{$path}.yaml";
+    }
+
+    public function exists(string $handle): bool
+    {
+        $path = Str::contains($handle, '::')
+            ? $this->namespacedFieldsetPath($handle)
+            : $this->standardFieldsetPath($handle);
+
+        return $path ? File::exists($path) : false;
     }
 
     public function make($handle = null): Fieldset
@@ -84,14 +119,14 @@ class FieldsetRepository
 
     public function all(): Collection
     {
-        $externalFieldsets = $this->fieldsetDirectories()
+        $namespaced = collect($this->hints)
             ->flatMap(function (string $directory, string $key) {
                 return $this->getFieldsetsByDirectory($directory, $key);
             });
 
         return $this
             ->getFieldsetsByDirectory($this->directory)
-            ->merge($externalFieldsets);
+            ->merge($namespaced);
     }
 
     public function save(Fieldset $fieldset)
@@ -119,19 +154,9 @@ class FieldsetRepository
         File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
     }
 
-    public function addDirectory(string $directory, string $key): void
+    public function addNamespace(string $namespace, string $directory): void
     {
-        $this->fieldsetDirectories[$key] = $directory;
-    }
-
-    public function getDirectory(string $key): ?string
-    {
-        return Arr::get($this->fieldsetDirectories, $key);
-    }
-
-    public function fieldsetDirectories(): Collection
-    {
-        return collect($this->fieldsetDirectories);
+        $this->hints[$namespace] = $directory;
     }
 
     private function getFieldsetsByDirectory(string $directory, string $key = null): Collection
@@ -152,14 +177,5 @@ class FieldsetRepository
                     ->setContents(YAML::file($file)->parse());
             })
             ->keyBy->handle();
-    }
-
-    private function addFieldset(string $handle, string $path): Fieldset
-    {
-        return tap(new Fieldset, function (Fieldset $fieldset) use ($handle, $path) {
-            $this->fieldsets[$handle] = $fieldset
-                ->setHandle($handle)
-                ->setContents(YAML::file($path)->parse());
-        });
     }
 }
