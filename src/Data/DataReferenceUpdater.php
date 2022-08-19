@@ -64,6 +64,8 @@ abstract class DataReferenceUpdater
         if ($this->updated) {
             $this->saveItem();
         }
+
+        return (bool) $this->updated;
     }
 
     /**
