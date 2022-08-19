@@ -68,7 +68,6 @@ class FormController extends Controller
             $submission->save();
         }
 
-        SubmissionCreated::dispatch($submission);
         SendEmails::dispatch($submission, $site);
 
         return $this->formSuccess($params, $submission);
