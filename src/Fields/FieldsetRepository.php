@@ -29,7 +29,7 @@ class FieldsetRepository
 
     public function find(string $handle): ?Fieldset
     {
-        if ($cached = Arr::get($this->fieldsets, $handle)) {
+        if ($cached = array_get($this->fieldsets, $handle)) {
             return $cached;
         }
 
