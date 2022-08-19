@@ -4,7 +4,6 @@ namespace Tests\Tags;
 
 use Statamic\Facades\Parse;
 use Statamic\Facades\Role;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UserRolesTagTest extends TestCase
@@ -19,7 +18,7 @@ class UserRolesTagTest extends TestCase
     /** @test */
     public function it_outputs_no_results()
     {
-         $this->assertEquals('nothing', $this->tag('{{ user_roles }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_roles }}'));
+        $this->assertEquals('nothing', $this->tag('{{ user_roles }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_roles }}'));
     }
 
     /** @test */
