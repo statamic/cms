@@ -6,21 +6,17 @@ use Statamic\Facades\Role;
 
 class UserRoles extends Tags
 {
-    use Concerns\OutputsItems;
-
     /**
      * {{ user_roles }} ... {{ /user_roles }}.
      */
     public function index()
     {
-        if ($group = $this->params->get('handle')) {
-            if (! $group = Role::find($group)) {
-                return $this->parseNoResults();
-            }
+        $roles = Role::all();
 
-            return $group;
+        if (! $handles = $this->params->explode('handle')) {
+            return $roles->values();
         }
 
-        return $this->output(Role::all()->values());
+        return $roles->filter(fn ($role) => in_array($role->handle(), $handles))->values();
     }
 }
