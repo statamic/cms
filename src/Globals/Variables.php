@@ -100,6 +100,16 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         return $this;
     }
 
+    public function saveQuietly()
+    {
+        $this
+            ->globalSet()
+            ->addLocalization($this)
+            ->saveQuietly();
+
+        return $this;
+    }
+
     public function site()
     {
         return Site::get($this->locale());
