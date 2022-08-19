@@ -25,7 +25,7 @@ class ReplaceAsset extends Action
 
     public function authorize($user, $asset)
     {
-        return $user->can('move', $asset); // TODO: Does this need it's own `replace` permission?
+        return $user->can('replace', $asset);
     }
 
     public function buttonText()

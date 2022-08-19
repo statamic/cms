@@ -55,4 +55,11 @@ class AssetPolicy
 
         return $user->hasPermission("delete {$asset->container()->handle()} assets");
     }
+
+    public function replace($user, $asset)
+    {
+        return $this->edit($user, $asset)
+            && $this->store($user, $asset)
+            && $this->delete($user, $asset);
+    }
 }
