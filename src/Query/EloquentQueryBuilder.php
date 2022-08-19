@@ -15,7 +15,6 @@ abstract class EloquentQueryBuilder implements Builder
 {
     protected $builder;
     protected $columns;
-    protected $limit;
 
     protected $operators = [
         '=' => 'Equals',
