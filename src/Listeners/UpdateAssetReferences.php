@@ -4,6 +4,7 @@ namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Assets\AssetReferenceUpdater;
+use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Events\AssetSaved;
 
 class UpdateAssetReferences implements ShouldQueue
@@ -37,10 +38,17 @@ class UpdateAssetReferences implements ShouldQueue
             return;
         }
 
-        $this->getItemsContainingData()->each(function ($item) use ($container, $originalPath, $newPath) {
-            AssetReferenceUpdater::item($item)
-                ->filterByContainer($container)
-                ->updateReferences($originalPath, $newPath);
-        });
+        $updatedItems = $this
+            ->getItemsContainingData()
+            ->map(function ($item) use ($container, $originalPath, $newPath) {
+                return AssetReferenceUpdater::item($item)
+                    ->filterByContainer($container)
+                    ->updateReferences($originalPath, $newPath);
+            })
+            ->filter();
+
+        if ($updatedItems->isNotEmpty()) {
+            AssetReferencesUpdated::dispatch($asset);
+        }
     }
 }

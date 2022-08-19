@@ -3,6 +3,7 @@
 namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\TermReferencesUpdated;
 use Statamic\Events\TermSaved;
 use Statamic\Taxonomies\TermReferenceUpdater;
 
@@ -37,10 +38,17 @@ class UpdateTermReferences implements ShouldQueue
             return;
         }
 
-        $this->getItemsContainingData()->each(function ($item) use ($taxonomy, $originalSlug, $newSlug) {
-            TermReferenceUpdater::item($item)
-                ->filterByTaxonomy($taxonomy)
-                ->updateReferences($originalSlug, $newSlug);
-        });
+        $updatedItems = $this
+            ->getItemsContainingData()
+            ->map(function ($item) use ($taxonomy, $originalSlug, $newSlug) {
+                return TermReferenceUpdater::item($item)
+                    ->filterByTaxonomy($taxonomy)
+                    ->updateReferences($originalSlug, $newSlug);
+            })
+            ->filter();
+
+        if ($updatedItems->isNotEmpty()) {
+            TermReferencesUpdated::dispatch($term);
+        }
     }
 }
