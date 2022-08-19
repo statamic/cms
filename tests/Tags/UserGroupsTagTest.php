@@ -4,12 +4,22 @@ namespace Tests\Tags;
 
 use Statamic\Facades\Parse;
 use Statamic\Facades\UserGroup;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UserGroupsTagTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        UserGroup::all()->each->delete();
+    }
+
+    /** @test */
+    public function it_outputs_no_results()
+    {
+        $this->assertEquals('nothing', $this->tag('{{ user_groups }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_groups }}'));
+    }
 
     /** @test */
     public function it_gets_all_groups()
@@ -29,6 +39,38 @@ class UserGroupsTagTest extends TestCase
         UserGroup::make()->handle('test3')->title('Test 3')->save();
 
         $this->assertEquals('test2', $this->tag('{{ user_groups handle="test2" }}{{ handle }}{{ /user_groups }}'));
+    }
+
+    /** @test */
+    public function it_gets_multiple_groups()
+    {
+        UserGroup::make()->handle('test')->title('Test')->save();
+        UserGroup::make()->handle('test2')->title('Test 2')->save();
+        UserGroup::make()->handle('test3')->title('Test 3')->save();
+
+        $this->assertEquals('test2|test3|', $this->tag('{{ user_groups handle="test2|test3" }}{{ handle }}|{{ /user_groups }}'));
+    }
+
+    /** @test */
+    public function it_outputs_no_results_when_finding_multiple_groups()
+    {
+        $this->assertEquals('nothing', $this->tag('{{ user_groups handle="test2|test3" }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_groups }}'));
+    }
+
+    /** @test */
+    public function it_gets_a_group_using_shorthand()
+    {
+        UserGroup::make()->handle('test')->title('Test')->save();
+        UserGroup::make()->handle('test2')->title('Test 2')->save();
+        UserGroup::make()->handle('test3')->title('Test 3')->save();
+
+        $this->assertEquals('test2', $this->tag('{{ user_groups:test2 }}{{ handle }}{{ /user_groups:test2 }}'));
+    }
+
+    /** @test */
+    public function it_outputs_nothing_when_using_shorthand()
+    {
+        $this->assertEquals('', $this->tag('{{ user_groups:test2 }}{{ handle }}{{ /user_groups:test2 }}'));
     }
 
     private function tag($tag, $data = [])
