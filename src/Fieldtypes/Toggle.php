@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Toggle as ToggleFilter;
 
 class Toggle extends Fieldtype
 {
@@ -51,5 +52,10 @@ class Toggle extends Fieldtype
     public function toGqlType()
     {
         return GraphQL::boolean();
+    }
+
+    public function filter()
+    {
+        return new ToggleFilter($this);
     }
 }
