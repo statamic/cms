@@ -3,10 +3,11 @@
 namespace Tests\Git;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
-use Statamic\Events\Event;
+use Statamic\Events;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\Git;
@@ -390,7 +391,54 @@ class GitEventTest extends TestCase
         $folder->delete();
     }
 
-    private function makeAsset()
+    /** @test */
+    public function it_commits_when_asset_references_are_updated()
+    {
+        Event::fake([
+            Events\CollectionSaved::class,
+            Events\BlueprintSaved::class,
+        ]);
+
+        $asset = tap($this->makeAsset('leia.jpg'))->saveQuietly();
+
+        $collection = tap(Facades\Collection::make('pages'))->save();
+
+        $blueprint = Facades\Blueprint::make('article')
+            ->setNamespace('collections.pages')
+            ->setContents([
+                'fields' => [
+                    [
+                        'handle' => 'avatar',
+                        'field' => [
+                            'type' => 'assets',
+                            'container' => $asset->container()->handle(),
+                            'max_files' => 1,
+                        ],
+                    ],
+                ],
+            ])
+            ->save();
+
+        foreach (range(1, 3) as $i) {
+            Facades\Entry::make()
+                ->collection($collection)
+                ->blueprint($blueprint->handle())
+                ->locale(Facades\Site::default()->handle())
+                ->data([
+                    'title' => $i,
+                    'avatar' => 'leia.jpg',
+                ])
+                ->saveQuietly();
+        }
+
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once(); // Account for the save call below for the renaming of our file
+        Git::shouldReceive('dispatchCommit')->with('Asset references updated')->once(); // Ensure new references updated event gets fired
+        Git::shouldReceive('dispatchCommit')->with('Entry saved')->never(); // Ensure individual entry saved events do not get fired
+
+        $asset->path('leia-new.jpg')->save();
+    }
+
+    private function makeAsset($path = 'asset.txt')
     {
         Git::shouldReceive('dispatchCommit')->with('Asset container saved')->once();
 
@@ -399,12 +447,12 @@ class GitEventTest extends TestCase
 
         return (new Asset)
             ->container($container->handle())
-            ->path('asset.txt')
+            ->path($path)
             ->data(['foo' => 'bar']);
     }
 }
 
-class PunSaved extends Event implements ProvidesCommitMessage
+class PunSaved extends Events\Event implements ProvidesCommitMessage
 {
     public $item;
 
