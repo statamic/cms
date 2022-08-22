@@ -125,10 +125,25 @@ fields:
     type: text
     display: Third Field
 EOT;
+        $secondNamespacedContents = <<<'EOT'
+title: Second Namespaced Fieldset
+fields:
+  three:
+    type: text
+    display: Fourth Field
+EOT;
+        $firstOverriddenNamespacedContents = <<<'EOT'
+title: First Namespaced Fieldset (vendor override)
+fields:
+  three:
+    type: text
+    display: Third Field
+EOT;
 
         File::shouldReceive('withAbsolutePaths')->times(2)->andReturnSelf();
         File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/foo', 'yaml')->once()->andReturn(new FileCollection([
             '/path/to/foo/bar/first.yaml',
+            '/path/to/foo/bar/second.yaml',
         ]));
         File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
             '/path/to/resources/fieldsets/first.yaml',
@@ -139,17 +154,20 @@ EOT;
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/first.yaml')->once()->andReturn($firstContents);
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/second.yaml')->once()->andReturn($secondContents);
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/third.yaml')->once()->andReturn($thirdContents);
-        File::shouldReceive('get')->with('/path/to/foo/bar/first.yaml')->once()->andReturn($firstNamespacedContents);
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/vendor/foo/bar/first.yaml')->once()->andReturnTrue();
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/vendor/foo/bar/second.yaml')->once()->andReturnFalse();
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/vendor/foo/bar/first.yaml')->once()->andReturn($firstOverriddenNamespacedContents);
+        File::shouldReceive('get')->with('/path/to/foo/bar/second.yaml')->once()->andReturn($secondNamespacedContents);
 
         $this->repo->addNamespace('foo', '/path/to/foo');
         $all = $this->repo->all();
 
         $this->assertInstanceOf(Collection::class, $all);
-        $this->assertCount(4, $all);
+        $this->assertCount(5, $all);
         $this->assertEveryItemIsInstanceOf(Fieldset::class, $all);
-        $this->assertEquals(['first', 'second', 'sub.third', 'foo::bar.first'], $all->keys()->all());
-        $this->assertEquals(['first', 'second', 'sub.third', 'foo::bar.first'], $all->map->handle()->values()->all());
-        $this->assertEquals(['First Fieldset', 'Second Fieldset', 'Third Fieldset', 'First Namespaced Fieldset'], $all->map->title()->values()->all());
+        $this->assertEquals(['first', 'second', 'sub.third', 'foo::bar.first', 'foo::bar.second'], $all->keys()->all());
+        $this->assertEquals(['first', 'second', 'sub.third', 'foo::bar.first', 'foo::bar.second'], $all->map->handle()->values()->all());
+        $this->assertEquals(['First Fieldset', 'Second Fieldset', 'Third Fieldset', 'First Namespaced Fieldset (vendor override)', 'Second Namespaced Fieldset'], $all->map->title()->values()->all());
     }
 
     /** @test */

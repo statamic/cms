@@ -128,8 +128,8 @@ class FieldsetRepository
     public function all(): Collection
     {
         $namespaced = collect($this->hints)
-            ->flatMap(function (string $directory, string $key) {
-                return $this->getFieldsetsByDirectory($directory, $key);
+            ->flatMap(function (string $directory, string $namespace) {
+                return $this->getFieldsetsByDirectory($directory, $namespace);
             });
 
         return $this
@@ -167,18 +167,22 @@ class FieldsetRepository
         $this->hints[$namespace] = $directory;
     }
 
-    private function getFieldsetsByDirectory(string $directory, string $key = null): Collection
+    private function getFieldsetsByDirectory(string $directory, string $namespace = null): Collection
     {
         return File::withAbsolutePaths()
             ->getFilesByTypeRecursively($directory, 'yaml')
             ->reject(fn ($path) => Str::startsWith($path, $directory.'/vendor/'))
-            ->map(function ($file) use ($directory, $key) {
+            ->map(function ($file) use ($directory, $namespace) {
                 $basename = str_after($file, str_finish($directory, '/'));
                 $handle = str_before($basename, '.yaml');
                 $handle = str_replace('/', '.', $handle);
 
-                if ($key) {
-                    $handle = "{$key}::{$handle}";
+                if ($namespace) {
+                    $handle = "{$namespace}::{$handle}";
+
+                    if (File::exists($override = $this->overriddenNamespacedFieldsetPath($handle))) {
+                        $file = $override;
+                    }
                 }
 
                 return $this
