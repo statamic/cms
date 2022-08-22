@@ -19,89 +19,9 @@ class ViewFieldsetListingTest extends TestCase
         Facades\Fieldset::shouldReceive('all')->andReturn(collect([
             'foo' => $fieldsetA = $this->createfieldset('foo'),
             'bar' => $fieldsetB = $this->createFieldset('bar'),
-        ]));
-
-        $user = Facades\User::make()->makeSuper()->save();
-
-        $response = $this
-            ->actingAs($user)
-            ->get(cp_route('fieldsets.index'))
-            ->assertSuccessful()
-            ->assertViewHas('fieldsets', collect(['My Fieldsets' => collect([
-                [
-                    'id' => 'foo',
-                    'handle' => 'foo',
-                    'title' => 'Foo',
-                    'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
-                    'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
-                    'is_deletable' => true,
-                ],
-                [
-                    'id' => 'bar',
-                    'handle' => 'bar',
-                    'title' => 'Bar',
-                    'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/fieldsets/bar/edit',
-                    'delete_url' => 'http://localhost/cp/fields/fieldsets/bar',
-                    'is_deletable' => true,
-                ],
-            ])]))
-            ->assertDontSee('no-results');
-    }
-
-    /** @test */
-    public function it_shows_a_list_of_editable_addon_fieldsets()
-    {
-        Facades\Fieldset::shouldReceive('all')->andReturn(collect([
-            'foo' => $fieldsetA = $this->createfieldset('foo'),
-            'baz::bar' => $fieldsetB = $this->createFieldset('baz::bar'),
-        ]));
-
-        $user = Facades\User::make()->makeSuper()->save();
-
-        $response = $this
-            ->actingAs($user)
-            ->get(cp_route('fieldsets.index'))
-            ->assertSuccessful()
-            ->assertViewHas('fieldsets', collect(
-                [
-                    'My Fieldsets' => collect([
-                        [
-                            'id' => 'foo',
-                            'handle' => 'foo',
-                            'title' => 'Foo',
-                            'fields' => 0,
-                            'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
-                            'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
-                            'is_deletable' => true,
-                        ],
-                    ]),
-                ],
-                [
-                    'Baz' => collect([
-                        [
-                            'id' => 'baz::bar',
-                            'handle' => 'baz::bar',
-                            'title' => 'Baz::bar',
-                            'fields' => 0,
-                            'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
-                            'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
-                            'is_deletable' => false,
-                        ],
-                    ]),
-                ]
-            ));
-    }
-
-    /** @test */
-    public function it_doesnt_show_non_editable_addon_fieldsets()
-    {
-        $fieldsetA = $this->createfieldset('foo::baz')->setContents(['editable' => false]);
-
-        Facades\Fieldset::shouldReceive('all')->andReturn(collect([
-            'foo::baz' => $fieldsetA,
-            'baz::bar' => $fieldsetB = $this->createFieldset('baz::bar'),
+            'baz::foo' => $this->createFieldset('baz::foo'),
+            'baz::bar' => $this->createFieldset('baz::bar'),
+            'baz::baz' => $this->createFieldset('baz::baz')->setContents(['editable' => false]),
         ]));
 
         $user = Facades\User::make()->makeSuper()->save();
@@ -111,15 +31,48 @@ class ViewFieldsetListingTest extends TestCase
             ->get(cp_route('fieldsets.index'))
             ->assertSuccessful()
             ->assertViewHas('fieldsets', collect([
-                [
-                    'id' => 'baz::bar',
-                    'handle' => 'baz::bar',
-                    'title' => 'Baz::bar',
-                    'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
-                    'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
-                ],
-            ]));
+                'My Fieldsets' => collect([
+                    [
+                        'id' => 'foo',
+                        'handle' => 'foo',
+                        'title' => 'Foo',
+                        'fields' => 0,
+                        'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
+                        'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
+                        'is_deletable' => true,
+                    ],
+                    [
+                        'id' => 'bar',
+                        'handle' => 'bar',
+                        'title' => 'Bar',
+                        'fields' => 0,
+                        'edit_url' => 'http://localhost/cp/fields/fieldsets/bar/edit',
+                        'delete_url' => 'http://localhost/cp/fields/fieldsets/bar',
+                        'is_deletable' => true,
+                    ],
+                ]),
+                'Baz' => collect([
+                    [
+                        'id' => 'baz::foo',
+                        'handle' => 'baz::foo',
+                        'title' => 'Foo',
+                        'fields' => 0,
+                        'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::foo/edit',
+                        'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::foo',
+                        'is_deletable' => false,
+                    ],
+                    [
+                        'id' => 'baz::bar',
+                        'handle' => 'baz::bar',
+                        'title' => 'Bar',
+                        'fields' => 0,
+                        'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
+                        'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
+                        'is_deletable' => false,
+                    ],
+                ]),
+            ]))
+            ->assertDontSee('no-results');
     }
 
     /** @test */
