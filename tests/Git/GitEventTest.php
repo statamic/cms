@@ -392,7 +392,57 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
-    public function it_commits_when_asset_references_are_updated()
+    public function it_commits_once_when_term_references_are_updated()
+    {
+        Event::fake([
+            Events\TaxonomySaved::class,
+            Events\CollectionSaved::class,
+            Events\BlueprintSaved::class,
+        ]);
+
+        $taxonomy = tap(Facades\Taxonomy::make('topics'))->save();
+
+        $term = tap(Facades\Term::make('leia')->taxonomy($taxonomy)->inDefaultLocale()->data([]))->saveQuietly();
+
+        $collection = tap(Facades\Collection::make('pages'))->save();
+
+        $blueprint = Facades\Blueprint::make('article')
+            ->setNamespace('collections.pages')
+            ->setContents([
+                'fields' => [
+                    [
+                        'handle' => 'topic',
+                        'field' => [
+                            'type' => 'terms',
+                            'taxonomies' => [$taxonomy->handle()],
+                            'max_items' => 1,
+                        ],
+                    ],
+                ],
+            ])
+            ->save();
+
+        foreach (range(1, 3) as $i) {
+            Facades\Entry::make()
+                ->collection($collection)
+                ->blueprint($blueprint->handle())
+                ->locale(Facades\Site::default()->handle())
+                ->data([
+                    'title' => $i,
+                    'topic' => 'leia',
+                ])
+                ->saveQuietly();
+        }
+
+        Git::shouldReceive('dispatchCommit')->with('Term saved')->once(); // Account for the save call below for the renaming of our file
+        Git::shouldReceive('dispatchCommit')->with('Term references updated')->once(); // Ensure new references updated event gets fired
+        Git::shouldReceive('dispatchCommit')->with('Entry saved')->never(); // Ensure individual entry saved events do not get fired
+
+        $term->slug('leia-updated')->save();
+    }
+
+    /** @test */
+    public function it_commits_once_when_asset_references_are_updated()
     {
         Event::fake([
             Events\CollectionSaved::class,
@@ -435,7 +485,7 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Asset references updated')->once(); // Ensure new references updated event gets fired
         Git::shouldReceive('dispatchCommit')->with('Entry saved')->never(); // Ensure individual entry saved events do not get fired
 
-        $asset->path('leia-new.jpg')->save();
+        $asset->path('leia-updated.jpg')->save();
     }
 
     private function makeAsset($path = 'asset.txt')
