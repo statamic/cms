@@ -7,6 +7,7 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
@@ -173,4 +174,29 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull($invalidator->invalidate($set));
     }
+
+     /** @test */
+     public function form_urls_can_be_invalidated()
+     {
+         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+             $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+         });
+ 
+         $form = tap(Mockery::mock(Form::class), function ($m) {
+             $m->shouldReceive('handle')->andReturn('newsletter');
+         });
+ 
+         $invalidator = new Invalidator($cacher, [
+             'forms' => [
+                 'newsletter' => [
+                     'urls' => [
+                         '/one',
+                         '/two',
+                     ],
+                 ],
+             ],
+         ]);
+ 
+         $this->assertNull($invalidator->invalidate($form));
+     }
 }
