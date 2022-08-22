@@ -11,8 +11,8 @@ class Toggle extends FieldtypeFilter
                 'type' => 'select',
                 'placeholder' => __('Select Value'),
                 'options' => [
-                    'true' => __('True'),
-                    'false' => __('False'),
+                    'true' => __('Is true'),
+                    'false' => __('Is false'),
                 ],
             ],
         ];
