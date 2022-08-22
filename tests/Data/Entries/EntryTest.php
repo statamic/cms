@@ -906,6 +906,19 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_can_set_a_blueprint_using_an_instance()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        Collection::make('blog')->save();
+        $entry = (new Entry)->collection('blog')->blueprint($second);
+
+        $this->assertSame($second, $entry->blueprint());
+    }
+
+    /** @test */
     public function it_gets_the_blueprint_when_defined_in_a_value()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
