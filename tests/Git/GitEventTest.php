@@ -434,7 +434,7 @@ class GitEventTest extends TestCase
                 ->saveQuietly();
         }
 
-        Git::shouldReceive('dispatchCommit')->with('Term saved')->once(); // Account for the save call below for the renaming of our file
+        Git::shouldReceive('dispatchCommit')->with('Term saved')->once(); // Account for the save call below for the renaming of our term
         Git::shouldReceive('dispatchCommit')->with('Term references updated')->once(); // Ensure new references updated event gets fired
         Git::shouldReceive('dispatchCommit')->with('Entry saved')->never(); // Ensure individual entry saved events do not get fired
 
