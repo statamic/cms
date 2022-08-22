@@ -25,6 +25,12 @@ class AddViewPaths
 
         $finder->setPaths($paths);
 
+        foreach ($finder->getHints() as $namespace => $paths) {
+            foreach ($paths as $path) {
+                $finder->prependNamespace($namespace, $path.'/'.$site);
+            }
+        }
+
         return $next($request);
     }
 }
