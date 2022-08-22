@@ -62,7 +62,9 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require "mockery/mockery >=1.3.3" --no-interaction --no-update
+          command: |
+            composer require "mockery/mockery >=1.3.3" --no-interaction --no-update
+            composer require "phpunit/phpunit >=8.5.23" --no-interaction --no-update
         if: matrix.php >= 8.0
 
       - name: Set PHP 8.1 Testbench
