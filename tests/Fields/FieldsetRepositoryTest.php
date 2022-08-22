@@ -134,6 +134,7 @@ EOT;
             '/path/to/resources/fieldsets/first.yaml',
             '/path/to/resources/fieldsets/second.yaml',
             '/path/to/resources/fieldsets/sub/third.yaml',
+            '/path/to/resources/fieldsets/vendor/foo/bar/first.yaml',
         ]));
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/first.yaml')->once()->andReturn($firstContents);
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/second.yaml')->once()->andReturn($secondContents);
@@ -227,5 +228,8 @@ EOT;
         $this->assertInstanceOf(Fieldset::class, $fieldset);
         $this->assertEquals('Overridden Fieldset', $fieldset->title());
         $this->assertEquals('foo::bar.baz.test', $fieldset->handle());
+
+        $this->assertNull($this->repo->find('vendor.foo.bar.baz.test'));
+        $this->assertFalse($this->repo->exists('vendor.foo.bar.baz.test'));
     }
 }

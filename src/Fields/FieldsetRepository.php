@@ -56,12 +56,20 @@ class FieldsetRepository
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
+        if (Str::startsWith($handle, 'vendor.')) {
+            return null;
+        }
+
         return "{$this->directory}/{$path}.yaml";
     }
 
     private function findStandardFieldsetPath(string $handle)
     {
-        if (File::exists($path = $this->standardFieldsetPath($handle))) {
+        if (! $path = $this->standardFieldsetPath($handle)) {
+            return null;
+        }
+
+        if (File::exists($path)) {
             return $path;
         }
     }
@@ -163,6 +171,7 @@ class FieldsetRepository
     {
         return File::withAbsolutePaths()
             ->getFilesByTypeRecursively($directory, 'yaml')
+            ->reject(fn ($path) => Str::startsWith($path, $directory.'/vendor/'))
             ->map(function ($file) use ($directory, $key) {
                 $basename = str_after($file, str_finish($directory, '/'));
                 $handle = str_before($basename, '.yaml');
