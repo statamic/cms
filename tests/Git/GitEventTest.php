@@ -2,6 +2,7 @@
 
 namespace Tests\Git;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -446,7 +447,6 @@ class GitEventTest extends TestCase
     {
         Event::fake([
             Events\CollectionSaved::class,
-            Events\BlueprintSaved::class,
         ]);
 
         $asset = tap($this->makeAsset('leia.jpg'))->saveQuietly();
@@ -466,8 +466,11 @@ class GitEventTest extends TestCase
                         ],
                     ],
                 ],
-            ])
-            ->save();
+            ]);
+
+        BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect([
+            'pages' => $blueprint,
+        ]));
 
         foreach (range(1, 3) as $i) {
             Facades\Entry::make()
