@@ -398,10 +398,13 @@ class GitEventTest extends TestCase
         Event::fake([
             Events\TaxonomySaved::class,
             Events\CollectionSaved::class,
-            Events\BlueprintSaved::class,
         ]);
 
         $taxonomy = tap(Facades\Taxonomy::make('topics'))->save();
+        $taxonomyBlueprint = Facades\Blueprint::make('default');
+
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/topics')->andReturn(collect([$taxonomyBlueprint]));
+        BlueprintRepository::makePartial();
 
         $term = tap(Facades\Term::make('leia')->taxonomy($taxonomy)->inDefaultLocale()->data([]))->saveQuietly();
 
@@ -420,8 +423,9 @@ class GitEventTest extends TestCase
                         ],
                     ],
                 ],
-            ])
-            ->save();
+            ]);
+
+        BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
 
         foreach (range(1, 3) as $i) {
             Facades\Entry::make()
@@ -468,9 +472,7 @@ class GitEventTest extends TestCase
                 ],
             ]);
 
-        BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect([
-            'pages' => $blueprint,
-        ]));
+        BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
 
         foreach (range(1, 3) as $i) {
             Facades\Entry::make()
