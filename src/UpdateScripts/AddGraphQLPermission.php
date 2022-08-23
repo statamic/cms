@@ -23,7 +23,7 @@ class AddGraphQLPermission extends UpdateScript
 
     private function updateRole($role)
     {
-        $role->addPermission("view graphql");
+        $role->addPermission('view graphql');
         $role->save();
     }
 }
