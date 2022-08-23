@@ -66,9 +66,9 @@
                     </slot>
                 </td>
                 <td class="type-column" v-if="showType">
-                    <span v-if="row.is_entry || row.is_term" class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
-                        <template v-if="row.is_entry">{{ row.collection.title }}</template>
-                        <template v-if="row.is_term">{{ row.taxonomy.title }}</template>
+                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
+                        <template v-if="type === 'entries'">{{ row.collection.title }}</template>
+                        <template v-if="type === 'terms'">{{ row.taxonomy.title }}</template>
                     </span>
                 </td>
                 <td class="actions-column">

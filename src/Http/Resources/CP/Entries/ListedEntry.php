@@ -42,7 +42,6 @@ class ListedEntry extends JsonResource
 
             'permalink' => $entry->absoluteUrl(),
             'edit_url' => $entry->editUrl(),
-            'is_entry' => true,
             'collection' => $entry->collection()->toArray(),
             'viewable' => User::current()->can('view', $entry),
             'editable' => User::current()->can('edit', $entry),
