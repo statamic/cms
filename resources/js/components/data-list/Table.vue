@@ -21,7 +21,10 @@
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
                     </svg>
                 </th>
-                <th class="type-column" v-if="showType"></th>
+                <th class="type-column" v-if="showType">
+                    <template v-if="type === 'entries'">{{ __('Collection') }}</template>
+                    <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
+                </th>
                 <th class="actions-column">
                     <data-list-column-picker :preferences-key="columnPreferencesKey" v-if="allowColumnPicker" />
                 </th>
@@ -127,6 +130,9 @@ export default {
         },
         columnPreferencesKey: {
             type: String,
+        },
+        type: {
+            type: String
         },
         showType: {
             type: Boolean,
