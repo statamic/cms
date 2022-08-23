@@ -86,4 +86,5 @@ return [
     'resolve_duplicate_ids' => 'Resolve Duplicate IDs',
     'resolve_duplicate_ids_desc' => 'Grants ability to see and resolve duplicate IDs.',
 
+    'view_graphql' => 'View GraphQL',
 ];
