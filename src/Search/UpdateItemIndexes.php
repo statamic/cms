@@ -30,8 +30,16 @@ class UpdateItemIndexes
     {
         $item = $event->entry ?? $event->asset ?? $event->user ?? $event->term;
 
-        $this->indexes($item)->each(function ($index) use ($item) {
-            $index->exists() ? $index->insert($item) : $index->update();
+        $this->indexes($item)->each(function (Index $index) use ($item) {
+            if ($index->exists()) {
+                if ($index->filter($item)) {
+                    $index->insert($item);
+                } else {
+                    $index->delete($item);
+                }
+            } elseif ($index->filter($item)) {
+                $index->update();
+            }
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Closure;
 use Statamic\Support\Arr;
 
 abstract class Index
@@ -87,5 +88,15 @@ abstract class Index
     public function searchables()
     {
         return new Searchables($this);
+    }
+
+    public function filter($searchable)
+    {
+        if (isset($this->config()['filter'])
+            && $this->config()['filter'] instanceof Closure) {
+            return $this->config()['filter']($searchable);
+        }
+
+        return true;
     }
 }
