@@ -597,7 +597,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         if ($preserveOriginalFilename) {
-            $this->path($originalAsset->path())->save();
+            $this->rename($originalAsset->filename());
         }
 
         // Event listener will automatically handle updating of asset references where necessary, if enabled
