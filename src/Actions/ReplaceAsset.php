@@ -42,16 +42,16 @@ class ReplaceAsset extends Action
     public function run($assets, $values)
     {
         $originalAsset = $assets->first();
-        $newAsset = Facades\Asset::find($values['asset'][0]);
+        $newAsset = Facades\Asset::find($values['new_asset'][0]);
 
-        $originalAsset->replace($newAsset, $values['delete_original']);
+        $newAsset->replace($originalAsset, $values['delete_original'], $values['preserve_filename']);
     }
 
     protected function fieldItems()
     {
         return [
-            'asset' => [
-                'display' => __('Asset'),
+            'new_asset' => [
+                'display' => __('New Asset'),
                 'type' => 'assets',
                 'container' => $this->context['container'],
                 'folder' => $this->context['folder'],
@@ -66,6 +66,15 @@ class ReplaceAsset extends Action
                 'display' => __('Delete Original Asset'),
                 'type' => 'toggle',
                 'default' => true,
+            ],
+            'preserve_filename' => [
+                'display' => __('Preserve Original Filename'),
+                'type' => 'toggle',
+                'default' => false,
+                'instructions' => __('You may encounter browser or server-level caching issues when preserving filenames.'),
+                'if' => [
+                    'delete_original' => true,
+                ],
             ],
         ];
     }
