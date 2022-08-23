@@ -144,7 +144,10 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_entry_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Collection saved')->once();
+        Config::set('statamic.git.ignored_events', [
+            Events\CollectionSaved::class,
+        ]);
+
         Git::shouldReceive('dispatchCommit')->with('Entry saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Entry deleted')->once();
 
@@ -162,9 +165,12 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_tracked_revisions_are_saved_and_deleted()
     {
+        Config::set('statamic.git.ignored_events', [
+            Events\CollectionSaved::class,
+        ]);
+
         Config::set('statamic.revisions.path', base_path('content/revisions'));
 
-        Git::shouldReceive('dispatchCommit')->with('Collection saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Revision saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Revision deleted')->once();
 
@@ -207,7 +213,10 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_a_collection_tree_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Collection saved')->once();
+        Config::set('statamic.git.ignored_events', [
+            Events\CollectionSaved::class,
+        ]);
+
         Git::shouldReceive('dispatchCommit')->with('Collection tree saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Collection tree deleted')->once();
 
@@ -233,7 +242,10 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_term_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Taxonomy saved')->once();
+        Config::set('statamic.git.ignored_events', [
+            Events\TaxonomySaved::class,
+        ]);
+
         Git::shouldReceive('dispatchCommit')->with('Term saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Term deleted')->once();
 
@@ -277,7 +289,10 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_form_submission_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Form saved')->once();
+        Config::set('statamic.git.ignored_events', [
+            Events\FormSaved::class,
+        ]);
+
         Git::shouldReceive('dispatchCommit')->with('Submission saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Submission deleted')->once();
 
@@ -395,9 +410,11 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_once_when_term_references_are_updated()
     {
-        Event::fake([
+        Config::set('statamic.git.ignored_events', [
             Events\TaxonomySaved::class,
             Events\CollectionSaved::class,
+            Events\TermSaved::class,
+            Events\EntrySaved::class,
         ]);
 
         $taxonomy = tap(Facades\Taxonomy::make('topics'))->save();
@@ -406,7 +423,7 @@ class GitEventTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('taxonomies/topics')->andReturn(collect([$taxonomyBlueprint]));
         BlueprintRepository::makePartial();
 
-        $term = tap(Facades\Term::make('leia')->taxonomy($taxonomy)->inDefaultLocale()->data([]))->saveQuietly();
+        $term = tap(Facades\Term::make('leia')->taxonomy($taxonomy)->inDefaultLocale()->data([]))->save();
 
         $collection = tap(Facades\Collection::make('pages'))->save();
 
@@ -436,11 +453,14 @@ class GitEventTest extends TestCase
                     'title' => $i,
                     'topic' => 'leia',
                 ])
-                ->saveQuietly();
+                ->save();
         }
 
-        Git::shouldReceive('dispatchCommit')->with('Term saved')->once(); // Account for the save call below for the renaming of our term
-        Git::shouldReceive('dispatchCommit')->with('Term references updated')->once(); // Ensure new references updated event gets fired
+        Config::set('statamic.git.ignored_events', [
+            Events\TermSaved::class,
+        ]);
+
+        Git::shouldReceive('dispatchCommit')->with('Term references updated')->once(); // Ensure references updated event gets fired
         Git::shouldReceive('dispatchCommit')->with('Entry saved')->never(); // Ensure individual entry saved events do not get fired
 
         $term->slug('leia-updated')->save();
@@ -449,11 +469,13 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_once_when_asset_references_are_updated()
     {
-        Event::fake([
+        Config::set('statamic.git.ignored_events', [
             Events\CollectionSaved::class,
+            Events\AssetSaved::class,
+            Events\EntrySaved::class,
         ]);
 
-        $asset = tap($this->makeAsset('leia.jpg'))->saveQuietly();
+        $asset = tap($this->makeAsset('leia.jpg'))->save();
 
         $collection = tap(Facades\Collection::make('pages'))->save();
 
@@ -483,11 +505,14 @@ class GitEventTest extends TestCase
                     'title' => $i,
                     'avatar' => 'leia.jpg',
                 ])
-                ->saveQuietly();
+                ->save();
         }
 
-        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once(); // Account for the save call below for the renaming of our file
-        Git::shouldReceive('dispatchCommit')->with('Asset references updated')->once(); // Ensure new references updated event gets fired
+        Config::set('statamic.git.ignored_events', [
+            Events\AssetSaved::class,
+        ]);
+
+        Git::shouldReceive('dispatchCommit')->with('Asset references updated')->once(); // Ensure references updated event gets fired
         Git::shouldReceive('dispatchCommit')->with('Entry saved')->never(); // Ensure individual entry saved events do not get fired
 
         $asset->path('leia-updated.jpg')->save();
