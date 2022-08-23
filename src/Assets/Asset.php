@@ -590,7 +590,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      * @param  bool  $deleteOriginal
      * @param  bool  $preserveOriginalFilename
      */
-    public function replace(Asset $originalAsset, $deleteOriginal = true, $preserveOriginalFilename = false)
+    public function replace(Asset $originalAsset, $deleteOriginal = false, $preserveOriginalFilename = false)
     {
         if ($deleteOriginal) {
             $originalAsset->delete();
