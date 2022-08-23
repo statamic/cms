@@ -18,6 +18,7 @@ use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
@@ -580,6 +581,21 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $this->save();
 
         return $this;
+    }
+
+    /**
+     * Replace an asset.
+     *
+     * @param  Asset  $newAsset
+     * @param  bool  $deleteOriginal
+     */
+    public function replace(Asset $originalAsset, $deleteOriginal = false)
+    {
+        if ($deleteOriginal) {
+            $originalAsset->delete();
+        }
+
+        AssetReplaced::dispatch($originalAsset, $this); // Listener will handle updating of asset references, if enabled
     }
 
     /**

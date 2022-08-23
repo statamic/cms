@@ -3,7 +3,6 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\Asset;
-use Statamic\Events\AssetReplaced;
 use Statamic\Facades;
 
 class ReplaceAsset extends Action
@@ -45,11 +44,7 @@ class ReplaceAsset extends Action
         $originalAsset = $assets->first();
         $newAsset = Facades\Asset::find($values['asset'][0]);
 
-        if ($values['delete_original']) {
-            $originalAsset->delete();
-        }
-
-        AssetReplaced::dispatch($originalAsset, $newAsset);
+        $originalAsset->replace($newAsset, $values['delete_original']);
     }
 
     protected function fieldItems()
