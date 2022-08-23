@@ -430,7 +430,7 @@ class GitEventTest extends TestCase
         foreach (range(1, 3) as $i) {
             Facades\Entry::make()
                 ->collection($collection)
-                ->blueprint($blueprint->handle())
+                ->blueprint($blueprint)
                 ->locale(Facades\Site::default()->handle())
                 ->data([
                     'title' => $i,
@@ -477,7 +477,7 @@ class GitEventTest extends TestCase
         foreach (range(1, 3) as $i) {
             Facades\Entry::make()
                 ->collection($collection)
-                ->blueprint($blueprint->handle())
+                ->blueprint($blueprint)
                 ->locale(Facades\Site::default()->handle())
                 ->data([
                     'title' => $i,
