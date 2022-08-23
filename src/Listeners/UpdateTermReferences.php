@@ -35,12 +35,10 @@ class UpdateTermReferences implements ShouldQueue
     public function handleSaved(TermSaved $event)
     {
         $term = $event->term;
-
-        $taxonomy = $term->taxonomy()->handle();
         $originalSlug = $term->getOriginal('slug');
         $newSlug = $term->slug();
 
-        $this->replaceReferences($taxonomy, $originalSlug, $newSlug);
+        $this->replaceReferences($term, $originalSlug, $newSlug);
     }
 
     /**
@@ -51,26 +49,26 @@ class UpdateTermReferences implements ShouldQueue
     public function handleDeleted(TermDeleted $event)
     {
         $term = $event->term;
-
-        $taxonomy = $term->taxonomy()->handle();
         $originalSlug = $term->getOriginal('slug');
         $newSlug = null;
 
-        $this->replaceReferences($taxonomy, $originalSlug, $newSlug);
+        $this->replaceReferences($term, $originalSlug, $newSlug);
     }
 
     /**
      * Replace term references.
      *
-     * @param  string  $taxonomy
+     * @param  \Statamic\Taxonomies\Term  $term
      * @param  string  $originalSlug
      * @param  string  $newSlug
      */
-    protected function replaceReferences($taxonomy, $originalSlug, $newSlug)
+    protected function replaceReferences($term, $originalSlug, $newSlug)
     {
         if (! $originalSlug || $originalSlug === $newSlug) {
             return;
         }
+
+        $taxonomy = $term->taxonomy()->handle();
 
         $updatedItems = $this
             ->getItemsContainingData()

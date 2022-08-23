@@ -35,12 +35,10 @@ class UpdateAssetReferences implements ShouldQueue
     public function handleSaved(AssetSaved $event)
     {
         $asset = $event->asset;
-
-        $container = $asset->container()->handle();
         $originalPath = $asset->getOriginal('path');
         $newPath = $asset->path();
 
-        $this->replaceReferences($container, $originalPath, $newPath);
+        $this->replaceReferences($asset, $originalPath, $newPath);
     }
 
     /**
@@ -51,26 +49,26 @@ class UpdateAssetReferences implements ShouldQueue
     public function handleDeleted(AssetDeleted $event)
     {
         $asset = $event->asset;
-
-        $container = $asset->container()->handle();
         $originalPath = $asset->getOriginal('path');
         $newPath = null;
 
-        $this->replaceReferences($container, $originalPath, $newPath);
+        $this->replaceReferences($asset, $originalPath, $newPath);
     }
 
     /**
      * Replace asset references.
      *
-     * @param  string  $container
+     * @param  \Statamic\Assets\Asset  $asset
      * @param  string  $originalPath
      * @param  string  $newPath
      */
-    protected function replaceReferences($container, $originalPath, $newPath)
+    protected function replaceReferences($asset, $originalPath, $newPath)
     {
         if (! $originalPath || $originalPath === $newPath) {
             return;
         }
+
+        $container = $asset->container()->handle();
 
         $updatedItems = $this
             ->getItemsContainingData()
