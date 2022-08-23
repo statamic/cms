@@ -584,18 +584,24 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
-     * Replace an asset.
+     * Replace an asset and/or its references where necessary.
      *
-     * @param  Asset  $newAsset
+     * @param  Asset  $originalAsset
      * @param  bool  $deleteOriginal
+     * @param  bool  $preserveOriginalFilename
      */
-    public function replace(Asset $originalAsset, $deleteOriginal = false)
+    public function replace(Asset $originalAsset, $deleteOriginal = true, $preserveOriginalFilename = false)
     {
         if ($deleteOriginal) {
             $originalAsset->delete();
         }
 
-        AssetReplaced::dispatch($originalAsset, $this); // Listener will handle updating of asset references, if enabled
+        if ($preserveOriginalFilename) {
+            $this->path($originalAsset->path())->save();
+        }
+
+        // Event listener will automatically handle updating of asset references where necessary, if enabled
+        AssetReplaced::dispatch($originalAsset, $this);
     }
 
     /**
