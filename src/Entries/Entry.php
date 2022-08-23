@@ -136,7 +136,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
 
-                return $blueprint;
+                return $blueprint instanceof \Statamic\Fields\Blueprint ? $blueprint->handle() : $blueprint;
             })
             ->args(func_get_args());
     }

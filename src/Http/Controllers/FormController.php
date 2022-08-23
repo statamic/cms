@@ -66,9 +66,13 @@ class FormController extends Controller
 
         if ($form->store()) {
             $submission->save();
+        } else {
+            // When the submission is saved, this same created event will be dispatched.
+            // We'll also fire it here if submissions are not configured to be stored
+            // so that developers may continue to listen and modify it as needed.
+            SubmissionCreated::dispatch($submission);
         }
 
-        SubmissionCreated::dispatch($submission);
         SendEmails::dispatch($submission, $site);
 
         return $this->formSuccess($params, $submission);

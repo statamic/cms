@@ -58,7 +58,7 @@ return [
     'collections_taxonomies_instructions' => 'Connect entries in this collection to taxonomies. Fields will be automatically added to publish forms.',
     'email_utility_configuration_description' => 'Mail settings are configured in <code>:path</code>',
     'email_utility_description' => 'Check email configuration settings and send test emails.',
-    'expect_root_instructions' => 'Considered the first page in the tree a "root" or "home" page.',
+    'expect_root_instructions' => 'Consider the first page in the tree a "root" or "home" page.',
     'field_conditions_instructions' => 'When to show or hide this field.',
     'field_desynced_from_origin' => 'Desynced from origin. Click to sync and revert to the origin\'s value.',
     'field_synced_with_origin' => 'Synced with origin. Click or edit the field to desync.',

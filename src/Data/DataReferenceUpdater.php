@@ -182,7 +182,7 @@ abstract class DataReferenceUpdater
      *
      * @return mixed
      */
-    public function originalValue()
+    protected function originalValue()
     {
         return $this->originalValue;
     }
@@ -192,9 +192,19 @@ abstract class DataReferenceUpdater
      *
      * @return mixed
      */
-    public function newValue()
+    protected function newValue()
     {
         return $this->newValue;
+    }
+
+    /**
+     * Check if value is being removed.
+     *
+     * @return bool
+     */
+    public function isRemovingValue()
+    {
+        return is_null($this->newValue);
     }
 
     /**
@@ -213,7 +223,11 @@ abstract class DataReferenceUpdater
             return;
         }
 
-        Arr::set($data, $dottedKey, $this->newValue());
+        if ($this->isRemovingValue()) {
+            Arr::forget($data, $dottedKey);
+        } else {
+            Arr::set($data, $dottedKey, $this->newValue());
+        }
 
         $this->item->data($data);
 
@@ -238,11 +252,24 @@ abstract class DataReferenceUpdater
             return;
         }
 
-        $fieldData->transform(function ($value) {
-            return $value === $this->originalValue() ? $this->newValue() : $value;
-        });
+        $fieldData = $fieldData
+            ->map(function ($value) {
+                if ($value === $this->originalValue() && $this->isRemovingValue()) {
+                    return null;
+                } elseif ($value === $this->originalValue()) {
+                    return $this->newValue();
+                } else {
+                    return $value;
+                }
+            })
+            ->filter()
+            ->values();
 
-        Arr::set($data, $dottedKey, $fieldData->all());
+        if ($fieldData->isEmpty()) {
+            Arr::forget($data, $dottedKey);
+        } else {
+            Arr::set($data, $dottedKey, $fieldData->all());
+        }
 
         $this->item->data($data);
 

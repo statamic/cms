@@ -4,6 +4,7 @@ namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Assets\AssetReferenceUpdater;
+use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Events\AssetSaved;
 
@@ -18,15 +19,20 @@ class UpdateAssetReferences implements ShouldQueue
      */
     public function subscribe($events)
     {
-        $events->listen(AssetSaved::class, self::class.'@handle');
+        if (config('statamic.system.update_references') === false) {
+            return;
+        }
+
+        $events->listen(AssetSaved::class, self::class.'@handleSaved');
+        $events->listen(AssetDeleted::class, self::class.'@handleDeleted');
     }
 
     /**
-     * Handle the events.
+     * Handle the asset saved event.
      *
      * @param  AssetSaved  $event
      */
-    public function handle(AssetSaved $event)
+    public function handleSaved(AssetSaved $event)
     {
         $asset = $event->asset;
 
@@ -34,6 +40,34 @@ class UpdateAssetReferences implements ShouldQueue
         $originalPath = $asset->getOriginal('path');
         $newPath = $asset->path();
 
+        $this->replaceReferences($container, $originalPath, $newPath);
+    }
+
+    /**
+     * Handle the asset deleted event.
+     *
+     * @param  AssetDeleted  $event
+     */
+    public function handleDeleted(AssetDeleted $event)
+    {
+        $asset = $event->asset;
+
+        $container = $asset->container()->handle();
+        $originalPath = $asset->getOriginal('path');
+        $newPath = null;
+
+        $this->replaceReferences($container, $originalPath, $newPath);
+    }
+
+    /**
+     * Replace asset references.
+     *
+     * @param  string  $container
+     * @param  string  $originalPath
+     * @param  string  $newPath
+     */
+    protected function replaceReferences($container, $originalPath, $newPath)
+    {
         if (! $originalPath || $originalPath === $newPath) {
             return;
         }
