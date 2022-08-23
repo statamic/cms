@@ -365,6 +365,36 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
+    public function it_only_commits_new_asset_when_replacing()
+    {
+        $originalAsset = tap($this->makeAsset())->saveQuietly();
+
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
+
+        $newAsset = $this->makeAsset()->upload(
+            UploadedFile::fake()->create('asset.txt')
+        );
+
+        $newAsset->replace($originalAsset);
+    }
+
+    /** @test */
+    public function it_commits_when_replaced_asset_is_deleted()
+    {
+        $originalAsset = tap($this->makeAsset())->saveQuietly();
+
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
+
+        $newAsset = $this->makeAsset()->upload(
+            UploadedFile::fake()->create('asset.txt')
+        );
+
+        Git::shouldReceive('dispatchCommit')->with('Asset deleted')->once();
+
+        $newAsset->replace($originalAsset, true);
+    }
+
+    /** @test */
     public function it_commits_when_asset_is_saved()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
@@ -475,7 +505,8 @@ class GitEventTest extends TestCase
             Events\EntrySaved::class,
         ]);
 
-        $asset = tap($this->makeAsset('leia.jpg'))->save();
+        $originalAsset = tap($this->makeAsset('leia.jpg'))->save();
+        $newAsset = tap($this->makeAsset('leia-2.jpg'))->save();
 
         $collection = tap(Facades\Collection::make('pages'))->save();
 
@@ -487,7 +518,7 @@ class GitEventTest extends TestCase
                         'handle' => 'avatar',
                         'field' => [
                             'type' => 'assets',
-                            'container' => $asset->container()->handle(),
+                            'container' => $originalAsset->container()->handle(),
                             'max_files' => 1,
                         ],
                     ],
@@ -508,14 +539,10 @@ class GitEventTest extends TestCase
                 ->save();
         }
 
-        Config::set('statamic.git.ignored_events', [
-            Events\AssetSaved::class,
-        ]);
-
         Git::shouldReceive('dispatchCommit')->with('Asset references updated')->once(); // Ensure references updated event gets fired
         Git::shouldReceive('dispatchCommit')->with('Entry saved')->never(); // Ensure individual entry saved events do not get fired
 
-        $asset->path('leia-updated.jpg')->save();
+        $newAsset->replace($originalAsset);
     }
 
     private function makeAsset($path = 'asset.txt')
