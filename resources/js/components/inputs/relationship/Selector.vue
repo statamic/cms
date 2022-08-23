@@ -42,7 +42,6 @@
                                 :allow-bulk-actions="true"
                                 :toggle-selection-on-row-click="true"
                                 :type="type"
-                                :show-type="true"
                                 @sorted="sorted"
                                 class="cursor-pointer"
                             >
