@@ -79,11 +79,6 @@ class Fieldset
         return $this->fields()->get($handle);
     }
 
-    public function isEditable(): bool
-    {
-        return Arr::get($this->contents, 'editable') !== false;
-    }
-
     public function isExternal(): bool
     {
         return Str::contains($this->handle(), '::');

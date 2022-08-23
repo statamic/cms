@@ -21,7 +21,6 @@ class ViewFieldsetListingTest extends TestCase
             'bar' => $fieldsetB = $this->createFieldset('bar'),
             'baz::foo' => $this->createFieldset('baz::foo'),
             'baz::bar' => $this->createFieldset('baz::bar'),
-            'baz::baz' => $this->createFieldset('baz::baz')->setContents(['editable' => false]),
         ]));
 
         $user = Facades\User::make()->makeSuper()->save();
