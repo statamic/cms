@@ -4,6 +4,7 @@ namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Events\TermDeleted;
+use Statamic\Events\TermReferencesUpdated;
 use Statamic\Events\TermSaved;
 use Statamic\Taxonomies\TermReferenceUpdater;
 
@@ -34,12 +35,10 @@ class UpdateTermReferences implements ShouldQueue
     public function handleSaved(TermSaved $event)
     {
         $term = $event->term;
-
-        $taxonomy = $term->taxonomy()->handle();
         $originalSlug = $term->getOriginal('slug');
         $newSlug = $term->slug();
 
-        $this->replaceReferences($taxonomy, $originalSlug, $newSlug);
+        $this->replaceReferences($term, $originalSlug, $newSlug);
     }
 
     /**
@@ -50,31 +49,38 @@ class UpdateTermReferences implements ShouldQueue
     public function handleDeleted(TermDeleted $event)
     {
         $term = $event->term;
-
-        $taxonomy = $term->taxonomy()->handle();
         $originalSlug = $term->getOriginal('slug');
         $newSlug = null;
 
-        $this->replaceReferences($taxonomy, $originalSlug, $newSlug);
+        $this->replaceReferences($term, $originalSlug, $newSlug);
     }
 
     /**
      * Replace term references.
      *
-     * @param  string  $taxonomy
+     * @param  \Statamic\Taxonomies\Term  $term
      * @param  string  $originalSlug
      * @param  string  $newSlug
      */
-    protected function replaceReferences($taxonomy, $originalSlug, $newSlug)
+    protected function replaceReferences($term, $originalSlug, $newSlug)
     {
         if (! $originalSlug || $originalSlug === $newSlug) {
             return;
         }
 
-        $this->getItemsContainingData()->each(function ($item) use ($taxonomy, $originalSlug, $newSlug) {
-            TermReferenceUpdater::item($item)
-                ->filterByTaxonomy($taxonomy)
-                ->updateReferences($originalSlug, $newSlug);
-        });
+        $taxonomy = $term->taxonomy()->handle();
+
+        $updatedItems = $this
+            ->getItemsContainingData()
+            ->map(function ($item) use ($taxonomy, $originalSlug, $newSlug) {
+                return TermReferenceUpdater::item($item)
+                    ->filterByTaxonomy($taxonomy)
+                    ->updateReferences($originalSlug, $newSlug);
+            })
+            ->filter();
+
+        if ($updatedItems->isNotEmpty()) {
+            TermReferencesUpdated::dispatch($term);
+        }
     }
 }

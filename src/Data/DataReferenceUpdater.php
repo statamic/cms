@@ -62,8 +62,10 @@ abstract class DataReferenceUpdater
         $this->recursivelyUpdateFields($this->getTopLevelFields());
 
         if ($this->updated) {
-            $this->item->save();
+            $this->saveItem();
         }
+
+        return (bool) $this->updated;
     }
 
     /**
@@ -272,5 +274,17 @@ abstract class DataReferenceUpdater
         $this->item->data($data);
 
         $this->updated = true;
+    }
+
+    /**
+     * Save item.
+     */
+    protected function saveItem()
+    {
+        if (! method_exists($this->item, 'saveQuietly')) {
+            return $this->item->save();
+        }
+
+        $this->item->saveQuietly();
     }
 }

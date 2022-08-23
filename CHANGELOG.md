@@ -1,5 +1,20 @@
 # Release Notes
 
+## 3.3.31 (2022-08-19)
+
+### What's new
+- Add `user_roles` tag. [#6517](https://github.com/statamic/cms/issues/6517) by @ryanmitchell
+- Add `user_groups` tag. [#6505](https://github.com/statamic/cms/issues/6505) by @ryanmitchell
+- Add `user` scope on `cache` tag. [#6515](https://github.com/statamic/cms/issues/6515) by @ryanmitchell
+
+### What's fixed
+- Compatibility for EloquentQueryBuilder. [#5844](https://github.com/statamic/cms/issues/5844) by @ryanmitchell
+- Fix double `SubmissionCreated` event. [#6532](https://github.com/statamic/cms/issues/6532) by @ryanmitchell
+- Fix `user:reset_password_form` tag action. [#6527](https://github.com/statamic/cms/issues/6527) by @jasonvarga
+- Fix type in root page field instructions. [#6512](https://github.com/statamic/cms/issues/6512) by @sjclark
+
+
+
 ## 3.3.30 (2022-08-17)
 
 ### What's new
