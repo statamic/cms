@@ -58,6 +58,7 @@ class CorePermissions
         });
 
         $this->register('resolve duplicate ids');
+        $this->register('view graphql');
     }
 
     protected function registerCollections()
