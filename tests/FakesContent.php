@@ -3,8 +3,8 @@
 namespace Tests;
 
 use Facades\Tests\Factories\EntryFactory;
-use Statamic\Facades\Collection;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 
 trait FakesContent
 {
