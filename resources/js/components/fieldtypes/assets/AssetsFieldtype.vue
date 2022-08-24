@@ -455,7 +455,7 @@ export default {
 
         idChanged(oldId, newId) {
             const index = this.value.indexOf(oldId);
-            this.value = [...this.value.slice(0, index), newId, ...this.value.slice(index + 1)];
+            this.update([...this.value.slice(0, index), newId, ...this.value.slice(index + 1)]);
         },
 
     },
