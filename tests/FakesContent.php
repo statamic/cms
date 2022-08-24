@@ -20,7 +20,7 @@ trait FakesContent
         $this->makeCollection()->save();
         $this->makeLinkBlueprint()->save();
 
-        return tap($this->makeLink($slug, $attributes))->blueprint('link')->save();
+        return tap($this->makeLink($slug, $attributes))->save();
     }
 
     protected function makePage($slug, $attributes = [])
