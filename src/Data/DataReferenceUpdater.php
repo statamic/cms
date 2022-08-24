@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Statamic\Facades\Blink;
 use Statamic\Fields\Fields;
 use Statamic\Support\Arr;
 
@@ -56,6 +57,10 @@ abstract class DataReferenceUpdater
      */
     public function updateReferences($originalValue, $newValue)
     {
+        if ($this->isDisabled()) {
+            return false;
+        }
+
         $this->originalValue = $originalValue;
         $this->newValue = $newValue;
 
@@ -66,6 +71,22 @@ abstract class DataReferenceUpdater
         }
 
         return (bool) $this->updated;
+    }
+
+    /**
+     * Temporarily disable this reference updater.
+     */
+    public static function disable()
+    {
+        Blink::put(static::disabledKey(), true);
+    }
+
+    /**
+     * Re-enable this reference updater.
+     */
+    public static function enable()
+    {
+        Blink::forget(static::disabledKey());
     }
 
     /**
@@ -286,5 +307,25 @@ abstract class DataReferenceUpdater
         }
 
         $this->item->saveQuietly();
+    }
+
+    /**
+     * Disabled key.
+     *
+     * @return string
+     */
+    protected static function disabledKey()
+    {
+        return static::class.'-disabled';
+    }
+
+    /**
+     * Is disabled.
+     *
+     * @return bool
+     */
+    protected function isDisabled()
+    {
+        return Blink::has(static::disabledKey());
     }
 }
