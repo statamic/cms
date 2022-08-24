@@ -29,7 +29,12 @@ class Utility
 
     public function icon($icon = null)
     {
-        return $this->fluentlyGetOrSet('icon')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('icon')
+            ->setter(function ($value) {
+                return Str::startsWith($value, '<svg') ? $value : Statamic::svg($value);
+            })
+            ->value($icon);
     }
 
     public function slug()
