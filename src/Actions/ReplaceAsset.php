@@ -45,6 +45,16 @@ class ReplaceAsset extends Action
         $newAsset = Facades\Asset::find($values['new_asset'][0]);
 
         $newAsset->replace($originalAsset, $values['delete_original'], $values['preserve_filename']);
+
+        $urls = [
+            $newAsset->thumbnailUrl('small'),
+            $newAsset->absoluteUrl(),
+        ];
+
+        return [
+            'message' => false,
+            'callback' => ['bustAndReloadImageCaches', $urls],
+        ];
     }
 
     protected function fieldItems()
