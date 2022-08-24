@@ -1464,6 +1464,25 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Wraps matched words with <mark> tags.
+     *
+     * @param $value
+     * @param  array  $params
+     * @return string
+     */
+    public function mark($value, $params, $context)
+    {
+        $words = $params[0] ?? $context['get']['q'] ?? null;
+
+        $params[0] = collect(preg_split('/\s+/', $words))
+            ->map(fn ($word) => preg_quote($word, '/'))
+            ->filter()
+            ->join('|');
+
+        return $this->regexMark($value, $params);
+    }
+
+    /**
      * Generate a HTML link to an email address.
      *
      * @param $value
@@ -1847,6 +1866,24 @@ class CoreModifiers extends Modifier
         $words = $this->wordCount(strip_tags($value));
 
         return ceil($words / Arr::get($params, 0, 200));
+    }
+
+    /**
+     * Wraps regex matches with <mark> tags.
+     *
+     * @param $value
+     * @param  array  $params
+     * @return string
+     */
+    public function regexMark($value, $params)
+    {
+        $pattern = Arr::get($params, 0);
+        $start = Arr::get($params, 1, '<mark>');
+        $end = Arr::get($params, 2, '</mark>');
+
+        return preg_replace_callback("/{$pattern}/is", function ($match) use ($start, $end) {
+            return $start . $match[0] . $end;
+        }, $value);
     }
 
     /**
