@@ -82,7 +82,8 @@
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 @updated="assetUpdated"
-                                @removed="assetRemoved">
+                                @removed="assetRemoved"
+                                @id-changed="idChanged(asset.id, $event)">
                             </asset-tile>
                         </div>
                     </sortable-list>
@@ -106,7 +107,8 @@
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
                                         @updated="assetUpdated"
-                                        @removed="assetRemoved">
+                                        @removed="assetRemoved"
+                                        @id-changed="idChanged(asset.id, $event)">
                                     </tr>
                                 </tbody>
                             </sortable-list>
@@ -123,7 +125,8 @@
                         :asset="asset"
                         :read-only="isReadOnly"
                         @updated="assetUpdated"
-                        @removed="assetRemoved">
+                        @removed="assetRemoved"
+                        @id-changed="idChanged(asset.id, $event)">
                     </asset-tile>
                 </div>
 
@@ -448,7 +451,12 @@ export default {
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', ');
-        }
+        },
+
+        idChanged(oldId, newId) {
+            const index = this.value.indexOf(oldId);
+            this.value = [...this.value.slice(0, index), newId, ...this.value.slice(index + 1)];
+        },
 
     },
 

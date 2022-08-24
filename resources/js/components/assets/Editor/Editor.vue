@@ -403,9 +403,12 @@ export default {
             this.$events.$emit('editor-action-started');
         },
 
-        actionCompleted(event, response) {
-            this.$events.$emit('editor-action-completed', event, response);
-            this.close();
+        actionCompleted(successful, response) {
+            this.$events.$emit('editor-action-completed', successful, response);
+            this.$emit('action-completed', successful, response);
+            if (successful) {
+                this.close();
+            }
         },
     }
 

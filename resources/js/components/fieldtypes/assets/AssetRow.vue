@@ -31,7 +31,8 @@
                 :id="asset.id"
                 :allow-deleting="false"
                 @closed="closeEditor"
-                @saved="assetSaved">
+                @saved="assetSaved"
+                @action-completed="actionCompleted">
             </asset-editor>
         </td>
     </tr>

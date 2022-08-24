@@ -52,8 +52,8 @@ class ReplaceAsset extends Action
         ];
 
         return [
-            'message' => false,
             'callback' => ['bustAndReloadImageCaches', $urls],
+            'ids' => [$newAsset->id()],
         ];
     }
 
