@@ -156,6 +156,7 @@ return [
     'publish_actions_publish' => 'Changes to the working copy will applied to the entry and it will be published immediately.',
     'publish_actions_schedule' => 'Changes to the working copy will applied to the entry and it will be appear published on the selected date.',
     'publish_actions_unpublish' => 'The current revision will be unpublished.',
+    'replace_asset_preserve_filename_instructions' => 'You may encounter browser or server-level caching issues when preserving filenames.',
     'reset_password_notification_body' => 'You are receiving this email because we received a password reset request for your account.',
     'reset_password_notification_no_action' => 'If you did not request a password reset, no further action is required.',
     'reset_password_notification_subject' => 'Reset Password Notification',

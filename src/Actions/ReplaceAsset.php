@@ -71,7 +71,7 @@ class ReplaceAsset extends Action
                 'display' => __('Preserve Original Filename'),
                 'type' => 'toggle',
                 'default' => false,
-                'instructions' => __('You may encounter browser or server-level caching issues when preserving filenames.'),
+                'instructions' => __('statamic::messages.replace_asset_preserve_filename_instructions'),
                 'if' => [
                     'delete_original' => true,
                 ],
