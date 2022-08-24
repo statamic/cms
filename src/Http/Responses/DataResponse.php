@@ -84,13 +84,13 @@ class DataResponse implements Responsable
 
     protected function getRedirect()
     {
-        if (! $redirect = $this->data->get('redirect')) {
+        if (! $this->data->get('redirect')) {
             return;
         }
 
-        $redirect = (new ResolveRedirect)($redirect, $this->data);
+        $redirect = $this->data->augmentedValue('redirect')->value();
 
-        if ($redirect == '404') {
+        if (! $redirect) {
             throw new NotFoundHttpException;
         }
 

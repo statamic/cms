@@ -680,4 +680,59 @@ class FrontendTest extends TestCase
         // Before the fix, you'd see "Service" instead of "Home", because the URI would also be /
         $this->get('/')->assertSee('Home');
     }
+
+    /** @test */
+    public function redirect_is_followed()
+    {
+        $this->createLink('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => 'entry::about-us',
+            ],
+        ]);
+        $this->createPage('about-us', [
+            'with' => [
+                'title' => 'About Us',
+            ],
+        ]);
+
+        $this->get('/about')
+            ->assertStatus(302)
+            ->assertHeader('Location', 'http://localhost/about-us');
+    }
+
+    /** @test */
+    public function redirect_is_followed_to_child()
+    {
+        $this->createLink('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => '@child',
+            ],
+        ]);
+        $this->createPage('team', [
+            'with' => [
+                'title' => 'Team',
+                'parent' => 'about', // this isn't right
+            ],
+        ]);
+
+        $this->get('/about')
+            ->assertStatus(302)
+            ->assertHeader('Location', 'http://localhost/about/team');
+    }
+
+    /** @test */
+    public function redirect_is_404_if_invalid()
+    {
+        $this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => 'entry::invalid',
+            ],
+        ]);
+
+        $this->get('/about')
+            ->assertStatus(404);
+    }
 }
