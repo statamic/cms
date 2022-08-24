@@ -592,15 +592,22 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function replace(Asset $originalAsset, $deleteOriginal = false, $preserveOriginalFilename = false)
     {
+        // Temporarily disable the reference updater to avoid triggering reference updates
+        // until after the `AssetReplaced` event is fired. We still want to fire events
+        // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
+        // get triggered (for cache invalidation, clearing of glide cache, etc.)
+        AssetReferenceUpdater::disable();
+
         if ($deleteOriginal) {
             $originalAsset->delete();
         }
 
-        if ($preserveOriginalFilename) {
+        if ($deleteOriginal && $preserveOriginalFilename) {
             $this->rename($originalAsset->filename());
         }
 
-        // Event listener will automatically handle updating of asset references where necessary, if enabled
+        AssetReferenceUpdater::enable();
+
         AssetReplaced::dispatch($originalAsset, $this);
     }
 
