@@ -4,6 +4,7 @@ namespace Statamic\CP\Utilities;
 
 use Closure;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
