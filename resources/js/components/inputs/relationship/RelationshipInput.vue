@@ -74,6 +74,7 @@
                     :max-selections="maxItems"
                     :search="search"
                     :exclusions="exclusions"
+                    :type="config.type"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
