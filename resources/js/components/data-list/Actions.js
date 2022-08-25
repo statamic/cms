@@ -44,34 +44,32 @@ export default {
             };
 
             this.$axios.post(this.url, payload, { responseType: 'blob' }).then(response => {
-                if (response.headers['content-disposition']) {
-                    this.downloadFile(response);
-                    this.$emit('completed', true);
-                }
-
-                // We need a blob for file downloads, but we need to convert it back to JSON to handle a redirect
-                else {
-                    response.data.text().then(data => {
-                        data = JSON.parse(data);
-                        if (data.redirect) window.location = data.redirect;
-                        this.$emit('completed', true, data);
-                    });
-                }
+                response.data.text().then(data => {
+                    response.headers['content-disposition']
+                        ? this.handleFileDownload(response) // Pass blob response for downloads
+                        : this.handleActionSuccess(JSON.parse(data)); // Otherwise convert to JSON and handle as normal
+                });
             }).catch(error => {
                 error.response.data.text().then(data => {
-                    data = JSON.parse(data);
-                    this.$toast.error(data.message);
-                    if (error.response.status == 422) this.errors = data.errors;
-                    this.$emit('completed', false, data)
+                    this.handleActionError(JSON.parse(data), error.response.status);
                 });
             });
         },
 
-        downloadFile(response) {
+        handleActionSuccess(response) {
+            if (response.redirect) window.location = response.redirect;
+            this.$emit('completed', true, response);
+        },
+
+        handleActionError(response, status) {
+            if (status == 422) this.errors = response.errors;
+            this.$toast.error(response.message);
+            this.$emit('completed', false, response)
+        },
+
+        handleFileDownload(response) {
             const attachmentMatch = response.headers['content-disposition'].match(/^attachment.+filename="?([^"]+)"?/i) || [];
-
             if (! attachmentMatch.length) return;
-
             const filename = attachmentMatch.length >= 2 ? attachmentMatch[1] : 'file.txt';
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -79,6 +77,7 @@ export default {
             link.setAttribute('download', filename);
             document.body.appendChild(link);
             link.click();
+            this.$emit('completed', true);
         },
 
     }
