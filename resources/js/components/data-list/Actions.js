@@ -58,6 +58,7 @@ export default {
 
         handleActionSuccess(response) {
             if (response.redirect) window.location = response.redirect;
+            if (response.callback) Statamic.$callbacks.call(response.callback[0], ...response.callback.slice(1));
             this.$emit('completed', true, response);
         },
 
