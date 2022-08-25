@@ -4,9 +4,10 @@ namespace Statamic\Git;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Events\Concerns\ListensForContentEvents;
+use Statamic\Events\Subscriber as StatamicSubscriber;
 use Statamic\Facades\Git;
 
-class Subscriber
+class Subscriber extends StatamicSubscriber
 {
     use ListensForContentEvents;
 
