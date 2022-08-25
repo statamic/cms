@@ -3,6 +3,7 @@
 namespace Statamic\Data;
 
 use Statamic\Fields\Fields;
+use Statamic\Git\Subscriber as GitSubscriber;
 use Statamic\Support\Arr;
 
 abstract class DataReferenceUpdater
@@ -277,14 +278,14 @@ abstract class DataReferenceUpdater
     }
 
     /**
-     * Save item.
+     * Save item without triggering individual git commits, as these should be batched into one larger commit.
      */
     protected function saveItem()
     {
-        if (! method_exists($this->item, 'saveQuietly')) {
-            return $this->item->save();
-        }
+        GitSubscriber::disable();
 
-        $this->item->saveQuietly();
+        $this->item->save();
+
+        GitSubscriber::enable();
     }
 }
