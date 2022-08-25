@@ -17,7 +17,7 @@
                     :attributes="attrs"
                     :class="{ 'w-full': !config.inline }"
                     :columns="$screens({ default: 1, lg: config.columns })"
-                    :input-debounce="500"
+                    :input-debounce="1000"
                     :is-expanded="name === 'date' || config.full_width"
                     :is-range="isRange"
                     :is-required="config.required"
