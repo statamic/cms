@@ -3,6 +3,7 @@
 namespace Tests\Events;
 
 use Illuminate\Support\Facades\Event;
+use ReflectionObject;
 use Statamic\Events\Event as StatamicEvent;
 use Tests\TestCase;
 
@@ -65,12 +66,28 @@ class MacroTest extends TestCase
 
     private function assertRegisteredListenersForEvent($event, $listeners)
     {
-        $this->assertEquals($listeners, array_values(app('events')->getRawListeners()[$event]));
+        $this->assertEquals($listeners, $this->getRegisteredListenersForEvent($event));
     }
 
     private function assertNoRegisteredListenersForEvent($event)
     {
-        $this->assertCount(0, array_values(app('events')->getRawListeners()[$event]));
+        $this->assertCount(0, $this->getRegisteredListenersForEvent($event));
+    }
+
+    private function getRegisteredListenersForEvent($event)
+    {
+        $dispatcher = app('events');
+
+        // This `getRawListeners()` method doesn't exist in older versions of Laravel...
+        if (! method_exists($dispatcher, 'getRawListeners')) {
+            $r = new ReflectionObject($dispatcher);
+            $p = $r->getProperty('listeners');
+            $p->setAccessible(true);
+
+            return array_values($p->getValue($dispatcher)[$event]);
+        }
+
+        return array_values($dispatcher->getRawListeners()[$event]);
     }
 }
 
