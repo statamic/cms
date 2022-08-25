@@ -1,5 +1,33 @@
 # Release Notes
 
+## 3.3.32 (2022-08-25)
+
+### What's new
+- Ability to invalidate urls when editing forms and their blueprints. [#6546](https://github.com/statamic/cms/issues/6546) by @arthurperton
+- Ability to provide custom icon SVGs to Utilities. [#6556](https://github.com/statamic/cms/issues/6556) by @duncanmcclean
+- Added a "View GraphQL" permission. [#6550](https://github.com/statamic/cms/issues/6550) by @ryanmitchell
+
+### What's improved
+- Added collection/taxonomy names to stack selector to more easily differentiate between similar entries. [#6518](https://github.com/statamic/cms/issues/6518) by @jacksleight
+- Improve UX of filtering listing by toggle fields. [#6545](https://github.com/statamic/cms/issues/6545) by @jacksleight
+- Improve display of toggle fields in listings. [#6541](https://github.com/statamic/cms/issues/6541) by @jacksleight
+- Support setting entry blueprint using instance. [#6547](https://github.com/statamic/cms/issues/6547) by @jesseleite
+- Support passing a form instance into tags. [#6544](https://github.com/statamic/cms/issues/6544) by @jasonvarga
+
+### What's fixed
+- Destroy key bindings from popover after closing. [#6566](https://github.com/statamic/cms/issues/6566) by @jonassiewertsen
+- Destroy key bindings from revision history after closing. [#6565](https://github.com/statamic/cms/issues/6565) by @jonassiewertsen
+- Destroy key bindings from modals after closing. [#6564](https://github.com/statamic/cms/issues/6564) by @jonassiewertsen
+- Destroy key bindings in Bard fields. [#6555](https://github.com/statamic/cms/issues/6555) by @jonassiewertsen
+- Destroy sortable instances in relationship fields. [#6563](https://github.com/statamic/cms/issues/6563) by @wiebkevogel
+- Adjust debounce in date fields. [#6560](https://github.com/statamic/cms/issues/6560) by @zsoltjanes
+- Fix modals and stacks not playing nicely together in some situations. [#6558](https://github.com/statamic/cms/issues/6558) by @jasonvarga
+- Fix incorrect meta when using certain fieldtypes as config fields. [#6549](https://github.com/statamic/cms/issues/6549) by @arthurperton
+- Fix multi-site namespaced view overrides. [#6539](https://github.com/statamic/cms/issues/6539) by @edalzell
+- Collect eloquent roles on sync to preserve passing them as an array. [#6540](https://github.com/statamic/cms/issues/6540) by @ryanmitchell
+
+
+
 ## 3.3.31 (2022-08-19)
 
 ### What's new

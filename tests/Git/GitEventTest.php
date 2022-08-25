@@ -13,6 +13,7 @@ use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\Git;
 use Statamic\Facades\User;
+use Statamic\Git\Subscriber as GitSubscriber;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -87,6 +88,20 @@ class GitEventTest extends TestCase
         $collection = Facades\Collection::make('pages');
 
         $collection->save();
+        $collection->delete();
+    }
+
+    /** @test */
+    public function it_doesnt_commit_when_event_subscriber_is_disabled()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
+        Git::shouldReceive('dispatchCommit')->with('Collection deleted')->once();
+
+        $collection = Facades\Collection::make('pages');
+
+        GitSubscriber::disable();
+        $collection->save();
+        GitSubscriber::enable();
         $collection->delete();
     }
 
