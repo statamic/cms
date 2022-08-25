@@ -112,11 +112,11 @@ abstract class AbstractCacher implements Cacher
      *
      * @return void
      */
-    public function cacheDomain()
+    public function cacheDomain($domain = null)
     {
         $domains = $this->getDomains();
 
-        if (! $domains->contains($domain = $this->getBaseUrl())) {
+        if (! $domains->contains($domain = $domain ?? $this->getBaseUrl())) {
             $domains->push($domain);
         }
 
@@ -176,17 +176,17 @@ abstract class AbstractCacher implements Cacher
      * @param  string  $url
      * @return void
      */
-    public function cacheUrl($key, $url)
+    public function cacheUrl($key, $url, $domain = null)
     {
-        $this->cacheDomain();
+        $this->cacheDomain($domain);
 
-        $urls = $this->getUrls();
+        $urls = $this->getUrls($domain);
 
-        $url = Str::removeLeft($url, $this->getBaseUrl());
+        $url = Str::removeLeft($url, $domain ?? $this->getBaseUrl());
 
         $urls->put($key, $url);
 
-        $this->cache->forever($this->getUrlsCacheKey(), $urls->all());
+        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
     }
 
     /**
@@ -195,13 +195,13 @@ abstract class AbstractCacher implements Cacher
      * @param  string  $key
      * @return void
      */
-    public function forgetUrl($key)
+    public function forgetUrl($key, $domain = null)
     {
-        $urls = $this->getUrls();
+        $urls = $this->getUrls($domain);
 
         $urls->forget($key);
 
-        $this->cache->forever($this->getUrlsCacheKey(), $urls->all());
+        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
     }
 
     /**

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -113,16 +114,23 @@ class FileCacher extends AbstractCacher
      * @param  string  $url
      * @return void
      */
-    public function invalidateUrl($url)
+    public function invalidateUrl($url, $domain = null)
     {
-        if (! $key = $this->getUrls()->flip()->get($url)) {
+        if (! $key = $this->getUrls($domain)->flip()->get($url)) {
             // URL doesn't exist, nothing to invalidate.
             return;
         }
 
-        $this->writer->delete($this->getFilePath($url));
+        $locale = $this->getLocaleForDomain($domain);
 
-        $this->forgetUrl($key);
+        $this->writer->delete($this->getFilePath($url, $locale));
+
+        $this->forgetUrl($key, $domain);
+    }
+
+    public function getLocaleForDomain($domain)
+    {
+        return $domain ? optional(Site::findByUrl($domain))->handle() : null;
     }
 
     public function getCachePaths()
@@ -159,7 +167,7 @@ class FileCacher extends AbstractCacher
      * @param $url
      * @return string
      */
-    public function getFilePath($url)
+    public function getFilePath($url, $locale = null)
     {
         $urlParts = parse_url($url);
         $pathParts = pathinfo($urlParts['path']);
@@ -170,7 +178,7 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        return $this->getCachePath().$pathParts['dirname'].'/'.$basename;
+        return $this->getCachePath($locale).$pathParts['dirname'].'/'.$basename;
     }
 
     private function isBasenameTooLong($basename)
