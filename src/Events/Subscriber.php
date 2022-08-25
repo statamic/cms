@@ -53,7 +53,7 @@ abstract class Subscriber
     /**
      * Normalize registered listener.
      *
-     * @param mixed $listener
+     * @param  mixed  $listener
      * @return mixed
      */
     public static function normalizeRegisteredListener($listener)
