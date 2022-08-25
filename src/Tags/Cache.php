@@ -49,8 +49,14 @@ class Cache extends Tags
             'params' => $this->params->all(),
         ];
 
-        if ($this->params->get('scope', 'site') === 'page') {
+        $scope = $this->params->get('scope', 'site');
+
+        if ($scope === 'page') {
             $hash['url'] = URL::makeAbsolute(URL::getCurrent());
+        }
+
+        if ($scope === 'user') {
+            $hash['user'] = ($user = auth()->user()) ? $user->id : 'guest';
         }
 
         return 'statamic.cache-tag.'.md5(json_encode($hash));

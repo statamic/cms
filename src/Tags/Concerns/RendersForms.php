@@ -9,6 +9,44 @@ trait RendersForms
 {
     use RendersAttributes;
 
+    protected function formAttrs($action, $method = 'POST', $knownTagParams = [], $additionalAttrs = [])
+    {
+        $formMethod = $method === 'GET' ? 'GET' : 'POST';
+
+        $attrs = array_merge([
+            'method' => $formMethod,
+            'action' => $action,
+        ], $additionalAttrs);
+
+        if ($this->params->bool('files')) {
+            $attrs['enctype'] = 'multipart/form-data';
+        }
+
+        $paramAttrs = collect($this->params->all())
+            ->except(array_merge(['method', 'action'], $knownTagParams))
+            ->mapWithKeys(function ($value, $attribute) {
+                return [preg_replace('/^attr:/', '', $attribute) => $value];
+            })
+            ->all();
+
+        return array_merge($attrs, $paramAttrs);
+    }
+
+    protected function formParams($method, $params = [])
+    {
+        if ($this->params->bool('csrf', true)) {
+            $params['token'] = csrf_token();
+        }
+
+        $method = strtoupper($method);
+
+        if (! in_array($method, ['GET', 'POST'])) {
+            $params['method'] = $method;
+        }
+
+        return $params;
+    }
+
     /**
      * Open a form.
      *
@@ -47,6 +85,15 @@ trait RendersForms
         }
 
         return $html;
+    }
+
+    protected function formMetaPrefix($meta)
+    {
+        return collect($meta)
+            ->mapWithKeys(function ($value, $key) {
+                return ['_'.$key => $value];
+            })
+            ->all();
     }
 
     protected function formMetaFields($meta)
@@ -102,8 +149,11 @@ trait RendersForms
      */
     protected function minifyFieldHtml($html)
     {
-        // Trim whitespace between elements.
-        $html = preg_replace('/>\s*([^<>]*)\s*</', '>$1<', $html);
+        // Leave whitespace around these html elements.
+        $ignoredHtmlElements = collect(['a', 'span'])->implode('|');
+
+        // Trim whitespace between all other html elements.
+        $html = preg_replace('/\s*(<(?!\/*('.$ignoredHtmlElements.'))[^>]+>)\s*/', '$1', $html);
 
         return $html;
     }

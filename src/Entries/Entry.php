@@ -136,7 +136,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
 
-                return $blueprint;
+                return $blueprint instanceof \Statamic\Fields\Blueprint ? $blueprint->handle() : $blueprint;
             })
             ->args(func_get_args());
     }
@@ -296,6 +296,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
+
         if ($withEvents) {
             if (EntrySaving::dispatch($this) === false) {
                 return false;
@@ -787,7 +788,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+        $title = (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+
+        return trim($title);
     }
 
     public function previewTargets()
