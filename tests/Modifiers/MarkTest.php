@@ -10,7 +10,7 @@ class MarkTest extends TestCase
     /** @test */
     public function it_marks_text()
     {
-        $text  = 'Lorem, ipsum dolor sit amet';
+        $text = 'Lorem, ipsum dolor sit amet';
         $words = 'lorem sit';
 
         $expected = '<mark>Lorem</mark>, ipsum dolor <mark>sit</mark> amet';
@@ -21,7 +21,7 @@ class MarkTest extends TestCase
     /** @test */
     public function it_marks_text_with_class()
     {
-        $text  = 'Lorem, ipsum dolor sit amet';
+        $text = 'Lorem, ipsum dolor sit amet';
         $words = 'ipsum';
         $param = 'class:highlight';
 

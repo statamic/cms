@@ -10,7 +10,7 @@ class RegexMarkTest extends TestCase
     /** @test */
     public function it_marks_text()
     {
-        $text  = 'Lorem, ipsum dolor sit amet';
+        $text = 'Lorem, ipsum dolor sit amet';
         $regex = 'ipsum dolor|amet';
 
         $expected = 'Lorem, <mark>ipsum dolor</mark> sit <mark>amet</mark>';
@@ -21,7 +21,7 @@ class RegexMarkTest extends TestCase
     /** @test */
     public function it_marks_text_with_class()
     {
-        $text  = 'Lorem, ipsum dolor sit amet';
+        $text = 'Lorem, ipsum dolor sit amet';
         $regex = 'ipsum dolor';
         $param = 'class:highlight';
 
