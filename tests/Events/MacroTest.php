@@ -5,6 +5,7 @@ namespace Tests\Events;
 use Illuminate\Support\Facades\Event;
 use ReflectionObject;
 use Statamic\Events\Event as StatamicEvent;
+use Statamic\Events\Subscriber;
 use Tests\TestCase;
 
 class MacroTest extends TestCase
@@ -78,13 +79,18 @@ class MacroTest extends TestCase
     {
         $dispatcher = app('events');
 
-        // This `getRawListeners()` method doesn't exist in older versions of Laravel...
+        // This `getRawListeners()` method doesn't exist in older versions of Laravel.
+        // We should be able remove this when we drop support for Laravel 8.x.
         if (! method_exists($dispatcher, 'getRawListeners')) {
+            $dispatcher = app('events');
             $r = new ReflectionObject($dispatcher);
             $p = $r->getProperty('listeners');
             $p->setAccessible(true);
+            $listeners = $p->getValue($dispatcher);
 
-            return array_values($p->getValue($dispatcher)[$event]);
+            return collect($listeners[$event])->map(function ($listener) {
+                return Subscriber::normalizeRegisteredListener($listener);
+            })->values()->all();
         }
 
         return array_values($dispatcher->getRawListeners()[$event]);

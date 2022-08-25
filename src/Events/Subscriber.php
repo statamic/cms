@@ -49,4 +49,19 @@ abstract class Subscriber
     {
         (new static)->subscribe(app('events'));
     }
+
+    /**
+     * Normalize registered listener.
+     *
+     * @param mixed $listener
+     * @return mixed
+     */
+    public static function normalizeRegisteredListener($listener)
+    {
+        // If we're using an older version of Laravel, listeners are stored as Closures.
+        // We should be able remove this when we drop support for Laravel 8.x.
+        return $listener instanceof \Closure
+            ? (new \ReflectionFunction($listener))->getStaticVariables()['listener']
+            : $listener;
+    }
 }
