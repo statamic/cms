@@ -1877,12 +1877,11 @@ class CoreModifiers extends Modifier
      */
     public function regexMark($value, $params)
     {
-        $pattern = Arr::get($params, 0);
-        $start = Arr::get($params, 1, '<mark>');
-        $end = Arr::get($params, 2, '</mark>');
+        $pattern = array_shift($params);
+        $attributes = $this->buildAttributesFromParameters($params);
 
-        return preg_replace_callback("/{$pattern}/is", function ($match) use ($start, $end) {
-            return $start . $match[0] . $end;
+        return preg_replace_callback("/{$pattern}/is", function ($match) use ($attributes) {
+            return Html::mark($match[0], $attributes);
         }, $value);
     }
 

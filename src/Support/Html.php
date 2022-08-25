@@ -193,6 +193,20 @@ class Html
     }
 
     /**
+     * Generate an HTML mark.
+     *
+     * @param  string  $value
+     * @param  array  $attributes
+     * @return \Illuminate\Support\HtmlString|string
+     */
+    public static function mark($value, $attributes = [])
+    {
+        $value = static::entities($value);
+
+        return static::toHtmlString('<mark'.static::attributes($attributes).'>'.$value.'</mark>');
+    }
+
+    /**
      * Obfuscate a string to prevent spam-bots from sniffing it.
      *
      * @param  string  $value
