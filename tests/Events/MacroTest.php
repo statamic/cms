@@ -11,54 +11,54 @@ class MacroTest extends TestCase
     /** @test */
     public function it_can_forget_a_listener_using_string_notation()
     {
-        Event::listen(PunSaved::class, 'Listener@handle');
+        Event::listen(JokeSaved::class, 'Listener@handle');
 
-        $this->assertRegisteredListenersForEvent(PunSaved::class, [
+        $this->assertRegisteredListenersForEvent(JokeSaved::class, [
             'Listener@handle',
         ]);
 
-        Event::forgetListener(PunSaved::class, 'Listener@handle');
+        Event::forgetListener(JokeSaved::class, 'Listener@handle');
 
-        $this->assertNoRegisteredListenersForEvent(PunSaved::class);
+        $this->assertNoRegisteredListenersForEvent(JokeSaved::class);
     }
 
     /** @test */
     public function it_can_forget_a_listener_using_array_notation()
     {
-        Event::listen(PunSaved::class, ['Listener', 'handle']);
+        Event::listen(JokeSaved::class, ['Listener', 'handle']);
 
-        $this->assertRegisteredListenersForEvent(PunSaved::class, [
+        $this->assertRegisteredListenersForEvent(JokeSaved::class, [
             ['Listener', 'handle'],
         ]);
 
-        Event::forgetListener(PunSaved::class, ['Listener', 'handle']);
+        Event::forgetListener(JokeSaved::class, ['Listener', 'handle']);
 
-        $this->assertNoRegisteredListenersForEvent(PunSaved::class);
+        $this->assertNoRegisteredListenersForEvent(JokeSaved::class);
     }
 
     /** @test */
     public function forgetting_a_listener_doesnt_affect_other_events_or_listeners()
     {
-        Event::listen(PunSaved::class, 'SubscriberOne@handle');
-        Event::listen(PunSaved::class, 'SubscriberTwo@handle');
-        Event::listen(PunDeleted::class, 'SubscriberOne@handle');
+        Event::listen(JokeSaved::class, 'SubscriberOne@handle');
+        Event::listen(JokeSaved::class, 'SubscriberTwo@handle');
+        Event::listen(JokeDeleted::class, 'SubscriberOne@handle');
 
-        $this->assertRegisteredListenersForEvent(PunSaved::class, [
+        $this->assertRegisteredListenersForEvent(JokeSaved::class, [
             'SubscriberOne@handle',
             'SubscriberTwo@handle',
         ]);
 
-        $this->assertRegisteredListenersForEvent(PunDeleted::class, [
+        $this->assertRegisteredListenersForEvent(JokeDeleted::class, [
             'SubscriberOne@handle',
         ]);
 
-        Event::forgetListener(PunSaved::class, 'SubscriberOne@handle');
+        Event::forgetListener(JokeSaved::class, 'SubscriberOne@handle');
 
-        $this->assertRegisteredListenersForEvent(PunSaved::class, [
+        $this->assertRegisteredListenersForEvent(JokeSaved::class, [
             'SubscriberTwo@handle',
         ]);
 
-        $this->assertRegisteredListenersForEvent(PunDeleted::class, [
+        $this->assertRegisteredListenersForEvent(JokeDeleted::class, [
             'SubscriberOne@handle',
         ]);
     }
@@ -74,12 +74,12 @@ class MacroTest extends TestCase
     }
 }
 
-class PunSaved extends StatamicEvent
+class JokeSaved extends StatamicEvent
 {
     //
 }
 
-class PunDeleted extends StatamicEvent
+class JokeDeleted extends StatamicEvent
 {
     //
 }
