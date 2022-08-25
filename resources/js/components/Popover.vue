@@ -40,7 +40,8 @@ export default {
 
     data() {
         return {
-            isOpen: false
+            isOpen: false,
+            escBinding: null,
         }
     },
 
@@ -74,10 +75,14 @@ export default {
         },
         open() {
             this.isOpen = true;
-            this.$keys.bind('esc', e => this.close())
+            this.escBinding = this.$keys.bind('esc', e => this.close())
         },
         close() {
             this.isOpen = false;
+            
+            if (this.escBinding) {
+                this.escBinding.destroy();
+            }
         }
     }
 }

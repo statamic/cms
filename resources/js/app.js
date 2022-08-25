@@ -144,13 +144,13 @@ Statamic.app({
         NavigationCreateForm: require('./components/navigation/CreateForm.vue').default,
         NavigationEditForm: require('./components/navigation/EditForm.vue').default,
         NavigationView: require('./components/navigation/View.vue').default,
-        Stacks: require('./components/stacks/Stacks.vue').default,
         TaxonomyCreateForm: require('./components/taxonomies/CreateForm.vue').default,
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
         TaxonomyBlueprintListing:  require('./components/taxonomies/BlueprintListing.vue').default,
         AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
         AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
         Updater: require('./components/updater/Updater.vue').default,
+        PortalTargets: require('./components/PortalTargets.vue').default,
     },
 
     data: {
@@ -158,8 +158,7 @@ Statamic.app({
         navOpen: true,
         mobileNavOpen: false,
         showBanner: true,
-        modals: [],
-        stacks: [],
+        portals: [],
         panes: [],
         appendedComponents: []
     },
