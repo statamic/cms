@@ -21,9 +21,24 @@ class ViewFieldsetListingTest extends TestCase
             'bar' => $fieldsetB = $this->createFieldset('bar'),
             'baz::foo' => $this->createFieldset('baz::foo'),
             'baz::bar' => $this->createFieldset('baz::bar'),
+            'baz::baz' => $this->createFieldset('baz::baz'),
         ]));
 
-        $user = Facades\User::make()->makeSuper()->save();
+        // Custom policy to allow fieldsets to demonstrate how certain fieldset can be restricted
+        app()->bind(\Statamic\Policies\FieldsetPolicy::class, function () {
+            return new class extends \Statamic\Policies\FieldsetPolicy
+            {
+                public function before($user, $ability, $fieldset)
+                {
+                    return $fieldset->handle() === 'baz::baz'
+                        ? false
+                        : parent::before($user, $ability, $fieldset);
+                }
+            };
+        });
+
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)

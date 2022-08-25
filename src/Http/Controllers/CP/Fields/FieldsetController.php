@@ -20,9 +20,8 @@ class FieldsetController extends CpController
     public function index(Request $request)
     {
         $fieldsets = Facades\Fieldset::all()
-            ->filter(function (Fieldset $fieldset) {
-                return $fieldset->isEditable();
-            })->mapToGroups(function (Fieldset $fieldset) {
+            ->filter(fn ($fieldset) => $request->user()->can('edit', $fieldset))
+            ->mapToGroups(function (Fieldset $fieldset) {
                 return [
                     $this->groupKey($fieldset) => [
                         'handle' => $fieldset->handle(),
