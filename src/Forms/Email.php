@@ -9,6 +9,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Config;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Parse;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -200,6 +201,8 @@ class Email extends Mailable
     protected function parseConfig(array $config)
     {
         return collect($config)->map(function ($value) {
+            $value = Parse::env($value); // deprecated
+
             return (string) Antlers::parse($value, $this->submissionData);
         });
     }
