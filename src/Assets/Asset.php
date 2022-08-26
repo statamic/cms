@@ -576,8 +576,8 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
-        $this->disk()->rename($oldMetaPath, $this->metaPath());
         $this->save();
+        $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
     }
