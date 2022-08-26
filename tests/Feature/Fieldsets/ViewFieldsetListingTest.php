@@ -4,6 +4,7 @@ namespace Tests\Feature\Fieldsets;
 
 use Statamic\Facades;
 use Statamic\Fields\Fieldset;
+use Statamic\Fields\FieldsetNamespace;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -23,6 +24,8 @@ class ViewFieldsetListingTest extends TestCase
             'baz::bar' => $this->createFieldset('baz::bar'),
             'baz::baz' => $this->createFieldset('baz::baz'),
         ]));
+
+        Facades\Fieldset::shouldReceive('namespace')->with('baz')->andReturn(new FieldsetNamespace('baz', '/path/to/baz'));
 
         // Custom policy to allow fieldsets to demonstrate how certain fieldset can be restricted
         app()->bind(\Statamic\Policies\FieldsetPolicy::class, function () {

@@ -9,7 +9,6 @@ use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
 use Statamic\Facades;
 use Statamic\Facades\Path;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Fieldset
@@ -79,9 +78,16 @@ class Fieldset
         return $this->fields()->get($handle);
     }
 
-    public function isExternal(): bool
+    public function isNamespaced(): bool
     {
         return Str::contains($this->handle(), '::');
+    }
+
+    public function namespace()
+    {
+        return $this->isNamespaced()
+            ? Facades\Fieldset::namespace(Str::before($this->handle, '::'))
+            : null;
     }
 
     public function editUrl()
@@ -92,6 +98,11 @@ class Fieldset
     public function deleteUrl()
     {
         return cp_route('fieldsets.destroy', $this->handle());
+    }
+
+    public function isDeletable()
+    {
+        return ! $this->isNamespaced();
     }
 
     public function afterSave($callback)

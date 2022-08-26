@@ -8,7 +8,6 @@ use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class FieldsetController extends CpController
 {
@@ -29,7 +28,7 @@ class FieldsetController extends CpController
                         'delete_url' => $fieldset->deleteUrl(),
                         'edit_url' => $fieldset->editUrl(),
                         'fields' => $fieldset->fields()->all()->count(),
-                        'is_deletable' => ! $fieldset->isExternal(),
+                        'is_deletable' => $fieldset->isDeletable(),
                         'title' => $fieldset->title(),
                     ],
                 ];
@@ -120,10 +119,6 @@ class FieldsetController extends CpController
 
     private function groupKey(Fieldset $fieldset): string
     {
-        if ($fieldset->isExternal()) {
-            return Str::of($fieldset->handle())->before('::')->replace('_', ' ')->title();
-        }
-
-        return __('My Fieldsets');
+        return $fieldset->isNamespaced() ? $fieldset->namespace()->title() : __('My Fieldsets');
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Collection;
+use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldsetRepository;
@@ -179,9 +180,16 @@ EOT;
         $this->assertCount(0, $all);
     }
 
-    /** @test */
-    public function it_saves_to_disk()
+    /**
+     * @test
+     * @dataProvider saveProvider
+     */
+    public function it_saves_to_disk($handle, $expectedPath)
     {
+        Facades\Fieldset::addNamespace('foo', '/path/to/foo')->saveToSelf();
+        Facades\Fieldset::addNamespace('bar', '/path/to/bar')->saveToVendor();
+        Facades\Fieldset::addNamespace('baz', '/path/to/baz');
+
         $expectedYaml = <<<'EOT'
 title: 'Test Fieldset'
 fields:
@@ -192,21 +200,36 @@ fields:
       bar: baz
 
 EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
-        File::shouldReceive('makeDirectory')->with('/path/to/resources/fieldsets')->once();
-        File::shouldReceive('put')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml', $expectedYaml)->once();
 
-        $fieldset = (new Fieldset)->setHandle('the_test_fieldset')->setContents([
-            'title' => 'Test Fieldset',
-            'fields' => [
-                [
-                    'handle' => 'foo',
-                    'field' => ['type' => 'textarea', 'bar' => 'baz'],
+        File::shouldReceive('put')->with($expectedPath, $expectedYaml)->once();
+
+        $fieldset = (new Fieldset)
+            ->setHandle($handle)
+            ->setContents([
+                'title' => 'Test Fieldset',
+                'fields' => [
+                    [
+                        'handle' => 'foo',
+                        'field' => ['type' => 'textarea', 'bar' => 'baz'],
+                    ],
                 ],
-            ],
-        ]);
+            ]);
 
         $this->repo->save($fieldset);
+    }
+
+    public function saveProvider()
+    {
+        return [
+            'standard' => ['test', '/path/to/resources/fieldsets/test.yaml'],
+            'standard subdir' => ['subdir.test', '/path/to/resources/fieldsets/subdir/test.yaml'],
+            'namespace, save to self' => ['foo::test', '/path/to/foo/test.yaml'],
+            'namespace, subdir, save to self' => ['foo::subdir.test', '/path/to/foo/subdir/test.yaml'],
+            'namespace, save to vendor' => ['bar::test', '/path/to/resources/fieldsets/vendor/bar/test.yaml'],
+            'namespace, subdir, save to vendor' => ['bar::subdir.test', '/path/to/resources/fieldsets/vendor/bar/subdir/test.yaml'],
+            'namespace, save to vendor by default' => ['baz::test', '/path/to/resources/fieldsets/vendor/baz/test.yaml'],
+            'namespace, subdir, save to vendor by default' => ['baz::subdir.test', '/path/to/resources/fieldsets/vendor/baz/subdir/test.yaml'],
+        ];
     }
 
     /** @test  */

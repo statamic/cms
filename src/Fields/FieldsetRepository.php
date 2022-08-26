@@ -99,7 +99,7 @@ class FieldsetRepository
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
-        return "{$this->hints[$namespace]}/{$path}.yaml";
+        return "{$this->hints[$namespace]->directory()}/{$path}.yaml";
     }
 
     private function overriddenNamespacedFieldsetPath(string $handle)
@@ -128,8 +128,8 @@ class FieldsetRepository
     public function all(): Collection
     {
         $namespaced = collect($this->hints)
-            ->flatMap(function (string $directory, string $namespace) {
-                return $this->getFieldsetsByDirectory($directory, $namespace);
+            ->flatMap(function (FieldsetNamespace $namespace, string $name) {
+                return $this->getFieldsetsByDirectory($namespace->directory(), $name);
             });
 
         return $this
@@ -139,17 +139,13 @@ class FieldsetRepository
 
     public function save(Fieldset $fieldset)
     {
-        if ($fieldset->isExternal()) {
-            [$key, $handle] = explode('::', $fieldset->handle());
-            $directory = resource_path("fieldsets/vendor/{$key}");
+        if ($fieldset->isNamespaced()) {
+            $directory = $fieldset->namespace()->saveDirectory();
         } else {
-            $handle = $fieldset->handle();
             $directory = $this->directory;
         }
 
-        if (! File::exists($directory)) {
-            File::makeDirectory($directory);
-        }
+        $handle = Str::of($fieldset->handle())->after('::')->replace('.', '/');
 
         File::put(
             "{$directory}/{$handle}.yaml",
@@ -162,9 +158,14 @@ class FieldsetRepository
         File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
     }
 
-    public function addNamespace(string $namespace, string $directory): void
+    public function addNamespace(string $namespace, string $directory): FieldsetNamespace
     {
-        $this->hints[$namespace] = $directory;
+        return $this->hints[$namespace] = new FieldsetNamespace($namespace, $directory);
+    }
+
+    public function namespace(string $key)
+    {
+        return $this->hints[$key];
     }
 
     private function getFieldsetsByDirectory(string $directory, string $namespace = null): Collection
