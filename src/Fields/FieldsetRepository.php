@@ -99,7 +99,7 @@ class FieldsetRepository
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
-        return "{$this->hints[$namespace]->directory()}/{$path}.yaml";
+        return "{$this->hints[$namespace]}/{$path}.yaml";
     }
 
     private function overriddenNamespacedFieldsetPath(string $handle)
@@ -128,8 +128,8 @@ class FieldsetRepository
     public function all(): Collection
     {
         $namespaced = collect($this->hints)
-            ->flatMap(function (FieldsetNamespace $namespace, string $name) {
-                return $this->getFieldsetsByDirectory($namespace->directory(), $name);
+            ->flatMap(function (string $directory, string $namespace) {
+                return $this->getFieldsetsByDirectory($directory, $namespace);
             });
 
         return $this
@@ -139,10 +139,11 @@ class FieldsetRepository
 
     public function save(Fieldset $fieldset)
     {
+        $directory = $this->directory;
+
         if ($fieldset->isNamespaced()) {
-            $directory = $fieldset->namespace()->saveDirectory();
-        } else {
-            $directory = $this->directory;
+            [$key, $handle] = explode('::', $fieldset->handle());
+            $directory = $this->directory.'/vendor/'.$key;
         }
 
         $handle = Str::of($fieldset->handle())->after('::')->replace('.', '/');
@@ -158,9 +159,9 @@ class FieldsetRepository
         File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
     }
 
-    public function addNamespace(string $namespace, string $directory): FieldsetNamespace
+    public function addNamespace(string $namespace, string $directory): void
     {
-        return $this->hints[$namespace] = new FieldsetNamespace($namespace, $directory);
+        $this->hints[$namespace] = $directory;
     }
 
     public function namespace(string $key)

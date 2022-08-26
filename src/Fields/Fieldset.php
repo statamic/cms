@@ -85,9 +85,7 @@ class Fieldset
 
     public function namespace()
     {
-        return $this->isNamespaced()
-            ? Facades\Fieldset::namespace(Str::before($this->handle, '::'))
-            : null;
+        return $this->isNamespaced() ? Str::before($this->handle, '::') : null;
     }
 
     public function editUrl()

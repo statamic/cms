@@ -8,6 +8,7 @@ use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FieldsetController extends CpController
 {
@@ -119,6 +120,6 @@ class FieldsetController extends CpController
 
     private function groupKey(Fieldset $fieldset): string
     {
-        return $fieldset->isNamespaced() ? $fieldset->namespace()->title() : __('My Fieldsets');
+        return $fieldset->isNamespaced() ? Str::of($fieldset->namespace())->replace('_', ' ')->title() : __('My Fieldsets');
     }
 }

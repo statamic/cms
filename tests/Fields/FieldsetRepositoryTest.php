@@ -186,9 +186,7 @@ EOT;
      */
     public function it_saves_to_disk($handle, $expectedPath)
     {
-        Facades\Fieldset::addNamespace('foo', '/path/to/foo')->saveToSelf();
-        Facades\Fieldset::addNamespace('bar', '/path/to/bar')->saveToVendor();
-        Facades\Fieldset::addNamespace('baz', '/path/to/baz');
+        Facades\Fieldset::addNamespace('foo', '/path/to/foo');
 
         $expectedYaml = <<<'EOT'
 title: 'Test Fieldset'
@@ -223,12 +221,8 @@ EOT;
         return [
             'standard' => ['test', '/path/to/resources/fieldsets/test.yaml'],
             'standard subdir' => ['subdir.test', '/path/to/resources/fieldsets/subdir/test.yaml'],
-            'namespace, save to self' => ['foo::test', '/path/to/foo/test.yaml'],
-            'namespace, subdir, save to self' => ['foo::subdir.test', '/path/to/foo/subdir/test.yaml'],
-            'namespace, save to vendor' => ['bar::test', '/path/to/resources/fieldsets/vendor/bar/test.yaml'],
-            'namespace, subdir, save to vendor' => ['bar::subdir.test', '/path/to/resources/fieldsets/vendor/bar/subdir/test.yaml'],
-            'namespace, save to vendor by default' => ['baz::test', '/path/to/resources/fieldsets/vendor/baz/test.yaml'],
-            'namespace, subdir, save to vendor by default' => ['baz::subdir.test', '/path/to/resources/fieldsets/vendor/baz/subdir/test.yaml'],
+            'namespace' => ['foo::test', '/path/to/resources/fieldsets/vendor/foo/test.yaml'],
+            'namespace, subdir' => ['foo::subdir.test', '/path/to/resources/fieldsets/vendor/foo/subdir/test.yaml'],
         ];
     }
 
