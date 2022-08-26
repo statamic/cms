@@ -1472,7 +1472,9 @@ class CoreModifiers extends Modifier
      */
     public function mark($value, $params, $context)
     {
-        $words = $params[0] ?? $context['get']['q'] ?? null;
+        if (! $words = $params[0] ?? $context['get']['q'] ?? null) {
+            return $value;
+        }
 
         $params[0] = collect(preg_split('/\s+/', $words))
             ->map(fn ($word) => preg_quote($word, '/'))
@@ -1877,12 +1879,24 @@ class CoreModifiers extends Modifier
      */
     public function regexMark($value, $params)
     {
-        $pattern = array_shift($params);
+        if (! $pattern = array_shift($params)) {
+            return $value;
+        }
+
         $attributes = $this->buildAttributesFromParameters($params);
 
-        return preg_replace_callback("/{$pattern}/is", function ($match) use ($attributes) {
-            return Html::mark($match[0], $attributes);
-        }, $value);
+        return Html::mapText($value, function($text) use ($pattern, $attributes) {
+            // Decode any entities so we can match against real characters
+            $text = html_entity_decode($text);
+            return Str::mapRegex($text, "/({$pattern})/is", function($part, $match) use ($attributes) {
+                // Re-encode any entities so the output is still valid HTML
+                $part = htmlentities($part);
+                if ($match) {
+                    $part = '<mark'.Html::attributes($attributes).'>'.$part.'</mark>';
+                }
+                return $part;
+            });
+        });
     }
 
     /**

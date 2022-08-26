@@ -2,10 +2,12 @@
 
 namespace Statamic\Support;
 
+use Closure;
 use Illuminate\Support\HtmlString;
 use Michelf\SmartyPants;
 use Statamic\Facades\Config;
 use Statamic\Facades\Markdown;
+use Statamic\Support\Str;
 
 class Html
 {
@@ -193,20 +195,6 @@ class Html
     }
 
     /**
-     * Generate an HTML mark.
-     *
-     * @param  string  $value
-     * @param  array  $attributes
-     * @return \Illuminate\Support\HtmlString|string
-     */
-    public static function mark($value, $attributes = [])
-    {
-        $value = static::entities($value);
-
-        return static::toHtmlString('<mark'.static::attributes($attributes).'>'.$value.'</mark>');
-    }
-
-    /**
      * Obfuscate a string to prevent spam-bots from sniffing it.
      *
      * @param  string  $value
@@ -273,6 +261,23 @@ class Html
         $title = static::entities($title);
 
         return static::toHtmlString('<a href="'.static::entities($url).'"'.static::attributes($attributes).'>'.$title.'</a>');
+    }
+
+    /**
+     * Parse each text part of an HTML string (no tags) through a callback function
+     *
+     * @param  string  $value
+     * @param  Closure  $callback
+     * @return string
+     */
+    public static function mapText($value, Closure $callback)
+    {
+        return Str::mapRegex($value, '/(<[^>]+>)/', function($part, $match) use ($callback) {
+            if (! $match) {
+                $part = $callback($part);
+            }
+            return $part;
+        });
     }
 
     /**
