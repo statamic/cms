@@ -164,11 +164,6 @@ class FieldsetRepository
         $this->hints[$namespace] = $directory;
     }
 
-    public function namespace(string $key)
-    {
-        return $this->hints[$key];
-    }
-
     private function getFieldsetsByDirectory(string $directory, string $namespace = null): Collection
     {
         return File::withAbsolutePaths()
