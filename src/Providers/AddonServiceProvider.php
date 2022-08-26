@@ -13,6 +13,8 @@ use Statamic\Actions\Action;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\File;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
@@ -593,11 +595,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldsets()
     {
-        if (! File::exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
+        if (! file_exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
             return $this;
         }
 
-        Fieldset::addDirectory($path, $this->getAddon()->slug());
+        Fieldset::addNamespace($this->getAddon()->slug(), $path);
 
         return $this;
     }
