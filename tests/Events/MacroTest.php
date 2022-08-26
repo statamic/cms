@@ -82,18 +82,17 @@ class MacroTest extends TestCase
         // This `getRawListeners()` method doesn't exist in older versions of Laravel.
         // We should be able remove this when we drop support for Laravel 8.x.
         if (! method_exists($dispatcher, 'getRawListeners')) {
-            $dispatcher = app('events');
-            $r = new ReflectionObject($dispatcher);
-            $p = $r->getProperty('listeners');
-            $p->setAccessible(true);
-            $listeners = $p->getValue($dispatcher);
-
-            return collect($listeners[$event])->map(function ($listener) {
-                return Subscriber::normalizeRegisteredListener($listener);
-            })->values()->all();
+            Event::macro('getRawListeners', function () {
+                return $this->listeners;
+            });
         }
 
-        return array_values($dispatcher->getRawListeners()[$event]);
+        return collect($dispatcher->getRawListeners()[$event])
+            ->map(function ($listener) {
+                return Subscriber::normalizeRegisteredListener($listener);
+            })
+            ->values()
+            ->all();
     }
 }
 
