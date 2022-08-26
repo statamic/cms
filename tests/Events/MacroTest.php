@@ -3,7 +3,6 @@
 namespace Tests\Events;
 
 use Illuminate\Support\Facades\Event;
-use ReflectionObject;
 use Statamic\Events\Event as StatamicEvent;
 use Statamic\Events\Subscriber;
 use Tests\TestCase;
