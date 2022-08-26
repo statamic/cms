@@ -828,7 +828,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected function ensureUniqueFilename($folder, $filename, $count = 0)
     {
         $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
-        $suffix = $count ? " ({$count})" : '';
+        $suffix = $count ? "-{$count}" : '';
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.$suffix.'.'.$extension), '/');
 
         if ($this->disk()->exists($newPath)) {
