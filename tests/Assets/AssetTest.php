@@ -441,6 +441,39 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_properly_merges_new_unsaved_data_to_meta()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expectedBeforeMerge = [
+            'data' => ['one' => 'foo'],
+            'size' => 123,
+        ]));
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/test.txt');
+        Facades\Asset::shouldReceive('save')->with($asset);
+        $asset->save();
+
+        $this->assertEquals($expectedBeforeMerge, $asset->meta());
+
+        $asset->merge([
+            'two' => 'bar',
+            'three' => 'baz',
+        ]);
+
+        $expectedAfterMerge = [
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+                'three' => 'baz',
+            ],
+            'size' => 123,
+        ];
+
+        $this->assertEquals($expectedAfterMerge, $asset->meta());
+    }
+
+    /** @test */
     public function it_generates_meta_on_demand_if_it_doesnt_exist()
     {
         Storage::fake('test');
