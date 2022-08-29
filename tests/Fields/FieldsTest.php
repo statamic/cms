@@ -3,10 +3,10 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
-use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Support\Facades\File;
 use Statamic\Facades;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeFieldsetRepository;
 use Tests\FakesRoles;
