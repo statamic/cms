@@ -106,12 +106,14 @@ class CacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:domains'));
 
         $cacher->cacheUrl('one', 'http://example.com/one');
+        $cacher->cacheUrl('two', '/two');
+        $cacher->cacheUrl('three', 'http://example.org/three', 'http://example.org');
 
         $domains = $cache->get('static-cache:domains');
         $urls = $cache->get('static-cache:'.md5('http://example.com').'.urls');
 
-        $this->assertEquals(['http://example.com'], $domains);
-        $this->assertEquals(['one' => '/one'], $urls);
+        $this->assertEquals(['http://example.com', 'http://example.org'], $domains);
+        $this->assertEquals(['one' => '/one', 'two' => '/two'], $urls);
     }
 
     /** @test */
@@ -141,10 +143,16 @@ class CacherTest extends TestCase
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
             'one' => '/one', 'two' => '/two',
         ]);
+        $cache->forever('static-cache:'.md5('http://example.org').'.urls', [
+            'one' => '/one', 'two' => '/two',
+        ]);
 
         $cacher->forgetUrl('one');
+        $cacher->forgetUrl('two', 'http://example.org');
 
         $this->assertEquals(['two' => '/two'], $cacher->getUrls()->all());
+        $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://example.com')->all());
+        $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://example.org')->all());
     }
 
     /** @test */
