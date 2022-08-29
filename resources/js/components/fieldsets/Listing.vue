@@ -44,8 +44,8 @@ export default {
             rows: this.initialRows,
             columns: [
                 { label: __('Title'), field: 'title' },
-                { label: __('Handle'), field: 'handle' },
-                { label: __('Fields'), field: 'fields' },
+                { label: __('Handle'), field: 'handle', width: '25%' },
+                { label: __('Fields'), field: 'fields', width: '15%' },
             ]
         }
     }
