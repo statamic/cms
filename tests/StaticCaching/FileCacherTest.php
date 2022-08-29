@@ -224,19 +224,27 @@ class FileCacherTest extends TestCase
         $cache = app(Repository::class);
         $cacher = $this->fileCacher([
             'path' => [
-                'en' => ['test/path'],
-                'fr' => ['test/path/fr'],
-                'de' => ['test/path/de'],
+                'en' => 'test/path',
+                'fr' => 'test/path/fr',
+                'de' => 'test/path/de',
             ]
         ], $writer, $cache);
 
+        $cache->forever($this->cacheKey('http://domain.com'), [
+            'one' => '/one', 'two' => '/two'
+        ]);
+        $cache->forever($this->cacheKey('http://domain.com/fr'), [
+            'one' => '/one', 'two' => '/two'
+        ]);
         $cache->forever($this->cacheKey('http://domain.de'), [
             'one' => '/one', 'two' => '/two'
         ]);
 
         $cacher->invalidateUrl('/one', 'http://domain.de');
 
-        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'));
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one',  'de'));
+        $this->assertEquals(['one' => '/one', 'two' => '/two'], $cacher->getUrls('http://domain.com')->all());
+        $this->assertEquals(['one' => '/one', 'two' => '/two'], $cacher->getUrls('http://domain.com/fr')->all());
         $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://domain.de')->all());
     }
 
