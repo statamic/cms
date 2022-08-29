@@ -898,11 +898,11 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
 
-        foreach (['foo', 'bar', 'baz', 'fraz'] as $filename) {
-            $disk->put("old/{$filename}.txt", 'The asset contents');
+        foreach (['foo', 'bar', 'baz', 'fraz', 'do-not-touch'] as $filename) {
+            $disk->put("old/{$filename}.txt", 'The asset con ents');
             $asset = $container->makeAsset("old/{$filename}.txt")->data(['test' => $filename]);
             $asset->saveQuietly();
-            $oldMeta[] = $disk->get("old/.meta/{$filename}.txt.yaml");
+            $oldMeta[$filename] = $disk->get("old/.meta/{$filename}.txt.yaml");
             $disk->assertExists("old/{$filename}.txt");
             $disk->assertExists("old/.meta/{$filename}.txt.yaml");
         }
@@ -911,32 +911,46 @@ class AssetTest extends TestCase
             'old/bar.txt',
             'old/baz.txt',
             'old/fraz.txt',
+            'old/do-not-touch.txt',
         ], $container->files()->all());
         $this->assertEquals([
             'old/foo.txt' => ['test' => 'foo'],
             'old/bar.txt' => ['test' => 'bar'],
             'old/baz.txt' => ['test' => 'baz'],
             'old/fraz.txt' => ['test' => 'fraz'],
+            'old/do-not-touch.txt' => ['test' => 'do-not-touch'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
 
-        $assets = $container->assets()->each->rename('tokyo', true);
+        $assets = $container->assets()
+            ->filter(function ($asset) {
+                return $asset->filename() !== 'do-not-touch';
+            })
+            ->each->rename('tokyo', true); // <-- This is how our RenameAsset action bulk renames.
+
+        $expected = [
+            'foo' => 'tokyo',
+            'bar' => 'tokyo-1',
+            'baz' => 'tokyo-2',
+            'fraz' => 'tokyo-3',
+            'do-not-touch' => 'do-not-touch',
+        ];
 
         Event::assertDispatched(AssetSaved::class, 4);
         foreach (['foo', 'bar', 'baz', 'fraz'] as $filename) {
             $disk->assertMissing("old/{$filename}.txt");
             $disk->assertMissing("old/.meta/{$filename}.txt.yaml");
         }
-        foreach (['tokyo', 'tokyo-1', 'tokyo-2', 'tokyo-3'] as $filename) {
+        foreach (array_values($expected) as $filename) {
             $disk->assertExists("old/{$filename}.txt");
             $disk->assertExists("old/.meta/{$filename}.txt.yaml");
         }
-        foreach ($oldMeta as $i => $meta) {
-            $filename = $i > 0 ? "tokyo-{$i}" : 'tokyo';
-            $this->assertEquals($meta, $disk->get("old/.meta/{$filename}.txt.yaml"));
+        foreach ($expected as $oldFilename => $newFilename) {
+            $this->assertEquals($oldMeta[$oldFilename], $disk->get("old/.meta/{$newFilename}.txt.yaml"));
         }
         $this->assertEquals([
+            'old/do-not-touch.txt',
             'old/tokyo.txt',
             'old/tokyo-1.txt',
             'old/tokyo-2.txt',
@@ -947,11 +961,13 @@ class AssetTest extends TestCase
             'old/tokyo-1.txt' => ['test' => 'bar'],
             'old/tokyo-2.txt' => ['test' => 'baz'],
             'old/tokyo-3.txt' => ['test' => 'fraz'],
+            'old/do-not-touch.txt' => ['test' => 'do-not-touch'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
         $this->assertEquals([
             'old',
+            'old/do-not-touch.txt',
             'old/tokyo.txt',
             'old/tokyo-1.txt',
             'old/tokyo-2.txt',
