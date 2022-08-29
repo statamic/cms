@@ -577,6 +577,13 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
         $this->save();
+
+        $isFlysystemV1 = method_exists($this->disk()->filesystem()->getDriver(), 'getTimestamp');
+
+        if ($isFlysystemV1) {
+            $this->disk()->delete($this->metaPath());
+        }
+
         $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
