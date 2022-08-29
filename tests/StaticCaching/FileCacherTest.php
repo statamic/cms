@@ -3,8 +3,6 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
-use Statamic\Auth\Eloquent\Role;
-use Statamic\Facades\Config;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
