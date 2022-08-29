@@ -63,7 +63,7 @@ class Fieldset
 
     public function title()
     {
-        return $this->contents['title'] ?? Str::humanize(str($this->handle)->after('::')->afterLast('.'));
+        return $this->contents['title'] ?? Str::humanize(Str::of($this->handle)->after('::')->afterLast('.'));
     }
 
     public function fields(): Fields
