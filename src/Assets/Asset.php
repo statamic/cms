@@ -132,7 +132,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         if ($this->meta) {
-            return array_merge($this->meta, ['data' => $this->data->all()]);
+            $meta = $this->meta;
+            $meta['data'] = array_merge($meta['data'], $this->data->all());
+
+            return $meta;
         }
 
         return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
