@@ -226,6 +226,28 @@ EOT;
         ];
     }
 
+    /** @test */
+    public function it_deletes_a_fieldset()
+    {
+        File::shouldReceive('delete')->with('/path/to/resources/fieldsets/test.yaml')->once();
+
+        $fieldset = (new Fieldset)->setHandle('test');
+
+        $this->repo->delete($fieldset);
+    }
+
+    /** @test */
+    public function it_doesnt_delete_namespaced_fieldsets()
+    {
+        $this->expectExceptionMessage('Namespaced fieldsets cannot be deleted');
+
+        File::shouldReceive('delete')->never();
+
+        $fieldset = (new Fieldset)->setHandle('foo::test');
+
+        $this->repo->delete($fieldset);
+    }
+
     /** @test  */
     public function it_gets_a_namespaced_fieldset()
     {

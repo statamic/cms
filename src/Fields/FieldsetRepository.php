@@ -156,6 +156,10 @@ class FieldsetRepository
 
     public function delete(Fieldset $fieldset)
     {
+        if ($fieldset->isNamespaced()) {
+            throw new \Exception('Namespaced fieldsets cannot be deleted');
+        }
+
         File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
     }
 
