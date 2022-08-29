@@ -178,11 +178,13 @@ abstract class AbstractCacher implements Cacher
      */
     public function cacheUrl($key, $url, $domain = null)
     {
+        $domain = $domain ?? $this->getBaseUrl();
+
         $this->cacheDomain($domain);
 
         $urls = $this->getUrls($domain);
 
-        $url = Str::removeLeft($url, $domain ?? $this->getBaseUrl());
+        $url = Str::removeLeft($url, $domain);
 
         $urls->put($key, $url);
 
