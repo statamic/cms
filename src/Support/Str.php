@@ -227,10 +227,11 @@ class Str extends \Illuminate\Support\Str
      */
     public static function mapRegex($value, $regex, Closure $callback)
     {
-        $parts = preg_split($regex, $value, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split($regex, $value, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         foreach ($parts as $i => $part) {
             $parts[$i] = $callback($part, preg_match($regex, $part));
         }
+
         return implode('', $parts);
     }
 

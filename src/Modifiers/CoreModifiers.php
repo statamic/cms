@@ -1885,15 +1885,13 @@ class CoreModifiers extends Modifier
 
         $attributes = $this->buildAttributesFromParameters($params);
 
-        return Html::mapText($value, function($text) use ($pattern, $attributes) {
-            // Decode any entities so we can match against real characters
-            $text = html_entity_decode($text);
-            return Str::mapRegex($text, "/({$pattern})/is", function($part, $match) use ($attributes) {
-                // Re-encode any entities so the output is still valid HTML
-                $part = htmlentities($part);
+        return Html::mapText($value, function ($text) use ($pattern, $attributes) {
+            return Str::mapRegex($text, "/({$pattern})/is", function ($part, $match) use ($attributes) {
+                $part = static::entities($part);
                 if ($match) {
                     $part = '<mark'.Html::attributes($attributes).'>'.$part.'</mark>';
                 }
+
                 return $part;
             });
         });

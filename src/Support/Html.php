@@ -7,7 +7,6 @@ use Illuminate\Support\HtmlString;
 use Michelf\SmartyPants;
 use Statamic\Facades\Config;
 use Statamic\Facades\Markdown;
-use Statamic\Support\Str;
 
 class Html
 {
@@ -272,11 +271,8 @@ class Html
      */
     public static function mapText($value, Closure $callback)
     {
-        return Str::mapRegex($value, '/(<[^>]+>)/', function($part, $match) use ($callback) {
-            if (! $match) {
-                $part = $callback($part);
-            }
-            return $part;
+        return Str::mapRegex($value, '/(<[^>]+>)/', function ($part, $match) use ($callback) {
+            return ! $match ? $callback($part) : $part;
         });
     }
 
