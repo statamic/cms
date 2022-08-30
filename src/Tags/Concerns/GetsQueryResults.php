@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Concerns;
 
 use Statamic\Facades\Blink;
+use Statamic\Query\EloquentQueryBuilder;
 
 trait GetsQueryResults
 {
@@ -38,8 +39,9 @@ trait GetsQueryResults
             $this->queryPaginationFriendlyOffset($query, $offset);
         }
 
+        $columns = $query instanceof EloquentQueryBuilder ? [] : ['*'];
         $pageName = $this->params->get('page_name', 'page');
-        $paginator = $query->paginate($perPage, ['*'], $pageName);
+        $paginator = $query->paginate($perPage, $columns, $pageName);
 
         Blink::put('tag-paginator', $paginator);
 
