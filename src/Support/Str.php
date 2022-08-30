@@ -218,7 +218,7 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
-     * Parse each part of a string split with a regex through a callback function
+     * Parse each part of a string split with a regex through a callback function.
      *
      * @param  string  $value
      * @param  string  $regex

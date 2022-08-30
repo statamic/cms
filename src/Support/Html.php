@@ -263,7 +263,7 @@ class Html
     }
 
     /**
-     * Parse each text part of an HTML string (no tags) through a callback function
+     * Parse each text part of an HTML string (no tags) through a callback function.
      *
      * @param  string  $value
      * @param  Closure  $callback
