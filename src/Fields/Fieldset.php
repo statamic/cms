@@ -17,6 +17,7 @@ class Fieldset
     protected $contents = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $initialPath;
 
     public function setHandle(string $handle)
     {
@@ -36,6 +37,17 @@ class Fieldset
             Facades\Fieldset::directory(),
             str_replace('.', '/', $this->handle()),
         ]));
+    }
+
+    public function initialPath($path = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->initialPath;
+        }
+
+        $this->initialPath = $path;
+
+        return $this;
     }
 
     public function setContents(array $contents)
