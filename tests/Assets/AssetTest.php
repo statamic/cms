@@ -126,8 +126,11 @@ class AssetTest extends TestCase
         // Assert data is correct without hydrating, to ensure the hydrate call happened when calling `set()` above
         $asset->withoutHydrating(function ($asset) {
             $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
             $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
             $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.three'));
             $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
         });
 
@@ -162,8 +165,11 @@ class AssetTest extends TestCase
         // Assert data is correct without hydrating, to ensure the hydrate call happened when calling `merge()` above
         $asset->withoutHydrating(function ($asset) {
             $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
             $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
             $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.three'));
             $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
         });
 
@@ -198,9 +204,13 @@ class AssetTest extends TestCase
         // Assert data is correct without hydrating, to ensure the hydrate call happened when setting with `data()` above
         $asset->withoutHydrating(function ($asset) {
             $this->assertNull($asset->get('one'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.one'));
             $this->assertNull($asset->get('two'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.two'));
             $this->assertEquals('baz', $asset->get('three'));
+            $this->assertEquals('baz', Arr::get($asset->meta(), 'data.three'));
             $this->assertEquals('qux', $asset->get('four'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.four'));
         });
 
         $this->assertEquals(123, $asset->getRawMeta()['size']);
@@ -230,8 +240,11 @@ class AssetTest extends TestCase
         // Assert data is correct without hydrating, to ensure the hydrate call happened when setting magical property via `__set()`
         $asset->withoutHydrating(function ($asset) {
             $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
             $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
             $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.three'));
             $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
         });
 
@@ -265,7 +278,9 @@ class AssetTest extends TestCase
         // Assert data is correct without hydrating, to ensure the hydrate call happened when calling `remove()` above
         $asset->withoutHydrating(function ($asset) {
             $this->assertNull($asset->get('one'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.one'));
             $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
         });
 
         $this->assertEquals(123, $asset->getRawMeta()['size']);
