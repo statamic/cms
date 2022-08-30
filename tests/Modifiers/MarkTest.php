@@ -67,6 +67,17 @@ class MarkTest extends TestCase
     }
 
     /** @test */
+    public function it_marks_html_with_entities()
+    {
+        $html = 'Lorem, ipsum el&uuml;t sit amet';
+        $words = 'elüt';
+
+        $expected = 'Lorem, ipsum <mark>el&uuml;t</mark> sit amet';
+
+        $this->assertEquals($expected, $this->modify($html, $words));
+    }
+
+    /** @test */
     public function it_marks_bard_value()
     {
         $data = new Value([
