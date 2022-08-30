@@ -207,6 +207,38 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_sets_data_values_using_magic_properties()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        $asset->one = 'new-foo';
+        $asset->three = 'qux';
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when setting magical property via `__set()`
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /** @test */
     public function it_removes_data_values()
     {
         Storage::disk('test')->put('foo/test.txt', '');
@@ -295,18 +327,6 @@ class AssetTest extends TestCase
                 return $asset;
             }],
         ];
-    }
-
-    /** @test */
-    public function it_sets_data_values_using_magic_properties()
-    {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
-        $this->assertNull($asset->get('foo'));
-
-        $asset->foo = 'bar';
-
-        $this->assertTrue($asset->has('foo'));
-        $this->assertEquals('bar', $asset->get('foo'));
     }
 
     /** @test */
