@@ -3,7 +3,6 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\Asset;
-use Statamic\Facades\URL;
 
 class DownloadAsset extends Action
 {
@@ -31,12 +30,6 @@ class DownloadAsset extends Action
 
     public function download($items, $values)
     {
-        $asset = $items->first();
-
-        if (URL::isExternal($asset->absoluteUrl())) {
-            return $asset->download();
-        }
-
-        return $asset->resolvedPath();
+        return $items->first()->download();
     }
 }
