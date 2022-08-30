@@ -77,6 +77,30 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_all_data_at_once()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        $data = $asset->data()->all();
+
+        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $data);
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /** @test */
     public function it_sets_data_values()
     {
         Storage::disk('test')->put('foo/test.txt', '');
@@ -359,18 +383,6 @@ class AssetTest extends TestCase
         $this->expectExceptionMessage('Call to undefined method Statamic\Assets\Asset::thisFieldDoesntExist()');
 
         (new Asset)->path('test.txt')->container($this->container)->thisFieldDoesntExist();
-    }
-
-    /** @test */
-    public function it_gets_and_sets_all_data()
-    {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
-        $this->assertEquals([], $asset->data()->all());
-
-        $return = $asset->data(['foo' => 'bar']);
-
-        $this->assertEquals($asset, $return);
-        $this->assertEquals(['foo' => 'bar'], $asset->data()->all());
     }
 
     /** @test */
