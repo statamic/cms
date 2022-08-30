@@ -325,7 +325,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function fallbackEntryBlueprint()
     {
-        $blueprint = Blueprint::find('default')
+        $blueprint = (clone Blueprint::find('default'))
             ->setHandle(Str::singular($this->handle()))
             ->setNamespace('collections.'.$this->handle());
 
