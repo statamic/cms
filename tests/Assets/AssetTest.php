@@ -215,6 +215,64 @@ class AssetTest extends TestCase
         $this->assertEquals(123, $asset->getRawMeta()['size']);
     }
 
+    /**
+     * @test
+     * @dataProvider reAddRemovedData
+     **/
+    public function it_doesnt_try_to_re_remove_newly_added_data_from_meta($reAddRemovedData)
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Calling `remove()` stores temporary `removedData` state on the asset to prevent it from getting
+        // merged back into the meta. We want to ensure this state gets cleared when subsequently adding
+        // new data, so that Statamic doesn't try to re-remove this key if it's intentionally re-added
+        $return = $asset->remove('one');
+
+        $this->assertEquals($asset, $return);
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertNull($asset->get('one'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+        });
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+
+        // This is where `removedData` state should be removed
+        $return = $reAddRemovedData($asset);
+
+        // Assert that newly added data isn't affected by lingering `removedData` state
+        $this->assertEquals($asset, $return);
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+        });
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    public function reAddRemovedData()
+    {
+        return [
+            'by calling set method' => [fn ($asset) => $asset->set('one', 'new-foo')],
+            'by calling data method' => [fn ($asset) => $asset->data(['one' => 'new-foo', 'two' => 'bar', 'three' => 'qux'])],
+            'by calling merge method' => [fn ($asset) => $asset->merge(['one' => 'new-foo', 'three' => 'qux'])],
+            'by calling __set() magically via property' => [function ($asset) {
+                $asset->one = 'new-foo';
+
+                return $asset;
+            }],
+        ];
+    }
+
     /** @test */
     public function it_sets_data_values_using_magic_properties()
     {
