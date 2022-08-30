@@ -34,6 +34,17 @@ class MarkTest extends TestCase
     }
 
     /** @test */
+    public function it_marks_text_with_specialchars()
+    {
+        $text = 'This number is <4 and >2: 3';
+        $words = 'and';
+
+        $expected = 'This number is &lt;4 <mark>and</mark> &gt;2: 3';
+
+        $this->assertEquals($expected, $this->modify($text, $words));
+    }
+
+    /** @test */
     public function it_marks_html()
     {
         $html = 'Lorem, ipsum <x-amet class="ipsum">dolor</x-amet> sit amet';

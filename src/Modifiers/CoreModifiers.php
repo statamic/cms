@@ -1887,7 +1887,7 @@ class CoreModifiers extends Modifier
 
         return Html::mapText($value, function ($text) use ($pattern, $attributes) {
             return Str::mapRegex($text, "/({$pattern})/is", function ($part, $match) use ($attributes) {
-                $part = static::entities($part);
+                $part = Html::entities($part);
                 if ($match) {
                     $part = '<mark'.Html::attributes($attributes).'>'.$part.'</mark>';
                 }
