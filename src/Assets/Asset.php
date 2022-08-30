@@ -102,6 +102,14 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     {
         $this->hydrate();
 
+        if (func_get_args()) {
+            $this->removedData = collect($this->meta['data'])
+                ->diffKeys($data)
+                ->keys()
+                ->merge($this->removedKeys)
+                ->all();
+        }
+
         return call_user_func_array([$this, 'traitData'], func_get_args());
     }
 
