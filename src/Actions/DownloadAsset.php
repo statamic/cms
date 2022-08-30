@@ -28,13 +28,10 @@ class DownloadAsset extends Action
         return $authed->can('view', $asset);
     }
 
-    public function run($items, $values)
+    public function download($items, $values)
     {
         $asset = $items->first();
 
-        return [
-            'message' => false,
-            'callback' => ['downloadUrl', $asset->absoluteUrl()],
-        ];
+        return $asset->resolvedPath();
     }
 }

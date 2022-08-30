@@ -215,20 +215,6 @@ Statamic.app({
                 await alert(url);
             }
         });
-
-        Statamic.$callbacks.add("downloadUrl", async function(url) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const link = document.createElement("a");
-
-                link.href = window.URL.createObjectURL(blob);
-                link.download = url.substring(url.lastIndexOf("/") + 1);
-                link.click();
-            } catch (err) {
-                await alert(url);
-            }
-        });
     },
 
     methods: {
