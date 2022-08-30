@@ -10,12 +10,12 @@ class RegexMarkTest extends TestCase
     /** @test */
     public function it_marks_with_regex()
     {
-        $text = 'Lorem, ipsum dolor sit amet';
+        $value = 'Lorem, ipsum dolor sit amet';
         $regex = 'ipsum dolor|amet';
 
         $expected = 'Lorem, <mark>ipsum dolor</mark> sit <mark>amet</mark>';
 
-        $this->assertEquals($expected, $this->modify($text, $regex));
+        $this->assertEquals($expected, $this->modify($value, $regex));
     }
 
     public function modify($arr, ...$args)

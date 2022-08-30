@@ -11,70 +11,59 @@ use Tests\TestCase;
 class MarkTest extends TestCase
 {
     /** @test */
-    public function it_marks_text()
+    public function it_marks()
     {
-        $text = 'Lorem, ipsum dolor sit amet';
+        $value = 'Lorem, ipsum dolor sit amet';
         $words = 'lorem sit';
 
         $expected = '<mark>Lorem</mark>, ipsum dolor <mark>sit</mark> amet';
 
-        $this->assertEquals($expected, $this->modify($text, $words));
+        $this->assertEquals($expected, $this->modify($value, $words));
     }
 
     /** @test */
-    public function it_marks_text_with_class()
+    public function it_marks_with_class()
     {
-        $text = 'Lorem, ipsum dolor sit amet';
+        $value = 'Lorem, ipsum dolor sit amet';
         $words = 'ipsum';
         $param = 'class:highlight';
 
         $expected = 'Lorem, <mark class="highlight">ipsum</mark> dolor sit amet';
 
-        $this->assertEquals($expected, $this->modify($text, $words, $param));
+        $this->assertEquals($expected, $this->modify($value, $words, $param));
     }
 
     /** @test */
-    public function it_marks_text_with_specialchars()
+    public function it_marks_with_tags()
     {
-        $text = 'This number is <4 and >2: 3';
-        $words = 'and';
-
-        $expected = 'This number is &lt;4 <mark>and</mark> &gt;2: 3';
-
-        $this->assertEquals($expected, $this->modify($text, $words));
-    }
-
-    /** @test */
-    public function it_marks_html()
-    {
-        $html = 'Lorem, ipsum <x-amet class="ipsum">dolor</x-amet> sit amet';
+        $value = 'Lorem, ipsum <x-amet class="ipsum">dolor</x-amet> sit amet';
         $words = 'ipsum amet';
 
         $expected = 'Lorem, <mark>ipsum</mark> <x-amet class="ipsum">dolor</x-amet> sit <mark>amet</mark>';
 
-        $this->assertEquals($expected, $this->modify($html, $words));
+        $this->assertEquals($expected, $this->modify($value, $words));
     }
 
     /** @test */
-    public function it_marks_html_with_specialchars()
+    public function it_marks_with_specialchars()
     {
-        $html = 'Lorem, ipsum &lt; 4 dolor &gt; 2 sit amet';
+        $value = 'Lorem, ipsum &lt; 4 dolor &gt; 2 sit amet';
         $words = 'dolor';
 
         $expected = 'Lorem, ipsum &lt; 4 <mark>dolor</mark> &gt; 2 sit amet';
 
-        $this->assertEquals($expected, $this->modify($html, $words));
+        $this->assertEquals($expected, $this->modify($value, $words));
     }
 
     /** @test */
-    public function it_marks_html_with_entities()
+    public function it_marks_with_entities()
     {
-        $html = 'Lorem, ipsum el&uuml;t sit amet';
+        $value = 'Lorem, ipsum el&uuml;t sit amet';
         $words = 'elüt';
 
         $expected = 'Lorem, ipsum <mark>el&uuml;t</mark> sit amet';
 
-        $this->assertEquals($expected, $this->modify($html, $words));
+        $this->assertEquals($expected, $this->modify($value, $words));
     }
 
     /** @test */
