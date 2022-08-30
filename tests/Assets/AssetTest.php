@@ -58,7 +58,7 @@ class AssetTest extends TestCase
     public function it_gets_data_values()
     {
         Storage::disk('test')->put('foo/test.txt', '');
-        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expectedBeforeMerge = [
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
             'data' => [
                 'one' => 'foo',
             ],
@@ -80,7 +80,7 @@ class AssetTest extends TestCase
     public function it_sets_data_values()
     {
         Storage::disk('test')->put('foo/test.txt', '');
-        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expectedBeforeMerge = [
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
             'data' => [
                 'one' => 'foo',
                 'two' => 'bar',
@@ -114,7 +114,7 @@ class AssetTest extends TestCase
     public function it_merges_data_values()
     {
         Storage::disk('test')->put('foo/test.txt', '');
-        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expectedBeforeMerge = [
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
             'data' => [
                 'one' => 'foo',
                 'two' => 'bar',
@@ -150,7 +150,7 @@ class AssetTest extends TestCase
     public function it_sets_all_data_at_once()
     {
         Storage::disk('test')->put('foo/test.txt', '');
-        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expectedBeforeMerge = [
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
             'data' => [
                 'one' => 'foo',
                 'two' => 'bar',
@@ -186,7 +186,7 @@ class AssetTest extends TestCase
     public function it_removes_data_values()
     {
         Storage::disk('test')->put('foo/test.txt', '');
-        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expectedBeforeMerge = [
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
             'data' => [
                 'one' => 'foo',
                 'two' => 'bar',
