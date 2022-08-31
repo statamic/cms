@@ -19,15 +19,6 @@ class DownloadAsset extends Action
         return $item instanceof Asset;
     }
 
-    public function visibleToBulk($items)
-    {
-        if ($items->whereInstanceOf(Asset::class)->count() !== $items->count()) {
-            return false;
-        }
-
-        return true;
-    }
-
     public function authorize($authed, $asset)
     {
         return $authed->can('view', $asset);
