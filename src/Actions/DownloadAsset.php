@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\Asset;
+use STS\ZipStream\ZipStreamFacade as Zip;
 
 class DownloadAsset extends Action
 {
@@ -34,6 +35,12 @@ class DownloadAsset extends Action
 
     public function download($items, $values)
     {
+        if ($items->count() > 1) {   
+            return Zip::create('assets.zip', $items->map(function ($asset) {
+                return $asset->resolvedPath();
+            })->all())->response();
+        }
+
         return $items->first()->download();
     }
 }

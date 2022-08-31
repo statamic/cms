@@ -145,7 +145,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
         Route::get('svgs/{encoded_asset}', 'SvgController@show')->name('assets.svgs.show');
         Route::get('pdfs/{encoded_asset}', 'PdfController@show')->name('assets.pdfs.show');
-        Route::get('zips/{encoded_assets}', 'ZipController@show')->name('assets.zips.show');
     });
 
     Route::group(['prefix' => 'fields', 'namespace' => 'Fields'], function () {
