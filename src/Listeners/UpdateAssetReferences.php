@@ -7,10 +7,16 @@ use Statamic\Assets\AssetReferenceUpdater;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Events\AssetSaved;
+use Statamic\Events\Subscriber;
 
-class UpdateAssetReferences implements ShouldQueue
+class UpdateAssetReferences extends Subscriber implements ShouldQueue
 {
     use Concerns\GetsItemsContainingData;
+
+    protected $listeners = [
+        AssetSaved::class => 'handleSaved',
+        AssetDeleted::class => 'handleDeleted',
+    ];
 
     /**
      * Register the listeners for the subscriber.
@@ -23,8 +29,7 @@ class UpdateAssetReferences implements ShouldQueue
             return;
         }
 
-        $events->listen(AssetSaved::class, self::class.'@handleSaved');
-        $events->listen(AssetDeleted::class, self::class.'@handleDeleted');
+        parent::subscribe($events);
     }
 
     /**
