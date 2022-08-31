@@ -18,14 +18,9 @@ class ZipController extends Controller
     {
         $encodedAssetIds = Str::split($encodedAssetIds, ',');
 
-        $paths = collect($encodedAssetIds)
-            ->map(function ($encodedAssetId) {
-                return $this->asset($encodedAssetId);
-            })
-            ->map(function ($asset) {
-                return $asset->resolvedPath();
-            })
-            ->all();
+        $paths = collect($encodedAssetIds)->map(function ($encodedAssetId) {
+            return $this->asset($encodedAssetId)->resolvedPath();
+        })->all();
 
         return Zip::create('assets.zip', $paths);
     }
