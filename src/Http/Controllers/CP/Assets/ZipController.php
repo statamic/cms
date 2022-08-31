@@ -16,15 +16,16 @@ class ZipController extends Controller
      */
     public function show($encodedAssetIds)
     {
-        $encodedAssetIds = collect(Str::split($encodedAssetIds, ','));
+        $encodedAssetIds = Str::split($encodedAssetIds, ',');
 
-        $assets = $encodedAssetIds->map(function ($encodedAssetId) {
-            return $this->asset($encodedAssetId);
-        });
-
-        $paths = $assets->map(function ($asset) {
-            return $asset->resolvedPath();
-        })->all();
+        $paths = collect($encodedAssetIds)
+            ->map(function ($encodedAssetId) {
+                return $this->asset($encodedAssetId);
+            })
+            ->map(function ($asset) {
+                return $asset->resolvedPath();
+            })
+            ->all();
 
         return Zip::create('assets.zip', $paths);
     }
