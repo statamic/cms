@@ -282,10 +282,8 @@ abstract class DataReferenceUpdater
      */
     protected function saveItem()
     {
-        GitSubscriber::disable();
-
-        $this->item->save();
-
-        GitSubscriber::enable();
+        GitSubscriber::withoutListeners(function () {
+            $this->item->save();
+        });
     }
 }
