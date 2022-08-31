@@ -35,7 +35,7 @@ class DownloadAsset extends Action
 
     public function download($items, $values)
     {
-        if ($items->count() > 1) {   
+        if ($items->count() > 1) {
             return Zip::create('assets.zip', $items->map(function ($asset) {
                 return $asset->resolvedPath();
             })->all())->response();
