@@ -20,7 +20,11 @@ class DownloadAsset extends Action
 
     public function visibleToBulk($items)
     {
-        return false;
+        if ($items->whereInstanceOf(Asset::class)->count() !== $items->count()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function authorize($authed, $asset)
@@ -30,6 +34,17 @@ class DownloadAsset extends Action
 
     public function run($items, $values)
     {
+        if ($items->count() > 1) {
+            $encodedAssetIds = $items->map(function ($item) {
+                return base64_encode($item->id());
+            })->join(',');
+
+            return [
+                'message' => false,
+                'callback' => ['streamUrl', cp_route('assets.zips.show', ['encoded_assets' => $encodedAssetIds])],
+            ];
+        }
+
         $asset = $items->first();
 
         return [

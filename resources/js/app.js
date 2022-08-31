@@ -229,6 +229,16 @@ Statamic.app({
                 await alert(url);
             }
         });
+
+        Statamic.$callbacks.add("streamUrl", async function(url) {
+            try {
+                const link = document.createElement("a");
+                link.href = url;
+                link.click();
+            } catch (err) {
+                throw err;
+            }
+        });
     },
 
     methods: {
