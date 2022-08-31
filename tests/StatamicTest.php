@@ -243,6 +243,17 @@ class StatamicTest extends TestCase
         $this->assertEquals($testStyle, $path);
     }
 
+    /** @test */
+    public function assets_with_equal_names_will_be_cached_differently()
+    {
+        Statamic::style('test-name', __DIR__.'/../resources/css/test-path-1.css');
+        Statamic::style('test-name', __DIR__.'/../resources/css/test-path-2.css');
+
+        $allStyles = Statamic::availableStyles(Request::create('/'));
+
+        $this->assertNotEquals($allStyles['test-name'][0], $allStyles['test-name'][1]);
+    }
+
     /**
      * @test
      * @dataProvider cpAssetUrlProvider

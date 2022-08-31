@@ -22,7 +22,6 @@ return [
         'file' => [
             'driver' => 'file',
             'paths' => [
-                'users' => base_path('users'),
                 'roles' => resource_path('users/roles.yaml'),
                 'groups' => resource_path('users/groups.yaml'),
             ],

@@ -48,6 +48,11 @@ class UpdateAssetReferencesTest extends TestCase
         parent::tearDown();
     }
 
+    protected function disableUpdateReferences($app)
+    {
+        $app['config']->set('statamic.system.update_references', false);
+    }
+
     /** @test */
     public function it_updates_single_assets_fields()
     {
@@ -117,6 +122,113 @@ class UpdateAssetReferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_nullifies_references_when_deleting_an_asset()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'products',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'featured',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'hoff.jpg',
+            'products' => ['norris.jpg', 'hoff.jpg'],
+            'featured' => 'asset::test_container::norris.jpg',
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $entry->get('avatar'));
+        $this->assertEquals(['norris.jpg', 'hoff.jpg'], $entry->get('products'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->get('featured'));
+
+        $this->assetHoff->delete();
+
+        $this->assertFalse($entry->fresh()->has('avatar'));
+        $this->assertEquals(['norris.jpg'], $entry->fresh()->get('products'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->fresh()->get('featured'));
+
+        $this->assetNorris->delete();
+
+        $this->assertFalse($entry->fresh()->has('products'));
+        $this->assertFalse($entry->fresh()->has('featured'));
+    }
+
+    /**
+     * @test
+     * @environment-setup disableUpdateReferences
+     **/
+    public function it_can_be_disabled()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'products',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'featured',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => 'hoff.jpg',
+            'products' => ['norris.jpg', 'hoff.jpg'],
+            'featured' => 'asset::test_container::norris.jpg',
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $entry->get('avatar'));
+        $this->assertEquals(['norris.jpg', 'hoff.jpg'], $entry->get('products'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->get('featured'));
+
+        $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
+
+        $this->assertEquals('hoff.jpg', $entry->fresh()->get('avatar'));
+        $this->assertEquals(['norris.jpg', 'hoff.jpg'], $entry->fresh()->get('products'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->fresh()->get('featured'));
+    }
+
+    /** @test */
     public function it_updates_link_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -137,21 +249,32 @@ class UpdateAssetReferencesTest extends TestCase
                         'container' => 'test_container',
                     ],
                 ],
+                [
+                    'handle' => 'featured',
+                    'field' => [
+                        'type' => 'link',
+                        'container' => 'test_container',
+                    ],
+                ],
             ],
         ]);
 
         $entry = tap(Facades\Entry::make()->collection($collection)->data([
             'avatar' => 'asset::test_container::hoff.jpg',
-            'product' => 'asset::test_container::surfboard.jpg',
+            'product' => 'asset::test_container::norris.jpg',
+            'featured' => 'asset::test_container::surfboard.jpg',
         ]))->save();
 
         $this->assertEquals('asset::test_container::hoff.jpg', $entry->get('avatar'));
-        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->get('product'));
+        $this->assertEquals('asset::test_container::norris.jpg', $entry->get('product'));
+        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->get('featured'));
 
         $this->assetHoff->path('hoff-new.jpg')->save();
+        $this->assetNorris->delete();
 
         $this->assertEquals('asset::test_container::hoff-new.jpg', $entry->fresh()->get('avatar'));
-        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->fresh()->get('product'));
+        $this->assertFalse($entry->fresh()->has('product'));
+        $this->assertEquals('asset::test_container::surfboard.jpg', $entry->fresh()->get('featured'));
     }
 
     /** @test */
@@ -215,7 +338,7 @@ class UpdateAssetReferencesTest extends TestCase
                 [
                     'type' => 'set_one',
                     'product' => 'hoff.jpg',
-                    'pics' => ['hoff.jpg', 'norris.jpg'],
+                    'pics' => ['hoff.jpg', 'norris.jpg', 'lee.jpg'],
                 ],
             ],
         ]))->save();
@@ -224,15 +347,16 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'reppy.0.pics'));
         $this->assertEquals('not an asset', Arr::get($entry->data(), 'reppy.1.not_asset'));
         $this->assertEquals('hoff.jpg', Arr::get($entry->data(), 'reppy.2.product'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'reppy.2.pics'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'lee.jpg'], Arr::get($entry->data(), 'reppy.2.pics'));
 
         $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
 
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'reppy.0.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.0.pics'));
+        $this->assertEquals(['content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.0.pics'));
         $this->assertEquals('not an asset', Arr::get($entry->fresh()->data(), 'reppy.1.not_asset'));
-        $this->assertEquals('hoff.jpg', Arr::get($entry->fresh()->data(), 'reppy.2.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.2.pics'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'reppy.2.product'));
+        $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'reppy.2.pics'));
     }
 
     /** @test */
@@ -276,7 +400,7 @@ class UpdateAssetReferencesTest extends TestCase
                 ],
                 [
                     'product' => 'hoff.jpg',
-                    'pics' => ['hoff.jpg', 'norris.jpg'],
+                    'pics' => ['hoff.jpg', 'norris.jpg', 'lee.jpg'],
                 ],
             ],
         ]))->save();
@@ -284,14 +408,15 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('norris.jpg', Arr::get($entry->data(), 'griddy.0.product'));
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'griddy.0.pics'));
         $this->assertEquals('hoff.jpg', Arr::get($entry->data(), 'griddy.1.product'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'griddy.1.pics'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'lee.jpg'], Arr::get($entry->data(), 'griddy.1.pics'));
 
         $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
 
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'griddy.0.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'griddy.0.pics'));
-        $this->assertEquals('hoff.jpg', Arr::get($entry->fresh()->data(), 'griddy.1.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'griddy.1.pics'));
+        $this->assertEquals(['content/norris.jpg'], Arr::get($entry->fresh()->data(), 'griddy.0.pics'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'griddy.1.product'));
+        $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'griddy.1.pics'));
     }
 
     /** @test */
@@ -363,7 +488,7 @@ class UpdateAssetReferencesTest extends TestCase
                         'values' => [
                             'type' => 'set_one',
                             'product' => 'hoff.jpg',
-                            'pics' => ['hoff.jpg', 'norris.jpg'],
+                            'pics' => ['hoff.jpg', 'norris.jpg', 'lee.jpg'],
                         ],
                     ],
                 ],
@@ -374,15 +499,16 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'bardo.0.attrs.values.pics'));
         $this->assertEquals('not an asset', Arr::get($entry->data(), 'bardo.1.not_asset'));
         $this->assertEquals('hoff.jpg', Arr::get($entry->data(), 'bardo.2.attrs.values.product'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'bardo.2.attrs.values.pics'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'lee.jpg'], Arr::get($entry->data(), 'bardo.2.attrs.values.pics'));
 
         $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
 
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.pics'));
+        $this->assertEquals(['content/norris.jpg'], Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.pics'));
         $this->assertEquals('not an asset', Arr::get($entry->fresh()->data(), 'bardo.1.not_asset'));
-        $this->assertEquals('hoff.jpg', Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.pics'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'bardo.2.attrs.values.product'));
+        $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.pics'));
     }
 
     /** @test */
@@ -404,6 +530,28 @@ class UpdateAssetReferencesTest extends TestCase
 
         $entry = tap(Facades\Entry::make()->collection($collection)->data([
             'bardo' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'asset::test_container::surfboard.jpg',
+                                'alt' => 'surfboard',
+                            ],
+                        ],
+                        [
+                            'type' => 'link',
+                            'attrs' => [
+                                'href' => 'statamic://asset::test_container::surfboard.jpg',
+                            ],
+                        ],
+                        [
+                            'type' => 'paragraph',
+                            'content' => 'unrelated',
+                        ],
+                    ],
+                ],
                 [
                     'type' => 'paragraph',
                     'content' => [
@@ -451,21 +599,32 @@ class UpdateAssetReferencesTest extends TestCase
             ],
         ]))->save();
 
-        $this->assertEquals('asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.0.attrs.src'));
-        $this->assertEquals('hoff', Arr::get($entry->data(), 'bardo.0.content.0.attrs.alt'));
-        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.0.content.1.attrs.href'));
-        $this->assertEquals('asset::test_container::norris.jpg', Arr::get($entry->data(), 'bardo.1.content.0.attrs.src'));
-        $this->assertEquals('norris', Arr::get($entry->data(), 'bardo.1.content.0.attrs.alt'));
-        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->data(), 'bardo.1.content.1.attrs.href'));
+        $this->assertEquals('asset::test_container::surfboard.jpg', Arr::get($entry->data(), 'bardo.0.content.0.attrs.src'));
+        $this->assertEquals('surfboard', Arr::get($entry->data(), 'bardo.0.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::surfboard.jpg', Arr::get($entry->data(), 'bardo.0.content.1.attrs.href'));
 
-        $this->assetHoff->path('content/hoff-new.jpg')->save();
+        $this->assertEquals('asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.1.content.0.attrs.src'));
+        $this->assertEquals('hoff', Arr::get($entry->data(), 'bardo.1.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->data(), 'bardo.1.content.1.attrs.href'));
 
-        $this->assertEquals('asset::test_container::content/hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.0.attrs.src'));
-        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'bardo.0.content.0.attrs.alt'));
-        $this->assertEquals('statamic://asset::test_container::content/hoff-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.1.attrs.href'));
-        $this->assertEquals('asset::test_container::norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.src'));
-        $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.alt'));
-        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.1.content.1.attrs.href'));
+        $this->assertEquals('asset::test_container::norris.jpg', Arr::get($entry->data(), 'bardo.2.content.0.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->data(), 'bardo.2.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->data(), 'bardo.2.content.1.attrs.href'));
+
+        $this->assetHoff->delete();
+        $this->assetNorris->path('content/norris-new.jpg')->save();
+
+        $this->assertEquals('asset::test_container::surfboard.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.0.attrs.src'));
+        $this->assertEquals('surfboard', Arr::get($entry->fresh()->data(), 'bardo.0.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::surfboard.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.content.1.attrs.href'));
+
+        $this->assertEquals('', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.src'));
+        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'bardo.1.content.0.attrs.alt'));
+        $this->assertEquals('', Arr::get($entry->fresh()->data(), 'bardo.1.content.1.attrs.href'));
+
+        $this->assertEquals('asset::test_container::content/norris-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.2.content.0.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'bardo.2.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::content/norris-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.2.content.1.attrs.href'));
     }
 
     /** @test */
@@ -494,6 +653,8 @@ class UpdateAssetReferencesTest extends TestCase
 <p><a href="statamic://asset::test_container::hoff.jpg">Link</a></p>
 <img src="statamic://asset::test_container::norris.jpg">
 <p><a href="statamic://asset::test_container::norris.jpg">Link</a></p>
+<img src="statamic://asset::test_container::surfboard.jpg">
+<p><a href="statamic://asset::test_container::surfboard.jpg">Link</a></p>
 EOT;
 
         $entry = tap(Facades\Entry::make()->collection($collection)->data(['bardo' => $content]))->save();
@@ -501,6 +662,7 @@ EOT;
         $this->assertEquals($content, $entry->get('bardo'));
 
         $this->assetHoff->path('content/hoff-new.jpg')->save();
+        $this->assetNorris->delete();
 
         $expected = <<<'EOT'
 <p>Some text.</p>
@@ -508,8 +670,10 @@ EOT;
 <img src="statamic://asset::test_container::content/hoff-new.jpg" alt="test">
 </p>More text.</p>
 <p><a href="statamic://asset::test_container::content/hoff-new.jpg">Link</a></p>
-<img src="statamic://asset::test_container::norris.jpg">
-<p><a href="statamic://asset::test_container::norris.jpg">Link</a></p>
+<img src="">
+<p><a href="">Link</a></p>
+<img src="statamic://asset::test_container::surfboard.jpg">
+<p><a href="statamic://asset::test_container::surfboard.jpg">Link</a></p>
 EOT;
 
         $this->assertEquals($expected, $entry->fresh()->get('bardo'));
@@ -536,7 +700,8 @@ EOT;
 Some text.
 ![](statamic://asset::test_container::hoff.jpg)
 More text.
-![](statamic://asset::test_container::norris.jpg)
+![First link](statamic://asset::test_container::norris.jpg)
+![Second link](statamic://asset::test_container::surfboard.jpg)
 EOT;
 
         $entry = tap(Facades\Entry::make()->collection($collection)->data(['content' => $content]))->save();
@@ -544,12 +709,14 @@ EOT;
         $this->assertEquals($content, $entry->get('content'));
 
         $this->assetHoff->path('content/hoff-new.jpg')->save();
+        $this->assetNorris->delete();
 
         $expected = <<<'EOT'
 Some text.
 ![](statamic://asset::test_container::content/hoff-new.jpg)
 More text.
-![](statamic://asset::test_container::norris.jpg)
+![First link]()
+![Second link](statamic://asset::test_container::surfboard.jpg)
 EOT;
 
         $this->assertEquals($expected, $entry->fresh()->get('content'));
@@ -658,12 +825,12 @@ EOT;
                                 'values' => [
                                     'type' => 'set_two',
                                     'product' => 'norris.jpg',
-                                    'pics' => ['hoff.jpg', 'norris.jpg'],
-                                    'bio' => '# Markdown: ![](statamic://asset::test_container::norris.jpg)',
+                                    'pics' => ['hoff.jpg', 'norris.jpg', 'surfboard.jpg'],
+                                    'bio' => '# Markdown: ![Norris](statamic://asset::test_container::norris.jpg) ![Hoff](statamic://asset::test_container::hoff.jpg)',
                                     'griddy' => [
                                         [
                                             'product' => 'norris.jpg',
-                                            'pics' => ['hoff.jpg', 'norris.jpg'],
+                                            'pics' => ['hoff.jpg', 'norris.jpg', 'surfboard.jpg'],
                                         ],
                                     ],
                                 ],
@@ -677,20 +844,21 @@ EOT;
         $this->assertEquals('norris.jpg', Arr::get($entry->data(), 'avatar'));
         $this->assertEquals('not an asset', Arr::get($entry->data(), 'reppy.0.not_asset'));
         $this->assertEquals('norris.jpg', Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.product'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.pics'));
-        $this->assertEquals('# Markdown: ![](statamic://asset::test_container::norris.jpg)', Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.bio'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'surfboard.jpg'], Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.pics'));
+        $this->assertEquals('# Markdown: ![Norris](statamic://asset::test_container::norris.jpg) ![Hoff](statamic://asset::test_container::hoff.jpg)', Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.bio'));
         $this->assertEquals('norris.jpg', Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.product'));
-        $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.pics'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'surfboard.jpg'], Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.pics'));
 
+        $this->assetHoff->delete();
         $this->assetNorris->path('content/norris.jpg')->save();
 
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'avatar'));
         $this->assertEquals('not an asset', Arr::get($entry->fresh()->data(), 'reppy.0.not_asset'));
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.pics'));
-        $this->assertEquals('# Markdown: ![](statamic://asset::test_container::content/norris.jpg)', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.bio'));
+        $this->assertEquals(['content/norris.jpg', 'surfboard.jpg'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.pics'));
+        $this->assertEquals('# Markdown: ![Norris](statamic://asset::test_container::content/norris.jpg) ![Hoff]()', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.bio'));
         $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.product'));
-        $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.pics'));
+        $this->assertEquals(['content/norris.jpg', 'surfboard.jpg'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.pics'));
     }
 
     /** @test */

@@ -73,4 +73,6 @@ return [
     'group_misc' => 'Divers',
     'resolve_duplicate_ids' => 'Résoudre les problèmes d’IDs en double',
     'resolve_duplicate_ids_desc' => 'Permet de voir et résoudre les problèmes d’IDs en double.',
+    'view_graphql' => 'Visualiser GraphQL',
+    'view_graphql_desc' => 'Permet d’accéder au visualiseur GraphQL',
 ];

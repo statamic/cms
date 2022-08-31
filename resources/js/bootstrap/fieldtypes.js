@@ -57,5 +57,6 @@ Vue.component('template-fieldtype', TemplateFieldtype);
 Vue.component('template_folder-fieldtype', require('../components/fieldtypes/TemplateFolderFieldtype.vue').default);
 Vue.component('time-fieldtype', require('../components/fieldtypes/TimeFieldtype.vue').default);
 Vue.component('toggle-fieldtype', require('../components/fieldtypes/ToggleFieldtype.vue').default);
+Vue.component('toggle-fieldtype-index', require('../components/fieldtypes/ToggleIndexFieldtype.vue').default);
 Vue.component('video-fieldtype', require('../components/fieldtypes/VideoFieldtype.vue').default);
 Vue.component('yaml-fieldtype', require('../components/fieldtypes/YamlFieldtype.vue').default);

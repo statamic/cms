@@ -25,6 +25,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess, Arrayable
@@ -107,9 +108,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function termBlueprint($blueprint = null, $term = null)
     {
-        $blueprint = is_null($blueprint)
-            ? $this->termBlueprints()->first()
-            : $this->termBlueprints()->keyBy->handle()->get($blueprint);
+        $blueprint = $this->getBaseTermBlueprint($blueprint);
 
         $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
 
@@ -118,6 +117,16 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         }
 
         return $blueprint;
+    }
+
+    private function getBaseTermBlueprint($blueprint)
+    {
+        if (is_null($blueprint)) {
+            return $this->termBlueprints()->first();
+        }
+
+        return $this->termBlueprints()->keyBy->handle()->get($blueprint)
+            ?? $this->termBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
     }
 
     public function ensureTermBlueprintFields($blueprint)
@@ -132,11 +141,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     public function fallbackTermBlueprint()
     {
         $blueprint = Blueprint::find('default')
-            ->setHandle($this->handle())
+            ->setHandle(Str::singular($this->handle()))
             ->setNamespace('taxonomies.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = $this->title();
+        $contents['title'] = Str::singular($this->title());
         $blueprint->setContents($contents);
 
         return $blueprint;

@@ -41,6 +41,7 @@ export default {
     data() {
         return {
             isOpen: false,
+            escBinding: null,
             popper: null,
         }
     },
@@ -78,12 +79,15 @@ export default {
 
             this.bindPopper();
             this.isOpen = true;
-            this.$keys.bind('esc', e => this.close())
+            this.escBinding = this.$keys.bind('esc', e => this.close())
         },
         close() {
             if (!this.popper) return;
 
             this.isOpen = false;
+            if (this.escBinding) {
+                this.escBinding.destroy();
+            }
             // timeout so that the fade out animation is still called correctly
             setTimeout(() => { 
                 this.destroyPopper(); 
