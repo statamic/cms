@@ -40,6 +40,7 @@ class DownloadAsset extends Action
             $items->each(function ($asset) use ($zip) {
                 $zip->addRaw($asset->contents(), $asset->basename());
             });
+
             return $zip->response();
         }
 
