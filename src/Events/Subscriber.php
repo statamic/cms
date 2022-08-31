@@ -2,6 +2,8 @@
 
 namespace Statamic\Events;
 
+use Statamic\Support\Str;
+
 abstract class Subscriber
 {
     protected $listeners = [];
@@ -29,7 +31,13 @@ abstract class Subscriber
             throw new \Exception('No event listeners registered in [$listeners] property!');
         }
 
-        return $this->listeners;
+        return collect($this->listeners)
+            ->map(function ($listener, $event) {
+                return is_string($listener) && ! Str::contains($listener, '@')
+                    ? [static::class, $listener]
+                    : $listener;
+            })
+            ->all();
     }
 
     /**

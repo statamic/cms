@@ -168,7 +168,7 @@ class StaticCachePunSubscriber extends StatamicSubscriber
 class EmailPunSubscriber extends StatamicSubscriber
 {
     public $listeners = [
-        PunSaved::class => self::class.'@handleSaved',
+        PunSaved::class => 'handleSaved', // string notation with implicit class
     ];
 
     public function handleSaved(PunSaved $event)
