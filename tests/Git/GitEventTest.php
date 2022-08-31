@@ -460,7 +460,6 @@ class GitEventTest extends TestCase
             Events\TaxonomySaved::class,
             Events\CollectionSaved::class,
             Events\TermSaved::class,
-            Events\EntrySaved::class,
         ]);
 
         $taxonomy = tap(Facades\Taxonomy::make('topics'))->save();
@@ -499,12 +498,8 @@ class GitEventTest extends TestCase
                     'title' => $i,
                     'topic' => 'leia',
                 ])
-                ->save();
+                ->saveQuietly();
         }
-
-        Config::set('statamic.git.ignored_events', [
-            Events\TermSaved::class,
-        ]);
 
         Git::shouldReceive('dispatchCommit')->with('Term references updated')->once(); // Ensure references updated event gets fired
         Git::shouldReceive('dispatchCommit')->with('Entry saved')->never(); // Ensure individual entry saved events do not get fired
@@ -518,7 +513,6 @@ class GitEventTest extends TestCase
         Config::set('statamic.git.ignored_events', [
             Events\CollectionSaved::class,
             Events\AssetSaved::class,
-            Events\EntrySaved::class,
         ]);
 
         $originalAsset = tap($this->makeAsset('leia.jpg'))->save();
@@ -552,7 +546,7 @@ class GitEventTest extends TestCase
                     'title' => $i,
                     'avatar' => 'leia.jpg',
                 ])
-                ->save();
+                ->saveQuietly();
         }
 
         Git::shouldReceive('dispatchCommit')->with('Asset references updated')->once(); // Ensure references updated event gets fired
