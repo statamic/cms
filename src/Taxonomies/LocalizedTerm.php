@@ -423,11 +423,6 @@ class LocalizedTerm implements
         return $this->term->save();
     }
 
-    public function saveQuietly()
-    {
-        return $this->term->saveQuietly();
-    }
-
     public function delete()
     {
         return $this->term->delete();
