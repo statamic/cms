@@ -27,6 +27,7 @@ use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -603,7 +604,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         // until after the `AssetReplaced` event is fired. We still want to fire events
         // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
         // get triggered (for cache invalidation, clearing of glide cache, etc.)
-        AssetReferenceUpdater::disable();
+        UpdateAssetReferencesSubscriber::disable();
 
         if ($deleteOriginal) {
             $originalAsset->delete();
@@ -613,7 +614,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             $this->rename($originalAsset->filename());
         }
 
-        AssetReferenceUpdater::enable();
+        UpdateAssetReferencesSubscriber::enable();
 
         AssetReplaced::dispatch($originalAsset, $this);
     }
