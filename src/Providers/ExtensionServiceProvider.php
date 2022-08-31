@@ -28,6 +28,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
+        Actions\DownloadAsset::class,
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,

@@ -42,16 +42,17 @@ export default {
         return {
             isOpen: false,
             escBinding: null,
+            popper: null,
         }
     },
 
-    mounted() {
-        if (! this.disabled) this.bindPopper()
+    beforeDestroy() {
+        this.destroyPopper();
     },
 
     methods: {
         bindPopper() {
-            createPopper(this.$refs.trigger, this.$refs.popover, {
+            this.popper = createPopper(this.$refs.trigger, this.$refs.popover, {
                 placement: this.placement,
                 modifiers: [
                     {
@@ -74,16 +75,30 @@ export default {
             this.isOpen ? this.close() : this.open();
         },
         open() {
+            if (this.popper) return;
+
+            this.bindPopper();
             this.isOpen = true;
             this.escBinding = this.$keys.bind('esc', e => this.close())
         },
         close() {
+            if (!this.popper) return;
+
             this.isOpen = false;
-            
             if (this.escBinding) {
                 this.escBinding.destroy();
             }
-        }
+            // timeout so that the fade out animation is still called correctly
+            setTimeout(() => { 
+                this.destroyPopper(); 
+            }, 100);
+        },
+        destroyPopper() {
+            if (!this.popper) return;
+
+            this.popper.destroy();
+            this.popper = null; 
+        },
     }
 }
 </script>

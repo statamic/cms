@@ -3,14 +3,20 @@
 namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\Subscriber;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermReferencesUpdated;
 use Statamic\Events\TermSaved;
 use Statamic\Taxonomies\TermReferenceUpdater;
 
-class UpdateTermReferences implements ShouldQueue
+class UpdateTermReferences extends Subscriber implements ShouldQueue
 {
     use Concerns\GetsItemsContainingData;
+
+    protected $listeners = [
+        TermSaved::class => 'handleSaved',
+        TermDeleted::class => 'handleDeleted',
+    ];
 
     /**
      * Register the listeners for the subscriber.
@@ -23,8 +29,7 @@ class UpdateTermReferences implements ShouldQueue
             return;
         }
 
-        $events->listen(TermSaved::class, self::class.'@handleSaved');
-        $events->listen(TermDeleted::class, self::class.'@handleDeleted');
+        parent::subscribe($events);
     }
 
     /**
