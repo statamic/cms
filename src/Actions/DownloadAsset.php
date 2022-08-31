@@ -32,24 +32,8 @@ class DownloadAsset extends Action
         return $authed->can('view', $asset);
     }
 
-    public function run($items, $values)
+    public function download($items, $values)
     {
-        if ($items->count() > 1) {
-            $encodedAssetIds = $items->map(function ($item) {
-                return base64_encode($item->id());
-            })->join(',');
-
-            return [
-                'message' => false,
-                'callback' => ['streamUrl', cp_route('assets.zips.show', ['encoded_assets' => $encodedAssetIds])],
-            ];
-        }
-
-        $asset = $items->first();
-
-        return [
-            'message' => false,
-            'callback' => ['downloadUrl', $asset->absoluteUrl()],
-        ];
+        return $items->first()->download();
     }
 }
