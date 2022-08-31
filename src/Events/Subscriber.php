@@ -51,6 +51,20 @@ abstract class Subscriber
     }
 
     /**
+     * Run a callback without triggering listeners handled by this subscriber.
+     *
+     * @param  \Closure  $callback
+     */
+    public static function withoutListeners($callback)
+    {
+        static::disable();
+
+        $callback();
+
+        static::enable();
+    }
+
+    /**
      * Normalize registered listener.
      *
      * @param  mixed  $listener

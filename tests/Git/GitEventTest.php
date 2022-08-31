@@ -99,9 +99,10 @@ class GitEventTest extends TestCase
 
         $collection = Facades\Collection::make('pages');
 
-        GitSubscriber::disable();
-        $collection->save();
-        GitSubscriber::enable();
+        GitSubscriber::withoutListeners(function () use ($collection) {
+            $collection->save();
+        });
+
         $collection->delete();
     }
 

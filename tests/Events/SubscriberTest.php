@@ -68,6 +68,35 @@ class SubscriberTest extends TestCase
     }
 
     /** @test */
+    public function it_can_temporarily_disable_listeners_on_code_run_within_a_callback()
+    {
+        Event::subscribe(StaticCachePunSubscriber::class);
+
+        $this->assertEventHandledCount(0, PunSaved::class);
+        $this->assertEventHandledCount(0, PunDeleted::class);
+
+        PunSaved::dispatch();
+        PunDeleted::dispatch();
+
+        $this->assertEventHandledCount(1, PunSaved::class);
+        $this->assertEventHandledCount(1, PunDeleted::class);
+
+        StaticCachePunSubscriber::withoutListeners(function () {
+            PunSaved::dispatch();
+            PunDeleted::dispatch();
+        });
+
+        $this->assertEventHandledCount(1, PunSaved::class);
+        $this->assertEventHandledCount(1, PunDeleted::class);
+
+        PunSaved::dispatch();
+        PunDeleted::dispatch();
+
+        $this->assertEventHandledCount(2, PunSaved::class);
+        $this->assertEventHandledCount(2, PunDeleted::class);
+    }
+
+    /** @test */
     public function disabling_one_subscriber_does_not_affect_other_subscribers()
     {
         Event::subscribe(StaticCachePunSubscriber::class);
