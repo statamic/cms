@@ -653,6 +653,24 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_clears_asset_glide_cache_when_deleting()
+    {
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('path/to/asset.txt', '');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = (new Asset)->container($container)->path('path/to/asset.txt');
+
+        // Just assert that `Glide::clearAsset()` is called on delete,
+        // since `Imaging\GlideTest.php` covers the actual functionality.
+        Facades\Glide::shouldReceive('clearAsset')->once();
+
+        $asset->delete();
+    }
+
+    /** @test */
     public function it_can_be_moved_to_another_folder()
     {
         Event::fake();
