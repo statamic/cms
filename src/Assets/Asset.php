@@ -597,6 +597,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      * @param  Asset  $originalAsset
      * @param  bool  $deleteOriginal
      * @param  bool  $preserveOriginalFilename
+     * @return $this
      */
     public function replace(Asset $originalAsset, $deleteOriginal = false, $preserveOriginalFilename = false)
     {
@@ -617,6 +618,8 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         UpdateAssetReferencesSubscriber::enable();
 
         AssetReplaced::dispatch($originalAsset, $this);
+
+        return $this;
     }
 
     /**
