@@ -13,8 +13,10 @@ use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\BlueprintCreated;
 use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
+use Statamic\Events\BlueprintSaving;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -35,6 +37,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     protected $fieldsCache;
     protected $parent;
     protected $ensuredFields = [];
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function setHandle(string $handle)
     {
@@ -372,11 +376,50 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         ];
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
+        $name = Str::removeLeft($this->namespace().'.'.$this->handle(), '.');
+        $isNew = is_null(Facades\Blueprint::find($name));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (BlueprintSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         BlueprintRepository::save($this);
 
-        BlueprintSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                BlueprintCreated::dispatch($this);
+            }
+
+            BlueprintSaved::dispatch($this);
+        }
 
         return $this;
     }

@@ -17,4 +17,14 @@ class ToggleTest extends TestCase
         $this->assertFalse($field->augment(null));
         $this->assertTrue($field->augment(true));
     }
+
+    /** @test */
+    public function it_processes_to_a_boolean_only_when_value_is_actually_set_or_submitted()
+    {
+        $field = (new Toggle)->setField(new Field('test', ['type' => 'toggle']));
+
+        $this->assertTrue($field->process(true));
+        $this->assertFalse($field->process(false));
+        $this->assertNull($field->process(null));
+    }
 }

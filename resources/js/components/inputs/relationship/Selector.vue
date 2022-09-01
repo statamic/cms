@@ -41,6 +41,7 @@
                                 :loading="loading"
                                 :allow-bulk-actions="true"
                                 :toggle-selection-on-row-click="true"
+                                :type="type"
                                 @sorted="sorted"
                                 class="cursor-pointer"
                             >
@@ -113,6 +114,7 @@ export default {
         maxSelections: Number,
         site: String,
         search: Boolean,
+        type: String,
         exclusions: {
             type: Array,
             default: () => []

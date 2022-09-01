@@ -2,6 +2,8 @@
 
     <div :class="classes" class="replicator-set">
 
+        <slot name="picker" />
+
         <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
             <div class="flex-1 p-1" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
@@ -52,8 +54,6 @@
                 @replicator-preview-updated="previewUpdated(field.handle, $event)"
             />
         </div>
-
-        <slot name="picker" />
 
     </div>
 

@@ -101,6 +101,11 @@ class Field implements Arrayable
         return $visibility ?? 'visible';
     }
 
+    public function alwaysSave()
+    {
+        return Arr::get($this->config, 'always_save', false);
+    }
+
     public function rules()
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
@@ -231,6 +236,7 @@ class Field implements Arrayable
             'required' => $this->isRequired(),
             'visibility' => $this->visibility(),
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
+            'always_save' => $this->alwaysSave(),
         ]);
     }
 

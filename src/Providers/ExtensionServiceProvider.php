@@ -28,6 +28,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
+        Actions\DownloadAsset::class,
         Actions\DuplicateAsset::class,
         Actions\DuplicateEntry::class,
         Actions\DuplicateForm::class,
@@ -178,7 +179,9 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Theme::class,
         Tags\Trans::class,
         Tags\TransChoice::class,
+        Tags\UserGroups::class,
         Tags\Users::class,
+        Tags\UserRoles::class,
         Tags\Vite::class,
         Tags\Widont::class,
         Tags\Yields::class,
@@ -187,6 +190,7 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Auth\Protect\Tags::class,
         \Statamic\OAuth\Tags::class,
         \Statamic\Search\Tags::class,
+        \Statamic\StaticCaching\NoCache\Tags::class,
     ];
 
     protected $widgets = [
@@ -206,6 +210,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddPerEntryPermissions::class,
         Updates\UseDedicatedTrees::class,
         Updates\AddUniqueSlugValidation::class,
+        Updates\AddGraphQLPermission::class,
     ];
 
     public function register()

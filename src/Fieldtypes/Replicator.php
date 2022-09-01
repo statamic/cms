@@ -266,4 +266,9 @@ class Replicator extends Fieldtype
             return array_merge($values, $processed);
         })->all();
     }
+
+    public function toQueryableValue($value)
+    {
+        return empty($value) ? null : $value;
+    }
 }

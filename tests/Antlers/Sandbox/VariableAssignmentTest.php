@@ -1036,4 +1036,30 @@ EOT;
 
         $this->runFieldTypeTest('replicator_blocks', null, ['bard']);
     }
+
+    public function test_empty_arrays_can_be_created_and_pushed_to()
+    {
+        $template = <<<'EOT'
+{{ empty_array = [] }}
+{{ empty_array += 'One'; empty_array += 'Two'; }}
+{{ empty_array += 'Three' }}
+{{ empty_array += 'Four'; }}
+{{ empty_array }}<{{ value }}>{{ /empty_array }}
+EOT;
+
+        $this->assertSame('<One><Two><Three><Four>', trim($this->renderString($template)));
+    }
+
+    public function test_arrays_with_data_can_be_created_and_pushed_to()
+    {
+        $template = <<<'EOT'
+{{ the_array = ['Zero'] }}
+{{ the_array += 'One'; the_array += 'Two'; }}
+{{ the_array += 'Three' }}
+{{ the_array += 'Four'; }}
+{{ the_array }}<{{ value }}>{{ /the_array }}
+EOT;
+
+        $this->assertSame('<Zero><One><Two><Three><Four>', trim($this->renderString($template)));
+    }
 }

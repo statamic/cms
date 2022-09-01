@@ -37,7 +37,11 @@ export default {
         },
         constrainDimensions: {
             type: Boolean
-        }
+        },
+        disabled: {
+            type: Boolean,
+            default: false
+        },
     },
 
     computed: {
@@ -81,6 +85,10 @@ export default {
     },
 
     mounted() {
+        if (this.disabled) {
+            return;
+        }
+
         const sortable = new Sortable(this.$el, this.computedOptions);
 
         sortable.on('drag:start', () => this.$emit('dragstart'));
