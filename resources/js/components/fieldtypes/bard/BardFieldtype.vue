@@ -166,6 +166,7 @@ export default {
             previews: this.meta.previews,
             mounted: false,
             pageHeader: null,
+            escBinding: null,
         }
     },
 
@@ -304,7 +305,7 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$keys.bind('esc', this.closeFullscreen)
+        this.escBinding = this.$keys.bind('esc', this.closeFullscreen)
 
         this.$nextTick(() => this.mounted = true);
 
@@ -315,6 +316,7 @@ export default {
 
     beforeDestroy() {
         this.editor.destroy();
+        this.escBinding.destroy();
 
         this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },

@@ -1,5 +1,60 @@
 # Release Notes
 
+## 3.3.33 (2022-08-31)
+
+### What's new
+- Add `page_name` parameter to support customizing the paginator in the `collection` tag. [#6593](https://github.com/statamic/cms/issues/6593) by @jacksleight
+- Add `mark` modifiers for highlighting words in text. [#6574](https://github.com/statamic/cms/issues/6574) by @jacksleight
+- Add "Download" action to Assets. [#6594](https://github.com/statamic/cms/issues/6594) by @ahinkle
+- Add "Add Set" button at the top of the Replicator fieldtype. [#6586](https://github.com/statamic/cms/issues/6586) by @wiebkevogel
+- Add ability to temporarily disable and re-enable an event subscriber. [#6577](https://github.com/statamic/cms/issues/6577) by @jesseleite
+
+### What's improved
+- Updating asset or term references will generate a single commit. [#6535](https://github.com/statamic/cms/issues/6535) by @jesseleite
+- German translations [#6590](https://github.com/statamic/cms/issues/6590) by @helloDanuk
+- French translations [#6578](https://github.com/statamic/cms/issues/6578) by @ebeauchamps
+
+### What's fixed
+- Fix form emails not using the appropriate site language. [#6607](https://github.com/statamic/cms/issues/6607) by @jasonvarga
+- Fix asset renaming when selecting more than 2 assets. [#6585](https://github.com/statamic/cms/issues/6585) by @jesseleite
+- Clone default blueprint before modifying them. [#6597](https://github.com/statamic/cms/issues/6597) by @arthurperton
+- Fix memory leak regarding popper components. [#6601](https://github.com/statamic/cms/issues/6601) by @wiebkevogel
+- Make Eloquent `paginate` `$columns` argument default to asterisk. [#6598](https://github.com/statamic/cms/issues/6598) by @jasonvarga
+- Remove redundant user path config. [#6580](https://github.com/statamic/cms/issues/6580) by @ryanmitchell
+- Bring back env value parsing in form email configs. [#6575](https://github.com/statamic/cms/issues/6575) by @jasonvarga
+- Fix icon vertical alignment on collection view. [#6576](https://github.com/statamic/cms/issues/6576) by @jackmcdade
+- Fix extra whitespace appearing in new check icon [#6571](https://github.com/statamic/cms/issues/6571) by @jacksleight
+
+
+
+## 3.3.32 (2022-08-25)
+
+### What's new
+- Ability to invalidate urls when editing forms and their blueprints. [#6546](https://github.com/statamic/cms/issues/6546) by @arthurperton
+- Ability to provide custom icon SVGs to Utilities. [#6556](https://github.com/statamic/cms/issues/6556) by @duncanmcclean
+- Added a "View GraphQL" permission. [#6550](https://github.com/statamic/cms/issues/6550) by @ryanmitchell
+
+### What's improved
+- Added collection/taxonomy names to stack selector to more easily differentiate between similar entries. [#6518](https://github.com/statamic/cms/issues/6518) by @jacksleight
+- Improve UX of filtering listing by toggle fields. [#6545](https://github.com/statamic/cms/issues/6545) by @jacksleight
+- Improve display of toggle fields in listings. [#6541](https://github.com/statamic/cms/issues/6541) by @jacksleight
+- Support setting entry blueprint using instance. [#6547](https://github.com/statamic/cms/issues/6547) by @jesseleite
+- Support passing a form instance into tags. [#6544](https://github.com/statamic/cms/issues/6544) by @jasonvarga
+
+### What's fixed
+- Destroy key bindings from popover after closing. [#6566](https://github.com/statamic/cms/issues/6566) by @jonassiewertsen
+- Destroy key bindings from revision history after closing. [#6565](https://github.com/statamic/cms/issues/6565) by @jonassiewertsen
+- Destroy key bindings from modals after closing. [#6564](https://github.com/statamic/cms/issues/6564) by @jonassiewertsen
+- Destroy key bindings in Bard fields. [#6555](https://github.com/statamic/cms/issues/6555) by @jonassiewertsen
+- Destroy sortable instances in relationship fields. [#6563](https://github.com/statamic/cms/issues/6563) by @wiebkevogel
+- Adjust debounce in date fields. [#6560](https://github.com/statamic/cms/issues/6560) by @zsoltjanes
+- Fix modals and stacks not playing nicely together in some situations. [#6558](https://github.com/statamic/cms/issues/6558) by @jasonvarga
+- Fix incorrect meta when using certain fieldtypes as config fields. [#6549](https://github.com/statamic/cms/issues/6549) by @arthurperton
+- Fix multi-site namespaced view overrides. [#6539](https://github.com/statamic/cms/issues/6539) by @edalzell
+- Collect eloquent roles on sync to preserve passing them as an array. [#6540](https://github.com/statamic/cms/issues/6540) by @ryanmitchell
+
+
+
 ## 3.3.31 (2022-08-19)
 
 ### What's new

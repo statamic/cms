@@ -9,6 +9,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Config;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Parse;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -27,6 +28,7 @@ class Email extends Mailable
         $this->submission = $submission;
         $this->config = $config;
         $this->site = $site;
+        $this->locale($site->lang());
     }
 
     public function getSubmission()
@@ -48,7 +50,6 @@ class Email extends Mailable
     {
         $this->submissionData = $this->submission->toAugmentedArray();
         $this->config = $this->parseConfig($this->config);
-        $this->locale($this->site->lang());
 
         $this
             ->subject(isset($this->config['subject']) ? __($this->config['subject']) : __('Form Submission'))
@@ -200,6 +201,8 @@ class Email extends Mailable
     protected function parseConfig(array $config)
     {
         return collect($config)->map(function ($value) {
+            $value = Parse::env($value); // deprecated
+
             return (string) Antlers::parse($value, $this->submissionData);
         });
     }

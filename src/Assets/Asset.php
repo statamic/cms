@@ -576,8 +576,15 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
-        $this->disk()->rename($oldMetaPath, $this->metaPath());
         $this->save();
+
+        $isFlysystemV1 = method_exists($this->disk()->filesystem()->getDriver(), 'getTimestamp');
+
+        if ($isFlysystemV1) {
+            $this->disk()->delete($this->metaPath());
+        }
+
+        $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
     }
@@ -828,7 +835,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected function ensureUniqueFilename($folder, $filename, $count = 0)
     {
         $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
-        $suffix = $count ? " ({$count})" : '';
+        $suffix = $count ? "-{$count}" : '';
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.$suffix.'.'.$extension), '/');
 
         if ($this->disk()->exists($newPath)) {

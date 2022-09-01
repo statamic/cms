@@ -73,4 +73,6 @@ return [
     'group_misc' => 'Verschiedenes',
     'resolve_duplicate_ids' => 'Doppelte IDs auflösen',
     'resolve_duplicate_ids_desc' => 'Ermöglicht das Erkennen und Auflösen von doppelten IDs.',
+    'view_graphql' => 'GraphQL anzeigen',
+    'view_graphql_desc' => 'Ermöglicht den Zugriff auf den GraphQL-Viewer.',
 ];

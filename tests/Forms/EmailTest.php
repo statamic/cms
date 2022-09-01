@@ -214,9 +214,8 @@ class EmailTest extends TestCase
 
         $makeEmail = function ($site) {
             $submission = Mockery::mock(Submission::class);
-            $submission->shouldReceive('toAugmentedArray')->andReturn([]);
 
-            return tap(new Email($submission, ['to' => 'test@test.com'], $site))->build();
+            return new Email($submission, ['to' => 'test@test.com'], $site);
         };
 
         $this->assertEquals('en', $makeEmail(Site::get('one'))->locale);

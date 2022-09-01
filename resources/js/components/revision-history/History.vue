@@ -63,6 +63,7 @@ export default {
         return {
             revisions: [],
             loading: true,
+            escBinding: null,
         }
     },
 
@@ -71,9 +72,13 @@ export default {
             this.loading = false;
             this.revisions = response.data.reverse();
         });
-        this.$keys.bindGlobal(['esc'], e => {
+        this.escBinding = this.$keys.bindGlobal(['esc'], e => {
             this.close();
         });
+    },
+    
+    beforeDestroy() {
+        this.escBinding.destroy();
     },
 
     methods: {
