@@ -12,7 +12,6 @@ class CollectionEntriesController extends ApiController
     protected $resourceConfigKey = 'collections';
     protected $routeResourceKey = 'collection';
     protected $filterPublished = true;
-    protected $query;
 
     public function index($collection)
     {
