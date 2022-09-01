@@ -154,7 +154,7 @@ class GlideTest extends TestCase
             $this->assertTrue(Glide::cacheStore()->has($cacheKey));
         });
 
-        Asset::find('test_container::foo/hoff.jpg')->delete();
+        Glide::clearAsset(Asset::find('test_container::foo/hoff.jpg'));
 
         $this->assertFileNotExists($glidePath);
 
