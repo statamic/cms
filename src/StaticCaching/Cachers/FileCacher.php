@@ -121,16 +121,16 @@ class FileCacher extends AbstractCacher
             return;
         }
 
-        $locale = $this->getLocaleForDomain($domain);
+        $locale = $this->getLocale($domain.$url);
 
         $this->writer->delete($this->getFilePath($url, $locale));
 
         $this->forgetUrl($key, $domain);
     }
 
-    public function getLocaleForDomain($domain)
+    public function getLocale($absoluteUrl)
     {
-        return $domain ? optional(Site::findByUrl($domain))->handle() : null;
+        return $absoluteUrl ? optional(Site::findByUrl($absoluteUrl))->handle() : null;
     }
 
     public function getCachePaths()
