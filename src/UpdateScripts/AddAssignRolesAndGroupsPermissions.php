@@ -3,7 +3,6 @@
 namespace Statamic\UpdateScripts;
 
 use Statamic\Facades\Role;
-use Statamic\Statamic;
 
 class AddAssignRolesAndGroupsPermissions extends UpdateScript
 {
