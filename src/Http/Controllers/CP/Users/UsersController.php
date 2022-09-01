@@ -123,15 +123,15 @@ class UsersController extends CpController
             ->email($request->email)
             ->data($values);
 
-        if ($request->roles && User::current()->can('edit roles')) {
+        if ($request->roles && User::current()->can('assign roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups && User::current()->can('edit user groups')) {
+        if ($request->groups && User::current()->can('assign user groups')) {
             $user->groups($request->groups);
         }
 
-        if ($request->super && User::current()->can('edit roles')) {
+        if ($request->super && User::current()->can('assign roles')) {
             $user->makeSuper();
         }
 
@@ -162,11 +162,11 @@ class UsersController extends CpController
 
         $blueprint = $user->blueprint();
 
-        if (! User::current()->can('edit roles')) {
+        if (! User::current()->can('assign roles')) {
             $blueprint->ensureField('roles', ['visibility' => 'read_only']);
         }
 
-        if (! User::current()->can('edit user groups')) {
+        if (! User::current()->can('assign user groups')) {
             $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
 
@@ -215,11 +215,11 @@ class UsersController extends CpController
         }
         $user->email($request->email);
 
-        if (User::current()->can('edit roles')) {
+        if (User::current()->can('assign roles')) {
             $user->roles($request->roles);
         }
 
-        if (User::current()->can('edit user groups')) {
+        if (User::current()->can('assign user groups')) {
             $user->groups($request->groups);
         }
 

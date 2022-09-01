@@ -73,6 +73,10 @@ return [
     'change_passwords' => 'Change passwords',
     'edit_user_groups' => 'Edit groups',
     'edit_roles' => 'Edit roles',
+    'assign_user_groups' => 'Assign groups to users',
+    'assign_user_groups_desc' => '',
+    'assign_roles' => 'Assign roles to users',
+    'assign_roles_desc' => '',
 
     'group_updates' => 'Updates',
     'view_updates' => 'View updates',
