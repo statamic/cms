@@ -108,11 +108,11 @@ class UpdateAssetReferencesTest extends TestCase
 
         $this->assertEquals('hoff.jpg', $entry->get('hero'));
 
-        $this->container->disk()->filesystem()->put('existing-file.jpg', '');
+        $this->actuallySaveAssetFileAndMetaToDisk($this->assetNorris);
 
-        $this->assetHoff->rename('existing-file', true);
+        $this->assetHoff->rename('norris', true);
 
-        $this->assertEquals('existing-file-1.jpg', $entry->fresh()->get('hero'));
+        $this->assertEquals('norris-1.jpg', $entry->fresh()->get('hero'));
     }
 
     /** @test */
@@ -133,6 +133,8 @@ class UpdateAssetReferencesTest extends TestCase
         $entry = $this->createEntryWithHoffHeroImage();
 
         $this->assertEquals('hoff.jpg', $entry->get('hero'));
+
+        $this->actuallySaveAssetFileAndMetaToDisk($this->assetNorris);
 
         // Replace with `$preserveOriginalFilename = true`
         $this->assetNorris->replace($this->assetHoff, true, true);
@@ -1415,11 +1417,19 @@ EOT;
 
         if ($assetPath) {
             $this->assetHoff->path($assetPath)->save();
-            $this->container->disk()->filesystem()->put($assetPath, '');
         }
+
+        $this->actuallySaveAssetFileAndMetaToDisk($this->assetHoff);
 
         return tap(Facades\Entry::make()->collection($collection)->data([
             'hero' => $this->assetHoff->path(),
         ]))->save();
+    }
+
+    // For Flysystem 1.x
+    protected function actuallySaveAssetFileAndMetaToDisk($asset)
+    {
+        $this->container->disk()->filesystem()->put($asset->path(), '');
+        $this->container->disk()->filesystem()->put($asset->metaPath(), '');
     }
 }
