@@ -214,11 +214,11 @@ class CorePermissions
             $permission = Permission::make($permission);
         }
 
-        return $permission->label(
-            __('statamic::permissions.'.str_replace(' ', '_', $permission->value()))
-        )->description(
-            __('statamic::permissions.'.str_replace(' ', '_', $permission->value().'_desc'))
-        );
+        $label = __('statamic::permissions.'.str_replace(' ', '_', $permission->value()));
+        $description = __($descKey = 'statamic::permissions.'.str_replace(' ', '_', $permission->value().'_desc'));
+        $description = $description === $descKey ? null : $description;
+
+        return $permission->label($label)->description($description);
     }
 
     protected function group($name, $callback)
