@@ -22,10 +22,8 @@ class CollectionEntriesController extends ApiController
             ->flatMap(fn ($blueprint) => $blueprint->fields()->all())
             ->filter->isRelationship()->keys()->all();
 
-        $this->query = $collection->queryEntries()->with($with);
-
         return app(EntryResource::class)::collection(
-            $this->filterSortAndPaginate($this->query)
+            $this->filterSortAndPaginate($collection->queryEntries()->with($with))
         );
     }
 
@@ -43,18 +41,21 @@ class CollectionEntriesController extends ApiController
 
     protected function getFilters()
     {
-        return parent::getFilters()->filter(function ($value, $filter) {
-            if (! Str::startsWith($filter, 'taxonomy:')) {
-                return true;
-            }
-
-            $this->applyTaxonomyFilter($filter, $value);
-
-            return false;
-        });
+        return parent::getFilters()->reject(fn ($_, $filter) => Str::startsWith($filter, 'taxonomy:'));
     }
 
-    protected function applyTaxonomyFilter($filter, $terms)
+    protected function filter($query)
+    {
+        parent::filter($query);
+
+        collect(request()->filter ?? [])
+            ->filter(fn ($_, $filter) => Str::startsWith($filter, 'taxonomy:'))
+            ->each(fn ($value, $filter) => $this->applyTaxonomyFilter($query, $filter, $value));
+
+        return $this;
+    }
+
+    protected function applyTaxonomyFilter($query, $filter, $terms)
     {
         [$keyword, $taxonomy, $condition] = array_pad(explode(':', $filter), 3, null);
 
@@ -62,11 +63,11 @@ class CollectionEntriesController extends ApiController
             ->map(fn ($term) => "$taxonomy::$term");
 
         if ($condition === 'in') {
-            $this->query->whereTaxonomyIn($terms->all());
+            $query->whereTaxonomyIn($terms->all());
         } elseif ($condition === 'not_in') {
-            $this->query->whereTaxonomyNotIn($terms->all());
+            $query->whereTaxonomyNotIn($terms->all());
         } else {
-            $terms->each(fn ($term) => $this->query->whereTaxonomy($term));
+            $terms->each(fn ($term) => $query->whereTaxonomy($term));
         }
     }
 
