@@ -611,6 +611,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_deletes()
     {
+        Event::fake();
         Storage::fake('local');
         $disk = Storage::disk('local');
         $disk->put('path/to/asset.txt', '');
@@ -643,14 +644,12 @@ class AssetTest extends TestCase
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
-
         $this->assertEquals([
             'path',
             'path/to',
             'path/to/another-asset.txt',
         ], $container->contents()->cached()->keys()->all());
-
-        // TODO: Assert about event, or convert to a callback
+        Event::assertDispatched(AssetDeleted::class);
     }
 
     /** @test */
