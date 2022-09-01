@@ -665,7 +665,9 @@ class AssetTest extends TestCase
 
         // Just assert that `Glide::clearAsset()` is called on delete,
         // since `Imaging\GlideTest.php` covers the actual functionality.
-        Facades\Glide::shouldReceive('clearAsset')->once();
+        Facades\Glide::shouldReceive('clearAsset')->withArgs(function ($arg) use ($asset) {
+            return $arg->id() === $asset->id();
+        })->once();
 
         $asset->delete();
     }
