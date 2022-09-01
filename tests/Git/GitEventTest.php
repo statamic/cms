@@ -371,6 +371,18 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
+    public function it_commits_when_asset_is_saved_and_deleted()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset deleted')->once();
+
+        $asset = $this->makeAsset()->data(['bar' => 'baz']);
+
+        $asset->save();
+        $asset->delete();
+    }
+
+    /** @test */
     public function it_commits_when_asset_is_uploaded()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
@@ -381,7 +393,27 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
-    public function it_only_commits_new_asset_when_replacing()
+    public function it_commits_when_asset_is_moved()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
+
+        $asset = tap($this->makeAsset()->data(['bar' => 'baz']))->saveQuietly();
+
+        $asset->move('new-location');
+    }
+
+    /** @test */
+    public function it_commits_when_asset_is_renamed()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
+
+        $asset = tap($this->makeAsset()->data(['bar' => 'baz']))->saveQuietly();
+
+        $asset->rename('new-name');
+    }
+
+    /** @test */
+    public function it_commits_only_once_when_asset_is_replaced_with_newly_uploaded_asset()
     {
         $originalAsset = tap($this->makeAsset())->saveQuietly();
 
@@ -407,39 +439,12 @@ class GitEventTest extends TestCase
 
         Git::shouldReceive('dispatchCommit')->with('Asset deleted')->once();
 
+        // Replace with `$deleteOriginal = true`
         $newAsset->replace($originalAsset, true);
     }
 
     /** @test */
-    public function it_commits_when_asset_is_saved()
-    {
-        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
-
-        $this->makeAsset()->data(['bar' => 'baz'])->save();
-    }
-
-    /** @test */
-    public function it_commits_when_asset_is_deleted()
-    {
-        Git::shouldReceive('dispatchCommit')->with('Asset deleted')->once();
-
-        $this->makeAsset()->delete();
-    }
-
-    /** @test */
-    public function it_commits_when_asset_folder_is_saved()
-    {
-        Git::shouldReceive('dispatchCommit')->with('Asset folder saved')->once();
-
-        $this
-            ->makeAsset()
-            ->container()
-            ->assetFolder('somewhere')
-            ->save();
-    }
-
-    /** @test */
-    public function it_commits_when_asset_folder_is_deleted()
+    public function it_commits_when_asset_folder_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset folder saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Asset folder deleted')->once();
@@ -454,7 +459,7 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
-    public function it_commits_once_when_term_references_are_updated()
+    public function it_batches_term_references_changes_into_one_commit()
     {
         Config::set('statamic.git.ignored_events', [
             Events\TaxonomySaved::class,
@@ -508,7 +513,7 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
-    public function it_commits_once_when_asset_references_are_updated()
+    public function it_batches_asset_references_changes_into_one_commit()
     {
         Config::set('statamic.git.ignored_events', [
             Events\CollectionSaved::class,
