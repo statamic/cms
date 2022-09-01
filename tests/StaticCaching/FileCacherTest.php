@@ -197,9 +197,9 @@ class FileCacherTest extends TestCase
         $writer = \Mockery::spy(Writer::class);
         $cache = app(Repository::class);
         $cacher = $this->fileCacher([], $writer, $cache, []);
-        
+
         $cache->forever($this->cacheKey('http://example.com'), [
-            'one' => '/one', 'two' => '/two'
+            'one' => '/one', 'two' => '/two',
         ]);
 
         $cacher->invalidateUrl('/one', 'http://example.com');
@@ -211,9 +211,9 @@ class FileCacherTest extends TestCase
         // Config::set('app.url', 'http://example.com');
     }
 
-     /** @test */
-     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite()
-     {
+    /** @test */
+    public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite()
+    {
         Site::setConfig(['sites' => [
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
@@ -227,22 +227,22 @@ class FileCacherTest extends TestCase
                 'en' => 'test/path',
                 'fr' => 'test/path/fr',
                 'de' => 'test/path/de',
-            ]
+            ],
         ], $writer, $cache);
 
         $cache->forever($this->cacheKey('http://domain.com'), [
-            'one' => '/one', 'two' => '/two'
+            'one' => '/one', 'two' => '/two',
         ]);
         $cache->forever($this->cacheKey('http://domain.com/fr'), [
-            'one' => '/one', 'two' => '/two'
+            'one' => '/one', 'two' => '/two',
         ]);
         $cache->forever($this->cacheKey('http://domain.de'), [
-            'one' => '/one', 'two' => '/two'
+            'one' => '/one', 'two' => '/two',
         ]);
 
         $cacher->invalidateUrl('/one', 'http://domain.de');
 
-        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one',  'de'));
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one', 'de'));
         $this->assertEquals(['one' => '/one', 'two' => '/two'], $cacher->getUrls('http://domain.com')->all());
         $this->assertEquals(['one' => '/one', 'two' => '/two'], $cacher->getUrls('http://domain.com/fr')->all());
         $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://domain.de')->all());
@@ -256,7 +256,7 @@ class FileCacherTest extends TestCase
     private function fileCacher($config = [], $writer = null, $cache = null)
     {
         $writer = $writer ?: \Mockery::mock(Writer::class);
-        
+
         $cache = $cache ?: app(Repository::class);
 
         return new FileCacher($writer, $cache, $config);
