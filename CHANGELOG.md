@@ -1,5 +1,32 @@
 # Release Notes
 
+## 3.3.33 (2022-08-31)
+
+### What's new
+- Add `page_name` parameter to support customizing the paginator in the `collection` tag. [#6593](https://github.com/statamic/cms/issues/6593) by @jacksleight
+- Add `mark` modifiers for highlighting words in text. [#6574](https://github.com/statamic/cms/issues/6574) by @jacksleight
+- Add "Download" action to Assets. [#6594](https://github.com/statamic/cms/issues/6594) by @ahinkle
+- Add "Add Set" button at the top of the Replicator fieldtype. [#6586](https://github.com/statamic/cms/issues/6586) by @wiebkevogel
+- Add ability to temporarily disable and re-enable an event subscriber. [#6577](https://github.com/statamic/cms/issues/6577) by @jesseleite
+
+### What's improved
+- Updating asset or term references will generate a single commit. [#6535](https://github.com/statamic/cms/issues/6535) by @jesseleite
+- German translations [#6590](https://github.com/statamic/cms/issues/6590) by @helloDanuk
+- French translations [#6578](https://github.com/statamic/cms/issues/6578) by @ebeauchamps
+
+### What's fixed
+- Fix form emails not using the appropriate site language. [#6607](https://github.com/statamic/cms/issues/6607) by @jasonvarga
+- Fix asset renaming when selecting more than 2 assets. [#6585](https://github.com/statamic/cms/issues/6585) by @jesseleite
+- Clone default blueprint before modifying them. [#6597](https://github.com/statamic/cms/issues/6597) by @arthurperton
+- Fix memory leak regarding popper components. [#6601](https://github.com/statamic/cms/issues/6601) by @wiebkevogel
+- Make Eloquent `paginate` `$columns` argument default to asterisk. [#6598](https://github.com/statamic/cms/issues/6598) by @jasonvarga
+- Remove redundant user path config. [#6580](https://github.com/statamic/cms/issues/6580) by @ryanmitchell
+- Bring back env value parsing in form email configs. [#6575](https://github.com/statamic/cms/issues/6575) by @jasonvarga
+- Fix icon vertical alignment on collection view. [#6576](https://github.com/statamic/cms/issues/6576) by @jackmcdade
+- Fix extra whitespace appearing in new check icon [#6571](https://github.com/statamic/cms/issues/6571) by @jacksleight
+
+
+
 ## 3.3.32 (2022-08-25)
 
 ### What's new

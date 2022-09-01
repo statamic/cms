@@ -69,7 +69,7 @@ export default {
         },
 
         handleFileDownload(response) {
-            const attachmentMatch = response.headers['content-disposition'].match(/^attachment.+filename="?([^"]+)"?/i) || [];
+            const attachmentMatch = response.headers['content-disposition'].match(/^attachment.+filename\*?=(?:UTF-8'')?"?([^"]+)"?/i) || [];
             if (! attachmentMatch.length) return;
             const filename = attachmentMatch.length >= 2 ? attachmentMatch[1] : 'file.txt';
             const url = window.URL.createObjectURL(new Blob([response.data]));

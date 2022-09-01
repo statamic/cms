@@ -25,6 +25,7 @@
         "rebing/graphql-laravel": "^6.5 || ^8.0",
         "spatie/blink": "^1.1.2",
         "statamic/stringy": "^3.1.2",
+        "stechstudio/laravel-zipstream": "^4.8",
         "symfony/http-foundation": "^4.3.3 || ^5.1.4 || ^6.0",
         "symfony/lock": "^5.1",
         "symfony/var-exporter": "^4.3 || ^5.1",

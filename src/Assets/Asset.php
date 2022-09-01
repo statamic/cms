@@ -45,6 +45,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         get as traitGet;
         remove as traitRemove;
         data as traitData;
+        merge as traitMerge;
     }
 
     protected $container;
@@ -52,6 +53,8 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected $meta;
     protected $syncOriginalProperties = ['path'];
     protected $withEvents = true;
+    protected $shouldHydrate = true;
+    protected $removedData = [];
 
     public function __construct()
     {
@@ -83,25 +86,59 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return $this->hydrate()->traitSet($key, $value);
     }
 
+    public function merge($value)
+    {
+        return $this->hydrate()->traitMerge($value);
+    }
+
     public function remove($key)
     {
-        return $this->hydrate()->traitRemove($key);
+        $this->hydrate();
+
+        $this->removedData[] = $key;
+
+        return $this->traitRemove($key);
     }
 
     public function data($data = null)
     {
         $this->hydrate();
 
+        if (func_get_args()) {
+            $this->removedData = collect($this->meta['data'])
+                ->diffKeys($data)
+                ->keys()
+                ->merge($this->removedKeys)
+                ->all();
+        }
+
         return call_user_func_array([$this, 'traitData'], func_get_args());
     }
 
     public function hydrate()
     {
+        if (! $this->shouldHydrate) {
+            return $this;
+        }
+
         $this->meta = $this->meta();
 
         $this->data = collect($this->meta['data']);
 
+        $this->removedData = [];
+
         return $this;
+    }
+
+    public function withoutHydrating($callback)
+    {
+        $this->shouldHydrate = false;
+
+        $return = $callback($this);
+
+        $this->shouldHydrate = true;
+
+        return $return;
     }
 
     /**
@@ -123,6 +160,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return $this->container()->files()->contains($path);
     }
 
+    public function getRawMeta()
+    {
+        return $this->meta;
+    }
+
     public function meta($key = null)
     {
         if (func_num_args() === 1) {
@@ -134,7 +176,14 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         if ($this->meta) {
-            return array_merge($this->meta, ['data' => $this->data->all()]);
+            $meta = $this->meta;
+
+            $meta['data'] = collect(Arr::get($meta, 'data', []))
+                ->merge($this->data->all())
+                ->except($this->removedData)
+                ->all();
+
+            return $meta;
         }
 
         return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {

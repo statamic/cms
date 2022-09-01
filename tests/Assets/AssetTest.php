@@ -57,46 +57,293 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_sets_and_gets_data_values()
+    public function it_gets_data_values()
     {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
-        $this->assertNull($asset->get('foo'));
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
 
-        $return = $asset->set('foo', 'bar');
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertNull($asset->get('one'));
+        });
 
-        $this->assertEquals($asset, $return);
-        $this->assertTrue($asset->has('foo'));
-        $this->assertEquals('bar', $asset->get('foo'));
+        $this->assertEquals('foo', $asset->get('one'));
         $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
     }
 
     /** @test */
-    public function it_removes_data_values()
+    public function it_gets_all_data_at_once()
     {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
 
-        $this->assertNull($asset->get('foo'));
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
 
-        $asset->set('foo', 'bar');
+        $data = $asset->data()->all();
 
-        $this->assertEquals('bar', $asset->get('foo'));
+        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $data);
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
 
-        $return = $asset->remove('foo');
+    /** @test */
+    public function it_sets_data_values()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        $asset->set('one', 'new-foo');
+        $return = $asset->set('three', 'qux');
 
         $this->assertEquals($asset, $return);
-        $this->assertNull($asset->get('foo'));
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when calling `set()` above
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+            $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.three'));
+            $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /** @test */
+    public function it_merges_data_values()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        $return = $asset->merge([
+            'one' => 'new-foo',
+            'three' => 'qux',
+        ]);
+
+        $this->assertEquals($asset, $return);
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when calling `merge()` above
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+            $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.three'));
+            $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /** @test */
+    public function it_sets_all_data_at_once()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        $return = $asset->data([
+            'three' => 'baz',
+            'four' => 'qux',
+        ]);
+
+        $this->assertEquals($asset, $return);
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when setting with `data()` above
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertNull($asset->get('one'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.one'));
+            $this->assertNull($asset->get('two'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.two'));
+            $this->assertEquals('baz', $asset->get('three'));
+            $this->assertEquals('baz', Arr::get($asset->meta(), 'data.three'));
+            $this->assertEquals('qux', $asset->get('four'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.four'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
     }
 
     /** @test */
     public function it_sets_data_values_using_magic_properties()
     {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
-        $this->assertNull($asset->get('foo'));
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
 
-        $asset->foo = 'bar';
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
 
-        $this->assertTrue($asset->has('foo'));
-        $this->assertEquals('bar', $asset->get('foo'));
+        $asset->one = 'new-foo';
+        $asset->three = 'qux';
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when setting magical property via `__set()`
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+            $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.three'));
+            $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /** @test */
+    public function it_removes_data_values()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        // Calling remove should both hydrate and remove from the asset's data,
+        // and this ensures that the removed key isn't re-added from the yaml
+        $return = $asset->remove('one');
+
+        $this->assertEquals($asset, $return);
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when calling `remove()` above
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertNull($asset->get('one'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /**
+     * @test
+     * @dataProvider reAddRemovedData
+     **/
+    public function it_doesnt_try_to_re_remove_newly_added_data_from_meta($reAddRemovedData)
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Calling `remove()` stores temporary `removedData` state on the asset to prevent it from getting
+        // merged back into the meta. We want to ensure this state gets cleared when subsequently adding
+        // new data, so that Statamic doesn't try to re-remove this key if it's intentionally re-added
+        $return = $asset->remove('one');
+
+        $this->assertEquals($asset, $return);
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertNull($asset->get('one'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+        });
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+
+        // This is where `removedData` state should be removed
+        $return = $reAddRemovedData($asset);
+
+        // Assert that newly added data isn't affected by lingering `removedData` state
+        $this->assertEquals($asset, $return);
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+        });
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    public function reAddRemovedData()
+    {
+        return [
+            'by calling set method' => [fn ($asset) => $asset->set('one', 'new-foo')],
+            'by calling data method' => [fn ($asset) => $asset->data(['one' => 'new-foo', 'two' => 'bar', 'three' => 'qux'])],
+            'by calling merge method' => [fn ($asset) => $asset->merge(['one' => 'new-foo', 'three' => 'qux'])],
+            'by calling __set() magically via property' => [function ($asset) {
+                $asset->one = 'new-foo';
+
+                return $asset;
+            }],
+        ];
     }
 
     /** @test */
@@ -173,18 +420,6 @@ class AssetTest extends TestCase
         $this->expectExceptionMessage('Call to undefined method Statamic\Assets\Asset::thisFieldDoesntExist()');
 
         (new Asset)->path('test.txt')->container($this->container)->thisFieldDoesntExist();
-    }
-
-    /** @test */
-    public function it_gets_and_sets_all_data()
-    {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
-        $this->assertEquals([], $asset->data()->all());
-
-        $return = $asset->data(['foo' => 'bar']);
-
-        $this->assertEquals($asset, $return);
-        $this->assertEquals(['foo' => 'bar'], $asset->data()->all());
     }
 
     /** @test */
@@ -440,6 +675,39 @@ class AssetTest extends TestCase
         // After we ask for meta, we should see it in cache as well...
         $this->assertEquals($expected, $asset->meta());
         $this->assertEquals($expected, Cache::get($asset->metaCacheKey()));
+    }
+
+    /** @test */
+    public function it_properly_merges_new_unsaved_data_to_meta()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expectedBeforeMerge = [
+            'data' => ['one' => 'foo'],
+            'size' => 123,
+        ]));
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/test.txt');
+        Facades\Asset::shouldReceive('save')->with($asset);
+        $asset->save();
+
+        $this->assertEquals($expectedBeforeMerge, $asset->meta());
+
+        $asset->merge([
+            'two' => 'bar',
+            'three' => 'baz',
+        ]);
+
+        $expectedAfterMerge = [
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+                'three' => 'baz',
+            ],
+            'size' => 123,
+        ];
+
+        $this->assertEquals($expectedAfterMerge, $asset->meta());
     }
 
     /** @test */
