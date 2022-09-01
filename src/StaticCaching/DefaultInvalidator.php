@@ -61,9 +61,11 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateEntryUrls($entry)
     {
-        if ($url = $entry->absoluteUrl()) {
-            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
-        }
+        $entry->descendants()->push($entry)->each(function ($entry) {
+            if ($url = $entry->absoluteUrl()) {
+                $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+            }
+        });
 
         $this->cacher->invalidateUrls(
             Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
