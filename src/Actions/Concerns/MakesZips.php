@@ -8,19 +8,24 @@ use ZipStream\ZipStream;
 
 trait MakesZips
 {
+    protected function makeZip($name, $files)
+    {
+        $options = new Archive();
+        $options->setZeroHeader(true);
+        $options->setSendHttpHeaders(true);
+
+        $zip = new ZipStream($name, $options);
+        $files->each(function ($stream, $path) use ($zip) {
+            $zip->addFileFromStream($path, $stream);
+        });
+
+        return $zip;
+    }
+
     protected function makeZipResponse($name, $files)
     {
         return new StreamedResponse(function () use ($name, $files) {
-            $options = new Archive();
-            $options->setZeroHeader(true);
-            $options->setSendHttpHeaders(true);
-
-            $zip = new ZipStream($name, $options);
-            $files->each(function ($stream, $path) use ($zip) {
-                $zip->addFileFromStream($path, $stream);
-            });
-
-            $zip->finish();
+            return tap($this->makeZip($name, $files))->finish();
         });
     }
 }
