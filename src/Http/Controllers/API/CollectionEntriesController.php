@@ -56,10 +56,9 @@ class CollectionEntriesController extends ApiController
 
     protected function applyTaxonomyFilter($query, $filter, $terms)
     {
-        [$keyword, $taxonomy, $condition] = array_pad(explode(':', $filter), 3, null);
+        [$_, $taxonomy, $condition] = array_pad(explode(':', $filter), 3, null);
 
-        $terms = collect($this->getPipedValues($terms))
-            ->map(fn ($term) => "$taxonomy::$term");
+        $terms = collect(explode(',', $terms))->map(fn ($term) => "$taxonomy::$term");
 
         if ($condition === 'in') {
             $query->whereTaxonomyIn($terms->all());
