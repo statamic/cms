@@ -792,6 +792,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
     }
 
+    /**
+     * Stream a file.
+     *
+     * @return resource
+     */
+    public function stream()
+    {
+        return $this->disk()->filesystem()->readStream($this->path());
+    }
+
     private function getSafeFilename($string)
     {
         $replacements = [
