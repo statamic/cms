@@ -142,7 +142,7 @@ class FileCacherTest extends TestCase
     }
 
     /** @test */
-    public function gets_the_locale_for_a_domain()
+    public function gets_the_locale_for_a_url()
     {
         Site::setConfig(['sites' => [
             'en' => ['url' => 'http://domain.com/'],
@@ -152,13 +152,19 @@ class FileCacherTest extends TestCase
 
         $cacher = $this->fileCacher([]);
 
-        $this->assertEquals('en', $cacher->getLocaleForDomain('http://domain.com/'));
-        $this->assertEquals('en', $cacher->getLocaleForDomain('http://domain.com'));
-        $this->assertEquals('fr', $cacher->getLocaleForDomain('http://domain.com/fr/'));
-        $this->assertEquals('fr', $cacher->getLocaleForDomain('http://domain.com/fr'));
-        $this->assertEquals('de', $cacher->getLocaleForDomain('http://domain.de/'));
-        $this->assertEquals('de', $cacher->getLocaleForDomain('http://domain.de'));
-        $this->assertNull($cacher->getLocaleForDomain(null));
+        $this->assertEquals('en', $cacher->getLocale('http://domain.com'));
+        $this->assertEquals('en', $cacher->getLocale('http://domain.com/'));
+        $this->assertEquals('en', $cacher->getLocale('http://domain.com/some/page'));
+        $this->assertEquals('en', $cacher->getLocale('http://domain.com/some/page/'));
+        $this->assertEquals('fr', $cacher->getLocale('http://domain.com/fr'));
+        $this->assertEquals('fr', $cacher->getLocale('http://domain.com/fr/'));
+        $this->assertEquals('fr', $cacher->getLocale('http://domain.com/fr/omelette/du/fromage'));
+        $this->assertEquals('fr', $cacher->getLocale('http://domain.com/fr/omelette/du/fromage/'));
+        $this->assertEquals('de', $cacher->getLocale('http://domain.de'));
+        $this->assertEquals('de', $cacher->getLocale('http://domain.de/'));
+        $this->assertEquals('de', $cacher->getLocale('http://domain.de/wiener/schnitzel'));
+        $this->assertEquals('de', $cacher->getLocale('http://domain.de/wiener/schintzel/'));
+        $this->assertNull($cacher->getLocale(null));
     }
 
     /** @test */
@@ -232,20 +238,21 @@ class FileCacherTest extends TestCase
 
         $cache->forever($this->cacheKey('http://domain.com'), [
             'one' => '/one', 'two' => '/two',
-        ]);
-        $cache->forever($this->cacheKey('http://domain.com/fr'), [
-            'one' => '/one', 'two' => '/two',
+            'un' => '/fr/un', 'deux' => '/fr/deux',
         ]);
         $cache->forever($this->cacheKey('http://domain.de'), [
             'one' => '/one', 'two' => '/two',
         ]);
 
-        $cacher->invalidateUrl('/one', 'http://domain.de');
+        $cacher->invalidateUrl('/one', 'http://domain.com');
+        $cacher->invalidateUrl('/fr/deux', 'http://domain.com');
+        $cacher->invalidateUrl('/two', 'http://domain.de');
 
-        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one', 'de'));
-        $this->assertEquals(['one' => '/one', 'two' => '/two'], $cacher->getUrls('http://domain.com')->all());
-        $this->assertEquals(['one' => '/one', 'two' => '/two'], $cacher->getUrls('http://domain.com/fr')->all());
-        $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://domain.de')->all());
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one', 'en'));
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/fr/deux', 'fr'));
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/two', 'de'));
+        $this->assertEquals(['two' => '/two', 'un' => '/fr/un'], $cacher->getUrls('http://domain.com')->all());
+        $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://domain.de')->all());
     }
 
     private function cacheKey($domain)
