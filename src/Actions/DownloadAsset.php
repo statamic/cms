@@ -28,12 +28,12 @@ class DownloadAsset extends Action
 
     public function download($items, $values)
     {
-        if ($items->count() > 1) {
-            return $this->makeZipResponse("{$this->context['container']}.zip", $items->mapWithKeys(function ($asset) {
-                return [$asset->basename() => $asset->stream()];
-            }));
+        if ($items->count() == 1) {
+            return $items->first()->download();
         }
 
-        return $items->first()->download();
+        return $this->makeZipResponse("{$this->context['container']}.zip", $items->mapWithKeys(function ($asset) {
+            return [$asset->basename() => $asset->stream()];
+        }));
     }
 }
