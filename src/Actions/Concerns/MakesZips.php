@@ -10,16 +10,13 @@ trait MakesZips
 {
     protected function makeZip($name, $files)
     {
-        $options = new Archive();
+        $options = new Archive;
         $options->setZeroHeader(true);
         $options->setSendHttpHeaders(true);
 
-        $zip = new ZipStream($name, $options);
-        $files->each(function ($stream, $path) use ($zip) {
-            $zip->addFileFromStream($path, $stream);
+        return tap(new ZipStream($name, $options), function ($zip) use ($files) {
+            $files->each(fn ($stream, $path) => $zip->addFileFromStream($path, $stream));
         });
-
-        return $zip;
     }
 
     protected function makeZipResponse($name, $files)
