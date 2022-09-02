@@ -20,6 +20,19 @@
                 {{ asset.basename }}
             </button>
         </td>
+        <td>
+            <inline-asset-editor :asset="asset">
+                <div slot-scope="{ values, setFieldValue, submit, error, saving, recentlySaved }">
+                    <div class="flex">
+                        <input type="text" class="input-text" :value="values.alt" @input="setFieldValue('alt', $event.target.value)" />
+                        <button type="button" class="btn" @click="submit" :disabled="saving">Save</button>
+                    </div>
+                    <div v-if="error" class="text-red text-xs">{{ error }}</div>
+                    <div v-if="saving" class="text-xs">Saving...</div>
+                    <div v-if="recentlySaved" class="text-xs text-green">Saved!</div>
+                </div>
+            </inline-asset-editor>
+        </td>
         <td class="p-0 w-8 text-right align-middle">
 
             <button v-if="!readOnly" class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90" @click="remove" :aria-label="__('Remove Asset')">

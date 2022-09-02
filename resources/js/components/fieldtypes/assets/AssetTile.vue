@@ -72,6 +72,18 @@
         <div class="asset-meta" v-if="showFilename">
             <div class="asset-filename" :title="label">{{ label }}</div>
         </div>
+
+        <inline-asset-editor :asset="asset">
+            <div slot-scope="{ values, setFieldValue, submit, error, saving, recentlySaved }">
+                <div class="flex">
+                    <input type="text" class="input-text" :value="values.alt" @input="setFieldValue('alt', $event.target.value)" />
+                    <button type="button" class="btn" @click="submit" :disabled="saving">Save</button>
+                </div>
+                <div v-if="error" class="text-red text-xs">{{ error }}</div>
+                <div v-if="saving" class="text-xs">Saving...</div>
+                <div v-if="recentlySaved" class="text-xs text-green">Saved!</div>
+            </div>
+        </inline-asset-editor>
     </div>
 
 </template>

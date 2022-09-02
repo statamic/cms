@@ -1,10 +1,12 @@
 import Luminous from 'luminous-lightbox';
 import AssetEditor from '../../assets/Editor/Editor.vue';
+import InlineAssetEditor from './InlineAssetEditor.vue';
 
 export default {
 
     components: {
-        AssetEditor
+        AssetEditor,
+        InlineAssetEditor
     },
 
     props: {
