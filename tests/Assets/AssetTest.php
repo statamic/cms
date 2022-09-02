@@ -940,6 +940,81 @@ class AssetTest extends TestCase
         $asset->delete();
     }
 
+        /** @test */
+        public function it_clears_asset_glide_cache_when_focus_is_added()
+        {
+            config()->set('statamic.search.indexes.default.searchables', null);
+            Storage::fake('local');
+            $disk = Storage::disk('local');
+            $disk->put('path/to/asset.txt', '');
+            $container = Facades\AssetContainer::make('test')->disk('local');
+            Facades\AssetContainer::shouldReceive('save')->with($container);
+            Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+            $asset = (new Asset)
+                ->container($container)
+                ->path('path/to/asset.txt');
+
+            $asset->save();
+
+            $asset->set('focus', '50-50');
+
+            Facades\Glide::shouldReceive('clearAsset')->withArgs(function ($arg) use ($asset) {
+                return $arg->id() === $asset->id();
+            })->once();
+
+            $asset->save();
+        }
+
+    /** @test */
+    public function it_clears_asset_glide_cache_when_focus_changes()
+    {
+        config()->set('statamic.search.indexes.default.searchables', null);
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('path/to/asset.txt', '');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = (new Asset)
+            ->container($container)
+            ->path('path/to/asset.txt')
+            ->set('focus', '75-25');
+
+        $asset->save();
+
+        $asset->set('focus', '50-50');
+
+        Facades\Glide::shouldReceive('clearAsset')->withArgs(function ($arg) use ($asset) {
+            return $arg->id() === $asset->id();
+        })->once();
+
+        $asset->save();
+    }
+
+    /** @test */
+    public function it_doesnt_clears_asset_glide_cache_when_focus_stays_the_same()
+    {
+        config()->set('statamic.search.indexes.default.searchables', null);
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('path/to/asset.txt', '');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = (new Asset)
+            ->container($container)
+            ->path('path/to/asset.txt')
+            ->set('focus', '75-25');
+
+        $asset->save();
+
+        $asset->set('foo', 'bar');
+
+        Facades\Glide::shouldReceive('clearAsset')->never();
+
+        $asset->save();
+    }
+
     /** @test */
     public function it_can_be_moved_to_another_folder()
     {
