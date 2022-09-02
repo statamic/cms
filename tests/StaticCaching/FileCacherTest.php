@@ -142,32 +142,6 @@ class FileCacherTest extends TestCase
     }
 
     /** @test */
-    public function gets_the_locale_for_a_url()
-    {
-        Site::setConfig(['sites' => [
-            'en' => ['url' => 'http://domain.com/'],
-            'fr' => ['url' => 'http://domain.com/fr/'],
-            'de' => ['url' => 'http://domain.de/'],
-        ]]);
-
-        $cacher = $this->fileCacher([]);
-
-        $this->assertEquals('en', $cacher->getLocale('http://domain.com'));
-        $this->assertEquals('en', $cacher->getLocale('http://domain.com/'));
-        $this->assertEquals('en', $cacher->getLocale('http://domain.com/some/page'));
-        $this->assertEquals('en', $cacher->getLocale('http://domain.com/some/page/'));
-        $this->assertEquals('fr', $cacher->getLocale('http://domain.com/fr'));
-        $this->assertEquals('fr', $cacher->getLocale('http://domain.com/fr/'));
-        $this->assertEquals('fr', $cacher->getLocale('http://domain.com/fr/omelette/du/fromage'));
-        $this->assertEquals('fr', $cacher->getLocale('http://domain.com/fr/omelette/du/fromage/'));
-        $this->assertEquals('de', $cacher->getLocale('http://domain.de'));
-        $this->assertEquals('de', $cacher->getLocale('http://domain.de/'));
-        $this->assertEquals('de', $cacher->getLocale('http://domain.de/wiener/schnitzel'));
-        $this->assertEquals('de', $cacher->getLocale('http://domain.de/wiener/schintzel/'));
-        $this->assertNull($cacher->getLocale(null));
-    }
-
-    /** @test */
     public function flushing_the_cache_deletes_from_all_cache_locations()
     {
         $writer = \Mockery::spy(Writer::class);

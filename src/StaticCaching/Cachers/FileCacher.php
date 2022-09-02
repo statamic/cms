@@ -121,16 +121,11 @@ class FileCacher extends AbstractCacher
             return;
         }
 
-        $site = $this->getSite($domain.$url);
+        $site = optional(Site::findByUrl($domain.$url))->handle();
 
         $this->writer->delete($this->getFilePath($url, $site));
 
         $this->forgetUrl($key, $domain);
-    }
-
-    public function getSite($absoluteUrl)
-    {
-        return $absoluteUrl ? optional(Site::findByUrl($absoluteUrl))->handle() : null;
     }
 
     public function getCachePaths()
