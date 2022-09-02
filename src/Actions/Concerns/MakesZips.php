@@ -16,8 +16,8 @@ trait MakesZips
             $options->setSendHttpHeaders(true);
 
             $zip = new ZipStream($name, $options);
-            $files->each(function ($stream, $basename) use ($zip) {
-                $zip->addFileFromStream($basename, $stream);
+            $files->each(function ($stream, $path) use ($zip) {
+                $zip->addFileFromStream($path, $stream);
             });
 
             $zip->finish();
