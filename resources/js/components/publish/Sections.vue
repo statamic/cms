@@ -2,7 +2,7 @@
 
     <element-container @resized="containerWasResized">
     <div>
-        <div class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
+        <div v-if="containerWidth !== null" class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
             <div
                 class="publish-tabs tabs flex-shrink" v-show="mainSections.length > 1"
                 ref="tabs"
@@ -36,7 +36,7 @@
             </dropdown-list>
         </div>
 
-        <div class="flex justify-between">
+        <div v-if="containerWidth !== null" class="flex justify-between">
             <div ref="publishSectionWrapper" class="publish-section-wrapper w-full min-w-0">
                 <div
                     role="tabpanel"
