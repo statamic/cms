@@ -2,11 +2,13 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Actions\Concerns\MakesZips;
 use Statamic\Contracts\Assets\Asset;
-use STS\ZipStream\ZipStreamFacade as Zip;
 
 class DownloadAsset extends Action
 {
+    use MakesZips;
+
     protected $confirm = false;
 
     public static function title()
@@ -27,12 +29,9 @@ class DownloadAsset extends Action
     public function download($items, $values)
     {
         if ($items->count() > 1) {
-            $zip = Zip::create('assets.zip');
-            $items->each(function ($asset) use ($zip) {
-                $zip->addRaw($asset->contents(), $asset->basename());
-            });
-
-            return $zip->response();
+            return $this->makeZip("{$this->context['container']}.zip", $items->mapWithKeys(function ($asset) {
+                return [$asset->basename() => $asset->stream()];
+            }));
         }
 
         return $items->first()->download();
