@@ -4,6 +4,7 @@ namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetSaved;
 use Statamic\Facades\Glide;
 
 class ClearAssetGlideCache implements ShouldQueue
@@ -15,16 +16,29 @@ class ClearAssetGlideCache implements ShouldQueue
      */
     public function subscribe($events)
     {
-        $events->listen(AssetDeleted::class, self::class.'@handle');
+        $events->listen(AssetDeleted::class, self::class.'@handleDeleted');
+        $events->listen(AssetSaved::class, self::class.'@handleSaved');
     }
 
     /**
-     * Handle the events.
+     * Handle the AssetDeleted event.
      *
      * @param  AssetDeleted  $event
      */
-    public function handle($event)
+    public function handleDeleted($event)
     {
         Glide::clearAsset($event->asset);
+    }
+
+    /**
+     * Handle the AssetSaved event.
+     *
+     * @param  AssetSaved  $event
+     */
+    public function handleSaved($event)
+    {
+        if ($event->asset->getOriginal('focus') != $event->asset->get('focus')) {
+            Glide::clearAsset($event->asset);
+        }
     }
 }
