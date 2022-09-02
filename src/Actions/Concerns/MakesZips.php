@@ -24,8 +24,6 @@ trait MakesZips
 
     protected function makeZipResponse($name, $files)
     {
-        return new StreamedResponse(function () use ($name, $files) {
-            return tap($this->makeZip($name, $files))->finish();
-        });
+        return new StreamedResponse(fn () => tap($this->makeZip($name, $files))->finish());
     }
 }
