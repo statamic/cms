@@ -32,7 +32,7 @@ class DownloadAssetFolder extends Action
         $folder = $items->first();
         $assets = $folder->assets(true);
 
-        return $this->makeZip("{$folder->basename()}.zip", $assets->mapWithKeys(function ($asset) use ($folder) {
+        return $this->makeZipResponse("{$folder->basename()}.zip", $assets->mapWithKeys(function ($asset) use ($folder) {
             return [Str::after($asset->path(), $folder->path().'/') => $asset->stream()];
         }));
     }

@@ -8,7 +8,7 @@ use ZipStream\ZipStream;
 
 trait MakesZips
 {
-    protected function makeZip($name, $files)
+    protected function makeZipResponse($name, $files)
     {
         return new StreamedResponse(function () use ($name, $files) {
             $options = new Archive();
