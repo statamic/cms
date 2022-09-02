@@ -153,6 +153,20 @@ class NavItem
     }
 
     /**
+     * Resolve children closure.
+     *
+     * @return $this
+     */
+    public function resolveChildren()
+    {
+        if (is_callable($this->children)) {
+            $this->children($this->children()());
+        }
+
+        return $this;
+    }
+
+    /**
      * Get or set authorization.
      *
      * @param  string|null  $ability

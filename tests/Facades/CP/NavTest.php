@@ -252,6 +252,30 @@ class NavTest extends TestCase
     }
 
     /** @test */
+    public function it_can_resolve_its_children_from_closure()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $item = Nav::droids('Security Droids')
+            ->children(function () {
+                return [
+                    'IG-86' => '/ig-86',
+                    'K-2SO' => '/k-2so',
+                ];
+            });
+
+        $this->assertEquals('Security Droids', $item->name());
+        $this->assertTrue(is_callable($item->children()));
+
+        $item->resolveChildren();
+
+        $this->assertEquals('Security Droids', $item->name());
+        $this->assertFalse(is_callable($item->children()));
+        $this->assertEquals('IG-86', $item->children()->get(0)->name());
+        $this->assertEquals('K-2SO', $item->children()->get(1)->name());
+    }
+
+    /** @test */
     public function it_can_remove_a_nav_section()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
