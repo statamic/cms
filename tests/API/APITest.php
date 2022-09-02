@@ -148,7 +148,6 @@ class APITest extends TestCase
     public function it_filters_by_taxonomy_terms()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
-        Facades\Config::set('statamic.api.cache', false);
 
         $this->makeTaxonomy('tags')->save();
         $this->makeTerm('tags', 'rad')->save();
