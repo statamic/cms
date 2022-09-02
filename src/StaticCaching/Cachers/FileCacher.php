@@ -121,14 +121,14 @@ class FileCacher extends AbstractCacher
             return;
         }
 
-        $locale = $this->getLocale($domain.$url);
+        $site = $this->getSite($domain.$url);
 
-        $this->writer->delete($this->getFilePath($url, $locale));
+        $this->writer->delete($this->getFilePath($url, $site));
 
         $this->forgetUrl($key, $domain);
     }
 
-    public function getLocale($absoluteUrl)
+    public function getSite($absoluteUrl)
     {
         return $absoluteUrl ? optional(Site::findByUrl($absoluteUrl))->handle() : null;
     }
@@ -147,18 +147,18 @@ class FileCacher extends AbstractCacher
     /**
      * Get the path where static files are stored.
      *
-     * @param  string|null  $locale  A specific locale's path.
+     * @param  string|null  $site  A specific site's path.
      * @return string
      */
-    public function getCachePath($locale = null)
+    public function getCachePath($site = null)
     {
         $paths = $this->getCachePaths();
 
-        if (! $locale) {
-            $locale = $this->config('locale');
+        if (! $site) {
+            $site = $this->config('locale');
         }
 
-        return $paths[$locale];
+        return $paths[$site];
     }
 
     /**
@@ -167,7 +167,7 @@ class FileCacher extends AbstractCacher
      * @param $url
      * @return string
      */
-    public function getFilePath($url, $locale = null)
+    public function getFilePath($url, $site = null)
     {
         $urlParts = parse_url($url);
         $pathParts = pathinfo($urlParts['path']);
@@ -178,7 +178,7 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        return $this->getCachePath($locale).$pathParts['dirname'].'/'.$basename;
+        return $this->getCachePath($site).$pathParts['dirname'].'/'.$basename;
     }
 
     private function isBasenameTooLong($basename)
