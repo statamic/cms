@@ -46,6 +46,10 @@ export default {
         }
     },
 
+    mounted() {
+        if (! this.disabled) this.bindPopper();
+    },
+
     beforeDestroy() {
         this.destroyPopper();
     },
@@ -75,27 +79,16 @@ export default {
             this.isOpen ? this.close() : this.open();
         },
         open() {
-            if (this.popper) return;
-
-            this.bindPopper();
             this.isOpen = true;
             this.escBinding = this.$keys.bind('esc', e => this.close())
         },
         close() {
-            if (!this.popper) return;
-
             this.isOpen = false;
             if (this.escBinding) {
                 this.escBinding.destroy();
             }
-            // timeout so that the fade out animation is still called correctly
-            setTimeout(() => { 
-                this.destroyPopper(); 
-            }, 100);
         },
         destroyPopper() {
-            if (!this.popper) return;
-
             this.popper.destroy();
             this.popper = null; 
         },
