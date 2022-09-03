@@ -105,7 +105,6 @@ class Nav
             ->buildExtensions()
             ->buildChildren()
             ->validateNesting()
-            ->validateIcons()
             ->validateViews()
             ->authorizeItems()
             ->authorizeChildren()
@@ -174,29 +173,6 @@ class Nav
             })
             ->each(function ($item) {
                 throw new Exception('Nav children have exceeded their nesting limit.');
-            });
-
-        return $this;
-    }
-
-    /**
-     * Validate that nav children don't specify icons.
-     *
-     * @return $this
-     *
-     * @throws Exception
-     */
-    protected function validateIcons()
-    {
-        collect($this->items)
-            ->flatMap(function ($item) {
-                return $item->children();
-            })
-            ->reject(function ($item) {
-                return is_null($item->icon());
-            })
-            ->each(function ($item) {
-                throw new Exception('These nav children cannot have icons.');
             });
 
         return $this;
