@@ -2,9 +2,9 @@
 
     <element-container @resized="containerWasResized">
     <div>
-        <div v-if="containerWidth !== null" class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
+        <div v-if="containerWidth !== null && mainSections.length > 1" class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
             <div
-                class="publish-tabs tabs flex-shrink" v-show="mainSections.length > 1"
+                class="publish-tabs tabs flex-shrink"
                 ref="tabs"
                 role="tablist"
                 :aria-label="__('Edit Content')"
