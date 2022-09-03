@@ -283,10 +283,6 @@ class Nav
             ->filter(function ($item) {
                 return $item->section();
             })
-            // ->reject(function ($item) {
-            //     return $item->section() === 'Top Level'
-            //         && ! in_array($item->name(), CoreNav::ALLOWED_TOP_LEVEL);
-            // })
             ->each(function ($item) use (&$sections) {
                 $sections[$item->section()][] = $item;
             });
@@ -317,70 +313,89 @@ class Nav
 
     protected function normalizeOverrides($overrides, $section)
     {
-        return collect($overrides)->map(function ($item) use ($section) {
-            return is_string($item) && ! Str::contains($item, '::')
-                ? "{$section}::{$item}"
-                : $item;
+        return collect($overrides)->map(function ($config, $id) {
+            return [
+                'item' => $this->findItem($id),
+                'config' => $this->normalizeOverrideConfig($config),
+            ];
         });
+    }
+
+    protected function normalizeOverrideConfig($config)
+    {
+        if (is_string($config)) {
+            return ['action' => Str::ensureLeft($config, '@')];
+        }
+
+        return array_merge(['action' => '@alias'], $config);
     }
 
     protected function applyPreferenceOverridesForSection($overrides, $section)
     {
-        $overrides
-            ->map(function ($item) {
-                return $this->findOrCreateItem($item);
-            })
-            ->each(function ($item) use ($section) {
-                $item->section(Str::modifyMultiple($section, ['deslugify', 'title']));
-            });
+        collect($overrides)->each(function ($override) use ($section) {
+            if ($override['config']['action'] === '@alias') {
+                return $this->aliasItem($override['item'], $section);
+            } elseif ($override['config']['action'] === '@move') {
+                return $this->moveItem($override['item'], $section);
+            }
+        });
     }
 
-    protected function findOrCreateItem($id)
+    protected function findItem($id)
     {
-        // cache this to class so we can keep building on it, or key them on class by id?
         $items = $this->items->keyBy->id();
 
-        $options = collect(explode('@', $id));
-        $id = $options->shift();
-
-        $item = $items->get($id);
-
-        $idParts = collect(explode('::', $id));
-
-        if ($idParts->count() > 2) {
-            $parentId = $idParts[0].'::'.$idParts[1];
+        if ($item = $items->get($id)) {
+            return $item;
         }
 
-        $parent = isset($parentId) ? $items->get($parentId) : null;
-
-        if ($parent && ! $item) {
+        if ($parent = $this->findParentItem($id)) {
             $parent->resolveChildren();
             $parent->children()->each(function ($item) use ($items) {
                 $items->put($item->id(), $item);
             });
-            $item = $items->get($id);
         }
 
-        if ($item) {
-            $cloned = clone $item;
-            $this->items[] = $cloned;
+        return $items->get($id);
+    }
 
-            if ($options->contains('move')) {
-                $item->hidden(true);
-            }
+    protected function findParentItem($id)
+    {
+        $items = $this->items->keyBy->id();
 
-            if ($parent && $options->contains('move')) {
-                $parent->children(
-                    $parent->children()->reject(function ($item) use ($id) {
-                        return $id === $item->id();
-                    })
-                );
-            }
+        $idParts = collect(explode('::', $id));
 
-            return $cloned;
+        if ($idParts->count() < 3) {
+            return null;
         }
 
-        return $this->create('WOTTT');
+        $parentId = $idParts[0].'::'.$idParts[1];
+
+        return $items->get($parentId);
+    }
+
+    protected function aliasItem($item, $section)
+    {
+        $clone = clone $item;
+
+        $clone->section(Str::modifyMultiple($section, ['deslugify', 'title']));
+
+        $this->items[] = $clone;
+    }
+
+    protected function moveItem($item, $section)
+    {
+        $this->aliasItem($item, $section);
+
+        $item->hidden(true);
+
+        if ($parent = $this->findParentItem($item->id())) {
+            $parent->children(
+                $parent->children()->reject(function ($child) use ($item) {
+                    return $child->id() === $item->id();
+                })
+            );
+        }
     }
 
     protected function getBuiltNav()

@@ -26,11 +26,6 @@ use Statamic\Statamic;
 
 class CoreNav
 {
-    const ALLOWED_TOP_LEVEL = [
-        'Dashboard',
-        'Playground',
-    ];
-
     /**
      * Make default nav items.
      */
