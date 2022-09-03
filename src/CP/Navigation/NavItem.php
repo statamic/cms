@@ -99,7 +99,7 @@ class NavItem
             ->setter(function ($value) {
                 return Str::startsWith($value, '<svg') ? $value : Statamic::svg($value);
             })
-            ->value($icon);
+            ->args(func_get_args());
     }
 
     /**
@@ -142,6 +142,10 @@ class NavItem
                 return $value instanceof self
                     ? $value
                     : Nav::item($key)->url($value);
+            })
+            ->map(function ($navItem) {
+                return $navItem
+                    ->icon($this->icon());
             })
             ->values();
 

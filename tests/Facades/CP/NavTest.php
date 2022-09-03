@@ -193,6 +193,32 @@ class NavTest extends TestCase
     }
 
     /** @test */
+    public function it_sets_parent_icon_on_children()
+    {
+        File::put($svg = statamic_path('resources/svg/droid.svg'), '<svg>droid</svg>');
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::droids('Battle Droids')
+            ->url('/battle-droids')
+            ->icon('droid')
+            ->children([
+                Nav::item('B1')->url('/b1'),
+                Nav::item('B2')->url('/b2'),
+                'HK-47' => '/hk-47', // If only specifying name and URL, can pass key/value pair as well.
+            ]);
+
+        $item = Nav::build()->get('Droids')->first();
+
+        $this->assertEquals('<svg>droid</svg>', $item->icon());
+        $this->assertEquals('<svg>droid</svg>', $item->children()->get(0)->icon());
+        $this->assertEquals('<svg>droid</svg>', $item->children()->get(1)->icon());
+        $this->assertEquals('<svg>droid</svg>', $item->children()->get(2)->icon());
+
+        File::delete($svg);
+    }
+
+    /** @test */
     public function it_doesnt_build_children_that_the_user_is_not_authorized_to_see()
     {
         $this->setTestRoles(['sith' => ['view sith diaries']]);
