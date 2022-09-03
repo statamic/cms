@@ -11,6 +11,7 @@ class Nav
 {
     protected $items = [];
     protected $extensions = [];
+    protected $withHidden = false;
 
     /**
      * Register a nav extension closure.
@@ -91,6 +92,20 @@ class Nav
     public function items()
     {
         return $this->items;
+    }
+
+    /**
+     * Include hidden items for when customizing nav.
+     *
+     * @return $this
+     */
+    public function withHidden()
+    {
+        $clone = clone $this;
+
+        $clone->withHidden = true;
+
+        return $clone;
     }
 
     /**
@@ -258,6 +273,9 @@ class Nav
         $sections = [];
 
         collect($this->items)
+            ->reject(function ($item) {
+                return $this->withHidden ? false : $item->isHidden();
+            })
             ->filter(function ($item) {
                 return $item->section();
             })

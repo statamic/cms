@@ -21,6 +21,7 @@ class NavItem
     protected $authorization;
     protected $active;
     protected $view;
+    protected $hidden;
 
     /**
      * Get or set name.
@@ -265,6 +266,31 @@ class NavItem
     public function view($view = null)
     {
         return $this->fluentlyGetOrSet('view')->value($view);
+    }
+
+    /**
+     * Get or set hidden status.
+     *
+     * @param  bool|null  $hidden
+     * @return mixed
+     */
+    public function hidden($hidden = null)
+    {
+        return $this->fluentlyGetOrSet('hidden')
+            ->getter(function ($value) {
+                return $value ?? false;
+            })
+            ->value($hidden);
+    }
+
+    /**
+     * Get whether the nav item is to be hidden, but still made available for when customizing nav.
+     *
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return $this->hidden();
     }
 
     /**

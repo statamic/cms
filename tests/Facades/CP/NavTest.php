@@ -65,6 +65,7 @@ class NavTest extends TestCase
         $this->assertEquals(config('app.url').'/wordpress-importer', $item->url());
         $this->assertEquals('view updates', $item->authorization()->ability);
         $this->assertEquals('view updates', $item->can()->ability);
+        $this->assertFalse($item->isHidden());
     }
 
     /** @test */
@@ -434,5 +435,43 @@ class NavTest extends TestCase
         $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
         $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
         $this->assertEquals('foo.*', $nav->active());
+    }
+
+    /** @test */
+    public function it_doesnt_build_with_hidden_items()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::testSection('Hidden Item')->hidden(true);
+
+        $this->assertNull(Nav::build()->get('Test Section'));
+    }
+
+    /** @test */
+    public function it_can_build_with_hidden_items()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::testSection('Hidden Item')->hidden(true);
+
+        $items = Nav::withHidden()->build()->get('Test Section');
+
+        $this->assertCount(1, $items);
+        $this->assertEquals('Hidden Item', $items->first()->name());
+        $this->assertTrue($items->first()->isHidden());
+    }
+
+    /** @test */
+    public function it_hides_items_after_calling_with_hidden()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::testSection('Hidden Item')->hidden(true);
+
+        // Calling `withHidden()` should clone the instance, so that we don't update the singleton bound to the facade
+        $this->assertCount(1, Nav::withHidden()->build()->get('Test Section'));
+
+        // Which means this should hide the hidden item again
+        $this->assertNull(Nav::build()->get('Test Section'));
     }
 }
