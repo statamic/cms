@@ -14,10 +14,16 @@ class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
     /** @test */
     public function excludes_urls()
     {
-        $excluder = $this->excluder(['/blog']);
+        $excluder = $this->excluder(['/blog', '/events/', '/']);
 
         $this->assertTrue($excluder->isExcluded('/blog'));
+        $this->assertTrue($excluder->isExcluded('/blog/'));
         $this->assertFalse($excluder->isExcluded('/blog/post'));
+        $this->assertTrue($excluder->isExcluded('/events'));
+        $this->assertTrue($excluder->isExcluded('/events/'));
+        $this->assertFalse($excluder->isExcluded('/events/statameet'));
+        $this->assertTrue($excluder->isExcluded('/'));
+        $this->assertTrue($excluder->isExcluded(''));
     }
 
     /** @test */
