@@ -59,6 +59,7 @@ class NavTest extends TestCase
 
         $item = Nav::build()->get('Utilities')->last();
 
+        $this->assertEquals('utilities::wordpress_importer', $item->id());
         $this->assertEquals('Utilities', $item->section());
         $this->assertEquals('Wordpress Importer', $item->name());
         $this->assertEquals(config('app.url').'/wordpress-importer', $item->url());
@@ -88,6 +89,7 @@ class NavTest extends TestCase
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::droids('C-3PO')
+            ->id('some::custom::id')
             ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
@@ -95,6 +97,7 @@ class NavTest extends TestCase
 
         $item = Nav::build()->get('Droids')->first();
 
+        $this->assertEquals('some::custom::id', $item->id());
         $this->assertEquals('Droids', $item->section());
         $this->assertEquals('C-3PO', $item->name());
         $this->assertEquals('http://localhost/human-cyborg-relations', $item->url());
@@ -188,8 +191,11 @@ class NavTest extends TestCase
 
         $this->assertEquals('Battle Droids', $item->name());
         $this->assertEquals('B1', $item->children()->get(0)->name());
+        $this->assertEquals('droids::battle_droids::b1', $item->children()->get(0)->id());
         $this->assertEquals('B2', $item->children()->get(1)->name());
+        $this->assertEquals('droids::battle_droids::b2', $item->children()->get(1)->id());
         $this->assertEquals('HK-47', $item->children()->get(2)->name());
+        $this->assertEquals('droids::battle_droids::hk_47', $item->children()->get(2)->id());
     }
 
     /** @test */
@@ -243,12 +249,13 @@ class NavTest extends TestCase
 
         $this->assertCount(1, $diaries->children());
         $this->assertEquals('Sith', $diaries->children()->get(0)->name());
+        $this->assertEquals('custom::diaries::sith', $diaries->children()->get(0)->id());
 
         $this->assertNull($logs->children());
     }
 
     /** @test */
-    public function it_can_create_a_nav_item_with_deferred_children()
+    public function it_can_create_a_nav_item_with_children_in_a_closure_to_defer_loading_until_they_are_needed()
     {
         $this->markTestSkipped('Getting a NotFoundHttpException, even though I\'m registering route?');
 
@@ -274,7 +281,9 @@ class NavTest extends TestCase
         $this->assertEquals('Security Droids', $item->name());
         $this->assertFalse(is_callable($item->children()));
         $this->assertEquals('IG-86', $item->children()->get(0)->name());
+        $this->assertEquals('droids::security_droids::ig_86', $item->children()->get(0)->id());
         $this->assertEquals('K-2SO', $item->children()->get(1)->name());
+        $this->assertEquals('droids::security_droids::k_2so', $item->children()->get(1)->id());
     }
 
     /** @test */
@@ -298,7 +307,9 @@ class NavTest extends TestCase
         $this->assertEquals('Security Droids', $item->name());
         $this->assertFalse(is_callable($item->children()));
         $this->assertEquals('IG-86', $item->children()->get(0)->name());
+        $this->assertEquals('droids::security_droids::ig_86', $item->children()->get(0)->id());
         $this->assertEquals('K-2SO', $item->children()->get(1)->name());
+        $this->assertEquals('droids::security_droids::k_2so', $item->children()->get(1)->id());
     }
 
     /** @test */

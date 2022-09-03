@@ -14,6 +14,7 @@ class NavItem
 
     protected $name;
     protected $section;
+    protected $id;
     protected $url;
     protected $icon;
     protected $children;
@@ -41,6 +42,34 @@ class NavItem
     public function section($section = null)
     {
         return $this->fluentlyGetOrSet('section')->value($section);
+    }
+
+    /**
+     * Get or set the ID for referencing in preferences.
+     *
+     * @param  string|null  $id
+     * @return mixed
+     */
+    public function id($id = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('id')
+            ->setter(function ($value) {
+                return Str::endsWith($value, '::')
+                    ? $value.static::snakeCase($this->name())
+                    : $value;
+            })
+            ->getter(function ($value) {
+                if ($value) {
+                    return $value;
+                }
+
+                $section = static::snakeCase($this->section());
+                $name = static::snakeCase($this->name());
+
+                return "{$section}::{$name}";
+            })
+            ->value($id);
     }
 
     /**
@@ -145,6 +174,7 @@ class NavItem
             })
             ->map(function ($navItem) {
                 return $navItem
+                    ->id($this->id().'::')
                     ->icon($this->icon());
             })
             ->values();
@@ -235,5 +265,19 @@ class NavItem
     public function view($view = null)
     {
         return $this->fluentlyGetOrSet('view')->value($view);
+    }
+
+    /**
+     * Convert to snake case.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    protected static function snakeCase($string)
+    {
+        $string = Str::modifyMultiple($string, ['lower', 'snake']);
+        $string = Str::replace($string, '-', '_');
+
+        return $string;
     }
 }
