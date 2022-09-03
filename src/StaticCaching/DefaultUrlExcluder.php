@@ -37,7 +37,7 @@ class DefaultUrlExcluder implements UrlExcluder
                 return true;
             }
 
-            if ($url === $excluded) {
+            if (Str::removeRight($url, '/') === Str::removeRight($excluded, '/')) {
                 return true;
             }
         }
