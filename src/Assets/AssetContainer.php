@@ -174,7 +174,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             'alt' => [
                 'type' => 'text',
                 'display' => __('Alt Text'),
-                'instructions' => __('Description of the image')
+                'instructions' => __('Description of the image'),
             ],
         ])->setHandle($this->handle())->setNamespace('assets');
 
