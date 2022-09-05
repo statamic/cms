@@ -1,204 +1,213 @@
 <template>
     <element-container @resized="containerWidth = $event.width">
-    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280 }">
-
-        <uploader
-            ref="uploader"
-            :container="container"
-            :enabled="config.allow_uploads"
-            :path="folder"
-            @updated="uploadsUpdated"
-            @upload-complete="uploadComplete"
-            @error="uploadError"
+        <div
+            :class="{
+                narrow: containerWidth < 500,
+                'really-narrow': containerWidth < 280
+            }"
         >
-            <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
-
-                <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
-                    <svg-icon name="upload" class="h-8 w-8 mr-3" />
-                    <span>{{ __('Drop File to Upload') }}</span>
-                </div>
-
+            <uploader
+                ref="uploader"
+                :container="container"
+                :enabled="config.allow_uploads"
+                :path="folder"
+                @updated="uploadsUpdated"
+                @upload-complete="uploadComplete"
+                @error="uploadError"
+            >
                 <div
-                    v-if="!maxFilesReached && !isReadOnly"
-                    class="assets-fieldtype-picker"
-                    :class="{
-                        'is-expanded': expanded,
-                        'bard-drag-handle': isInBardField
-                    }"
+                    slot-scope="{ dragging }"
+                    class="assets-fieldtype-drag-container"
                 >
-
-                    <button
-                        type="button"
-                        class="btn btn-with-icon"
-                        @click="openSelector"
-                        @keyup.space.enter="openSelector"
-                        tabindex="0">
-                        <svg-icon name="folder-image" class="w-6 h-6 text-grey-80"></svg-icon>
-                        {{ __('Browse') }}
-                    </button>
-
-                    <p class="asset-upload-control text-xs text-grey-60" v-if="config.allow_uploads">
-                        <button type="button" class="upload-text-button" @click.prevent="uploadFile">
-                            {{ __('Upload file') }}
-                        </button>
-                        <span class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
-                    </p>
-
-                    <button
-                        type="button"
-                        class="delete-bard-set btn btn-icon float-right"
-                        v-if="isInBardField"
-                        @click.prevent="$dispatch('asset-field.delete-bard-set')">
-                        <span class="icon icon-trash"></span>
-                    </button>
-
-                </div>
-
-                <uploads
-                    v-if="uploads.length"
-                    :uploads="uploads"
-                />
-
-                <template v-if="expanded">
-
-                    <sortable-list
-                        v-if="displayMode === 'grid' && ! soloAsset"
-                        v-model="assets"
-                        item-class="asset-tile"
-                        handle-class="asset-thumb-container"
-                        @dragstart="$emit('focus')"
-                        @dragend="$emit('blur')"
-                        :disabled="isReadOnly"
+                    <div
+                        class="drag-notification"
+                        v-if="config.allow_uploads"
+                        v-show="dragging && !showSelector"
                     >
-                        <div
-                            class="asset-grid-listing border rounded overflow-hidden"
-                            :class="{ 'rounded-t-none': !maxFilesReached }"
-                            ref="assets"
-                        >
-                            <asset-tile
-                                v-for="asset in assets"
-                                :key="asset.id"
-                                :asset="asset"
-                                :read-only="isReadOnly"
-                                :show-filename="config.show_filename"
-                                @updated="assetUpdated"
-                                @removed="assetRemoved">
-                            </asset-tile>
-                        </div>
-                    </sortable-list>
-
-                    <div class="asset-table-listing" v-if="displayMode === 'list'">
-
-                        <table class="table-fixed">
-                            <sortable-list
-                                v-model="assets"
-                                :vertical="true"
-                                item-class="asset-row"
-                                handle-class="asset-row"
-                                :disabled="isReadOnly"
-                            >
-                                <tbody ref="assets">
-                                    <tr is="assetRow"
-                                        class="asset-row"
-                                        v-for="asset in assets"
-                                        :key="asset.id"
-                                        :asset="asset"
-                                        :read-only="isReadOnly"
-                                        :show-filename="config.show_filename"
-                                        @updated="assetUpdated"
-                                        @removed="assetRemoved">
-                                    </tr>
-                                </tbody>
-                            </sortable-list>
-                        </table>
-
+                        <svg-icon name="upload" class="h-8 w-8 mr-3" />
+                        <span>{{ __("Drop File to Upload") }}</span>
                     </div>
 
-                </template>
+                    <div
+                        v-if="!isReadOnly"
+                        class="assets-fieldtype-picker"
+                        :class="{
+                            'is-expanded': expanded,
+                            'bard-drag-handle': isInBardField
+                        }"
+                    >
+                        <button
+                            type="button"
+                            class="btn btn-with-icon"
+                            @click="openSelector"
+                            @keyup.space.enter="openSelector"
+                            tabindex="0"
+                        >
+                            <svg-icon
+                                name="folder-image"
+                                class="w-6 h-6 text-grey-80"
+                            ></svg-icon>
+                            {{ __("Browse") }}
+                        </button>
 
-                <div class="asset-solo-container" v-if="expanded && soloAsset && displayMode == 'grid'" ref="assets">
-                    <asset-tile
-                        v-for="asset in assets"
-                        :key="asset.id"
-                        :asset="asset"
-                        :read-only="isReadOnly"
-                        @updated="assetUpdated"
-                        @removed="assetRemoved">
-                    </asset-tile>
+                        <p
+                            class="asset-upload-control text-xs text-grey-60"
+                            v-if="config.allow_uploads"
+                        >
+                            <button
+                                type="button"
+                                class="upload-text-button"
+                                @click.prevent="uploadFile"
+                            >
+                                {{ __("Upload file") }}
+                            </button>
+                            <span
+                                v-if="soloAsset"
+                                class="drag-drop-text"
+                                v-text="__('or drag & drop here to replace.')"
+                            ></span>
+                            <span
+                                v-else
+                                class="drag-drop-text"
+                                v-text="__('or drag & drop here.')"
+                            ></span>
+                        </p>
+
+                        <button
+                            type="button"
+                            class="delete-bard-set btn btn-icon float-right"
+                            v-if="isInBardField"
+                            @click.prevent="$dispatch('asset-field.delete-bard-set')"
+                        >
+                            <span class="icon icon-trash"></span>
+                        </button>
+                    </div>
+
+                    <uploads v-if="uploads.length" :uploads="uploads" />
+
+                    <template v-if="expanded">
+                        <sortable-list
+                            v-if="displayMode === 'grid'"
+                            v-model="assets"
+                            item-class="asset-tile"
+                            handle-class="asset-thumb-container"
+                            @dragstart="$emit('focus')"
+                            @dragend="$emit('blur')"
+                            :disabled="isReadOnly"
+                        >
+                            <div
+                                class="asset-grid-listing border rounded overflow-hidden"
+                                :class="{ 'rounded-t-none': !maxFilesReached }"
+                                ref="assets"
+                            >
+                                <asset-tile
+                                    v-for="asset in assets"
+                                    :key="asset.id"
+                                    :asset="asset"
+                                    :read-only="isReadOnly"
+                                    :show-filename="config.show_filename"
+                                    :is-solo="soloAsset"
+                                    @updated="assetUpdated"
+                                    @removed="assetRemoved"
+                                >
+                                </asset-tile>
+                            </div>
+                        </sortable-list>
+
+                        <div
+                            class="asset-table-listing"
+                            v-if="displayMode === 'list'"
+                        >
+                            <table class="table-fixed">
+                                <sortable-list
+                                    v-model="assets"
+                                    :vertical="true"
+                                    item-class="asset-row"
+                                    handle-class="asset-row"
+                                    :disabled="isReadOnly"
+                                >
+                                    <tbody ref="assets">
+                                        <tr
+                                            is="assetRow"
+                                            class="asset-row"
+                                            v-for="asset in assets"
+                                            :key="asset.id"
+                                            :asset="asset"
+                                            :read-only="isReadOnly"
+                                            :show-filename="config.show_filename"
+                                            @updated="assetUpdated"
+                                            @removed="assetRemoved"
+                                        ></tr>
+                                    </tbody>
+                                </sortable-list>
+                            </table>
+                        </div>
+                    </template>
                 </div>
+            </uploader>
 
-            </div>
-
-        </uploader>
-
-        <stack
-            v-if="showSelector"
-            name="asset-selector"
-            @closed="closeSelector"
-        >
-            <selector
-                :container="container"
-                :folder="folder"
-                :restrict-container-navigation="true"
-                :restrict-folder-navigation="restrictNavigation"
-                :selected="selectedAssets"
-                :view-mode="selectorViewMode"
-                :max-files="maxFiles"
-                @selected="assetsSelected"
-                @closed="closeSelector">
-            </selector>
-        </stack>
-    </div>
+            <stack
+                v-if="showSelector"
+                name="asset-selector"
+                @closed="closeSelector"
+            >
+                <selector
+                    :container="container"
+                    :folder="folder"
+                    :restrict-container-navigation="true"
+                    :restrict-folder-navigation="restrictNavigation"
+                    :selected="selectedAssets"
+                    :view-mode="selectorViewMode"
+                    :max-files="maxFiles"
+                    @selected="assetsSelected"
+                    @closed="closeSelector"
+                >
+                </selector>
+            </stack>
+        </div>
     </element-container>
 </template>
 
-
 <style lang="scss">
+.asset-listing-uploads {
+    border: 1px dashed #ccc;
+    border-top: 0;
+    margin: 0;
+    padding: 10px 20px;
 
-    .asset-listing-uploads {
-        border: 1px dashed #ccc;
-        border-top: 0;
+    table {
         margin: 0;
-        padding: 10px 20px;
-
-        table {
-            margin: 0;
-        }
-
-        thead {
-            display: none;
-        }
-
-        tr:first-child {
-            border-top: 0;
-        }
     }
 
+    thead {
+        display: none;
+    }
+
+    tr:first-child {
+        border-top: 0;
+    }
+}
 </style>
 
-
 <script>
-import AssetRow from './AssetRow.vue';
-import AssetTile from './AssetTile.vue';
-import Selector from '../../assets/Selector.vue';
-import Uploader from '../../assets/Uploader.vue';
-import Uploads from '../../assets/Uploads.vue';
-import { SortableList } from '../../sortable/Sortable';
+import AssetRow from "./AssetRow.vue";
+import AssetTile from "./AssetTile.vue";
+import Selector from "../../assets/Selector.vue";
+import Uploader from "../../assets/Uploader.vue";
+import Uploads from "../../assets/Uploads.vue";
+import { SortableList } from "../../sortable/Sortable";
 
 export default {
-
     components: {
         AssetTile,
         AssetRow,
         Selector,
         Uploader,
         Uploads,
-        SortableList,
+        SortableList
     },
 
-
     mixins: [Fieldtype],
-
 
     data() {
         return {
@@ -210,14 +219,12 @@ export default {
             draggingFile: false,
             uploads: [],
             innerDragging: false,
-            displayMode: 'grid',
-            containerWidth: null,
+            displayMode: "grid",
+            containerWidth: null
         };
     },
 
-
     computed: {
-
         /**
          * Whether any assets have been selected.
          */
@@ -236,7 +243,7 @@ export default {
          * The initial folder to be displayed in the selector.
          */
         folder() {
-            return this.config.folder || '/';
+            return this.config.folder || "/";
         },
 
         /**
@@ -251,7 +258,7 @@ export default {
          * The maximum number of files allowed.
          */
         maxFiles() {
-            if (! this.config.max_files) return Infinity;
+            if (!this.config.max_files) return Infinity;
 
             return parseInt(this.config.max_files);
         },
@@ -285,7 +292,7 @@ export default {
          * The IDs of the assets.
          */
         assetIds() {
-            return _.pluck(this.assets, 'id');
+            return _.pluck(this.assets, "id");
         },
 
         /**
@@ -308,9 +315,9 @@ export default {
             while (true) {
                 let parent = vm.$parent;
 
-                if (! parent) return false;
+                if (!parent) return false;
 
-                if (parent.constructor.name === 'BardFieldtype') {
+                if (parent.constructor.name === "BardFieldtype") {
                     return true;
                 }
 
@@ -319,25 +326,23 @@ export default {
         },
 
         replicatorPreview() {
-            return _.map(this.assets, (asset) => {
-                return asset.isImage ?
-                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
+            return _.map(this.assets, asset => {
+                return asset.isImage
+                    ? `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
-            }).join(', ');
+            }).join(", ");
         }
-
     },
 
     events: {
-        'close-selector' () {
+        "close-selector"() {
             this.closeSelector();
         }
     },
 
     methods: {
-
         initializeAssets() {
-            if (! this.meta.data) {
+            if (!this.meta.data) {
                 this.loadAssets(this.value);
                 this.initializing = false;
                 return;
@@ -356,7 +361,7 @@ export default {
          * Accepts an array of asset URLs and/or IDs.
          */
         loadAssets(assets) {
-            if (! assets || ! assets.length) {
+            if (!assets || !assets.length) {
                 this.loading = false;
                 this.assets = [];
                 return;
@@ -364,12 +369,14 @@ export default {
 
             this.loading = true;
 
-            this.$axios.get(cp_url('assets-fieldtype'), {
-                params: { assets }
-            }).then(response => {
-                this.assets = response.data;
-                this.loading = false;
-            });
+            this.$axios
+                .get(cp_url("assets-fieldtype"), {
+                    params: { assets }
+                })
+                .then(response => {
+                    this.assets = response.data;
+                    this.loading = false;
+                });
         },
 
         /**
@@ -443,18 +450,15 @@ export default {
         },
 
         getReplicatorPreviewText() {
-            return _.map(this.assets, (asset) => {
-                return asset.is_image ?
-                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
+            return _.map(this.assets, asset => {
+                return asset.is_image
+                    ? `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
-            }).join(', ');
+            }).join(", ");
         }
-
     },
 
-
     watch: {
-
         assets(assets) {
             if (this.initializing) return;
 
@@ -464,7 +468,7 @@ export default {
 
             this.updateMeta({
                 ...this.meta,
-                data: [...assets],
+                data: [...assets]
             });
         },
 
@@ -479,21 +483,20 @@ export default {
         },
 
         showSelector(selecting) {
-            this.$emit(selecting ? 'focus' : 'blur');
+            this.$emit(selecting ? "focus" : "blur");
         }
-
     },
 
     mounted() {
         this.displayMode = this.isInsideGridField
-            ? 'list'
-            : this.config.mode || 'grid';
+            ? "list"
+            : this.config.mode || "grid";
 
-        this.selectorViewMode = Cookies.get('statamic.assets.listing_view_mode') || 'grid';
+        this.selectorViewMode =
+            Cookies.get("statamic.assets.listing_view_mode") || "grid";
 
         // We only have URLs in the field data, so we'll need to get the asset data.
         this.initializeAssets();
     }
-
-}
+};
 </script>
