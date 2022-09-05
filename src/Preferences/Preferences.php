@@ -38,6 +38,7 @@ class Preferences
             ->resetState()
             ->mergeDottedUserPreferences()
             ->mergeDottedRolePreferences()
+            ->mergeDottedDefaultPreferences()
             ->getMultiDimensionalPreferences();
     }
 
@@ -88,6 +89,20 @@ class Preferences
         foreach ($this->user->roles() as $role) {
             $this->dotted += Arr::dot($role->preferences());
         }
+
+        return $this;
+    }
+
+    /**
+     * Merged dotted default preferences.
+     *
+     * @return $this
+     */
+    protected function mergeDottedDefaultPreferences()
+    {
+        $defaultPreferences = DefaultPreferences::all();
+
+        $this->dotted += Arr::dot($defaultPreferences);
 
         return $this;
     }
