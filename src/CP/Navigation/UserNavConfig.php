@@ -89,7 +89,7 @@ class UserNavConfig implements ArrayAccess
             ? collect(['action' => Str::ensureLeft($itemConfig, '@')])
             : collect($itemConfig);
 
-        if (! in_array($normalized->get('action'), ['@alias', '@move', '@inherit'])) {
+        if (! in_array($normalized->get('action'), ['@alias', '@move', '@inherit', '@create'])) {
             $normalized->put('action', $normalized->get('reorder') ? '@inherit' : '@alias');
         }
 

@@ -338,10 +338,13 @@ class Nav
                 ];
             })
             ->each(function ($override) use ($section) {
-                if ($override['config']['action'] === '@alias') {
-                    return $this->aliasItem($override['item'], $section);
-                } elseif ($override['config']['action'] === '@move') {
-                    return $this->moveItem($override['item'], $section);
+                switch ($override['config']['action']) {
+                    case '@alias':
+                        return $this->aliasItem($override['item'], $section);
+                    case '@move':
+                        return $this->moveItem($override['item'], $section);
+                    case '@create':
+                        return $this->createUserItem($override['config'], $section);
                 }
             });
 
@@ -431,6 +434,34 @@ class Nav
                 })
             );
         }
+    }
+
+    /**
+     * Create new NavItem from user config.
+     *
+     * @param  NavItem  $item
+     * @param  string  $section
+     */
+    protected function createUserItem($config, $section)
+    {
+        $config = collect($config);
+
+        if (! $display = $config->get('display')) {
+            return;
+        }
+
+        $item = $this->{$section}($display);
+
+        $allowedSetters = [
+            'url',
+            'route',
+            'icon',
+            'children',
+        ];
+
+        collect($allowedSetters)
+            ->filter(fn ($setter) => $config->has($setter))
+            ->each(fn ($setter) => $item->{$setter}($config->get($setter)));
     }
 
     /**
