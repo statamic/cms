@@ -294,53 +294,68 @@ class Nav
         return $this;
     }
 
+    /**
+     * Apply overrides from user preferences.
+     *
+     * @return $this
+     */
     protected function applyPreferenceOverrides()
     {
         if (! $userNav = Preference::get('nav')) {
             return $this;
         }
 
-        collect($userNav)
-            ->map(function ($overrides, $section) {
-                return $this->normalizeOverrides($overrides, $section);
+        $userNav = new UserNavConfig($userNav);
+
+        collect($userNav['sections'])
+            ->reject(function ($overrides) {
+                return $overrides === '@inherit';
             })
             ->each(function ($overrides, $section) {
                 $this->applyPreferenceOverridesForSection($overrides, $section);
             });
 
+        if ($userNav['reorder']) {
+            // $this->reorderSections();
+        }
+
         return $this;
     }
 
-    protected function normalizeOverrides($overrides, $section)
+    /**
+     * Apply user preference overrides for specific section.
+     *
+     * @param  array  $sectionNav
+     * @param  string  $section
+     */
+    protected function applyPreferenceOverridesForSection($sectionNav, $section)
     {
-        return collect($overrides)->map(function ($config, $id) {
-            return [
-                'item' => $this->findItem($id),
-                'config' => $this->normalizeOverrideConfig($config),
-            ];
-        });
-    }
+        collect($sectionNav['items'])
+            ->map(function ($config, $id) {
+                return [
+                    'item' => $this->findItem($id),
+                    'config' => $config,
+                ];
+            })
+            ->each(function ($override) use ($section) {
+                if ($override['config']['action'] === '@alias') {
+                    return $this->aliasItem($override['item'], $section);
+                } elseif ($override['config']['action'] === '@move') {
+                    return $this->moveItem($override['item'], $section);
+                }
+            });
 
-    protected function normalizeOverrideConfig($config)
-    {
-        if (is_string($config)) {
-            return ['action' => Str::ensureLeft($config, '@')];
+        if ($sectionNav['reorder']) {
+            // $this->reorderItems();
         }
-
-        return array_merge(['action' => '@alias'], $config);
     }
 
-    protected function applyPreferenceOverridesForSection($overrides, $section)
-    {
-        collect($overrides)->each(function ($override) use ($section) {
-            if ($override['config']['action'] === '@alias') {
-                return $this->aliasItem($override['item'], $section);
-            } elseif ($override['config']['action'] === '@move') {
-                return $this->moveItem($override['item'], $section);
-            }
-        });
-    }
-
+    /**
+     * Find existing nav item by ID.
+     *
+     * @param  string  $id
+     * @return NavItem|null
+     */
     protected function findItem($id)
     {
         $items = $this->items->keyBy->id();
@@ -359,6 +374,12 @@ class Nav
         return $items->get($id);
     }
 
+    /**
+     * Find parent nav item by ID.
+     *
+     * @param  string  $id
+     * @return NavItem|null
+     */
     protected function findParentItem($id)
     {
         $items = $this->items->keyBy->id();
@@ -374,6 +395,12 @@ class Nav
         return $items->get($parentId);
     }
 
+    /**
+     * Create alias for NavItem.
+     *
+     * @param  NavItem  $item
+     * @param  string  $section
+     */
     protected function aliasItem($item, $section)
     {
         $clone = clone $item;
@@ -383,6 +410,12 @@ class Nav
         $this->items[] = $clone;
     }
 
+    /**
+     * Move NavItem to new section.
+     *
+     * @param  NavItem  $item
+     * @param  string  $section
+     */
     protected function moveItem($item, $section)
     {
         $this->aliasItem($item, $section);
@@ -398,6 +431,11 @@ class Nav
         }
     }
 
+    /**
+     * Get built nav.
+     *
+     * @return \Illuminate\Support\Collection
+     */
     protected function getBuiltNav()
     {
         return $this->built;
