@@ -4,7 +4,8 @@
         :class="{
             'is-image': isImage && !canShowSvg,
             'is-svg': canShowSvg,
-            'is-file': !isImage && !canShowSvg
+            'is-file': !isImage && !canShowSvg,
+            'col-span-2 row-span-2': isSolo
         }"
         :title="asset.filename"
     >
@@ -18,10 +19,7 @@
         </asset-editor>
 
         <div class="asset-thumb-container">
-            <div
-                class="asset-thumb"
-                :class="{ 'bg-checkerboard': canBeTransparent }"
-            >
+            <div class="asset-thumb" :class="{ 'bg-checkerboard': canBeTransparent }">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
                     <img :src="asset.url" />
@@ -31,11 +29,7 @@
                     <img :src="thumbnail" v-if="isImage" :title="label" />
 
                     <template v-else>
-                        <img
-                            v-if="canShowSvg"
-                            :src="asset.url"
-                            class="p-2"
-                        />
+                        <img v-if="canShowSvg" :src="asset.url" class="p-2" />
                         <file-icon
                             v-else
                             :extension="asset.extension"
@@ -62,13 +56,7 @@
 
                 <div class="asset-controls" v-if="readOnly">
                     <button
-                        v-if="
-                            asset.url &&
-                                (asset.isImage ||
-                                    asset.isAudio ||
-                                    asset.isVideo) &&
-                                this.canDownload
-                        "
+                        v-if="asset.url && asset.isMedia && this.canDownload"
                         @click="open"
                         class="btn btn-icon"
                         :alt="__('Open in a new window')"
@@ -113,8 +101,14 @@ import Asset from "./Asset";
 export default {
     mixins: [Asset],
 
-    computed: {
+    props: {
+        isSolo: {
+            type: Boolean,
+            default: false
+        }
+    },
 
+    computed: {
         isInAssetBrowser() {
             let vm = this;
 
