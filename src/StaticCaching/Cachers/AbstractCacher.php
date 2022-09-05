@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request as RequestFacade;
+use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
@@ -216,10 +217,12 @@ abstract class AbstractCacher implements Cacher
         // Remove the asterisk
         $wildcard = substr($wildcard, 0, -1);
 
+        $wildcard = URL::makeRelative($wildcard);
+
         $this->getUrls()->filter(function ($url) use ($wildcard) {
             return Str::startsWith($url, $wildcard);
         })->each(function ($url) {
-            $this->invalidateUrl($url);
+            $this->invalidateUrl(URL::makeAbsolute($url));
         });
     }
 
@@ -235,7 +238,7 @@ abstract class AbstractCacher implements Cacher
             if (Str::contains($url, '*')) {
                 $this->invalidateWildcardUrl($url);
             } else {
-                $this->invalidateUrl($url);
+                $this->invalidateUrl(URL::makeAbsolute($url));
             }
         });
     }
