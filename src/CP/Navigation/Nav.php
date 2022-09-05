@@ -405,6 +405,8 @@ class Nav
     {
         $clone = clone $item;
 
+        $clone->id($clone->id().'::clone');
+
         $clone->section(Str::modifyMultiple($section, ['deslugify', 'title']));
 
         $this->items[] = $clone;
