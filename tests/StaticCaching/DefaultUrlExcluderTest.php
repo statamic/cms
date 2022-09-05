@@ -35,11 +35,16 @@ class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertTrue($excluder->isExcluded('/blog/post'));
+        $this->assertTrue($excluder->isExcluded('/blog/post/'));
         $this->assertFalse($excluder->isExcluded('/blog'));
+        $this->assertFalse($excluder->isExcluded('/blog/'));
 
         $this->assertTrue($excluder->isExcluded('/news'));
+        $this->assertTrue($excluder->isExcluded('/news/'));
         $this->assertTrue($excluder->isExcluded('/news/article'));
+        $this->assertTrue($excluder->isExcluded('/news/article/'));
         $this->assertTrue($excluder->isExcluded('/newspaper'));
+        $this->assertTrue($excluder->isExcluded('/newspaper/'));
     }
 
     /** @test */
@@ -48,6 +53,7 @@ class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
         $excluder = $this->excluder(['/blog']);
 
         $this->assertTrue($excluder->isExcluded('/blog?page=1'));
+        $this->assertTrue($excluder->isExcluded('/blog/?page=1'));
     }
 
     /** @test */
@@ -56,5 +62,6 @@ class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
         $excluder = $this->excluder(['/blog'], 'http://example.com');
 
         $this->assertTrue($excluder->isExcluded('http://example.com/blog'));
+        $this->assertTrue($excluder->isExcluded('http://example.com/blog/'));
     }
 }
