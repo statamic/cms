@@ -238,6 +238,10 @@ abstract class Tree implements Contract, Localization
 
     public function append($entry)
     {
+        if (is_null($entry)) {
+            return $this;
+        }
+
         $this->tree[] = ['entry' => $entry->id()];
 
         return $this;
@@ -245,8 +249,12 @@ abstract class Tree implements Contract, Localization
 
     public function appendTo($parent, $page)
     {
-        if ($parent && ! $this->page($parent)) {
+        if ($parent && ! $this->find($parent)) {
             throw new \Exception("Page [{$parent}] does not exist in this structure");
+        }
+
+        if (is_null($page)) {
+            return $this;
         }
 
         if (is_string($page)) {
