@@ -35,7 +35,7 @@ class UserNavConfig implements ArrayAccess
 
         $sections = $sections
             ->prepend($sections->pull('top_level') ?? '@inherit', 'top_level')
-            ->map(fn ($config) => $this->normalizeSectionConfig($config))
+            ->map(fn ($config, $section) => $this->normalizeSectionConfig($config, $section))
             ->filter()
             ->reject(fn ($config) => $config === '@inherit' && ! $reorder)
             ->all();
@@ -51,7 +51,7 @@ class UserNavConfig implements ArrayAccess
      * @param  mixed  $sectionConfig
      * @return array
      */
-    protected function normalizeSectionConfig($sectionConfig)
+    protected function normalizeSectionConfig($sectionConfig, $sectionKey)
     {
         if (is_string($sectionConfig)) {
             return $sectionConfig;
@@ -59,9 +59,21 @@ class UserNavConfig implements ArrayAccess
 
         $sectionConfig = collect($sectionConfig);
 
-        $normalized = collect()->put('reorder', $reorder = $sectionConfig->get('reorder', false));
+        $normalized = collect();
 
-        $items = collect($sectionConfig->get('items') ?? $sectionConfig->except('reorder'));
+        $normalized->put('reorder', $reorder = $sectionConfig->get('reorder', false));
+
+        $normalized->put('display', $display = $sectionConfig->get('display',
+            $displayOriginal = Str::modifyMultiple($sectionKey, ['deslugify', 'title']))
+        );
+
+        $normalized->put('display_original', $display !== $displayOriginal ? $displayOriginal : null);
+
+        $items = collect($sectionConfig->get('items') ?? $sectionConfig->except([
+            'reorder',
+            'display',
+            'display_original',
+        ]));
 
         $items = $items
             ->map(function ($config) {

@@ -311,8 +311,16 @@ class Nav
             ->reject(function ($overrides) {
                 return $overrides === '@inherit';
             })
-            ->each(function ($overrides, $section) {
-                $this->applyPreferenceOverridesForSection($overrides, $section);
+            ->each(function ($overrides) {
+                $this->applyPreferenceOverridesForSection($overrides);
+            });
+
+        collect($userNav['sections'])
+            ->reject(function ($overrides) {
+                return is_null($overrides['display_original']);
+            })
+            ->each(function ($overrides) {
+                $this->renameSection($overrides['display_original'], $overrides['display']);
             });
 
         if ($userNav['reorder']) {
@@ -326,10 +334,11 @@ class Nav
      * Apply user preference overrides for specific section.
      *
      * @param  array  $sectionNav
-     * @param  string  $section
      */
-    protected function applyPreferenceOverridesForSection($sectionNav, $section)
+    protected function applyPreferenceOverridesForSection($sectionNav)
     {
+        $section = $sectionNav['display'];
+
         collect($sectionNav['items'])
             ->map(function ($config, $id) {
                 return [
@@ -351,6 +360,19 @@ class Nav
         if ($sectionNav['reorder']) {
             // $this->reorderItems();
         }
+    }
+
+    /**
+     * Rename section.
+     *
+     * @param  string  $displayOriginal
+     * @param  string  $displayNew
+     */
+    protected function renameSection($displayOriginal, $displayNew)
+    {
+        $this->items
+            ->filter(fn ($item) => $item->section() === $displayOriginal)
+            ->each(fn ($item) => $item->section($displayNew));
     }
 
     /**
@@ -410,7 +432,7 @@ class Nav
 
         $clone->id($clone->id().'::clone');
 
-        $clone->section(Str::modifyMultiple($section, ['deslugify', 'title']));
+        $clone->section($section);
 
         $this->items[] = $clone;
     }
@@ -450,7 +472,7 @@ class Nav
             return;
         }
 
-        $item = $this->{$section}($display);
+        $item = $this->create($display)->section($section);
 
         $allowedSetters = [
             'url',
