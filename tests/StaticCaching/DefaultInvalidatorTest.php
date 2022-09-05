@@ -62,8 +62,35 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($invalidator->invalidate($asset));
     }
 
+      /** @test */
+      public function collection_urls_can_be_invalidated()
+      {
+          $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+              $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.com')->once();
+              $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+          });
+
+          $collection = tap(Mockery::mock(Collection::class), function ($m) {
+              $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/collection');
+              $m->shouldReceive('handle')->andReturn('blog');
+          });
+
+          $invalidator = new Invalidator($cacher, [
+              'collections' => [
+                  'blog' => [
+                      'urls' => [
+                          '/blog/one',
+                          '/blog/two',
+                      ],
+                  ],
+              ],
+          ]);
+
+          $this->assertNull($invalidator->invalidate($collection));
+      }
+
     /** @test */
-    public function collection_urls_can_be_invalidated()
+    public function collection_urls_can_be_invalidated_by_an_entry()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
