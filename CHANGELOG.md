@@ -1,5 +1,27 @@
 # Release Notes
 
+## 3.3.34 (2022-09-05)
+
+### What's new
+- Add support for downloading multiple assets as a zip. [#6606](https://github.com/statamic/cms/issues/6606) [#6626](https://github.com/statamic/cms/issues/6626) by @jacksleight
+- Add support for filtering entries by taxonomy terms in the REST API. [#6615](https://github.com/statamic/cms/issues/6615) by @arthurperton
+
+### What's improved
+- Asset fieldtype UI/UX improvements such as ability to set missing alt attributes, and better thumbnails. [#6638](https://github.com/statamic/cms/issues/6638) by @jackmcdade
+- Static caching: When saving a collection (or its tree), the configured collection urls will be invalidated. [#6636](https://github.com/statamic/cms/issues/6636) by @arthurperton
+- Static caching excluded URLs treat trailing slashes as optional. [#6633](https://github.com/statamic/cms/issues/6633) by @arthurperton
+
+### What's fixed
+- Exclude `published` from data when saving entries. [#6641](https://github.com/statamic/cms/issues/6641) by @jasonvarga
+- Show placeholder in form select fields. [#6637](https://github.com/statamic/cms/issues/6637) by @fjahn
+- Avoid fieldtypes getting mounted twice. [#6632](https://github.com/statamic/cms/issues/6632) by @arthurperton
+- Fix popper causing overflow. [#6628](https://github.com/statamic/cms/issues/6628) by @jasonvarga
+- Fix missing permission translation keys being shown. [#6624](https://github.com/statamic/cms/issues/6624) by @jasonvarga
+- Fix numeric separators JS error. [#6625](https://github.com/statamic/cms/issues/6625) by @jesseleite
+- Fix asset data handling. [#6591](https://github.com/statamic/cms/issues/6591) by @jesseleite
+
+
+
 ## 3.3.33 (2022-08-31)
 
 ### What's new
