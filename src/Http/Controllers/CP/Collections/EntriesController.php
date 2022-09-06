@@ -207,7 +207,7 @@ class EntriesController extends CpController
 
         if ($entry->collection()->dated()) {
             $date = $this->formatDateForSaving($request->date);
-
+            
             $entry->date($date);
 
             $entry->descendants()->each(fn ($entry) => $this->saveUpdatedEntry($entry->date($date)));
@@ -461,7 +461,7 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
         } else {
-            if (! is_null($published) && ! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
+            if (!is_null($published) && ! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($published);
             }
 
