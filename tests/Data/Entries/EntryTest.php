@@ -848,6 +848,23 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_copies_a_changed_date_to_its_descendants()
+    {
+        $collection = tap(Collection::make('dated')->dated(true))->save();
+
+        $origin = (new Entry)->collection('dated')->id('origin')->date('2022-09-06');
+        $origin->save();
+        $descendant = (new Entry)->collection('dated')->id('descendant')->date('2022-09-06')->origin($origin);
+        $descendant->save();
+
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2022-09-06 00:00')->eq($descendant->date()));
+
+        $origin->date('2022-09-08')->save();
+
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2022-09-08 00:00')->eq($descendant->date()));
+    }
+
+    /** @test */
     public function future_dated_entries_are_private_when_configured_in_the_collection()
     {
         Carbon::setTestNow('2019-01-01');

@@ -32,7 +32,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Fields\Value;
+use Statamic\Facades\User;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -338,6 +338,27 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                 ->each(function ($siteHandle) {
                     $this->makeLocalization($siteHandle)->save();
                 });
+        }
+
+        if (! $isNew && $this->collection()->dated()) {
+            $date = $this->date();
+
+            $this->descendants()->each(function ($entry) use ($date) {
+                if ($entry->date()->eq($date)) {
+                    return;
+                }
+
+                $entry->date($date);
+
+                if ($entry->revisionsEnabled() && $entry->published()) {
+                    $entry
+                        ->makeWorkingCopy()
+                        ->user(User::current())
+                        ->save();
+                } else {
+                    $entry->updateLastModified(User::current())->save();
+                }
+            });
         }
 
         return true;
