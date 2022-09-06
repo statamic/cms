@@ -9,6 +9,13 @@ class UserNavConfig implements ArrayAccess
 {
     protected $config;
 
+    const ALLOWED_NAV_ITEM_SETTERS = [
+        'url',
+        'route',
+        'icon',
+        'children',
+    ];
+
     /**
      * Instantiate user nav config helper.
      *
@@ -17,6 +24,27 @@ class UserNavConfig implements ArrayAccess
     public function __construct($userNavPreferences)
     {
         $this->config = $this->normalizeConfig($userNavPreferences);
+    }
+
+    /**
+     * Instantiate user nav config helper.
+     *
+     * @param  array  $userNavPreferences
+     * @return static
+     */
+    public static function normalize($userNavPreferences)
+    {
+        return new static($userNavPreferences);
+    }
+
+    /**
+     * Get normalized config.
+     *
+     * @return array
+     */
+    public function get()
+    {
+        return $this->config;
     }
 
     /**
@@ -42,7 +70,9 @@ class UserNavConfig implements ArrayAccess
 
         $normalized->put('sections', $sections);
 
-        return $normalized->all();
+        $allowedKeys = ['reorder', 'sections'];
+
+        return $normalized->only($allowedKeys)->all();
     }
 
     /**
@@ -76,8 +106,8 @@ class UserNavConfig implements ArrayAccess
         ]));
 
         $items = $items
-            ->map(function ($config) {
-                return $this->normalizeItemConfig($config);
+            ->map(function ($config) use ($reorder) {
+                return $this->normalizeItemConfig($config, $reorder);
             })
             ->reject(function ($config) use ($reorder) {
                 return isset($config['action']) && $config['action'] === '@inherit' && ! $reorder;
@@ -86,26 +116,35 @@ class UserNavConfig implements ArrayAccess
 
         $normalized->put('items', $items);
 
-        return $normalized->all();
+        $allowedKeys = ['reorder', 'display', 'display_original', 'items'];
+
+        return $normalized->only($allowedKeys)->all();
     }
 
     /**
      * Normalize item config.
      *
      * @param  mixed  $itemConfig
+     * @param  bool  $isReordering
      * @return array
      */
-    protected function normalizeItemConfig($itemConfig)
+    protected function normalizeItemConfig($itemConfig, $isReordering)
     {
         $normalized = is_string($itemConfig)
             ? collect(['action' => Str::ensureLeft($itemConfig, '@')])
             : collect($itemConfig);
 
         if (! in_array($normalized->get('action'), ['@alias', '@move', '@inherit', '@create'])) {
-            $normalized->put('action', $normalized->get('reorder') ? '@inherit' : '@alias');
+            $normalized->put('action', $isReordering ? '@inherit' : '@alias');
         }
 
-        return $normalized->all();
+        $allowedKeys = ['action', 'display'];
+
+        if ($normalized->get('action') === '@create') {
+            $allowedKeys = array_merge($allowedKeys, static::ALLOWED_NAV_ITEM_SETTERS);
+        }
+
+        return $normalized->only($allowedKeys)->all();
     }
 
     #[\ReturnTypeWillChange]

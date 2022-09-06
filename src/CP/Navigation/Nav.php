@@ -305,7 +305,7 @@ class Nav
             return $this;
         }
 
-        $userNav = new UserNavConfig($userNav);
+        $userNav = UserNavConfig::normalize($userNav);
 
         collect($userNav['sections'])
             ->reject(function ($overrides) {
@@ -474,14 +474,7 @@ class Nav
 
         $item = $this->create($display)->section($section);
 
-        $allowedSetters = [
-            'url',
-            'route',
-            'icon',
-            'children',
-        ];
-
-        collect($allowedSetters)
+        collect(UserNavConfig::ALLOWED_NAV_ITEM_SETTERS)
             ->filter(fn ($setter) => $config->has($setter))
             ->each(fn ($setter) => $item->{$setter}($config->get($setter)));
     }
