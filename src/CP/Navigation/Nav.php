@@ -349,9 +349,11 @@ class Nav
             ->each(function ($override) use ($section) {
                 switch ($override['config']['action']) {
                     case '@alias':
-                        return $this->aliasItem($override['item'], $section);
+                        return $this->aliasItem($override['item'], $override['config'], $section);
                     case '@move':
-                        return $this->moveItem($override['item'], $section);
+                        return $this->moveItem($override['item'], $override['config'], $section);
+                    case '@modify':
+                        return $this->modifyItem($override['item'], $override['config'], $section);
                     case '@create':
                         return $this->createUserItem($override['config'], $section);
                 }
@@ -424,15 +426,18 @@ class Nav
      * Create alias for NavItem.
      *
      * @param  NavItem  $item
+     * @param  array  $config
      * @param  string  $section
      */
-    protected function aliasItem($item, $section)
+    protected function aliasItem($item, $config, $section)
     {
         $clone = clone $item;
 
         $clone->id($clone->id().'::clone');
 
         $clone->section($section);
+
+        $this->modifyItem($clone, $config);
 
         $this->items[] = $clone;
     }
@@ -441,11 +446,12 @@ class Nav
      * Move NavItem to new section.
      *
      * @param  NavItem  $item
+     * @param  array  $config
      * @param  string  $section
      */
-    protected function moveItem($item, $section)
+    protected function moveItem($item, $config, $section)
     {
-        $this->aliasItem($item, $section);
+        $this->aliasItem($item, $config, $section);
 
         $item->hidden(true);
 
@@ -459,9 +465,22 @@ class Nav
     }
 
     /**
-     * Create new NavItem from user config.
+     * Modify NavItem.
      *
      * @param  NavItem  $item
+     * @param  array  $config
+     */
+    protected function modifyItem($item, $config)
+    {
+        if (isset($config['display'])) {
+            $item->name($config['display']);
+        }
+    }
+
+    /**
+     * Create new NavItem from user config.
+     *
+     * @param  array  $config
      * @param  string  $section
      */
     protected function createUserItem($config, $section)

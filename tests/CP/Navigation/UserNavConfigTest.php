@@ -224,7 +224,7 @@ class UserNavConfigTest extends TestCase
         $nav = $this->normalize([
             'content' => [
                 'user::profiles' => [
-                    'action' => '@create',
+                    'action' => '@create', // The `@create` action is required to use the following setters...
                     'display' => 'Profiles',
                     'url' => '/profiles',
                     'icon' => 'user',
@@ -232,7 +232,7 @@ class UserNavConfigTest extends TestCase
                         'Json' => 'https://jsonvarga.net',
                         'Yaml' => 'https://spamlyaml.org',
                     ],
-                    'invalid_nav_item_setter' => 'test', // this should get removed
+                    'invalid_nav_item_setter' => 'test', // This should get removed as it's not a valid setter.
                 ],
             ],
         ]);
@@ -249,6 +249,49 @@ class UserNavConfigTest extends TestCase
         ];
 
         $this->assertEquals($expected, Arr::get($nav, 'sections.content.items.user::profiles'));
+    }
+
+    /** @test */
+    public function it_filters_out_create_actions_for_existing_item_ids()
+    {
+        $this->markTestSkipped();
+    }
+
+    /** @test */
+    public function it_allows_modifying_of_items_using_modify_action()
+    {
+        $nav = $this->normalize([
+            'top_level' => [
+                'top_level::dashboard' => [
+                    'action' => '@modify', // The `@modify` action is required to use the following setters on the original nav item...
+                    'display' => 'Dashboard Confessional',
+                    'url' => '/dashboard-confessional',
+                    'icon' => 'music',
+                    'children' => [
+                        'Statamic Dashboard' => '/dashboard',
+                    ],
+                    'invalid_nav_item_setter' => 'test', // This should get removed as it's not a valid setter.
+                ],
+            ],
+        ]);
+
+        $expected = [
+            'action' => '@modify',
+            'display' => 'Dashboard Confessional',
+            'url' => '/dashboard-confessional',
+            'icon' => 'music',
+            'children' => [
+                'Statamic Dashboard' => '/dashboard',
+            ],
+        ];
+
+        $this->assertEquals($expected, Arr::get($nav, 'sections.top_level.items.top_level::dashboard'));
+    }
+
+    /** @test */
+    public function it_filters_out_modify_actions_for_items_not_natively_in_section()
+    {
+        $this->markTestSkipped();
     }
 
     /** @test */

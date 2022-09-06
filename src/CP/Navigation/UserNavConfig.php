@@ -134,13 +134,13 @@ class UserNavConfig implements ArrayAccess
             ? collect(['action' => Str::ensureLeft($itemConfig, '@')])
             : collect($itemConfig);
 
-        if (! in_array($normalized->get('action'), ['@alias', '@move', '@inherit', '@create'])) {
+        if (! in_array($normalized->get('action'), ['@alias', '@move', '@inherit', '@create', '@modify'])) {
             $normalized->put('action', $isReordering ? '@inherit' : '@alias');
         }
 
         $allowedKeys = ['action', 'display'];
 
-        if ($normalized->get('action') === '@create') {
+        if (in_array($normalized->get('action'), ['@create', '@modify'])) {
             $allowedKeys = array_merge($allowedKeys, static::ALLOWED_NAV_ITEM_SETTERS);
         }
 
