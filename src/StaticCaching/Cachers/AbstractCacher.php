@@ -5,8 +5,7 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Request as RequestFacade;
-use Statamic\Facades\URL;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
@@ -51,7 +50,16 @@ abstract class AbstractCacher implements Cacher
      */
     public function getBaseUrl()
     {
-        return $this->config('base_url') ?? RequestFacade::root();
+        // Check 'base_url' for backward compatibility.
+        if ($url = $this->config('base_url')) {
+            return $url;
+        }
+
+        $site = app()->runningInConsole() ? Site::default() : Site::current();
+
+        return Str::startsWith($url = $site->url(), '/')
+            ? Str::removeRight(config('app.url'), '/').$url
+            : $url;
     }
 
     /**
@@ -217,12 +225,12 @@ abstract class AbstractCacher implements Cacher
         // Remove the asterisk
         $wildcard = substr($wildcard, 0, -1);
 
-        $wildcard = URL::makeRelative($wildcard);
+        [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
 
-        $this->getUrls()->filter(function ($url) use ($wildcard) {
+        $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
             return Str::startsWith($url, $wildcard);
-        })->each(function ($url) {
-            $this->invalidateUrl(URL::makeAbsolute($url));
+        })->each(function ($url) use ($domain) {
+            $this->invalidateUrl($url, $domain);
         });
     }
 
@@ -238,7 +246,7 @@ abstract class AbstractCacher implements Cacher
             if (Str::contains($url, '*')) {
                 $this->invalidateWildcardUrl($url);
             } else {
-                $this->invalidateUrl(URL::makeAbsolute($url));
+                $this->invalidateUrl(...$this->getPathAndDomain($url));
             }
         });
     }
@@ -268,5 +276,22 @@ abstract class AbstractCacher implements Cacher
     public function hasCachedPage(Request $request)
     {
         return $this->getCachedPage($request) !== null;
+    }
+
+    private function getPathAndDomain($url)
+    {
+        if (Str::startsWith($url, '/')) {
+            return [
+                $url,
+                $this->getBaseUrl(),
+            ];
+        }
+
+        $parsed = parse_url($url);
+
+        return [
+            $parsed['path'] ?? '/',
+            $parsed['scheme'].'://'.$parsed['host'],
+        ];
     }
 }
