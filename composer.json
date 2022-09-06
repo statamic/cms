@@ -20,6 +20,7 @@
         "league/commonmark": "^1.5 || ^2.2",
         "league/csv": "^9.0",
         "league/glide": "^1.1 || ^2.0",
+        "maennchen/zipstream-php": "^2.2",
         "michelf/php-smartypants": "^1.8.1",
         "pixelfear/composer-dist-plugin": "^0.1.4",
         "rebing/graphql-laravel": "^6.5 || ^8.0",

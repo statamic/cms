@@ -19,7 +19,7 @@
                 </div>
 
                 <div
-                    v-if="!maxFilesReached && !isReadOnly"
+                    v-if="!isReadOnly"
                     class="assets-fieldtype-picker"
                     :class="{
                         'is-expanded': expanded,
@@ -41,7 +41,8 @@
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
-                        <span class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
+                        <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
+                        <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                     </p>
 
                     <button
@@ -62,7 +63,7 @@
                 <template v-if="expanded">
 
                     <sortable-list
-                        v-if="displayMode === 'grid' && ! soloAsset"
+                        v-if="displayMode === 'grid'"
                         v-model="assets"
                         item-class="asset-tile"
                         handle-class="asset-thumb-container"
@@ -70,15 +71,12 @@
                         @dragend="$emit('blur')"
                         :disabled="isReadOnly"
                     >
-                        <div
-                            class="asset-grid-listing border rounded overflow-hidden"
-                            :class="{ 'rounded-t-none': !maxFilesReached }"
-                            ref="assets"
-                        >
+                        <div class="asset-grid-listing border rounded overflow-hidden rounded-t-none" ref="assets">
                             <asset-tile
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
+                                :is-solo="soloAsset"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 @updated="assetUpdated"
@@ -88,7 +86,6 @@
                     </sortable-list>
 
                     <div class="asset-table-listing" v-if="displayMode === 'list'">
-
                         <table class="table-fixed">
                             <sortable-list
                                 v-model="assets"
@@ -111,31 +108,12 @@
                                 </tbody>
                             </sortable-list>
                         </table>
-
                     </div>
-
                 </template>
-
-                <div class="asset-solo-container" v-if="expanded && soloAsset && displayMode == 'grid'" ref="assets">
-                    <asset-tile
-                        v-for="asset in assets"
-                        :key="asset.id"
-                        :asset="asset"
-                        :read-only="isReadOnly"
-                        @updated="assetUpdated"
-                        @removed="assetRemoved">
-                    </asset-tile>
-                </div>
-
             </div>
-
         </uploader>
 
-        <stack
-            v-if="showSelector"
-            name="asset-selector"
-            @closed="closeSelector"
-        >
+        <stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
             <selector
                 :container="container"
                 :folder="folder"
