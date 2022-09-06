@@ -11,8 +11,8 @@ class UserNavConfig implements ArrayAccess
 
     const ALLOWED_NAV_ITEM_ACTIONS = [
         '@create',   // create new item
-        '@remove',   // hide item
-        '@modify',   // modify item
+        '@remove',   // hide item (only works if item is in its original section)
+        '@modify',   // modify item (only works if item is in its original section)
         '@alias',    // alias into another section (can also modify item)
         '@move',     // move into another section (can also modify item)
         '@inherit',  // inherit item without modification (used for reordering purposes only, when none of the above apply)
@@ -120,6 +120,7 @@ class UserNavConfig implements ArrayAccess
             ->map(function ($config, $itemId) use ($sectionKey) {
                 return $this->normalizeItemConfig($itemId, $config, $sectionKey);
             })
+            ->filter()
             ->reject(function ($config) use ($reorder) {
                 return isset($config['action']) && $config['action'] === '@inherit' && ! $reorder;
             })
@@ -149,6 +150,15 @@ class UserNavConfig implements ArrayAccess
         $isModified = $this->itemIsModified($itemConfig);
         $isInOriginalSection = $this->itemIsInOriginalSection($itemId, $sectionKey);
 
+        // Remove item when not properly using section-specific actions, to ensure the JS nav builder doesn't
+        // do unexpected things. See comments on `ALLOWED_NAV_ITEM_ACTIONS` constant at top for details.
+        if ($isInOriginalSection && in_array($normalized->get('action'), ['@move'])) {
+            return null;
+        } elseif (! $isInOriginalSection && in_array($normalized->get('action'), ['@remove', '@modify', '@inherit'])) {
+            return null;
+        }
+
+        // If action is not set, determine the best default action.
         if (! in_array($normalized->get('action'), static::ALLOWED_NAV_ITEM_ACTIONS)) {
             if ($isModified && $isInOriginalSection) {
                 $normalized->put('action', '@modify');
@@ -159,7 +169,7 @@ class UserNavConfig implements ArrayAccess
             }
         }
 
-        $allowedKeys = array_merge(['action', 'display'], static::ALLOWED_NAV_ITEM_MODIFICATIONS);
+        $allowedKeys = array_merge(['action'], static::ALLOWED_NAV_ITEM_MODIFICATIONS);
 
         return $normalized->only($allowedKeys)->all();
     }
@@ -172,11 +182,11 @@ class UserNavConfig implements ArrayAccess
      */
     protected function itemIsModified($config)
     {
-        if (is_string($config)) {
+        if (is_string($config) || ! $config) {
             return false;
         }
 
-        $possibleModifications = array_merge(['display'], static::ALLOWED_NAV_ITEM_MODIFICATIONS);
+        $possibleModifications = array_merge(static::ALLOWED_NAV_ITEM_MODIFICATIONS);
 
         return collect($possibleModifications)
             ->intersect(array_keys($config))

@@ -337,6 +337,52 @@ class UserNavConfigTest extends TestCase
     }
 
     /** @test */
+    public function it_removes_section_specific_actions_that_might_be_confusing_to_js_nav_builder()
+    {
+        $nav = $this->normalize([
+            'top_level' => [
+                'reorder' => true,
+                'items' => [
+                    'top_level::create' => '@create',
+                    'top_level::remove' => '@remove',
+                    'top_level::modify' => '@modify',
+                    'top_level::alias' => '@alias',
+                    'top_level::inherit' => '@inherit',
+                    'top_level::move' => '@move', // if reordering use `@inherit`, or if modifying use `@modify`
+                ],
+            ],
+            'content' => [
+                'reorder' => true,
+                'items' => [
+                    'top_level::create' => '@create',
+                    'top_level::remove' => '@remove', // if removing, put item/action in it's proper section
+                    'top_level::modify' => '@modify', // if you're moving or aliasing into this section, modifying will work with those actions
+                    'top_level::alias' => '@alias',
+                    'top_level::inherit' => '@inherit', // if you're moving or aliasing into this section, reordering will work with those actions
+                    'top_level::move' => '@move',
+                ],
+            ],
+        ]);
+
+        $expectedTopLevelItems = [
+            'top_level::create',
+            'top_level::remove',
+            'top_level::modify',
+            'top_level::alias',
+            'top_level::inherit',
+        ];
+
+        $expectedContentItems = [
+            'top_level::create',
+            'top_level::alias',
+            'top_level::move',
+        ];
+
+        $this->assertEquals($expectedTopLevelItems, array_keys(Arr::get($nav, 'sections.top_level.items')));
+        $this->assertEquals($expectedContentItems, array_keys(Arr::get($nav, 'sections.content.items')));
+    }
+
+    /** @test */
     public function it_normalizes_an_example_config()
     {
         $nav = $this->normalize([

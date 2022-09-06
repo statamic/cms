@@ -12,7 +12,7 @@ class NavItem
 {
     use FluentlyGetsAndSets;
 
-    protected $name;
+    protected $display;
     protected $section;
     protected $id;
     protected $url;
@@ -24,14 +24,14 @@ class NavItem
     protected $hidden;
 
     /**
-     * Get or set name.
+     * Get or set display.
      *
-     * @param  string|null  $name
+     * @param  string|null  $display
      * @return mixed
      */
-    public function name($name = null)
+    public function display($display = null)
     {
-        return $this->fluentlyGetOrSet('name')->value($name);
+        return $this->fluentlyGetOrSet('display')->value($display);
     }
 
     /**
@@ -57,7 +57,7 @@ class NavItem
             ->fluentlyGetOrSet('id')
             ->setter(function ($value) {
                 return Str::endsWith($value, '::')
-                    ? $value.static::snakeCase($this->name())
+                    ? $value.static::snakeCase($this->display())
                     : $value;
             })
             ->getter(function ($value) {
@@ -66,9 +66,9 @@ class NavItem
                 }
 
                 $section = static::snakeCase($this->section());
-                $name = static::snakeCase($this->name());
+                $item = static::snakeCase($this->display());
 
-                return "{$section}::{$name}";
+                return "{$section}::{$item}";
             })
             ->value($id);
     }
@@ -291,6 +291,17 @@ class NavItem
     public function isHidden()
     {
         return $this->hidden();
+    }
+
+    /**
+     * Alias for `display()`, left here for backwards compatibility.
+     *
+     * @param  string|null  $name
+     * @return mixed
+     */
+    public function name(...$arguments)
+    {
+        return $this->display(...$arguments);
     }
 
     /**

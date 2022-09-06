@@ -33,7 +33,7 @@ class Nav
      */
     public function create($name)
     {
-        $item = (new NavItem)->name($name);
+        $item = (new NavItem)->display($name);
 
         $this->items[] = $item;
 
@@ -60,7 +60,7 @@ class Nav
     {
         $item = collect($this->items)->first(function ($item) use ($section, $name) {
             return $item->section() === $section
-                && $item->name() === $name;
+                && $item->display() === $name;
         });
 
         return $item ?: $this->create($name)->section($section);
@@ -78,7 +78,7 @@ class Nav
         $this->items = collect($this->items)
             ->reject(function ($item) use ($section, $name) {
                 return $name
-                    ? $item->section() === $section && $item->name() === $name
+                    ? $item->section() === $section && $item->display() === $name
                     : $item->section() === $section;
             })
             ->all();
@@ -348,14 +348,16 @@ class Nav
             })
             ->each(function ($override) use ($section) {
                 switch ($override['config']['action']) {
-                    case '@alias':
-                        return $this->aliasItem($override['item'], $override['config'], $section);
-                    case '@move':
-                        return $this->moveItem($override['item'], $override['config'], $section);
-                    case '@modify':
-                        return $this->modifyItem($override['item'], $override['config'], $section);
                     case '@create':
-                        return $this->createUserItem($override['config'], $section);
+                        return $this->userCreateItem($override['config'], $section);
+                    case '@remove':
+                        return $this->userRemoveItem($override['item']);
+                    case '@modify':
+                        return $this->userModifyItem($override['item'], $override['config'], $section);
+                    case '@alias':
+                        return $this->userAliasItem($override['item'], $override['config'], $section);
+                    case '@move':
+                        return $this->userMoveItem($override['item'], $override['config'], $section);
                 }
             });
 
@@ -423,13 +425,59 @@ class Nav
     }
 
     /**
+     * Create new NavItem from user config.
+     *
+     * @param  array  $config
+     * @param  string  $section
+     */
+    protected function userCreateItem($config, $section)
+    {
+        $config = collect($config);
+
+        if (! $display = $config->get('display')) {
+            return;
+        }
+
+        $item = $this->create($display)->section($section);
+
+        $this->userModifyItem($item, $config);
+    }
+
+    /**
+     * Remove NavItem.
+     *
+     * @param  NavItem  $item
+     */
+    protected function userRemoveItem($item)
+    {
+        $item->hidden(true);
+
+        $this->userRemoveItemFromChildren($item);
+    }
+
+    /**
+     * Modify NavItem.
+     *
+     * @param  NavItem  $item
+     * @param  array  $config
+     */
+    protected function userModifyItem($item, $config)
+    {
+        $config = collect($config);
+
+        collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
+            ->filter(fn ($setter) => $config->has($setter))
+            ->each(fn ($setter) => $item->{$setter}($config->get($setter)));
+    }
+
+    /**
      * Create alias for NavItem.
      *
      * @param  NavItem  $item
      * @param  array  $config
      * @param  string  $section
      */
-    protected function aliasItem($item, $config, $section)
+    protected function userAliasItem($item, $config, $section)
     {
         $clone = clone $item;
 
@@ -437,7 +485,7 @@ class Nav
 
         $clone->section($section);
 
-        $this->modifyItem($clone, $config);
+        $this->userModifyItem($clone, $config);
 
         $this->items[] = $clone;
     }
@@ -449,54 +497,31 @@ class Nav
      * @param  array  $config
      * @param  string  $section
      */
-    protected function moveItem($item, $config, $section)
+    protected function userMoveItem($item, $config, $section)
     {
-        $this->aliasItem($item, $config, $section);
+        $this->userAliasItem($item, $config, $section);
 
         $item->hidden(true);
 
+        $this->userRemoveItemFromChildren($item);
+    }
+
+    /**
+     * Remove NavItem from parent's children.
+     *
+     * @param  mixed  $item
+     */
+    protected function userRemoveItemFromChildren($item)
+    {
+        ray('removing from children', $item->id());
         if ($parent = $this->findParentItem($item->id())) {
+            ray($parent);
             $parent->children(
                 $parent->children()->reject(function ($child) use ($item) {
                     return $child->id() === $item->id();
                 })
             );
         }
-    }
-
-    /**
-     * Modify NavItem.
-     *
-     * @param  NavItem  $item
-     * @param  array  $config
-     */
-    protected function modifyItem($item, $config)
-    {
-        if (isset($config['display'])) {
-            $item->name($config['display']);
-        }
-    }
-
-    /**
-     * Create new NavItem from user config.
-     *
-     * @param  array  $config
-     * @param  string  $section
-     */
-    protected function createUserItem($config, $section)
-    {
-        $config = collect($config);
-
-        if (! $display = $config->get('display')) {
-            return;
-        }
-
-        $item = $this->create($display)->section($section);
-
-        collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
-            ->transform(fn ($setter) => $setter === 'display' ? 'name' : $setter)
-            ->filter(fn ($setter) => $config->has($setter))
-            ->each(fn ($setter) => $item->{$setter}($config->get($setter)));
     }
 
     /**
