@@ -206,11 +206,7 @@ class EntriesController extends CpController
         }
 
         if ($entry->collection()->dated()) {
-            $date = $this->formatDateForSaving($request->date);
-            
-            $entry->date($date);
-
-            $entry->descendants()->each(fn ($entry) => $this->saveUpdatedEntry($entry->date($date)));
+            $entry->date($this->toCarbonInstanceForSaving($request->date));
         }
 
         $entry->slug($this->resolveSlug($request));
@@ -231,7 +227,18 @@ class EntriesController extends CpController
 
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
-        $this->saveUpdatedEntry($entry, $request->published);
+        if ($entry->revisionsEnabled() && $entry->published()) {
+            $entry
+                ->makeWorkingCopy()
+                ->user(User::current())
+                ->save();
+        } else {
+            if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
+                $entry->published($request->published);
+            }
+
+            $entry->updateLastModified(User::current())->save();
+        }
 
         return new EntryResource($entry->fresh());
     }
@@ -451,22 +458,6 @@ class EntriesController extends CpController
             })
             ->filter()
             ->values();
-    }
-
-    protected function saveUpdatedEntry($entry, $published = null)
-    {
-        if ($entry->revisionsEnabled() && $entry->published()) {
-            $entry
-                ->makeWorkingCopy()
-                ->user(User::current())
-                ->save();
-        } else {
-            if (!is_null($published) && ! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
-                $entry->published($published);
-            }
-
-            $entry->updateLastModified(User::current())->save();
-        }
     }
 
     protected function toCarbonInstanceForSaving($date): Carbon
