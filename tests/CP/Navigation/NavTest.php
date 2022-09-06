@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Facades\CP;
+namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
