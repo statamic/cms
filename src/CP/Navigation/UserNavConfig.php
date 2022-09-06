@@ -9,7 +9,17 @@ class UserNavConfig implements ArrayAccess
 {
     protected $config;
 
-    const ALLOWED_NAV_ITEM_SETTERS = [
+    const ALLOWED_NAV_ITEM_ACTIONS = [
+        '@create',   // create new item
+        '@remove',   // hide item
+        '@modify',   // modify item
+        '@alias',    // alias into another section (can also modify item)
+        '@move',     // move into another section (can also modify item)
+        '@inherit',  // inherit item without modification (used for reordering purposes only, when none of the above apply)
+    ];
+
+    const ALLOWED_NAV_ITEM_MODIFICATIONS = [
+        'display',
         'url',
         'route',
         'icon',
@@ -79,6 +89,7 @@ class UserNavConfig implements ArrayAccess
      * Normalize section config.
      *
      * @param  mixed  $sectionConfig
+     * @param  string  $sectionKey
      * @return array
      */
     protected function normalizeSectionConfig($sectionConfig, $sectionKey)
@@ -106,8 +117,8 @@ class UserNavConfig implements ArrayAccess
         ]));
 
         $items = $items
-            ->map(function ($config) use ($reorder) {
-                return $this->normalizeItemConfig($config, $reorder);
+            ->map(function ($config, $itemId) use ($sectionKey) {
+                return $this->normalizeItemConfig($itemId, $config, $sectionKey);
             })
             ->reject(function ($config) use ($reorder) {
                 return isset($config['action']) && $config['action'] === '@inherit' && ! $reorder;
@@ -124,27 +135,64 @@ class UserNavConfig implements ArrayAccess
     /**
      * Normalize item config.
      *
+     * @param  string  $itemId
      * @param  mixed  $itemConfig
-     * @param  bool  $isReordering
+     * @param  string  $sectionKey
      * @return array
      */
-    protected function normalizeItemConfig($itemConfig, $isReordering)
+    protected function normalizeItemConfig($itemId, $itemConfig, $sectionKey)
     {
         $normalized = is_string($itemConfig)
             ? collect(['action' => Str::ensureLeft($itemConfig, '@')])
             : collect($itemConfig);
 
-        if (! in_array($normalized->get('action'), ['@alias', '@move', '@inherit', '@create', '@modify'])) {
-            $normalized->put('action', $isReordering ? '@inherit' : '@alias');
+        $isModified = $this->itemIsModified($itemConfig);
+        $isInOriginalSection = $this->itemIsInOriginalSection($itemId, $sectionKey);
+
+        if (! in_array($normalized->get('action'), static::ALLOWED_NAV_ITEM_ACTIONS)) {
+            if ($isModified && $isInOriginalSection) {
+                $normalized->put('action', '@modify');
+            } elseif ($isInOriginalSection) {
+                $normalized->put('action', '@inherit');
+            } else {
+                $normalized->put('action', '@alias');
+            }
         }
 
-        $allowedKeys = ['action', 'display'];
-
-        if (in_array($normalized->get('action'), ['@create', '@modify'])) {
-            $allowedKeys = array_merge($allowedKeys, static::ALLOWED_NAV_ITEM_SETTERS);
-        }
+        $allowedKeys = array_merge(['action', 'display'], static::ALLOWED_NAV_ITEM_MODIFICATIONS);
 
         return $normalized->only($allowedKeys)->all();
+    }
+
+    /**
+     * Determine if config is modifying a nav item.
+     *
+     * @param  array  $config
+     * @return bool
+     */
+    protected function itemIsModified($config)
+    {
+        if (is_string($config)) {
+            return false;
+        }
+
+        $possibleModifications = array_merge(['display'], static::ALLOWED_NAV_ITEM_MODIFICATIONS);
+
+        return collect($possibleModifications)
+            ->intersect(array_keys($config))
+            ->isNotEmpty();
+    }
+
+    /**
+     * Determine if nav item is in original section.
+     *
+     * @param  string  $itemId
+     * @param  string  $currentSectionKey
+     * @return bool
+     */
+    protected function itemIsInOriginalSection($itemId, $currentSectionKey)
+    {
+        return Str::startsWith($itemId, "$currentSectionKey::");
     }
 
     #[\ReturnTypeWillChange]

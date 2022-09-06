@@ -193,8 +193,64 @@ class UserNavConfigTest extends TestCase
         ])['sections']['top_level']['items']));
     }
 
+    /**
+     * @test
+     * @dataProvider modifiers
+     **/
+    public function it_defaults_action_to_modify_when_modifying_in_original_section($modifier)
+    {
+        // With `reorder: true`
+        $this->assertEquals('@modify', Arr::get($this->normalize([
+            'content' => [
+                'reorder' => true,
+                'content::collections::pages' => [
+                    $modifier => 'test',
+                ],
+            ],
+        ]), 'sections.content.items.content::collections::pages.action'));
+
+        // With `reorder: true` and sections properly nested
+        $this->assertEquals('@modify', Arr::get($this->normalize([
+            'content' => [
+                'reorder' => true,
+                'items' => [
+                    'content::collections::pages' => [
+                        $modifier => 'test',
+                    ],
+                ],
+            ],
+        ]), 'sections.content.items.content::collections::pages.action'));
+    }
+
+    public function modifiers()
+    {
+        return collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)->map(fn ($key) => [$key]);
+    }
+
     /** @test */
-    public function it_defaults_action_to_alias_when_not_reordering()
+    public function it_defaults_action_to_inherit_when_reordering_in_original_section()
+    {
+        // With `reorder: true`
+        $this->assertEquals('@inherit', Arr::get($this->normalize([
+            'content' => [
+                'reorder' => true,
+                'content::collections::pages' => [],
+            ],
+        ]), 'sections.content.items.content::collections::pages.action'));
+
+        // With `reorder: true` and sections properly nested
+        $this->assertEquals('@inherit', Arr::get($this->normalize([
+            'content' => [
+                'reorder' => true,
+                'items' => [
+                    'content::collections::pages' => [],
+                ],
+            ],
+        ]), 'sections.content.items.content::collections::pages.action'));
+    }
+
+    /** @test */
+    public function it_defaults_action_to_alias_when_in_another_section()
     {
         $nav = $this->normalize([
             'top_level' => [
@@ -203,19 +259,17 @@ class UserNavConfigTest extends TestCase
         ]);
 
         $this->assertEquals('@alias', Arr::get($nav, 'sections.top_level.items.content::collections::pages.action'));
-    }
 
-    /** @test */
-    public function it_defaults_action_to_inherit_when_reordering()
-    {
         $nav = $this->normalize([
             'top_level' => [
-                'reorder' => true,
-                'content::collections::pages' => [],
+                'content::collections::pages' => [
+                    'display' => 'Pagerinos',
+                    'url' => '/pagerinos',
+                ],
             ],
         ]);
 
-        $this->assertEquals('@inherit', Arr::get($nav, 'sections.top_level.items.content::collections::pages.action'));
+        $this->assertEquals('@alias', Arr::get($nav, 'sections.top_level.items.content::collections::pages.action'));
     }
 
     /** @test */
@@ -252,12 +306,6 @@ class UserNavConfigTest extends TestCase
     }
 
     /** @test */
-    public function it_filters_out_create_actions_for_existing_item_ids()
-    {
-        $this->markTestSkipped();
-    }
-
-    /** @test */
     public function it_allows_modifying_of_items_using_modify_action()
     {
         $nav = $this->normalize([
@@ -289,20 +337,20 @@ class UserNavConfigTest extends TestCase
     }
 
     /** @test */
-    public function it_filters_out_modify_actions_for_items_not_natively_in_section()
-    {
-        $this->markTestSkipped();
-    }
-
-    /** @test */
-    public function it_normalizes_a_fairly_minimal_example_config()
+    public function it_normalizes_an_example_config()
     {
         $nav = $this->normalize([
             'top_level' => [
+                'top_level::dashboard' => [
+                    'display' => 'Dashboard Confessional',
+                ],
                 'fields::blueprints' => '@alias',
                 'content::collections::pages' => '@move',
             ],
             'content' => [
+                'fields::blueprints' => [
+                    'display' => 'Content Blueprints',
+                ],
                 'user::profiles' => [
                     'action' => '@create',
                     'url' => '/profiles',
@@ -319,6 +367,10 @@ class UserNavConfigTest extends TestCase
                     'display' => 'Top Level',
                     'display_original' => null,
                     'items' => [
+                        'top_level::dashboard' => [
+                            'action' => '@modify',
+                            'display' => 'Dashboard Confessional',
+                        ],
                         'fields::blueprints' => [
                             'action' => '@alias',
                         ],
@@ -332,6 +384,10 @@ class UserNavConfigTest extends TestCase
                     'display' => 'Content',
                     'display_original' => null,
                     'items' => [
+                        'fields::blueprints' => [
+                            'action' => '@alias',
+                            'display' => 'Content Blueprints',
+                        ],
                         'user::profiles' => [
                             'action' => '@create',
                             'url' => '/profiles',

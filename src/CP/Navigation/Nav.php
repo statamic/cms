@@ -493,7 +493,8 @@ class Nav
 
         $item = $this->create($display)->section($section);
 
-        collect(UserNavConfig::ALLOWED_NAV_ITEM_SETTERS)
+        collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
+            ->transform(fn ($setter) => $setter === 'display' ? 'name' : $setter)
             ->filter(fn ($setter) => $config->has($setter))
             ->each(fn ($setter) => $item->{$setter}($config->get($setter)));
     }
