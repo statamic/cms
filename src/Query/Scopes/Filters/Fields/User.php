@@ -3,7 +3,6 @@
 namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Facades\User as UserFacade;
-use Statamic\Support\Arr;
 
 class User extends FieldtypeFilter
 {
@@ -43,7 +42,7 @@ class User extends FieldtypeFilter
         $value = $values['value'];
 
         if ($value !== 'me') {
-            $value = UserFacade::current()->name();
+            $value = UserFacade::find($value)->name();
         }
 
         return $field.' '.strtolower($operator).' '.$value;

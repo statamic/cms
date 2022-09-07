@@ -8,8 +8,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\UserType;
 use Statamic\Query\OrderedQueryBuilder;
-use Statamic\Support\Arr;
 use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
+use Statamic\Support\Arr;
 
 class Users extends Relationship
 {
