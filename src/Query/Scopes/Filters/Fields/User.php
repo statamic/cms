@@ -8,7 +8,7 @@ class User extends FieldtypeFilter
 {
     public function fieldItems()
     {
-        $users =  UserFacade::all()
+        $users = UserFacade::all()
             ->mapWithKeys(function ($user) {
                 return [$user->id() => $user->name()];
             })
