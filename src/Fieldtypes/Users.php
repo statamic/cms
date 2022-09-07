@@ -9,6 +9,7 @@ use Statamic\Facades\User;
 use Statamic\GraphQL\Types\UserType;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Support\Arr;
+use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
 
 class Users extends Relationship
 {
@@ -171,5 +172,10 @@ class Users extends Relationship
         }
 
         return $type;
+    }
+
+    public function filter()
+    {
+        return new UserFilter($this);
     }
 }
