@@ -8,18 +8,19 @@ class User extends FieldtypeFilter
 {
     public function fieldItems()
     {
+        $users =  UserFacade::all()
+            ->mapWithKeys(function ($user) {
+                return [$user->id() => $user->name()];
+            })
+            ->all();
+
         return [
             'value' => [
                 'type' => 'select',
                 'placeholder' => __('Select User'),
                 'options' => array_merge([
-                    'me' => 'Me',
-                ], UserFacade::all()
-                    ->mapWithKeys(function ($user) {
-                        return [$user->id() => $user->name()];
-                    })
-                    ->all()
-                ),
+                    'me' => __('Me'),
+                ], $users),
             ],
         ];
     }
