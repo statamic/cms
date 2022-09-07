@@ -121,9 +121,7 @@ class UserNavConfig implements ArrayAccess
                 return $this->normalizeItemConfig($itemId, $config, $sectionKey);
             })
             ->filter()
-            ->reject(function ($config) use ($reorder) {
-                return isset($config['action']) && $config['action'] === '@inherit' && ! $reorder;
-            })
+            ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
             ->all();
 
         $normalized->put('items', $items);

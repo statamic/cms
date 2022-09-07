@@ -153,12 +153,12 @@ class UserNavConfigTest extends TestCase
     public function it_removes_inherit_action_items_when_not_reordering()
     {
         $this->assertEquals(['content::collections::posts'], array_keys($this->normalize([
-            'top_level' => [
+            'content' => [
                 'content::collections::pages' => '@inherit',
-                'content::collections::posts' => '@move',
+                'content::collections::posts' => ['display' => 'Posterinos'],
                 'content::collections::profiles' => '@inherit',
             ],
-        ])['sections']['top_level']['items']));
+        ])['sections']['content']['items']));
     }
 
     /** @test */
@@ -172,25 +172,25 @@ class UserNavConfigTest extends TestCase
 
         // With `reorder: true`
         $this->assertEquals($expected, array_keys($this->normalize([
-            'top_level' => [
+            'content' => [
                 'reorder' => true,
                 'content::collections::pages' => '@inherit',
-                'content::collections::posts' => '@move',
+                'content::collections::posts' => ['display' => 'Posterinos'],
                 'content::collections::profiles' => '@inherit',
             ],
-        ])['sections']['top_level']['items']));
+        ])['sections']['content']['items']));
 
         // With `reorder: true` and sections properly nested
         $this->assertEquals($expected, array_keys($this->normalize([
-            'top_level' => [
+            'content' => [
                 'reorder' => true,
                 'items' => [
                     'content::collections::pages' => '@inherit',
-                    'content::collections::posts' => '@move',
+                    'content::collections::posts' => ['display' => 'Posterinos'],
                     'content::collections::profiles' => '@inherit',
                 ],
             ],
-        ])['sections']['top_level']['items']));
+        ])['sections']['content']['items']));
     }
 
     /**
