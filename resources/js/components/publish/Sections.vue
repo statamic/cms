@@ -215,15 +215,20 @@ export default {
 
         containerWasResized($event) {
             this.containerWidth = $event.width;
-            this.wangjangleTabVisibility();
+
+            if (this.containerWidth !== null) {
+                this.wangjangleTabVisibility();
+            }
         },
 
         wangjangleTabVisibility: _.debounce(function () {
             this.$nextTick(() => {
-                let visibleTabs = []
+                if (!this.$refs.tabs) return;
+                
+                const visibleTabs = []
 
                 // Offset 40px for dropdown list position
-                let maxWidth = this.$refs.publishSectionWrapper.offsetWidth - 40;
+                const maxWidth = this.$refs.publishSectionWrapper.offsetWidth - 40;
                 let tabWidthSum = 0;
 
                 this.$refs.tabs.childNodes.forEach((tab, index) => {
