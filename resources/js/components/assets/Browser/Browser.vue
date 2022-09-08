@@ -454,7 +454,7 @@ export default {
             this.loading = true;
 
             const url = this.searchQuery
-                ? cp_url(`assets/browse/search/${this.container.id}`)
+                ? cp_url(`assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`).replace(/\/$/, '')
                 : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
 
             this.$axios.get(url, { params: this.parameters }).then(response => {

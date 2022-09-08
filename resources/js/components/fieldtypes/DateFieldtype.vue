@@ -29,7 +29,7 @@
                     :popover="{ visibility: 'focus' }"
                     :rows="$screens({ default: 1, lg: config.rows })"
                     :update-on-input="true"
-                    :value="value"
+                    :value="dateString"
                     @input="setDate"
                 >
                     <template v-if="!config.inline" v-slot="{ inputValue, inputEvents }">
@@ -152,6 +152,10 @@ export default {
                 type: 'string',
                 mask: this.format,
             }
+        },
+
+        dateString() {
+            return this.value.split(' ')[0];
         },
 
         timeString() {
