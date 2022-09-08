@@ -514,7 +514,11 @@ class Nav
 
         collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
             ->filter(fn ($setter) => $config->has($setter))
-            ->each(fn ($setter) => $item->{$setter}($config->get($setter)));
+            ->each(function ($setter) use ($item, $config) {
+                $item
+                    ->id($item->id()) // Preserve the item's original ID before modifying
+                    ->{$setter}($config->get($setter));
+            });
     }
 
     /**

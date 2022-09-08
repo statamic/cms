@@ -756,20 +756,3 @@ class FakePreferences
         return $this->preferences;
     }
 }
-
-    // // Recommended syntax...
-    // $usersNav = $this->buildNavWithPreferences([
-    //     'users' => [
-    //         'users::users' => [
-    //             'display' => 'Kids',
-    //             'url' => '/kids',
-    //         ],
-    //         'users::permissions' => [
-    //             'display' => 'Kid Can Haz?',
-    //             'icon' => '<svg>custom</svg>',
-    //         ],
-    //     ],
-    // ])->get('Users');
-    // $this->assertEquals($renamedItems, $usersNav->map->display()->all());
-    // $this->assertEquals('http://localhost/kids', $usersNav->keyBy->display()->get('Kids')->url());
-    // $this->assertEquals('<svg>custom</svg>', $usersNav->keyBy->display()->get('Kid Can Haz?')->icon());
